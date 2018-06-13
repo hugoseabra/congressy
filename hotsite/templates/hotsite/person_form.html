@@ -97,7 +97,7 @@
                                             {% if config and config.cpf != config.CPF_HIDE %}
                                                 {% if config.cpf == config.CPF_REQUIRED %}
                                                     {% render_generic_field form.cpf required=True hide=True %}
-                                                    {% render_generic_field form.international_doc required=True  hide=True %}
+                                                    {% render_generic_field form.international_doc required=True hide=True %}
                                                 {% else %}
                                                     {% render_generic_field form.cpf %}
                                                     {% render_generic_field form.international_doc %}
@@ -294,12 +294,14 @@
             phone_el.unmask();
             phone_el.attr('onkeyup', 'this.value = this.value.replace(/\\D/g,\'\');');
 
-            {% if config and config.cpf == config.CPF_SHOW %}
-                cpf.parent().parent().hide();
+            {% if config and config.cpf != config.CPF_HIDE %}
                 international_doc.parent().parent().show();
+                cpf.parent().parent().hide();
+
+                cpf.removeAttr('required');
+                international_doc.removeAttr('required');
 
                 {% if config.cpf == config.CPF_REQUIRED %}
-                    cpf.removeAttr('required');
                     international_doc.attr('required', 'required');
                 {% endif %}
             {% endif %}
@@ -319,12 +321,12 @@
             {% endif %}
 
             {% if config and config.address == config.ADDRESS_SHOW %}
-            zip_code_el.unbind('keyup');
-            zip_code_el.unmask();
-            zip_code_el.removeAttr('required');
-            zip_code_block_el.hide();
-            zip_code_intern_block_el.show();
-            zip_code_intern_el.attr('required', 'required');
+                zip_code_el.unbind('keyup');
+                zip_code_el.unmask();
+                zip_code_el.removeAttr('required');
+                zip_code_block_el.hide();
+                zip_code_intern_block_el.show();
+                zip_code_intern_el.attr('required', 'required');
             {% endif %}
         }
 
@@ -346,13 +348,13 @@
             ddi_el.val(country.val());
             phone_el.mask("(99) 99999-9999");
             phone_el.removeAttr('onkeyup');
-
-            {% if config and config.cpf == config.CPF_SHOW %}
-                cpf.parent().parent().show();
-                international_doc.parent().parent().hide();
+            cpf.parent().parent().show();
+            international_doc.parent().parent().hide();
+            cpf.removeAttr('required');
+            international_doc.removeAttr('required');
+            {% if config and config.cpf != config.CPF_HIDE %}
                 {% if config.cpf == config.CPF_REQUIRED %}
                     cpf.attr('required', 'required');
-                    international_doc.removeAttr('required');
                 {% endif %}
             {% endif %}
 
@@ -370,15 +372,15 @@
             {% endif %}
 
             {% if config and config.address == config.ADDRESS_SHOW %}
-            zip_code_block_el.show();
-            zip_code_el.on('keyup', function () {
-                hotsiteSearchByCep();
-            });
-            zip_code_el.mask("99999-999");
-            zip_code_el.attr('required', 'required');
+                zip_code_block_el.show();
+                zip_code_el.on('keyup', function () {
+                    hotsiteSearchByCep();
+                });
+                zip_code_el.mask("99999-999");
+                zip_code_el.attr('required', 'required');
 
-            zip_code_intern_el.removeAttr('required');
-            zip_code_intern_block_el.hide();
+                zip_code_intern_el.removeAttr('required');
+                zip_code_intern_block_el.hide();
             {% endif %}
         }
 
@@ -399,7 +401,7 @@
                 form.attr('novalidate', 'novalidate');
             });
 
-            $('#id_person-country').on('change', function() {
+            $('#id_person-country').on('change', function () {
                 set_if_international();
             });
 
