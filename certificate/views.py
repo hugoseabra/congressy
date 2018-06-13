@@ -13,6 +13,7 @@ from gatheros_subscription.models import Subscription
 class CertificateConfigView(EventViewMixin, generic.TemplateView):
     template_name = 'certificate/certificado_.html'
     object = None
+    really_long_name = "Luciana Silva Alburquerque Qualhato de Andrade Gonçalves"
 
     def dispatch(self, request, *args, **kwargs):
         response = super(CertificateConfigView, self).dispatch(request, *args,
@@ -30,6 +31,15 @@ class CertificateConfigView(EventViewMixin, generic.TemplateView):
             self.object, _ = models.Certificate.objects.get_or_create(
                 event=self.event
             )
+
+        if "{{NOME}}" in self.object.text_content:
+            long_div = self.really_long_name
+            self.object.text_content = self.object.text_content.replace(
+                "{{NOME}}", long_div)
+
+        if "{{EVENTO}}" in self.object.text_content:
+            self.object.text_content = self.object.text_content. \
+                replace("{{""EVENTO}}", self.event.name)
 
         context['has_inside_bar'] = True
         context['active'] = 'certificate'
@@ -139,7 +149,7 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
                 'NOME': self.subscription.person.name.upper(),
                 'EVENTO': self.subscription.event.name,
                 'CPF': self.subscription.person.cpf,
-             }
+            }
         )
         res = text_template.render(context)
         return res
