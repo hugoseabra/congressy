@@ -25,12 +25,13 @@ from gatheros_event.views.mixins import (
     AccountMixin,
     PermissionDenied,
 )
-from gatheros_subscription.forms import SubscriptionFilterForm, \
-    SubscriptionForm, SubscriptionAttendanceForm
+from gatheros_subscription.forms import SubscriptionAttendanceForm, \
+    SubscriptionFilterForm, SubscriptionForm
 from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.helpers.report_payment import \
     PaymentReportCalculator
 from gatheros_subscription.models import FormConfig, Subscription
+from mailer import exception as mailer_exception, services as mailer
 from payment import forms
 from payment.helpers import payment_helpers
 from payment.models import Transaction
@@ -414,6 +415,29 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         return ctx
 
     def post(self, request, *args, **kwargs):
+        url = reverse('subscription:subscription-payments', kwargs={
+            'event_pk': self.event.pk,
+            'pk': self.object.pk,
+        })
+
+        data = request.POST.copy()
+
+        action = data.get('action')
+        next_url = data.get('next_url')
+        if action == 'notify_boleto':
+            if next:
+                url = next_url
+
+            try:
+                mailer.notify_open_boleto(
+                    transaction=self._get_last_transaction()
+                )
+                messages.success(request, 'Boleto enviado com sucesso.')
+
+            except mailer_exception.NotifcationError as e:
+                messages.error(request, str(e))
+
+            return redirect(url)
 
         if self.event.allow_internal_subscription is False:
             self.permission_denied_url = reverse(
@@ -423,7 +447,6 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
             )
             raise PermissionDenied('Você não pode realizar esta ação.')
 
-        data = request.POST.copy()
         data['manual_author'] = '{} ({})'.format(
             request.user.get_full_name(),
             request.user.email,
@@ -446,11 +469,6 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
             ))
 
         form.save()
-
-        url = reverse('subscription:subscription-payments', kwargs={
-            'event_pk': self.event.pk,
-            'pk': self.object.pk,
-        })
 
         if transaction_id:
             messages.success(request, 'Recebimento editado com sucesso.')
