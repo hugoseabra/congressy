@@ -72,7 +72,7 @@ class CertificateFormView(EventViewMixin, generic.FormView):
 
     def get_form(self, form_class=None):
 
-        if not self.event.has_certificate:
+        if not self.event.has_certificate_config:
             models.Certificate.objects.create(
                 event=self.event
             )
