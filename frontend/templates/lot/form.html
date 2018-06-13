@@ -19,10 +19,16 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="{% static "assets/plugins/moment/moment.js" %}"></script>
+    <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
+    <script src="{% static 'assets/js/date-time.js' %}"></script>
+
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
     <script type="application/javascript">
 
+    createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
+    createTimePicker()
         (function ($) {
             function show(el) {
                 $(el).fadeIn();
@@ -417,7 +423,10 @@
             <div class="col-lg-12 col-xl-8 col-xl-push-2">
                 <div class="buttonbar">
                     <div class="float-right">
-                        <a href="{% url 'subscription:lot-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}"
+                        <a href="
+
+
+                                {% url 'subscription:lot-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}"
                            class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>
                             Cancelar
@@ -452,19 +461,21 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div id="datepicker-begin"
+                                 class="col-md-6">
                                 {% render_generic_field form.date_start %}
                             </div>
-                            <div class="col-md-6">
+                            <div id="datepicker-end"
+                                 class="col-md-6">
                                 {% render_generic_field form.date_end %}
                             </div>
                         </div>
                         {% if object.event.rsvp_type != object.event.RSVP_DISABLED and object.event.has_rsvp %}
-                        <div class="row">
-                            <div class="col-xl-10 col-xl-push-1 col-md-12">
-                                {% render_switchery_field form.rsvp_restrict %}
+                            <div class="row">
+                                <div class="col-xl-10 col-xl-push-1 col-md-12">
+                                    {% render_switchery_field form.rsvp_restrict %}
+                                </div>
                             </div>
-                        </div>
                         {% endif %}
                     </div>
                 </div>
@@ -563,7 +574,8 @@
                                             </div>
                                             <div class="help-block"
                                                  style="font-size:12px">
-                                                Se o participante pagar parcelado.
+                                                Se o participante pagar
+                                                parcelado.
                                             </div>
                                             <div style="font-weight: bold;font-size: 14px;color:green">
                                                 <div id="installment_price_to_receive"
@@ -581,14 +593,17 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="alert alert-warning">
-                                            <strong>È necessário que complete seus
-                                                dados bancários para criar lotes
+                                            <strong>È necessário que complete
+                                                seus
+                                                dados bancários para criar
+                                                lotes
                                                 pagos!</strong>
 
                                         </div>
                                         <p>
                                             <a href="{% url 'event:organization-financial-edit' organization.pk %}">
-                                                Clique aqui para configurar estes
+                                                Clique aqui para configurar
+                                                estes
                                                 dados.</a></p>
                                     </div>
                                 </div>
@@ -603,7 +618,10 @@
             <div class="col-lg-12 col-xl-8 col-xl-push-2">
                 <div class="buttonbar bottom">
                     <div class="float-right">
-                        <a href="{% url 'subscription:lot-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}"
+                        <a href="
+
+
+                                {% url 'subscription:lot-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}"
                            class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>Cancelar
                         </a>
@@ -618,4 +636,8 @@
         </div>
     </form>
 
+{% endblock %}
+{% block styles %}
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
 {% endblock %}

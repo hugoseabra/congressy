@@ -191,43 +191,13 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <div id="datepicker-begin"
-                                                     class='input-group date'>
-                                                    <input type='text'
-                                                           class="form-control"/>
-                                                    <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>
-                                                </div>
-                                                <div class='input-group date timepicker'>
-                                                    <input type='text'
-                                                           class="form-control"/>
-                                                    <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-time"></span>
-                                                    </span>
-                                                </div>
-                                            </div>
+                                        <div id="datepicker-begin"
+                                             class="col-md-6">
+                                            {% render_generic_field form.date_start %}
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <div id="datepicker-end"
-                                                     class='input-group date'>
-                                                    <input type='text'
-                                                           class="form-control"/>
-                                                    <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>
-                                                </div>
-                                                <div class='input-group date timepicker'>
-                                                    <input type='text'
-                                                           class="form-control"/>
-                                                    <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-time"></span>
-                                                    </span>
-                                                </div>
-                                            </div>
+                                        <div id="datepicker-end"
+                                             class="col-md-6">
+                                            {% render_generic_field form.date_end %}
                                         </div>
                                     </div>
                                 </div>
@@ -323,34 +293,11 @@
     <script src="{% static "assets/plugins/moment/moment.js" %}"></script>
     <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
     <script src="{% static 'assets/js/event.js' %}"></script>
+    <script src="{% static 'assets/js/date-time.js' %}"></script>
+
     <script>
-
-            $('#datepicker-begin').datetimepicker({
-                locale: 'pt-br',
-                format: 'DD/MM/YYYY',
-                allowInputToggle: true,
-                defaultDate: new Date(),
-                minDate: new Date()
-
-            }).on('dp.change', function (e) {
-                $('#datepicker-end').data("DateTimePicker").minDate(e.date)
-            });
-            $('#datepicker-end').datetimepicker({
-                locale: 'pt-br',
-                format: 'DD/MM/YYYY',
-                allowInputToggle: true,
-                defaultDate: new Date(),
-                minDate: new Date()
-            });
-
-
-        $('.timepicker').datetimepicker({
-            locale: 'pt-br',
-            format: 'HH:mm',
-            allowInputToggle: true,
-            defaultDate: new Date(),
-            minDate: new Date()
-        });
+        createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
+        createTimePicker();
 
         function choose_type(chosen_type) {
             $('#event_type').val(chosen_type);

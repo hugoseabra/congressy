@@ -2,8 +2,8 @@
 from datetime import datetime, timedelta
 
 from django import forms
-
-from core.forms import PriceInput, SplitDateTimeWidget
+from core.forms.widgets import SplitDateTimeBootsrapWidget
+from core.forms import PriceInput
 from gatheros_subscription.models import EventSurvey, LotCategory, Lot
 
 INSTALLMENT_CHOICES = (
@@ -47,8 +47,8 @@ class LotForm(forms.ModelForm):
         widgets = {
             'event': forms.HiddenInput(),
             'price': PriceInput(),
-            'date_start': SplitDateTimeWidget(),
-            'date_end': SplitDateTimeWidget(),
+            'date_start': SplitDateTimeBootsrapWidget(),
+            'date_end': SplitDateTimeBootsrapWidget(),
             'installment_limit': forms.Select(
                 choices=INSTALLMENT_CHOICES
             ),

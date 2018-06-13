@@ -77,9 +77,52 @@ class DateInput(forms.DateInput):
         return value
 
 
+class DateInputBootstrap(forms.DateInput):
+    input_type = 'tel'
+    template_name = 'forms/widgets/date-bootstrap.html'
+
+    def value_from_datadict(self, data, files, name):
+        value = super().value_from_datadict(data, files, name)
+
+        if not value:
+            return value
+
+        if isinstance(value, datetime):
+            return value
+
+        try:
+            date_format = '%d/%m/%Y'
+
+            value = datetime.strptime(value, date_format)
+
+        except ValueError:
+            pass
+
+        return value
+
+
 class TimeInput(forms.TimeInput):
     input_type = 'tel'
     template_name = 'forms/widgets/time.html'
+
+    def value_from_datadict(self, data, files, name):
+        value = super().value_from_datadict(data, files, name)
+
+        if not value:
+            return value
+
+        if isinstance(value, datetime):
+            return value
+
+        if len(value) == 5:
+            value += ':00'
+
+        return value
+
+
+class TimeInputBootstrap(forms.TimeInput):
+    input_type = 'tel'
+    template_name = 'forms/widgets/time-bootstrap.html'
 
     def value_from_datadict(self, data, files, name):
         value = super().value_from_datadict(data, files, name)
@@ -150,6 +193,50 @@ class SplitDateTimeWidget(forms.MultiWidget):
             date = value.strftime('%d/%m/%Y')
         else:
             date = value.date()
+
+        return [date, value.time().replace(microsecond=0)]
+
+
+class SplitDateTimeBootsrapWidget(forms.MultiWidget):
+    """
+    A Widget that splits datetime input into two <input type="text"> boxes.
+    """
+    supports_microseconds = False
+    template_name = 'forms/widgets/splitdatetime.html'
+
+    def __init__(self, attrs=None, date_format=None, time_format=None):
+        date = DateInputBootstrap(attrs=attrs, format=date_format)
+        time = TimeInputBootstrap(attrs=attrs, format=time_format)
+
+        super().__init__((date, time), attrs)
+
+    def value_from_datadict(self, data, files, name):
+        date, time = super().value_from_datadict(data, files, name)
+
+        if isinstance(date, datetime):
+            date = date.strftime('%Y-%m-%d')
+            date_format = '%Y-%m-%d %H:%M:%S'
+
+        else:
+            date_format = '%d/%m/%Y %H:%M:%S'
+
+        dt = '{} {}'.format(date, time)
+
+        try:
+            return datetime.strptime(dt, date_format)
+
+        except ValueError:
+            pass
+
+        return [date, time]
+
+    def decompress(self, value):
+        if not value:
+            return [None, None]
+
+        value = to_current_timezone(value)
+
+        date = value.strftime('%d/%m/%Y')
 
         return [date, value.time().replace(microsecond=0)]
 

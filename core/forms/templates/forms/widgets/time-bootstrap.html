@@ -1,0 +1,8 @@
+<div class='input-group date timepicker'>
+    <input type="{{ widget.type }}" name="{{ widget.name }}"
+           class="form-control cgsy-time-input" {% if widget.value != None %}
+           value="{{ widget.value }}"{% endif %}{% include "django/forms/widgets/attrs.html" %} />
+    <span class="input-group-addon">
+        <span class="glyphicon glyphicon-time"></span>
+    </span>
+</div>

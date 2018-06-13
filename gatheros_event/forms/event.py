@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from django import forms
 from django.shortcuts import get_object_or_404
 
-from core.forms.widgets import SplitDateTimeWidget
+from core.forms.widgets import SplitDateTimeBootsrapWidget
 from gatheros_event.models import Event, Member, Organization
 from gatheros_subscription.models import LotCategory
 
@@ -40,8 +40,8 @@ class EventForm(forms.ModelForm):
             'organization': forms.HiddenInput,
             'event_type': forms.HiddenInput,
             'subscription_type': forms.RadioSelect,
-            'date_start': SplitDateTimeWidget(),
-            'date_end': SplitDateTimeWidget(),
+            'date_start': SplitDateTimeBootsrapWidget,
+            'date_end': SplitDateTimeBootsrapWidget,
         }
 
     def __init__(self, user, lang='pt-br', *args, **kwargs):

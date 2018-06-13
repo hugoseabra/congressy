@@ -85,10 +85,12 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div id="datepicker-begin"
+                                         class="col-md-6">
                                         {% render_generic_field form.date_start %}
                                     </div>
-                                    <div class="col-md-6">
+                                    <div id="datepicker-end"
+                                         class="col-md-6">
                                         {% render_generic_field form.date_end %}
                                     </div>
                                 </div>
@@ -132,9 +134,15 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.full.min.js" %}"></script>
+    <script src="{% static "assets/plugins/moment/moment.js" %}"></script>
+    <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
     <script src="{% static 'assets/js/event.js' %}"></script>
+    <script src="{% static 'assets/js/date-time.js' %}"></script>
+
     <script>
+        createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
+        createTimePicker();
+
         (function ($) {
             $(document).ready(function () {
                 {% if LANGUAGE_CODE == 'pt-br' %}
@@ -168,7 +176,7 @@
 
 {% block styles %}
     <link rel="stylesheet"
-          href="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.min.css" %}">
+          href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
 
     <style>
         #gmap {

@@ -1,7 +1,7 @@
 from django import forms
 
 from base import managers
-from core.forms.widgets import SplitDateTimeWidget, PriceInput
+from core.forms.widgets import SplitDateTimeWidget, PriceInput,SplitDateTimeBootsrapWidget
 from .constants import MINIMUM_RELEASE_DAYS
 from .models import (
     Product,
@@ -46,7 +46,7 @@ class ProductManager(managers.Manager):
         fields = '__all__'
         widgets = {
             'liquid_price': PriceInput,
-            'date_end_sub': SplitDateTimeWidget,
+            'date_end_sub': SplitDateTimeBootsrapWidget,
         }
 
     def __init__(self, **kwargs):
@@ -86,9 +86,9 @@ class ServiceManager(managers.Manager):
         widgets = {
             # 'theme': ManageableSelect,
             'liquid_price': PriceInput,
-            'date_end_sub': SplitDateTimeWidget,
-            'schedule_start': SplitDateTimeWidget,
-            'schedule_end': SplitDateTimeWidget,
+            'date_end_sub': SplitDateTimeBootsrapWidget,
+            'schedule_start': SplitDateTimeBootsrapWidget,
+            'schedule_end': SplitDateTimeBootsrapWidget,
         }
 
     def __init__(self, **kwargs):
