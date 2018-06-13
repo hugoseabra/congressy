@@ -130,7 +130,7 @@
                             text-align:justify;
                         {% endif %}"
                      id="cert-text">
-                    {{ object.text_content }}
+                    {{ object.text_content|safe }}
                 </div>
             </div>
         </div>

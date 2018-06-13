@@ -58,6 +58,15 @@ class CertificateConfigView(EventViewMixin, generic.TemplateView):
                     ref_object.text_content = ref_object.text_content.replace(
                         self.really_long_name, "{{NOME}}", )
 
+        if "{{NOME}}" in ref_object.text_content:
+            ref_object.text_content = ref_object.text_content.replace(
+                "{{NOME}}", "<strong>{{NOME}}</strong>")
+
+        if self.really_long_name in ref_object.text_content:
+            ref_object.text_content = ref_object.text_content.replace(
+                self.really_long_name,
+                "<strong>" + self.really_long_name + "</strong>")
+
         context['has_inside_bar'] = True
         context['active'] = 'certificate'
         context['object'] = ref_object
