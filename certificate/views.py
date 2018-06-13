@@ -8,6 +8,7 @@ from wkhtmltopdf.views import PDFTemplateView
 from certificate import models, forms
 from gatheros_event.views.mixins import EventViewMixin, AccountMixin
 from gatheros_subscription.models import Subscription
+from gatheros_event.models import Event
 
 
 class CertificateConfigView(EventViewMixin, generic.TemplateView):
@@ -167,3 +168,54 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
             return person.institution_cnpj
         else:
             return ''
+
+
+class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
+    template_name = 'pdf/certificate.html'
+    event = None
+    show_content_in_browser = True
+    permission_denied_url = reverse_lazy('front:start')
+    really_long_name = "Luciana Silva Alburquerque Qualhato de Andrade Gonçalves"
+
+    cmd_options = {
+        'dpi': 96,
+        'margin-top': 0,
+        'margin-bottom': 0,
+        'margin-left': 0,
+        'margin-right': 0,
+        'page-size': 'A4',
+        'orientation': 'Landscape',
+    }
+
+    def pre_dispatch(self, request):
+        event_pk = self.kwargs.get('event_pk')
+        self.event = get_object_or_404(Event, pk=event_pk)
+        return super().pre_dispatch(request)
+
+    def get_context_data(self, **kwargs):
+        context = super(CertificatePDFExampleView, self).get_context_data(**kwargs)
+        image_url = self.event.certificate.background_image.default.url
+        context['background_image'] = image_url
+        context['event'] = self.event
+        context['certificate'] = self.event.certificate
+        context['text'] = self.get_text()
+        return context
+
+    def get_text(self):
+
+        text = self.event.certificate.text_content
+
+        if "{{NOME}}" in text:
+            text = text.replace("{{NOME}}", "<strong>{{NOME}}</strong>")
+
+        text_template = Template(text)
+        context = Context(
+            {
+                'NOME': self.really_long_name,
+                'EVENTO': self.event.name,
+                'CPF': "629.162.880-58",
+            }
+        )
+        res = text_template.render(context)
+        return res
+
