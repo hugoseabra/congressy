@@ -276,6 +276,8 @@
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script>
         function set_form_as_international() {
+            console.log('settin form as international.');
+
             var country = $('#id_person-country');
             var ddi_el = $('#id_person-ddi');
             var phone_el = $('#id_person-phone');
@@ -292,22 +294,28 @@
             phone_el.unmask();
             phone_el.attr('onkeyup', 'this.value = this.value.replace(/\\D/g,\'\');');
 
-            cpf.parent().parent().hide();
-            international_doc.parent().parent().show();
-            {% if config and config.cpf != config.CPF_HIDE %}
+            {% if config and config.cpf == config.CPF_SHOW %}
+                cpf.parent().parent().hide();
+                international_doc.parent().parent().show();
+
                 {% if config.cpf == config.CPF_REQUIRED %}
                     cpf.removeAttr('required');
                     international_doc.attr('required', 'required');
                 {% endif %}
             {% endif %}
 
+
             city_block.hide();
             city_intern_block.show();
+
+            $('#id_person-state').removeAttr('required');
+            $('#id_person-city_name').removeAttr('required');
+            $('#id_person-city_international').removeAttr('required');
+            $('#id_person-state_international').removeAttr('required');
+
             {% if config and config.city is True %}
                 $('#id_person-city_international').attr('required', 'required');
                 $('#id_person-state_international').attr('required', 'required');
-                $('#id_person-state').removeAttr('required');
-                $('#id_person-city_name').removeAttr('required');
             {% endif %}
 
             {% if config and config.address == config.ADDRESS_SHOW %}
@@ -321,6 +329,8 @@
         }
 
         function set_form_as_national() {
+            console.log('settin form as national.');
+
             var country = $('#id_person-country');
             var ddi_el = $('#id_person-ddi');
             var phone_el = $('#id_person-phone');
@@ -337,9 +347,9 @@
             phone_el.mask("(99) 99999-9999");
             phone_el.removeAttr('onkeyup');
 
-            cpf.parent().parent().show();
-            international_doc.parent().parent().hide();
-            {% if config and config.cpf != config.CPF_HIDE %}
+            {% if config and config.cpf == config.CPF_SHOW %}
+                cpf.parent().parent().show();
+                international_doc.parent().parent().hide();
                 {% if config.cpf == config.CPF_REQUIRED %}
                     cpf.attr('required', 'required');
                     international_doc.removeAttr('required');
@@ -348,11 +358,15 @@
 
             city_block.show();
             city_intern_block.hide();
+
+            $('#id_person-state').removeAttr('required');
+            $('#id_person-city_name').removeAttr('required');
+            $('#id_person-city_international').removeAttr('required');
+            $('#id_person-state_international').removeAttr('required');
+
             {% if config and config.city is True %}
                 $('#id_person-state').attr('required', 'required');
                 $('#id_person-city_name').attr('required', 'required');
-                $('#id_person-city_international').removeAttr('required');
-                $('#id_person-state_international').removeAttr('required');
             {% endif %}
 
             {% if config and config.address == config.ADDRESS_SHOW %}
