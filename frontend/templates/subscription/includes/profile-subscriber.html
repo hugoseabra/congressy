@@ -228,14 +228,14 @@
                                                     <i class="far fa-file-alt"></i>
                                                     {% if last_transaction.boleto_url %}abrir{% else %}aguarde ...{% endif %}
                                                 </button>
-{#                                                <button type="button"#}
-{#                                                        data-toggle="tooltip"#}
-{#                                                        title="Abrir documento"#}
-{#                                                        class="btn btn-info btn-sm btn-trans"#}
-{#                                                        onclick="window.open('{{ last_transaction.boleto_url }}')">#}
-{#                                                    <i class="far fa-envelope"></i>#}
-{#                                                    enviar#}
-{#                                                </button>#}
+                                                <button type="button"
+                                                        data-toggle="tooltip"
+                                                        title="Enviar boleto para o participante"
+                                                        class="btn btn-info btn-sm btn-trans"
+                                                        onclick="if(!$(this).hasClass('disabled') && confirm('Confirme para enviar o boleto ao participante!')){$(this).addClass('disabled').text('aguarde ...');$('#payment-notify-boleto').submit();}">
+                                                    <i class="far fa-envelope"></i>
+                                                    enviar
+                                                </button>
                                             </div>
                                             {% endif %}
                                             {% if new_boleto_allowed and last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}

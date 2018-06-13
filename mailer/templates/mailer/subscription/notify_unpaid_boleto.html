@@ -1,0 +1,14 @@
+{% extends 'mailer/subscription/base_notification.html' %}
+{% load humanize %}
+
+{% block introduction %}
+    <p style="text-align: justify;">
+        Você está recebendo este e-mail como lembrete de um boleto que está
+        disponível para pagamento.
+    </p>
+{% endblock %}
+
+{% block extra_content %}
+    {% include 'mailer/subscription/includes/boleto-url.html' %}
+    {% include 'mailer/subscription/includes/account.html' %}
+{% endblock %}
