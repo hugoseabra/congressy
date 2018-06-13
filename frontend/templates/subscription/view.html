@@ -123,7 +123,7 @@
                 {% endfor %}
             {% endif %}
 
-            {% if last_transaction.type == last_transaction.BOLETO and last_transaction.status == last_Transaction.PROCESSING %}
+            {% if last_transaction.type == last_transaction.BOLETO and not last_transaction.boleto_url and last_transaction.status == last_Transaction.PROCESSING %}
                 window.setTimeout(function() {
                     window.location.href=window.location.href;
                 }, 5000);
