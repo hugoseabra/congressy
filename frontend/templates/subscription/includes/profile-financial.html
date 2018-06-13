@@ -227,6 +227,7 @@
                                                             <i class="far fa-file-alt"></i>
                                                             {% if last_transaction.boleto_url %}abrir{% else %}aguarde ...{% endif %}
                                                         </button>
+                                                        {% if last_transaction.boleto_url %}
                                                         <button type="button"
                                                                 data-toggle="tooltip"
                                                                 title="Enviar boleto para o participante"
@@ -235,6 +236,7 @@
                                                             <i class="far fa-envelope"></i>
                                                             enviar
                                                         </button>
+                                                        {% endif %}
                                                     </div>
                                                     {% endif %}
                                                     {% if new_boleto_allowed and last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
