@@ -4,6 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from django.conf import settings
+from django.contrib import messages
 from django.db.models import Q
 from django.db.transaction import atomic
 from django.http import (
@@ -11,9 +12,9 @@ from django.http import (
     HttpResponseBadRequest,
 )
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils.formats import localize
-from django.views.generic import ListView
+from django.views.generic import FormView, ListView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -36,7 +37,7 @@ from mailer.services import (
     notify_refunded_subscription_credit_card,
 )
 from mailer.tasks import send_mail
-from payment.forms import PaymentForm
+from payment.forms import PagarMeCheckoutForm, PaymentForm
 from payment.helpers import (
     TransactionDirector,
     TransactionSubscriptionStatusIntegrator,
@@ -74,7 +75,6 @@ def log(message, extra_data=None, type='error', notify_admins=False):
 
 
 def notify_postback(transaction, data):
-
     event = transaction.subscription.event
 
     body = """
@@ -189,6 +189,51 @@ class EventPaymentView(AccountMixin, ListView):
                 totals['pending'] += transaction.liquid_amount or Decimal(0.00)
 
         return totals
+
+
+class CheckoutView(AccountMixin, FormView):
+    form_class = PagarMeCheckoutForm
+    template_name = 'payments/checkout.html'
+    success_url = reverse_lazy('public:payment-checkout')
+    object = None
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial.update(self.request.GET.items())
+        return initial
+
+    def get_success_url(self):
+        url = self.success_url
+        querystrings = []
+        for key, value in self.request.GET.items():
+            if key == 'csrmiddlewaretoken':
+                continue
+            querystrings.append('{}={}'.format(key, value))
+
+        return '{}?{}'.format(url, '&'.join(querystrings))
+
+    def post(self, request, *args, **kwargs):
+        next_url = self.request.POST.get('next_url')
+        if next_url:
+            self.success_url = next_url
+
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object = form.save()
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        non_field_errors = form.non_field_errors()
+        for error in non_field_errors:
+            messages.error(self.request, str(error))
+
+        for hidden_field in form.hidden_fields():
+            if hidden_field.errors:
+                for error in errors:
+                    messages.error(self.request, str(error))
+
+        return super().form_valid(form)
 
 
 @api_view(['POST'])
