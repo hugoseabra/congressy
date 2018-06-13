@@ -9,6 +9,7 @@ from certificate import models, forms
 from gatheros_event.views.mixins import EventViewMixin, AccountMixin
 from gatheros_subscription.models import Subscription
 from gatheros_event.models import Event
+from copy import copy
 
 
 class CertificateConfigView(EventViewMixin, generic.TemplateView):
@@ -32,33 +33,35 @@ class CertificateConfigView(EventViewMixin, generic.TemplateView):
             self.object, _ = models.Certificate.objects.get_or_create(
                 event=self.event
             )
+        ref_object = copy(self.object)
 
         event_name = self.request.GET.get('eventName')
         long_name = self.request.GET.get('longName')
 
         if event_name:
             if event_name == "1":
-                if "{{EVENTO}}" in self.object.text_content:
-                    self.object.text_content = self.object.text_content. \
+                if "{{EVENTO}}" in ref_object.text_content:
+                    ref_object.text_content = ref_object.text_content. \
                         replace("{{""EVENTO}}", self.event.name)
             elif event_name == "0":
-                if self.event.name in self.object.text_content:
-                    self.object.text_content = self.object.text_content. \
+                if self.event.name in ref_object.text_content:
+                    ref_object.text_content = ref_object.text_content. \
                         replace(self.event.name, "{{""EVENTO}}")
 
         if long_name:
             if long_name == "1":
-                if "{{NOME}}" in self.object.text_content:
-                    self.object.text_content = self.object.text_content.replace(
+                if "{{NOME}}" in ref_object.text_content:
+                    ref_object.text_content = ref_object.text_content.replace(
                         "{{NOME}}", self.really_long_name)
             elif long_name == "0":
-                if self.really_long_name in self.object.text_content:
-                    self.object.text_content = self.object.text_content.replace(
+                if self.really_long_name in ref_object.text_content:
+                    ref_object.text_content = ref_object.text_content.replace(
                         self.really_long_name, "{{NOME}}", )
 
         context['has_inside_bar'] = True
         context['active'] = 'certificate'
-        context['object'] = self.object
+        context['object'] = ref_object
+
         context['form'] = forms.CertificatePartialForm(instance=self.object)
         return context
 
