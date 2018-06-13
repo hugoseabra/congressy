@@ -55,11 +55,15 @@ def clean_cellphone(phone_number, country='BR'):
             # qualquer telefone.
             is_cellphone = True
 
-        phone = phonenumbers.parse(tmp_dirty_phone)
-        possible = phonenumbers.is_possible_number(phone)
-        valid = phonenumbers.is_valid_number(phone)
+        try:
+            phone = phonenumbers.parse(tmp_dirty_phone)
+            possible = phonenumbers.is_possible_number(phone)
+            valid = phonenumbers.is_valid_number(phone)
 
-        if not is_cellphone or not possible or not valid:
+            if not is_cellphone or not possible or not valid:
+                raise phonenumbers.NumberParseException(0, "The phone number "
+                                                        "supplied is not valid")
+        except phonenumbers.NumberParseException:
             raise forms.ValidationError(
                 'Telefone Inválido',
                 code='invalid_phone',
