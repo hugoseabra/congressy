@@ -221,11 +221,11 @@
                                                     <div class="float-right">
                                                         <button type="button"
                                                                 data-toggle="tooltip"
-                                                                title="Abrir documento"
-                                                                class="btn btn-success btn-sm btn-trans"
+                                                                title="{% if last_transaction.boleto_url %}Abrir boleto{% else %}Aguardando processamento{% endif %}"
+                                                                class="btn btn-success btn-sm btn-trans {% if not last_transaction.boleto_url %}disabled{% endif %}"
                                                                 onclick="window.open('{{ last_transaction.boleto_url }}')">
                                                             <i class="far fa-file-alt"></i>
-                                                            abrir
+                                                            {% if last_transaction.boleto_url %}abrir{% else %}aguarde ...{% endif %}
                                                         </button>
 {#                                                        <button type="button"#}
 {#                                                                data-toggle="tooltip"#}
