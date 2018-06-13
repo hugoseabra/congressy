@@ -104,7 +104,10 @@
 
                 {% if object.is_ready %}
                     <div style="position:absolute;
-                        text-align: justify;"
+                            {% if object.date_hide %}
+                                display: none;
+                            {% endif %}
+                            text-align: justify;"
                          id="cert-date">
 
 
@@ -121,8 +124,7 @@
 
                 <div style="
                         position:absolute;
-                        text-align: justify;
-                        "
+                        text-align:{% if object.text_center %}center{% else %}justify{% endif %};"
                      id="cert-text">
                     {{ object.text_content }}
                 </div>
@@ -190,7 +192,7 @@
                 var url = new URL(url_string);
                 var longName = url.searchParams.get("longName");
                 var eventName = url.searchParams.get("eventName");
-                
+
                 if (longName === "1") {
                     showLongNameCheckBox.click();
                 }
