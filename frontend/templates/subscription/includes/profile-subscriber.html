@@ -150,7 +150,7 @@
                             <td class="message" style="cursor: default;border-top:0">
                                 <div>
                                     {% if last_transaction.manual is True %}
-                                        {% if transaction.manual_payment_type == transaction.MANUAL_PAYMENT_MONEY %}
+                                        {% if last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_MONEY %}
                                             <div class="float-left">
                                                 <i style="font-size: 40px" class="far fa-money-bill-alt"></i>
                                             </div>
@@ -159,7 +159,7 @@
                                                 <span>Dinheiro</span>
                                                 <small>(manual)</small>
                                             </div>
-                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_PAYCHECK %}
+                                        {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_PAYCHECK %}
                                             <div class="float-left">
                                                 <i style="font-size: 40px" class="fas fa-money-check-alt"></i>
                                             </div>
@@ -168,7 +168,7 @@
                                                 <span>Cheque</span>
                                                 <small>(manual)</small>
                                             </div>
-                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_DEBIT_CARD %}
+                                        {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_DEBIT_CARD %}
                                             <div class="float-left">
                                                 <i style="font-size: 40px" class="far fa-credit-card"></i>
                                             </div>
@@ -177,7 +177,7 @@
                                                 <span>Cartão de Débito</span>
                                                 <small>(manual)</small>
                                             </div>
-                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_CREDIT_CARD %}
+                                        {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_CREDIT_CARD %}
                                             <div class="float-left">
                                                 <i style="font-size: 40px" class="far fa-credit-card"></i>
                                             </div>
@@ -186,7 +186,7 @@
                                                 <span>Cartão de Crédito</span>
                                                 <small>(manual)</small>
                                             </div>
-                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_BANK_DEPOSIT %}
+                                        {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_BANK_DEPOSIT %}
                                             <div class="float-left">
                                                 <i style="font-size: 40px" class="fas fa-university"></i>
                                             </div>
@@ -195,7 +195,7 @@
                                                 <span>Depósito</span>
                                                 <small>(manual)</small>
                                             </div>
-                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_BANK_TRANSFER %}
+                                        {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_BANK_TRANSFER %}
                                             <div class="float-left">
                                                 <i style="font-size: 40px" class="fas fa-exchange-alt"></i>
                                             </div>
@@ -218,15 +218,15 @@
                                                     <strong class="text-warning">(vencido)</strong>
                                                 {% endif %}
                                             </div>
-                                            {% if last_transaction.status != transaction.PAID and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                            {% if last_transaction.status != last_transaction.PAID and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
                                             <div class="float-right">
                                                 <button type="button"
                                                         data-toggle="tooltip"
-                                                        title="Abrir documento"
-                                                        class="btn btn-success btn-sm btn-trans"
+                                                        title="{% if last_transaction.boleto_url %}Abrir boleto{% else %}Aguardando processamento{% endif %}"
+                                                        class="btn btn-success btn-sm btn-trans {% if not last_transaction.boleto_url %}disabled{% endif %}"
                                                         onclick="window.open('{{ last_transaction.boleto_url }}')">
                                                     <i class="far fa-file-alt"></i>
-                                                    abrir
+                                                    {% if last_transaction.boleto_url %}abrir{% else %}aguarde ...{% endif %}
                                                 </button>
 {#                                                <button type="button"#}
 {#                                                        data-toggle="tooltip"#}
@@ -238,7 +238,7 @@
 {#                                                </button>#}
                                             </div>
                                             {% endif %}
-                                            {% if new_boleto_allowed and last_transaction.status != transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                            {% if new_boleto_allowed and last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
                                                 <div class="float-right">
                                                     <button type="button"
                                                         data-toggle="tooltip"
