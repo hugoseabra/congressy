@@ -56,9 +56,9 @@
             text-align: justify;"
          id="cert-date">
         {% if certificate.has_city %}
-            {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}
+            {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
         {% else %}
-            {{ certificate.event_location }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}
+            {{ certificate.event_location }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
         {% endif %}
     </div>
 
