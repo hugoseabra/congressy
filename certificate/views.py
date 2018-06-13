@@ -9,6 +9,7 @@ from certificate import models, forms
 from gatheros_event.views.mixins import EventViewMixin, AccountMixin
 from gatheros_subscription.models import Subscription
 from gatheros_event.models import Event
+from copy import copy
 
 
 class CertificateConfigView(EventViewMixin, generic.TemplateView):
@@ -32,21 +33,44 @@ class CertificateConfigView(EventViewMixin, generic.TemplateView):
             self.object, _ = models.Certificate.objects.get_or_create(
                 event=self.event
             )
+        ref_object = copy(self.object)
 
-        if self.request.GET.get('eventName'):
-            if "{{EVENTO}}" in self.object.text_content:
-                self.object.text_content = self.object.text_content. \
-                    replace("{{""EVENTO}}", self.event.name)
+        event_name = self.request.GET.get('eventName')
+        long_name = self.request.GET.get('longName')
 
-        if self.request.GET.get('longName'):
-            if "{{NOME}}" in self.object.text_content:
-                long_div = self.really_long_name
-                self.object.text_content = self.object.text_content.replace(
-                    "{{NOME}}", long_div)
+        if event_name:
+            if event_name == "1":
+                if "{{EVENTO}}" in ref_object.text_content:
+                    ref_object.text_content = ref_object.text_content. \
+                        replace("{{""EVENTO}}", self.event.name)
+            elif event_name == "0":
+                if self.event.name in ref_object.text_content:
+                    ref_object.text_content = ref_object.text_content. \
+                        replace(self.event.name, "{{""EVENTO}}")
+
+        if long_name:
+            if long_name == "1":
+                if "{{NOME}}" in ref_object.text_content:
+                    ref_object.text_content = ref_object.text_content.replace(
+                        "{{NOME}}", self.really_long_name)
+            elif long_name == "0":
+                if self.really_long_name in ref_object.text_content:
+                    ref_object.text_content = ref_object.text_content.replace(
+                        self.really_long_name, "{{NOME}}", )
+
+        if "{{NOME}}" in ref_object.text_content:
+            ref_object.text_content = ref_object.text_content.replace(
+                "{{NOME}}", "<strong>{{NOME}}</strong>")
+
+        if self.really_long_name in ref_object.text_content:
+            ref_object.text_content = ref_object.text_content.replace(
+                self.really_long_name,
+                "<strong>" + self.really_long_name + "</strong>")
 
         context['has_inside_bar'] = True
         context['active'] = 'certificate'
-        context['object'] = self.object
+        context['object'] = ref_object
+
         context['form'] = forms.CertificatePartialForm(instance=self.object)
         return context
 
@@ -135,6 +159,7 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
         context['event'] = self.event
         context['certificate'] = self.event.certificate
         context['text'] = self.get_text()
+        context['is_example'] = False
         return context
 
     def get_complementary_data(self):
@@ -195,16 +220,17 @@ class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
         return super().pre_dispatch(request)
 
     def get_context_data(self, **kwargs):
-        context = super(CertificatePDFExampleView, self).get_context_data(**kwargs)
+        context = super(CertificatePDFExampleView, self).get_context_data(
+            **kwargs)
         image_url = self.event.certificate.background_image.default.url
         context['background_image'] = image_url
         context['event'] = self.event
         context['certificate'] = self.event.certificate
         context['text'] = self.get_text()
+        context['is_example'] = True
         return context
 
     def get_text(self):
-
         text = self.event.certificate.text_content
 
         if "{{NOME}}" in text:
@@ -220,4 +246,3 @@ class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
         )
         res = text_template.render(context)
         return res
-
