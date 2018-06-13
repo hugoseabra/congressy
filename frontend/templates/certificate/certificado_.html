@@ -102,7 +102,7 @@
                         {% if object.title_hide %}display: none;{% endif %}
                         " id="cert-title">{{ object.title_content }}</div>
 
-                {% if object.is_ready %}
+                {% if object.is_ready and object.event_has_any_type_of_location %}
                     <div style="position:absolute;
                             {% if object.date_hide %}
                                 display: none;
@@ -226,11 +226,19 @@
                 });
                 dateCheckBox.on('change', function () {
 
-                    if (this.checked) {
-                        cert.hideDate();
-                    } else {
-                        cert.showDate();
-                    }
+
+                    {% if  object.event_has_any_type_of_location %}
+                        if (this.checked) {
+                            cert.hideDate();
+                        } else {
+                            cert.showDate();
+                        }
+                    {% else %}
+                        alert("Você não pode habilitar esse recurso sem antes" +
+                            " configurar sua localização, veja o 'Conteudo' ");
+                    {% endif %}
+
+
                 });
                 centralizarCheckBox.on('change', function () {
                     if (this.checked) {
@@ -324,6 +332,17 @@
                         {% render_generic_field form.background_image required=True %}
                         {% render_generic_field form.text_content required=True %}
                         {% render_generic_field form.event_location required=True %}
+                        {% if not object.event_has_any_type_of_location %}
+                            <div class="alert alert-warning">
+                                <strong>
+                                    <i class="fas fa-exclamation-triangle warning-color"></i>
+                                    Atenção!
+                                </strong>
+                                Você não possui nenhuma localização para seu
+                                evento, portanto não podera usar o atributo
+                                de data até que ele seja informado.
+                            </div>
+                        {% endif %}
                         <div class="well">
                             <i>
                                 <strong>

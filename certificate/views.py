@@ -159,6 +159,7 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
         context['event'] = self.event
         context['certificate'] = self.event.certificate
         context['text'] = self.get_text()
+        context['is_example'] = False
         return context
 
     def get_complementary_data(self):
@@ -226,6 +227,7 @@ class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
         context['event'] = self.event
         context['certificate'] = self.event.certificate
         context['text'] = self.get_text()
+        context['is_example'] = True
         return context
 
     def get_text(self):
