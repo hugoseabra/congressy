@@ -222,11 +222,31 @@
                                                         <button type="button"
                                                                 data-toggle="tooltip"
                                                                 title="Abrir documento"
-                                                                class="btn btn-default btn-sm btn-trans"
+                                                                class="btn btn-success btn-sm btn-trans"
                                                                 onclick="window.open('{{ last_transaction.boleto_url }}')">
-                                                            documento
+                                                            <i class="far fa-file-alt"></i>
+                                                            abrir
                                                         </button>
+{#                                                        <button type="button"#}
+{#                                                                data-toggle="tooltip"#}
+{#                                                                title="Abrir documento"#}
+{#                                                                class="btn btn-info btn-sm btn-trans"#}
+{#                                                                onclick="window.open('{{ last_transaction.boleto_url }}')">#}
+{#                                                            <i class="far fa-envelope"></i>#}
+{#                                                            enviar#}
+{#                                                        </button>#}
                                                     </div>
+                                                    {% endif %}
+                                                    {% if new_boleto_allowed and last_transaction.status != transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                        <div class="float-right">
+                                                            <button type="button"
+                                                                data-toggle="tooltip"
+                                                                title="Abrir documento"
+                                                                class="btn btn-info btn-sm btn-trans"
+                                                                onclick="open_checkout()">
+                                                            novo boleto
+                                                        </button>
+                                                        </div>
                                                     {% endif %}
                                                 {% elif last_transaction.type == last_transaction.CREDIT_CARD %}
                                                     <div class="float-left">

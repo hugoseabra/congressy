@@ -1,4 +1,5 @@
 {% load static humanize %}
+{% now "Y-m-d" as today %}
 
 <div class="row tooltip-wrapper">
     <div class="col-xl-11 col-lg-11 col-md-12">
@@ -214,7 +215,7 @@
                                                 <span class="title">Método</span>
                                                 Boleto
                                                 {% if last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
-                                                <strong class="text-warning">(vencido)</strong>
+                                                    <strong class="text-warning">(vencido)</strong>
                                                 {% endif %}
                                             </div>
                                             {% if last_transaction.status != transaction.PAID and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
@@ -222,11 +223,31 @@
                                                 <button type="button"
                                                         data-toggle="tooltip"
                                                         title="Abrir documento"
-                                                        class="btn btn-default btn-sm btn-trans"
+                                                        class="btn btn-success btn-sm btn-trans"
                                                         onclick="window.open('{{ last_transaction.boleto_url }}')">
-                                                    documento
+                                                    <i class="far fa-file-alt"></i>
+                                                    abrir
                                                 </button>
+{#                                                <button type="button"#}
+{#                                                        data-toggle="tooltip"#}
+{#                                                        title="Abrir documento"#}
+{#                                                        class="btn btn-info btn-sm btn-trans"#}
+{#                                                        onclick="window.open('{{ last_transaction.boleto_url }}')">#}
+{#                                                    <i class="far fa-envelope"></i>#}
+{#                                                    enviar#}
+{#                                                </button>#}
                                             </div>
+                                            {% endif %}
+                                            {% if new_boleto_allowed and last_transaction.status != transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                <div class="float-right">
+                                                    <button type="button"
+                                                        data-toggle="tooltip"
+                                                        title="Abrir documento"
+                                                        class="btn btn-info btn-sm btn-trans"
+                                                        onclick="open_checkout()">
+                                                    novo boleto
+                                                </button>
+                                                </div>
                                             {% endif %}
                                         {% elif last_transaction.type == last_transaction.CREDIT_CARD %}
                                             <div class="float-left">
@@ -271,6 +292,74 @@
                                             class="btn btn-info btn-sm btn-trans">
                                         detalhamento
                                     </button>
+                                </div>
+                                <div class="clearfix"></div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% elif not object.free and not last_transaction %}
+    <div class="col-xl-5 col-lg-5 col-md-6">
+        <div class="panel">
+            <div class="panel-body" style="padding:0">
+                <div style="border:1px solid #ddd">
+                    <table class="table table-inbox table-hover"
+                           style="margin-bottom:0">
+                        <thead>
+                        <tr>
+                            <th>Sobre o Pagamento</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="unread">
+                            <td class="message" style="cursor: default;border-top:0">
+                                <div>
+                                    <div class="float-left">
+                                        <i style="font-size: 40px" class="fas fa-minus"></i>
+                                    </div>
+                                    <div class="float-left"
+                                         style="margin-left:10px">
+                                        <span class="title">Método</span>
+                                        Nenhum
+                                        {% if last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                            <strong class="text-warning">(vencido)</strong>
+                                        {% endif %}
+                                    </div>
+                                    <div class="float-right">
+                                        <button type="button"
+                                            data-toggle="tooltip"
+                                            title="Abrir documento"
+                                            class="btn btn-info btn-sm btn-trans"
+                                            onclick="open_checkout()">
+                                        novo boleto
+                                    </button>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="unread">
+                            <td class="message" style="cursor: default">
+                                <div class="float-left">
+                                    {% if total_paid  %}
+                                        <span class="title">Valor pago</span>
+                                        <strong class="text-success">
+                                            R$ {{ total_paid|intcomma }} (pago)
+                                        </strong>
+                                        {% if dividend_amount < 0 %}
+                                        restante: <span class="text-danger">R$ {{ dividend_amount|intcomma }}</span>
+                                        {% elif dividend_amount > 0 %}
+                                        em ver: <span class="text-primary">R$ {{ dividend_amount|intcomma }}</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="title">Valor inscrição</span>
+                                        <strong class="text-danger">
+                                            R$ {{ object.lot.get_calculated_price|intcomma }}
+                                        </strong>
+                                    {% endif %}
                                 </div>
                                 <div class="clearfix"></div>
                             </td>
@@ -381,7 +470,7 @@
                     <div class="row" style="padding-left:16px;">
                         <div class="connect social">
                             <ul>
-                                {% if not object.free %}
+                                {% if not object.free and last_transaction %}
                                 <li>
                                     <button type="button"
                                             class="btn btn-info btn-trans"

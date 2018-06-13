@@ -32,6 +32,7 @@ from gatheros_subscription.helpers.report_payment import \
     PaymentReportCalculator
 from gatheros_subscription.models import FormConfig, Subscription
 from payment import forms
+from payment.helpers import payment_helpers
 from payment.models import Transaction
 
 
@@ -319,8 +320,12 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
 
         messenger = []
         for message in list(storage):
+            level_tag = message.level_tag
+            if level_tag == 'danger':
+                level_tag = 'error'
+
             messenger.append({
-                'type': message.level_tag,
+                'type': level_tag,
                 'message': message.message,
             })
 
@@ -348,7 +353,7 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
                     pk=self.object.pk,
                 )
 
-            if self.object.free:
+            if not self.last_transaction:
                 messages.warning(
                     request,
                     'Este perfil não possui transações financeiras.'
@@ -392,6 +397,13 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         ctx['dividend_amount'] = calculator.dividend_amount
         ctx['financial'] = self.financial
         ctx['last_transaction'] = self.last_transaction
+        ctx['form'] = self.get_checkout_form()
+        ctx['encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
+        ctx['services'] = self.get_services()
+        ctx['products'] = self.get_products()
+        ctx['new_boleto_allowed'] = payment_helpers.is_boleto_allowed(
+            self.event
+        )
 
         if self.request.GET.get('details'):
             ctx['show_details'] = True
@@ -446,6 +458,26 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
             messages.success(request, 'Recebimento registrado com sucesso.')
 
         return redirect(url + '?details=1')
+
+    def get_checkout_form(self):
+        return forms.PagarMeCheckoutForm(
+            initial={
+                'subscription': self.object.pk,
+                'next_url': reverse(
+                    'subscription:subscription-payments',
+                    kwargs={
+                        'event_pk': self.event.pk,
+                        'pk': self.object.pk,
+                    }
+                ),
+            }
+        )
+
+    def get_products(self):
+        return self.object.subscription_products.all()
+
+    def get_services(self):
+        return self.object.subscription_services.all()
 
 
 class SubscriptionAddFormView(SubscriptionFormMixin):
