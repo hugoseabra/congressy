@@ -57,7 +57,9 @@
     <!-- Custom styles for this theme -->
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
 
-    {% block styles %}{% endblock %}
+    {% if form %}
+        {{ form.media.css }}
+    {% endif %}
 
     <style>
         input[type="file"] {
@@ -73,11 +75,9 @@
 
     </style>
 
-    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+    {% block styles %}{% endblock %}
 
-    {% if form %}
-        {{ form.media.css }}
-    {% endif %}
+    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
 
     {% block headscripts %}{% endblock %}
 
@@ -327,6 +327,10 @@
 <script src="{% static "assets/js/cgsy.js" %}"></script>
 <script src="{% static "assets/js/ajax.js" %}"></script>
 
+{% if form %}
+    {{ form.media.js }}
+{% endif %}
+
 <script type="application/javascript">
 
     $(document).ready(function () {
@@ -357,9 +361,6 @@
 
 {% block scripts %}{% endblock %}
 
-{% if form %}
-    {{ form.media.js }}
-{% endif %}
 </body>
 </html>
 

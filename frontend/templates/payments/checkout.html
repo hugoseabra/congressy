@@ -1,0 +1,18 @@
+{% load form_config_tags %}
+
+<form method="post">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        {% render_errors form.non_field_errors %}
+    {% endif %}
+
+    {% for hidden_field in form.hidden_fields %}
+        {% if hidden_field.errors %}
+            {% render_errors hidden_field.errors %}
+        {% endif %}
+    {% endfor %}
+
+    {{ form.as_p }}
+    <button>Enviar</button>
+</form>

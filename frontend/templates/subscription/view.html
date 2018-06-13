@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load i18n static queryset_filter %}
+{% load i18n l10n static queryset_filter %}
 
 
 {% block title %}
@@ -44,6 +44,58 @@
             $('#payment-delete-form').submit();
         }
 
+        function open_checkout() {
+            var payment_form_el = $('#checkout_form');
+            var checkout = new window.cgsy.pagarme.Checkout(
+                '{{ encryption_key }}',
+                'boleto',
+                payment_form_el
+            );
+            checkout.add_item(
+                'subscription',
+                '{{ object.pk }}',
+                'Inscrição: {{ event.name }}',
+                1,
+                parseFloat('{{ object.lot.get_calculated_price|unlocalize }}')
+            );
+            {% if products %}
+                // Adiciona billing de opcionais de produtos/serviços
+                {% for product in products %}
+                    {% if product.optional_price %}
+                    window.cgsy.payment.add_item(
+                        'optional-product',
+                        '{{ object.pk }}',
+                        'Produto/Serviço: {{ event.name }}',
+                        1,
+                        parseFloat('{{ product.optional_price|unlocalize }}')
+                    );
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            {% if services %}
+                // Adiciona billing de opcionais de produtos/serviços
+                {% for service in services %}
+                    {% if service.optional_price %}
+                    window.cgsy.payment.add_item(
+                        'optional-product',
+                        '{{ object.pk }}',
+                        'Produto/Serviço: {{ event.name }}',
+                        1,
+                        parseFloat('{{ service.optional_price|unlocalize }}')
+                    );
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            checkout.setSuccessCallback(function() {
+                var form = new window.cgsy.pagarme.CheckoutForm($('#checkout_form_block'));
+                    form.setNextUrl("{% url 'subscription:subscription-view' event.pk object.pk %}");
+                    form.send("{% url 'public:payment-checkout' %}");
+            });
+
+            checkout.run();
+        }
+
         $(document).ready(function() {
             Messenger.options = {
                 extraClasses: 'messenger-fixed messenger-on-bottom ' +
@@ -69,6 +121,12 @@
                         type: '{{ msg.type }}'
                     });
                 {% endfor %}
+            {% endif %}
+
+            {% if last_transaction.type == last_transaction.BOLETO and last_transaction.status == last_Transaction.PROCESSING %}
+                window.setTimeout(function() {
+                    window.location.href=window.location.href;
+                }, 5000);
             {% endif %}
         });
     </script>
@@ -113,6 +171,13 @@
         {% csrf_token %}
         <input type="hidden" name="transaction_id" id="transaction_id" value="" />
     </form>
+    <div id="checkout_form_block" style="display:none">
+        <form id="checkout_form" action="{% url 'public:payment-checkout' %}" method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+        </form>
+    </div>
+
 {% endblock %}
 {% block modals %}
     {% include 'subscription/includes/modal-manual-payment-form.html' with form=manual_payment_form %}
