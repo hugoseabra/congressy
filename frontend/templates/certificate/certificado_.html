@@ -124,7 +124,11 @@
 
                 <div style="
                         position:absolute;
-                        text-align:{% if object.text_center %}center{% else %}justify{% endif %};"
+                        {% if object.text_center %}
+                            text-align:center;
+                        {% else %}
+                            text-align:justify;
+                        {% endif %}"
                      id="cert-text">
                     {{ object.text_content }}
                 </div>
