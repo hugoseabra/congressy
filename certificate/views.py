@@ -33,16 +33,28 @@ class CertificateConfigView(EventViewMixin, generic.TemplateView):
                 event=self.event
             )
 
-        if self.request.GET.get('eventName'):
-            if "{{EVENTO}}" in self.object.text_content:
-                self.object.text_content = self.object.text_content. \
-                    replace("{{""EVENTO}}", self.event.name)
+        event_name = self.request.GET.get('eventName')
+        long_name = self.request.GET.get('longName')
 
-        if self.request.GET.get('longName'):
-            if "{{NOME}}" in self.object.text_content:
-                long_div = self.really_long_name
-                self.object.text_content = self.object.text_content.replace(
-                    "{{NOME}}", long_div)
+        if event_name:
+            if event_name == "1":
+                if "{{EVENTO}}" in self.object.text_content:
+                    self.object.text_content = self.object.text_content. \
+                        replace("{{""EVENTO}}", self.event.name)
+            elif event_name == "0":
+                if self.event.name in self.object.text_content:
+                    self.object.text_content = self.object.text_content. \
+                        replace(self.event.name, "{{""EVENTO}}")
+
+        if long_name:
+            if long_name == "1":
+                if "{{NOME}}" in self.object.text_content:
+                    self.object.text_content = self.object.text_content.replace(
+                        "{{NOME}}", self.really_long_name)
+            elif long_name == "0":
+                if self.really_long_name in self.object.text_content:
+                    self.object.text_content = self.object.text_content.replace(
+                        self.really_long_name, "{{NOME}}", )
 
         context['has_inside_bar'] = True
         context['active'] = 'certificate'
@@ -195,7 +207,8 @@ class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
         return super().pre_dispatch(request)
 
     def get_context_data(self, **kwargs):
-        context = super(CertificatePDFExampleView, self).get_context_data(**kwargs)
+        context = super(CertificatePDFExampleView, self).get_context_data(
+            **kwargs)
         image_url = self.event.certificate.background_image.default.url
         context['background_image'] = image_url
         context['event'] = self.event
@@ -204,7 +217,6 @@ class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
         return context
 
     def get_text(self):
-
         text = self.event.certificate.text_content
 
         if "{{NOME}}" in text:
@@ -220,4 +232,3 @@ class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
         )
         res = text_template.render(context)
         return res
-
