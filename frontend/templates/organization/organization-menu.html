@@ -4,9 +4,7 @@
         <a class="sidebar-itens" href=
                 {% if active == 'convites' %}
                     "{% url 'event:organization-edit' invitation_organization.pk %}"
-                {% elif active == 'membros' %}
-                    "{% url 'event:organization-edit' organization.pk %}"
-                {% elif active == 'editar' %}
+                {% else %}
                     "{% url 'event:organization-edit' organization.pk %}"
                 {% endif %}
         >
@@ -17,9 +15,7 @@
         <a class="sidebar-itens" href=
                 {% if active == 'convites' %}
                     "{% url 'event:member-list' invitation_organization.pk %}"
-                {% elif active == 'membros' %}
-                    "{% url 'event:member-list' organization.pk %}"
-                {% elif active == 'editar' %}
+                {% else %}
                     "{% url 'event:member-list' organization.pk %}"
                 {% endif %}
 
@@ -31,14 +27,11 @@
         <a class="sidebar-itens" href=
                 {% if active == 'convites' %}
                     "{% url 'event:invitation-list' invitation_organization.pk %}"
-                {% elif active == 'membros' %}
+                {% else %}
                     "{% url 'event:invitation-list' organization.pk %}"
-                {% elif active == 'editar' %}
-                    "{% url 'event:invitation-list' organization.pk %}"
+
                 {% endif %}
-
-
-        >
+ >
         <i class="fas fa-envelope-open"></i> Convites
         </a>
     </li>

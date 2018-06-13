@@ -272,6 +272,15 @@
                                             <div class="col-md-6">
                                                 {% render_switchery_field form.has_checkin %}
                                             </div>
+                                            <div class="col-md-6">
+                                                {% render_switchery_field form.has_survey %}
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                {% render_switchery_field form.has_survey %}
+                                            </div>
                                         </div>
                                     {% endif %}
                                 {% endif %}

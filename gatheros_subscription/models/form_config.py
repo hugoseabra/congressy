@@ -103,8 +103,8 @@ class FormConfig(models.Model):
         choices=CPF_OPTIONS,
         default=CPF_HIDE,
         max_length=35,
-        verbose_name='CPF',
-        help_text='Configuração do campo "CPF" no formulário.'
+        verbose_name='CPF ou ID/Passport',
+        help_text='Configuração do campo de documentos pessoais no formulário.'
     )
 
     birth_date = models.CharField(
