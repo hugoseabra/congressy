@@ -258,22 +258,22 @@
                     }
                 });
 
-                $('#titleFontSize').bind('click keyup', function () {
+                $('#titleFontSize').bind('keyup', function () {
                     cert.saveTitleFontSize($(this).val());
                     title.css("font-size", $(this).val() + "px");
                 });
 
-                $('#dateFontSize').bind('click keyup', function () {
+                $('#dateFontSize').bind('keyup', function () {
                     cert.saveDateFontSize($(this).val());
                     date.css("font-size", $(this).val() + "px");
                 });
 
-                $('#textFontSize').bind('click keyup', function () {
+                $('#textFontSize').bind('keyup', function () {
                     cert.saveTextFontSize($(this).val());
                     text.css("font-size", $(this).val() + "px");
                 });
 
-                $('#textLineHeight').bind('click keyup', function () {
+                $('#textLineHeight').bind('keyup', function () {
                     cert.saveTextLineHeight($(this).val());
                     text.css('line-height', $(this).val() + "px");
                 });
@@ -484,8 +484,7 @@
                             </label>
                             <input class="form-control"
                                    type="number"
-                                   id="textLineHeight" min="1"
-                                   max="10" step="0.1"
+                                   id="textLineHeight" min="10"
                                    value={{ object.text_line_height|floatformat:"0" }}>
                         </div>
                     </div>
