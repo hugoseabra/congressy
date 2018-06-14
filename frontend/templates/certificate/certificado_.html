@@ -57,9 +57,13 @@
                         Alinhamento
                     </button>
 
-                    <a class="btn btn-primary"
+                    <a class="btn btn-primary{% if not object.is_ready %} disabled{% endif %}"
                        href="{% url 'certificate:event-certificate-example-pdf' event.pk %}"
                        target="_blank"
+                        {% if not object.is_ready %}
+                            data-toggle="tooltip"
+                            title="Certificado não configurado"
+                        {% endif %}
                        style="margin-left: 10px">
                         <i class="far fa-eye"></i>
                         Pré-Visualização

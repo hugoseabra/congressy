@@ -222,8 +222,11 @@ class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
     def get_context_data(self, **kwargs):
         context = super(CertificatePDFExampleView, self).get_context_data(
             **kwargs)
-        image_url = self.event.certificate.background_image.default.url
-        context['background_image'] = image_url
+
+        if self.event.certificate.background_image:
+            image_url = self.event.certificate.background_image.default.url
+            context['background_image'] = image_url
+
         context['event'] = self.event
         context['certificate'] = self.event.certificate
         context['text'] = self.get_text()
