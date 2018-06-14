@@ -258,34 +258,6 @@
                     }
                 });
 
-                showLongNameCheckBox.on('change', function () {
-
-                    var url = new URL(window.location.href);
-
-                    if (this.checked) {
-                        url.searchParams.set('longName', '1');
-                    } else {
-                        url.searchParams.set('longName', '0');
-                    }
-
-                    window.location.href = url.href
-
-                });
-
-                showEventNameCheckBox.on('change', function () {
-
-                    var url = new URL(window.location.href);
-
-                    if (this.checked) {
-                        url.searchParams.set('eventName', '1');
-                    } else {
-                        url.searchParams.set('eventName', '0');
-                    }
-
-                    window.location.href = url.href
-
-                });
-
                 $('#titleFontSize').bind('click keyup', function () {
                     cert.saveTitleFontSize($(this).val());
                     title.css("font-size", $(this).val() + "px");
@@ -393,16 +365,6 @@
                                 = Nome do seu evento
                             </div>
 
-
-                            <div>
-                                <code>
-                                    {% verbatim %}
-                                    {{ CPF }}
-                                    {%endverbatim %}
-                                </code>
-                                = Documento identificador CPF
-                            </div>
-
                         </div>
                         {{ form.event }}
 
@@ -451,23 +413,6 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td><input class="js-switch" type="checkbox"
-                                       id="showEventNameCheckBox"
-                                       name="showEventNameCheckBox"></td>
-                            <td><label for="showEventNameCheckBox">
-                                Substituir pelo nome do evento
-                            </label></td>
-
-                        </tr>
-                        <tr>
-                            <td><input class="js-switch" type="checkbox"
-                                       id="showLongNameCheckBox"
-                                       name="showLongNameCheckBox"></td>
-                            <td><label for="showLongNameCheckBox">
-                                Substituir por um nome fictício grande
-                            </label></td>
-                        </tr>
                         <tr>
                             <td><input class="js-switch" type="checkbox"
                                        {% if object.title_hide %}checked{% endif %}

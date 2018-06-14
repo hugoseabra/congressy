@@ -15,7 +15,7 @@ from copy import copy
 class CertificateConfigView(EventViewMixin, generic.TemplateView):
     template_name = 'certificate/certificado_.html'
     object = None
-    really_long_name = "Luciana Silva Alburquerque Qualhato de Andrade Gonçalves"
+    long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
 
     def dispatch(self, request, *args, **kwargs):
         response = super(CertificateConfigView, self).dispatch(request, *args,
@@ -23,7 +23,6 @@ class CertificateConfigView(EventViewMixin, generic.TemplateView):
         self.object = models.Certificate.objects.get_or_create(
             event=self.event
         )
-
         return response
 
     def get_context_data(self, **kwargs):
@@ -35,37 +34,18 @@ class CertificateConfigView(EventViewMixin, generic.TemplateView):
             )
         ref_object = copy(self.object)
 
-        event_name = self.request.GET.get('eventName')
-        long_name = self.request.GET.get('longName')
-
-        if event_name:
-            if event_name == "1":
-                if "{{ EVENTO }}" in ref_object.text_content:
-                    ref_object.text_content = ref_object.text_content. \
-                        replace("{{""EVENTO}}", self.event.name)
-            elif event_name == "0":
-                if self.event.name in ref_object.text_content:
-                    ref_object.text_content = ref_object.text_content. \
-                        replace(self.event.name, "{{ EVENTO }}")
-
-        if long_name:
-            if long_name == "1":
-                if "{{ NOME }}" in ref_object.text_content:
-                    ref_object.text_content = ref_object.text_content.replace(
-                        "{{ NOME }}", self.really_long_name)
-            elif long_name == "0":
-                if self.really_long_name in ref_object.text_content:
-                    ref_object.text_content = ref_object.text_content.replace(
-                        self.really_long_name, "{{ NOME }}", )
-
         if "{{ NOME }}" in ref_object.text_content:
             ref_object.text_content = ref_object.text_content.replace(
-                "{{ NOME }}", "<strong>{{ NOME }}</strong>")
+                "{{ NOME }}", self.long_name)
 
-        if self.really_long_name in ref_object.text_content:
+        if self.long_name in ref_object.text_content:
             ref_object.text_content = ref_object.text_content.replace(
-                self.really_long_name,
-                "<strong>" + self.really_long_name + "</strong>")
+                self.long_name,
+                "<strong>" + self.long_name + "</strong>")
+
+        if "{{ EVENTO }}" in ref_object.text_content:
+            ref_object.text_content = ref_object.text_content.replace(
+                "{{ EVENTO }}", self.event.name)
 
         context['has_inside_bar'] = True
         context['active'] = 'certificate'
@@ -202,7 +182,7 @@ class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
     event = None
     show_content_in_browser = True
     permission_denied_url = reverse_lazy('front:start')
-    really_long_name = "Luciana Silva Alburquerque Qualhato de Andrade Gonçalves"
+    long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
 
     cmd_options = {
         'dpi': 96,
@@ -242,7 +222,7 @@ class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
         text_template = Template(text)
         context = Context(
             {
-                'NOME': self.really_long_name,
+                'NOME': self.long_name,
                 'EVENTO': self.event.name,
                 'CPF': "629.162.880-58",
             }
