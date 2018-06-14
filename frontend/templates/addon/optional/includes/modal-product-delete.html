@@ -1,0 +1,42 @@
+<!-- Product Delete Modal -->
+<div class="modal fade" id="modal-product-delete" tabindex="-1" role="dialog"
+     aria-labelledby="modal-product-delete-title" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="modal-product-delete-title">
+                    Deletar Produto Opcional
+                </h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <i class="fas fa-trash-alt fa-6x danger-color"></i>
+                    </div>
+                    <div class="col-md-10">
+                        <h3>
+                            Tem certeza que deseja deletar
+                            <span id="product_optional_name"
+                                  style="font-weight: bolder">
+                        </span> ?
+                        </h3>
+                    </div>
+                </div>
+
+                <input type="hidden" name="product_optional_delete_id"
+                       id="product_optional_delete_id">
+                
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary"
+                        onclick="submit_delete_optional('product')">Deletar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- / Service Limit Modal -->

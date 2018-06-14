@@ -158,6 +158,40 @@ function save_optional(url, data, msg) {
     );
 }
 
+function delete_optional(url, msg) {
+
+    send(
+        url,
+        'DELETE',
+        {},
+        function () {
+            Messenger().post({
+                message: msg,
+                type: 'success'
+            });
+
+            if (url.indexOf('services') !== -1) {
+                render_service_optional_list();
+            }
+
+            if (url.indexOf('products') !== -1) {
+                render_product_optional_list();
+            }
+        },
+        function (response) {
+            response = response.responseJSON;
+            console.error(response);
+            var msg = 'Não foi possivel processar apagamento de opcional.';
+
+            if (response.hasOwnProperty('detail')) {
+                msg += '. Detalhe: ' + response.detail
+            }
+
+            Messenger().post({message: msg, type: 'error'});
+        }
+    );
+}
+
 function createAnchorEvents() {
     $('.cat-tab-link').on('click', function () {
         window.location.hash = '#cat=' + $(this).data('cat-id');
@@ -168,17 +202,17 @@ function publish_optional(type, id) {
 
     var title = (type === 'service') ? 'Atividade extra' : 'Produto / Serviço';
 
-    if (!confirm('Tem certeza que deseja publicar este '+title+'?')) {
+    if (!confirm('Tem certeza que deseja publicar este ' + title + '?')) {
         return;
     }
 
     var url;
     if (type === 'service') {
-        url = '/api/addon/optionals/services/'+ id +'/'
+        url = '/api/addon/optionals/services/' + id + '/'
     }
 
     if (type === 'product') {
-        url = '/api/addon/optionals/products/'+ id +'/'
+        url = '/api/addon/optionals/products/' + id + '/'
     }
 
     if (!url) {
@@ -193,17 +227,17 @@ function unpublish_optional(type, id) {
 
     var title = (type === 'service') ? 'Atividade extra' : 'Produto / Serviço';
 
-    if (!confirm('Tem certeza que deseja despublicar este '+title+'?')) {
+    if (!confirm('Tem certeza que deseja despublicar este ' + title + '?')) {
         return;
     }
 
     var url;
     if (type === 'service') {
-        url = '/api/addon/optionals/services/'+ id +'/'
+        url = '/api/addon/optionals/services/' + id + '/'
     }
 
     if (type === 'product') {
-        url = '/api/addon/optionals/products/'+ id +'/'
+        url = '/api/addon/optionals/products/' + id + '/'
     }
 
     if (!url) {
@@ -268,11 +302,11 @@ function set_restrict_unique(type, id) {
 
     var url;
     if (type === 'service') {
-        url = '/api/addon/optionals/services/'+ id +'/'
+        url = '/api/addon/optionals/services/' + id + '/'
     }
 
     if (type === 'product') {
-        url = '/api/addon/optionals/products/'+ id +'/'
+        url = '/api/addon/optionals/products/' + id + '/'
     }
 
     if (!url) {
@@ -287,11 +321,11 @@ function unset_restrict_unique(type, id) {
 
     var url;
     if (type === 'service') {
-        url = '/api/addon/optionals/services/'+ id +'/'
+        url = '/api/addon/optionals/services/' + id + '/'
     }
 
     if (type === 'product') {
-        url = '/api/addon/optionals/products/'+ id +'/'
+        url = '/api/addon/optionals/products/' + id + '/'
     }
 
     if (!url) {
@@ -300,6 +334,69 @@ function unset_restrict_unique(type, id) {
 
     var data = {'restrict_unique': false};
     save_optional(url, data, 'Atividade configurada como não-restrita!');
+}
+
+function service_fetch_data_and_open_delete_modal(optional_id) {
+
+
+    var url = '/api/addon/optionals/services/' + optional_id + '/';
+    send(url, 'GET', {}, function (response) {
+        $('#service_optional_delete_id').val(optional_id);
+        $('#service_optional_name').text(response.name);
+        $('#modal-service-delete').modal('show');
+    }, function (response) {
+        response = response.responseJSON;
+        console.error(response);
+        var msg = 'Não foi possivel pegar os dados do opcional.';
+
+        if (response.hasOwnProperty('detail')) {
+            msg += '. Detalhe: ' + response.detail
+        }
+        Messenger().post({message: msg, type: 'error'});
+    });
+}
+
+function product_fetch_data_and_open_delete_modal(optional_id) {
+    var url = '/api/addon/optionals/products/' + optional_id + '/';
+
+
+    send(url, 'GET', {}, function (response) {
+        $('#product_optional_delete_id').val(optional_id);
+        $('#product_optional_name').text(response.name);
+        $('#modal-product-delete').modal('show');
+    }, function (response) {
+        response = response.responseJSON;
+        console.error(response);
+        var msg = 'Não foi possivel pegar os dados do opcional.';
+
+        if (response.hasOwnProperty('detail')) {
+            msg += '. Detalhe: ' + response.detail
+        }
+        Messenger().post({message: msg, type: 'error'});
+    });
+
+
+}
+
+function submit_delete_optional(typeOfOptional) {
+
+    var optional_id;
+    var url;
+
+    if(typeOfOptional === "service"){
+        $('#modal-service-delete').modal('hide');
+        optional_id = $('#service_optional_delete_id');
+        url = '/api/addon/optionals/services/' + optional_id.val() + '/';
+        console.log(url);
+        delete_optional(url, 'Atividade extra deletado com sucesso!');
+        optional_id.val("");
+    } else if (typeOfOptional === "product"){
+        $('#modal-product-delete').modal('hide');
+        optional_id = $('#product_optional_delete_id');
+        url = '/api/addon/optionals/products/' + optional_id.val() + '/';
+        delete_optional(url, 'Produto deletado com sucesso!');
+        optional_id.val("");
+    }
 }
 
 $(document).ready(function () {

@@ -59,7 +59,7 @@
                     <div class="buttonbar">
                         <div class="float-left">
                             <a href="{% url 'addon:optional-product-add' event.pk %}"
-                                class="btn btn-success">
+                               class="btn btn-success">
                                 <i class="fa fa-plus"></i>
                                 Novo Produto / Serviço
                             </a>
@@ -78,4 +78,5 @@
 
 {% block modals %}
     {% include 'addon/optional/includes/modal-product-limit.html' %}
+    {% include 'addon/optional/includes/modal-product-delete.html' %}
 {% endblock %}
