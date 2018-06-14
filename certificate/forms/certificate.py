@@ -14,7 +14,8 @@ class CertificatePartialForm(forms.ModelForm):
             'event',
             'background_image',
             'text_content',
-            'event_location'
+            'event_location',
+            'only_attending_participantes',
         ]
 
         widgets = {
@@ -64,6 +65,7 @@ class CertificatePartialForm(forms.ModelForm):
 
     def clean_text_content(self):
         text_content = self.cleaned_data['text_content']
+        text_content = text_content.strip()
         text_content = text_content\
             .replace('\r\n', ' ')\
             .replace('\r', ' ')\

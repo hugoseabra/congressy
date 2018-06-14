@@ -340,6 +340,12 @@
 
                         {% csrf_token %}
                         {% render_generic_field form.background_image required=True %}
+                        {% render_switchery_field form.only_attending_participantes required=True%}
+                        <small class="text-muted">
+                            Independente da presença confirmada ou não,
+                            certificados serão emitidos apenas para
+                            participantes que possuem inscrição confirmada.
+                        </small>
                         {% render_generic_field form.text_content required=True %}
                         {% render_generic_field form.event_location required=True %}
                         {% if not object.event_has_any_type_of_location %}

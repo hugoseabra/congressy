@@ -181,6 +181,11 @@ class Certificate(models.Model):
         verbose_name='centralizar texto',
     )
 
+    only_attending_participantes = models.BooleanField(
+        default=True,
+        verbose_name='apenas para presentes(check-in)',
+    )
+
     def __str__(self):
         return '{}'.format(self.event)
 
