@@ -122,7 +122,7 @@ def _export_subscriptions(worksheet, subscriptions):
 
         collector[row_idx].append('Sim' if sub.attended else 'Não')
         collector[row_idx].append(
-            sub.attended.strftime('%d/%m/%Y') if sub.attended else ''
+            sub.attended_on.strftime('%d/%m/%Y') if sub.attended else ''
         )
 
         collector[row_idx].append(get_object_value(person, 'name'))
