@@ -354,17 +354,6 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
                     pk=self.object.pk,
                 )
 
-            if not self.last_transaction:
-                messages.warning(
-                    request,
-                    'Este perfil não possui transações financeiras.'
-                )
-                return redirect(
-                    'subscription:subscription-view',
-                    event_pk=self.event.pk,
-                    pk=self.object.pk,
-                )
-
         return response
 
     def _get_last_transaction(self):

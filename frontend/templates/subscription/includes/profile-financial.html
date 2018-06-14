@@ -41,17 +41,29 @@
                             <h1 style="margin-top:8px">{{ object.person.name }}</h1>
                         </div>
                         <div class="float-right">
-                            {% if dividend_amount < 0 %}
+                            {% if last_transaction %}
+                                {% if dividend_amount < 0 %}
+                                    <i class="fas fa-exclamation-triangle text-warning animated shake" style="margin-left:20px"
+                                       data-toggle="tooltip"
+                                       title="Participante com dívidas."
+                                    ></i>
+                                {% elif dividend_amount > 0 %}
+                                    <i class="fas fa-exclamation-triangle text-warning animated shake" style="margin-left:20px"
+                                       data-toggle="tooltip"
+                                       title="Participante com valor em ver com o evento."
+                                    ></i>
+                                {% elif dividend_amount == 0 %}
+                                    <i class="fas fa-check text-success" style="margin-left:20px"
+                                       data-toggle="tooltip"
+                                       title="Participante sem dívidas."
+                                    ></i>
+                                {% endif %}
+                            {% elif object.free is False %}
                                 <i class="fas fa-exclamation-triangle text-warning animated shake" style="margin-left:20px"
                                    data-toggle="tooltip"
                                    title="Participante com dívidas."
                                 ></i>
-                            {% elif dividend_amount > 0 %}
-                                <i class="fas fa-exclamation-triangle text-warning animated shake" style="margin-left:20px"
-                                   data-toggle="tooltip"
-                                   title="Participante com valor em ver com o evento."
-                                ></i>
-                            {% elif dividend_amount == 0 %}
+                            {% elif object.free is True %}
                                 <i class="fas fa-check text-success" style="margin-left:20px"
                                    data-toggle="tooltip"
                                    title="Participante sem dívidas."
