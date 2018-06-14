@@ -1,5 +1,5 @@
 {% extends 'base/base.html' %}
-{% load static humanize l10n form_config_tags %}
+{% load static humanize i18n l10n form_config_tags %}
 
 {% block title %}
     Certificado | Congressy
@@ -113,19 +113,15 @@
                             {% endif %}
                             text-align: justify;"
                          id="cert-date">
-                        {% localize off %}
-
+                        {% language 'pt-br' %}
                             {% if object.has_city %}
                                 {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
                             {% else %}
                                 {{ object.event_location }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
                             {% endif %}
-                        {% endlocalize %}
-
+                        {% endlanguage %}
                     </div>
                 {% endif %}
-
-
                 <div style="
                         position:absolute;
                         {% if object.text_center %}
