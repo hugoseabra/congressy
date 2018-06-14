@@ -362,7 +362,7 @@
                                 </strong>
                             </i>
 
-                            <div style="margin-top: 10px">
+                            <div >
                                 <strong>
                                     Chaves disponiveis no momento:
                                 </strong>
@@ -399,24 +399,6 @@
                         {{ form.event }}
 
 
-                        <label for="showEventNameCheckBox" style="margin-top:
-                        10px">
-                            Substituir pelo nome do evento
-                        </label>
-                        <input class="js-switch" type="checkbox"
-                               id="showEventNameCheckBox"
-                               name="showEventNameCheckBox">
-                        <br/>
-
-                        <label for="showLongNameCheckBox" style="margin-top:
-                        10px">
-                            Substituir por um nome fictício grande
-                        </label>
-                        <input class="js-switch" type="checkbox"
-                               id="showLongNameCheckBox"
-                               name="showLongNameCheckBox">
-
-
                     </div>
                     <div class="modal-footer">
 
@@ -434,7 +416,7 @@
         </div>
     </div>
 
-    <!-- ALIGNMENT MODAL -->
+    <!-- EDIÇÂO MODAL -->
     <div class="modal fade in" id="certificateAlignmentModal"
          role="dialog"
          aria-labelledby="certificateAlignmentModalLabel" aria-hidden="false">
@@ -450,66 +432,107 @@
                 </div>
                 <div class="modal-body">
 
-                    <label for="titleCheckBox" style="margin-top: 10px">
-                        Esconder título
-                    </label>
-                    <input class="js-switch" type="checkbox"
-                           {% if object.title_hide %}checked{% endif %}
-                           id="titleCheckBox"
-                           name="titleCheckBox">
-                    <br/>
+                    <table class="table borderless">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><input class="js-switch" type="checkbox"
+                                       id="showEventNameCheckBox"
+                                       name="showEventNameCheckBox"></td>
+                            <td><label for="showEventNameCheckBox">
+                                Substituir pelo nome do evento
+                            </label></td>
 
-                    <label for="dateCheckBox" style="margin-top: 10px">
-                        Esconder data
-                    </label>
-                    <input type="checkbox" class="js-switch"
-                           {% if object.date_hide %}checked{% endif %}
-                           id="dateCheckBox"
-                           name="dateCheckBox">
-                    <br/>
-                    <br/>
-                    <label for="centralizar">
-                        Centralizar texto:
-                    </label>
-                    <input class="js-switch" type="checkbox" id='centralizar'
-                           name="centralizar">
-                    <br/>
-                    <br/>
+                        </tr>
+                        <tr>
+                            <td><input class="js-switch" type="checkbox"
+                                       id="showLongNameCheckBox"
+                                       name="showLongNameCheckBox"></td>
+                            <td><label for="showLongNameCheckBox">
+                                Substituir por um nome fictício grande
+                            </label></td>
+                        </tr>
+                        <tr>
+                            <td><input class="js-switch" type="checkbox"
+                                       {% if object.title_hide %}checked{% endif %}
+                                       id="titleCheckBox"
+                                       name="titleCheckBox"></td>
+                            <td>
+                                <label for="titleCheckBox">
+                                    Esconder título
+                                </label></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="js-switch"
+                                       {% if object.date_hide %}checked{% endif %}
+                                       id="dateCheckBox"
+                                       name="dateCheckBox"></td>
+                            <td>
+                                <label for="dateCheckBox">
+                                    Esconder data
+                                </label></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input class="js-switch" type="checkbox" id='centralizar'
+                                       name="centralizar"></td>
+                            <td><label for="centralizar">
+                                Centralizar texto
+                            </label></td>
+                        </tr>
 
-                    <label for="titleFontSize" style="margin-top: 20px">
-                        Tamanho do titulo:
-                    </label>
-                    <input class="form-control"
-                           type="number"
-                           id="titleFontSize" min="1"
-                           value= {{ object.title_font_size|floatformat:"0" }}>
+                        </tbody>
+                    </table>
 
 
-                    <label for="dateFontSize" style="margin-top: 10px">
-                        Tamanho da data:
-                    </label>
-                    <input class="form-control"
-                           type="number"
-                           id="dateFontSize" min="1"
-                           value= {{ object.date_font_size|floatformat:"0" }}>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="titleFontSize" >
+                                Tamanho do titulo:
+                            </label>
+                            <input class="form-control"
+                                   type="number"
+                                   id="titleFontSize" min="1"
+                                   value= {{ object.title_font_size|floatformat:"0" }}>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dateFontSize" >
+                                Tamanho da data:
+                            </label>
+                            <input class="form-control"
+                                   type="number"
+                                   id="dateFontSize" min="1"
+                                   value= {{ object.date_font_size|floatformat:"0" }}>
+                        </div>
+                    </div>
 
 
-                    <label for="textFontSize" style="margin-top: 10px">
-                        Tamanho do texto
-                    </label>
-                    <input class="form-control"
-                           type="number"
-                           id="textFontSize" min="1"
-                           value={{ object.text_font_size|floatformat:"0" }}>
-
-                    <label for="textLineHeight" style="margin-top: 10px">
-                        Espaçamento entre linhas do texto
-                    </label>
-                    <input class="form-control"
-                           type="number"
-                           id="textLineHeight" min="1"
-                           max="10" step="0.1"
-                           value={{ object.text_line_height|floatformat:"0" }}>
+                    <div class="row">
+                        <div class="col-md-6" style="margin-top: 10px">
+                            <label for="textFontSize" >
+                                Tamanho do texto
+                            </label>
+                            <input class="form-control"
+                                   type="number"
+                                   id="textFontSize" min="1"
+                                   value={{ object.text_font_size|floatformat:"0" }}>
+                        </div>
+                        <div class="col-md-6" style="margin-top: 10px">
+                            <label for="textLineHeight" >
+                                Espaço entre linhas do texto
+                            </label>
+                            <input class="form-control"
+                                   type="number"
+                                   id="textLineHeight" min="1"
+                                   max="10" step="0.1"
+                                   value={{ object.text_line_height|floatformat:"0" }}>
+                        </div>
+                    </div>
 
 
                 </div>
