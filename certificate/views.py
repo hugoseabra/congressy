@@ -156,7 +156,6 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
             {
                 'NOME': self.subscription.person.name.upper(),
                 'EVENTO': self.subscription.event.name,
-                'CPF': self.subscription.person.cpf,
             }
         )
         res = text_template.render(context)
@@ -165,16 +164,6 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
     def can_access(self):
         return self.subscription.confirmed is True and \
                self.subscription.attended is True
-
-    def get_document_number(self):
-        person = self.subscription.person
-
-        if person.cpf:
-            return person.cpf
-        elif person.institution_cnpj:
-            return person.institution_cnpj
-        else:
-            return ''
 
 
 class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
