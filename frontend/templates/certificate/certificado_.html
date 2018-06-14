@@ -328,13 +328,15 @@
                         Editar conteudo do certificado
                     </h4>
                 </div>
-                <form class="submission_form form-horizontal"
-                      role="form"
-                      method="post"
-                      style="margin-left: 15px"
-                      action="{% url 'certificate:event-certificate-form' event.pk %}"
-                      enctype="multipart/form-data">
-                    <div class="modal-body" style="margin-right: 15px">
+
+                <div class="modal-body" style="margin-right: 15px">
+                    <form class="submission_form form-horizontal"
+                          role="form"
+                          method="post"
+                          id="certificate_modal_form"
+                          style="margin-left: 15px"
+                          action="{% url 'certificate:event-certificate-form' event.pk %}"
+                          enctype="multipart/form-data">
 
                         {% csrf_token %}
                         {% render_generic_field form.background_image required=True %}
@@ -362,7 +364,7 @@
                                 </strong>
                             </i>
 
-                            <div >
+                            <div>
                                 <strong>
                                     Chaves disponiveis no momento:
                                 </strong>
@@ -398,25 +400,28 @@
                         </div>
                         {{ form.event }}
 
+                    </form>
+                </div>
+                <div class="modal-footer">
 
-                    </div>
-                    <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-success"
+                            id="certificate_modal_form_save_btn"
+                            onclick="save_form();return false;">
+                        <i class="far fa-save"></i>
+                        Salvar
+                    </button>
+                    <button type="button" class="btn btn-danger"
+                            data-dismiss="modal">
+                        Fechar
+                    </button>
+                </div>
 
-                        <button type="submit" class="btn btn-success">
-                            <i class="far fa-save"></i>
-                            Salvar
-                        </button>
-                        <button type="button" class="btn btn-danger"
-                                data-dismiss="modal">
-                            Fechar
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
 
-    <!-- EDIÇÂO MODAL -->
+    <!-- EDIÇÃO MODAL -->
     <div class="modal fade in" id="certificateAlignmentModal"
          role="dialog"
          aria-labelledby="certificateAlignmentModalLabel" aria-hidden="false">
@@ -492,7 +497,7 @@
 
                     <div class="row">
                         <div class="col-md-6">
-                            <label for="titleFontSize" >
+                            <label for="titleFontSize">
                                 Tamanho do titulo:
                             </label>
                             <input class="form-control"
@@ -501,7 +506,7 @@
                                    value= {{ object.title_font_size|floatformat:"0" }}>
                         </div>
                         <div class="col-md-6">
-                            <label for="dateFontSize" >
+                            <label for="dateFontSize">
                                 Tamanho da data:
                             </label>
                             <input class="form-control"
@@ -514,7 +519,7 @@
 
                     <div class="row">
                         <div class="col-md-6" style="margin-top: 10px">
-                            <label for="textFontSize" >
+                            <label for="textFontSize">
                                 Tamanho do texto
                             </label>
                             <input class="form-control"
@@ -523,7 +528,7 @@
                                    value={{ object.text_font_size|floatformat:"0" }}>
                         </div>
                         <div class="col-md-6" style="margin-top: 10px">
-                            <label for="textLineHeight" >
+                            <label for="textLineHeight">
                                 Espaço entre linhas do texto
                             </label>
                             <input class="form-control"
