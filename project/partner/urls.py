@@ -28,9 +28,6 @@ urlpatterns += static.static(
 # ========================== DEBUG ENVIRONMENT ============================== #
 if settings.DEBUG:
 
-    if os.environ.get('DJANGO_SETTINGS_MODULE') == 'project.settings.staging':
-        urlpatterns += [url(r'^logs/', include('logtailer.urls')), ]
-
     import debug_toolbar
 
     urlpatterns = [
