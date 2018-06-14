@@ -40,27 +40,27 @@ class CertificateConfigView(EventViewMixin, generic.TemplateView):
 
         if event_name:
             if event_name == "1":
-                if "{{EVENTO}}" in ref_object.text_content:
+                if "{{ EVENTO }}" in ref_object.text_content:
                     ref_object.text_content = ref_object.text_content. \
                         replace("{{""EVENTO}}", self.event.name)
             elif event_name == "0":
                 if self.event.name in ref_object.text_content:
                     ref_object.text_content = ref_object.text_content. \
-                        replace(self.event.name, "{{""EVENTO}}")
+                        replace(self.event.name, "{{ EVENTO }}")
 
         if long_name:
             if long_name == "1":
-                if "{{NOME}}" in ref_object.text_content:
+                if "{{ NOME }}" in ref_object.text_content:
                     ref_object.text_content = ref_object.text_content.replace(
-                        "{{NOME}}", self.really_long_name)
+                        "{{ NOME }}", self.really_long_name)
             elif long_name == "0":
                 if self.really_long_name in ref_object.text_content:
                     ref_object.text_content = ref_object.text_content.replace(
-                        self.really_long_name, "{{NOME}}", )
+                        self.really_long_name, "{{ NOME }}", )
 
-        if "{{NOME}}" in ref_object.text_content:
+        if "{{ NOME }}" in ref_object.text_content:
             ref_object.text_content = ref_object.text_content.replace(
-                "{{NOME}}", "<strong>{{NOME}}</strong>")
+                "{{ NOME }}", "<strong>{{ NOME }}</strong>")
 
         if self.really_long_name in ref_object.text_content:
             ref_object.text_content = ref_object.text_content.replace(
@@ -168,8 +168,8 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
     def get_text(self):
         text = self.event.certificate.text_content
 
-        if "{{NOME}}" in text:
-            text = text.replace("{{NOME}}", "<strong>{{NOME}}</strong>")
+        if "{{ NOME }}" in text:
+            text = text.replace("{{ NOME }}", "<strong>{{ NOME }}</strong>")
 
         text_template = Template(text)
         context = Context(
@@ -236,8 +236,8 @@ class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
     def get_text(self):
         text = self.event.certificate.text_content
 
-        if "{{NOME}}" in text:
-            text = text.replace("{{NOME}}", "<strong>{{NOME}}</strong>")
+        if "{{ NOME }}" in text:
+            text = text.replace("{{ NOME }}", "<strong>{{ NOME }}</strong>")
 
         text_template = Template(text)
         context = Context(
