@@ -69,7 +69,9 @@ class CertificatePartialForm(forms.ModelForm):
         text_content = text_content\
             .replace('\r\n', ' ')\
             .replace('\r', ' ')\
-            .replace('\n', ' ')
+            .replace('\n', ' ')\
+            .replace('{{ ', '{{')\
+            .replace(' }}', '}}')
 
         return text_content
 

@@ -189,10 +189,6 @@ class Certificate(models.Model):
     def __str__(self):
         return '{}'.format(self.event)
 
-    # TEXT
-    @property
-    def converted_text_content(self):
-        return Decimal((self.text_position_y * 100)) / self.MANAGE_TO_PDF_RATIO
 
     @property
     def converted_text_font_size(self):

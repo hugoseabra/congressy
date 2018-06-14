@@ -32,20 +32,19 @@ class CertificateConfigView(EventViewMixin, generic.TemplateView):
             self.object, _ = models.Certificate.objects.get_or_create(
                 event=self.event
             )
+
         ref_object = copy(self.object)
+        # Objeto de referencia criado para não manipular o self.object que o
+        # objeto de fato que é usado na instancia do form;
 
-        if "{{ NOME }}" in ref_object.text_content:
-            ref_object.text_content = ref_object.text_content.replace(
-                "{{ NOME }}", self.long_name)
+        ref_object.text_content = ref_object.text_content\
+            .replace("{{NOME}}", self.long_name)
 
-        if self.long_name in ref_object.text_content:
-            ref_object.text_content = ref_object.text_content.replace(
-                self.long_name,
-                "<strong>" + self.long_name + "</strong>")
+        ref_object.text_content = ref_object.text_content\
+            .replace(self.long_name, "<strong>" + self.long_name + "</strong>")
 
-        if "{{ EVENTO }}" in ref_object.text_content:
-            ref_object.text_content = ref_object.text_content.replace(
-                "{{ EVENTO }}", self.event.name)
+        ref_object.text_content = ref_object.text_content\
+            .replace("{{EVENTO}}", self.event.name)
 
         context['has_inside_bar'] = True
         context['active'] = 'certificate'
@@ -147,9 +146,7 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
 
     def get_text(self):
         text = self.event.certificate.text_content
-
-        if "{{ NOME }}" in text:
-            text = text.replace("{{ NOME }}", "<strong>{{ NOME }}</strong>")
+        text = text.replace("{{NOME}}", "<strong>{{NOME}}</strong>")
 
         text_template = Template(text)
         context = Context(
@@ -199,14 +196,12 @@ class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
         context['event'] = self.event
         context['certificate'] = self.event.certificate
         context['text'] = self.get_text()
-        context['is_example'] = True
         return context
 
     def get_text(self):
         text = self.event.certificate.text_content
 
-        if "{{ NOME }}" in text:
-            text = text.replace("{{ NOME }}", "<strong>{{ NOME }}</strong>")
+        text = text.replace("{{NOME}}", "<strong>{{NOME}}</strong>")
 
         text_template = Template(text)
         context = Context(
@@ -216,5 +211,5 @@ class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
                 'CPF': "629.162.880-58",
             }
         )
-        res = text_template.render(context)
-        return res
+
+        return text_template.render(context)
