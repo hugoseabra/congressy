@@ -1,26 +1,16 @@
-{% if has_inside_bar %}
-    <div class="tooltip-wrapper collapse navbar-collapse col-xs-12
-            col-sm-4 col-lg-4
-            col-xl-2" id="sidebar" data-animated="fadeInRight">
-{% endif %}
-
-<div {% if has_inside_bar %} class="col-xs-1 col-sm-1 col-lg-1
-                col-xl-1" style="padding: 0" {% else %} class="tooltip-wrapper
-                collapse FadeInLeft
-                navbar-collapse col-xs-1
-                col-sm-1 col-lg-1
-                col-xl-1 " id="sidebar" style="height:
-                 100%; position: fixed;width: 60px;z-index: 1000;" {% endif %}>
+<div class="collapse navbar-collapse collapse" id="sidebar"
+     data-animated="fadeInRight">
     <div class="principal_sidebar new_nav  sidebar-left sidebar"
-         style="width:
-                    50px; padding-top: 0">
+         style=" padding-top: 0">
         <ul class="col nav nav-pills nav-stacked " style="
                             font-size: 25px;text-align: center; margin: 0">
             <li class="dropdown" style="width: 50px;">
+                <ul id="profile-navbar"
+                    class="col nav nav-pills nav-stacked " role="menu"></ul>
                 <a id="profile-button"
                    data-toggle="tooltip"
                    data-placement="right"
-                   data-original-title="{{ user.get_full_name }}" ;
+                   data-original-title="{{ user.get_full_name }}";>
                     <span class="meta">
                        <span style="cursor: pointer;"
                              class="text">
@@ -82,12 +72,10 @@
 
                 ></a>
             </li>
+            <li class="divider sidebar_divider visible-xs"></li>
         </ul>
-        <li class="divider sidebar_divider visible-xs"></li>
-
         <ul class="col nav nav-pills nav-stacked visible-xs"
-            style="
-                            font-size: 30px;text-align: center;margin: 0;">
+            style="font-size: 30px;text-align: center;margin: 0;">
             <li>
                 <a href="{% url 'event:event-add' %}" class="btn
                     " style="width: 50px;height:
@@ -101,30 +89,20 @@
             </li>
         </ul>
     </div>
-</div>
 
-{% if has_inside_bar %}
-    <div class="manage_sidebar col-xs-3 col-sm-3 col-lg-3 col-xl-1">
-        <div>
+    {% if has_inside_bar %}
+        <div class="manage_sidebar">
+            <div>
 
-            <nav style="color: #383838">
-                {% if event %}
-                    {% include 'event/event-menu.html' %}
-                {% elif organization %}
-                    {% include 'organization/organization-menu.html' %}
-                {% endif %}
-            </nav>
+                <nav style="color: #383838">
+                    {% if event %}
+                        {% include 'event/event-menu.html' %}
+                    {% elif organization %}
+                        {% include 'organization/organization-menu.html' %}
+                    {% endif %}
+                </nav>
+            </div>
         </div>
-    </div>
-    </div>
-{% endif %}
-
-
-<div {% if has_inside_bar %}
-    class="col-xs-12  col-sm-8 col-lg-9 col-xl-10"
-{% else %}
-    class="principal_content col-xs-12 col-sm-12 col-lg-12
-                    col-xl-12"
-    style="float:right; position: relative;"
-{% endif %}>
+    {% endif %}
+</div>
 

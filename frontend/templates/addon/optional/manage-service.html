@@ -43,6 +43,9 @@
         $(document).ready(function () {
             selectFromHash();
             createAnchorEvents();
+
+
+
         });
     </script>
 {% endblock %}
@@ -83,4 +86,5 @@
 
 {% block modals %}
     {% include 'addon/optional/includes/modal-service-limit.html' %}
+    {% include 'addon/optional/includes/modal-service-delete.html' %}
 {% endblock %}

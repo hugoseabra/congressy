@@ -25,13 +25,15 @@ from gatheros_event.views.mixins import (
     AccountMixin,
     PermissionDenied,
 )
-from gatheros_subscription.forms import SubscriptionFilterForm, \
-    SubscriptionForm, SubscriptionAttendanceForm
+from gatheros_subscription.forms import SubscriptionAttendanceForm, \
+    SubscriptionFilterForm, SubscriptionForm
 from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.helpers.report_payment import \
     PaymentReportCalculator
 from gatheros_subscription.models import FormConfig, Subscription
+from mailer import exception as mailer_exception, services as mailer
 from payment import forms
+from payment.helpers import payment_helpers
 from payment.models import Transaction
 
 
@@ -319,8 +321,12 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
 
         messenger = []
         for message in list(storage):
+            level_tag = message.level_tag
+            if level_tag == 'danger':
+                level_tag = 'error'
+
             messenger.append({
-                'type': message.level_tag,
+                'type': level_tag,
                 'message': message.message,
             })
 
@@ -348,7 +354,7 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
                     pk=self.object.pk,
                 )
 
-            if self.object.free:
+            if not self.last_transaction:
                 messages.warning(
                     request,
                     'Este perfil não possui transações financeiras.'
@@ -392,6 +398,13 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         ctx['dividend_amount'] = calculator.dividend_amount
         ctx['financial'] = self.financial
         ctx['last_transaction'] = self.last_transaction
+        ctx['form'] = self.get_checkout_form()
+        ctx['encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
+        ctx['services'] = self.get_services()
+        ctx['products'] = self.get_products()
+        ctx['new_boleto_allowed'] = payment_helpers.is_boleto_allowed(
+            self.event
+        )
 
         if self.request.GET.get('details'):
             ctx['show_details'] = True
@@ -402,6 +415,29 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         return ctx
 
     def post(self, request, *args, **kwargs):
+        url = reverse('subscription:subscription-payments', kwargs={
+            'event_pk': self.event.pk,
+            'pk': self.object.pk,
+        })
+
+        data = request.POST.copy()
+
+        action = data.get('action')
+        next_url = data.get('next_url')
+        if action == 'notify_boleto':
+            if next:
+                url = next_url
+
+            try:
+                mailer.notify_open_boleto(
+                    transaction=self._get_last_transaction()
+                )
+                messages.success(request, 'Boleto enviado com sucesso.')
+
+            except mailer_exception.NotifcationError as e:
+                messages.error(request, str(e))
+
+            return redirect(url)
 
         if self.event.allow_internal_subscription is False:
             self.permission_denied_url = reverse(
@@ -411,7 +447,6 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
             )
             raise PermissionDenied('Você não pode realizar esta ação.')
 
-        data = request.POST.copy()
         data['manual_author'] = '{} ({})'.format(
             request.user.get_full_name(),
             request.user.email,
@@ -435,17 +470,32 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
 
         form.save()
 
-        url = reverse('subscription:subscription-payments', kwargs={
-            'event_pk': self.event.pk,
-            'pk': self.object.pk,
-        })
-
         if transaction_id:
             messages.success(request, 'Recebimento editado com sucesso.')
         else:
             messages.success(request, 'Recebimento registrado com sucesso.')
 
         return redirect(url + '?details=1')
+
+    def get_checkout_form(self):
+        return forms.PagarMeCheckoutForm(
+            initial={
+                'subscription': self.object.pk,
+                'next_url': reverse(
+                    'subscription:subscription-payments',
+                    kwargs={
+                        'event_pk': self.event.pk,
+                        'pk': self.object.pk,
+                    }
+                ),
+            }
+        )
+
+    def get_products(self):
+        return self.object.subscription_products.all()
+
+    def get_services(self):
+        return self.object.subscription_services.all()
 
 
 class SubscriptionAddFormView(SubscriptionFormMixin):
@@ -819,7 +869,7 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
     event = None
     person = None
     lot = None
-    show_content_in_browser = False
+    show_content_in_browser = True
     permission_denied_url = reverse_lazy('front:start')
 
     cmd_options = {

@@ -90,6 +90,9 @@ def can_process_payment(wizard):
     if is_paid_lot(wizard) is False:
         return False
 
+    if wizard.storage.current_step == "payment":
+        return True
+
     has_boleto_waiting = False
     has_card_waiting = False
     for transaction in subscription.transactions.all():

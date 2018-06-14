@@ -4,42 +4,8 @@
  *   Copyright 2014 Authentic Goods Co. http://authenticgoods.co
  *
 */
-@font-face {
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Montserrat Regular'), local('Montserrat-Regular'), url(https://fonts.gstatic.com/s/montserrat/v12/JTUSjIg1_i6t8kCHKm459Wlhzg.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Montserrat Bold'), local('Montserrat-Bold'), url(https://fonts.gstatic.com/s/montserrat/v12/JTURjIg1_i6t8kCHKm45_dJE3gnD-w.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Open Sans Regular'), local('OpenSans-Regular'), url(https://fonts.gstatic.com/s/opensans/v15/mem8YaGs126MiZpBA-UFVZ0e.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 600;
-  src: local('Open Sans SemiBold'), local('OpenSans-SemiBold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UNirkOUuhs.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UN7rgOUuhs.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 800;
-  src: local('Open Sans ExtraBold'), local('OpenSans-ExtraBold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UN8rsOUuhs.ttf) format('truetype');
-}
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,700");
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800");
 html {
   height: 100%;
   font-size: 100%;
@@ -3494,6 +3460,20 @@ label.valid {
 .theme-cgsy-full .principal_content {
   padding-left: 51px;
 }
+.theme-cgsy-full .sidebar-section .navbar-collapse {
+  padding-left: 0;
+}
+.theme-cgsy-full .main-page-full {
+  width: 79%;
+  padding-bottom: 50px;
+}
+.theme-cgsy-full .main-page-sidebar {
+  width: 100%;
+  padding-left: 50px;
+}
+.theme-cgsy-full .main-page-sidebar .cgsy-footer {
+  padding-left: 25px;
+}
 .theme-cgsy-full .sidebar_divider {
   height: 1.4px;
   margin: 9px 0;
@@ -3617,6 +3597,13 @@ label.valid {
   padding-bottom: 105px !important;
 }
 @media only screen and (max-width: 768px) {
+  .theme-cgsy-full .main-page-sidebar {
+    padding-top: 60px;
+    padding-left: 0;
+  }
+  .theme-cgsy-full .main-page-full {
+    width: 100%;
+  }
   .theme-cgsy-full .brand {
     margin-left: 0;
   }

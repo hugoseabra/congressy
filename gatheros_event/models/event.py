@@ -66,7 +66,7 @@ class Event(models.Model, GatherosModelMixin):
     EVENT_TYPES = (
         (EVENT_TYPE_FREE, 'gratuito'),
         (EVENT_TYPE_PAID, 'pago'),
-        (EVENT_TYPE_SCIENTIFIC, 'scientific'),
+        (EVENT_TYPE_SCIENTIFIC, 'cientifico'),
     )
 
     RSVP_DISABLED = 'rsvp-disabled'
@@ -124,6 +124,13 @@ class Event(models.Model, GatherosModelMixin):
         default=False,
         verbose_name='Certificado',
         help_text="Seu evento terá entrega de Certificados ?"
+
+    )
+
+    has_survey = models.BooleanField(
+        default=False,
+        verbose_name='Formulário Personalizado',
+        help_text="Seu evento terá formulário com perguntas personalizadas ?"
 
     )
 

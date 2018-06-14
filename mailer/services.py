@@ -962,6 +962,64 @@ def notify_new_event(event):
     )
 
 
+# ======================= MANAGE ORGANIZER EMAILS =========================== #
+def notify_open_boleto(transaction):
+    """
+    Notifica participante sobre novo boleto disponível para pagamento.
+    """
+    subscription = transaction.subscription
+    event = subscription.event
+    person = subscription.person
+
+    checks.check_notification_transaction_unpaid_boleto(transaction)
+
+    boleto_url = transaction.boleto_url
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    user = person.user
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    password_set_url = absoluteuri.reverse(
+        'password_reset_confirm',
+        kwargs={
+            'uidb64': uid,
+            'token': token,
+        }
+    )
+
+    # @TODO set event.date_start to period
+    template_name = \
+        'mailer/subscription/notify_unpaid_boleto.html'
+
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': False,
+        'boleto_url': boleto_url,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+        'password_set_url': password_set_url,
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Boleto disponível: {}'.format(event.name),
+        body=body,
+        to=person.email,
+        reply_to=event.organization.email,
+    )
+
+
 # =========================== ORGANIZATION  EMAILS ========================== #
 def notify_invite(organization, link, inviter, invited_person, email):
     """

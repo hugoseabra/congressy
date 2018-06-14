@@ -96,3 +96,20 @@ def filter_lookup(value, arg):
     if arg not in value:
         return None
     return value[arg]
+
+
+@register.simple_tag
+def has_many_organizations(user):
+    """ Retorna se o usuário possui mais de uma organização """
+    if user.person:
+        x = user.person.members.all().count() > 1
+        y = user.person.members.all()
+        return user.person.members.all().count() > 1
+
+
+@register.simple_tag
+def has_events(user):
+    """ Retorna se o usuário possui mais de uma organização """
+    if user.person:
+        org = user.person.members.first().organization
+        return org.events.all().count() > 0 or has_many_organizations(user)
