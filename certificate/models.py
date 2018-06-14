@@ -246,7 +246,7 @@ class Certificate(models.Model):
     @property
     def is_ready(self):
 
-        if self.background_image is None:
+        if not hasattr(self.background_image, 'default'):
             return False
 
         if not self.event_has_city and self.event_location is None:
