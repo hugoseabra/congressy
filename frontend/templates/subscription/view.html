@@ -126,7 +126,7 @@
             {% if last_transaction.type == last_transaction.BOLETO and not last_transaction.boleto_url %}
                 window.setTimeout(function() {
                     window.location.href=window.location.href;
-                }, 5000);
+                }, 7500);
             {% endif %}
         });
     </script>
@@ -177,6 +177,11 @@
             {{ form.as_p }}
         </form>
     </div>
+    <form action="" method="post" id="payment-notify-boleto" style="display:none" onsubmit="this.next_url.value=window.location.pathname">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="notify_boleto" />
+        <input type="hidden" name="next_url" value="" />
+    </form>
 
 {% endblock %}
 {% block modals %}
