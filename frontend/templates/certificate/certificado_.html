@@ -184,6 +184,14 @@
                 $('#certificateDataModal').modal('show');
             });
 
+            //Line breaks in textarea
+            var text_content = $("#id_text_content");
+            text_content.keypress(function (e) {
+                if (e.keyCode !== 13) return;
+                text_content.val(text_content.val().replace(/\n/g, ""));
+                return false;
+            });
+
 
             {% if object.is_ready %}
                 var title = $('#cert-title');
