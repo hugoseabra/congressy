@@ -136,7 +136,7 @@ window.cgsy.cert = window.cgsy.cert || {};
         this.saveLineHeight = function (size) {
             size = size || '22';
             save(
-                {'text_font_size': remove_px(size)},
+                {'text_line_height': remove_px(size)},
                 'Espaço entre-linhas do texto salvo com sucesso.'
             );
         };

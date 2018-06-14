@@ -21,7 +21,8 @@
             position: absolute;
             width: {{ certificate.converted_text_width|unlocalize }}px;
             height: {{ certificate.converted_text_height|unlocalize }}px;
-            font-size: {{ certificate.converted_text_font_size|unlocalize }}px;
+            font-size: {{ certificate.converted_text_font_size|floatformat:"0"|unlocalize }}px;
+            line-height: {{ certificate.converted_text_line_height|floatformat:"0"|unlocalize }}px;
             text-align: {% if certificare.text_center %}center{% else %}justify{% endif %};
             -webkit-transform: translate({{ certificate.converted_text_position_x|unlocalize}}px,{{ certificate.converted_text_position_y|unlocalize}}px);
             transform: translate({{ certificate.converted_text_position_x|unlocalize}}px,{{ certificate.converted_text_position_y|unlocalize}}px);
@@ -69,7 +70,7 @@
     </div>
 
     <div style="position:absolute;" id="cert-text">
-        {{ text|safe }}
+        {{ text|safe }}{{ certificate.converted_text_font_size|floatformat:"0"|unlocalize }}
     </div>
 </div>
 

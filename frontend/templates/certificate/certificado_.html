@@ -303,7 +303,7 @@
 
                 $('#textLineHeight').bind('click keyup', function () {
                     cert.saveTextLineHeight($(this).val());
-                    text.css('line-height', $(this).val());
+                    text.css('line-height', $(this).val() + "px");
                 });
 
             {% endif %}
