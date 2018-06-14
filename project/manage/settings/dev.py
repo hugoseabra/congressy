@@ -11,7 +11,6 @@ ABSOLUTEURI_PROTOCOL = 'http'
 # ================================= APPS ==================================== #
 INSTALLED_APPS.extend([
     'debug_toolbar',
-    'logtailer',
 ])
 # ============================== DATABASE =================================== #
 DATABASES = {

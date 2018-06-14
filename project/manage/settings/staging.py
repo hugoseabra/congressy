@@ -14,7 +14,6 @@ STAGING = True
 # ================================= APPS ==================================== #
 INSTALLED_APPS.extend([
     'django_nose',
-    'logtailer',
 ])
 # ========================= SERVER CONFIGURATION ============================ #
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media_staging')
