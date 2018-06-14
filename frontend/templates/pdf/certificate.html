@@ -24,11 +24,7 @@
             text-align: {% if certificare.text_center %}center{% else %}justify{% endif %};
             -webkit-transform: translate({{ certificate.converted_text_position_x|unlocalize}}px,{{ certificate.converted_text_position_y|unlocalize}}px);
             transform: translate({{ certificate.converted_text_position_x|unlocalize}}px,{{ certificate.converted_text_position_y|unlocalize}}px);
-            overflow-wrap: break-word;
-            {% if is_example %}
-                border: 1px dotted grey;
-            {% endif %}
-
+            overflow: hidden;
         }
 
         #cert-title {
@@ -72,7 +68,7 @@
     </div>
 
     <div style="position:absolute;" id="cert-text">
-        {{ text }}
+        {{ text|safe }}
     </div>
 </div>
 
