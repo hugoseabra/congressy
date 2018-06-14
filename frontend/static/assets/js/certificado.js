@@ -268,17 +268,6 @@ window.cgsy.cert = window.cgsy.cert || {};
 
 })(jQuery, window.cgsy.cert);
 
-
- function save_form() {
-    var formEl = $('#certificate_modal_form');
-    var formElSaveBtnEl = $('#certificate_modal_form_save_btn');
-
-    formElSaveBtnEl.text('Aguarde...');
-    formElSaveBtnEl.addClass('disabled');
-    formEl.submit();
-    return false;
-}
-
 (function ($, interact, cert) {
     "use strict";
     // WRAPPER DE INTERACT
@@ -381,3 +370,13 @@ window.cgsy.cert = window.cgsy.cert || {};
         .on('resizemove', dragResize);
 
 })(jQuery, interact, window.cgsy.cert);
+
+ function save_form() {
+    var formEl = $('#certificate_modal_form');
+    var formElSaveBtnEl = $('#certificate_modal_form_save_btn');
+
+    formElSaveBtnEl.text('Aguarde...');
+    formElSaveBtnEl.addClass('disabled');
+    formEl.submit();
+    return false;
+}
