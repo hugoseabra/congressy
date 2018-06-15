@@ -137,13 +137,12 @@
             }
         }
 
-        function reoderDivs(progress) {
-            if (progress === '100.0') {
-                var todo_data = $('#todo-data');
-                var event_data = $('#graph-data');
-                todo_data.insertAfter(event_data);
-            }
-        }
+        {#function reoderDivs(progress) {#}
+        {#    if (progress === '100.0') {#}
+        {#        var todo_data = $('#todo-data');#}
+        {#        var event_data = $('#graph-data');#}
+        {#        todo_data.insertAfter(event_data);#}
+        {#    }#}
 
         function evaluateProgress() {
             var num_todo_elements = $('#todo-list tr').length;
@@ -174,8 +173,8 @@
                     $(this).parent().parent().attr('id'),
                     function () {
                         create_todo_events();
-                        setProgressBar()
-                        remove_table_add()
+                        setProgressBar();
+                        remove_table_add();
 
                     }
                 );
@@ -197,9 +196,10 @@
         $(document).ready(function () {
             setProgressBar();
             create_todo_events();
-            reoderDivs(evaluateProgress());
+            {#reoderDivs(evaluateProgress());#}
             remove_table_add();
         });
+
     </script>
 
 {% endblock %}

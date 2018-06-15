@@ -13,6 +13,7 @@ from gatheros_event.models import Info, Organization
 from gatheros_event.views.mixins import AccountMixin
 from gatheros_subscription.models import Subscription, EventSurvey
 from payment.models import Transaction
+from certificate.models import Certificate
 
 
 class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
@@ -114,6 +115,10 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         except Info.DoesNotExist:
             pass
 
+        try:
+            context['ready_certificate'] = self.event.certificate.is_ready
+        except AttributeError:
+            context['ready_certificate'] = False
 
         return context
 

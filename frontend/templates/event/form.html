@@ -246,6 +246,11 @@
                                                 {% render_switchery_field form.has_survey %}
                                             </div>
                                         </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                {% render_switchery_field form.has_certificate %}
+                                            </div>
+                                        </div>
                                     {% else %}
                                         <div class="row">
                                             <div class="col-md-6">
@@ -380,6 +385,11 @@
         .panel-footer {
             background-color: #fff;
             border-color: #fff;
+        }
+
+        h3 {
+            line-height: 1.3;
+
         }
 
     </style>

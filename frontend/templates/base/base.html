@@ -137,14 +137,7 @@
                                             <span class="caret hidden-xs"></span>
                                         </span>
                             </a>
-                        {% else %}
-                            <a style="outline: none">
-                                <span class="meta" style="color: black">
-                                    <span class="text">
-                                        {{ organization.name|truncatechars:20 }}
-                                    </span>
-                                </span>
-                            </a>
+
                         {% endif %}
                         {% if has_events %}
                             <ul class="dropdown-menu animated fadeInRight "
