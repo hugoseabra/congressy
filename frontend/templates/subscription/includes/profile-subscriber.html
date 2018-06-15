@@ -228,7 +228,7 @@
                                                     <i class="far fa-file-alt"></i>
                                                     {% if last_transaction.boleto_url %}abrir{% else %}aguarde ...{% endif %}
                                                 </button>
-                                                {% if last_transaction.boleto_url %}
+                                                {% if last_transaction.boleto_url and object.person.email %}
                                                 <button type="button"
                                                         data-toggle="tooltip"
                                                         title="Enviar boleto para o participante"

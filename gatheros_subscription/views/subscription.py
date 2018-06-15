@@ -414,8 +414,13 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         action = data.get('action')
         next_url = data.get('next_url')
         if action == 'notify_boleto':
-            if next:
+            if next_url:
                 url = next_url
+
+            last_transaction = self._get_last_transaction()
+            if not last_transaction.subscription.person.email:
+                messages.error(request, 'Participante não possui e-mail.')
+                return redirect(url)
 
             try:
                 mailer.notify_open_boleto(
