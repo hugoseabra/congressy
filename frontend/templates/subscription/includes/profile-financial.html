@@ -160,6 +160,7 @@
                                 <tr class="unread">
                                     <td class="message" style="cursor:pointer;border-top:0">
                                         <div>
+                                        {% if not object.free and last_transaction %}
                                             {% if last_transaction.manual is True %}
                                                 {% if last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_MONEY %}
                                                     <div class="float-left">
@@ -224,44 +225,44 @@
                                                     <div class="float-left"
                                                          style="margin-left:10px">
                                                         <span class="title">Método</span>
-                                                        Boleto
-                                                        {% if last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
-                                                        <strong class="text-warning">(vencido)</strong>
-                                                        {% endif %}
-                                                    </div>
-                                                    {% if last_transaction.status != last_transaction.PAID and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
-                                                    <div class="float-right">
-                                                        <button type="button"
-                                                                data-toggle="tooltip"
-                                                                title="{% if last_transaction.boleto_url %}Abrir boleto{% else %}Aguardando processamento{% endif %}"
-                                                                class="btn btn-success btn-sm btn-trans {% if not last_transaction.boleto_url %}disabled{% endif %}"
-                                                                onclick="window.open('{{ last_transaction.boleto_url }}')">
-                                                            <i class="far fa-file-alt"></i>
-                                                            {% if last_transaction.boleto_url %}abrir{% else %}aguarde ...{% endif %}
-                                                        </button>
-                                                        {% if last_transaction.boleto_url %}
-                                                        <button type="button"
-                                                                data-toggle="tooltip"
-                                                                title="Enviar boleto para o participante"
-                                                                class="btn btn-info btn-sm btn-trans"
-                                                                onclick="if(!$(this).hasClass('disabled') && confirm('Confirme para enviar o boleto ao participante!')){$(this).addClass('disabled').text('aguarde ...');$('#payment-notify-boleto').submit();}">
-                                                            <i class="far fa-envelope"></i>
-                                                            enviar
-                                                        </button>
-                                                        {% endif %}
-                                                    </div>
-                                                    {% endif %}
-                                                    {% if new_boleto_allowed and last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
-                                                        <div class="float-right">
-                                                            <button type="button"
-                                                                data-toggle="tooltip"
-                                                                title="Abrir documento"
-                                                                class="btn btn-info btn-sm btn-trans"
-                                                                onclick="open_checkout()">
-                                                            novo boleto
-                                                        </button>
+                                                        <div>
+                                                            Boleto
+                                                            {% if last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                            <strong class="text-warning">(vencido)</strong>
+                                                            {% endif %}
                                                         </div>
-                                                    {% endif %}
+                                                        <div style="margin-top:5px;">
+                                                        {% if last_transaction.status != last_transaction.PAID and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                            <button type="button"
+                                                                    data-toggle="tooltip"
+                                                                    title="{% if last_transaction.boleto_url %}Abrir boleto{% else %}Aguardando processamento{% endif %}"
+                                                                    class="btn btn-success btn-sm btn-trans {% if not last_transaction.boleto_url %}disabled{% endif %}"
+                                                                    onclick="window.open('{{ last_transaction.boleto_url }}')">
+                                                                <i class="far fa-file-alt"></i>
+                                                                {% if last_transaction.boleto_url %}abrir{% else %}aguarde ...{% endif %}
+                                                            </button>
+                                                            {% if last_transaction.boleto_url %}
+                                                            <button type="button"
+                                                                    data-toggle="tooltip"
+                                                                    title="Enviar boleto para o participante"
+                                                                    class="btn btn-info btn-sm btn-trans"
+                                                                    onclick="if(!$(this).hasClass('disabled') && confirm('Confirme para enviar o boleto ao participante!')){$(this).addClass('disabled').text('aguarde ...');$('#payment-notify-boleto').submit();}">
+                                                                <i class="far fa-envelope"></i>
+                                                                enviar
+                                                            </button>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                        {% if new_boleto_allowed and last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                            <button type="button"
+                                                                    data-toggle="tooltip"
+                                                                    title="Abrir documento"
+                                                                    class="btn btn-info btn-sm btn-trans"
+                                                                    onclick="open_checkout()">
+                                                                novo boleto
+                                                            </button>
+                                                        {% endif %}
+                                                        </div>
+                                                    </div>
                                                 {% elif last_transaction.type == last_transaction.CREDIT_CARD %}
                                                     <div class="float-left">
                                                         <i style="font-size: 40px" class="far fa-credit-card"></i>
@@ -272,6 +273,24 @@
                                                     </div>
                                                 {% endif %}
                                             {% endif %}
+                                        {% elif not object.free and not last_transaction %}
+                                            <div class="float-left">
+                                                <i style="font-size: 40px" class="fas fa-minus"></i>
+                                            </div>
+                                            <div class="float-left" style="margin-left:10px">
+                                                <span class="title">Método</span>
+                                                <div>Nenhum</div>
+                                                <div style="margin-top:5px;">
+                                                    <button type="button"
+                                                        data-toggle="tooltip"
+                                                        title="Abrir documento"
+                                                        class="btn btn-info btn-sm btn-trans"
+                                                        onclick="open_checkout()">
+                                                        novo boleto
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {% endif %}
                                             <div class="clearfix"></div>
                                         </div>
                                     </td>
@@ -279,7 +298,6 @@
                                 </tbody>
                             </table>
                         </div>
-
                     </div>
                     <br/>
                     <div class="row" style="padding-left:16px;">
