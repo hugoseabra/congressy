@@ -1,105 +1,11 @@
-from django import forms as django_forms
-from django.shortcuts import reverse, get_object_or_404
-from django.urls import reverse_lazy
-from django.views import generic
+from django.shortcuts import get_object_or_404
 from django.template import Template, Context
+from django.urls import reverse_lazy
 from wkhtmltopdf.views import PDFTemplateView
 
-from certificate import models, forms
-from gatheros_event.views.mixins import EventViewMixin, AccountMixin
-from gatheros_subscription.models import Subscription
 from gatheros_event.models import Event
-from copy import copy
-
-
-class CertificateConfigView(EventViewMixin, generic.TemplateView):
-    template_name = 'certificate/certificado_.html'
-    object = None
-    long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
-
-    def dispatch(self, request, *args, **kwargs):
-        response = super(CertificateConfigView, self).dispatch(request, *args,
-                                                               **kwargs)
-        self.object = models.Certificate.objects.get_or_create(
-            event=self.event
-        )
-        return response
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        if not self.object:
-            self.object, _ = models.Certificate.objects.get_or_create(
-                event=self.event
-            )
-
-        ref_object = copy(self.object)
-        # Objeto de referencia criado para não manipular o self.object que o
-        # objeto de fato que é usado na instancia do form;
-
-        ref_object.text_content = ref_object.text_content\
-            .replace("{{NOME}}", self.long_name)
-
-        ref_object.text_content = ref_object.text_content\
-            .replace(self.long_name, "<strong>" + self.long_name + "</strong>")
-
-        ref_object.text_content = ref_object.text_content\
-            .replace("{{EVENTO}}", self.event.name)
-
-        context['has_inside_bar'] = True
-        context['active'] = 'certificate'
-        context['object'] = ref_object
-
-        context['form'] = forms.CertificatePartialForm(instance=self.object)
-        return context
-
-
-class CertificateFormView(EventViewMixin, generic.FormView):
-    template_name = 'certificate/certificate_form.html'
-    model = models.Certificate
-    slug_field = 'event__pk'
-    slug_url_kwarg = 'event_pk'
-    form_class = forms.CertificatePartialForm
-    instance = None
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['has_inside_bar'] = True
-        context['active'] = 'certificate'
-        return context
-
-    def get_success_url(self):
-        return reverse('certificate:event-certificate-config', kwargs={
-            'event_pk': self.event.pk,
-        })
-
-    def get_form(self, form_class=None):
-
-        if not self.event.has_certificate_config:
-            models.Certificate.objects.create(
-                event=self.event
-            )
-
-        form = forms.CertificatePartialForm(
-            instance=self.event.certificate)
-
-        form.fields['event'].widget = django_forms.HiddenInput()
-        return form
-
-    def form_valid(self, form):
-        self.instance = form.save()
-        return super().form_valid(form)
-
-    def post(self, request, *args, **kwargs):
-
-        form = forms.CertificatePartialForm(
-            instance=self.event.certificate, data=self.request.POST,
-            files=self.request.FILES)
-
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+from gatheros_event.views.mixins import AccountMixin
+from gatheros_subscription.models import Subscription
 
 
 class CertificatePDFView(AccountMixin, PDFTemplateView):
