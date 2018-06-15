@@ -245,7 +245,7 @@ class PagarmeDataBuilder:
             split_rules.append({
                 "recipient_id": id,
                 "amount": self.as_payment_format(receiver.amount),
-                "liable": True,
+                "liable": receiver.chargeback_responsible,
                 "charge_processing_fee": receiver.processing_fee_responsible
             })
 

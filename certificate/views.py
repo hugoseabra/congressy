@@ -8,11 +8,14 @@ from wkhtmltopdf.views import PDFTemplateView
 from certificate import models, forms
 from gatheros_event.views.mixins import EventViewMixin, AccountMixin
 from gatheros_subscription.models import Subscription
+from gatheros_event.models import Event
+from copy import copy
 
 
 class CertificateConfigView(EventViewMixin, generic.TemplateView):
     template_name = 'certificate/certificado_.html'
     object = None
+    long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
 
     def dispatch(self, request, *args, **kwargs):
         response = super(CertificateConfigView, self).dispatch(request, *args,
@@ -20,7 +23,6 @@ class CertificateConfigView(EventViewMixin, generic.TemplateView):
         self.object = models.Certificate.objects.get_or_create(
             event=self.event
         )
-
         return response
 
     def get_context_data(self, **kwargs):
@@ -31,9 +33,23 @@ class CertificateConfigView(EventViewMixin, generic.TemplateView):
                 event=self.event
             )
 
+        ref_object = copy(self.object)
+        # Objeto de referencia criado para não manipular o self.object que o
+        # objeto de fato que é usado na instancia do form;
+
+        ref_object.text_content = ref_object.text_content\
+            .replace("{{NOME}}", self.long_name)
+
+        ref_object.text_content = ref_object.text_content\
+            .replace(self.long_name, "<strong>" + self.long_name + "</strong>")
+
+        ref_object.text_content = ref_object.text_content\
+            .replace("{{EVENTO}}", self.event.name)
+
         context['has_inside_bar'] = True
         context['active'] = 'certificate'
-        context['object'] = self.object
+        context['object'] = ref_object
+
         context['form'] = forms.CertificatePartialForm(instance=self.object)
         return context
 
@@ -59,7 +75,7 @@ class CertificateFormView(EventViewMixin, generic.FormView):
 
     def get_form(self, form_class=None):
 
-        if not self.event.has_certificate:
+        if not self.event.has_certificate_config:
             models.Certificate.objects.create(
                 event=self.event
             )
@@ -90,7 +106,7 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
     template_name = 'pdf/certificate.html'
     subscription = None
     event = None
-    show_content_in_browser = False
+    show_content_in_browser = True
     permission_denied_url = reverse_lazy('front:start')
 
     cmd_options = {
@@ -119,8 +135,10 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
         context = super(CertificatePDFView, self).get_context_data(**kwargs)
         image_url = self.event.certificate.background_image.default.url
         context['background_image'] = image_url
+        context['event'] = self.event
         context['certificate'] = self.event.certificate
         context['text'] = self.get_text()
+        context['is_example'] = False
         return context
 
     def get_complementary_data(self):
@@ -128,8 +146,15 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
 
     def get_text(self):
         text = self.event.certificate.text_content
+        text = text.replace("{{NOME}}", "<strong>{{NOME}}</strong>")
+
         text_template = Template(text)
-        context = Context({'NOME': self.subscription.person.name.upper()})
+        context = Context(
+            {
+                'NOME': self.subscription.person.name.upper(),
+                'EVENTO': self.subscription.event.name,
+            }
+        )
         res = text_template.render(context)
         return res
 
@@ -137,78 +162,54 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
         return self.subscription.confirmed is True and \
                self.subscription.attended is True
 
-    def get_document_number(self):
-        person = self.subscription.person
 
-        if person.cpf:
-            return person.cpf
-        elif person.institution_cnpj:
-            return person.institution_cnpj
-        else:
-            return ''
+class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
+    template_name = 'pdf/certificate.html'
+    event = None
+    show_content_in_browser = True
+    permission_denied_url = reverse_lazy('front:start')
+    long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
 
-# def certificate_pdf_view(request, event_pk, pk):
-#     # Create the HttpResponse object with the appropriate PDF headers.
-#     response = HttpResponse(content_type='application/pdf')
-#
-#     event = get_object_or_404(Event, pk=event_pk)
-#     subscription = get_object_or_404(Subscription, pk=pk)
-#
-#     if subscription.status != Subscription.CONFIRMED_STATUS or not \
-#             subscription.attended:
-#         return HttpResponse(status=404)
-#
-#     try:
-#         certificate = event.certificate
-#     except models.Certificate.DoesNotExist:
-#         return HttpResponse(status=400)
-#
-#     if not certificate.background_image:
-#         return HttpResponse(status=400)
-#
-#     file_name = '{}-{}.pdf'.format(event.name, subscription.person.name)
-#     response[
-#         'Content-Disposition'] = 'attachment; filename="' + file_name + '"'
-#
-#     buffer = BytesIO()
-#
-#     # Create the PDF object, using the BytesIO object as its "file."
-#     p = canvas.Canvas(buffer, pagesize=landscape(A4))
-#
-#     # Draw things on the PDF. Here's where the PDF generation happens.
-#     # See the ReportLab documentation for the full list of functionality.
-#     image_path = certificate.background_image.path
-#
-#     p.drawImage(image_path, 0, 0, height=595, width=842)
-#     if not certificate.title_hide and event.certificate.title_content:
-#         p.setFont("Helvetica", event.certificate.title_font_size)
-#         x_coordinate = event.certificate.title_position_x
-#         y_coordinate = event.certificate.title_position_y
-#         title = event.certificate.title_content
-#         p.drawString(x=x_coordinate, y=y_coordinate, text=title)
-#
-#     if certificate.text_content:
-#         p.setFont("Helvetica", event.certificate.text_font_size)
-#         x_coordinate = event.certificate.text_position_x
-#         y_coordinate = event.certificate.text_position_y
-#         text = event.certificate.text_content
-#         text_template = Template(text)
-#         res = text_template.render(nome=subscription.person.name)
-#         p.drawString(x=x_coordinate, y=y_coordinate, text=res)
-#
-#     if not certificate.date_hide and certificate.date_content:
-#         p.setFont("Helvetica", certificate.date_font_size)
-#         x_coordinate = certificate.date_position_x
-#         y_coordinate = certificate.date_position_y
-#         date = certificate.date_content
-#         p.drawString(x=x_coordinate, y=y_coordinate, text=date)
-#
-#     # Close the PDF object cleanly.
-#     p.showPage()
-#     p.save()
-#
-#     # Get the value of the BytesIO buffer and write it to the response.
-#     pdf = buffer.getvalue()
-#     buffer.close()
-#     response.write(pdf)
-#     return response
+    cmd_options = {
+        'dpi': 96,
+        'margin-top': 0,
+        'margin-bottom': 0,
+        'margin-left': 0,
+        'margin-right': 0,
+        'page-size': 'A4',
+        'orientation': 'Landscape',
+    }
+
+    def pre_dispatch(self, request):
+        event_pk = self.kwargs.get('event_pk')
+        self.event = get_object_or_404(Event, pk=event_pk)
+        return super().pre_dispatch(request)
+
+    def get_context_data(self, **kwargs):
+        context = super(CertificatePDFExampleView, self).get_context_data(
+            **kwargs)
+
+        if self.event.certificate.background_image:
+            image_url = self.event.certificate.background_image.default.url
+            context['background_image'] = image_url
+
+        context['event'] = self.event
+        context['certificate'] = self.event.certificate
+        context['text'] = self.get_text()
+        return context
+
+    def get_text(self):
+        text = self.event.certificate.text_content
+
+        text = text.replace("{{NOME}}", "<strong>{{NOME}}</strong>")
+
+        text_template = Template(text)
+        context = Context(
+            {
+                'NOME': self.long_name,
+                'EVENTO': self.event.name,
+                'CPF': "629.162.880-58",
+            }
+        )
+
+        return text_template.render(context)

@@ -18,7 +18,11 @@ from gatheros_front.urls import (
     urlpatterns_public as gatheros_front_public,
 )
 from hotsite.urls import urlpatterns_public_hotsite
-from payment.urls import private_payment_urls, urlpatterns_public_payments_api
+from payment.urls import (
+    private_payment_urls,
+    urlpatterns_public_payments,
+    urlpatterns_public_payments_api,
+)
 from raffle.urls import urlpatterns_private_raffles
 
 handler500 = 'project.views.handler500'
@@ -41,6 +45,7 @@ public_urls = gatheros_front_public
 public_urls += urlpatterns_public_account
 public_urls += urlpatterns_public_password
 public_urls += urlpatterns_public_invitation
+public_urls += urlpatterns_public_payments
 public_urls += urlpatterns_public_hotsite
 
 public_auth_urlpatterns = [url(r'^', include(public_urls, 'public'))]

@@ -177,13 +177,13 @@
                     data-original-title="Excluir">
                     {% if optional_active == 'service' %}
                     <button class="btn btn-sm btn-default btn-trans btn-block"
-                        onclick="window.location.href='{% url 'addon:optional-service-delete' event.pk optional.pk %}'">
+                        onclick="service_fetch_data_and_open_delete_modal({{ optional.pk }})">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                     {% endif %}
                     {% if optional_active == 'product' %}
                     <button class="btn btn-sm btn-default btn-trans btn-block"
-                        onclick="window.location.href='{% url 'addon:optional-product-delete' event.pk optional.pk %}'">
+                        onclick="product_fetch_data_and_open_delete_modal({{ optional.pk }})">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                     {% endif %}

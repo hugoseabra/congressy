@@ -195,6 +195,7 @@ class OrganizationFinancialForm(forms.ModelForm):
             'agency',
             'account',
             'cnpj_ou_cpf',
+            'conta_dv',
             'legal_name',
             'account_type',
         ]

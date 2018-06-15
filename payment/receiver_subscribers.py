@@ -207,7 +207,7 @@ class ReceiverPublisher(object):
             amount=org_amount,
             transfer_taxes=lot.transfer_tax is True,
             chargeback_responsible=True,
-            processing_fee_responsible=True,
+            processing_fee_responsible=False,
             installment_result=InstallmentResult(
                 calculator=self.installment_calculator,
                 amount=self.amount,

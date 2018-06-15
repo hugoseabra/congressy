@@ -87,6 +87,14 @@ window.cgsy.cert = window.cgsy.cert || {};
             save({'title_hide': false}, 'Título sendo exibido.');
         };
 
+        this.centralize = function () {
+            save({'text_center': true}, 'Texto centralizado');
+        };
+
+        this.justify = function () {
+            save({'text_center': false}, 'Texto justificado');
+        };
+
         this.savePosition = function (x, y) {
             save(
                 {'title_position_x': x, 'title_position_y': y},
@@ -128,7 +136,7 @@ window.cgsy.cert = window.cgsy.cert || {};
         this.saveLineHeight = function (size) {
             size = size || '22';
             save(
-                {'text_font_size': remove_px(size)},
+                {'text_line_height': remove_px(size)},
                 'Espaço entre-linhas do texto salvo com sucesso.'
             );
         };
@@ -248,6 +256,13 @@ window.cgsy.cert = window.cgsy.cert || {};
             new cert.persistence.Text().saveLineHeight(size);
         };
 
+        this.centralizeText = function () {
+            new cert.persistence.Title().centralize();
+        };
+
+        this.justifyText = function () {
+            new cert.persistence.Title().justify();
+        };
 
     };
 
@@ -355,3 +370,13 @@ window.cgsy.cert = window.cgsy.cert || {};
         .on('resizemove', dragResize);
 
 })(jQuery, interact, window.cgsy.cert);
+
+ function save_form() {
+    var formEl = $('#certificate_modal_form');
+    var formElSaveBtnEl = $('#certificate_modal_form_save_btn');
+
+    formElSaveBtnEl.text('Aguarde...');
+    formElSaveBtnEl.addClass('disabled');
+    formEl.submit();
+    return false;
+}

@@ -3,12 +3,13 @@
 Models de certificados
 """
 
-import os
+from decimal import Decimal
 
+import os
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from stdimage import StdImageField
 from stdimage.validators import MinSizeValidator
-from decimal import Decimal
 
 
 def get_image_path(instance, filename):
@@ -168,13 +169,26 @@ class Certificate(models.Model):
         verbose_name='esconder data',
     )
 
+    event_location = models.CharField(
+        max_length=50,
+        verbose_name='local do evento',
+        null=True,
+        blank=True,
+    )
+
+    text_center = models.BooleanField(
+        default=False,
+        verbose_name='centralizar texto',
+    )
+
+    only_attending_participantes = models.BooleanField(
+        default=True,
+        verbose_name='apenas para presentes(check-in)',
+    )
+
     def __str__(self):
         return '{}'.format(self.event)
 
-    # TEXT
-    @property
-    def converted_text_content(self):
-        return Decimal((self.text_position_y * 100)) / self.MANAGE_TO_PDF_RATIO
 
     @property
     def converted_text_font_size(self):
@@ -229,4 +243,33 @@ class Certificate(models.Model):
     @property
     def converted_date_position_y(self):
         return Decimal((self.date_position_y * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def is_ready(self):
+
+        if not hasattr(self.background_image, 'default'):
+            return False
+
+        if not self.background_image.file.readable():
+            return False
+
+        if not self.event_has_city and self.event_location is None:
+            return False
+
+        return True
+
+    @property
+    def event_has_city(self):
+
+        try:
+            _ = self.event.place.city
+            return True
+        except ObjectDoesNotExist:
+            pass
+
+        return False
+
+    def event_has_any_type_of_location(self):
+        return self.event_has_city or bool(self.event_location)
+
 
