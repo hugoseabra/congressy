@@ -271,6 +271,17 @@
                                                         <span class="title">Método</span>
                                                         Cartão de Crédito
                                                     </div>
+                                                    {% if new_boleto_allowed and last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                        <div class="float-right">
+                                                            <button type="button"
+                                                                data-toggle="tooltip"
+                                                                title="Abrir documento"
+                                                                class="btn btn-info btn-sm btn-trans"
+                                                                onclick="open_checkout()">
+                                                                novo boleto
+                                                            </button>
+                                                        </div>
+                                                    {% endif %}
                                                 {% endif %}
                                             {% endif %}
                                         {% elif not object.free and not last_transaction %}
