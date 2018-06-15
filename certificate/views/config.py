@@ -1,5 +1,8 @@
+import os
+from base64 import b64encode
 from copy import copy
 
+from django.conf import settings
 from django.views import generic
 
 from certificate import models, forms
@@ -40,8 +43,24 @@ class CertificateConfigView(EventViewMixin, generic.TemplateView):
         ref_object.text_content = ref_object.text_content \
             .replace("{{EVENTO}}", self.event.name)
 
+        premium_path = os.path.join(
+            settings.STATIC_ROOT,
+            'assets',
+            'img',
+            'default_certificates',
+            'premium',
+            'default.jpg'
+        )
+
+        with open(premium_path, 'rb') as f:
+            premium = f.read()
+            f.close()
+
+        encoded_premium = b64encode(premium).decode("utf-8")
+
         context['has_inside_bar'] = True
         context['active'] = 'certificate'
+        context['premium_template_image'] = encoded_premium
         context['object'] = ref_object
 
         context['form'] = forms.CertificatePartialForm(instance=self.object)

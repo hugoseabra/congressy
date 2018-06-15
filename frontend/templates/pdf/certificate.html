@@ -9,7 +9,7 @@
 
     <style>
         .resize-container {
-            background-image: url("{{ background_image }}") no-repeat;
+            background: url("{{ background_image }}") no-repeat;
             height: 990px;
             width: 1402px;
             left: 0;
@@ -23,7 +23,8 @@
             height: {{ certificate.converted_text_height|unlocalize }}px;
             font-size: {{ certificate.converted_text_font_size|floatformat:"0"|unlocalize }}px;
             line-height: {{ certificate.converted_text_line_height|floatformat:"0"|unlocalize }}px;
-            text-align: {% if certificate.text_center %}center{% else %}justify{% endif %};
+            text-align:
+                    {% if certificate.text_center %}center{% else %}justify{% endif %};
             -webkit-transform: translate({{ certificate.converted_text_position_x|unlocalize}}px,{{ certificate.converted_text_position_y|unlocalize}}px);
             transform: translate({{ certificate.converted_text_position_x|unlocalize}}px,{{ certificate.converted_text_position_y|unlocalize}}px);
             overflow: hidden;
@@ -56,15 +57,17 @@
     </div>
 
     <div style="position:absolute;
-            {% if certificate.date_hide %}display: none;{% endif %}
+            {% if certificate.date_hide or not certificate.event_has_any_type_of_location %}display: none;{% endif %}
             text-align: justify;"
          id="cert-date">
 
         {% language 'pt-br' %}
-            {% if certificate.has_city %}
-                {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
-            {% else %}
-                {{ certificate.event_location }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
+            {% if certificate.event_has_any_type_of_location %}
+                {% if certificate.event_has_city %}
+                    {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
+                {% else %}
+                    {{ certificate.event_location }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
+                {% endif %}
             {% endif %}
         {% endlanguage %}
     </div>

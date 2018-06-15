@@ -38,41 +38,57 @@
         #cert-date {
             font-size: {{ object.date_font_size|unlocalize }}px;
         }
+
+        .template-img {
+            border: 3px solid white;
+        }
+
+        .template-img:hover {
+            border: 3px solid black;
+        }
+
     </style>
 {% endblock %}
 
 {% block content %}
 
-    <div class="row">
-        <div class="col-lg-9 col-lg-push-3 col-xl-9 col-xl-push-3">
-            <div class="buttonbar">
-                <div class="float-right">
-                    <button class="btn btn-primary open-edit-modal">
-                        <i class="fas fa-pencil-alt"></i>
-                        Conteúdo
-                    </button>
-                    <button class="btn btn-primary open-config-modal"
-                            style="margin-left: 10px">
-                        <i class="fas fa-align-center"></i>
-                        Alinhamento
-                    </button>
+    {% if object.is_ready %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar">
+                    <div class="float-left">
+                        <button class="btn btn-primary open-edit-modal">
+                            <i class="fas fa-pencil-alt"></i>
+                            Conteúdo
+                        </button>
+                        <button class="btn btn-primary open-config-modal"
+                                style="margin-left: 10px">
+                            <i class="fas fa-align-center"></i>
+                            Alinhamento
+                        </button>
+                        <button class="btn btn-primary open-template-modal"
+                                style="margin-left: 10px">
+                            <i class="fas fa-clone"></i>
+                            Templates
+                        </button>
 
-                    <a class="btn btn-primary{% if not object.is_ready %} disabled{% endif %}"
-                       href="{% url 'certificate:event-certificate-example-pdf' event.pk %}"
-                       target="_blank"
-                            {% if not object.is_ready %}
-                       data-toggle="tooltip"
-                       title="Certificado não configurado"
-                            {% endif %}
-                       style="margin-left: 10px">
-                        <i class="far fa-eye"></i>
-                        Pré-Visualização
-                    </a>
+                        <a class="btn btn-primary{% if not object.is_ready %} disabled{% endif %}"
+                           href="{% url 'certificate:event-certificate-example-pdf' event.pk %}"
+                           target="_blank"
+                                {% if not object.is_ready %}
+                           data-toggle="tooltip"
+                           title="Certificado não configurado"
+                                {% endif %}
+                           style="margin-left: 10px">
+                            <i class="far fa-eye"></i>
+                            Pré-Visualização
+                        </a>
+                    </div>
+                    <div class="clearfix"></div>
                 </div>
-                <div class="clearfix"></div>
             </div>
         </div>
-    </div>
+    {% endif %}
 
     <div class="row">
         <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
@@ -136,28 +152,36 @@
         </div>
     {% else %}
         <div id="no-background-warning">
-            <div class="panel panel-warning">
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        Alerta
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </h3>
-                </div>
+            <div class="panel panel-default col-md-6 col-lg-offset-2">
                 <div class="panel-body">
-                    <div class="row">
-                        <h3>
-                            <strong>
-                                Você ainda não possui nenhuma imagem de fundo
-                                definida
-                                portanto não pode editar seu certificado.
-                            </strong>
-                        </h3>
+                    <div class="certificate-config">
+                        <div class="row text-center ">
+                            <h3 style="margin-left: 15px">
+                                <strong>
+                                    Vamos configurar seu certificado!
+                                </strong>
+                            </h3>
+                        </div>
+                        <div class="row text-center" style="margin-top: 20px">
+                            <button class="btn btn-success open-edit-modal">
+                                Configure você mesmo
+                            </button>
+                            Ou
+                            <button class="btn btn-primary open-template-modal">
+                                Utilize nosso template padrão
+                            </button>
+                        </div>
                     </div>
-                    <div class="row text-center" style="margin-top: 20px">
-                        <button class="btn btn-success open-edit-modal">
-                            Click para configurar
-                        </button>
+
+
+                    <div class="row text-center certificate-loader"
+                         style="margin-top:20px; display: none">
+                        <h3>Processando, aguarde...</h3>
+                        <i class="fas info-color fa-circle-notch fa-spin
+                        fa-6x" style="margin-top: 20px"></i>
                     </div>
+
+
                 </div>
             </div>
 
@@ -174,10 +198,40 @@
     <script>
         $(document).ready(function () {
             window.cgsy.cert.persistence.url = "{% url 'certificate:certificate-detail' event.pk object.pk %}";
+            var certificate_template_modal = $('#certificateTemplateModal');
 
 
             $('.open-edit-modal').on("click", function () {
                 $('#certificateDataModal').modal('show');
+            });
+
+            $('.open-template-modal').on("click", function () {
+                certificate_template_modal.modal('show');
+            });
+
+            $('.template-img').on("click", function () {
+                certificate_template_modal.modal('hide');
+                $('#certificate-config').hide();
+                $('#certificate-lodaer').show();
+
+                if ($(this).data('name') === "premium") {
+
+                    var data = {
+                        'background_image': '{{ premium_template_image }}'
+                    };
+
+
+                    var sender = new cgsy.AjaxSender("{% url 'certificate:certificate-detail' event.pk object.pk %}");
+                    sender.setSuccessCallback(function () {
+                        window.location.reload(true);
+                    });
+                    sender.setFailCallback(function (err) {
+                        console.error(err.responseText);
+                    });
+
+                    sender.send('PATCH', data)
+                }
+
             });
 
             //Line breaks in textarea
@@ -312,7 +366,7 @@
 
                         {% csrf_token %}
                         {% render_generic_field form.background_image required=True %}
-                        {% render_switchery_field form.only_attending_participantes required=True%}
+                        {% render_switchery_field form.only_attending_participantes required=True %}
                         <small class="text-muted">
                             Independente da presença confirmada ou não,
                             certificados serão emitidos apenas para
@@ -494,6 +548,40 @@
                     <button type="button" class="btn btn-default"
                             data-dismiss="modal">
                         Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TEMPLATE MODAL -->
+    <div class="modal fade in" id="certificateTemplateModal"
+         role="dialog"
+         aria-labelledby="certificateTemplateModalLabel" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">×
+                    </button>
+                    <h2 class="modal-title" id="certificateTemplateModalLabel">
+                        Selecione um dos templates cuidadosamente criados
+                        pela Congressy
+                    </h2>
+                </div>
+                <div class="modal-body">
+
+                    <div style="margin-top: 20px">
+                        <img class="template-img"
+                             data-name="premium"
+                             src="{% static 'assets/img/default_certificates/premium/thumbnail.jpg' %}">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger"
+                            data-dismiss="modal">
+                        Cancelar
                     </button>
                 </div>
             </div>
