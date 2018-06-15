@@ -94,6 +94,20 @@ class PagarMeCheckoutForm(forms.Form):
         try:
             self.subscription = Subscription.objects.get(pk=sub_pk)
 
+            if self.subscription.free is True:
+                raise forms.ValidationError({
+                    forms.ALL_FIELDS: 'Pagamentos não podem ser processados'
+                                      ' para inscrições gratuitas.'
+                })
+
+            person = self.subscription.person
+            if not person.cpf:
+                raise forms.ValidationError({
+                    forms.ALL_FIELDS: 'Você não pode criar meio de pagamento'
+                                      ' para inscrições de pessoas cujo CPF'
+                                      ' não foi informado.'
+                })
+
         except Subscription.DoesNotExist:
             raise forms.ValidationError({
                 forms.ALL_FIELDS: 'Inscrição não informada.'
@@ -120,10 +134,21 @@ class PagarMeCheckoutForm(forms.Form):
         boleto_allowed = payment_helpers.is_boleto_allowed(
             self.subscription.event
         )
-        if transaction_type == 'boleto' and boleto_allowed is False:
-            raise forms.ValidationError({
-                forms.ALL_FIELDS: 'Transação com boleto não é permitida.'
-            })
+
+        if transaction_type == Transaction.BOLETO:
+            if boleto_allowed is False:
+                raise forms.ValidationError({
+                    forms.ALL_FIELDS: 'Transação com boleto não é permitida.'
+                })
+
+            open_boletos = payment_helpers.get_opened_boleto_transactions(
+                self.subscription
+            )
+            if open_boletos.count() > 0:
+                raise forms.ValidationError({
+                    forms.ALL_FIELDS: 'Já existe um ou mais boletos em aberto'
+                                      ' para esta inscrição.'
+                })
 
         return transaction_type
 
@@ -151,22 +176,6 @@ class PagarMeCheckoutForm(forms.Form):
         self.subscription_debt_form = self._create_subscription_debt_form()
         self.product_debt_forms = self._create_product_debt_forms()
         self.service_debt_forms = self._create_service_debt_forms()
-
-        if self.subscription.free is True:
-            raise forms.ValidationError(
-                'Pagamentos não podem ser processados para inscrições'
-                ' gratuitas.'
-            )
-
-        if cleaned_data.get('transaction_type') == Transaction.BOLETO:
-            open_boletos = payment_helpers.get_opened_boleto_transactions(
-                self.subscription
-            )
-            if open_boletos.count() > 0:
-                raise forms.ValidationError({
-                    forms.ALL_FIELDS: 'Já existe um boleto em aberto para'
-                                      ' esta inscrição.'
-                })
 
         if not self.subscription_debt_form.is_valid():
             error_msgs = []

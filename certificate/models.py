@@ -38,9 +38,13 @@ class Certificate(models.Model):
         blank=True,
         null=True,
         verbose_name='imagem de fundo do certificado do evento',
-        variations={'default': (1402, 991), 'regular': (1024, 724)},
+        variations={
+            'default': (1402, 991),
+            'regular': (1024, 724),
+            'thumbnail': (283, 200),
+        },
         validators=[MinSizeValidator(1402, 991)],
-        help_text="Imagem de fundo do certificado, mínimo de: "
+        help_text="Imagem de fundo300 do certificado, mínimo de: "
                   "1402px largura x "
                   "991px altura.(png/jpg) "
                   "<a  target='_blank'"
@@ -251,9 +255,6 @@ class Certificate(models.Model):
             return False
 
         if not self.background_image.file.readable():
-            return False
-
-        if not self.event_has_city and self.event_location is None:
             return False
 
         return True

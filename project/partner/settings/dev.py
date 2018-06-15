@@ -8,7 +8,6 @@ DEBUG = True
 # ================================= APPS ==================================== #
 INSTALLED_APPS.extend([
     'debug_toolbar',
-    'logtailer',
 ])
 # ========================= SERVER CONFIGURATION ============================ #
 SITE_ID = 1
