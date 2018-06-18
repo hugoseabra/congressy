@@ -29,13 +29,20 @@ class BankAccountForm(forms.ModelForm):
         self.bank_account_id = None
         self.document_type = None
         self.date_created = None
+        self.recipient_id = None
 
         super(BankAccountForm, self).__init__(data=data, *args,
                                               **kwargs)
 
-        banking_required_fields = ['bank_code', 'agency', 'account',
-                                   'account_dv', 'document_number',
-                                   'account_type']
+        banking_required_fields = [
+            'bank_code',
+            'agency',
+            'account',
+            'account_dv',
+            'document_number',
+            'account_type',
+            'legal_name',
+        ]
 
         for field in banking_required_fields:
             self.fields[field].required = True
@@ -54,6 +61,11 @@ class BankAccountForm(forms.ModelForm):
             'legal_name': cleaned_data.get('legal_name'),
             'type': cleaned_data.get('account_type'),
         }
+
+        for key, value in recipient_dict:
+            if value is None:
+                raise forms.ValidationError("O valor {} é "
+                                            "obrigatorio.".format(key))
 
         try:
             recipient = create_pagarme_recipient(recipient_dict=recipient_dict)
