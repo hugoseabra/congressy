@@ -28,7 +28,7 @@ class EventOptionalMixin(AccountMixin, generic.View):
         if self.event.event_type == self.event.EVENT_TYPE_FREE:
             messages.error(
                 request,
-                "Evento não grátis não possui opcionais."
+                "Evento grátis não possui opcionais."
             )
             return redirect('event:event-panel', self.event.pk)
 
