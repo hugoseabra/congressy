@@ -232,6 +232,7 @@
 
             var uf_el = $('#id_state');
             var city_el = $('#id_city_name');
+            var hidden_city_el = $('#id_city');
 
             $('#id_zip_code').mask("99999-999");
 
@@ -240,13 +241,28 @@
             window.setTimeout(function () {
                 {% if event.place and event.place.city %}
                     uf_el.val('{{ event.place.city.uf }}');
-                    fetch_cities(uf_el, '{{ event.place.city.pk }}');
+                    fetch_cities(uf_el, city_el, hidden_city_el, '{{ event.place.city.pk }}');
                 {% else %}
                     uf_el.val('');
                     city_el.val('');
                     city_el.prop('disabled', true);
                 {% endif %}
             }, 300);
+
+            uf_el.change(function () {
+                city_el.html($('<option>').text('Carregando...'));
+                var that = $(this);
+                window.setTimeout(function () {
+                    fetch_cities($(that), city_el, hidden_city_el);
+                }, 500);
+            });
+
+
+            city_el.change(function () {
+                hidden_city_el.val($(this).val());
+            });
+
+
         });
     </script>
 
@@ -397,15 +413,15 @@
                     </div>
                 </div>
                 {% if event.is_scientific %}
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="panel panel-primary">
-                            <div class="panel-heading">
-                                <div class="panel-title">
-                                    Configurações científica
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <div class="panel-title">
+                                        Configurações científica
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="panel-body">
+                                <div class="panel-body">
 
                                     <div class="row">
                                         <div class="col-md-12">
@@ -419,17 +435,17 @@
                                         </div>
                                     </div>
 
-                                <button type="button"
-                                        class="btn btn-success submit-button"
-                                        style=" float: right; margin-right:
+                                    <button type="button"
+                                            class="btn btn-success submit-button"
+                                            style=" float: right; margin-right:
                                         10px">
-                                    <i class="fa fa-save"></i>
-                                    Salvar
-                                </button>
+                                        <i class="fa fa-save"></i>
+                                        Salvar
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
                 {% endif %}
             </div>
             <div class="col-md-3 hidden-xs hidden-sm">
