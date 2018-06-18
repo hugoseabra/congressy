@@ -31,19 +31,9 @@ theme_urls = [
 
 optional_urls = [
     url(
-        r'^products/(?P<optional_pk>[\d]+)/delete/$',
-        views.OptionalProductDeleteView.as_view(),
-        name='optional-product-delete'
-    ),
-    url(
         r'^products/(?P<optional_pk>[\d]+)/edit/$',
         views.OptionalProductEditView.as_view(),
         name='optional-product-edit'
-    ),
-    url(
-        r'^services/(?P<optional_pk>[\d]+)/delete/$',
-        views.OptionalServiceDeleteView.as_view(),
-        name='optional-service-delete'
     ),
     url(
         r'^services/(?P<optional_pk>[\d]+)/edit/$',

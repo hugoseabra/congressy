@@ -7,10 +7,8 @@ from .theme import (
 from .optional import (
     OptionalAddProductView,
     OptionalAddServiceView,
-    OptionalProductDeleteView,
     OptionalProductListView,
     OptionalProductEditView,
     OptionalServiceEditView,
     OptionalServiceListView,
-    OptionalServiceDeleteView,
 )
