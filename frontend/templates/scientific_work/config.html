@@ -84,8 +84,11 @@
     <script src="{% static 'assets/js/date-time.js' %}"></script>
 
     <script>
-        createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
-        createTimePicker();
+        $(document).ready(function () {
+
+            createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
+            createTimePicker();
+        });
         $(document).ready(function () {
             $('#add_area_category').val('');
 
