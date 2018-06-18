@@ -34,7 +34,7 @@ class BankAccountForm(forms.ModelForm):
         super(BankAccountForm, self).__init__(data=data, *args,
                                               **kwargs)
 
-        banking_required_fields = [
+        self.banking_required_fields = [
             'bank_code',
             'agency',
             'account',
@@ -44,7 +44,7 @@ class BankAccountForm(forms.ModelForm):
             'legal_name',
         ]
 
-        for field in banking_required_fields:
+        for field in self.banking_required_fields:
             self.fields[field].required = True
 
     def clean(self):
@@ -62,7 +62,7 @@ class BankAccountForm(forms.ModelForm):
             'type': cleaned_data.get('account_type'),
         }
 
-        for key, value in recipient_dict:
+        for key, value in self.banking_required_fields:
             if value is None:
                 raise forms.ValidationError("O valor {} é "
                                             "obrigatorio.".format(key))
