@@ -1,0 +1,45 @@
+{% load form_config_tags  %}
+
+<div class="modal" id="event-delete-modal" role="dialog"
+     data-backdrop="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <form method="post" class="form-horizontal" role="form">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal"
+                        aria-label="Close"><span
+                        aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-bold">
+                    Excluir evento
+                </h4>
+            </div>
+            <div class="modal-body">
+                {% csrf_token %}
+                {% if delete_message %}
+                    {{ delete_message }}
+                {% endif %}
+                <br/>
+                <br/>
+
+                <div>
+                    <!--suppress HtmlUnknownAttribute -->
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input class="btn btn-danger" type="submit"
+                           value="Confirmar"/>
+                    {% if next_path %}
+                        <a class="btn btn-default"
+                           href="{{ next_path|urlencode }}">Voltar</a>
+                    {% else %}
+                        <a class="btn btn-default"
+                           href="{{ go_back_path }}">Voltar</a>
+                    {% endif %}
+            </div>
+            </form>
+        </div>
+    </div>
+</div>

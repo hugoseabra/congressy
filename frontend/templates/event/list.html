@@ -175,11 +175,11 @@
                                         <td class="hidden-xs hidden-sm">{{ event.category.name }}</td>
                                         <td class="hidden-xs hidden-sm">
                                             {% if event.event_type == event.EVENT_TYPE_FREE %}
-                                            Gratuito
+                                                Gratuito
                                             {% elif event.event_type == event.EVENT_TYPE_PAID %}
-                                            Pago
+                                                Pago
                                             {% elif event.event_type == event.EVENT_TYPE_SCIENTIFIC %}
-                                            Científico
+                                                Científico
                                             {% endif %}
                                         </td>
 
@@ -214,7 +214,8 @@
                                                         {% endif %}
                                                         {% if event.is_deletable and user has 'gatheros_event.delete_event' of event %}
                                                             <li>
-                                                                <a href="{% url 'event:event-delete' event.pk %}">
+                                                                <a data-toggle="modal"
+                                                                   data-target="#event-delete-modal">
                                                                     <i class="fas fa-trash-alt"></i>
                                                                     Excluir
                                                                 </a>
@@ -242,4 +243,7 @@
         </div>
     </div>
 
+{% endblock %}
+{% block modals %}
+    {% include 'event/event-delete-modal.html' %}
 {% endblock %}

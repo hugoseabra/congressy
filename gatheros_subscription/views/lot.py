@@ -117,6 +117,7 @@ class BaseFormLotView(BaseLotView, generic.FormView):
 class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
     """Lista de lotes de acordo com o evento do contexto"""
     template_name = 'lot/manage.html'
+
     queryset = Lot.objects.filter(category__isnull=True).order_by(
         'date_start',
         'date_end'

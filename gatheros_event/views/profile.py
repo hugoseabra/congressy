@@ -137,6 +137,7 @@ class ProfileCreateView(TemplateView, FormView):
 
 
 class PasswordResetView(auth_views.PasswordResetView):
+    title = 'Recuperar Conta'
     def dispatch(self, request, *args, **kwargs):
 
         if request.user.is_authenticated:
