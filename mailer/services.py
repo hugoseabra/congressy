@@ -5,7 +5,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-
+from django.contrib.auth.models import User
 from gatheros_subscription.helpers.voucher import (
     create_voucher,
     get_voucher_file_name,
@@ -137,32 +137,50 @@ def notify_new_user_and_unpaid_subscription_boleto(event, transaction):
     )
 
     user = person.user
-    uid = urlsafe_base64_encode(force_bytes(user.pk))
-    token = default_token_generator.make_token(user)
-    password_set_url = absoluteuri.reverse(
-        'password_reset_confirm',
-        kwargs={
-            'uidb64': uid,
-            'token': token,
-        }
-    )
 
-    # @TODO set event.date_start to period
-    template_name = \
-        'mailer/subscription/notify_new_user_and_unpaid_subscription.html'
+    if isinstance(user, User):
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        password_set_url = absoluteuri.reverse(
+            'password_reset_confirm',
+            kwargs={
+                'uidb64': uid,
+                'token': token,
+            }
+        )
 
-    body = render_to_string(template_name, {
-        'person': person,
-        'event': event,
-        'period': event.date_start,
-        'event_url': event_url,
-        'date': subscription.created,
-        'has_voucher': False,
-        'boleto_url': boleto_url,
-        'my_account_url': absoluteuri.reverse('front:start'),
-        'reset_password_url': absoluteuri.reverse('public:password_reset'),
-        'password_set_url': password_set_url,
-    })
+        # @TODO set event.date_start to period
+        template_name = \
+            'mailer/subscription/notify_new_user_and_unpaid_subscription.html'
+
+        body = render_to_string(template_name, {
+            'person': person,
+            'event': event,
+            'period': event.date_start,
+            'event_url': event_url,
+            'date': subscription.created,
+            'has_voucher': False,
+            'boleto_url': boleto_url,
+            'my_account_url': absoluteuri.reverse('front:start'),
+            'reset_password_url': absoluteuri.reverse('public:password_reset'),
+            'password_set_url': password_set_url,
+        })
+    else:
+
+        # @TODO set event.date_start to period
+        template_name = \
+            'mailer/subscription' \
+            '/notify_new_subscription_and_unpaid_subscription.html'
+
+        body = render_to_string(template_name, {
+            'person': person,
+            'event': event,
+            'period': event.date_start,
+            'event_url': event_url,
+            'date': subscription.created,
+            'has_voucher': False,
+            'boleto_url': boleto_url,
+        })
 
     sender = send_mail.delay if CELERY else send_mail
 
