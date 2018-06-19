@@ -217,11 +217,13 @@ class SubscriptionWizardView(SessionWizardView):
     event = None
     person = None
     subscription = None
+    top_bar = False
 
     def dispatch(self, request, *args, **kwargs):
 
         slug = self.kwargs.get('slug')
-
+        path = request.path
+        self.top_bar = '/subscription/' in path
         if not slug:
             return redirect('https://congressy.com')
 
@@ -513,7 +515,7 @@ class SubscriptionWizardView(SessionWizardView):
         context['num_lots'] = self.get_num_lots()
         context['subscription'] = self.get_subscription()
         context['is_last'] = self.steps.current == self.steps.last
-
+        context['has_top_bar'] = self.top_bar
         has_open_boleto = False
 
         person = self.get_person()

@@ -15,12 +15,23 @@
 
 {% block styles %}
     <link rel="stylesheet"
-          href="{% static 'assets/plugins/dataTables/css/dataTables.css' %}">
+          href="{% static 'assets/plugins/dataTables/css/responsive.bootstrap.min.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/dataTables/css/datatables.min.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/icheck/css/all.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/dataTables/css/responsive.dataTables.min.css' %}">
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.js' %}"></script>
-    <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.js' %}"></script>
+    <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/dataTables/js/dataTables.responsive.min.js' %}"></script>
+
+    <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.min.js' %}"></script>
+
+    <script src="{% static 'assets/plugins/dataTables/js/responsive.bootstrap.min.js' %}"></script>
+
     <script>
         $(document).ready(function () {
             $('#organization_table').DataTable({
@@ -62,7 +73,10 @@
                     }
                 ],
                 // Default order
-                "order": [[0, 'asc']]
+                "order": [[0, 'asc']],
+                responsive: true,
+                scrollX: true
+
             });
         });
     </script>
@@ -97,7 +111,7 @@
                                 <thead>
                                 <tr>
                                     <th>Nome</th>
-                                    <th class="hidden-sm hidden-xs">Cargo</th>
+                                    <th>Cargo</th>
                                     <th></th>
                                 </tr>
                                 </thead>
@@ -105,52 +119,52 @@
                                 <tbody>
                                 {% for item in object_list %}
                                     <tr>
-                                    {% get_member_group item user as member_group %}
-                                    <td>
-                                        <a href="{% url 'event:organization-panel' item.pk %}">{{ item.name }}</a>
-                                    </td>
-                                    <td>
-                                        {% get_member_group_name item user %}
-                                    </td>
-                                    <td>
-                                        {% if member_group == member.ADMIN %}
-                                            <div class="btn-group">
-                                                <button
-                                                        type="button"
-                                                        class="btn
+                                        {% get_member_group item user as member_group %}
+                                        <td>
+                                            <a href="{% url 'event:organization-panel' item.pk %}">{{ item.name }}</a>
+                                        </td>
+                                        <td>
+                                            {% get_member_group_name item user %}
+                                        </td>
+                                        <td>
+                                            {% if member_group == member.ADMIN %}
+                                                <div class="btn-group">
+                                                    <button
+                                                            type="button"
+                                                            class="btn
                                                     btn-primary btn-trans
                                                     btn-sm dropdown-toggle"
-                                                        data-toggle="dropdown"
-                                                        aria-expanded="false"
-                                                >
-                                                    <span class="fas fa-cog"></span>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-right"
-                                                    role="menu">
-                                                    <li>
-                                                        <a href="{% url 'event:organization-edit' item.pk %}">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                            Editar
-                                                        </a>
-                                                    </li>
-                                                    {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
+                                                            data-toggle="dropdown"
+                                                            aria-expanded="false"
+                                                    >
+                                                        <span class="fas fa-cog"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-right"
+                                                        role="menu">
                                                         <li>
-                                                            <a href="{% url 'event:organization-delete' item.pk %}">
-                                                                <i class="fas fa-trash-alt"></i>
-                                                                Excluir
+                                                            <a href="{% url 'event:organization-edit' item.pk %}">
+                                                                <i class="fas fa-pencil-alt"></i>
+                                                                Editar
                                                             </a>
                                                         </li>
-                                                    {% endif %}
-                                                </ul>
-                                            </div>
-                                        {% endif %}
-                                    </td>
+                                                        {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
+                                                            <li>
+                                                                <a href="{% url 'event:organization-delete' item.pk %}">
+                                                                    <i class="fas fa-trash-alt"></i>
+                                                                    Excluir
+                                                                </a>
+                                                            </li>
+                                                        {% endif %}
+                                                    </ul>
+                                                </div>
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
                             </table>
-                            <br />
-                            <br />
+                            <br/>
+                            <br/>
                         </div>
                     {% else %}
                         <h3>Nenhum dado.</h3>
