@@ -263,7 +263,7 @@
                                                         {% endif %}
                                                         </div>
                                                     </div>
-                                                {% elif last_transaction.type == last_transaction.CREDIT_CARD %}
+                                                {% elif new_boleto_allowed and last_transaction.type == last_transaction.CREDIT_CARD %}
                                                     <div class="float-left">
                                                         <i style="font-size: 40px" class="far fa-credit-card"></i>
                                                     </div>
@@ -284,7 +284,7 @@
                                                     {% endif %}
                                                 {% endif %}
                                             {% endif %}
-                                        {% elif not object.free and not last_transaction %}
+                                        {% elif new_boleto_allowed and not object.free and not last_transaction %}
                                             <div class="float-left">
                                                 <i style="font-size: 40px" class="fas fa-minus"></i>
                                             </div>

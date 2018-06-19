@@ -303,7 +303,6 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
 
 class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
     template_name = 'subscription/view.html'
-    # template_name = 'maintainance.html'
     object = None
     queryset = Subscription.objects.get_queryset()
     financial = False
