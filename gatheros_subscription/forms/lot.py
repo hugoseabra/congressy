@@ -162,10 +162,13 @@ class LotForm(forms.ModelForm):
 
     def _lot_has_optionals(self):
         lot_category = self.instance.category
-        products = lot_category.product_optionals.all().count()
-        services = lot_category.service_optionals.all().count()
 
-        if services > 0 or products > 0:
-            return True
+        if lot_category is not None:
+
+            products = lot_category.product_optionals.all().count()
+            services = lot_category.service_optionals.all().count()
+
+            if services > 0 or products > 0:
+                return True
 
         return False
