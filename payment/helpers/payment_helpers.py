@@ -30,7 +30,11 @@ def is_boleto_allowed(event):
 
     # Se evento permite boletos mediante configuração de mínimo de dias
     # de emissão de boleto configurado em 'boleto_limit_days'
-    return event.date_start >= diff_days_boleto
+
+    if datetime.now() >= diff_days_boleto:
+        return False
+
+    return True
 
 
 def amount_as_decimal(amount):
