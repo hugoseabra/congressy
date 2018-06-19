@@ -26,7 +26,7 @@ def is_boleto_allowed(event):
     days_boleto = timedelta(days=event.boleto_limit_days)
 
     # Data/hora em que os boletos serão desativados.
-    diff_days_boleto = datetime.now() - days_boleto
+    diff_days_boleto = event.date_start - days_boleto
 
     # Se evento permite boletos mediante configuração de mínimo de dias
     # de emissão de boleto configurado em 'boleto_limit_days'
