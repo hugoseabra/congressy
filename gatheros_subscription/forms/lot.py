@@ -57,7 +57,7 @@ class LotForm(forms.ModelForm):
             ),
         }
 
-    def __init__(self,**kwargs):
+    def __init__(self, **kwargs):
         self.event = kwargs.get('initial').get('event')
 
         instance = kwargs.get('instance')
@@ -86,7 +86,7 @@ class LotForm(forms.ModelForm):
         self.fields['event_survey'].empty_label = '- Selecione -'
 
         if self.instance.pk and self.instance.subscriptions.filter(
-            completed=True
+                completed=True
         ).count() > 0:
             self.fields['price'].widget.attrs['disabled'] = 'disabled'
             self.fields['price'].disabled = True
@@ -136,6 +136,14 @@ class LotForm(forms.ModelForm):
                 ' alterado.'
             )
 
+        # Se vinculado à opcionais e/ou atividades extras,
+        # não permitir alterar valor para "0" (setar como gratuito).
+        if self._lot_has_optionals() and price == 0:
+            raise forms.ValidationError(
+                'Esse lote está em uma categoria que já possui opcionais e não'
+                ' pode mais ter preço grátis.'
+            )
+
         return price
 
     def clean_exhibition_code(self):
@@ -151,3 +159,16 @@ class LotForm(forms.ModelForm):
             raise forms.ValidationError('Este código já existe.')
 
         return code
+
+    def _lot_has_optionals(self):
+        lot_category = self.instance.category
+
+        if lot_category is not None:
+
+            products = lot_category.product_optionals.all().count()
+            services = lot_category.service_optionals.all().count()
+
+            if services > 0 or products > 0:
+                return True
+
+        return False

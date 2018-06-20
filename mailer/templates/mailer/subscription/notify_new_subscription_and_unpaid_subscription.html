@@ -1,0 +1,10 @@
+{% extends 'mailer/subscription/base_notification.html' %}
+{% load humanize %}
+
+{% block introduction %}
+    {% include 'mailer/subscription/includes/new-subscription.html' %}
+{% endblock %}
+
+{% block extra_content %}
+    {% include 'mailer/subscription/includes/boleto-url.html' %}
+{% endblock %}

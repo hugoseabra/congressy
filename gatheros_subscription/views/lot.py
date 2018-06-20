@@ -1,5 +1,4 @@
 from decimal import Decimal
-from gatheros_subscription.forms import SurveyForm
 
 from django.conf import settings
 from django.contrib import messages
@@ -212,7 +211,7 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
             kwargs={'event_pk': self.event.pk}
         )
         if self.cat_pk is not None:
-            url += '#cat='+self.cat_pk
+            url += '#cat=' + self.cat_pk
 
         return url
 
@@ -278,6 +277,7 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         context['form_title'] = "Editar lote de '{}'".format(self.event.name)
         context['full_banking'] = self._get_full_banking()
         context['has_surveys'] = self._event_has_surveys()
+        context['has_optionals'] = self._lot_has_optionals()
         context['lot_has_subscriptions'] = self.object.subscriptions.filter(
             completed=True,
         ).count() > 0
@@ -367,6 +367,16 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         all_surveys = EventSurvey.objects.filter(event=self.event).count()
         return all_surveys > 0
 
+    def _lot_has_optionals(self):
+        lot_category = self.object.category
+        products = lot_category.product_optionals.all().count()
+        services = lot_category.service_optionals.all().count()
+
+        if services > 0 or products > 0:
+            return True
+
+        return False
+
 
 class LotDeleteView(BaseLotView, DeleteViewMixin):
     model = Lot
@@ -410,7 +420,7 @@ class LotSurveyView(generic.DetailView):
         if not self.object.event_survey:
             return None
 
-        return SurveyForm(
+        return forms.SurveyForm(
             event_survey=self.object.event_survey,
             user=self.request.user
         )

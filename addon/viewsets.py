@@ -4,13 +4,14 @@ from rest_framework.authentication import (
     SessionAuthentication,
 )
 from rest_framework.permissions import IsAuthenticated
+from .addons_api_permissions import IsNotFreeEvent
 
 from addon import models, serializers
 
 
 class RestrictionViewMixin(object):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsNotFreeEvent)
 
 
 class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
