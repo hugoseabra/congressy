@@ -105,3 +105,4 @@ Usado para verificar métodos que poderiam ser estáticos.
 #### E1101 - Class Event has no objects member ####
  
 As vezes o pylint não consegue encontrar @classonly objects.
+
