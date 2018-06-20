@@ -1,57 +1,102 @@
 <div class="tab-wrapper tab-primary">
     <ul class="nav nav-tabs">
         <li class="active">
-            <a href="#home1" data-toggle="tab">Em andamento</a>
+            <a href="#running-lot" data-toggle="tab">Em andamento</a>
         </li>
         <li>
-            <a href="#profile1" data-toggle="tab">Não iniciados</a>
+            <a href="#not-started-lot" data-toggle="tab">Não iniciados</a>
         </li>
-        <li class="dropdown">
-            <a class="dropdown-toggle" href="#">Finalizados</a>
+        <li>
+            <a href="#finished-lot" data-toggle="tab">Finalizados</a>
         </li>
     </ul>
     <div class="tab-content">
-        <div class="tab-pane active" id="home1">
-            <ul>
-                <li>
-                    <span class="text-left">Network Usage</span>
-                    <div class="progress ">
-                        <div class="progress-bar progress-bar-success"
-                             role="progressbar" aria-valuenow="65"
-                             aria-valuemin="0" aria-valuemax="100"
-                             style="width: 65%">
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <span class="text-left">CPU Load</span>
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-info"
-                             role="progressbar" aria-valuenow="40"
-                             aria-valuemin="0" aria-valuemax="100"
-                             style="width: 40%">
-                        </div>
-                    </div>
-                </li>
-            </ul>
+        <div class="tab-pane active" id="running-lot">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Inscritos</th>
+                    <th>Porcentagem</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for lot in all_lots.running %}
+                    <tr role="presentation">
+                        <td>
+                            <a>{{ lot.name }}</a>
+                        </td>
+
+                        <td>
+                            <a>{{ lot.number_subscription }}/{{ lot.limit }}</a>
+                        </td>
+                        <td>
+                            <a>{{ lot.percent_completed }}%</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <div class="tab-pane" id="profile1">
-            <p>
-                Food truck fixie locavore, accusamus mcsweeney's marfa nulla
-                single-origin coffee squid. Exercitation +1 labore velit, blog
-                sartorial PBR leggings next level wes anderson artisan four
-                loko farm-to-table craft beer twee. Qui photo booth
-                letterpress, commodo
-                enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl
-                cillum PBR. Homo nostrud organic, assumenda labore aesthetic
-                magna delectus mollit. Keytar helvetica VHS salvia yr, vero
-                magna velit sapiente labore
-                stumptown. Vegan fanny pack odio cillum wes anderson 8-bit,
-                sustainable jean shorts beard ut DIY ethical culpa terry
-                richardson biodiesel. Art party scenester stumptown, tumblr
-                butcher vero sint qui sapiente
-                accusamus tattooed echo park.
-            </p>
+
+        <div class="tab-pane" id="not-started-lot">
+
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Inscritos</th>
+                    <th>Porcentagem</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for lot in all_lots.notstarted %}
+                    <tr role="presentation">
+                        <td>
+                            <a>{{ lot.name }}</a>
+                        </td>
+
+                        <td>
+                            <a>{{ lot.number_subscription }}/{{ lot.limit }}</a>
+                        </td>
+                        <td>
+                            <a>{{ lot.percent_completed }}%</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tab-pane" id="finished-lot">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Inscritos</th>
+                    <th>Porcentagem</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for lot in all_lots.finished %}
+                    <tr role="presentation">
+                        <td>
+                            <a>{{ lot.name }}</a>
+                        </td>
+
+                        <td>
+                            <a>{{ lot.number_subscription }}/{{ lot.limit }}</a>
+                        </td>
+                        <td>
+                            <a>{{ lot.percent_completed }}%</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
