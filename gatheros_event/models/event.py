@@ -260,6 +260,13 @@ class Event(models.Model, GatherosModelMixin):
         verbose_name='evento científico',
     )
 
+    expected_subscriptions = models.PositiveIntegerField(
+        verbose_name='Número esperado de participantes',
+        help_text='Quantas pessoas você espera no seu evento ?',
+        null=True,
+        blank=True,
+    )
+
     class Meta:
         verbose_name = 'evento'
         verbose_name_plural = 'eventos'

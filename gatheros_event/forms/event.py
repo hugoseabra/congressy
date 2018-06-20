@@ -34,6 +34,7 @@ class EventForm(forms.ModelForm):
             'has_survey',
             'event_type',
             'rsvp_type',
+            'expected_subscriptions',
         ]
 
         widgets = {
@@ -42,6 +43,7 @@ class EventForm(forms.ModelForm):
             'subscription_type': forms.RadioSelect,
             'date_start': SplitDateTimeBootsrapWidget,
             'date_end': SplitDateTimeBootsrapWidget,
+
         }
 
     def __init__(self, user, lang='pt-br', *args, **kwargs):

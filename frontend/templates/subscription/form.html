@@ -19,45 +19,47 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static "hotsite/js/subscription.js" %}"></script>
-<script type="application/javascript">
+    <script src="{% static "hotsite/js/subscription.js" %}"></script>
+    <script src="{% static 'assets/js/user_notification.js' %}"></script>
 
-    $(document).ready(function () {
-        $('#id_person-phone').mask("(99) 99999-9999");
-        $('#id_person-zip_code').mask("99999-999");
+    <script type="application/javascript">
 
-        hotsiteShowHideCepLoader();
+        $(document).ready(function () {
+            $('#id_person-phone').mask("(99) 99999-9999");
+            $('#id_person-zip_code').mask("99999-999");
 
-        var uf_el = $('#id_person-state');
-        var city_el = $('#id_person-city_name');
-        window.setTimeout(function () {
-            {% if object.city %}
-                uf_el.val('{{ object.city.uf }}');
-                fetch_cities(uf_el, $('#id_person-city_name'), $('#id_person-city'), '{{ object.city.pk }}');
-            {% else %}
-                uf_el.val('');
-                city_el.val('');
-                city_el.prop('disabled', true);
-            {% endif %}
-        }, 300);
+            hotsiteShowHideCepLoader();
 
-        $('#id_state').change(function () {
-            city_el.html($('<option>').text('Carregando...'));
-            var that = $(this);
+            var uf_el = $('#id_person-state');
+            var city_el = $('#id_person-city_name');
             window.setTimeout(function () {
-                fetch_cities($(that), $('#id_city_name'));
-            }, 500);
-        });
+                {% if object.city %}
+                    uf_el.val('{{ object.city.uf }}');
+                    fetch_cities(uf_el, $('#id_person-city_name'), $('#id_person-city'), '{{ object.city.pk }}');
+                {% else %}
+                    uf_el.val('');
+                    city_el.val('');
+                    city_el.prop('disabled', true);
+                {% endif %}
+            }, 300);
 
-        $('#id_city_name').change(function () {
-            $('#id_city').val($(this).val());
-        });
+            $('#id_state').change(function () {
+                city_el.html($('<option>').text('Carregando...'));
+                var that = $(this);
+                window.setTimeout(function () {
+                    fetch_cities($(that), $('#id_city_name'));
+                }, 500);
+            });
 
-        $('#id_zip_code').on('keyup', function () {
-            searchByCep();
+            $('#id_city_name').change(function () {
+                $('#id_city').val($(this).val());
+            });
+
+            $('#id_zip_code').on('keyup', function () {
+                searchByCep();
+            });
         });
-    });
-</script>
+    </script>
 
 {% endblock %}
 
@@ -111,11 +113,20 @@
                                 <small style="color:#C9302C">*</small>
                             </label>
                             <div>
-                                <select name="subscription-lot" class="form-control" id="id_subscription-lot" required="required" {% if not allow_edit_lot %}disabled=""{% endif %}>
+                                <select name="subscription-lot"
+                                        class="form-control"
+                                        id="id_subscription-lot"
+                                        required="required"
+                                        {% if not allow_edit_lot %}disabled=""{% endif %}>
                                     {% for lot in lots %}
-                                    <option value="{{ lot.pk }}" {% if subscription and subscription.lot.pk == lot.pk %}selected{% endif %}>
-                                        até: {{ lot.date_end|date:'d/m/Y H\hi' }} - {{ lot.display_publicly }} {% if lot.private  %}<small>(privado)</small>{% endif %}
-                                    </option>
+                                        <option value="{{ lot.pk }}"
+                                                {% if subscription and subscription.lot.pk == lot.pk %}selected{% endif %}>
+                                            até: {{ lot.date_end|date:'d/m/Y H\hi' }}
+                                            - {{ lot.display_publicly }}
+                                            {% if lot.private %}
+                                                <small>(privado)
+                                                </small>{% endif %}
+                                        </option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -227,7 +238,8 @@
                             <div class="row">
                                 <div class="col-md-3">
                                     {% render_generic_field form.zip_code required=True %}
-                                    <div id="cep_loader" style="width: 22px;position: absolute;top: 32px;right: 31px;">
+                                    <div id="cep_loader"
+                                         style="width: 22px;position: absolute;top: 32px;right: 31px;">
                                         <img src="{% static 'assets/img/loader.gif' %}"/>
                                     </div>
                                 </div>

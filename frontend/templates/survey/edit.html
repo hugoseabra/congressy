@@ -197,175 +197,175 @@
 {% endblock %}
 
 {% block modals %}
-<!-- Modals -->
-<div class="modal fade" id="addQuestion"
-     tabindex="-1"
-     role="dialog">
+    <!-- Modals -->
+    <div class="modal fade" id="addQuestion"
+         tabindex="-1"
+         role="dialog">
 
-    <div class="modal-dialog " role="document">
+        <div class="modal-dialog " role="document">
 
-        <div class="modal-content">
+            <div class="modal-content">
 
-            <div class="modal-header">
-                <button type="button" class="close"
-                        data-dismiss="modal"
-                        aria-label="Close"><span
-                        aria-hidden="true">&times;</span>
-                </button>
-                <p style="font-size: 15px"
-                   class="modal-title">
-                    Adicionar ao Formulário </p>
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <p style="font-size: 15px"
+                       class="modal-title">
+                        Adicionar ao Formulário </p>
+                </div>
+
+                <form method="post" id="addQuestionForm">
+
+                    {% csrf_token %}
+
+
+                    <div class="modal-body">
+
+
+                        <strong style="font-size: 25px">
+                            <i class="iconOfField"></i>
+                            <span class="typeOfField"></span>
+                        </strong>
+                        <hr/>
+                        {% render_generic_field form.name autofocus=True %}
+                        {% render_generic_field form.help_text %}
+
+                        <hr>
+
+                        <div id="intro">
+                            {% render_generic_field form.intro %}
+                        </div>
+
+                        <div id="options">
+                            {% render_generic_field form.options %}
+                        </div>
+
+
+                        <input type="hidden"
+                               id="id_question_type"
+                               name="question_type">
+                    </div>
+
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-danger"
+                                data-dismiss="modal">Cancelar
+                        </button>
+                        <button type="submit"
+                                class="btn btn-success new_question_save">
+                            Salvar
+                        </button>
+                    </div>
+
+
+                </form>
+
             </div>
-
-            <form method="post" id="addQuestionForm">
-
-                {% csrf_token %}
-
-
-                <div class="modal-body">
-
-
-                    <strong style="font-size: 25px">
-                        <i class="iconOfField"></i>
-                        <span class="typeOfField"></span>
-                    </strong>
-                    <hr/>
-                    {% render_generic_field form.name autofocus=True %}
-                    {% render_generic_field form.help_text %}
-
-                    <hr>
-
-                    <div id="intro">
-                        {% render_generic_field form.intro %}
-                    </div>
-
-                    <div id="options">
-                        {% render_generic_field form.options %}
-                    </div>
-
-
-                    <input type="hidden"
-                           id="id_question_type"
-                           name="question_type">
-                </div>
-
-
-                <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-danger"
-                            data-dismiss="modal">Cancelar
-                    </button>
-                    <button type="submit"
-                            class="btn btn-success new_question_save">
-                        Salvar
-                    </button>
-                </div>
-
-
-            </form>
 
         </div>
 
     </div>
 
-</div>
+    <div class="modal fade" id="editQuestion" tabindex="-1" role="dialog">
+        <div class="modal-dialog " role="document">
 
-<div class="modal fade" id="editQuestion" tabindex="-1" role="dialog">
-    <div class="modal-dialog " role="document">
+            <div class="modal-content">
 
-        <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <p style="font-size: 15px"
+                       class="modal-title">
+                        Editar pergunta
+                    </p>
+                </div>
+                <div class="modal-body">
 
-            <div class="modal-header">
-                <button type="button" class="close"
-                        data-dismiss="modal"
-                        aria-label="Close"><span
-                        aria-hidden="true">&times;</span>
-                </button>
-                <p style="font-size: 15px"
-                   class="modal-title">
-                    Editar pergunta
-                </p>
-            </div>
-            <div class="modal-body">
-
-                <form onsubmit="editQuestion(this); return false;">
-
-                    <div class="form-group">
-
-                        <label>Nome do campo:</label>
-
-                        <small style="color:#C9302C">*</small>
-
-
-                        <div>
-                            <input autofocus="" required=""
-                                   class="form-control form-control"
-                                   name="name_edit"
-                                   id="id_name_edit" type="text">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-
-                        <label>Texto de ajuda:</label>
-
-                        <div>
-                            <input class="form-control"
-                                   id="id_help_text_edit"
-                                   name="help_text_edit"
-                                   type="text">
-
-                            <div>
-                                <small class="text-muted">Uma instrução
-                                    similar a está para ajudar seu
-                                    participante a entender melhor a
-                                    pergunta.
-                                </small>
-                            </div>
-                        </div>
-
-                    </div>
-
-
-                    <hr>
-
-                    <div id="intro_edit" style="display: none">
-
+                    <form onsubmit="editQuestion(this); return false;">
 
                         <div class="form-group">
 
-                            <label>Primeiro campo
-                                vazio:</label>
+                            <label>Nome do campo:</label>
+
+                            <small style="color:#C9302C">*</small>
 
 
                             <div>
+                                <input autofocus="" required=""
+                                       class="form-control form-control"
+                                       name="name_edit"
+                                       id="id_name_edit" type="text">
+                            </div>
+                        </div>
 
-                                <input id="id_intro_edit"
-                                       name="intro_edit"
-                                       type="checkbox">
+                        <div class="form-group">
+
+                            <label>Texto de ajuda:</label>
+
+                            <div>
+                                <input class="form-control"
+                                       id="id_help_text_edit"
+                                       name="help_text_edit"
+                                       type="text">
+
+                                <div>
+                                    <small class="text-muted">Uma instrução
+                                        similar a está para ajudar seu
+                                        participante a entender melhor a
+                                        pergunta.
+                                    </small>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <hr>
+
+                        <div id="intro_edit" style="display: none">
+
+
+                            <div class="form-group">
+
+                                <label>Primeiro campo
+                                    vazio:</label>
 
 
                                 <div>
-                                    <small class="text-muted help-text">
-                                        Deixar o primeiro item da lista em
-                                        branco
-                                    </small>
+
+                                    <input id="id_intro_edit"
+                                           name="intro_edit"
+                                           type="checkbox">
+
+
+                                    <div>
+                                        <small class="text-muted help-text">
+                                            Deixar o primeiro item da lista em
+                                            branco
+                                        </small>
+                                    </div>
+
+
                                 </div>
-
-
                             </div>
                         </div>
-                    </div>
 
-                    <div id="options_edit" style="display: none">
-
-
-                        <div class="form-group">
-
-                            <label>Opções:</label>
+                        <div id="options_edit" style="display: none">
 
 
-                            <div>
+                            <div class="form-group">
+
+                                <label>Opções:</label>
+
+
+                                <div>
 
                                 <textarea cols="40" rows="10"
                                           class="form-control"
@@ -375,90 +375,91 @@
                                 </textarea>
 
 
-                                <div>
-                                    <small class="text-muted help-text">
-                                        Insira as opções da sua pergunta
-                                        uma
-                                        linha de cada vez.
-                                    </small>
+                                    <div>
+                                        <small class="text-muted help-text">
+                                            Insira as opções da sua pergunta
+                                            uma
+                                            linha de cada vez.
+                                        </small>
+                                    </div>
+
+
                                 </div>
-
-
                             </div>
                         </div>
-                    </div>
 
-                    <input type="hidden" name="question_id"
-                           id="question_id">
+                        <input type="hidden" name="question_id"
+                               id="question_id">
 
-                    <div class="modal-footer">
-                        <button type="button"
-                                class="btn btn-danger"
-                                data-dismiss="modal">Cancelar
-                        </button>
-                        <button id="#editQuestion"
-                                type="submit"
-                                class="btn btn-success ">Salvar
-                        </button>
-                    </div>
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-danger"
+                                    data-dismiss="modal">Cancelar
+                            </button>
+                            <button id="#editQuestion"
+                                    type="submit"
+                                    class="btn btn-success ">Salvar
+                            </button>
+                        </div>
 
 
-                </form>
+                    </form>
+
+
+                </div>
 
 
             </div>
 
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmDelete"
+         role="dialog">
+
+        <div class="modal-dialog " role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <p class="modal-title">
+                        <strong>
+                            Certeza que deseja deletar essa pergunta?
+                        </strong>
+                    </p>
+                    <hr/>
+                    <i id="removingQuestion"></i>
+                    <input type="hidden"
+                           id="removingQuestionId">
+                    <input type="hidden"
+                           id="removingQuestionName">
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-danger"
+                            data-dismiss="modal">Não
+                    </button>
+                    <button type="button"
+                            class="btn btn-success"
+                            id="deleteQuestion"
+                            data-dismiss="modal">
+                        Sim
+                    </button>
+                </div>
+
+            </div>
 
         </div>
 
     </div>
-</div>
-
-<div class="modal fade" id="confirmDelete"
-     role="dialog">
-
-    <div class="modal-dialog " role="document">
-
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <button type="button" class="close"
-                        data-dismiss="modal"
-                        aria-label="Close"><span
-                        aria-hidden="true">&times;</span>
-                </button>
-                <p class="modal-title">
-                    <strong>
-                        Certeza que deseja deletar essa pergunta?
-                    </strong>
-                </p>
-                <hr/>
-                <i id="removingQuestion"></i>
-                <input type="hidden"
-                       id="removingQuestionId">
-                <input type="hidden"
-                       id="removingQuestionName">
-            </div>
-            <div class="modal-footer">
-                <button type="button"
-                        class="btn btn-danger"
-                        data-dismiss="modal">Não
-                </button>
-                <button type="button"
-                        class="btn btn-success"
-                        id="deleteQuestion"
-                        data-dismiss="modal">
-                    Sim
-                </button>
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
 {% endblock %}
 {% block scripts %}
+    <script src="{% static 'assets/js/user_notification.js' %}"></script>
 
     <script type="application/javascript">
 

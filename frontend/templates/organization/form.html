@@ -19,7 +19,7 @@
 
 {% block styles %}
     <style type="text/css">
-        .django-ckeditor-widget{
+        .django-ckeditor-widget {
             display: block !important;
         }
     </style>
@@ -148,10 +148,11 @@
 
 {% block scripts %}
     {{ block.super }}
+    <script src="{% static 'assets/js/user_notification.js' %}"></script>
 
     <!-- mask -->
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
-        <script type="application/javascript">
+    <script type="application/javascript">
         $(document).ready(function () {
             $('#id_phone').mask("(99) 99999-9999");
         });

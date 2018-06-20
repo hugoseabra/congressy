@@ -22,7 +22,7 @@
     <script src="{% static "assets/plugins/moment/moment.js" %}"></script>
     <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
     <script src="{% static 'assets/js/date-time.js' %}"></script>
-
+    <script src="{% static 'assets/js/user_notification.js' %}"></script>
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
     <script type="application/javascript">
@@ -443,6 +443,7 @@
                     <div class="float-right">
                         <a href="
 
+
                                 {% url 'subscription:lot-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}"
                            class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>
@@ -649,6 +650,7 @@
                 <div class="buttonbar bottom">
                     <div class="float-right">
                         <a href="
+
 
 
                                 {% url 'subscription:lot-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}"
