@@ -44,22 +44,28 @@ class InfoForm(BaseModelFileForm):
             'lead',
             'description_html',
             'scientific_rules',
-            'editorial_body'
+            'editorial_body',
+            'voucher_extra_info',
 
         ]
         widgets = {
             'description_html': CKEditorWidget(),
             'scientific_rules': CKEditorWidget(),
             'editorial_body': CKEditorWidget(),
+            'voucher_extra_info': forms.Textarea(attrs={
+                'cols': '20', 'rows': '2'
+            }),
         }
 
         help_texts = {
             'editorial_body': 'Corpo editorial que compõem sua organização',
-            'scientific_rules': 'Normas do seu evento científico'
+            'scientific_rules': 'Normas do seu evento científico',
+            'voucher_extra_info': 'Limite de 255 caracteres.'
         }
         labels = {
             'editorial_body': "Corpo editorial",
-            'scientific_rules': "Normas do evento"
+            'scientific_rules': "Normas do evento",
+            'voucher_extra_info': "Informações extras para o voucher"
         }
 
     def __init__(self, event=None, **kwargs):
