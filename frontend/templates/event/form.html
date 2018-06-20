@@ -301,8 +301,10 @@
     <script src="{% static 'assets/js/date-time.js' %}"></script>
 
     <script>
-        createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
-        createTimePicker();
+        $(document).ready(function () {
+            createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
+            createTimePicker();
+        });
 
         function choose_type(chosen_type) {
             $('#event_type').val(chosen_type);
@@ -311,22 +313,22 @@
 
         (function ($) {
             $(document).ready(function () {
-                {% if LANGUAGE_CODE == 'pt-br' %}
-                    $('#id_date_start_0').mask("99/99/9999");
-                    $('#id_date_start_1').mask("99:99");
-                    $('#id_date_end_0').mask("99/99/9999");
-                    $('#id_date_end_1').mask("99:99");
-                {% elif LANGUAGE_CODE == 'en' or LANGUAGE_CODE == 'en-us' %}
-                    $('#id_date_start_0').mask("99/99/9999");
-                    $('#id_date_start_1').mask("99:99");
-                    $('#id_date_end_0').mask("99/99/9999");
-                    $('#id_date_end_1').mask("99:99");
-                {% else %}
-                    $('#id_date_start_0').mask("9999-99-99");
-                    $('#id_date_start_1').mask("99:99");
-                    $('#id_date_end_0').mask("9999-99-99");
-                    $('#id_date_end_1').mask("99:99");
-                {% endif %}
+{#                {% if LANGUAGE_CODE == 'pt-br' %}#}
+{#                    $('#id_date_start_0').mask("99/99/9999");#}
+{#                    $('#id_date_start_1').mask("99:99");#}
+{#                    $('#id_date_end_0').mask("99/99/9999");#}
+{#                    $('#id_date_end_1').mask("99:99");#}
+{#                {% elif LANGUAGE_CODE == 'en' or LANGUAGE_CODE == 'en-us' %}#}
+{#                    $('#id_date_start_0').mask("99/99/9999");#}
+{#                    $('#id_date_start_1').mask("99:99");#}
+{#                    $('#id_date_end_0').mask("99/99/9999");#}
+{#                    $('#id_date_end_1').mask("99:99");#}
+{#                {% else %}#}
+{#                    $('#id_date_start_0').mask("9999-99-99");#}
+{#                    $('#id_date_start_1').mask("99:99");#}
+{#                    $('#id_date_end_0').mask("9999-99-99");#}
+{#                    $('#id_date_end_1').mask("99:99");#}
+{#                {% endif %}#}
 
 
                 $('.type_event').on('click', function () {

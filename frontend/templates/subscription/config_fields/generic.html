@@ -54,6 +54,13 @@
                 </label>
                 {{ field }}
 
+                {% if help_text %}
+                    <br/>
+                    <small class="text-muted">
+                        {{ help_text|safe }}
+                    </small>
+                {% endif %}
+
 
             {% else %}
 

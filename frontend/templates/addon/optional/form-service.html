@@ -28,40 +28,43 @@
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
     <script src="{% static "assets/js/addon.js" %}"></script>
     <script type="application/javascript">
-        createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
-        createTimePicker();
-        createDatePicker();
-        (function ($) {
-            "use strict";
+        $(document).ready(function () {
 
-            $(document).ready(function () {
-                {% if LANGUAGE_CODE == 'pt-br' or LANGUAGE_CODE == 'en' or LANGUAGE_CODE == 'en-us' %}
-                    $('#id_date_end_sub_0').mask("99/99/9999");
-                    $('#id_schedule_start_0').mask("99/99/9999");
-                    $('#id_schedule_end_0').mask("99/99/9999");
-                {% else %}
-                    $('#id_date_end_sub_0').mask("9999-99-99");
-                    $('#id_schedule_start_0').mask("9999-99-99");
-                    $('#id_schedule_end_0').mask("9999-99-99");
-                {% endif %}
+            createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
+            createTimePicker();
+            createDatePicker();
+        });
+            (function ($) {
+                "use strict";
 
-                $('#id_date_end_sub_1').mask("99:99");
-                $('#id_schedule_start_1').mask("99:99");
-                $('#id_schedule_end_1').mask("99:99");
-                $('#id_liquid_price').mask('#.##0,00', {reverse: true});
+                $(document).ready(function () {
+                    {% if LANGUAGE_CODE == 'pt-br' or LANGUAGE_CODE == 'en' or LANGUAGE_CODE == 'en-us' %}
+                        $('#id_date_end_sub_0').mask("99/99/9999");
+                        $('#id_schedule_start_0').mask("99/99/9999");
+                        $('#id_schedule_end_0').mask("99/99/9999");
+                    {% else %}
+                        $('#id_date_end_sub_0').mask("9999-99-99");
+                        $('#id_schedule_start_0').mask("9999-99-99");
+                        $('#id_schedule_end_0').mask("9999-99-99");
+                    {% endif %}
 
-                window.setTimeout(function () {
-                    window.cgsy.addon.create_events();
+                    $('#id_date_end_sub_1').mask("99:99");
+                    $('#id_schedule_start_1').mask("99:99");
+                    $('#id_schedule_end_1').mask("99:99");
+                    $('#id_liquid_price').mask('#.##0,00', {reverse: true});
 
-                    {% for theme in themes %}
-                        window.cgsy.addon.add_theme_limit({{ theme.pk }}, '{{ theme.name }}', {{ theme.limit|default_if_none:0 }});
-                    {% endfor %}
-                    window.cgsy.addon.show_theme_limit();
-                    window.cgsy.addon.check_uncheck_has_price();
-                }, 300);
-            });
+                    window.setTimeout(function () {
+                        window.cgsy.addon.create_events();
 
-        })(jQuery);
+                        {% for theme in themes %}
+                            window.cgsy.addon.add_theme_limit({{ theme.pk }}, '{{ theme.name }}', {{ theme.limit|default_if_none:0 }});
+                        {% endfor %}
+                        window.cgsy.addon.show_theme_limit();
+                        window.cgsy.addon.check_uncheck_has_price();
+                    }, 300);
+                });
+
+            })(jQuery);
     </script>
 {% endblock %}
 
@@ -94,6 +97,7 @@
                 <div class="buttonbar">
                     <div class="float-right">
                         <a href="
+
                                 {% url 'addon:optional-service-list' event.pk %}{% if object.lot_category %}#cat={{ object.lot_category.pk }}{% endif %}"
                            class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>
@@ -155,10 +159,12 @@
                         </div>
 
                         <div class="row">
-                            <div id="datepicker-begin" class="col-xl-5 col-xl-push-1 col-md-6">
+                            <div id="datepicker-begin"
+                                 class="col-xl-5 col-xl-push-1 col-md-6">
                                 {% render_generic_field form.schedule_start %}
                             </div>
-                            <div id="datepicker-end" class="col-xl-5 col-xl-push-1 col-md-6">
+                            <div id="datepicker-end"
+                                 class="col-xl-5 col-xl-push-1 col-md-6">
                                 {% render_generic_field form.schedule_end %}
                             </div>
                         </div>
@@ -269,6 +275,7 @@
                 <div class="buttonbar bottom">
                     <div class="float-right">
                         <a href="
+
                                 {% url 'addon:optional-service-list' event.pk %}{% if object.lot_category %}#cat={{ object.lot_category.pk }}{% endif %}"
                            class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>Cancelar

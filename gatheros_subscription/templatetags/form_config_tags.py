@@ -34,7 +34,7 @@ def render_generic_field(
             label=label
         )
 
-    if help_text and hasattr(field, 'help_text'):
+    if not help_text and hasattr(field, 'help_text'):
         help_text = field.help_text
 
     return {

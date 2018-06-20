@@ -27,7 +27,11 @@
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
     <script src="{% static "assets/js/addon.js" %}"></script>
     <script type="application/javascript">
-        createTimePicker();
+        $(document).ready(function () {
+            createDatePicker();
+
+            createTimePicker();
+        });
         (function ($) {
             "use strict";
 
@@ -91,6 +95,7 @@
                 <div class="buttonbar">
                     <div class="float-right">
                         <a href="
+
                                 {% url 'addon:optional-product-list' event.pk %}{% if object.lot_category %}#cat={{ object.lot_category.pk }}{% endif %}"
                            class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>
@@ -214,6 +219,7 @@
                 <div class="buttonbar bottom">
                     <div class="float-right">
                         <a href="
+
                                 {% url 'addon:optional-product-list' event.pk %}{% if object.lot_category %}#cat={{ object.lot_category.pk }}{% endif %}"
                            class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>Cancelar

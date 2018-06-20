@@ -11,19 +11,26 @@ from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription.models import LotCategory
 
 
-class EventViewMixin(AccountMixin, generic.View):
+class EventOptionalMixin(AccountMixin, generic.View):
     event = None
 
     def dispatch(self, request, *args, **kwargs):
         try:
             self.event = Event.objects.get(pk=self.kwargs.get('event_pk'))
-
         except Event.DoesNotExist:
             messages.warning(
                 request,
                 "Evento não informado."
             )
             return redirect('event:event-list')
+
+        # Check if event is free or not
+        if self.event.event_type == self.event.EVENT_TYPE_FREE:
+            messages.error(
+                request,
+                "Evento grátis não possui opcionais."
+            )
+            return redirect('event:event-panel', self.event.pk)
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -48,7 +55,7 @@ class EventViewMixin(AccountMixin, generic.View):
 
 
 class OptionalServiceListView(TemplateNameableMixin,
-                              EventViewMixin,
+                              EventOptionalMixin,
                               generic.ListView):
     queryset = LotCategory.objects.all()
     template_name = 'addon/optional/manage-service.html'
@@ -92,7 +99,7 @@ class OptionalServiceListView(TemplateNameableMixin,
 
 
 class OptionalProductListView(TemplateNameableMixin,
-                              EventViewMixin,
+                              EventOptionalMixin,
                               generic.ListView):
     queryset = LotCategory.objects.all()
     template_name = 'addon/optional/manage-product.html'
@@ -136,7 +143,7 @@ class OptionalProductListView(TemplateNameableMixin,
         return stats
 
 
-class OptionalAddProductView(EventViewMixin, generic.CreateView):
+class OptionalAddProductView(EventOptionalMixin, generic.CreateView):
     form_class = services.ProductService
     template_name = 'addon/optional/form-product.html'
 
@@ -193,7 +200,7 @@ class OptionalAddProductView(EventViewMixin, generic.CreateView):
     #     return initial
 
 
-class OptionalAddServiceView(EventViewMixin, generic.CreateView):
+class OptionalAddServiceView(EventOptionalMixin, generic.CreateView):
     form_class = services.ServiceService
     template_name = 'addon/optional/form-service.html'
 
@@ -255,7 +262,7 @@ class OptionalAddServiceView(EventViewMixin, generic.CreateView):
         #     return initial
 
 
-class OptionalProductEditView(EventViewMixin, generic.UpdateView):
+class OptionalProductEditView(EventOptionalMixin, generic.UpdateView):
     form_class = services.ProductService
     model = Product
     template_name = 'addon/optional/form-product.html'
@@ -304,7 +311,7 @@ class OptionalProductEditView(EventViewMixin, generic.UpdateView):
         return super().form_invalid(form)
 
 
-class OptionalServiceEditView(EventViewMixin, generic.UpdateView):
+class OptionalServiceEditView(EventOptionalMixin, generic.UpdateView):
     form_class = services.ServiceService
     model = Service
     template_name = 'addon/optional/form-service.html'
@@ -357,37 +364,3 @@ class OptionalServiceEditView(EventViewMixin, generic.UpdateView):
 
     def form_invalid(self, form):
         return super().form_invalid(form)
-
-
-class OptionalProductDeleteView(DeleteViewMixin):
-    model = Product
-    pk_url_kwarg = 'optional_pk'
-    delete_message = "Tem certeza que deseja excluir o opcional \"{name}\"?"
-    success_message = "Produto / Serviço Opcional excluído com sucesso!"
-
-    def get_success_url(self):
-        return reverse(
-            'addon:optional-product-list',
-            kwargs={'event_pk': self.kwargs['event_pk']}
-        )
-
-    def can_delete(self):
-        obj = self.get_object()
-        return obj.is_deletable()
-
-
-class OptionalServiceDeleteView(DeleteViewMixin):
-    model = Service
-    pk_url_kwarg = 'optional_pk'
-    delete_message = "Tem certeza que deseja excluir o opcional \"{name}\"?"
-    success_message = "Atividade extra Opcional excluída com sucesso!"
-
-    def get_success_url(self):
-        return reverse(
-            'addon:optional-service-list',
-            kwargs={'event_pk': self.kwargs['event_pk']}
-        )
-
-    def can_delete(self):
-        obj = self.get_object()
-        return obj.is_deletable()

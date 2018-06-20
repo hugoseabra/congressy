@@ -4,7 +4,6 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
 from django.shortcuts import get_object_or_404, redirect
-
 from gatheros_event import forms
 from gatheros_event.models import Organization, Event
 from gatheros_event.views.mixins import AccountMixin
@@ -213,6 +212,8 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
     def get_initial(self):
         initial = super(EventEditFormView, self).get_initial()
         initial['organization'] = self.organization
+        initial['date_start'] = self.event.date_start
+        initial['date_end'] = self.event.date_end
 
         return initial
 
@@ -255,6 +256,7 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
             return self.render_to_response(self.get_context_data(
                 form=form,
             ))
+
 
 
 class EventPublicationFormView(BaseSimpleEditlView, generic.UpdateView):
