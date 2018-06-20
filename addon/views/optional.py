@@ -24,8 +24,14 @@ class EventOptionalMixin(AccountMixin, generic.View):
             )
             return redirect('event:event-list')
 
-        # Check if event is free or not
-        if self.event.event_type == self.event.EVENT_TYPE_FREE:
+        paid_lots = False
+
+        for lot in self.event.lots.all():
+            if lot.price > 0:
+                paid_lots = True
+                break
+
+        if self.event.event_type == self.event.EVENT_TYPE_FREE or paid_lots:
             messages.error(
                 request,
                 "Evento grátis não possui opcionais."
