@@ -53,6 +53,7 @@ function createTimePicker(el) {
         format: 'HH:mm',
         allowInputToggle: true,
         tooltips: tooltips,
+        useCurrent: true
     });
     return el
 }

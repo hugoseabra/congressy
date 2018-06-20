@@ -331,6 +331,13 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
 
         return can
 
+    def get_initial(self):
+        initial = super(LotEditFormView, self).get_initial()
+        initial['date_start'] = self.object.date_start
+        initial['date_end'] = self.object.date_end
+
+        return initial
+
     def _get_full_banking(self):
 
         if not self.organization:
