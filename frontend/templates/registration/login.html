@@ -60,6 +60,9 @@
                 <div class="col-md-12">
                     {{ form.captcha }}
                     <small class="text-danger">{{ form.captcha.errors }}</small>
+{#                    <div class="g-recaptcha"#}
+{#                         style="transform:scale(0.77);-webkit-transform:scale(0.77);transform-origin:0 0;-webkit-transform-origin:0 0;"#}
+{#                         data-sitekey="6Lerw18UAAAAANaVK-G5QZEM2My-iumnxVFbDrpZ">#}
                 </div>
             </div>
         {% endif %}
@@ -98,6 +101,7 @@
 {% endblock %}
 
 {% block local_js %}
+    <script src='https://www.google.com/recaptcha/api.js'></script>
     <script>
         /**
          * Current Caps Lock state
