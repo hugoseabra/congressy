@@ -280,6 +280,9 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
 
         return super().form_valid(form)
 
+    def form_invalid(self, form):
+        return super().form_invalid(form)
+
 
 class SubscriptionListView(EventViewMixin, generic.ListView):
     """ Lista de inscrições """
