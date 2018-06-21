@@ -12,19 +12,76 @@
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <!-- Script used in in subscription. -->
 
+    <link href="{% static "assets/plugins/croppie/croppie.css" %}" rel="stylesheet">
+    <script src="{% static "assets/plugins/croppie/croppie.js" %}"></script>
+
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script type="application/javascript">
 
-        $(document).ready(function () {
-            $('#id_cpf').mask("999.999.999-99");
-            $('#id_institution_cnpj').mask("99.999.999/9999-99");
-{#            $('#id_phone').mask("(99) 99999-9999");#}
-            $('#id_zip_code').mask("99999-999");
 
-            showHideCepLoader();
+        $(function () {
+            var $uploadCrop;
+            var avatar_file_el = $('#id_avatar_file');
+            var avatar_el = $('#id_avatar');
+
+            $uploadCrop = $('.thumbnail').croppie({
+                viewport: {
+                    width: 200,
+                    height: 200,
+                    type: 'circle'
+                },
+                boundary: {
+                    width: 400,
+                    height: 300
+                }
+            });
+
+            function readFile(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+
+                        $uploadCrop.croppie('bind', {
+                            url: e.target.result
+                        });
+                        $('.thumbnail').addClass('ready');
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            avatar_file_el.on('change', function () {
+                readFile(this);
+            });
+
+            $('#result').on("click", function () {
+                $('.thumbnail').croppie('result', 'base64').then(function (base64_image) {
+                    avatar_el.val(base64_image);
+                    console.log('setting' + base64_image);
+                    console.log('set => ');
+                    console.log(avatar_el.val());
+                });
+            });
+
+            $('#stop-edit').on("click", function () {
+                $('.thumbnail').croppie('destroy');
+            });
+
+        });
+
+
+        $(document).ready(function () {
 
             var uf_el = $('#id_state');
             var city_el = $('#id_city_name');
+            var zip_el = $('#id_zip_code');
+
+            $('#id_cpf').mask("999.999.999-99");
+            $('#id_institution_cnpj').mask("99.999.999/9999-99");
+            zip_el.mask("99999-999");
+
+            showHideCepLoader();
+
             window.setTimeout(function () {
                 {% if person.city %}
                     uf_el.val('{{ person.city.uf }}');
@@ -36,7 +93,7 @@
                 {% endif %}
             }, 300);
 
-            $('#id_state').change(function () {
+            uf_el.change(function () {
                 city_el.html($('<option>').text('Carregando...'));
                 var that = $(this);
                 window.setTimeout(function () {
@@ -44,11 +101,11 @@
                 }, 500);
             });
 
-            $('#id_city_name').change(function () {
+            city_el.change(function () {
                 $('#id_city').val($(this).val());
             });
 
-            $('#id_zip_code').on('keyup', function () {
+            zip_el.on('keyup', function () {
                 searchByCep();
             });
         });
@@ -57,7 +114,7 @@
 
 {% block content %}
 
-    <form action="" method="post" enctype="multipart/form-data">
+    <form action="" method="post" enctype="multipart/form-data" id="profileForm">
 
         {% csrf_token %}
 
@@ -95,6 +152,30 @@
                         <div class="panel-title">Dados pessoais</div>
                     </div>
                     <div class="panel-body">
+
+                        <!-- CONTAINER TO DISPLAY THE CROPPED AVATAR -->
+                        <div class="row">
+                            <div class="col-md-3 ">
+                                {% if  person.avatar %}
+                                    <img src="{{ person.avatar.url }}"
+                                         class="thumbnail">
+                                {% endif %}
+                                {% render_generic_field form.avatar_file %}
+
+                                <button type="button" id="result">
+                                    result
+                                </button>
+
+                                <button type="button" id="edit">
+                                    edit
+                                </button>
+
+                                <button type="button" id="stop-edit">
+                                    stop edit
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="col-md-9">
                                 {% render_generic_field form.name %}
@@ -234,5 +315,39 @@
         </div>
 
     </form>
+
+{% endblock %}
+
+
+{% block modals %}
+    <!-- MODAL TO CROP THE IMAGE -->
+    <div class="modal fade" id="modalCrop">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Crop the photo</h4>
+                </div>
+                <div class="modal-body">
+                    <img src="" id="image" style="max-width: 100%;">
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group pull-left" role="group">
+                        <button type="button" class="btn btn-default js-zoom-in">
+                            <span class="glyphicon glyphicon-zoom-in"></span>
+                        </button>
+                        <button type="button" class="btn btn-default js-zoom-out">
+                            <span class="glyphicon glyphicon-zoom-out"></span>
+                        </button>
+                    </div>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Nevermind</button>
+                    <button type="button" class="btn btn-primary js-crop-and-upload">Crop and upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 {% endblock %}

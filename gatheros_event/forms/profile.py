@@ -2,10 +2,11 @@
 """
 Formulário relacionados a Convites de Pessoas a serem membros de organizações
 """
+import base64
+import binascii
 from uuid import uuid4
 
 import absoluteuri
-from PIL import Image
 from captcha.fields import CaptchaField
 from django import forms
 from django.contrib.auth import (
@@ -15,6 +16,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.base import ContentFile
 from django.utils import six
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -221,12 +223,6 @@ class ProfileForm(forms.ModelForm):
     city_name = AjaxChoiceField(label='Cidade', choices=empty, required=False)
     email = forms.EmailField(label='E-Mail')
 
-    # Avatar crop attributes
-    x = forms.FloatField(widget=forms.HiddenInput())
-    y = forms.FloatField(widget=forms.HiddenInput())
-    width = forms.FloatField(widget=forms.HiddenInput())
-    height = forms.FloatField(widget=forms.HiddenInput())
-
     error_messages = {
         'password_mismatch': "Os dois passwords não combinam",
     }
@@ -244,6 +240,8 @@ class ProfileForm(forms.ModelForm):
     )
 
     cpf = BRCPFField(required=False, label="CPF")
+
+    avatar_file = forms.FileField(required=False, label="Avatar")
 
     class Meta:
         """ Meta """
@@ -265,7 +263,7 @@ class ProfileForm(forms.ModelForm):
             'village',
             'institution',
             'institution_cnpj',
-            'function'
+            'function',
             'avatar',
         ]
 
@@ -283,20 +281,27 @@ class ProfileForm(forms.ModelForm):
             'birth_date': forms.SelectDateWidget(
                 attrs=({'style': 'width: 30%; display: inline-block;'}),
                 years=create_years_list(), ),
+            'avatar': forms.HiddenInput(),
         }
-
-    class Media:
-        js = (
-            'assets/plugins/cropper/js/cropper.min.js',
-        )
-
-        css = (
-            'assets/plugins/cropper/css/cropper.min.css'
-        )
 
     def __init__(self, user, password_required=True, *args, **kwargs):
         if hasattr(user, 'person'):
             kwargs.update({'instance': user.person})
+
+        # Decoding from base64 avatar into a file obj.
+        data = kwargs.get('data')
+        if data:
+            possible_base64 = data.get('avatar')
+            if possible_base64:
+                try:
+                    file_ext, imgstr = possible_base64.split(';base64,')
+                    ext = file_ext.split('/')[-1]
+                    data['avatar'] = ContentFile(
+                        base64.b64decode(imgstr),
+                        name='temp.' + ext
+                    )
+                except (binascii.Error, ValueError):
+                    pass
 
         super(ProfileForm, self).__init__(*args, **kwargs)
         self.user = user
@@ -365,17 +370,6 @@ class ProfileForm(forms.ModelForm):
         if self.cleaned_data["new_password1"]:
             self.user.set_password(self.cleaned_data["new_password1"])
         self.user.save()
-
-        # Cropping the avatar
-        x = self.cleaned_data.get('x')
-        y = self.cleaned_data.get('y')
-        w = self.cleaned_data.get('width')
-        h = self.cleaned_data.get('height')
-
-        image = Image.open(self.instance.avatar)
-        cropped_image = image.crop((x, y, w + x, h + y))
-        resized_image = cropped_image.resize((200, 200), Image.ANTIALIAS)
-        resized_image.save(self.instance.avatar.file.path)
 
         self.instance.user = self.user
         self.instance.save()
