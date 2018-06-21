@@ -3,7 +3,72 @@ from datetime import datetime
 
 from django import forms
 
-from gatheros_subscription.models import Subscription, Lot
+from gatheros_event.forms import PersonForm
+from gatheros_subscription.models import Subscription, Lot, FormConfig
+
+
+class SubscriptionPersonForm(PersonForm):
+    def check_requirements(self, lot=None):
+
+        has_paid_lots = False
+        if lot:
+            has_paid_lots = lot.price > 0 if lot.price else False
+
+        if has_paid_lots:
+            try:
+                config = lot.event.formconfig
+            except AttributeError:
+                config = FormConfig()
+                config.event = lot.event
+        else:
+            config = FormConfig()
+            config.event = lot.event
+
+        country = self.data.get('person-country', 'BR')
+        required_fields = ['gender', 'country']
+
+        if has_paid_lots or config.phone:
+            required_fields.append('phone')
+
+        if has_paid_lots:
+            required_fields.append('street')
+            required_fields.append('village')
+
+            if country == 'BR':
+                required_fields.append('zip_code')
+            else:
+                required_fields.append('zip_code_international')
+
+            if country == 'BR':
+                required_fields.append('city')
+            else:
+                required_fields.append('city_international')
+                required_fields.append('state_international')
+
+        if not has_paid_lots \
+                and not config.address_show \
+                and config.city is True:
+
+            if country == 'BR':
+                required_fields.append('city')
+            else:
+                required_fields.append('city_international')
+
+        if has_paid_lots or config.cpf_required:
+            if country == 'BR':
+                required_fields.append('cpf')
+            else:
+                required_fields.append('international_doc')
+                required_fields.append('state_international')
+
+        if has_paid_lots or config.birth_date_required:
+            required_fields.append('birth_date')
+
+        for field_name in required_fields:
+            self.setAsRequired(field_name)
+
+    def save(self, commit=True):
+        return super().save(commit=commit)
 
 
 class SubscriptionForm(forms.ModelForm):

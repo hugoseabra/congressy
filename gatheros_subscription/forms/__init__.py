@@ -2,6 +2,10 @@
 from .form_config import FormConfigForm
 from .lotcategory import LotCategoryForm
 from .lot import LotForm
-from .subscription import SubscriptionForm, SubscriptionAttendanceForm
+from .subscription import (
+    SubscriptionAttendanceForm,
+    SubscriptionForm,
+    SubscriptionPersonForm,
+)
 from .export import SubscriptionFilterForm
 from .survey import EventSurveyForm, SurveyForm

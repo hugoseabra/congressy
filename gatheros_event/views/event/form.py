@@ -258,7 +258,6 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
             ))
 
 
-
 class EventPublicationFormView(BaseSimpleEditlView, generic.UpdateView):
     form_class = forms.EventPublicationForm
     model = forms.EventPublicationForm.Meta.model
