@@ -296,9 +296,10 @@ class ProfileForm(forms.ModelForm):
                 try:
                     file_ext, imgstr = possible_base64.split(';base64,')
                     ext = file_ext.split('/')[-1]
+                    file_name = str(user.person.pk) + "." + ext
                     data['avatar'] = ContentFile(
                         base64.b64decode(imgstr),
-                        name='temp.' + ext
+                        name=file_name
                     )
                 except (binascii.Error, ValueError):
                     pass
