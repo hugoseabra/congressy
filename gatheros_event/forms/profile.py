@@ -5,6 +5,7 @@ Formulário relacionados a Convites de Pessoas a serem membros de organizações
 from uuid import uuid4
 
 import absoluteuri
+from PIL import Image
 from captcha.fields import CaptchaField
 from django import forms
 from django.contrib.auth import (
@@ -220,6 +221,12 @@ class ProfileForm(forms.ModelForm):
     city_name = AjaxChoiceField(label='Cidade', choices=empty, required=False)
     email = forms.EmailField(label='E-Mail')
 
+    # Avatar crop attributes
+    x = forms.FloatField(widget=forms.HiddenInput())
+    y = forms.FloatField(widget=forms.HiddenInput())
+    width = forms.FloatField(widget=forms.HiddenInput())
+    height = forms.FloatField(widget=forms.HiddenInput())
+
     error_messages = {
         'password_mismatch': "Os dois passwords não combinam",
     }
@@ -259,6 +266,7 @@ class ProfileForm(forms.ModelForm):
             'institution',
             'institution_cnpj',
             'function'
+            'avatar',
         ]
 
         widgets = {
@@ -357,6 +365,17 @@ class ProfileForm(forms.ModelForm):
         if self.cleaned_data["new_password1"]:
             self.user.set_password(self.cleaned_data["new_password1"])
         self.user.save()
+
+        # Cropping the avatar
+        x = self.cleaned_data.get('x')
+        y = self.cleaned_data.get('y')
+        w = self.cleaned_data.get('width')
+        h = self.cleaned_data.get('height')
+
+        image = Image.open(self.instance.avatar)
+        cropped_image = image.crop((x, y, w + x, h + y))
+        resized_image = cropped_image.resize((200, 200), Image.ANTIALIAS)
+        resized_image.save(self.instance.avatar.file.path)
 
         self.instance.user = self.user
         self.instance.save()
