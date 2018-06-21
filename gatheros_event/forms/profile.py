@@ -277,6 +277,15 @@ class ProfileForm(forms.ModelForm):
                 years=create_years_list(), ),
         }
 
+    class Media:
+        js = (
+            'assets/plugins/cropper/js/cropper.min.js',
+        )
+
+        css = (
+            'assets/plugins/cropper/css/cropper.min.css'
+        )
+
     def __init__(self, user, password_required=True, *args, **kwargs):
         if hasattr(user, 'person'):
             kwargs.update({'instance': user.person})
