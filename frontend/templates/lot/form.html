@@ -27,8 +27,12 @@
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
     <script type="application/javascript">
         $(document).ready(function () {
-            createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
-            createTimePicker()
+            var date = createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
+            createTimePicker();
+            {% if object %}
+                date.data("DateTimePicker").minDate(false);
+            {% endif %}
+
         });
         (function ($) {
             function show(el) {
@@ -443,6 +447,9 @@
                     <div class="float-right">
                         <a href="
 
+
+
+
                                 {% url 'subscription:lot-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}"
                            class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>
@@ -649,6 +656,9 @@
                 <div class="buttonbar bottom">
                     <div class="float-right">
                         <a href="
+
+
+
 
 
                                 {% url 'subscription:lot-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}"
