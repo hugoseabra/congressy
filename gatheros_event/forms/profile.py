@@ -241,8 +241,6 @@ class ProfileForm(forms.ModelForm):
 
     cpf = BRCPFField(required=False, label="CPF")
 
-    avatar_file = forms.FileField(required=False, label="Avatar")
-
     class Meta:
         """ Meta """
         model = Person

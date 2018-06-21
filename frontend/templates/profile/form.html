@@ -18,25 +18,38 @@
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script type="application/javascript">
 
+        function askForFile() {
+
+            // creating input on-the-fly
+            var input = $("#id_avatar_file");
+            // add onchange handler if you wish to get the file :)
+            input.trigger("click"); // opening dialog
+            return false; // avoiding navigation
+
+        }
+
 
         $(function () {
             var $uploadCrop;
             var avatar_file_el = $('#id_avatar_file');
             var avatar_el = $('#id_avatar');
 
-            $uploadCrop = $('.thumbnail').croppie({
-                viewport: {
-                    width: 200,
-                    height: 200,
-                    type: 'circle'
-                },
-                boundary: {
-                    width: 400,
-                    height: 300
-                }
-            });
-
             function readFile(input) {
+
+                if (typeof ($uploadCrop) === "undefined") {
+                    $uploadCrop = $('.avatar-thumbnail').croppie({
+                        viewport: {
+                            width: 200,
+                            height: 200,
+                            type: 'circle'
+                        },
+                        boundary: {
+                            width: 400,
+                            height: 300
+                        }
+                    });
+                }
+
                 if (input.files && input.files[0]) {
                     var reader = new FileReader();
                     reader.onload = function (e) {
@@ -44,7 +57,7 @@
                         $uploadCrop.croppie('bind', {
                             url: e.target.result
                         });
-                        $('.thumbnail').addClass('ready');
+                        $('.avatar-thumbnail').addClass('ready');
                     };
                     reader.readAsDataURL(input.files[0]);
                 }
@@ -55,7 +68,7 @@
             });
 
             $('#result').on("click", function () {
-                $('.thumbnail').croppie('result', 'base64').then(function (base64_image) {
+                $('.avatar-thumbnail').croppie('result', 'base64').then(function (base64_image) {
                     avatar_el.val(base64_image);
                     console.log('setting' + base64_image);
                     console.log('set => ');
@@ -64,8 +77,23 @@
             });
 
             $('#stop-edit').on("click", function () {
-                $('.thumbnail').croppie('destroy');
+                $('.avatar-thumbnail').croppie('destroy');
             });
+
+            $('#edit').on("click", function () {
+                $uploadCrop = $('.avatar-thumbnail').croppie({
+                    viewport: {
+                        width: 200,
+                        height: 200,
+                        type: 'circle'
+                    },
+                    boundary: {
+                        width: 400,
+                        height: 300
+                    }
+                });
+            });
+
 
         });
 
@@ -147,42 +175,55 @@
         <div class="row">
 
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="col-xs-4 col-lg-push-4">
+                    <div class="row text-center">
+                        <input type="file" style="display: none"
+                               id="id_avatar_file" accept="image/*">
+                        {% if  person.avatar %}
+                            <img src="{{ person.avatar.url }}"
+                                 class="avatar-thumbnail">
+                        {% endif %}
+                        <a href="#" onclick="askForFile();">
+                            <div style="position:absolute;left:175px;top:165px;">
+                                <span class="fa-stack">
+                                    <i class="fas fa-circle fa-stack-2x fa-inverse"></i>
+                                    <i class="fas fa-pencil-alt fa-stack-1x "></i>
+                                </span>
+                            </div>
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row" style="margin-top: 20px">
+
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <div class="panel-title">Dados pessoais</div>
                     </div>
                     <div class="panel-body">
 
-                        <!-- CONTAINER TO DISPLAY THE CROPPED AVATAR -->
                         <div class="row">
-                            <div class="col-md-3 ">
-                                {% if  person.avatar %}
-                                    <img src="{{ person.avatar.url }}"
-                                         class="thumbnail">
-                                {% endif %}
-                                {% render_generic_field form.avatar_file %}
+                            <div class="col-xs-8">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        {% render_generic_field form.name %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        {% render_generic_field form.gender %}
+                                    </div>
+                                </div>
 
-                                <button type="button" id="result">
-                                    result
-                                </button>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.birth_date %}
+                                    </div>
+                                </div>
 
-                                <button type="button" id="edit">
-                                    edit
-                                </button>
-
-                                <button type="button" id="stop-edit">
-                                    stop edit
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-9">
-                                {% render_generic_field form.name %}
-                            </div>
-
-                            <div class="col-md-3">
-                                {% render_generic_field form.gender %}
                             </div>
                         </div>
 
@@ -196,10 +237,7 @@
                             </div>
                         </div>
                         <div class="row" style="padding-bottom: 30px">
-                            <div class="col-md-6">
-                                {% render_generic_field form.birth_date %}
 
-                            </div>
 
                             <div class="col-md-6">
 
