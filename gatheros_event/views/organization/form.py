@@ -143,6 +143,12 @@ class OrganizationEditFormView(BaseOrganizationView, generic.UpdateView):
         return can_edit
 
     def get_success_url(self):
+
+        if self.object:
+            return reverse_lazy('event:organization-edit', kwargs={
+                'pk': self.object.pk,
+            })
+
         form_kwargs = self.get_form_kwargs()
         data = form_kwargs.get('data', {})
         next_path = data.get('next')
