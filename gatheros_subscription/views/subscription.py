@@ -736,7 +736,6 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
             Subscription.objects.filter(
                 event=self.get_event(),
                 completed=True,
-                attended=True,
             ).exclude(status=Subscription.CANCELED_STATUS).count()
 
         return total
@@ -747,7 +746,6 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
             Subscription.objects.filter(
                 status=Subscription.CONFIRMED_STATUS,
                 completed=True,
-                attended=True,
                 event=self.get_event()
             ).count()
 
