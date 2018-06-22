@@ -1,6 +1,6 @@
 {% extends "base/base.html" %}
 
-{% load static  widget_tweaks organization_tags %}
+{% load static  widget_tweaks organization_tags form_config_tags%}
 
 
 {% block title %}
@@ -19,7 +19,7 @@
 
 {% block styles %}
     <style type="text/css">
-        .django-ckeditor-widget{
+        .django-ckeditor-widget {
             display: block !important;
         }
     </style>
@@ -34,6 +34,18 @@
     <form action="" method="post" class="form-horizontal" role="form"
           name="event_form">
         {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
         <div class="row">
             <div class="col-md-12">
                 <div class="buttonbar">
@@ -151,7 +163,7 @@
 
     <!-- mask -->
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
-        <script type="application/javascript">
+    <script type="application/javascript">
         $(document).ready(function () {
             $('#id_phone').mask("(99) 99999-9999");
         });
