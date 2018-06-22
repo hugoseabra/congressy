@@ -32,12 +32,23 @@
             return false; // avoiding navigation
         }
 
+        // Replace the client image for the image that was just uploaded
+        function replaceFile() {
+
+            // Get the first file in the FileList object
+            var imageFile = $('#id_avatar_file')[0].files[0];
+
+            // Now use your newly created URL!
+            $('#avatar-thumbnail')[0].src = window.URL.createObjectURL(imageFile);
+        }
+
         $(document).ready(function () {
             var uf_el = $('#id_state');
             var city_el = $('#id_city_name');
             var zip_el = $('#id_zip_code');
             var cpf_el = $('#id_cpf');
             var cnpj_el = $('#id_institution_cnpj');
+            var avatar_file_el = $('#id_avatar_file');
 
 
             //Masking
@@ -73,6 +84,14 @@
             zip_el.on('keyup', function () {
                 searchByCep();
             });
+
+            // Listener responsavel por ler o arquivo que foi submetido.
+            // È aqui que começa o processo de crop.
+            avatar_file_el.on('change', function () {
+                console.log("File has changed....");
+                replaceFile();
+            });
+
         });
 
 
