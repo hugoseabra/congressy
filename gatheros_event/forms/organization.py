@@ -49,6 +49,23 @@ class OrganizationForm(forms.ModelForm):
         self.user = user
         self.internal = internal
 
+        # Decoding from base64 avatar into a file obj.
+        if data:
+            possible_base64 = data.get('avatar')
+            if possible_base64:
+                try:
+                    file_ext, imgstr = possible_base64.split(';base64,')
+                    ext = file_ext.split('/')[-1]
+                    file_name = str(user.person.pk) + "." + ext
+                    data._mutable = True
+                    data['avatar'] = ContentFile(
+                        base64.b64decode(imgstr),
+                        name=file_name
+                    )
+                    data._mutable = False
+                except (binascii.Error, ValueError):
+                    pass
+
         try:
             self.user.person
         except ObjectDoesNotExist:
@@ -63,21 +80,6 @@ class OrganizationForm(forms.ModelForm):
                 '__all__': 'Usuário não possui qualquer vínculo com a'
                            ' organização.'
             })
-
-        # Decoding from base64 avatar into a file obj.
-        if data:
-            possible_base64 = data.get('avatar')
-            if possible_base64:
-                try:
-                    file_ext, imgstr = possible_base64.split(';base64,')
-                    ext = file_ext.split('/')[-1]
-                    file_name = str(user.person.pk) + "." + ext
-                    data['avatar'] = ContentFile(
-                        base64.b64decode(imgstr),
-                        name=file_name
-                    )
-                except (binascii.Error, ValueError):
-                    pass
 
         super(OrganizationForm, self).__init__(data=data, *args, **kwargs)
 
