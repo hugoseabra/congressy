@@ -88,8 +88,19 @@
             // Listener responsavel por ler o arquivo que foi submetido.
             // È aqui que começa o processo de crop.
             avatar_file_el.on('change', function () {
-                console.log("File has changed....");
                 replaceFile();
+                $('#avatar-thumbnail').croppie({
+                    viewport: {
+                        width: 200,
+                        height: 200,
+                        type: 'circle'
+                    },
+                    boundary: {
+                        width: 400,
+                        height: 300
+                    },
+                    showZoomer: false
+                });
             });
 
         });
