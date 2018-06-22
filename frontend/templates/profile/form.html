@@ -91,6 +91,7 @@
             // È aqui que começa o processo de crop.
             avatar_file_el.on('change', function () {
                 replaceFile();
+                $('#edit_btn').hide();
                 croppie_obj = $('#avatar-thumbnail').croppie({
                     viewport: {
                         width: 200,
@@ -161,13 +162,12 @@
                         <img {% if  person.avatar %}
                             src="{{ person.avatar.url }}"
                         {% else %}
-                            style="max-width: 50%"
                             src="{% static 'assets/img/user_undefined.jpg' %}"
                         {% endif %}
                             class="img-circle" id="avatar-thumbnail">
 
-                        <a href="#" onclick="askForFile();">
-                            <div style="position:absolute;left:235px;top:165px;">
+                        <a href="#" onclick="askForFile();" id="edit_btn">
+                            <div style="position:relative;left:43px;top:-30px;">
                                 <span class="fa-stack">
                                     <i class="fas fa-circle fa-stack-2x fa-inverse"></i>
                                     <i class="fas fa-pencil-alt fa-stack-1x "></i>
