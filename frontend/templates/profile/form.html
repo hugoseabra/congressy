@@ -100,16 +100,14 @@
                     boundary: {
                         width: 400,
                         height: 300
-                    },
-                    showZoomer: false
+                    }
                 });
             });
 
             // Listener ao clicar no submit.
             $('.btn-success').on('click', function () {
                 if (typeof(croppie_obj !== "undefined")) {
-                    croppie_obj.croppie('result', 'base64', 'original', 'png', '1', true).then(function (base64_image) {
-                        $('#avatar-thumbnail')[0].src = base64_image;
+                    croppie_obj.croppie('result', 'base64', 'original', 'png', '1', false).then(function (base64_image) {$('#avatar-thumbnail')[0].src = base64_image;
                         avatar_form_el.val(base64_image);
                     });
                 }
