@@ -49,6 +49,8 @@
             var cpf_el = $('#id_cpf');
             var cnpj_el = $('#id_institution_cnpj');
             var avatar_file_el = $('#id_avatar_file');
+            var avatar_form_el = $('#id_avatar');
+            var croppie_obj;
 
 
             //Masking
@@ -89,7 +91,7 @@
             // È aqui que começa o processo de crop.
             avatar_file_el.on('change', function () {
                 replaceFile();
-                $('#avatar-thumbnail').croppie({
+                croppie_obj = $('#avatar-thumbnail').croppie({
                     viewport: {
                         width: 200,
                         height: 200,
@@ -101,6 +103,18 @@
                     },
                     showZoomer: false
                 });
+            });
+
+            // Listener ao clicar no submit.
+            $('.btn-success').on('click', function () {
+                if (typeof(croppie_obj !== "undefined")) {
+                    croppie_obj.croppie('result', 'base64', 'original', 'png', '1', true).then(function (base64_image) {
+                        $('#avatar-thumbnail')[0].src = base64_image;
+                        avatar_form_el.val(base64_image);
+                    });
+
+                    croppie_obj.croppie('destroy');
+                }
             });
 
         });
