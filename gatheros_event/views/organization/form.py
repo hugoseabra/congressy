@@ -14,7 +14,6 @@ from payment.exception import OrganizerRecipientError
 
 
 class BaseOrganizationView(AccountMixin, View):
-    # template_name = 'gatheros_event/organization/form.html'
     template_name = 'organization/form.html'
     success_message = ''
     success_url = None
