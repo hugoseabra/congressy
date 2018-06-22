@@ -2,6 +2,8 @@
 """
 Formulário relacionados a Convites de Pessoas a serem membros de organizações
 """
+import base64
+import binascii
 from uuid import uuid4
 
 import absoluteuri
@@ -14,6 +16,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.base import ContentFile
 from django.utils import six
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -258,7 +261,8 @@ class ProfileForm(forms.ModelForm):
             'village',
             'institution',
             'institution_cnpj',
-            'function'
+            'function',
+            'avatar',
         ]
 
         widgets = {
@@ -275,11 +279,28 @@ class ProfileForm(forms.ModelForm):
             'birth_date': forms.SelectDateWidget(
                 attrs=({'style': 'width: 30%; display: inline-block;'}),
                 years=create_years_list(), ),
+            'avatar': forms.HiddenInput(),
         }
 
     def __init__(self, user, password_required=True, *args, **kwargs):
         if hasattr(user, 'person'):
             kwargs.update({'instance': user.person})
+
+        # Decoding from base64 avatar into a file obj.
+        data = kwargs.get('data')
+        if data:
+            possible_base64 = data.get('avatar')
+            if possible_base64:
+                try:
+                    file_ext, imgstr = possible_base64.split(';base64,')
+                    ext = file_ext.split('/')[-1]
+                    file_name = str(user.person.pk) + "." + ext
+                    data['avatar'] = ContentFile(
+                        base64.b64decode(imgstr),
+                        name=file_name
+                    )
+                except (binascii.Error, ValueError):
+                    pass
 
         super(ProfileForm, self).__init__(*args, **kwargs)
         self.user = user
