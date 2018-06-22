@@ -8,6 +8,7 @@ from gatheros_event import forms
 from gatheros_event.models import Organization, Event
 from gatheros_event.views.mixins import AccountMixin
 from gatheros_event.helpers.account import update_account
+from core.util import model_field_slugify
 
 
 class BaseEventView(AccountMixin, View):
@@ -122,9 +123,9 @@ class EventAddFormView(BaseEventView, generic.CreateView):
 
         event_type = request.GET.get('event_type')
         if event_type and event_type not in (
-            Event.EVENT_TYPE_FREE,
-            Event.EVENT_TYPE_PAID,
-            Event.EVENT_TYPE_SCIENTIFIC,
+                Event.EVENT_TYPE_FREE,
+                Event.EVENT_TYPE_PAID,
+                Event.EVENT_TYPE_SCIENTIFIC,
         ):
             messages.warning(request, 'Escolha um tipo de evento válido.')
             return redirect('event:event-add')
@@ -145,6 +146,7 @@ class EventAddFormView(BaseEventView, generic.CreateView):
 
         step = self.request.GET.get('step')
         event_type = self.request.GET.get('event_type')
+        slug = self.request.GET.get('slug')
         if step and event_type:
             context['step'] = step
             context['event_type'] = event_type
@@ -245,7 +247,6 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
 
         return context
 
-
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
@@ -256,7 +257,6 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
             return self.render_to_response(self.get_context_data(
                 form=form,
             ))
-
 
 
 class EventPublicationFormView(BaseSimpleEditlView, generic.UpdateView):

@@ -12,7 +12,6 @@ ABSOLUTEURI_PROTOCOL = 'http'
 INSTALLED_APPS.extend([
     'debug_toolbar',
     'django_extensions',
-    'logtailer',
 ])
 # ============================== DATABASE =================================== #
 DATABASES = {

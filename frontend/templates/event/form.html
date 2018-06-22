@@ -183,6 +183,16 @@
                                         </div>
                                     </div>
                                     <div class="row">
+                                        <div class="col-md-12">
+                                            <label for="print-url">
+                                                Link do seu evento:
+                                            </label>
+                                            <div id="slug">
+                                                {% include "event/includes/slug_event.html" %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col-md-6">
                                             {% render_generic_field form.organization %}
                                         </div>
@@ -306,6 +316,13 @@
     <script src="{% static 'assets/js/user_notification.js' %}"></script>
 
     <script>
+        {#var inputBox = document.getElementById('id_name');#}
+        {#url = "www.ev.congressy.com/";#}
+        {#inputBox.onkeyup = function () {#}
+        {#    document.getElementById('print-url').innerHTML = url + inputBox.value;#}
+
+
+
 
         $(document).ready(function () {
             createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
