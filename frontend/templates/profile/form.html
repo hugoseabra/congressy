@@ -2,6 +2,10 @@
 
 {% load i18n static widget_tweaks form_config_tags %}
 
+{% block styles %}
+    <link href="{% static "assets/plugins/croppie/croppie.css" %}" rel="stylesheet">
+{% endblock %}
+
 {% block title %}Editar Perfil | Congressy{% endblock %}
 
 {% block page_title %}Editar Perfil{% endblock %}
@@ -9,103 +13,27 @@
 {% block page_sub_title %}{{ request.user.get_full_name }}{% endblock %}
 
 {% block scripts %}
+
+    <script src="{% static "assets/plugins/croppie/croppie.js" %}"></script>
+    <!-- Script used for cropping -->
+
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <!-- Script used in in subscription. -->
-
-    <link href="{% static "assets/plugins/croppie/croppie.css" %}" rel="stylesheet">
-    <script src="{% static "assets/plugins/croppie/croppie.js" %}"></script>
 
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script type="application/javascript">
 
-        function askForFile() {
-
-            // creating input on-the-fly
-            var input = $("#id_avatar_file");
-            // add onchange handler if you wish to get the file :)
-            input.trigger("click"); // opening dialog
-            return false; // avoiding navigation
-
-        }
-
-
-        $(function () {
-            var $uploadCrop;
-            var avatar_file_el = $('#id_avatar_file');
-            var avatar_el = $('#id_avatar');
-
-            function readFile(input) {
-
-                if (typeof ($uploadCrop) === "undefined") {
-                    $uploadCrop = $('.avatar-thumbnail').croppie({
-                        viewport: {
-                            width: 200,
-                            height: 200,
-                            type: 'circle'
-                        },
-                        boundary: {
-                            width: 400,
-                            height: 300
-                        }
-                    });
-                }
-
-                if (input.files && input.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-
-                        $uploadCrop.croppie('bind', {
-                            url: e.target.result
-                        });
-                        $('.avatar-thumbnail').addClass('ready');
-                    };
-                    reader.readAsDataURL(input.files[0]);
-                }
-            }
-
-            avatar_file_el.on('change', function () {
-                readFile(this);
-            });
-
-            $('#result').on("click", function () {
-                $('.avatar-thumbnail').croppie('result', 'base64').then(function (base64_image) {
-                    avatar_el.val(base64_image);
-                    console.log('setting' + base64_image);
-                    console.log('set => ');
-                    console.log(avatar_el.val());
-                });
-            });
-
-            $('#stop-edit').on("click", function () {
-                $('.avatar-thumbnail').croppie('destroy');
-            });
-
-            $('#edit').on("click", function () {
-                $uploadCrop = $('.avatar-thumbnail').croppie({
-                    viewport: {
-                        width: 200,
-                        height: 200,
-                        type: 'circle'
-                    },
-                    boundary: {
-                        width: 400,
-                        height: 300
-                    }
-                });
-            });
-
-
-        });
-
-
         $(document).ready(function () {
-
             var uf_el = $('#id_state');
             var city_el = $('#id_city_name');
             var zip_el = $('#id_zip_code');
+            var cpf_el = $('#id_cpf');
+            var cnpj_el = $('#id_institution_cnpj');
 
-            $('#id_cpf').mask("999.999.999-99");
-            $('#id_institution_cnpj').mask("99.999.999/9999-99");
+
+            //Masking
+            cpf_el.mask("999.999.999-99");
+            cnpj_el.mask("99.999.999/9999-99");
             zip_el.mask("99999-999");
 
             showHideCepLoader();
@@ -125,7 +53,7 @@
                 city_el.html($('<option>').text('Carregando...'));
                 var that = $(this);
                 window.setTimeout(function () {
-                    fetch_cities($(that), $('#id_city_name'));
+                    fetch_cities($(that), city_el);
                 }, 500);
             });
 
@@ -142,7 +70,7 @@
 
 {% block content %}
 
-    <form action="" method="post" enctype="multipart/form-data" id="profileForm">
+    <form action="" method="post" enctype="multipart/form-data">
 
         {% csrf_token %}
 
@@ -175,55 +103,18 @@
         <div class="row">
 
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-                <div class="col-xs-4 col-lg-push-4">
-                    <div class="row text-center">
-                        <input type="file" style="display: none"
-                               id="id_avatar_file" accept="image/*">
-                        {% if  person.avatar %}
-                            <img src="{{ person.avatar.url }}"
-                                 class="avatar-thumbnail">
-                        {% endif %}
-                        <a href="#" onclick="askForFile();">
-                            <div style="position:absolute;left:175px;top:165px;">
-                                <span class="fa-stack">
-                                    <i class="fas fa-circle fa-stack-2x fa-inverse"></i>
-                                    <i class="fas fa-pencil-alt fa-stack-1x "></i>
-                                </span>
-                            </div>
-                        </a>
-
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="row" style="margin-top: 20px">
-
-            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <div class="panel-title">Dados pessoais</div>
                     </div>
                     <div class="panel-body">
-
                         <div class="row">
-                            <div class="col-xs-8">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        {% render_generic_field form.name %}
-                                    </div>
-                                    <div class="col-md-4">
-                                        {% render_generic_field form.gender %}
-                                    </div>
-                                </div>
+                            <div class="col-md-9">
+                                {% render_generic_field form.name %}
+                            </div>
 
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        {% render_generic_field form.birth_date %}
-                                    </div>
-                                </div>
-
+                            <div class="col-md-3">
+                                {% render_generic_field form.gender %}
                             </div>
                         </div>
 
@@ -237,7 +128,10 @@
                             </div>
                         </div>
                         <div class="row" style="padding-bottom: 30px">
+                            <div class="col-md-6">
+                                {% render_generic_field form.birth_date %}
 
+                            </div>
 
                             <div class="col-md-6">
 
@@ -353,39 +247,5 @@
         </div>
 
     </form>
-
-{% endblock %}
-
-
-{% block modals %}
-    <!-- MODAL TO CROP THE IMAGE -->
-    <div class="modal fade" id="modalCrop">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title">Crop the photo</h4>
-                </div>
-                <div class="modal-body">
-                    <img src="" id="image" style="max-width: 100%;">
-                </div>
-                <div class="modal-footer">
-                    <div class="btn-group pull-left" role="group">
-                        <button type="button" class="btn btn-default js-zoom-in">
-                            <span class="glyphicon glyphicon-zoom-in"></span>
-                        </button>
-                        <button type="button" class="btn btn-default js-zoom-out">
-                            <span class="glyphicon glyphicon-zoom-out"></span>
-                        </button>
-                    </div>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Nevermind</button>
-                    <button type="button" class="btn btn-primary js-crop-and-upload">Crop and upload</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
 {% endblock %}
