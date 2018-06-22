@@ -135,7 +135,7 @@ class Info(models.Model, GatherosModelMixin):
     )
 
     voucher_extra_info = models.CharField(
-        max_length=255,
+        max_length=2000,
         null=True,
         blank=True,
         verbose_name='Informações Extras do Voucher',
