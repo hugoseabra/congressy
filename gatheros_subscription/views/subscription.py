@@ -736,6 +736,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
             Subscription.objects.filter(
                 event=self.get_event(),
                 completed=True,
+                attended=True,
             ).exclude(status=Subscription.CANCELED_STATUS).count()
 
         return total
@@ -746,6 +747,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
             Subscription.objects.filter(
                 status=Subscription.CONFIRMED_STATUS,
                 completed=True,
+                attended=True,
                 event=self.get_event()
             ).count()
 
@@ -753,7 +755,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
 
     def get_report(self):
         """ Resgata informações gerais do evento. """
-        return self.get_event().get_report()
+        return self.get_event().get_report(only_attended=True)
 
 
 class MySubscriptionsListView(AccountMixin, generic.ListView):
