@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block scripts %}
-        <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'assets/plugins/dataTables/js/dataTables.responsive.min.js' %}"></script>
 
     <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.min.js' %}"></script>
@@ -81,6 +81,12 @@
                 responsive: true,
                 scrollX: true
             });
+
+            function delete_event(event_pk) {
+                $('#event-delete-modal').modal();
+                $('#transaction_id').val(event_pk);
+
+            }
         });
     </script>
 {% endblock %}
@@ -227,8 +233,8 @@
                                                         {% endif %}
                                                         {% if event.is_deletable and user has 'gatheros_event.delete_event' of event %}
                                                             <li>
-                                                                <a data-toggle="modal"
-                                                                   data-target="#event-delete-modal">
+                                                                <a href="javascript:void(0)"
+                                                                   onclick="$('#event-delete-form').attr('action','{% url 'event:event-delete' event.pk %}');$('#event-delete-modal').modal();">
                                                                     <i class="fas fa-trash-alt"></i>
                                                                     Excluir
                                                                 </a>

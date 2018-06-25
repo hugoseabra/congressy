@@ -213,8 +213,7 @@
                                                          data-placement="left"
                                                          title=""
                                                          data-original-title="Excluir">
-                                                        <div data-toggle="modal"
-                                                             data-target="#delete-modal">
+                                                        <div onclick="$('#lot-delete-form').attr('action','{% url 'subscription:lot-delete' event.pk lot.pk%}');$('#lot-delete-modal').modal();">
                                                             <button class="btn btn-sm btn-default btn-trans btn-block">
                                                                 <i class="fas fa-trash-alt"></i>
                                                             </button>

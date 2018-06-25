@@ -459,4 +459,43 @@
         </div>
     </div>
     <!-- / Lot Privacy Modal -->
+
+
+    <div class="modal" id="lot-delete-modal" role="dialog"
+         data-backdrop="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <form action="" method="post" class="form-horizontal"
+                      role="form" id="lot-delete-form">
+                    <div class="modal-header">
+                        <button type="button" class="close"
+                                data-dismiss="modal"
+                                aria-label="Close"><span
+                                aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title text-bold">
+                            Excluir Lote
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+
+                        <p>Deseja realmente excluir o lote ?</p>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-success" type="submit">
+                            Confirmar
+                        </button>
+
+                        <button class="btn btn-danger"
+                                data-dismiss="modal">Voltar
+                        </button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
