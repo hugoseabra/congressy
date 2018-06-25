@@ -84,10 +84,12 @@ class InfoForm(BaseModelFileForm):
                     file_ext, imgstr = possible_base64.split(';base64,')
                     ext = file_ext.split('/')[-1]
                     file_name = str(event.slug) + "." + ext
+                    data._mutable = True
                     data['image_main'] = ContentFile(
                         base64.b64decode(imgstr),
                         name=file_name
                     )
+                    data._mutable = False
                 except (binascii.Error, ValueError):
                     pass
 
