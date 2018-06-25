@@ -197,6 +197,8 @@
     <!--Page specific JS -->
     <script type="application/javascript">
 
+        var croppie_obj;
+
         // Functions
         function askForFile() {
             // creating input on-the-fly
@@ -209,11 +211,33 @@
         // Replace the client image for the image that was just uploaded
         function replaceFile() {
 
+            if (typeof(croppie_obj) !== "undefined") {
+                croppie_obj.croppie('destroy');
+                croppie_obj = undefined;
+            }
+
             // Get the first file in the FileList object
             var imageFile = $('#id_avatar_file')[0].files[0];
+            var url = window.URL.createObjectURL(imageFile);
 
             // Now use your newly created URL!
-            $('#avatar-thumbnail-modal')[0].src = window.URL.createObjectURL(imageFile);
+            $('#avatar-thumbnail-modal')[0].src = url;
+            $('#avatar-thumbnail')[0].src = url;
+
+            if (typeof(croppie_obj) === "undefined") {
+                croppie_obj = $('#avatar-thumbnail-modal').croppie({
+                    viewport: {
+                        width: 200,
+                        height: 200,
+                        type: 'circle'
+                    },
+                    boundary: {
+                        width: 400,
+                        height: 300
+                    }
+                });
+            }
+
         }
 
         function openModal() {
@@ -223,29 +247,13 @@
         $(document).ready(function () {
             var avatar_file_el = $('#id_avatar_file');
             var avatar_form_el = $('#id_avatar');
-            var croppie_obj;
 
             $('#id_phone').mask("(99) 99999-9999");
-
 
             // Listener responsavel por ler o arquivo que foi submetido.
             // È aqui que começa o processo de crop.
             avatar_file_el.on('change', function () {
                 replaceFile();
-
-                if (typeof(croppie_obj) === "undefined") {
-                    croppie_obj = $('#avatar-thumbnail-modal').croppie({
-                        viewport: {
-                            width: 200,
-                            height: 200,
-                            type: 'circle'
-                        },
-                        boundary: {
-                            width: 400,
-                            height: 300
-                        }
-                    });
-                }
             });
 
             // Listener ao clicar no submit.
