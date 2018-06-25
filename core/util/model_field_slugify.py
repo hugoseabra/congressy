@@ -3,6 +3,22 @@
 from django.template.defaultfilters import slugify as lib_slugify
 
 
+class ReservedSlugException(Exception):
+    """
+    Erro: quando um slug reservado é inserido pelo usuário
+    """
+
+
+reserved_slug = (
+    'manage',
+    'login',
+    'logout',
+    'register',
+    'cgsy-admin-18',
+    'reset-password'
+)
+
+
 def model_field_slugify(
         model_class,
         instance,
@@ -12,8 +28,10 @@ def model_field_slugify(
         slug_field='slug'):
     """Slugify string based on another string and saves slug in model"""
 
-    original_slug = lib_slugify(string)
+    if string in reserved_slug:
+        raise ReservedSlugException('Este Slug é reservado')
 
+    original_slug = lib_slugify(string)
     if exclude_keys:
         if not isinstance(exclude_keys, dict):
             raise Exception('O parâmetro `exclude_keys` deve ser um `dict`.')

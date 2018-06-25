@@ -1,14 +1,17 @@
+import absoluteuri
+
 from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from gatheros_event import forms
 from gatheros_event.models import Organization, Event
 from gatheros_event.views.mixins import AccountMixin
 from gatheros_event.helpers.account import update_account
-from core.util import model_field_slugify
+from core.util import model_field_slugify, ReservedSlugException
 
 
 class BaseEventView(AccountMixin, View):
@@ -277,3 +280,25 @@ class EventDatesFormView(BaseSimpleEditlView, generic.UpdateView):
     model = forms.EventEditDatesForm.Meta.model
     success_message = 'Datas alteradas com sucesso.'
     form_title = 'Editar Datas do Evento'
+
+
+class EventSlugUpdaterView(AccountMixin, generic.View):
+    def get(self, request, *args, **kargs):
+        name = request.GET.get('name')
+        try:
+            slug = model_field_slugify(
+                model_class=Event,
+                instance=Event(),
+                string=name,
+            )
+            slug = str(slug)
+            if slug is None or slug is 'none':
+                slug = ''
+
+            url = absoluteuri.build_absolute_uri('/{}'.format(slug))
+
+            print(url)
+            return HttpResponse(url)
+
+        except ReservedSlugException as e:
+            return HttpResponse(str(e), status=200)

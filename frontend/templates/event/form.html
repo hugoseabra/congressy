@@ -187,9 +187,9 @@
                                             <label for="print-url">
                                                 Link do seu evento:
                                             </label>
-                                            <div id="slug">
-                                                {% include "event/includes/slug_event.html" %}
+                                            <div id="print-url">
                                             </div>
+                                            <br>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -316,13 +316,19 @@
     <script src="{% static 'assets/js/user_notification.js' %}"></script>
 
     <script>
-        {#var inputBox = document.getElementById('id_name');#}
-        {#url = "www.ev.congressy.com/";#}
-        {#inputBox.onkeyup = function () {#}
-        {#    document.getElementById('print-url').innerHTML = url + inputBox.value;#}
-
-
-
+        $(document).ready(function () {
+            var slug_checker = null;
+            $('#id_name').on('keyup', function() {
+                window.clearTimeout(slug_checker);
+                slug_checker = window.setTimeout(function() {
+                    var eventName =  $('#id_name').val();
+                    $.get("{% url 'event:event-slug' %}", {name: eventName })
+                        .done(function (data) {
+                            document.getElementById('print-url').innerHTML = data;
+                        });
+                }, 300);
+            });
+        });
 
         $(document).ready(function () {
             createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
