@@ -101,7 +101,7 @@
                     boundary: {
                         width: 400,
                         height: 300
-                    }
+                    },
                 });
             });
 
@@ -110,6 +110,7 @@
                 if (typeof(croppie_obj !== "undefined")) {
                     croppie_obj.croppie('result', 'base64', 'original', 'png', '1', false).then(function (base64_image) {$('#avatar-thumbnail')[0].src = base64_image;
                         avatar_form_el.val(base64_image);
+                        croppie_obj.setZoom(0);
                     });
                 }
             });
@@ -159,13 +160,7 @@
                     <div class="row text-center">
                         <input type="file" style="display: none"
                                id="id_avatar_file" accept="image/*">
-                        <img {% if  person.avatar %}
-                            src="{{ person.avatar.url }}"
-                        {% else %}
-                            src="{% static 'assets/img/user_undefined.jpg' %}"
-                        {% endif %}
-                            class="img-circle" id="avatar-thumbnail">
-
+                        <img {% if  person.avatar %}src="{{ person.avatar.url }}"{% else %}src="{% static 'assets/img/user_undefined.jpg' %}"{% endif %} class="img-circle" id="avatar-thumbnail">
                         <a href="#" onclick="askForFile();" id="edit_btn">
                             <div style="position:relative;left:43px;top:-30px;">
                                 <span class="fa-stack">
@@ -174,7 +169,14 @@
                                 </span>
                             </div>
                         </a>
-
+                    </div>
+                    <div class="row text-center">
+                        <button class="btn btn-sm btn-danger">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button class="btn btn-sm btn-success">
+                            <i class="fas fa-save"></i>
+                        </button>
                     </div>
                 </div>
             </div>
