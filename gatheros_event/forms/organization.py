@@ -20,6 +20,12 @@ class OrganizationForm(forms.ModelForm):
     user = None
     internal = False
 
+    remove_image = forms.CharField(
+        max_length=10,
+        widget=forms.HiddenInput,
+        required=False,
+    )
+
     class Meta:
         model = Organization
 
@@ -49,23 +55,6 @@ class OrganizationForm(forms.ModelForm):
         self.user = user
         self.internal = internal
 
-        # Decoding from base64 avatar into a file obj.
-        if data:
-            possible_base64 = data.get('avatar')
-            if possible_base64:
-                try:
-                    file_ext, imgstr = possible_base64.split(';base64,')
-                    ext = file_ext.split('/')[-1]
-                    file_name = str(user.person.pk) + "." + ext
-                    data._mutable = True
-                    data['avatar'] = ContentFile(
-                        base64.b64decode(imgstr),
-                        name=file_name
-                    )
-                    data._mutable = False
-                except (binascii.Error, ValueError):
-                    pass
-
         try:
             self.user.person
         except ObjectDoesNotExist:
@@ -80,6 +69,29 @@ class OrganizationForm(forms.ModelForm):
                 '__all__': 'Usuário não possui qualquer vínculo com a'
                            ' organização.'
             })
+
+        if data:
+
+            possible_base64 = data.get('avatar')
+            possible_remove_image = data.get('remove_image')
+
+            # Decoding from base64 avatar into a file obj.
+            if possible_base64:
+                try:
+                    file_ext, imgstr = possible_base64.split(';base64,')
+                    ext = file_ext.split('/')[-1]
+                    file_name = str(user.person.pk) + "." + ext
+                    data._mutable = True
+                    data['avatar'] = ContentFile(
+                        base64.b64decode(imgstr),
+                        name=file_name
+                    )
+                    data._mutable = False
+                except (binascii.Error, ValueError):
+                    pass
+
+            if possible_remove_image and instance is not None:
+                instance.avatar.delete(save=True)
 
         super(OrganizationForm, self).__init__(data=data, *args, **kwargs)
 
