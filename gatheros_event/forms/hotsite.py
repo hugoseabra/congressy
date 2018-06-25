@@ -1,8 +1,12 @@
 """
 Formulários de Informação de evento
 """
+import base64
+import binascii
+
 from ckeditor.widgets import CKEditorWidget
 from django import forms
+from django.core.files.base import ContentFile
 
 from core.forms.combined_form import CombinedFormBase
 from gatheros_event.forms import PlaceForm
@@ -36,6 +40,13 @@ class BaseModelFileForm(forms.ModelForm):
 
 
 class InfoForm(BaseModelFileForm):
+
+    remove_image = forms.CharField(
+        max_length=10,
+        widget=forms.HiddenInput,
+        required=False,
+    )
+
     class Meta:
         """ Meta """
         model = Info
@@ -46,7 +57,6 @@ class InfoForm(BaseModelFileForm):
             'scientific_rules',
             'editorial_body',
             'voucher_extra_info',
-
         ]
         widgets = {
             'description_html': CKEditorWidget(),
@@ -55,6 +65,7 @@ class InfoForm(BaseModelFileForm):
             'voucher_extra_info': forms.Textarea(attrs={
                 'cols': '20', 'rows': '2'
             }),
+            'image_main': forms.HiddenInput(),
         }
 
         help_texts = {
@@ -70,10 +81,38 @@ class InfoForm(BaseModelFileForm):
 
     def __init__(self, event=None, **kwargs):
         self.event = event
+
+        data = kwargs.get('data')
+
+        if data:
+
+            possible_remove_image = data.get('remove_image')
+            possible_base64 = data.get('image_main')
+
+            # Decoding from base64 avatar into a file obj.
+            if possible_base64 and possible_remove_image is '':
+                try:
+                    file_ext, imgstr = possible_base64.split(';base64,')
+                    ext = file_ext.split('/')[-1]
+                    file_name = str(event.slug) + "." + ext
+                    data._mutable = True
+                    data['image_main'] = ContentFile(
+                        base64.b64decode(imgstr),
+                        name=file_name
+                    )
+                    data._mutable = False
+                except (binascii.Error, ValueError):
+                    pass
+
+            if possible_remove_image:
+                event.info.image_main.delete(save=True)
+
         super().__init__(**kwargs)
 
         if self.event.is_scientific:
             self.fields['description_html'].label = "Apresentação do evento"
+
+        self.fields['image_main'].required = False
 
     def clean_event(self):
         return self.event
