@@ -753,7 +753,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
 
     def get_report(self):
         """ Resgata informações gerais do evento. """
-        return self.get_event().get_report()
+        return self.get_event().get_report(only_attended=True)
 
 
 class MySubscriptionsListView(AccountMixin, generic.ListView):

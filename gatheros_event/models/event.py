@@ -385,7 +385,7 @@ class Event(models.Model, GatherosModelMixin):
 
         return period
 
-    def get_report(self):
+    def get_report(self, only_attended=False):
         """
         Recupera um dicinário com informaçõse que podem ser utilizadas como
         relatório.
@@ -401,6 +401,9 @@ class Event(models.Model, GatherosModelMixin):
         queryset = self.subscriptions \
             .filter(completed=True) \
             .exclude(status='canceled')
+
+        if only_attended is True:
+            queryset = queryset.filter(attended=True)
 
         total = queryset.count()
 
