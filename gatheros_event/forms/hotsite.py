@@ -40,6 +40,13 @@ class BaseModelFileForm(forms.ModelForm):
 
 
 class InfoForm(BaseModelFileForm):
+
+    remove_image = forms.CharField(
+        max_length=10,
+        widget=forms.HiddenInput,
+        required=False,
+    )
+
     class Meta:
         """ Meta """
         model = Info
@@ -75,11 +82,15 @@ class InfoForm(BaseModelFileForm):
     def __init__(self, event=None, **kwargs):
         self.event = event
 
-        # Decoding from base64 avatar into a file obj.
         data = kwargs.get('data')
+
         if data:
+
+            possible_remove_image = data.get('remove_image')
             possible_base64 = data.get('image_main')
-            if possible_base64:
+
+            # Decoding from base64 avatar into a file obj.
+            if possible_base64 and possible_remove_image is '':
                 try:
                     file_ext, imgstr = possible_base64.split(';base64,')
                     ext = file_ext.split('/')[-1]
@@ -93,10 +104,15 @@ class InfoForm(BaseModelFileForm):
                 except (binascii.Error, ValueError):
                     pass
 
+            if possible_remove_image:
+                event.info.image_main.delete(save=True)
+
         super().__init__(**kwargs)
 
         if self.event.is_scientific:
             self.fields['description_html'].label = "Apresentação do evento"
+
+        self.fields['image_main'].required = False
 
     def clean_event(self):
         return self.event
