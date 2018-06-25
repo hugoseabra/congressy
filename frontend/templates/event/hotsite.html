@@ -11,6 +11,9 @@
 {% block page_description %}Configuração da página do evento.{% endblock %}
 
 {% block styles %}
+
+    <link href="{% static "assets/plugins/croppie/croppie.css" %}" rel="stylesheet">
+
     <style>
         .event-info-status-item {
             text-align: center;
@@ -54,6 +57,10 @@
 
 {% block scripts %}
     {{ block.super }}
+
+    <script src="{% static "assets/plugins/croppie/croppie.js" %}"></script>
+    <!-- Script used for cropping -->
+
     <!-- ckeditor -->
     <script type="text/javascript"
             src="{% static "ckeditor/ckeditor-init.js" %}"></script>
@@ -329,10 +336,6 @@
         });
     </script>
 {% endblock %}
-
-
-
-
 
 {% include 'event/event-menu.html' %}
 
