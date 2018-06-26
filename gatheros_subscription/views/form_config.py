@@ -127,9 +127,24 @@ class FormConfigView(TemplateNameableMixin, EventViewMixin, generic.FormView):
         cxt['active'] = 'form-personalizado'
         cxt['object'] = self.object
         cxt['event'] = self.event
-        cxt['event_survey_list'] = EventSurvey.objects.all().filter(
-            event=self.event).order_by(Lower('survey__name'))
-
+        cxt['event_survey_list'] = self._get_event_surveys()
         cxt['survey_list_form'] = EventSurveyForm(event=self.event)
 
         return cxt
+
+    def _get_event_surveys(self):
+
+        survey_list = []
+        all_surveys = EventSurvey.objects.all().filter(
+            event=self.event).order_by(Lower('survey__name'))
+
+        for event_survey in all_surveys:
+            lots = event_survey.lots.all().order_by(Lower('name'))
+            survey_list.append({
+                'event_survey': event_survey,
+                'lots': list(lots),
+            })
+
+        return survey_list
+
+

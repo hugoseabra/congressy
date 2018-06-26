@@ -21,25 +21,50 @@
         <div class="col-md-12">
 
             {% if event_survey_list %}
+
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th style="width: 90%">
+                        <th style="width: 50%">
                             Nome
+                        </th>
+                        <th style="width: 40%">
+                            Lotes
+                            <small>
+                                <i class="fas fa-question-circle" data-toggle="tooltip"
+                                   data-placement="right" title="Todos os
+                                   lotes que este formulário está
+                                   vinculado."></i>
+                            </small>
                         </th>
                         <th></th>
                     </tr>
                     </thead>
-                    <tbody>
-                    {% for event_survey in event_survey_list %}
+
+                    {% for item in event_survey_list %}
+                        <tbody>
                         <tr>
                             <td>
 
-                                <a href="{% url 'subscription:survey-edit' event.pk event_survey.pk %}">
+                                <a href="{% url 'subscription:survey-edit' event.pk item.event_survey.pk %}">
                                     <strong>
-                                        {{ event_survey.survey.name }}
+                                        {{ item.event_survey.survey.name }}
                                     </strong>
                                 </a>
+                            </td>
+                            <td>
+                                {% if item.lots %}
+                                    <ul style="list-style: none;padding-left:
+                                     0px">
+                                        {% for lot in item.lots %}
+                                            <li>
+                                                {{ lot.name }}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    ---
+                                {% endif %}
                             </td>
                             <td>
                                 <div class="btn-group">
@@ -59,9 +84,9 @@
                                             role="menu">
                                         <li>
                                             <a class="open-editSurvey"
-                                               data-id="{{ event_survey.pk }}"
-                                               data-title="{{ event_survey.survey.name }}"
-                                               data-description="{{ event_survey.survey.description }}">
+                                               data-id="{{ item.event_survey.pk }}"
+                                               data-title="{{ item.event_survey.survey.name }}"
+                                               data-description="{{ item.event_survey.survey.description }}">
                                                 <i class="fas fa-pencil-alt"></i>
                                                 Editar
                                             </a>
@@ -70,8 +95,8 @@
                                         <li>
                                             <a class="open-DeleteQuestionDialog"
                                                data-event="{{ event.pk }}"
-                                               data-survey-name="{{ event_survey.survey.name }}"
-                                               data-survey="{{ event_survey.pk }}">
+                                               data-survey-name="{{ item.event_survey.survey.name }}"
+                                               data-survey="{{ item.event_survey.pk }}">
                                                 <i class="fas fa-trash-alt"></i>
                                                 Excluir
                                             </a>
@@ -80,10 +105,9 @@
                                 </div>
                             </td>
                         </tr>
+                        </tbody>
                     {% endfor %}
-                    </tbody>
                 </table>
-
             {% else %}
                 <h3>Nenhum formulário.</h3>
             {% endif %}
