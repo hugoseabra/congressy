@@ -132,7 +132,7 @@ class QuestionForm(forms.Form):
             for option in self.options_list:
                 option.save()
 
-        if self.question is None:
+        if self.question is None and self.service.is_valid():
             self.question = self.service.save()
 
         return self.question
