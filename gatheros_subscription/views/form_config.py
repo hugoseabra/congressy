@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.db.models.functions import Lower
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
@@ -127,7 +128,8 @@ class FormConfigView(TemplateNameableMixin, EventViewMixin, generic.FormView):
         cxt['object'] = self.object
         cxt['event'] = self.event
         cxt['event_survey_list'] = EventSurvey.objects.all().filter(
-            event=self.event)
+            event=self.event).order_by(Lower('survey__name'))
+
         cxt['survey_list_form'] = EventSurveyForm(event=self.event)
 
         return cxt
