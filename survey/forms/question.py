@@ -5,10 +5,10 @@
 
 from django import forms
 from django.utils.text import slugify
+from django.utils.translation import gettext as _
 
-from survey.models import Question, Option
+from survey.models import Question
 from survey.services import QuestionService, OptionService
-from django.db import IntegrityError
 
 
 class QuestionModelForm(forms.ModelForm):
@@ -47,6 +47,9 @@ class QuestionModelForm(forms.ModelForm):
 
 
 class QuestionForm(forms.Form):
+    question = None
+    options_list = []
+
     name = forms.CharField(
         label='Nome do campo',
         required=True,
@@ -84,32 +87,52 @@ class QuestionForm(forms.Form):
         service_is_valid = self.service.is_valid()
         return form_is_valid and service_is_valid
 
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        if self.service.is_valid():
+
+            options = cleaned_data.get('options', None)
+
+            if options is not None:
+                self.question = self.service.save()
+
+                option_list = options.splitlines()
+
+                for option in option_list:
+
+                    option_data = {
+                        'question': self.question.pk,
+                        'name': option,
+                        'value': option
+                    }
+
+                    option_service = OptionService(data=option_data)
+                    if not option_service.is_valid():
+                        self.question.delete()
+                        for key, err in option_service.errors.items():
+                            raise forms.ValidationError("Problema ao "
+                                                        "salvar uma opção: "
+                                                        + _(err[0]))
+                    else:
+                        self.options_list.append(option_service)
+
+        return cleaned_data
+
     def save(self):
-        question = self.service.save()
 
-        options = self.cleaned_data.get('options', None)
+        if self.options_list:
 
-        if options:
-
-            all_existing_options = question.options.all()
+            all_existing_options = self.question.options.all()
 
             for option in all_existing_options:
                 option.delete()
 
-            option_list = options.splitlines()
+            for option in self.options_list:
+                option.save()
 
-            for option in option_list:
+        if self.question is None:
+            self.question = self.service.save()
 
-                option_data = {
-                    'question': question.pk,
-                    'name': option,
-                    'value': option
-                }
-                option_service = OptionService(data=option_data)
-                if option_service.is_valid():
-                    option_service.save()
-                else:
-                    raise Exception("Não foi possivel salvar a opção: {}"
-                                    .format(option))
-
-        return question
+        return self.question

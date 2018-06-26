@@ -185,10 +185,11 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
                     "Pergunta criada com sucesso!"
                 )
             else:
-                messages.error(
-                    self.request,
-                    "Corrija os erros abaixo."
-                )
+                for key, err in question_form.errors.items():
+                    messages.error(
+                        self.request,
+                        err[0]
+                    )
 
         return redirect(reverse_lazy('subscription:survey-edit', kwargs={
             'event_pk': self.event.pk,
