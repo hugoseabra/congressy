@@ -21,7 +21,6 @@
         <div class="col-md-12">
 
             {% if event_survey_list %}
-
                 <table class="table table-bordered">
                     <thead>
                     <tr>
@@ -78,10 +77,7 @@
                                     >
                                         <span class="fas fa-cog"></span>
                                     </button>
-                                    <ul
-                                            class="dropdown-menu
-                                                dropdown-menu-right"
-                                            role="menu">
+                                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
                                         <li>
                                             <a class="open-editSurvey"
                                                data-id="{{ item.event_survey.pk }}"
@@ -91,6 +87,16 @@
                                                 Editar
                                             </a>
                                         </li>
+
+                                        <li>
+                                            <a class="open-lotModal"
+                                               data-id="{{ item.event_survey.pk }}"
+                                               data-title="{{ item.event_survey.survey.name }}">
+                                                <i class="fas fa-th-large"></i>
+                                                Lots
+                                            </a>
+                                        </li>
+
 
                                         <li>
                                             <a class="open-DeleteQuestionDialog"

@@ -7,10 +7,11 @@ from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 
+from core.util import represents_int
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.views.mixins import EventViewMixin, AccountMixin
 from gatheros_subscription.forms import EventSurveyForm
-from gatheros_subscription.models import EventSurvey
+from gatheros_subscription.models import EventSurvey, Lot
 from survey.api import SurveySerializer
 from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST
 from survey.forms import QuestionForm, SurveyForm
@@ -313,3 +314,41 @@ class EventSurveyEditAjaxView(EventViewMixin, AccountMixin):
             return HttpResponse(status=200)
 
         return HttpResponse(status=500)
+
+
+class EventSurveyLotsEditAjaxView(EventViewMixin, AccountMixin):
+    event_survey = None
+
+    def dispatch(self, request, *args, **kwargs):
+
+        if 'event_survey' not in request.POST:
+            raise Exception('Não foi passado um event_survey dentro do JSON.')
+
+        event_survey = request.POST.get('event_survey')
+
+        if represents_int(event_survey):
+            self.event_survey = get_object_or_404(EventSurvey, pk=event_survey)
+        else:
+            return HttpResponse(status=400, content="Bad event_survey id.")
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        # TODO: add a pre-check to validate if all lot ids are valid.
+
+        data = dict(request.POST)
+        lots = []
+        for key, item in data.items():
+            if 'lots' in key:
+                lot_pk = key.replace('lots[', '').replace(']', '')
+                status = item[0].replace('[', '').replace(']', '')
+                status = True if status == 'true' else False
+                lots.append({'lot': lot_pk, 'status': status})
+
+        for item in lots:
+            if item['status']:
+                lot = Lot.objects.get(pk=item['lot'], event=self.event.pk)
+                lot.event_survey = self.event_survey
+                lot.save()
+
+        return HttpResponse(status=200)
