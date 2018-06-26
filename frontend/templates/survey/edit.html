@@ -542,7 +542,7 @@
 
             var question = $(this).closest('tr');
             var question_label = question.find('label').html().replace(':', '');
-            var question_help_text = question.find('.help-text').html();
+            var question_help_text = question.find('*[data-toggle="tooltip"]').attr('title');
             var question_type = question.find('[data-question-type]').data('question-type');
             var question_id = question.find('[data-question-id]').data('question-id');
 
@@ -599,6 +599,8 @@
             if (!question_label) {
                 throw 'cgsy-manage: Can\'t find the question field element.'
             }
+
+            question_label = $.trim(question_label);
 
             name_field.val(question_label);
 
