@@ -2,15 +2,16 @@ import json
 from ast import literal_eval
 
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, get_object_or_404
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views import generic
 
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.views.mixins import EventViewMixin, AccountMixin
 from gatheros_subscription.forms import EventSurveyForm
 from gatheros_subscription.models import EventSurvey
+from survey.api import SurveySerializer
 from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST
 from survey.forms import QuestionForm, SurveyForm
 from survey.models import Survey, Question
@@ -235,15 +236,25 @@ class SurveyListView(EventViewMixin, AccountMixin, generic.ListView):
 
 class EventSurveyCreateView(EventViewMixin, AccountMixin, generic.View):
 
-    def post(self, request, event_pk):
+    def post(self, request, *args, **kwargs):
         data = request.POST.copy()
 
         form = EventSurveyForm(data=data, event=self.event)
 
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            serialized_obj = SurveySerializer(instance)
 
-            return HttpResponse(status=201)
+            object_dict = serialized_obj.data
+            url = reverse(
+                'subscription:survey-edit', kwargs={
+                    'event_pk': self.event.pk,
+                    'survey_pk': instance.pk
+                })
+            object_dict.update({'url': url})
+            object_json = json.dumps(object_dict)
+
+            return JsonResponse(object_json, status=201, safe=False)
 
         return HttpResponse(status=400)
 

@@ -147,6 +147,13 @@
                         </div>
                     </div>
                     <div class="panel-body">
+                        <div class="row text-center survey-loader"
+                             style="margin-top:20px; display: none">
+                            <h3>Processando, aguarde...</h3>
+                            <i class="fas info-color fa-circle-notch fa-spin
+                        fa-6x" style="margin-top: 20px"></i>
+                        </div>
+
                         <div id="survey-list">
                             {% include 'subscription/includes/survey_form.html' %}
                         </div>
@@ -393,8 +400,11 @@
 
         function createEventSurvey(form) {
 
-            $('#addSurvey').modal('hide');
+            var survey_list = $('#survey-list');
 
+            $('#addSurvey').modal('hide');
+            survey_list.hide();
+            $('.survey-loader').show();
             var url = "{% url 'subscription:survey-create' event.pk %}";
 
             var values = {};
@@ -407,6 +417,7 @@
                 url: url,
                 data: values, // serializes the form's elements.
                 error: function (err) {
+                    survey_list.show();
                     Messenger().post({
                         message: 'Não foi possivel criar este ' +
                         'formulário.',
@@ -416,11 +427,8 @@
                     throw err.textField;
                 },
                 success: function (res) {
-                    Messenger().post({
-                        message: 'Formulário criado com sucesso!',
-                        type: 'success'
-                    });
-                    updateSurveyList();
+                    res = JSON.parse(res);
+                    window.location.replace(res.url);
                 }
             });
 
