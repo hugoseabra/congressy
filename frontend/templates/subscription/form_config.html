@@ -147,6 +147,13 @@
                         </div>
                     </div>
                     <div class="panel-body">
+                        <div class="row text-center survey-loader"
+                             style="margin-top:20px; display: none">
+                            <h3>Processando, aguarde...</h3>
+                            <i class="fas info-color fa-circle-notch fa-spin
+                        fa-6x" style="margin-top: 20px"></i>
+                        </div>
+
                         <div id="survey-list">
                             {% include 'subscription/includes/survey_form.html' %}
                         </div>
@@ -226,7 +233,11 @@
 {% endblock %}
 
 {% block scripts %}
+
     <script>
+
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
         // Se algum lote pago.
         var setLotPaiedStatus = function () {
             var radios = $('input[type=radio]');
@@ -349,8 +360,6 @@
                 survey_edit_description: values['survey_edit_description']
             };
 
-            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-
             $.ajax({
                 type: "POST",
                 url: '{% url 'subscription:survey-ajax-edit' event.pk%}',
@@ -393,8 +402,11 @@
 
         function createEventSurvey(form) {
 
-            $('#addSurvey').modal('hide');
+            var survey_list = $('#survey-list');
 
+            $('#addSurvey').modal('hide');
+            survey_list.hide();
+            $('.survey-loader').show();
             var url = "{% url 'subscription:survey-create' event.pk %}";
 
             var values = {};
@@ -407,6 +419,7 @@
                 url: url,
                 data: values, // serializes the form's elements.
                 error: function (err) {
+                    survey_list.show();
                     Messenger().post({
                         message: 'Não foi possivel criar este ' +
                         'formulário.',
@@ -416,13 +429,14 @@
                     throw err.textField;
                 },
                 success: function (res) {
-                    Messenger().post({
-                        message: 'Formulário criado com sucesso!',
-                        type: 'success'
-                    });
-                    updateSurveyList();
+                    res = JSON.parse(res);
+                    window.location.replace(res.url);
                 }
             });
+
+
+            $('#id_name').val('');
+            $('#id_description').val('');
         }
 
         function create_events() {
@@ -502,6 +516,37 @@
                     });
             });
 
+            $('.open-lotModal').on('click', function () {
+                var survey_id = $(this).data('id');
+                var existing_modal = $("#survey-lots-form-modal");
+
+                if (typeof(existing_modal[0]) !== 'undefined') {
+                    existing_modal.remove()
+                }
+
+                $.ajax({
+                    type: "GET",
+                    url: '?survey=' + survey_id + '&template_name=subscription/includes/modal-survey-lots',
+                    error: function (err) {
+                        Messenger().post({
+                            message: 'Não foi possivel buscar os dados deste ' +
+                            'formulário.',
+                            type: 'danger'
+                        });
+
+                        throw err.textField;
+                    },
+                    success: function (res) {
+                        var new_modal = $($.parseHTML(res));
+                        new_modal = $(new_modal[1]);
+                        $('.modals').append(new_modal);
+                        app.switcheryToggle();
+                        $('#survey-lots-form-modal').modal('show');
+
+                    }
+                });
+            });
+
 
             //Disable btn save on first click
             $(".new_survey_save").click(function () {
@@ -510,177 +555,220 @@
 
         }
 
+        function processSurveyLot() {
+            $('#survey-lots-form-modal').modal('hide');
+            var changed_data = {};
+            changed_data['event_survey'] = $('#survey-being-changed').val();
+            changed_data['lots'] = {};
+            $('.change-lot').each(function (i, obj) {
+                changed_data['lots'][$(obj).data('lot-id')] = obj.checked;
+            });
+
+            console.log(changed_data);
+
+
+            $.ajax({
+                type: "POST",
+                url: '{% url 'subscription:survey-ajax-lots' event.pk%}',
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: changed_data,
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Formulário vinculado aos lotes com sucesso!',
+                        type: 'success'
+                    });
+                    updateSurveyList();
+                },
+                error: function () {
+
+                    Messenger().post({
+                        message: 'Não foi possivel vincular seu formulário ' +
+                        'aos lotes',
+                        type: 'error'
+                    });
+                }
+            });
+
+        }
+
     </script>
+
 {% endblock %}
 {% block modals %}
 
-    <div class="modal fade" id="addSurvey"
-         role="dialog">
+    <div class="modals">
+        <div class="modal fade" id="addSurvey"
+             role="dialog">
 
-        <div class="modal-dialog " role="document">
+            <div class="modal-dialog " role="document">
 
-            <div class="modal-content">
+                <div class="modal-content">
 
-                <div class="modal-header">
-                    <button type="button" class="close"
-                            data-dismiss="modal"
-                            aria-label="Close"><span
-                            aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title">
-                        Novo formulário</h4>
-                </div>
+                    <div class="modal-header">
+                        <button type="button" class="close"
+                                data-dismiss="modal"
+                                aria-label="Close"><span
+                                aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title">
+                            Novo formulário</h4>
+                    </div>
 
-                <form id="createSurveyForm" onsubmit="createEventSurvey(this);
+                    <form id="createSurveyForm" onsubmit="createEventSurvey(this);
                 return false;">
 
-                    {% csrf_token %}
+                        {% csrf_token %}
 
-                    <div class="modal-body">
-                        {% render_generic_field survey_list_form.name autofocus=True %}
-                        {% render_generic_field survey_list_form.description %}
-                    </div>
-
-
-                    <div class="modal-footer">
-                        <button type="button"
-                                class="btn btn-danger"
-                                data-dismiss="modal">
-                            Cancelar
-                        </button>
-                        <button type="submit"
-                                class="btn btn-success">
-                            Salvar
-                        </button>
-                    </div>
+                        <div class="modal-body">
+                            {% render_generic_field survey_list_form.name autofocus=True %}
+                            {% render_generic_field survey_list_form.description %}
+                        </div>
 
 
-                </form>
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-danger"
+                                    data-dismiss="modal">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                    class="btn btn-success">
+                                Salvar
+                            </button>
+                        </div>
+
+
+                    </form>
+
+                </div>
 
             </div>
 
         </div>
+        <div class="modal fade" id="editSurvey"
+             role="dialog">
 
-    </div>
-    <div class="modal fade" id="editSurvey"
-         role="dialog">
+            <div class="modal-dialog " role="document">
 
-        <div class="modal-dialog " role="document">
+                <div class="modal-content">
 
-            <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close"
+                                data-dismiss="modal"
+                                aria-label="Close"><span
+                                aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title">
+                            Editar questionário</h4>
+                    </div>
 
-                <div class="modal-header">
-                    <button type="button" class="close"
-                            data-dismiss="modal"
-                            aria-label="Close"><span
-                            aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title">
-                        Editar questionário</h4>
-                </div>
+                    <form onsubmit="editEventSurvey(this); return false;">
 
-                <form onsubmit="editEventSurvey(this); return false;">
-
-                    {% csrf_token %}
+                        {% csrf_token %}
 
 
-                    <div class="modal-body">
+                        <div class="modal-body">
 
-                        <div class="form-group">
+                            <div class="form-group">
 
-                            <label>Nome:</label>
+                                <label>Nome:</label>
 
-                            <small style="color:#C9302C">
-                                *
-                            </small>
-
-
-                            <div>
-
-                                <input type="text"
-                                       maxlength="255"
-                                       autofocus=""
-                                       required=""
-                                       class="form-control form-control"
-                                       name="survey_edit_title"
-                                       id="surveyEditTitle">
+                                <small style="color:#C9302C">
+                                    *
+                                </small>
 
 
                                 <div>
-                                    <small class="text-muted">
-                                        Nome do seu
-                                        questionário
-                                    </small>
+
+                                    <input type="text"
+                                           maxlength="255"
+                                           autofocus=""
+                                           required=""
+                                           class="form-control form-control"
+                                           name="survey_edit_title"
+                                           id="surveyEditTitle">
+
+
+                                    <div>
+                                        <small class="text-muted">
+                                            Nome do seu
+                                            questionário
+                                        </small>
+                                    </div>
+
+
                                 </div>
-
-
                             </div>
-                        </div>
 
-                        <div class="form-group">
+                            <div class="form-group">
 
-                            <label>Descrição:</label>
+                                <label>Descrição:</label>
 
-                            <div>
+                                <div>
 
                                 <textarea cols="20" rows="3"
                                           class="form-control"
                                           name="survey_edit_description"
                                           id="surveyEditDescription"></textarea>
 
-                                <div>
-                                    <small class="text-muted">
-                                        Uma descrição
-                                        para
-                                        te ajudar a
-                                        identificar este
-                                        questionário.
-                                    </small>
+                                    <div>
+                                        <small class="text-muted">
+                                            Uma descrição
+                                            para
+                                            te ajudar a
+                                            identificar este
+                                            questionário.
+                                        </small>
+                                    </div>
+
+
                                 </div>
-
-
                             </div>
+
+                            <input type="hidden"
+                                   name="action">
+                            <input type="hidden"
+                                   name="event_survey_id"
+                                   id="edit_event_survey_id">
+
                         </div>
 
-                        <input type="hidden"
-                               name="action">
-                        <input type="hidden"
-                               name="event_survey_id"
-                               id="edit_event_survey_id">
 
-                    </div>
-
-
-                    <div class="modal-footer">
-                        <button type="button"
-                                class="btn btn-danger"
-                                data-dismiss="modal">
-                            Cancelar
-                        </button>
-                        <button type="submit"
-                                class="btn btn-success new_survey_save ">
-                            Salvar
-                        </button>
-                    </div>
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-danger"
+                                    data-dismiss="modal">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                    class="btn btn-success new_survey_save ">
+                                Salvar
+                            </button>
+                        </div>
 
 
-                </form>
+                    </form>
+
+                </div>
 
             </div>
 
         </div>
+        <div class="modal fade" id="deleteSurvey"
+             role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
 
-    </div>
-    <div class="modal fade" id="deleteSurvey"
-         role="dialog">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
+                    <div id="question_delete_modal"></div>
 
-                <div id="question_delete_modal"></div>
-
+                </div>
             </div>
         </div>
     </div>
+
+
 
 {% endblock %}
 
