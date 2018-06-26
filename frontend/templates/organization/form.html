@@ -222,7 +222,6 @@
 
             // Now use your newly created URL!
             $('#avatar-thumbnail-modal')[0].src = url;
-            $('#avatar-thumbnail')[0].src = url;
 
             if (typeof(croppie_obj) === "undefined") {
                 croppie_obj = $('#avatar-thumbnail-modal').croppie({
@@ -241,7 +240,7 @@
         }
 
         function openModal() {
-            $('#edit_banner_modal').modal('show');
+            $('#edit_avatar_modal').modal('show');
         }
 
         $(document).ready(function () {
@@ -295,7 +294,6 @@
                 }
                 $('#id_remove_image').val('true');
                 $('#avatar-thumbnail-modal')[0].src = "{% static 'assets/img/user_undefined.jpg' %}";
-                $('#avatar-thumbnail')[0].src = "{% static 'assets/img/user_undefined.jpg' %}";
                 avatar_form_el.val('');
             });
 
@@ -307,13 +305,13 @@
 
 
 {% block modals %}
-    <div class="modal fade" id="edit_banner_modal" tabindex="-1"
+    <div class="modal fade" id="edit_avatar_modal" tabindex="-1"
          role="dialog"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 class="modal-title">Editar banner: </h3>
+                    <h3 class="modal-title">Editar avatar da organização: </h3>
                     <button type="button" class="close"
                             data-dismiss="modal" aria-hidden="true">
                         ×
@@ -372,7 +370,7 @@
                     <div class="pull-right">
                         <button type="button" class="btn btn-md btn-success banner-save"
                                 data-dismiss="modal"
-                                id="edit_banner_modal_btn">
+                                id="edit_avatar_modal_btn">
                             <i class="far fa-save"></i>
                             Salvar
                         </button>
