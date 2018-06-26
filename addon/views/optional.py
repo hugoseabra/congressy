@@ -27,7 +27,7 @@ class EventOptionalMixin(AccountMixin, generic.View):
         paid_lots = False
 
         for lot in self.event.lots.all():
-            if lot.price > 0:
+            if lot.price is not None and lot.price > 0:
                 paid_lots = True
                 break
 
