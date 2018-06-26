@@ -14,6 +14,10 @@
 
 {% block scripts %}
 
+
+    <script src="{% static "assets/js/messenger.js" %}"></script>
+    <!-- Messenger lib -->
+
     <script src="{% static "assets/plugins/croppie/croppie.js" %}"></script>
     <!-- Script used for cropping -->
 
@@ -22,6 +26,8 @@
 
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script type="application/javascript">
+
+        var croppie_obj;
 
         // Functions
         function askForFile() {
@@ -35,11 +41,36 @@
         // Replace the client image for the image that was just uploaded
         function replaceFile() {
 
+            if (typeof(croppie_obj) !== "undefined") {
+                croppie_obj.croppie('destroy');
+                croppie_obj = undefined;
+            }
+
             // Get the first file in the FileList object
             var imageFile = $('#id_avatar_file')[0].files[0];
+            var url = window.URL.createObjectURL(imageFile);
 
             // Now use your newly created URL!
-            $('#avatar-thumbnail')[0].src = window.URL.createObjectURL(imageFile);
+            $('#avatar-thumbnail-modal')[0].src = url;
+
+            if (typeof(croppie_obj) === "undefined") {
+                croppie_obj = $('#avatar-thumbnail-modal').croppie({
+                    viewport: {
+                        width: 200,
+                        height: 200,
+                        type: 'circle'
+                    },
+                    boundary: {
+                        width: 400,
+                        height: 300
+                    }
+                });
+            }
+
+        }
+
+        function openModal() {
+            $('#edit_avatar_modal').modal('show');
         }
 
         $(document).ready(function () {
@@ -50,7 +81,6 @@
             var cnpj_el = $('#id_institution_cnpj');
             var avatar_file_el = $('#id_avatar_file');
             var avatar_form_el = $('#id_avatar');
-            var croppie_obj;
 
 
             //Masking
@@ -91,34 +121,59 @@
             // È aqui que começa o processo de crop.
             avatar_file_el.on('change', function () {
                 replaceFile();
-                $('#edit_btn').hide();
-                croppie_obj = $('#avatar-thumbnail').croppie({
-                    viewport: {
-                        width: 200,
-                        height: 200,
-                        type: 'circle'
-                    },
-                    boundary: {
-                        width: 400,
-                        height: 300
-                    },
-                });
             });
 
             // Listener ao clicar no submit.
             $('.btn-success').on('click', function () {
                 if (typeof(croppie_obj !== "undefined")) {
-                    croppie_obj.croppie('result', 'base64', 'original', 'png', '1', false).then(function (base64_image) {$('#avatar-thumbnail')[0].src = base64_image;
+                    croppie_obj.croppie('result', 'base64', 'original', 'png', '1', false).then(function (base64_image) {
+                        $('#avatar-thumbnail')[0].src = base64_image;
                         avatar_form_el.val(base64_image);
-                        croppie_obj.setZoom(0);
                     });
                 }
             });
+
+
+            $('#start_crop').on('click', function () {
+                if (typeof(croppie_obj) === "undefined") {
+                    croppie_obj = $('#avatar-thumbnail-modal').croppie({
+                        viewport: {
+                            width: 200,
+                            height: 200,
+                            type: 'circle'
+                        },
+                        boundary: {
+                            width: 400,
+                            height: 300
+                        }
+                    });
+                }
+            });
+
+
+            $('.banner-remove').on('click', function () {
+
+                window.cgsy.messenger.triggerSuccess('Imagem retirada com ' +
+                    'sucesso!');
+
+                if (typeof(croppie_obj) !== "undefined") {
+                    croppie_obj.croppie('destroy');
+                    croppie_obj = undefined;
+                }
+                $('#id_remove_image').val('true');
+                $('#avatar-thumbnail-modal')[0].src = "{% static 'assets/img/user_undefined.jpg' %}";
+                $('#avatar-thumbnail')[0].src = "{% static 'assets/img/user_undefined.jpg' %}";
+                avatar_form_el.val('');
+            });
+
 
         });
 
 
     </script>
+
+
+
 {% endblock %}
 
 {% block content %}
@@ -160,23 +215,17 @@
                     <div class="row text-center">
                         <input type="file" style="display: none"
                                id="id_avatar_file" accept="image/*">
-                        <img {% if  person.avatar %}src="{{ person.avatar.url }}"{% else %}src="{% static 'assets/img/user_undefined.jpg' %}"{% endif %} class="img-circle" id="avatar-thumbnail">
-                        <a href="#" onclick="askForFile();" id="edit_btn">
-                            <div style="position:relative;left:43px;top:-30px;">
+                        <img {% if  person.avatar %}src="{{ person.avatar.url }}"
+                             {% else %}src="{% static 'assets/img/user_undefined.jpg' %}"{% endif %} class="img-circle"
+                             id="avatar-thumbnail">
+
+                        <div style="position:relative;left:43px;top:-30px;" onclick="openModal()">
                                 <span class="fa-stack">
                                     <i class="fas fa-circle fa-stack-2x fa-inverse"></i>
                                     <i class="fas fa-pencil-alt fa-stack-1x "></i>
                                 </span>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="row text-center">
-                        <button class="btn btn-sm btn-danger">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                        <button class="btn btn-sm btn-success">
-                            <i class="fas fa-save"></i>
-                        </button>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -331,4 +380,85 @@
 
     </form>
 
+{% endblock %}
+
+{% block modals %}
+    <div class="modal fade" id="edit_avatar_modal" tabindex="-1"
+         role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Editar avatar do seu perfil: </h3>
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row text-center">
+
+
+                        <img {% if person.avatar %}
+                            src="{{ person.avatar.url }}"
+                        {% else %}
+                            src="{% static 'assets/img/user_undefined.jpg' %}"
+                        {% endif %}
+                            id="avatar-thumbnail-modal" class="img-circle">
+
+
+                    </div>
+
+                    <div class="row text-center" style="margin-top: 5px">
+                        <div class="row text-center" style="margin-top: 5px">
+                            <div class="row text-center" style="margin-top: 3px;
+                    margin-bottom: 5px">
+
+                                <button class="btn btn-md btn-info"
+                                        onclick="askForFile();" id="edit_btn" type="button">
+                                    <i class="fas fa-exchange-alt"></i>
+                                    Trocar
+                                </button>
+
+
+                                <button class="btn btn-md btn-info"
+                                        id="start_crop"
+                                        type="button">
+                                    <i class="fas fa-pencil-alt"></i>
+                                    Editar
+                                </button>
+
+
+                                <button type="button" class="btn btn-md  btn-danger banner-remove"
+                                        data-dismiss="modal">
+                                    <i class="fas fa-trash"></i>
+                                    Deletar
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="modal-footer">
+
+
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-md btn-success banner-save"
+                                data-dismiss="modal"
+                                id="edit_avatar_modal_btn">
+                            <i class="far fa-save"></i>
+                            Salvar
+                        </button>
+                        <button type="button" class="btn btn-md  btn-default"
+                                data-dismiss="modal">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
