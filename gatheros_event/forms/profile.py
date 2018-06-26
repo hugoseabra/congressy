@@ -241,6 +241,12 @@ class ProfileForm(forms.ModelForm):
 
     cpf = BRCPFField(required=False, label="CPF")
 
+    remove_image = forms.CharField(
+        max_length=10,
+        widget=forms.HiddenInput,
+        required=False,
+    )
+
     class Meta:
         """ Meta """
         model = Person
@@ -286,10 +292,14 @@ class ProfileForm(forms.ModelForm):
         if hasattr(user, 'person'):
             kwargs.update({'instance': user.person})
 
-        # Decoding from base64 avatar into a file obj.
         data = kwargs.get('data')
+
         if data:
+
             possible_base64 = data.get('avatar')
+            possible_remove_image = data.get('remove_image')
+
+            # Decoding from base64 avatar into a file obj.
             if possible_base64:
                 try:
                     file_ext, imgstr = possible_base64.split(';base64,')
@@ -301,6 +311,9 @@ class ProfileForm(forms.ModelForm):
                     )
                 except (binascii.Error, ValueError):
                     pass
+
+            if possible_remove_image:
+                user.person.avatar.delete(save=True)
 
         super(ProfileForm, self).__init__(*args, **kwargs)
         self.user = user
