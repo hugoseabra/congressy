@@ -55,15 +55,15 @@
         </div>
         <p style="display:none;" class="danger-color" id="caps">CapsLock está ativado
         </p>
-        {% if form.captcha %}
+        {% if show_captcha %}
             <div class="form-group">
                 <div class="col-md-12">
-                    {{ form.captcha }}
-                    <small class="text-danger">{{ form.captcha.errors }}</small>
-{#                    <div class="g-recaptcha"#}
-{#                         style="transform:scale(0.77);-webkit-transform:scale(0.77);transform-origin:0 0;-webkit-transform-origin:0 0;"#}
-{#                         data-sitekey="6Lerw18UAAAAANaVK-G5QZEM2My-iumnxVFbDrpZ">#}
-{#                </div>#}
+{#                    {{ form.captcha }}#}
+{#                    <small class="text-danger">{{ form.captcha.errors }}</small>#}
+                    <div class="g-recaptcha"
+                         style="transform:scale(0.77);-webkit-transform:scale(0.77);transform-origin:0 0;-webkit-transform-origin:0 0;"
+                         data-sitekey="6Lerw18UAAAAANaVK-G5QZEM2My-iumnxVFbDrpZ">
+                </div>
             </div>
         {% endif %}
         <div class="form-group">

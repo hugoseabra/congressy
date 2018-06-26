@@ -15,6 +15,9 @@ from django.views.generic import TemplateView, View
 from gatheros_front.forms import AuthenticationForm
 from gatheros_subscription.views.subscription import MySubscriptionsListView
 from mailer.services import notify_set_password
+import urllib
+import json
+from django.conf import settings
 
 
 @login_required
@@ -35,18 +38,45 @@ class Login(auth_views.LoginView):
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        if 'show_captcha' in self.request.session \
-                and self.request.session['show_captcha'] is True:
-            form.add_captcha()
+        # if 'show_captcha' in self.request.session \
+        #         and self.request.session['show_captcha'] is True:
+        #     form.add_captcha()
 
         return form
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['is_embeded'] = self.request.GET.get('embeded') == '1'
+        if 'show_captcha' in self.request.session \
+                and self.request.session['show_captcha'] is True:
+            ctx['show_captcha'] = True
         return ctx
 
     def form_valid(self, form):
+
+        # Recaptcha
+        if 'show_captcha' in self.request.session \
+                and self.request.session['show_captcha'] is True:
+
+            recaptcha_response = self.request.POST.get('g-recaptcha-response')
+            url = 'https://www.google.com/recaptcha/api/siteverify'
+            print(settings.GOOGLE_MAPS_API_KEY)
+            values = {
+                'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                'response': recaptcha_response
+            }
+            data = urllib.parse.urlencode(values).encode()
+            req = urllib.request.Request(url, data=data)
+            response = urllib.request.urlopen(req)
+            result = json.loads(response.read().decode())
+
+            if result['success']:
+
+                return super().form_valid(form)
+
+            else:
+                return super().form_invalid(form)
+
         self.request.session['show_captcha'] = False
         return super().form_valid(form)
 
