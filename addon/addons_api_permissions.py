@@ -27,7 +27,7 @@ class IsNotFreeEvent(BasePermission):
             raise NotFound()
 
         for lot in optional.lot_category.event.lots.all():
-            if lot.price > 0:
+            if lot.price and lot.price > 0:
                 return True
 
         if optional.lot_category.event.event_type == \
