@@ -40,7 +40,6 @@ class BaseModelFileForm(forms.ModelForm):
 
 
 class InfoForm(BaseModelFileForm):
-
     remove_image = forms.CharField(
         max_length=10,
         widget=forms.HiddenInput,
@@ -89,23 +88,29 @@ class InfoForm(BaseModelFileForm):
             possible_remove_image = data.get('remove_image')
             possible_base64 = data.get('image_main')
 
-            # Decoding from base64 avatar into a file obj.
-            if possible_base64 and possible_remove_image is '':
-                try:
-                    file_ext, imgstr = possible_base64.split(';base64,')
-                    ext = file_ext.split('/')[-1]
-                    file_name = str(event.slug) + "." + ext
-                    data._mutable = True
-                    data['image_main'] = ContentFile(
-                        base64.b64decode(imgstr),
-                        name=file_name
-                    )
-                    data._mutable = False
-                except (binascii.Error, ValueError):
-                    pass
+            if possible_remove_image and possible_remove_image == 'True':
 
-            if possible_remove_image:
+                data._mutable = True
+                del data['image_main']
+                data._mutable = False
                 event.info.image_main.delete(save=True)
+
+            else:
+
+                if possible_base64:
+                    # Decoding from base64 avatar into a file obj.
+                    try:
+                        file_ext, imgstr = possible_base64.split(';base64,')
+                        ext = file_ext.split('/')[-1]
+                        file_name = str(event.slug) + "." + ext
+                        data._mutable = True
+                        data['image_main'] = ContentFile(
+                            base64.b64decode(imgstr),
+                            name=file_name
+                        )
+                        data._mutable = False
+                    except (binascii.Error, ValueError):
+                        pass
 
         super().__init__(**kwargs)
 
