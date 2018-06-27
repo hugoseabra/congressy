@@ -19,4 +19,5 @@ class SurveyForm(forms.Form):
 
         instance = survey_director.get_form(survey=self.event_survey.survey)
         super().__init__(**kwargs)
+        self.initial = instance.initial
         self.fields = instance.fields
