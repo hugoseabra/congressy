@@ -84,6 +84,7 @@ class InfoForm(BaseModelFileForm):
         data = kwargs.get('data')
 
         if data:
+            # TODO: this isn't DRY. Separate this logic into a helper.
 
             possible_remove_image = data.get('remove_image')
             possible_base64 = data.get('image_main')
