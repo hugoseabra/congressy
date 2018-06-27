@@ -56,6 +56,7 @@ class EventForm(forms.ModelForm):
         #                                          'submissão de artigos ' \
         #                                          'cientificos?'
 
+        self.fields['expected_subscriptions'].required = True
         if instance is None:
             self._configure_organization_field()
 

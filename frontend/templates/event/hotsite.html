@@ -63,8 +63,16 @@
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script>
         $(document).ready(function () {
+
+            if(! $('#id_show_location').is(':checked')) {
+                $('#map-block').hide();
+                $('#place-form-block').removeClass('col-md-6');
+                $('#place-form-block').addClass('col-md-12');
+            }
+
+
             $('.switchery').on('click', function () {
-                $('#map-block').toggle("slow");
+                $('#map-block').toggle();
                 $('#place-form-block').toggleClass('col-md-6');
                 $('#place-form-block').toggleClass('col-md-12');
             })
@@ -173,6 +181,7 @@
                         $('#map-loader').hide();
                         $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
                         $('#error-maps').show();
+                        $('#id_city_name').prop('disabled', false);
                         return;
                     }
                     var components = results[0].address_components;
@@ -318,7 +327,7 @@
                     $('#id_complement').val('');
                     $('#id_village').val('');
                     $('#id_state').val('');
-                    $('#id_city_name').prop('disabled', true);
+                    {#$('#id_city_name').prop('disabled', true);#}
 
                     map_reload_timer = window.setTimeout(function () {
                         window.cgsy.maps.retrieveAddress();
