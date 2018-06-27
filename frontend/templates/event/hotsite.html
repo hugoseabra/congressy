@@ -250,6 +250,9 @@
         function submitImage() {
             var banner_form_el = $('#id_image_main');
 
+            $('.banner').hide();
+            $('.banner-loader').show();
+
             if (typeof(croppie_obj) === "undefined") {
                 croppie_obj = createCroppieObj()
             }
@@ -313,19 +316,9 @@
                 });
             });
 
-
-            // Listener ao clicar no save da imagem.
-            $('.banner-save').on('click', function () {
-
-                if (typeof(croppie_obj !== "undefined")) {
-                    croppie_obj.croppie('result', 'base64', 'original', 'png', '1', false).then(function (base64_image) {
-                        $('#banner-cropped')[0].src = base64_image;
-                        banner_form_el.val(base64_image);
-                    });
-                }
-            });
-
             $('.banner-remove').on('click', function () {
+                $('.banner').hide();
+                $('.banner-loader').show();
                 $('#id_remove_image').val('True');
                 $('#hotsite-form').submit();
             });
@@ -488,7 +481,27 @@
                                 </div>
                             </div>
                             <div class="panel-body">
-                                <div class="row">
+
+
+                                <div class="row text-center banner-loader"
+                                     style="margin-top:20px; display: none">
+                                    <h3>Processando, aguarde...</h3>
+                                    <i class="fas info-color fa-circle-notch fa-spin
+                        fa-6x" style="margin-top: 20px"></i>
+                                </div>
+
+                                <div class="row text-center banner">
+                                    <img {% if event.info.image_main %}
+                                        src="{{ event.info.image_main.url }}"
+                                    {% else %}
+                                        src="{% static 'assets/img/480x640.png' %}"
+                                    {% endif %}
+                                        style="width: 150px;"
+                                        id="banner-thumbnail">
+                                </div>
+
+                                <div class="row text-center banner"
+                                     style="margin-top: 10px">
 
                                     <div class="col-md-12">
                                         <button type="button" class="btn
@@ -835,7 +848,7 @@
                                         id="start_crop"
                                         type="button">
                                     <i class="fas fa-pencil-alt"></i>
-                                    Editar
+                                    Ativar crop
                                 </button>
 
 
