@@ -28,18 +28,21 @@
             -webkit-transform: translate({{ certificate.converted_text_position_x|unlocalize}}px,{{ certificate.converted_text_position_y|unlocalize}}px);
             transform: translate({{ certificate.converted_text_position_x|unlocalize}}px,{{ certificate.converted_text_position_y|unlocalize}}px);
             overflow: hidden;
+            color: {{ certificate.font_color }};
         }
 
         #cert-title {
             font-size: {{ certificate.converted_title_font_size|unlocalize }}px;
             -webkit-transform: translate({{ certificate.converted_title_position_x|unlocalize}}px,{{ certificate.converted_title_position_y|unlocalize}}px);
             transform: translate({{ certificate.converted_title_position_x|unlocalize}}px,{{ certificate.converted_title_position_y|unlocalize}}px);
+            color: {{ certificate.font_color }};
         }
 
         #cert-date {
             font-size: {{ certificate.converted_date_font_size|unlocalize }}px;
             -webkit-transform: translate({{ certificate.converted_date_position_x|unlocalize}}px,{{ certificate.converted_date_position_y|unlocalize}}px);
             transform: translate({{ certificate.converted_date_position_x|unlocalize}}px,{{ certificate.converted_date_position_y|unlocalize}}px);
+            color: {{ certificate.font_color }};
         }
 
     </style>
