@@ -118,12 +118,13 @@
                 <div style="
                         position: absolute;
                         text-align: justify;
+                        color: {{ object.font_color }};
                         transform: translate({{ object.title_position_x }}px, {{ object.title_position_y }}px);
                         {% if object.title_hide %}display: none;{% endif %}
                         " id="cert-title">{{ object.title_content }}</div>
 
                 {% if object.is_ready and object.event_has_any_type_of_location %}
-                    <div style="position:absolute;
+                    <div style="position:absolute;color: {{ object.font_color }};
                             {% if object.date_hide %}
                                 display: none;
                             {% endif %}
@@ -140,6 +141,7 @@
                 {% endif %}
                 <div style="
                         position:absolute;
+                        color: {{ object.font_color }};
                         {% if object.text_center %}
                             text-align:center;
                         {% else %}
