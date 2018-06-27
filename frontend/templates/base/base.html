@@ -294,7 +294,9 @@
 
 <!-- Modals -->
 {% include 'organization/modal-switch-organization.html' %}
+<div class="tooltip-wrapper">
 {% block modals %}{% endblock %}
+</div>
 
 {% include 'sentry-javascript-sdk.html' %}
 
@@ -350,6 +352,8 @@
         org_context.value = value;
         document.getElementById("organization_context").submit();
     }
+
+
 </script>
 
 {% block scripts %}{% endblock %}

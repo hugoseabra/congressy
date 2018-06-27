@@ -10,8 +10,8 @@
             switcheryToggle();
             icheckStart();
             tooltips();
+            modal_onload();
         });
-
 
         var navToggleRight = function () {
             $('#toggle-right').on('click', function () {
@@ -106,6 +106,13 @@
                 container: "body",
                 html:true
             })
+        };
+
+        var modal_onload = function() {
+            $(window).on('shown.bs.modal', function() {
+                app.tooltips();
+                app.switcheryToggle();
+            });
         };
 
         //return functions
