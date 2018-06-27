@@ -13,6 +13,8 @@ from core.forms.widgets import (
 from core.util import create_years_list
 from gatheros_event.models import Occupation, Person
 from gatheros_event.locale.phone_choices import get_country_phone_code
+from core.forms.widgets import SplitDateTimeBootsrapWidget
+
 
 
 # class InternationalTelephoneInput(forms.MultiWidget):
@@ -114,10 +116,8 @@ class PersonForm(forms.ModelForm):
             'phone': TelephoneInput,
             'zip_code': TelephoneInput,
             'city': forms.HiddenInput(),
-            'birth_date': forms.SelectDateWidget(
-                attrs=({'style': 'width: 30%; display: inline-block;'}),
-                years=create_years_list(),
-            )
+            'birth_date': SplitDateTimeBootsrapWidget,
+
         }
 
     def __init__(self, is_chrome=False, **kwargs):

@@ -8,13 +8,15 @@ $(document).ready(function () {
         submitButton.prop('disabled', true);
     });
 
-    $(":input").change(function () {//trigers change in all input fields including text type
+    $(":input").change(verificarEdicaoForm());
+    $(".iCheck-helper").change(verificarEdicaoForm());
+
+    function verificarEdicaoForm() {
         var submitButton = $('form').find(':submit');
         submitButton.prop('disabled', false);
         $(window).on("beforeunload", function () {
             return "Você tem certeza? Você não terminou de preencher o formulário!";
         });
-    });
 
-
+    }
 });
