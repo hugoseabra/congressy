@@ -16,10 +16,16 @@ class CertificatePartialForm(forms.ModelForm):
             'text_content',
             'event_location',
             'only_attending_participantes',
+            'font_color',
         ]
 
         widgets = {
             'event': forms.HiddenInput()
+        }
+
+        help_texts = {
+            'font_color': 'Cor da fonte do seu certificado em formato '
+                          'hexdecimal.'
         }
 
     def __init__(self, *args, **kwargs):
