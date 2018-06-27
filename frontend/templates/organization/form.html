@@ -18,7 +18,8 @@
 {% endblock %}
 
 {% block styles %}
-    <link href="{% static "assets/plugins/croppie/croppie.css" %}" rel="stylesheet">
+    <link href="{% static "assets/plugins/croppie/croppie.css" %}"
+          rel="stylesheet">
     <style type="text/css">
         .django-ckeditor-widget {
             display: block !important;
@@ -35,6 +36,10 @@
     <form action="" method="post" class="form-horizontal" role="form"
           name="event_form">
         {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
         <input type="file" style="display: none"
                id="id_avatar_file" accept="image/*">
 
@@ -192,8 +197,10 @@
     <script src="{% static "assets/plugins/croppie/croppie.js" %}"></script>
 
     <!-- ckeditor -->
-    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
-    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+    <script type="text/javascript"
+            src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript"
+            src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 
     <!--Page specific JS -->
     <script type="application/javascript">
@@ -339,7 +346,8 @@
                     margin-bottom: 5px">
 
                                 <button class="btn btn-md btn-info"
-                                        onclick="askForFile();" id="edit_btn" type="button">
+                                        onclick="askForFile();" id="edit_btn"
+                                        type="button">
                                     <i class="fas fa-exchange-alt"></i>
                                     Trocar
                                 </button>
@@ -353,7 +361,8 @@
                                 </button>
 
 
-                                <button type="button" class="btn btn-md  btn-danger banner-remove"
+                                <button type="button"
+                                        class="btn btn-md  btn-danger banner-remove"
                                         data-dismiss="modal">
                                     <i class="fas fa-trash"></i>
                                     Deletar
@@ -369,7 +378,8 @@
 
 
                     <div class="pull-right">
-                        <button type="button" class="btn btn-md btn-success banner-save"
+                        <button type="button"
+                                class="btn btn-md btn-success banner-save"
                                 data-dismiss="modal"
                                 id="edit_avatar_modal_btn">
                             <i class="far fa-save"></i>
