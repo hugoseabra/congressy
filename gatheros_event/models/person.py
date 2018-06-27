@@ -12,6 +12,7 @@ from kanu_locations.models import City
 
 from core.model import track_data
 from core.model.validator import cpf_validator
+from gatheros_event.locale import locales
 from gatheros_event.locale.country_choices import get_country_choices
 from gatheros_event.locale.phone_choices import get_phone_choices
 from . import Occupation
@@ -111,7 +112,7 @@ class Person(models.Model, GatherosModelMixin):
     )
     country = models.CharField(
         choices=get_country_choices(),
-        default='BR',
+        default=locales.BRASIL['codes']['digits_2'],
         max_length=10,
         blank=True,
         null=True,
@@ -119,7 +120,7 @@ class Person(models.Model, GatherosModelMixin):
     )
     ddi = models.CharField(
         choices=get_phone_choices(),
-        default='BR',
+        default=locales.BRASIL['codes']['digits_2'],
         max_length=10,
         blank=True,
         null=True,

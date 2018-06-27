@@ -30,8 +30,10 @@
     <script src="{% static "assets/js/addon.js" %}"></script>
     <script type="application/javascript">
         $(document).ready(function () {
-            createDatePicker();
-
+            var date = createDatePicker();
+            {% if object %}
+                date.data("DateTimePicker").minDate(false);
+            {% endif %}
             createTimePicker();
         });
         (function ($) {

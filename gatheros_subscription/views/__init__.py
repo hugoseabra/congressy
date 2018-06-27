@@ -35,6 +35,7 @@ from .survey import (
     EventSurveyCreateView,
     EventSurveyDeleteAjaxView,
     EventSurveyEditAjaxView,
+    EventSurveyLotsEditAjaxView,
     SurveyEditView,
     SurveyListView,
 )

@@ -24,13 +24,20 @@ class EventOptionalMixin(AccountMixin, generic.View):
             )
             return redirect('event:event-list')
 
-        # Check if event is free or not
-        if self.event.event_type == self.event.EVENT_TYPE_FREE:
-            messages.error(
-                request,
-                "Evento grátis não possui opcionais."
-            )
-            return redirect('event:event-panel', self.event.pk)
+        paid_lots = False
+
+        for lot in self.event.lots.all():
+            if lot.price is not None and lot.price > 0:
+                paid_lots = True
+                break
+
+        if paid_lots is False:
+            if self.event.event_type == self.event.EVENT_TYPE_FREE:
+                messages.error(
+                    request,
+                    "Evento grátis não possui opcionais."
+                )
+                return redirect('event:event-panel', self.event.pk)
 
         return super().dispatch(request, *args, **kwargs)
 

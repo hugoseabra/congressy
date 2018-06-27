@@ -41,6 +41,8 @@ function createDateStartDateEnd(path_start, path_end) {
         date_end.data("DateTimePicker").minDate(e.date);
     });
 
+    return date_start
+
 }
 
 function createTimePicker(el) {
@@ -75,3 +77,4 @@ function createDatePicker(el) {
 
     return el;
 }
+

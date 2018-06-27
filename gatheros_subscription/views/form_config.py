@@ -1,8 +1,10 @@
 from django.contrib import messages
+from django.db.models.functions import Lower
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
 
+from core.util import represents_int
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
@@ -74,8 +76,15 @@ class FormConfigView(TemplateNameableMixin, EventViewMixin, generic.FormView):
     form_class = FormConfigForm
     template_name = 'subscription/form_config.html'
     object = None
+    survey = None
 
     def dispatch(self, request, *args, **kwargs):
+
+        get_survey = request.GET.get('survey')
+
+        if get_survey and represents_int(get_survey):
+            self.survey = get_object_or_404(EventSurvey, pk=get_survey)
+
         self.event = self.get_event()
         try:
             self.object = self.event.formconfig
@@ -126,8 +135,40 @@ class FormConfigView(TemplateNameableMixin, EventViewMixin, generic.FormView):
         cxt['active'] = 'form-personalizado'
         cxt['object'] = self.object
         cxt['event'] = self.event
-        cxt['event_survey_list'] = EventSurvey.objects.all().filter(
-            event=self.event)
+        cxt['event_survey_list'] = self._get_event_surveys()
         cxt['survey_list_form'] = EventSurveyForm(event=self.event)
 
+        if self.survey is not None:
+            cxt['survey'] = self.survey.survey
+            cxt['event_survey'] = self.survey
+            cxt['lots'] = self._get_selected_lots()
+
         return cxt
+
+    def _get_event_surveys(self):
+
+        survey_list = []
+        all_surveys = EventSurvey.objects.all().filter(
+            event=self.event).order_by(Lower('survey__name'))
+
+        for event_survey in all_surveys:
+            lots = event_survey.lots.all().order_by(Lower('name'))
+            survey_list.append({
+                'event_survey': event_survey,
+                'lots': list(lots),
+            })
+
+        return survey_list
+
+    def _get_selected_lots(self):
+        lots_list = []
+        all_lots = self.event.lots.all().order_by(Lower('name'))
+        selected_lots = self.survey.lots.all()
+
+        for lot in all_lots:
+            if lot in selected_lots:
+                lots_list.append({'lot': lot, 'selected': True})
+            else:
+                lots_list.append({'lot': lot, 'selected': False})
+
+        return lots_list

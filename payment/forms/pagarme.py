@@ -7,6 +7,8 @@ import logging
 from django import forms
 from django.db.transaction import atomic
 
+from gatheros_event.locale import locales
+from gatheros_event.models import Person
 from gatheros_subscription.models import Lot, Subscription
 from payment.exception import (
     TransactionApiError,
@@ -95,18 +97,53 @@ class PagarMeCheckoutForm(forms.Form):
             self.subscription = Subscription.objects.get(pk=sub_pk)
 
             if self.subscription.free is True:
-                raise forms.ValidationError({
-                    forms.ALL_FIELDS: 'Pagamentos não podem ser processados'
-                                      ' para inscrições gratuitas.'
-                })
+                msg = 'Pagamentos não podem ser processados para inscrições' \
+                      ' gratuitas.'
+                self.add_error(None, msg)
+                raise forms.ValidationError(msg)
 
             person = self.subscription.person
-            if not person.cpf:
-                raise forms.ValidationError({
-                    forms.ALL_FIELDS: 'Você não pode criar meio de pagamento'
-                                      ' para inscrições de pessoas cujo CPF'
-                                      ' não foi informado.'
-                })
+
+            country = person.country
+            if country == locales.BRASIL['codes']['digits_2']:
+                if not person.cpf:
+                    msg = 'Você não pode criar meio de pagamento para' \
+                          ' inscrições de pessoas cujo CPF não foi informado.'
+                    self.add_error(None, msg)
+                    raise forms.ValidationError(msg)
+
+                address_fields = (
+                    'street',
+                    'complement',
+                    'number',
+                    'village',
+                    'zip_code',
+                )
+
+            else:
+                if not person.international_doc:
+                    msg = 'Você não pode criar meio de pagamento para' \
+                          ' inscrições de pessoas cujo ID/Passport não foi' \
+                          ' informado.'
+                    self.add_error(None, msg)
+                    raise forms.ValidationError(msg)
+
+                address_fields = (
+                    'street',
+                    'complement',
+                    'number',
+                    'village',
+                    'city_international',
+                    'state_international',
+                    'zip_code_international',
+                )
+
+            for f in address_fields:
+                if not getattr(person, f):
+                    msg = 'Você não pode criar meio de pagamento sem' \
+                          ' informar o endereço completo.'
+                    self.add_error(None, msg)
+                    raise forms.ValidationError(msg)
 
         except Subscription.DoesNotExist:
             raise forms.ValidationError({
@@ -137,18 +174,19 @@ class PagarMeCheckoutForm(forms.Form):
 
         if transaction_type == Transaction.BOLETO:
             if boleto_allowed is False:
-                raise forms.ValidationError({
-                    forms.ALL_FIELDS: 'Transação com boleto não é permitida.'
-                })
+                msg = 'Transação com boleto não é permitida.'
+                self.add_error(None, msg)
+                raise forms.ValidationError(msg)
 
             open_boletos = payment_helpers.get_opened_boleto_transactions(
                 self.subscription
             )
             if open_boletos.count() > 0:
-                raise forms.ValidationError({
-                    forms.ALL_FIELDS: 'Já existe um ou mais boletos em aberto'
-                                      ' para esta inscrição.'
-                })
+                msg = 'Já existe um ou mais boletos em aberto para esta' \
+                      ' inscrição.'
+
+                self.add_error(None, msg)
+                raise forms.ValidationError(msg)
 
         return transaction_type
 

@@ -1,10 +1,13 @@
 """
 Formulários de Organization
 """
+import base64
+import binascii
 
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.files.base import ContentFile
 from django.db import IntegrityError
 
 from core.forms import TelephoneInput, clean_phone as phone_cleaner
@@ -17,10 +20,17 @@ class OrganizationForm(forms.ModelForm):
     user = None
     internal = False
 
+    remove_image = forms.CharField(
+        max_length=10,
+        widget=forms.HiddenInput,
+        required=False,
+    )
+
     class Meta:
         model = Organization
 
         fields = (
+            'avatar',
             'name',
             'phone',
             'email',
@@ -33,6 +43,7 @@ class OrganizationForm(forms.ModelForm):
         )
 
         widgets = {
+            'avatar': forms.HiddenInput(),
             'description_html': CKEditorWidget(),
             'phone': TelephoneInput(attrs={'placeholder': '(99) 99999-9999'}),
             'email': forms.TextInput(
@@ -58,6 +69,29 @@ class OrganizationForm(forms.ModelForm):
                 '__all__': 'Usuário não possui qualquer vínculo com a'
                            ' organização.'
             })
+
+        if data:
+
+            possible_base64 = data.get('avatar')
+            possible_remove_image = data.get('remove_image')
+
+            # Decoding from base64 avatar into a file obj.
+            if possible_base64:
+                try:
+                    file_ext, imgstr = possible_base64.split(';base64,')
+                    ext = file_ext.split('/')[-1]
+                    file_name = str(user.person.pk) + "." + ext
+                    data._mutable = True
+                    data['avatar'] = ContentFile(
+                        base64.b64decode(imgstr),
+                        name=file_name
+                    )
+                    data._mutable = False
+                except (binascii.Error, ValueError):
+                    pass
+
+            if possible_remove_image and instance is not None:
+                instance.avatar.delete(save=True)
 
         super(OrganizationForm, self).__init__(data=data, *args, **kwargs)
 
@@ -166,7 +200,6 @@ class OrganizationFinancialForm(forms.ModelForm):
                 attrs={'type': 'email',
                        'placeholder': 'me@you.com'}),
         }
-
 
     def __init__(self, user, internal=False, data=None, *args, **kwargs):
         self.user = user

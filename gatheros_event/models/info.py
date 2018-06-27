@@ -134,6 +134,14 @@ class Info(models.Model, GatherosModelMixin):
         blank=True,
     )
 
+    voucher_extra_info = models.CharField(
+        max_length=2000,
+        null=True,
+        blank=True,
+        verbose_name='Informações Extras do Voucher',
+        help_text="Informações extras que serão impressas junto com o voucher.",
+    )
+
     @property
     def youtube_image(self):
         if not self.youtube_video:

@@ -32,9 +32,13 @@
     <script type="application/javascript">
         $(document).ready(function () {
 
-            createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
+            var dateStart = createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
             createTimePicker();
-            createDatePicker();
+            var dateRestrict = createDatePicker();
+            {% if object %}
+                dateStart.data("DateTimePicker").minDate(false);
+                dateRestrict.data("DateTimePicker").minDate(false);
+            {% endif %}
         });
             (function ($) {
                 "use strict";

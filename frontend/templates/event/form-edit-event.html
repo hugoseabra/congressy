@@ -143,9 +143,11 @@
 
     <script>
         $(document).ready(function () {
-
-            createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
+            var date = createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
             createTimePicker();
+            {% if object %}
+                date.data("DateTimePicker").minDate(false);
+            {% endif %}
         });
         (function ($) {
             $(document).ready(function () {

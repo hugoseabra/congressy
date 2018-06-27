@@ -18,19 +18,22 @@ from wkhtmltopdf.views import PDFTemplateView
 
 from core.forms.cleaners import clear_string
 from core.views.mixins import TemplateNameableMixin
-from gatheros_event.forms import PersonForm
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Person
 from gatheros_event.views.mixins import (
     AccountMixin,
     PermissionDenied,
 )
-from gatheros_subscription.forms import SubscriptionAttendanceForm, \
-    SubscriptionFilterForm, SubscriptionForm
+from gatheros_subscription.forms import (
+    SubscriptionAttendanceForm,
+    SubscriptionPersonForm,
+    SubscriptionFilterForm,
+    SubscriptionForm,
+)
 from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.helpers.report_payment import \
     PaymentReportCalculator
-from gatheros_subscription.models import FormConfig, Subscription
+from gatheros_subscription.models import FormConfig, Lot, Subscription
 from mailer import exception as mailer_exception, services as mailer
 from payment import forms
 from payment.helpers import payment_helpers
@@ -126,7 +129,7 @@ class EventViewMixin(TemplateNameableMixin, AccountMixin):
 
 class SubscriptionFormMixin(EventViewMixin, generic.FormView):
     template_name = 'subscription/form.html'
-    form_class = PersonForm
+    form_class = SubscriptionPersonForm
     success_message = None
     subscription = None
     object = None
@@ -170,6 +173,24 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
 
         return kwargs
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+
+        lot_pk = self.request.GET.get('lot', 0)
+
+        if not lot_pk and self.subscription:
+            form.check_requirements(lot=self.subscription.lot)
+
+        else:
+            try:
+                lot = self.event.lots.get(pk=int(lot_pk) if lot_pk else 0)
+                form.check_requirements(lot=lot)
+
+            except Lot.DoesNotExist:
+                pass
+
+        return form
+
     def get_subscription_form(self, person, lot_pk):
         data = {
             'person': person.pk,
@@ -194,12 +215,23 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
 
         context['object'] = self.object
         context['allow_edit_lot'] = self.allow_edit_lot
+
         context['lots'] = [
             lot
             for lot in self.get_lots()
             if lot.status == lot.LOT_STATUS_RUNNING
+               or (self.subscription and self.subscription.lot == lot)
         ]
+
         context['subscription'] = self.subscription
+
+        lot_pk = self.request.GET.get('lot', 0)
+        if not lot_pk and self.subscription:
+            context['selected_lot'] = self.subscription.lot.pk
+
+        else:
+            context['selected_lot'] = int(lot_pk) if lot_pk else 0
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -247,6 +279,9 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
             self.subscription = subscription_form.save()
 
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return super().form_invalid(form)
 
 
 class SubscriptionListView(EventViewMixin, generic.ListView):
@@ -718,7 +753,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
 
     def get_report(self):
         """ Resgata informações gerais do evento. """
-        return self.get_event().get_report()
+        return self.get_event().get_report(only_attended=True)
 
 
 class MySubscriptionsListView(AccountMixin, generic.ListView):

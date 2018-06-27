@@ -10,7 +10,7 @@
     <div class="form-group"
          {% if hide is True %}style="display:none"{% endif %}>
         {% if field.label %}
-            <label for="{{ field.id_for_label }}">
+            <label for="{{ field.id_for_label }}" style="margin-bottom:0">
                 {{ field.label|safe|capfirst }}
                 {% if  required  or required == 'True' %}
                     <span style="color:#C9302C">*</span>
@@ -25,28 +25,11 @@
             </small>
         {% endif %}
 
-        <div {% if field.field.widget.input_type == "checkbox" or field.field.widget.input_type == "radio" %}class="row"{% endif %}>
-
-            {% if autofocus %}
-
-                {% if  required  or required == 'True' %}
-                    {% render_field field class="form-control" required="required" autofocus="autofocus" %}
-                {% else %}
-                    {% render_field field class="form-control" autofocus="autofocus" %}
-                {% endif %}
-
-            {% elif field.field.widget.input_type == "checkbox" %}
-
-                {% if  required  or required == 'True' %}
-                    {% render_field field required="required" %}
-                {% else %}
-                    {% render_field field %}
-                {% endif %}
+        <div class="row">
+            {% if field.field.widget.input_type == "checkbox" %}
+                {% render_field field %}
                 <br>
-
             {% elif field.field.widget.input_type == "file" %}
-
-
                 <label for="{{ field.id_for_label }}"
                        class="custom-file-upload">
                     <i class="fas fa-cloud-upload-alt"></i>
@@ -60,20 +43,17 @@
                         {{ help_text|safe }}
                     </small>
                 {% endif %}
-
-
             {% else %}
-
                 {% if  required  or required == 'True' %}
                     {% render_field field class="form-control" required="required" %}
                 {% else %}
                     {% render_field field class="form-control" %}
                 {% endif %}
-
             {% endif %}
-
             {% if errors %}
-                {% render_field_errors errors %}
+                <div class="col-md-12">
+                    {% render_field_errors errors %}
+                </div>
             {% endif %}
         </div>
     </div>

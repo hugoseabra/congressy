@@ -1,0 +1,77 @@
+{% load form_config_tags %}
+
+<div class="modal" id="survey-lots-form-modal" role="dialog" data-backdrop="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <form class="form-horizontal" role="form" name="survey-lots-form"
+                  onsubmit="$(this).find('button[type=submit]').attr('disabled', '').text('Aguarde...'); processSurveyLot();return false;">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title text-bold">
+                        {% if survey %}
+                            Lots vinculados ao formulario personalizado:
+                            <strong>{{ survey.name }}</strong>
+                        {% else %}
+                            Erro ao buscar os dados do formulario solicitado.
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="modal-body" style="padding: 30px">
+
+                    <div class="row">
+                        <div class="alert alert-info">
+                            <i><strong>Lembrete!</strong></i> Cada
+                            questionario só
+                            pode pertencer a um unico lote.
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th style="width: 70%">
+                                    Nome
+                                </th>
+                                <th></th>
+
+                            </tr>
+                            </thead>
+                            <input type="hidden"
+                                   name="survey-being-changed"
+                                   value="{{ event_survey.pk }}"
+                                   id="survey-being-changed">
+
+                            {% for item in lots %}
+
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        {{ item.lot.name }}
+                                    </td>
+                                    <td>
+                                        <input
+                                                type="checkbox"
+                                                class="js-switch change-lot"
+                                                data-lot-id="{{ item.lot.pk }}"
+                                                {% if  item.selected %}checked{% endif %}/>
+                                    </td>
+
+                                </tr>
+                                </tbody>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

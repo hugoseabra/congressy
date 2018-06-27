@@ -84,6 +84,20 @@
                         {{ subscription.lot.display_publicly|intcomma }}
                     </td>
                 </tr>
+                {% if event.info.voucher_extra_info %}
+                    <tr style="border-width: 0;">
+                        <td class="col-sm-2" style="border-width: 0;">
+                            <strong>Observação:</strong>
+                        </td>
+
+                        <td class="col-sm-6" style="border-width: 0;">
+                            <div style="font-size: 12px; text-align: justify">
+                                {{ event.info.voucher_extra_info }}
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+
                 </tbody>
             </table>
 

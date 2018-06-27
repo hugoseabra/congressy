@@ -26,6 +26,13 @@ class IsNotFreeEvent(BasePermission):
         if optional is None:
             raise NotFound()
 
+        for lot in optional.lot_category.event.lots.all():
+            if lot.price > 0:
+                return True
+
         if optional.lot_category.event.event_type == \
                 optional.lot_category.event.EVENT_TYPE_FREE:
             raise PermissionDenied()
+
+        return True
+
