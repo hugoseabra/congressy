@@ -564,9 +564,6 @@
                 changed_data['lots'][$(obj).data('lot-id')] = obj.checked;
             });
 
-            console.log(changed_data);
-
-
             $.ajax({
                 type: "POST",
                 url: '{% url 'subscription:survey-ajax-lots' event.pk%}',
