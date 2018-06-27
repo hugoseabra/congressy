@@ -616,31 +616,26 @@
                             Novo formulário</h4>
                     </div>
 
-                    <form id="createSurveyForm" onsubmit="createEventSurvey(this);
-                return false;">
-
-                        {% csrf_token %}
-
-                        <div class="modal-body">
+                    <div class="modal-body" style="padding: 20px">
+                        <form id="createSurveyForm" onsubmit="createEventSurvey(this);return false;">
+                            {% csrf_token %}
                             {% render_generic_field survey_list_form.name autofocus=True %}
                             {% render_generic_field survey_list_form.description %}
-                        </div>
+                        </form>
+                    </div>
 
 
-                        <div class="modal-footer">
-                            <button type="button"
-                                    class="btn btn-danger"
-                                    data-dismiss="modal">
-                                Cancelar
-                            </button>
-                            <button type="submit"
-                                    class="btn btn-success">
-                                Salvar
-                            </button>
-                        </div>
-
-
-                    </form>
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-danger"
+                                data-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit"
+                                class="btn btn-success">
+                            Salvar
+                        </button>
+                    </div>
 
                 </div>
 
