@@ -610,29 +610,30 @@
                                 aria-hidden="true">&times;</span>
                         </button>
                         <h4 class="modal-title">
-                            Novo formulário</h4>
+                            Novo formulário
+                        </h4>
                     </div>
 
-                    <div class="modal-body" style="padding: 20px">
-                        <form id="createSurveyForm" onsubmit="createEventSurvey(this);return false;">
+                    <form id="createSurveyForm" onsubmit="createEventSurvey(this);return false;">
+                        <div class="modal-body" style="padding: 20px">
                             {% csrf_token %}
                             {% render_generic_field survey_list_form.name autofocus=True %}
                             {% render_generic_field survey_list_form.description %}
-                        </form>
-                    </div>
+                        </div>
 
 
-                    <div class="modal-footer">
-                        <button type="button"
-                                class="btn btn-danger"
-                                data-dismiss="modal">
-                            Cancelar
-                        </button>
-                        <button type="submit"
-                                class="btn btn-success">
-                            Salvar
-                        </button>
-                    </div>
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-danger"
+                                    data-dismiss="modal">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                    class="btn btn-success">
+                                Salvar
+                            </button>
+                        </div>
+                    </form>
 
                 </div>
 
