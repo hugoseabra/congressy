@@ -100,7 +100,6 @@
             var cnpj_el = $('#id_institution_cnpj');
             var avatar_file_el = $('#id_avatar_file');
 
-
             //Masking
             cpf_el.mask("999.999.999-99");
             cnpj_el.mask("99.999.999/9999-99");
@@ -157,7 +156,7 @@
                     croppie_obj.croppie('destroy');
                     croppie_obj = undefined;
                 }
-                $('#id_remove_image').val('true');
+                $('#id_remove_image').val('True');
                 $('#avatar-thumbnail-modal')[0].src = "{% static 'assets/img/user_undefined.jpg' %}";
                 $('#avatar-thumbnail')[0].src = "{% static 'assets/img/user_undefined.jpg' %}";
 
