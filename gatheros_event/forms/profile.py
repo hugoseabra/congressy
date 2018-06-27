@@ -301,12 +301,11 @@ class ProfileForm(forms.ModelForm):
             possible_base64 = data.get('avatar')
 
             if possible_remove_image and possible_remove_image == 'True':
-
+                user.person.avatar.delete(save=True)
                 data._mutable = True
                 del data['avatar']
                 data._mutable = False
-                user.person.avatar.delete(save=True)
-
+                kwargs.update({'data': data})
             else:
 
                 if possible_base64:
@@ -321,10 +320,12 @@ class ProfileForm(forms.ModelForm):
                             name=file_name
                         )
                         data._mutable = False
+                        kwargs.update({'data': data})
                     except (binascii.Error, ValueError):
                         pass
 
         super(ProfileForm, self).__init__(*args, **kwargs)
+        self.fields['avatar'].required = False
         self.user = user
 
         if self.instance.pk:
