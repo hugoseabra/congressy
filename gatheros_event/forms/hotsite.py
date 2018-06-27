@@ -104,7 +104,7 @@ class InfoForm(BaseModelFileForm):
                 except (binascii.Error, ValueError):
                     pass
 
-            if possible_remove_image:
+            if possible_remove_image is not None:
                 event.info.image_main.delete(save=True)
 
         super().__init__(**kwargs)
