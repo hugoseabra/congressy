@@ -29,7 +29,7 @@ def model_field_slugify(
     """Slugify string based on another string and saves slug in model"""
 
     if string in reserved_slug:
-        raise ReservedSlugException('Este Slug é reservado')
+        raise ReservedSlugException('Este nome é reservado')
 
     original_slug = lib_slugify(string)
     if exclude_keys:
