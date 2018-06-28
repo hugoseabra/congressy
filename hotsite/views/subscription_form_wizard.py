@@ -87,6 +87,9 @@ def can_process_payment(wizard):
     """ Verifica se pagamento pode ser processado no wizard. """
     subscription = wizard.get_subscription()
 
+    if has_paid_products(wizard) is True or has_paid_services(wizard) is True:
+        return True
+
     if is_paid_lot(wizard) is False:
         return False
 
@@ -203,6 +206,72 @@ def has_services(wizard):
 
     except AttributeError:
         return False
+
+
+def has_paid_products(wizard):
+    # Get cleaned data from lots step
+    cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
+    if not cleaned_data:
+        cleaned_data = wizard.get_cleaned_data_for_step('lot')
+
+    # Return true if lot has price and price > 0
+    if not cleaned_data:
+        return False
+
+    lot = cleaned_data['lots']
+    if not lot:
+        return False
+
+    if not isinstance(lot, Lot):
+        try:
+            lot = Lot.objects.get(pk=lot)
+
+        except Lot.DoesNotExist:
+            return False
+
+    try:
+        optionals = lot.category.product_optionals
+        for optional in optionals.all():
+            if optional.price and optional.price > 0:
+                return True
+
+    except AttributeError:
+        return False
+
+    return False
+
+
+def has_paid_services(wizard):
+    # Get cleaned data from lots step
+    cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
+    if not cleaned_data:
+        cleaned_data = wizard.get_cleaned_data_for_step('lot')
+
+    # Return true if lot has price and price > 0
+    if not cleaned_data:
+        return False
+
+    lot = cleaned_data['lots']
+    if not lot:
+        return False
+
+    if not isinstance(lot, Lot):
+        try:
+            lot = Lot.objects.get(pk=lot)
+
+        except Lot.DoesNotExist:
+            return False
+
+    try:
+        optionals = lot.category.service_optionals
+        for optional in optionals.all():
+            if optional.price and optional.price > 0:
+                return True
+
+    except AttributeError:
+        return False
+
+    return False
 
 
 class SubscriptionWizardView(SessionWizardView):
