@@ -76,6 +76,10 @@ class ProfileView(AccountMixin, FormView):
         messages.success(self.request, self.messages['success'])
         return redirect('event:profile')
 
+    def form_invalid(self, form):
+        print('asd')
+        return super().form_invalid(form)
+
     def post(self, request, *args, **kwargs):
         request.POST = request.POST.copy()
 
