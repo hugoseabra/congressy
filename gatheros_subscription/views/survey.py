@@ -2,6 +2,7 @@ import json
 from ast import literal_eval
 
 from django.contrib import messages
+from django.db.models.functions import Lower
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
@@ -44,10 +45,12 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
                      TemplateNameableMixin):
     template_name = 'survey/edit.html'
     survey = None
+    event_survey = None
 
     def dispatch(self, request, *args, **kwargs):
         self.event = self.get_event()
         self.survey = self.get_survey()
+        self.event_survey = EventSurvey.objects.get(survey=self.survey)
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -57,6 +60,7 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
         context['has_inside_bar'] = True
         context['active'] = 'form-personalizado'
         context['form'] = QuestionForm(survey=self.survey)
+        context['lots'] = self._get_selected_lots()
         context['full_survey_form'] = SurveyForm(
             survey=self.survey)
 
@@ -207,6 +211,19 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
             pk=self.kwargs.get('survey_pk')
         )
         return self.survey
+
+    def _get_selected_lots(self):
+        lots_list = []
+        all_lots = self.event.lots.all().order_by(Lower('name'))
+        selected_lots = self.event_survey.lots.all()
+
+        for lot in all_lots:
+            if lot in selected_lots:
+                lots_list.append({'lot': lot, 'selected': True})
+            else:
+                lots_list.append({'lot': lot, 'selected': False})
+
+        return lots_list
 
 
 class SurveyListView(EventViewMixin, AccountMixin, generic.ListView):
