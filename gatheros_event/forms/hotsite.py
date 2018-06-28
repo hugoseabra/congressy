@@ -40,8 +40,14 @@ class BaseModelFileForm(forms.ModelForm):
 
 
 class InfoForm(BaseModelFileForm):
+
     remove_image = forms.CharField(
         max_length=10,
+        widget=forms.HiddenInput,
+        required=False,
+    )
+
+    image_main = forms.CharField(
         widget=forms.HiddenInput,
         required=False,
     )
@@ -50,7 +56,6 @@ class InfoForm(BaseModelFileForm):
         """ Meta """
         model = Info
         fields = [
-            'image_main',
             'lead',
             'description_html',
             'scientific_rules',
@@ -135,6 +140,9 @@ class InfoForm(BaseModelFileForm):
 
     def save(self, commit=True):
         self.instance.event = self.event
+        image_main = self.data.get('image_main')
+        if isinstance(image_main, ContentFile):
+            self.instance.image_main = image_main
         return super().save(commit)
 
 
