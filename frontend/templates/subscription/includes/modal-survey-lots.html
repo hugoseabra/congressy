@@ -13,7 +13,7 @@
                     </button>
                     <h4 class="modal-title text-bold">
                         {% if survey %}
-                            Lots vinculados ao formulario personalizado:
+                            Lotes vinculados ao formulario personalizado:
                             <strong>{{ survey.name }}</strong>
                         {% else %}
                             Erro ao buscar os dados do formulario solicitado.
@@ -54,10 +54,10 @@
                                     </td>
                                     <td>
                                         <input
-                                                type="checkbox"
-                                                class="js-switch change-lot"
-                                                data-lot-id="{{ item.lot.pk }}"
-                                                {% if  item.selected %}checked{% endif %}/>
+                                            type="checkbox"
+                                            class="js-switch change-lot"
+                                            data-lot-id="{{ item.lot.pk }}"
+                                            {% if  item.selected %}checked{% endif %}/>
                                     </td>
 
                                 </tr>

@@ -53,14 +53,11 @@
                             </td>
                             <td>
                                 {% if item.lots %}
-                                    <ul style="list-style: none;padding-left:
-                                     0px">
-                                        {% for lot in item.lots %}
-                                            <li>
-                                                {{ lot.name }}
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
+                                    {% for lot in item.lots %}
+                                    <div style="{% if not forloop.last %}border-bottom:1px solid #DDD;{% endif %}padding:8px 4px">
+                                        - {{ lot.name }}
+                                    </div>
+                                    {% endfor %}
                                 {% else %}
                                     ---
                                 {% endif %}
