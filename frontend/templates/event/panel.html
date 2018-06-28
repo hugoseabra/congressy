@@ -157,11 +157,11 @@
         }
 
         function setProgressBar() {
-            progress = evaluateProgress()
-            $('.progress-bar').text(progress + '%');
-            $('.progress-bar').attr('aria-valuenow', progress);
+            progress = evaluateProgress();
+            $('#progress_event').text(progress + '%');
+            $(this).attr('aria-valuenow', progress);
             setTimeout(function () {
-                $('.progress-bar').css('width', progress + '%');
+                $('#progress_event').css('width', progress + '%');
             }, 300);
         }
 
@@ -274,17 +274,17 @@
     </div>
 
     <div id="todo-data"
-         class="panel panel-primary col-xs-12 col-xl-12 col-sm-12 col-md-12 col-lg-12"
-         style="padding: 0;">
+         class="panel panel-primary col-xs-12 col-xl-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0">
         <div class="panel-heading">
             <div class="panel-title">Etapas de configuração do seu evento</div>
         </div>
         <div class="panel-body tooltip-wrapper">
             <div id="todo">
-                {% include "event/todo_list.html" %}
+                {% include "event/includes/todo_list.html" %}
             </div>
         </div>
     </div>
+
 
     {% if has_paid_lots %}
         <div class="col-md-12 col-lg-12">

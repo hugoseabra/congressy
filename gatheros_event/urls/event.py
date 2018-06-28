@@ -61,6 +61,11 @@ urls = [
         name='event-add'
     ),
     url(
+        r'^slug/$',
+        views.EventSlugUpdaterView.as_view(),
+        name='event-slug'
+    ),
+    url(
         r'^$',
         views.EventListView.as_view(),
         name='event-list'

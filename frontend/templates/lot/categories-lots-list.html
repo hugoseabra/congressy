@@ -5,193 +5,238 @@
         <div class="tab-wrapper tab-left ">
             <ul class="nav nav-tabs">
                 {% for cat in categories %}
-                <li id="cat-super-{{ cat.pk }}" class="{% if forloop.counter0 == 0 %}active{% endif %}" style="width:180px;overflow: hidden">
-                    <a class="cat-tab-link" data-cat-id="{{ cat.pk }}" href="#cat-{{ cat.pk }}" data-toggle="tab" aria-expanded="{% if forloop.counter0 == 0 %}true{% else %}false{% endif %}">
-                        {{ cat.name }}
-                    </a>
-                </li>
+                    <li id="cat-super-{{ cat.pk }}"
+                        class="{% if forloop.counter0 == 0 %}active{% endif %}"
+                        style="width:180px;overflow: hidden">
+                        <a class="cat-tab-link" data-cat-id="{{ cat.pk }}"
+                           href="#cat-{{ cat.pk }}" data-toggle="tab"
+                           aria-expanded="{% if forloop.counter0 == 0 %}true{% else %}false{% endif %}">
+                            {{ cat.name }}
+                        </a>
+                    </li>
                 {% endfor %}
             </ul>
             <div class="tab-content">
                 {% for cat in categories %}
-                <div class="tab-pane {% if forloop.counter0 == 0 %}active{% endif %}" id="cat-{{ cat.pk }}">
-                    <h3 class="well well-sm" style="font-weight: bold;padding: 10px">{{ cat.name }}</h3>
-                    <hr />
-                    {% if cat.lots.count %}
-                    <ul class="list-group block-list">
-                        {% for lot in cat.lots.all %}
-                        <li class="list-group-item">
-                            <div class="row tooltip-wrapper">
-                                <div class="col-md-8 col-lg-7 col-xl-8" style="word-wrap: break-word">
-                                    <div class="panel-title">
-                                        {{ lot.get_period }}
-                                    </div>
-                                    <hr />
-                                    <div style="margin-bottom:3px;">
-                                        <div class="float-left">
-                                            {{ lot.name }}
-                                        </div>
-                                        <div class="float-right">
-                                        {% if lot.price %}
-                                            <div style="font-size:14px" class="badge badge-primary" data-toggle="tooltip" title="" data-original-title="Preço do lote">R$ {{ lot.get_calculated_price }}</div>
-                                        {% endif %}
-                                        </div>
-                                        <div class="clearfix"></div>
-                                    </div>
+                    <div class="tab-pane {% if forloop.counter0 == 0 %}active{% endif %}"
+                         id="cat-{{ cat.pk }}">
+                        <h3 class="well well-sm"
+                            style="font-weight: bold;padding: 10px">{{ cat.name }}</h3>
+                        <hr/>
+                        {% if cat.lots.count %}
+                            <ul class="list-group block-list">
+                                {% for lot in cat.lots.all %}
+                                    <li class="list-group-item">
+                                        <div class="row tooltip-wrapper">
+                                            <div class="col-md-8 col-lg-7 col-xl-8"
+                                                 style="word-wrap: break-word">
+                                                <div class="panel-title">
+                                                    {{ lot.get_period }}
+                                                </div>
+                                                <hr/>
+                                                <div style="margin-bottom:3px;">
+                                                    <div class="float-left">
+                                                        {{ lot.name }}
+                                                    </div>
+                                                    <div class="float-right">
+                                                        {% if lot.price %}
+                                                            <div style="font-size:14px"
+                                                                 class="badge badge-primary"
+                                                                 data-toggle="tooltip"
+                                                                 title=""
+                                                                 data-original-title="Preço do lote">
+                                                                R$ {{ lot.get_calculated_price }}</div>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="clearfix"></div>
+                                                </div>
 
-                                    {% if lot.status == lot.LOT_STATUS_RUNNING %}
-                                        <div class="badge badge-success" data-toggle="tooltip" title="" data-original-title="Status: em andamento">Andamento</div>
-                                    {% elif lot.status == lot.LOT_STATUS_FINISHED %}
-                                        <div class="badge badge-warning" data-toggle="tooltip" title="" data-original-title="Status: já finalizado">Finalizado</div>
-                                    {% else %}
-                                        <div class="badge" data-toggle="tooltip" title="" data-original-title="Status: ainda não-iniciado">Não-iniciado</div>
-                                    {% endif %}
-                                    {% if lot.private %}
-                                        <div class="badge badge-primary" data-toggle="tooltip" title="" data-original-title="Lote privado: somente para cupons.">Privado</div>
-                                    {% endif %}
-                                    {% if lot.event_survey %}
-                                        <div class="badge badge-primary" data-toggle="tooltip" title="" data-original-title="Formulário personalizado">{{ lot.event_survey }}</div>
-                                    {% endif %}
-                                    {% if lot.price and not full_banking %}
-                                    <br />
-                                    <a href="{% url 'event:organization-financial-edit' organization.pk %}" class="btn btn-link btn-sm btn-danger">
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                        Você não inseriu dados bancários.
-                                    </a>
-                                    {% endif %}
-                                    <hr />
-                                    <div style="margin-bottom:3px;">
-                                        Inscrições:
-                                        <span style="font-weight: bold;">
+                                                {% if lot.status == lot.LOT_STATUS_RUNNING %}
+                                                    <div class="badge badge-success"
+                                                         data-toggle="tooltip"
+                                                         title=""
+                                                         data-original-title="Status: em andamento">
+                                                        Andamento
+                                                    </div>
+                                                {% elif lot.status == lot.LOT_STATUS_FINISHED %}
+                                                    <div class="badge badge-warning"
+                                                         data-toggle="tooltip"
+                                                         title=""
+                                                         data-original-title="Status: já finalizado">
+                                                        Finalizado
+                                                    </div>
+                                                {% else %}
+                                                    <div class="badge"
+                                                         data-toggle="tooltip"
+                                                         title=""
+                                                         data-original-title="Status: ainda não-iniciado">
+                                                        Não-iniciado
+                                                    </div>
+                                                {% endif %}
+                                                {% if lot.private %}
+                                                    <div class="badge badge-primary"
+                                                         data-toggle="tooltip"
+                                                         title=""
+                                                         data-original-title="Lote privado: somente para cupons.">
+                                                        Privado
+                                                    </div>
+                                                {% endif %}
+                                                {% if lot.event_survey %}
+                                                    <div class="badge badge-primary"
+                                                         data-toggle="tooltip"
+                                                         title=""
+                                                         data-original-title="Formulário personalizado">{{ lot.event_survey }}</div>
+                                                {% endif %}
+                                                {% if lot.price and not full_banking %}
+                                                    <br/>
+                                                    <a href="{% url 'event:organization-financial-edit' organization.pk %}"
+                                                       class="btn btn-link btn-sm btn-danger">
+                                                        <i class="fas fa-exclamation-triangle"></i>
+                                                        Você não inseriu dados
+                                                        bancários.
+                                                    </a>
+                                                {% endif %}
+                                                <hr/>
+                                                <div style="margin-bottom:3px;">
+                                                    Inscrições:
+                                                    <span style="font-weight: bold;">
                                             {% filter_lookup subscription_stats.num lot.pk %}
-                                            {% if not lot.limit %}(ilimitado){% endif %}
+                                                        {% if not lot.limit %}
+                                                            (ilimitado){% endif %}
                                         </span>
-                                    </div>
-                                    {% if lot.limit %}
-                                    <div style="margin-bottom:3px;">
-                                        Vagas disponíveis: <span style="font-weight: bold;"><span style="font-weight: bold;">{% filter_lookup subscription_stats.remaining lot.pk %}</span></span>
-                                    </div>
-                                    {% endif %}
-                                    {% if lot.private %}
-                                    <div style="margin-bottom:3px;">
-                                        Cupom: <span style="font-weight: bold;">{{ lot.exhibition_code|default_if_none:'-' }}</span>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-2 col-lg-3 col-xl-2">
-                                    <hr class="hidden-md hidden-lg hidden-xl" />
-                                    <div
-                                        data-placement="left"
-                                        data-toggle="tooltip"
-                                        title=""
-                                        data-original-title="Gerenciar Formulário personalizado">
-                                        <button
-                                            class="btn btn-sm btn-info btn-block {% if not lot.event_survey %}btn-trans{% endif %}"
-                                            data-toggle="modal"
-                                            data-backdrop="static"
-                                            onclick="$('#survey-lot_id').val('{{ lot.pk }}');$('#survey-lot-name').text('{{ lot.name }}');$('#lot-survey').val('{{ lot.event_survey_id|default_if_none:'' }}')"
-                                            data-target="#survey-lot-form">
-                                            <i class="fas fa-list"></i>
-                                            <span class="hidden-md">Formulário</span>
-                                        </button>
-                                    </div>
-                                    <div
-                                        data-toggle="tooltip"
-                                        data-placement="left"
-                                        title=""
-                                        data-original-title="Gerenciar limite de vagas">
-                                        <button
-                                            class="btn btn-sm btn-info btn-block {% if not lot.limit %}btn-trans{% endif %}"
-                                            data-toggle="modal"
-                                            data-backdrop="static"
-                                            onclick="$('#lot-limit-lot_id').val('{{ lot.pk }}');$('#lot-limit-name').text('{{ lot.name }}');$('#lot-limit').val('{{ lot.limit|default_if_none:0 }}')"
-                                            data-target="#lot-limit-form">
-                                            <i class="fas fa-users"></i>
-                                            <span class="hidden-md">Vagas</span>
-                                        </button>
-                                    </div>
-                                    <div
-                                        data-toggle="tooltip"
-                                        data-placement="left"
-                                        title=""
-                                        data-original-title="Gerenciar privacidade">
-                                        <button
-                                            class="btn btn-sm btn-info btn-block {% if not lot.private %}btn-trans{% endif %}"
-                                            data-toggle="modal"
-                                            data-backdrop="static"
-                                            onclick="$('#lot-privacy-lot_id').val('{{ lot.pk }}');$('#lot-privacy_name').text('{{ lot.name }}');app.setSwitchery('#lot-privacy_private', {% if lot.private %}true{% else %}false{% endif %});$('#lot-privacy_exhibition-code').val('{{ lot.exhibition_code|default_if_none:exhibition_code }}')"
-                                            data-target="#lot-privacy_form">
-                                            <i class="fas fa-lock"></i>
-                                            <span class="hidden-md">Privacidade</span>
-                                        </button>
-                                    </div>
-                                </div>
+                                                </div>
+                                                {% if lot.limit %}
+                                                    <div style="margin-bottom:3px;">
+                                                        Vagas disponíveis:
+                                                        <span style="font-weight: bold;"><span
+                                                                style="font-weight: bold;">{% filter_lookup subscription_stats.remaining lot.pk %}</span></span>
+                                                    </div>
+                                                {% endif %}
+                                                {% if lot.private %}
+                                                    <div style="margin-bottom:3px;">
+                                                        Cupom: <span
+                                                            style="font-weight: bold;">{{ lot.exhibition_code|default_if_none:'-' }}</span>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-md-2 col-lg-3 col-xl-2">
+                                                <hr class="hidden-md hidden-lg hidden-xl"/>
+                                                <div
+                                                        data-placement="left"
+                                                        data-toggle="tooltip"
+                                                        title=""
+                                                        data-original-title="Gerenciar Formulário personalizado">
+                                                    <button
+                                                            class="btn btn-sm btn-info btn-block {% if not lot.event_survey %}btn-trans{% endif %}"
+                                                            data-toggle="modal"
+                                                            data-backdrop="static"
+                                                            onclick="$('#survey-lot_id').val('{{ lot.pk }}');$('#survey-lot-name').text('{{ lot.name }}');$('#lot-survey').val('{{ lot.event_survey_id|default_if_none:'' }}')"
+                                                            data-target="#survey-lot-form">
+                                                        <i class="fas fa-list"></i>
+                                                        <span class="hidden-md">Formulário</span>
+                                                    </button>
+                                                </div>
+                                                <div
+                                                        data-toggle="tooltip"
+                                                        data-placement="left"
+                                                        title=""
+                                                        data-original-title="Gerenciar limite de vagas">
+                                                    <button
+                                                            class="btn btn-sm btn-info btn-block {% if not lot.limit %}btn-trans{% endif %}"
+                                                            data-toggle="modal"
+                                                            data-backdrop="static"
+                                                            onclick="$('#lot-limit-lot_id').val('{{ lot.pk }}');$('#lot-limit-name').text('{{ lot.name }}');$('#lot-limit').val('{{ lot.limit|default_if_none:0 }}')"
+                                                            data-target="#lot-limit-form">
+                                                        <i class="fas fa-users"></i>
+                                                        <span class="hidden-md">Vagas</span>
+                                                    </button>
+                                                </div>
+                                                <div
+                                                        data-toggle="tooltip"
+                                                        data-placement="left"
+                                                        title=""
+                                                        data-original-title="Gerenciar privacidade">
+                                                    <button
+                                                            class="btn btn-sm btn-info btn-block {% if not lot.private %}btn-trans{% endif %}"
+                                                            data-toggle="modal"
+                                                            data-backdrop="static"
+                                                            onclick="$('#lot-privacy-lot_id').val('{{ lot.pk }}');$('#lot-privacy_name').text('{{ lot.name }}');app.setSwitchery('#lot-privacy_private', {% if lot.private %}true{% else %}false{% endif %});$('#lot-privacy_exhibition-code').val('{{ lot.exhibition_code|default_if_none:exhibition_code }}')"
+                                                            data-target="#lot-privacy_form">
+                                                        <i class="fas fa-lock"></i>
+                                                        <span class="hidden-md">Privacidade</span>
+                                                    </button>
+                                                </div>
+                                            </div>
 
-                                <div class="col-md-2">
-                                    {% if user has 'gatheros_subscription.change_lot' of lot %}
-                                    <div
-                                        data-toggle="tooltip"
-                                        data-placement="left"
-                                        title=""
-                                        data-original-title="Editar">
-                                        <button
-                                           onclick="window.location.href='{% url 'subscription:lot-edit' event.pk lot.pk %}'"
-                                           class="btn btn-sm btn-primary btn-trans btn-block"
-                                           data-target="#lot-form">
-                                           <i class="fa fa-pencil-alt"></i>
-                                        </button>
-                                    </div>
-                                    {% endif %}
-                                    {% if lot.active %}
-                                    <div
-                                        data-toggle="tooltip"
-                                        data-placement="left"
-                                        title=""
-                                        data-original-title="Este lote está ativo. Clique para desativa-lo.">
-                                        <button
-                                            onclick="unpublishLot('{{ lot.pk }}')"
-                                            class="btn btn-sm btn-success btn-trans btn-block">
-                                            <i class="fas fa-check-circle"></i>
-                                        </button>
-                                    </div>
-                                    {% else %}
-                                    <div
-                                        data-toggle="tooltip"
-                                        data-placement="left"
-                                        title=""
-                                        data-original-title="Este lote está inativo. Clique para ativa-lo.">
-                                        <button
-                                            onclick="publishLot('{{ lot.pk }}')"
-                                            class="btn btn-sm btn-warning btn-trans btn-block">
-                                            <i class="fa fa-exclamation-circle"></i>
-                                        </button>
-                                    </div>
-                                    {% endif %}
-                                    {% if lot.is_deletable and user has 'gatheros_subscription.delete_lot' of lot %}
-                                    <div
-                                        data-toggle="tooltip"
-                                        data-placement="left"
-                                        title=""
-                                        data-original-title="Excluir">
-                                        <button class="btn btn-sm btn-default btn-trans btn-block"
-                                            onclick="window.location.href='{% url 'subscription:lot-delete' event.pk lot.pk %}'">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                    {% endif %}
-                                </div>
+                                            <div class="col-md-2">
+                                                {% if user has 'gatheros_subscription.change_lot' of lot %}
+                                                    <div
+                                                            data-toggle="tooltip"
+                                                            data-placement="left"
+                                                            title=""
+                                                            data-original-title="Editar">
+                                                        <button
+                                                                onclick="window.location.href='{% url 'subscription:lot-edit' event.pk lot.pk %}'"
+                                                                class="btn btn-sm btn-primary btn-trans btn-block"
+                                                                data-target="#lot-form">
+                                                            <i class="fa fa-pencil-alt"></i>
+                                                        </button>
+                                                    </div>
+                                                {% endif %}
+                                                {% if lot.active %}
+                                                    <div
+                                                            data-toggle="tooltip"
+                                                            data-placement="left"
+                                                            title=""
+                                                            data-original-title="Este lote está ativo. Clique para desativa-lo.">
+                                                        <button
+                                                                onclick="unpublishLot('{{ lot.pk }}')"
+                                                                class="btn btn-sm btn-success btn-trans btn-block">
+                                                            <i class="fas fa-check-circle"></i>
+                                                        </button>
+                                                    </div>
+                                                {% else %}
+                                                    <div
+                                                            data-toggle="tooltip"
+                                                            data-placement="left"
+                                                            title=""
+                                                            data-original-title="Este lote está inativo. Clique para ativa-lo.">
+                                                        <button
+                                                                onclick="publishLot('{{ lot.pk }}')"
+                                                                class="btn btn-sm btn-warning btn-trans btn-block">
+                                                            <i class="fa fa-exclamation-circle"></i>
+                                                        </button>
+                                                    </div>
+                                                {% endif %}
+                                                {% if lot.is_deletable and user has 'gatheros_subscription.delete_lot' of lot %}
+                                                    <div data-toggle="tooltip"
+                                                         data-placement="left"
+                                                         title=""
+                                                         data-original-title="Excluir">
+                                                        <div onclick="$('#lot-delete-form').attr('action','{% url 'subscription:lot-delete' event.pk lot.pk%}');$('#lot-delete-modal').modal();">
+                                                            <button class="btn btn-sm btn-default btn-trans btn-block">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <div style="padding: 40px 20px">
+                                Não há lotes nesta categoria.
                             </div>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                        <div style="padding: 40px 20px">
-                        Não há lotes nesta categoria.
-                        </div>
-                    {% endif %}
-                </div>
+                        {% endif %}
+                    </div>
                 {% endfor %}
             </div>
         </div>
     </div>
 </div>
+
+{% block modals %}
+    {% include 'generic/delete-modal.html' %}
+{% endblock %}

@@ -8,7 +8,8 @@ from .event.form import (
     EventDatesFormView,
     EventEditFormView,
     EventPublicationFormView,
-    EventSubscriptionTypeFormView
+    EventSlugUpdaterView,
+    EventSubscriptionTypeFormView,
 )
 from .event.hotsite import EventHotsiteView
 from .event.info import EventInfoView

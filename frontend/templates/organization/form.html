@@ -36,6 +36,10 @@
           id="organization-form"
           name="event_form">
         {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
         <input type="file" style="display: none"
                id="id_avatar_file" accept="image/*">
 
@@ -189,6 +193,7 @@
 
 {% block scripts %}
     {{ block.super }}
+    <script src="{% static 'assets/js/user_notification.js' %}"></script>
 
     <script src="{% static "assets/js/messenger.js" %}"></script>
     <!-- Messenger lib -->

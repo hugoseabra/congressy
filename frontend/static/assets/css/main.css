@@ -3494,16 +3494,19 @@ label.valid {
 .theme-cgsy-full .principal_content {
   padding-left: 51px;
 }
+.theme-cgsy-full .sidebar-section {
+  width: 20%;
+}
 .theme-cgsy-full .sidebar-section .navbar-collapse {
   padding-left: 0;
 }
 .theme-cgsy-full .main-page-full {
-  width: 79%;
+  width: 80%;
   padding-bottom: 50px;
 }
 .theme-cgsy-full .main-page-sidebar {
   width: 100%;
-  padding-left: 50px;
+  padding-left: 65px;
 }
 .theme-cgsy-full .main-page-sidebar .cgsy-footer {
   padding-left: 25px;
@@ -3531,7 +3534,7 @@ label.valid {
 }
 .theme-cgsy-full .manage_sidebar {
   margin-top: 60px;
-  margin-left: 50px;
+  margin-left: 65px;
   padding-left: 1px;
   width: 200px;
   padding-right: 10px;

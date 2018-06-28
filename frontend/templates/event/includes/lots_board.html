@@ -1,0 +1,102 @@
+<div class="tab-wrapper tab-primary">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#running-lot" data-toggle="tab">Em andamento</a>
+        </li>
+        <li>
+            <a href="#not-started-lot" data-toggle="tab">Não iniciados</a>
+        </li>
+        <li>
+            <a href="#finished-lot" data-toggle="tab">Finalizados</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="running-lot">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Inscritos</th>
+                    <th>Porcentagem</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for lot in all_lots.running %}
+                    <tr role="presentation">
+                        <td>
+                            <a>{{ lot.name }}</a>
+                        </td>
+
+                        <td>
+                            <a>{{ lot.number_subscription }}/{{ lot.limit }}</a>
+                        </td>
+                        <td>
+                            <a>{{ lot.percent_completed }}%</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tab-pane" id="not-started-lot">
+
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Inscritos</th>
+                    <th>Porcentagem</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for lot in all_lots.notstarted %}
+                    <tr role="presentation">
+                        <td>
+                            <a>{{ lot.name }}</a>
+                        </td>
+
+                        <td>
+                            <a>{{ lot.number_subscription }}/{{ lot.limit }}</a>
+                        </td>
+                        <td>
+                            <a>{{ lot.percent_completed }}%</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tab-pane" id="finished-lot">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Inscritos</th>
+                    <th>Porcentagem</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for lot in all_lots.finished %}
+                    <tr role="presentation">
+                        <td>
+                            <a>{{ lot.name }}</a>
+                        </td>
+
+                        <td>
+                            <a>{{ lot.number_subscription }}/{{ lot.limit }}</a>
+                        </td>
+                        <td>
+                            <a>{{ lot.percent_completed }}%</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

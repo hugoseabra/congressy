@@ -11,7 +11,7 @@ from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
 from gatheros_event.models import Info, Organization
 from gatheros_event.views.mixins import AccountMixin
-from gatheros_subscription.models import Subscription, EventSurvey
+from gatheros_subscription.models import Subscription, EventSurvey, Lot
 from payment.models import Transaction
 from certificate.models import Certificate
 
@@ -49,8 +49,6 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
             elif row_name == 'survey':
                 self.event.has_survey = val
 
-
-
             self.event.save()
 
         return HttpResponse(status=201)
@@ -85,6 +83,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         context['totals'] = self._get_payables()
         context['limit'] = self._get_limit()
         context['has_paid_lots'] = self.has_paid_lots()
+        context['all_lots'] = self.all_lots_status()
         context['gender'] = self._get_gender()
         context['pending'] = self._get_number_pending()
         context['has_inside_bar'] = True
@@ -102,7 +101,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         }
         context['report'] = self._get_report()
         context['full_banking'] = self._get_full_banking()
-        context['has_survey_create']= self.has_survey_create()
+        context['has_survey_create'] = self.has_survey_create()
         context['number_attendances'] = self.get_number_attendances()
         context['status_addons'] = self.get_status_addons()
         try:
@@ -122,6 +121,34 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
 
         return context
 
+    def all_lots_status(self):
+        lots = {
+            'running': [],
+            'finished': [],
+            'notstarted': []
+        }
+        for lot in self.event.lots.all():
+            lot_istance = {
+                'name': lot.name,
+                'limit': lot.limit,
+                'number_subscription': lot.subscriptions.filter(
+                    completed=True
+                ).exclude(
+                    status='canceled'
+                ).count(),
+                'percent_completed': lot.percent_completed
+            }
+            if lot.status == Lot.LOT_STATUS_RUNNING:
+                lots['running'].append(lot_istance)
+
+            elif lot.status == Lot.LOT_STATUS_NOT_STARTED:
+                lots['notstarted'].append(lot_istance)
+
+            elif lot.status == Lot.LOT_STATUS_FINISHED:
+                lots['finished'].append(lot_istance)
+
+        return lots
+
     def get_status_addons(self):
         has_services = False
         has_products = False
@@ -138,6 +165,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         }
 
         return status_addons
+
     def get_number_attendances(self):
         try:
             return Subscription.objects.filter(
@@ -173,8 +201,6 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
                 return True
 
         return False
-
-
 
     def _get_full_banking(self):
 
@@ -322,8 +348,8 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
                 Q(subscription__event=self.event) &
                 Q(subscription__completed=True) &
                 (
-                    Q(status=Transaction.PAID) |
-                    Q(status=Transaction.WAITING_PAYMENT)
+                        Q(status=Transaction.PAID) |
+                        Q(status=Transaction.WAITING_PAYMENT)
                 )
             ).exclude(subscription__status=Subscription.CANCELED_STATUS)
 

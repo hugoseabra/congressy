@@ -11,7 +11,6 @@ class EventDeleteView(DeleteViewMixin):
     success_url = reverse_lazy('event:event-list')
     delete_message = "Tem certeza que deseja excluir o evento \"{name}\"?"
     success_message = "Evento excluído com sucesso."
-    template_name = "event/delete.html"
 
     def pre_dispatch(self, request):
         self.object = self.get_object()

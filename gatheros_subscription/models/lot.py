@@ -315,10 +315,25 @@ class Lot(models.Model, GatherosModelMixin):
         if self.limit and self.limit > 0:
             queryset = self.subscriptions.filter(
                 completed=True,
-            ).exclude(status__in=['canceled'],)
+            ).exclude(status__in=['canceled'], )
 
             if queryset.count() >= self.limit:
                 return Lot.LOT_STATUS_FINISHED
+
+            if self.event.expected_subscriptions and \
+                    self.event.expected_subscriptions > 0:
+
+                total_subscriptions_event = 0
+                for lot in self.event.lots.all():
+                    total_subscriptions_event += lot.subscriptions.filter(
+                        completed=True
+                    ).exclude(
+                        status='canceled'
+                    ).count()
+
+                if total_subscriptions_event >= self.event.expected_subscriptions:
+                    return Lot.LOT_STATUS_FINISHED
+
 
         now = datetime.now()
         if now >= self.date_end:

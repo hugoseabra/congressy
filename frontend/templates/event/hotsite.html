@@ -71,7 +71,24 @@
             src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
+        <script src="{% static 'assets/js/user_notification.js' %}"></script>
+
     <script>
+        $(document).ready(function () {
+
+            if(! $('#id_show_location').is(':checked')) {
+                $('#map-block').hide();
+                $('#place-form-block').removeClass('col-md-6');
+                $('#place-form-block').addClass('col-md-12');
+            }
+
+
+            $('.switchery').on('click', function () {
+                $('#map-block').toggle();
+                $('#place-form-block').toggleClass('col-md-6');
+                $('#place-form-block').toggleClass('col-md-12');
+            })
+        });
         window.cgsy = window.cgsy || {};
         cgsy.maps = cgsy.maps || {};
         var croppie_obj = undefined;
@@ -118,7 +135,10 @@
                 var map = new window.google.maps.Map(
                     document.getElementById("map"),
                     {
-                        center: {lat: parseFloat(lat), lng: parseFloat(long)},
+                        center: {
+                            lat: parseFloat(lat),
+                            lng: parseFloat(long)
+                        },
                         zoom: parseInt(zoom) || 18
                     }
                 );
@@ -171,11 +191,15 @@
                 var geocoder = new window.google.maps.Geocoder;
                 geocoder.geocode({'address': address}, function (results, status) {
                     if (status !== 'OK') {
-                        alert('Geocode was not successful for the following reason: ' + status);
+                        $('#map-loader').hide();
+                        $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
+                        $('#error-maps').show();
+                        $('#id_city_name').prop('disabled', false);
                         return;
                     }
                     var components = results[0].address_components;
                     if (components.length) {
+                        $('#error-maps').hide();
                         var uf, city;
                         $.each(components, function (i, component) {
                             if ($.inArray('postal_code', component.types) != -1) {
@@ -402,7 +426,7 @@
                     $('#id_complement').val('');
                     $('#id_village').val('');
                     $('#id_state').val('');
-                    $('#id_city_name').prop('disabled', true);
+                    {#$('#id_city_name').prop('disabled', true);#}
 
                     map_reload_timer = window.setTimeout(function () {
                         window.cgsy.maps.retrieveAddress();
@@ -709,6 +733,10 @@
                                 <div class="row name-row">
                                     <div class="col-md-12 col-lg-8 col-xl-9">
                                         {% render_generic_field form.name help_text='Pesquise pelo nome do local.' %}
+                                        <p id="error-maps" class="danger-color"
+                                           style="display: none">Local não
+                                            encontrado no Google Maps</p>
+
                                     </div>
                                     <div class="col-md-12 col-lg-4 col-xl-3"
                                          style="padding-left: 30px;padding-right: 30px">
@@ -766,7 +794,7 @@
                                     do Google.
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" id="map-block">
                                 <div id="map-loader"
                                      class="fas info-color fa-2x fa-circle-notch fa-spin"
                                      style="position:absolute;z-index:1000;top:0;display:none"></div>

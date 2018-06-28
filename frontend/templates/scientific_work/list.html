@@ -1,6 +1,6 @@
 {% extends "base/base.html" %}
 {% load i18n static widget_tweaks form_config_tags %}
-{% block title %}Lista de artigos científicas | Congressy{% endblock %}
+{% block title %}Artigos científicas | Congressy{% endblock %}
 {% block page_title %}Artigos científicos submetidos{% endblock %}
 {% block sidebar %}{% endblock %}
 {% block sidebar-bars %}{% endblock %}
@@ -130,8 +130,13 @@
 
 
 {% block scripts %}
-    <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.js' %}"></script>
-    <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.js' %}"></script>
+    <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/dataTables/js/dataTables.responsive.min.js' %}"></script>
+
+    <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.min.js' %}"></script>
+
+    <script src="{% static 'assets/plugins/dataTables/js/responsive.bootstrap.min.js' %}"></script>
+
 
     <script>
         $(document).ready(function () {
@@ -177,7 +182,9 @@
                     }
                 ],
                 // Default order
-                "order": [[0, 'asc']]
+                "order": [[0, 'asc']],
+                responsive: true,
+                scrollX: true
             });
 
             /**
@@ -195,3 +202,14 @@
     </script>
 {% endblock %}
 
+{% block styles %}
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/dataTables/css/responsive.bootstrap.min.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/dataTables/css/datatables.min.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/icheck/css/all.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/dataTables/css/responsive.dataTables.min.css' %}">
+
+{% endblock %}

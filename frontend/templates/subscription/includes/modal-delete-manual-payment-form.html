@@ -1,0 +1,45 @@
+{% load form_config_tags humanize%}
+
+<div class="modal" id="manual-delete-payment-form-modal" role="dialog"
+     data-backdrop="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <form action="{% url 'subscription:payment-delete' event.pk object.pk %}"
+          method="post" id="payment-delete-form"  class="form-horizontal" role="form">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title text-bold">
+                        Excluir lançamento manual
+                    </h4>
+                </div>
+                <div class="modal-body">
+                            {% csrf_token %}
+
+                    <h2 class="danger-color" style="text-align:center">
+                        <i class="fas fa-exclamation-triangle
+                        fa-1x"></i> Atenção! <i class="fas
+                        fa-exclamation-triangle
+                        fa-1x"></i>
+                    </h2>
+                    <br>
+                    <h2 style="margin-top: 5px" id="delete-message">
+                    </h2>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Confirmar
+                    </button>
+                    <button type="button" class="btn btn-danger"
+                            data-dismiss="modal">Fechar
+                    </button>
+
+                    <input type="hidden" name="transaction_id" id="transaction_id"
+               value=""/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

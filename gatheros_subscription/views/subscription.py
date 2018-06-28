@@ -897,6 +897,7 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
     event = None
     person = None
     lot = None
+    place = None
     show_content_in_browser = True
     permission_denied_url = reverse_lazy('front:start')
 
@@ -960,6 +961,7 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
         self.event = self.subscription.event
         self.person = self.subscription.person
         self.lot = self.subscription.lot
+        self.place = self.subscription.event.place
 
     def can_access(self):
         return self.subscription.confirmed is True

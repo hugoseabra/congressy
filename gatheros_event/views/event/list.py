@@ -6,6 +6,8 @@ from gatheros_event.views.mixins import AccountMixin
 
 class EventListView(AccountMixin, ListView):
     model = Event
+    delete_message = "Tem certeza que deseja excluir o evento \"{name}\"?"
+
     # old template template_name = 'gatheros_event/event/list.html'
     template_name = 'event/list.html'
     ordering = ['name']

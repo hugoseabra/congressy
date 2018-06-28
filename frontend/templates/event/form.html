@@ -183,6 +183,16 @@
                                         </div>
                                     </div>
                                     <div class="row">
+                                        <div class="col-md-12">
+                                            <label for="print-url">
+                                                Link do seu evento:
+                                            </label>
+                                            <div id="print-url">
+                                            </div>
+                                            <br>
+                                        </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col-md-6">
                                             {% render_generic_field form.organization %}
                                         </div>
@@ -226,40 +236,44 @@
                                     </div>
                                 </div>
                             {% endif %}
-                            <div class="row">
-                                {% if not object %}
-                                    {% if event_type != 'free' %}
+                            {% if not object %}
+                                {% if event_type != 'free' %}
 
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                {% render_switchery_field form.has_optionals %}
-                                            </div>
-                                            <div class="col-md-6">
-                                                {% render_switchery_field form.has_extra_activities %}
-                                            </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {% render_generic_field form.expected_subscriptions %}
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                {% render_switchery_field form.has_checkin %}
-                                            </div>
-                                            <div class="col-md-6">
-                                                {% render_switchery_field form.has_survey %}
-                                            </div>
+                                        <div class="col-md-6">
+                                            {% render_switchery_field form.has_checkin %}
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                {% render_switchery_field form.has_certificate %}
-                                            </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {% render_switchery_field form.has_optionals %}
                                         </div>
-                                    {% else %}
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                {% render_switchery_field form.has_survey %}
-                                            </div>
+                                        <div class="col-md-6">
+                                            {% render_switchery_field form.has_extra_activities %}
                                         </div>
-                                    {% endif %}
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {% render_switchery_field form.has_certificate %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% render_switchery_field form.has_survey %}
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {% render_generic_field form.expected_subscriptions %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% render_switchery_field form.has_survey %}
+                                        </div>
+                                    </div>
                                 {% endif %}
-                            </div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="buttonbar bottom">
@@ -299,8 +313,23 @@
     <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
     <script src="{% static 'assets/js/event.js' %}"></script>
     <script src="{% static 'assets/js/date-time.js' %}"></script>
+    <script src="{% static 'assets/js/user_notification.js' %}"></script>
 
     <script>
+        $(document).ready(function () {
+            var slug_checker = null;
+            $('#id_name').on('keyup', function() {
+                window.clearTimeout(slug_checker);
+                slug_checker = window.setTimeout(function() {
+                    var eventName =  $('#id_name').val();
+                    $.get("{% url 'event:event-slug' %}", {name: eventName })
+                        .done(function (data) {
+                            document.getElementById('print-url').innerHTML = data;
+                        });
+                }, 300);
+            });
+        });
+
         $(document).ready(function () {
             createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
             createTimePicker();
@@ -313,22 +342,22 @@
 
         (function ($) {
             $(document).ready(function () {
-{#                {% if LANGUAGE_CODE == 'pt-br' %}#}
-{#                    $('#id_date_start_0').mask("99/99/9999");#}
-{#                    $('#id_date_start_1').mask("99:99");#}
-{#                    $('#id_date_end_0').mask("99/99/9999");#}
-{#                    $('#id_date_end_1').mask("99:99");#}
-{#                {% elif LANGUAGE_CODE == 'en' or LANGUAGE_CODE == 'en-us' %}#}
-{#                    $('#id_date_start_0').mask("99/99/9999");#}
-{#                    $('#id_date_start_1').mask("99:99");#}
-{#                    $('#id_date_end_0').mask("99/99/9999");#}
-{#                    $('#id_date_end_1').mask("99:99");#}
-{#                {% else %}#}
-{#                    $('#id_date_start_0').mask("9999-99-99");#}
-{#                    $('#id_date_start_1').mask("99:99");#}
-{#                    $('#id_date_end_0').mask("9999-99-99");#}
-{#                    $('#id_date_end_1').mask("99:99");#}
-{#                {% endif %}#}
+                {#                {% if LANGUAGE_CODE == 'pt-br' %}#}
+                {#                    $('#id_date_start_0').mask("99/99/9999");#}
+                {#                    $('#id_date_start_1').mask("99:99");#}
+                {#                    $('#id_date_end_0').mask("99/99/9999");#}
+                {#                    $('#id_date_end_1').mask("99:99");#}
+                {#                {% elif LANGUAGE_CODE == 'en' or LANGUAGE_CODE == 'en-us' %}#}
+                {#                    $('#id_date_start_0').mask("99/99/9999");#}
+                {#                    $('#id_date_start_1').mask("99:99");#}
+                {#                    $('#id_date_end_0').mask("99/99/9999");#}
+                {#                    $('#id_date_end_1').mask("99:99");#}
+                {#                {% else %}#}
+                {#                    $('#id_date_start_0').mask("9999-99-99");#}
+                {#                    $('#id_date_start_1').mask("99:99");#}
+                {#                    $('#id_date_end_0').mask("9999-99-99");#}
+                {#                    $('#id_date_end_1').mask("99:99");#}
+                {#                {% endif %}#}
 
 
                 $('.type_event').on('click', function () {
