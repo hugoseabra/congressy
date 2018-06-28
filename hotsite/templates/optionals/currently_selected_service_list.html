@@ -1,3 +1,5 @@
+{% load humanize %}
+
 <div id="currently_selected">
     {% if  object_list %}
         <label for="selected_products_table">Serviços</label>
@@ -39,7 +41,7 @@
                                         {% if service.optional.price == 0.00 %}
                                             Grátis
                                         {% else %}
-                                            R$ {{ service.optional.price }}
+                                            R$ {{ service.optional.price|intcomma }}
                                         {% endif %}
                                     </td>
 
