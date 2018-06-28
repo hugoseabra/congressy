@@ -76,7 +76,7 @@
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-right" role="menu">
                                         <li>
-                                            <a class="open-editSurvey"
+                                            <a href="javascript:void(0)" class="open-editSurvey"
                                                data-id="{{ item.event_survey.pk }}"
                                                data-title="{{ item.event_survey.survey.name }}"
                                                data-description="{{ item.event_survey.survey.description }}">
@@ -86,7 +86,7 @@
                                         </li>
 
                                         <li>
-                                            <a class="open-lotModal"
+                                            <a href="javascript:void(0)" class="open-lotModal"
                                                data-id="{{ item.event_survey.pk }}"
                                                data-title="{{ item.event_survey.survey.name }}">
                                                 <i class="fas fa-th-large"></i>
@@ -96,7 +96,7 @@
 
 
                                         <li>
-                                            <a class="open-DeleteQuestionDialog"
+                                            <a href="javascript:void(0)" class="open-DeleteQuestionDialog"
                                                data-event="{{ event.pk }}"
                                                data-survey-name="{{ item.event_survey.survey.name }}"
                                                data-survey="{{ item.event_survey.pk }}">
