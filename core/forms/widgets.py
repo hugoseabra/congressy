@@ -241,6 +241,10 @@ class SplitDateTimeBootsrapWidget(forms.MultiWidget):
         return [date, value.time().replace(microsecond=0)]
 
 
+class ColorInput(forms.TextInput):
+    input_type = 'color'
+
+
 class DateTimeInput(forms.DateTimeInput):
     input_type = 'tel'
 

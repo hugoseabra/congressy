@@ -47,11 +47,15 @@ class InfoForm(BaseModelFileForm):
         required=False,
     )
 
+    image_main = forms.CharField(
+        widget=forms.HiddenInput,
+        required=False,
+    )
+
     class Meta:
         """ Meta """
         model = Info
         fields = [
-            'image_main',
             'lead',
             'description_html',
             'scientific_rules',
@@ -85,27 +89,34 @@ class InfoForm(BaseModelFileForm):
         data = kwargs.get('data')
 
         if data:
+            # TODO: this isn't DRY. Separate this logic into a helper.
 
             possible_remove_image = data.get('remove_image')
             possible_base64 = data.get('image_main')
 
-            # Decoding from base64 avatar into a file obj.
-            if possible_base64 and possible_remove_image is '':
-                try:
-                    file_ext, imgstr = possible_base64.split(';base64,')
-                    ext = file_ext.split('/')[-1]
-                    file_name = str(event.slug) + "." + ext
-                    data._mutable = True
-                    data['image_main'] = ContentFile(
-                        base64.b64decode(imgstr),
-                        name=file_name
-                    )
-                    data._mutable = False
-                except (binascii.Error, ValueError):
-                    pass
+            if possible_remove_image and possible_remove_image == 'True':
 
-            if possible_remove_image:
+                data._mutable = True
+                del data['image_main']
+                data._mutable = False
                 event.info.image_main.delete(save=True)
+
+            else:
+
+                if possible_base64:
+                    # Decoding from base64 avatar into a file obj.
+                    try:
+                        file_ext, imgstr = possible_base64.split(';base64,')
+                        ext = file_ext.split('/')[-1]
+                        file_name = str(event.slug) + "." + ext
+                        data._mutable = True
+                        data['image_main'] = ContentFile(
+                            base64.b64decode(imgstr),
+                            name=file_name
+                        )
+                        data._mutable = False
+                    except (binascii.Error, ValueError):
+                        pass
 
         super().__init__(**kwargs)
 
@@ -129,6 +140,9 @@ class InfoForm(BaseModelFileForm):
 
     def save(self, commit=True):
         self.instance.event = self.event
+        image_main = self.data.get('image_main')
+        if isinstance(image_main, ContentFile):
+            self.instance.image_main = image_main
         return super().save(commit)
 
 

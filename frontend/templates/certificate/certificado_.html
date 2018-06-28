@@ -118,12 +118,13 @@
                 <div style="
                         position: absolute;
                         text-align: justify;
+                        color: {{ object.font_color }};
                         transform: translate({{ object.title_position_x }}px, {{ object.title_position_y }}px);
                         {% if object.title_hide %}display: none;{% endif %}
                         " id="cert-title">{{ object.title_content }}</div>
 
                 {% if object.is_ready and object.event_has_any_type_of_location %}
-                    <div style="position:absolute;
+                    <div style="position:absolute;color: {{ object.font_color }};
                             {% if object.date_hide %}
                                 display: none;
                             {% endif %}
@@ -140,6 +141,7 @@
                 {% endif %}
                 <div style="
                         position:absolute;
+                        color: {{ object.font_color }};
                         {% if object.text_center %}
                             text-align:center;
                         {% else %}
@@ -366,6 +368,13 @@
 
                         {% csrf_token %}
                         {% render_generic_field form.background_image required=True %}
+                        {% render_generic_field form.font_color required=True %}
+                        <small class="text-muted">
+                            Core da font do seu certificado em forma
+                            hexadecimal. (#ff7373) Veja mais <a
+                                href="http://www1.color-hex.com/"
+                                target="_blank"> Exemplos </a>
+                        </small>
                         {% render_switchery_field form.only_attending_participantes required=True %}
                         <small class="text-muted">
                             Independente da presença confirmada ou não,
@@ -467,20 +476,24 @@
                         </thead>
                         <tbody>
                         <tr>
-                            <td><input class="js-switch" type="checkbox"
+                            <td>
+                                <input class="js-switch" type="checkbox"
                                        {% if object.title_hide %}checked{% endif %}
                                        id="titleCheckBox"
-                                       name="titleCheckBox"></td>
+                                       name="titleCheckBox">
+                            </td>
                             <td>
                                 <label for="titleCheckBox">
                                     Esconder título
                                 </label></td>
                         </tr>
                         <tr>
-                            <td><input type="checkbox" class="js-switch"
+                            <td>
+                                <input type="checkbox" class="js-switch"
                                        {% if object.date_hide %}checked{% endif %}
                                        id="dateCheckBox"
-                                       name="dateCheckBox"></td>
+                                       name="dateCheckBox">
+                            </td>
                             <td>
                                 <label for="dateCheckBox">
                                     Esconder data
@@ -488,11 +501,11 @@
                         </tr>
                         <tr>
                             <td>
-                                <input class="js-switch" type="checkbox" id='centralizar'
-                                       name="centralizar"></td>
-                            <td><label for="centralizar">
-                                Centralizar texto
-                            </label></td>
+                                <input class="js-switch" type="checkbox" id='centralizar' name="centralizar" {% if object.text_center %}checked{% endif %}>
+                            </td>
+                            <td>
+                                <label for="centralizar">Centralizar texto</label>
+                            </td>
                         </tr>
 
                         </tbody>

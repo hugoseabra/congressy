@@ -564,9 +564,6 @@
                 changed_data['lots'][$(obj).data('lot-id')] = obj.checked;
             });
 
-            console.log(changed_data);
-
-
             $.ajax({
                 type: "POST",
                 url: '{% url 'subscription:survey-ajax-lots' event.pk%}',
@@ -613,15 +610,13 @@
                                 aria-hidden="true">&times;</span>
                         </button>
                         <h4 class="modal-title">
-                            Novo formulário</h4>
+                            Novo formulário
+                        </h4>
                     </div>
 
-                    <form id="createSurveyForm" onsubmit="createEventSurvey(this);
-                return false;">
-
-                        {% csrf_token %}
-
-                        <div class="modal-body">
+                    <form id="createSurveyForm" onsubmit="createEventSurvey(this);return false;">
+                        <div class="modal-body" style="padding: 20px">
+                            {% csrf_token %}
                             {% render_generic_field survey_list_form.name autofocus=True %}
                             {% render_generic_field survey_list_form.description %}
                         </div>
@@ -638,8 +633,6 @@
                                 Salvar
                             </button>
                         </div>
-
-
                     </form>
 
                 </div>
