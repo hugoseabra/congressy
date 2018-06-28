@@ -253,8 +253,6 @@ class ProfileForm(forms.ModelForm):
         fields = [
             'name',
             'email',
-            'new_password1',
-            'new_password2',
             'gender',
             'birth_date',
             'zip_code',
