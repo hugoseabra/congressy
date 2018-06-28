@@ -43,25 +43,31 @@ class OptionManager(Manager):
 
     def _create_slug(self):
         """
-        Slugify deve garantir que o nome de Question em um survey seja único.
+            Slugify deve garantir que o nome de Option em uma Question seja
+            único.
         """
         name = self.cleaned_data.get('name')
         question = self.cleaned_data.get('question')
 
         original_slug = slugify(name)
-        exists = True
 
         slug = original_slug
-        counter = 1
 
-        while exists:
-            query_set = Option.objects.filter(
-                name=slug,
-                question=question
-            )
-            exists = query_set.exists()
-            if exists:
-                slug = original_slug + '-' + str(counter)
-                counter += 1
+        existing_options = Option.objects.filter(
+            question=question
+        )
+
+        if existing_options.count() >= 1:
+            counter = 1
+            for option in existing_options:
+
+                query_set = Option.objects.filter(
+                    value=option.value,
+                    question=question
+                )
+
+                if query_set.exists():
+                    slug = original_slug + '-' + str(counter)
+                    counter += 1
 
         return slug
