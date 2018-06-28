@@ -13,8 +13,6 @@ from core.forms.widgets import (
 from core.util import create_years_list
 from gatheros_event.models import Occupation, Person
 from gatheros_event.locale.phone_choices import get_country_phone_code
-from core.forms.widgets import DateInputBootstrap
-
 
 
 # class InternationalTelephoneInput(forms.MultiWidget):
@@ -107,7 +105,9 @@ class PersonForm(forms.ModelForm):
 
         widgets = {
             # CPF como telefone para aparecer como número no mobile
-            'cpf': TelephoneInput,
+            'cpf': TelephoneInput(
+                attrs={'placeholder': '999.999.999-99'}
+            ),
             'name': forms.TextInput(attrs={'placeholder': 'Nome completo'}),
             'email': forms.EmailInput(attrs={
                 'placeholder': 'me@you.com',
@@ -116,8 +116,13 @@ class PersonForm(forms.ModelForm):
             'phone': TelephoneInput,
             'zip_code': TelephoneInput,
             'city': forms.HiddenInput(),
-            'birth_date': DateInputBootstrap,
-
+            'birth_date': forms.SelectDateWidget(
+                attrs=({'style': 'width: 30%; display: inline-block;'}),
+                years=create_years_list(),
+            ),
+            'institution_cnpj': forms.TextInput(
+                attrs={'placeholder': '99.999.999/0001-99'}
+            ),
         }
 
     def __init__(self, is_chrome=False, **kwargs):
@@ -142,7 +147,6 @@ class PersonForm(forms.ModelForm):
 
         if is_chrome:
             self.fields['birth_date'].widget = DateInput()
-
 
     def setAsRequired(self, field_name):
         if field_name not in self.fields:
