@@ -81,7 +81,7 @@ class SurveyField(object):
         if self.type == self.FIELD_INPUT_TEXT:
             self.django_field = fields.CharField(
                 max_length=self.max_length,
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,

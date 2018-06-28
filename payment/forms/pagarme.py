@@ -114,8 +114,8 @@ class PagarMeCheckoutForm(forms.Form):
 
                 address_fields = (
                     'street',
-                    'complement',
-                    'number',
+                    # 'complement',
+                    # 'number',
                     'village',
                     'zip_code',
                 )
@@ -130,8 +130,8 @@ class PagarMeCheckoutForm(forms.Form):
 
                 address_fields = (
                     'street',
-                    'complement',
-                    'number',
+                    # 'complement',
+                    # 'number',
                     'village',
                     'city_international',
                     'state_international',

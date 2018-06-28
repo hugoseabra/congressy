@@ -26,11 +26,15 @@ class OrganizationForm(forms.ModelForm):
         required=False,
     )
 
+    avatar = forms.CharField(
+        widget=forms.HiddenInput,
+        required=False,
+    )
+
     class Meta:
         model = Organization
 
         fields = (
-            'avatar',
             'name',
             'phone',
             'email',
@@ -71,29 +75,39 @@ class OrganizationForm(forms.ModelForm):
             })
 
         if data:
+            # TODO: this isn't DRY. Separate this logic into a helper.
 
-            possible_base64 = data.get('avatar')
             possible_remove_image = data.get('remove_image')
+            possible_base64 = data.get('avatar')
 
-            # Decoding from base64 avatar into a file obj.
-            if possible_base64:
-                try:
-                    file_ext, imgstr = possible_base64.split(';base64,')
-                    ext = file_ext.split('/')[-1]
-                    file_name = str(user.person.pk) + "." + ext
-                    data._mutable = True
-                    data['avatar'] = ContentFile(
-                        base64.b64decode(imgstr),
-                        name=file_name
-                    )
-                    data._mutable = False
-                except (binascii.Error, ValueError):
-                    pass
+            if possible_remove_image \
+                    and possible_remove_image == 'True' \
+                    and instance is not None:
 
-            if possible_remove_image and instance is not None:
+                data._mutable = True
+                del data['avatar']
+                data._mutable = False
                 instance.avatar.delete(save=True)
 
+            else:
+
+                if possible_base64:
+                    # Decoding from base64 avatar into a file obj.
+                    try:
+                        file_ext, imgstr = possible_base64.split(';base64,')
+                        ext = file_ext.split('/')[-1]
+                        file_name = str(user.person.pk) + "." + ext
+                        data._mutable = True
+                        data['avatar'] = ContentFile(
+                            base64.b64decode(imgstr),
+                            name=file_name
+                        )
+                        data._mutable = False
+                    except (binascii.Error, ValueError):
+                        pass
+
         super(OrganizationForm, self).__init__(data=data, *args, **kwargs)
+        self.fields['avatar'].required = False
 
         extra_required_fields = [
             'phone',
@@ -108,6 +122,10 @@ class OrganizationForm(forms.ModelForm):
         # noinspection PyProtectedMember
         is_new = self.instance._state.adding
         self.instance.internal = self.internal
+
+        avatar = self.data.get('avatar')
+        if isinstance(avatar, ContentFile):
+            self.instance.avatar = avatar
 
         if is_new:
             self.instance.active = True

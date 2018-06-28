@@ -190,6 +190,14 @@ class Certificate(models.Model):
         verbose_name='apenas para presentes(check-in)',
     )
 
+    font_color = models.CharField(
+        max_length=20,
+        verbose_name='cor da fonte',
+        null=True,
+        blank=True,
+        default='#565656'
+    )
+
     def __str__(self):
         return '{}'.format(self.event)
 

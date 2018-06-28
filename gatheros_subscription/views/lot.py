@@ -55,7 +55,7 @@ class BaseLotView(AccountMixin, View):
             if lot.price is None:
                 continue
 
-            if lot.price > 0:
+            if lot.price and lot.price > 0:
                 return True
 
         return False
@@ -386,11 +386,13 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
 
     def _lot_has_optionals(self):
         lot_category = self.object.category
-        products = lot_category.product_optionals.all().count()
-        services = lot_category.service_optionals.all().count()
 
-        if services > 0 or products > 0:
-            return True
+        if lot_category is not None:
+            products = lot_category.product_optionals.all().count()
+            services = lot_category.service_optionals.all().count()
+
+            if services > 0 or products > 0:
+                return True
 
         return False
 
