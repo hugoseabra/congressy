@@ -242,7 +242,10 @@ class ProfileForm(forms.ModelForm):
     cpf = BRCPFField(required=False, label="CPF")
 
     remove_image = forms.CharField(
-        max_length=10,
+        widget=forms.HiddenInput,
+        required=False,
+    )
+    avatar = forms.CharField(
         widget=forms.HiddenInput,
         required=False,
     )
@@ -253,8 +256,6 @@ class ProfileForm(forms.ModelForm):
         fields = [
             'name',
             'email',
-            'new_password1',
-            'new_password2',
             'gender',
             'birth_date',
             'zip_code',
@@ -268,7 +269,6 @@ class ProfileForm(forms.ModelForm):
             'institution',
             'institution_cnpj',
             'function',
-            'avatar',
         ]
 
         widgets = {
@@ -378,11 +378,11 @@ class ProfileForm(forms.ModelForm):
             return clear_string(cpf)
         return cpf
 
-    def clean_phone(self):
-        phone = self.cleaned_data.get('phone')
-        if phone:
-            phone = phone_cleaner('+55{}'.format(phone))
-        return phone
+    # def clean_phone(self):
+    #     phone = self.cleaned_data.get('phone')
+    #     if phone:
+    #         phone = phone_cleaner('+55{}'.format(phone))
+    #     return phone
 
     def save(self, **_):
         """ Salva dados. """
@@ -392,6 +392,10 @@ class ProfileForm(forms.ModelForm):
         if self.cleaned_data["new_password1"]:
             self.user.set_password(self.cleaned_data["new_password1"])
         self.user.save()
+
+        avatar = self.data.get('avatar')
+        if isinstance(avatar, ContentFile):
+            self.instance.avatar = avatar
 
         self.instance.user = self.user
         self.instance.save()

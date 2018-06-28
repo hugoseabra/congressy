@@ -26,11 +26,15 @@ class OrganizationForm(forms.ModelForm):
         required=False,
     )
 
+    avatar = forms.CharField(
+        widget=forms.HiddenInput,
+        required=False,
+    )
+
     class Meta:
         model = Organization
 
         fields = (
-            'avatar',
             'name',
             'phone',
             'email',
@@ -118,6 +122,10 @@ class OrganizationForm(forms.ModelForm):
         # noinspection PyProtectedMember
         is_new = self.instance._state.adding
         self.instance.internal = self.internal
+
+        avatar = self.data.get('avatar')
+        if isinstance(avatar, ContentFile):
+            self.instance.avatar = avatar
 
         if is_new:
             self.instance.active = True
