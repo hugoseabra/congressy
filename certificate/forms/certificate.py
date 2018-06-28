@@ -2,6 +2,7 @@ from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 
 from certificate.models import Certificate
+from core.forms.widgets import ColorInput
 from gatheros_event.models import Event
 
 
@@ -20,7 +21,8 @@ class CertificatePartialForm(forms.ModelForm):
         ]
 
         widgets = {
-            'event': forms.HiddenInput()
+            'event': forms.HiddenInput(),
+            'font_color': ColorInput(),
         }
 
         help_texts = {
@@ -72,11 +74,11 @@ class CertificatePartialForm(forms.ModelForm):
     def clean_text_content(self):
         text_content = self.cleaned_data['text_content']
         text_content = text_content.strip()
-        text_content = text_content\
-            .replace('\r\n', ' ')\
-            .replace('\r', ' ')\
-            .replace('\n', ' ')\
-            .replace('{{ ', '{{')\
+        text_content = text_content \
+            .replace('\r\n', ' ') \
+            .replace('\r', ' ') \
+            .replace('\n', ' ') \
+            .replace('{{ ', '{{') \
             .replace(' }}', '}}')
 
         return text_content

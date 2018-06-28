@@ -476,20 +476,24 @@
                         </thead>
                         <tbody>
                         <tr>
-                            <td><input class="js-switch" type="checkbox"
+                            <td>
+                                <input class="js-switch" type="checkbox"
                                        {% if object.title_hide %}checked{% endif %}
                                        id="titleCheckBox"
-                                       name="titleCheckBox"></td>
+                                       name="titleCheckBox">
+                            </td>
                             <td>
                                 <label for="titleCheckBox">
                                     Esconder título
                                 </label></td>
                         </tr>
                         <tr>
-                            <td><input type="checkbox" class="js-switch"
+                            <td>
+                                <input type="checkbox" class="js-switch"
                                        {% if object.date_hide %}checked{% endif %}
                                        id="dateCheckBox"
-                                       name="dateCheckBox"></td>
+                                       name="dateCheckBox">
+                            </td>
                             <td>
                                 <label for="dateCheckBox">
                                     Esconder data
@@ -497,11 +501,11 @@
                         </tr>
                         <tr>
                             <td>
-                                <input class="js-switch" type="checkbox" id='centralizar'
-                                       name="centralizar"></td>
-                            <td><label for="centralizar">
-                                Centralizar texto
-                            </label></td>
+                                <input class="js-switch" type="checkbox" id='centralizar' name="centralizar" {% if object.text_center %}checked{% endif %}>
+                            </td>
+                            <td>
+                                <label for="centralizar">Centralizar texto</label>
+                            </td>
                         </tr>
 
                         </tbody>
