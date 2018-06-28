@@ -38,7 +38,7 @@ function createDateStartDateEnd(path_start, path_end) {
     var date_end = createDatePicker(path_end);
 
     var date_start = createDatePicker(path_start).on('dp.change', function (e) {
-        date_end.data("DateTimePicker").minDate(e.date);
+        date_end.date("DateTimePicker").minDate(e.date);
     });
 
     return date_start

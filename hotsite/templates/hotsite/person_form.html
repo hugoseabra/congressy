@@ -67,6 +67,7 @@
                                 <div class="panel-heading">
                                     <div class="panel-title">
                                         Dados pessoais
+                                        {{ person.birth_date }}
                                     </div>
                                 </div>
                                 <div class="panel-body">
@@ -279,15 +280,29 @@
 {% block styles %}
     <link rel="stylesheet"
           href="https://unpkg.com/vue-form-wizard/dist/vue-form-wizard.min.css">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
 {% endblock %}
 
 {% block scripts %}
 
     <!-- SCRIPT Subscription -->
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
+    <script src="{% static "assets/plugins/moment/moment.js" %}"></script>
+
+    <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
+
     <script src="{% static 'assets/js/date-time.js' %}"></script>
 
     <script>
+    $(document).ready(function () {
+        var birthDate = createDatePicker();
+        var date = $('#id_person-birth_date').attr('value');
+        birthDate.data("DateTimePicker").minDate(false);
+        birthDate.data("DateTimePicker").useCurrent(false);
+        birthDate.data("DateTimePicker").date(date);
+    });
+
         function set_form_as_international() {
             console.log('settin form as international.');
 

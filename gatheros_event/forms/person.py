@@ -13,7 +13,7 @@ from core.forms.widgets import (
 from core.util import create_years_list
 from gatheros_event.models import Occupation, Person
 from gatheros_event.locale.phone_choices import get_country_phone_code
-from core.forms.widgets import SplitDateTimeBootsrapWidget
+from core.forms.widgets import DateInputBootstrap
 
 
 
@@ -116,7 +116,7 @@ class PersonForm(forms.ModelForm):
             'phone': TelephoneInput,
             'zip_code': TelephoneInput,
             'city': forms.HiddenInput(),
-            'birth_date': SplitDateTimeBootsrapWidget,
+            'birth_date': DateInputBootstrap,
 
         }
 
@@ -142,6 +142,7 @@ class PersonForm(forms.ModelForm):
 
         if is_chrome:
             self.fields['birth_date'].widget = DateInput()
+
 
     def setAsRequired(self, field_name):
         if field_name not in self.fields:
