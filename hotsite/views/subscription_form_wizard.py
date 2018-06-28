@@ -775,7 +775,7 @@ class SubscriptionWizardView(SessionWizardView):
 
     def get_exhibition_code_lot(self, code):
         if code:
-            for lot in self.event.lots.filter(private=True):
+            for lot in self.event.lots.filter(private=True, active=True):
                 running = lot.status == lot.LOT_STATUS_RUNNING
                 lot_code = lot.exhibition_code
                 if lot_code and lot_code.upper() == code.upper() and running:
