@@ -3463,7 +3463,7 @@ label.valid {
 .theme-cgsy-full .sidebar-section {
   width: 20%;
   position: relative;
-  z-index: 10000;
+  z-index: 1000;
 }
 .theme-cgsy-full .sidebar-section .navbar-collapse {
   padding-left: 0;
