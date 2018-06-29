@@ -38,7 +38,7 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
         self.person = self.get_person()
 
         # Se  não há lotes pagos, não há o que fazer aqui.
-        if not self.has_paid_lots():
+        if not self.has_paid_lots() and not self.has_paid_optionals():
             return redirect('public:hotsite', slug=self.event.slug)
 
         try:
@@ -72,6 +72,29 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
             return redirect('public:hotsite', slug=self.event.slug)
 
         return super().dispatch(request, *args, **kwargs)
+
+    def has_paid_optionals(self):
+        """ Retorna se evento possui algum lote pago. """
+
+        try:
+            sub = Subscription.objects.get(
+                person=self.person,
+                event=self.event,
+                completed=True,
+            )
+
+            has_products = sub.subscription_products.filter(
+                optional_price__gt=0
+            ).count() > 0
+
+            has_services = sub.subscription_services.filter(
+                optional_price__gt=0
+            ).count() > 0
+
+            return has_products is True or has_services is True
+
+        except Subscription.DoesNotExist:
+            return False
 
     def get_context_data(self, **kwargs):
 

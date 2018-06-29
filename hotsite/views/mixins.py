@@ -263,6 +263,33 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
 
         return False
 
+    def has_paid_optionals(self):
+        """ Retorna se evento possui algum lote pago. """
+
+        person = self.get_person()
+        if not person:
+            return False
+
+        try:
+            sub = Subscription.objects.get(
+                person=person,
+                event=self.event,
+                completed=True,
+            )
+
+            has_products = sub.subscription_products.filter(
+                optional_price__gt=0
+            ).count() > 0
+
+            has_services = sub.subscription_services.filter(
+                optional_price__gt=0
+            ).count() > 0
+
+            return has_products is True or has_services is True
+
+        except Subscription.DoesNotExist:
+            return False
+
     def subscriber_has_account(self, email):
         if self.request.user.is_authenticated:
             return True

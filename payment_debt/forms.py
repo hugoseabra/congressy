@@ -41,11 +41,11 @@ class DebtForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        if self.subscription.free is True:
-            raise forms.ValidationError(
-                'Pagamentos não podem ser processados para inscrições'
-                ' gratuitas.'
-            )
+        # if self.subscription.free is True:
+        #     raise forms.ValidationError(
+        #         'Pagamentos não podem ser processados para inscrições'
+        #         ' gratuitas.'
+        #     )
 
         # Calcula valor líquido.
         debt_type = cleaned_data.get('type', Debt.DEBT_TYPE_SUBSCRIPTION)

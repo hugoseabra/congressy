@@ -1,3 +1,5 @@
+{% load l10n %}
+
 {% if  object_list %}
     <label for="services_table">Serviços</label>
 
@@ -38,7 +40,7 @@
                                     {% if service.optional.price == 0.00 %}
                                         Grátis
                                     {% else %}
-                                        R$ {{ service.optional.price }}
+                                        R$ {{ service.optional.price|intcomma }}
                                     {% endif %}
                                 </td>
                                 {% if service.available %}

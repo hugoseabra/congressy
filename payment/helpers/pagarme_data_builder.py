@@ -216,7 +216,7 @@ class PagarmeDataBuilder:
 
         if self.debt_amount > amount:
             raise TransactionDataError(
-                'Valor de transações de pendências inseridas ultrapassagem'
+                'Valor de transações de pendências inseridas ultrapassa'
                 ' o montante principal a ser transacionado.'
             )
 

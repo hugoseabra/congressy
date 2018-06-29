@@ -12,6 +12,9 @@ from .lot import (
     LotListView,
     LotSurveyView,
 )
+from .lot_api import (
+    LotChangeSurveyAPIView,
+)
 from .payment import PaymentDeleteView
 from .subscription import (
     MySubscriptionsListView,

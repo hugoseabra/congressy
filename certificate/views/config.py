@@ -62,6 +62,8 @@ class CertificateConfigView(EventViewMixin, generic.TemplateView):
         context['active'] = 'certificate'
         context['premium_template_image'] = encoded_premium
         context['object'] = ref_object
+        context['has_city'] = self.object.event_has_city
+        context['has_event_location'] = self.object.event_has_location
 
         context['form'] = forms.CertificatePartialForm(instance=self.object)
         return context

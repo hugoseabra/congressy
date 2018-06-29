@@ -30,10 +30,10 @@ from survey.directors import SurveyDirector
 FORMS = [
     ("private_lot", forms.PrivateLotForm),
     ("lot", forms.LotsForm),
-    ("person", forms.SubscriptionPersonForm),
-    ("survey", forms.SurveyForm),
     ("service", forms.ServiceForm),
     ("product", forms.ProductForm),
+    ("person", forms.SubscriptionPersonForm),
+    ("survey", forms.SurveyForm),
     ("payment", forms.PaymentForm)
 ]
 
@@ -83,16 +83,12 @@ def is_paid_lot(wizard):
     return False
 
 
-def can_process_payment(wizard):
-    """ Verifica se pagamento pode ser processado no wizard. """
+def has_pending_payment(wizard):
     subscription = wizard.get_subscription()
 
-    if is_paid_lot(wizard) is False:
-        return False
-
-    if wizard.storage.current_step == "payment":
-        return True
-
+    ##########################################################################
+    # Verifica se já existe pagamentos aguardando serem processados.
+    ##########################################################################
     has_boleto_waiting = False
     has_card_waiting = False
     for transaction in subscription.transactions.all():
@@ -109,9 +105,55 @@ def can_process_payment(wizard):
         if transaction.status == Transaction.PROCESSING and is_cc:
             has_card_waiting = True
 
-    deny_payment = has_card_waiting is True and has_boleto_waiting is True
+    return has_card_waiting is True or has_boleto_waiting is True
 
-    return deny_payment is False
+
+def can_process_payment(wizard):
+    """ Verifica se pagamento pode ser processado no wizard. """
+    if wizard.storage.current_step == "payment":
+        return True
+
+    subscription = wizard.get_subscription()
+
+    ##########################################################################
+    # Verifica se existe inscrições e existe necessidade de processamento
+    # de pagamento.
+    ##########################################################################
+    is_selected_paid_lot = is_paid_lot(wizard)
+
+    if is_selected_paid_lot is False:
+        # Se é de um lote gratuito:
+        ev_has_paid_products = has_paid_products(wizard)
+        ev_has_paid_services = has_paid_services(wizard)
+
+        if ev_has_paid_services is False and ev_has_paid_products is False:
+            # Para eventos gratuitos que não possuem atividades extras ou
+            # opcionais pagos, não processar pagamento.
+            return False
+
+        # Verificando se inscrição possui vínculo com alguma das atividades
+        # extras e/ou opcionais.
+        num_paid_products = subscription.subscription_products.filter(
+            optional_price__gt=0
+        ).count()
+        num_paid_services = subscription.subscription_services.filter(
+            optional_price__gt=0
+        ).count()
+
+        if num_paid_products == 0 and num_paid_services == 0:
+            # Se a inscrição não possui vinculo com atividades  extras e
+            # opcionais pagos.
+            return False
+
+    # Se o lote selecionado é pago, independente das atividades extras e/ou
+    # opcionais, o pagamento poderá ser processado.
+
+    if has_pending_payment(wizard):
+        # Porém, se inscrição já possui pagamento pendente.
+        return False
+
+    # Tudo certo, vamos processar o pagamento.
+    return True
 
 
 def has_survey(wizard):
@@ -203,6 +245,72 @@ def has_services(wizard):
 
     except AttributeError:
         return False
+
+
+def has_paid_products(wizard):
+    # Get cleaned data from lots step
+    cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
+    if not cleaned_data:
+        cleaned_data = wizard.get_cleaned_data_for_step('lot')
+
+    # Return true if lot has price and price > 0
+    if not cleaned_data:
+        return False
+
+    lot = cleaned_data['lots']
+    if not lot:
+        return False
+
+    if not isinstance(lot, Lot):
+        try:
+            lot = Lot.objects.get(pk=lot)
+
+        except Lot.DoesNotExist:
+            return False
+
+    try:
+        optionals = lot.category.product_optionals
+        for optional in optionals.all():
+            if optional.price and optional.price > 0:
+                return True
+
+    except AttributeError:
+        return False
+
+    return False
+
+
+def has_paid_services(wizard):
+    # Get cleaned data from lots step
+    cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
+    if not cleaned_data:
+        cleaned_data = wizard.get_cleaned_data_for_step('lot')
+
+    # Return true if lot has price and price > 0
+    if not cleaned_data:
+        return False
+
+    lot = cleaned_data['lots']
+    if not lot:
+        return False
+
+    if not isinstance(lot, Lot):
+        try:
+            lot = Lot.objects.get(pk=lot)
+
+        except Lot.DoesNotExist:
+            return False
+
+    try:
+        optionals = lot.category.service_optionals
+        for optional in optionals.all():
+            if optional.price and optional.price > 0:
+                return True
+
+    except AttributeError:
+        return False
+
+    return False
 
 
 class SubscriptionWizardView(SessionWizardView):
@@ -614,9 +722,19 @@ class SubscriptionWizardView(SessionWizardView):
                 subscription.save()
                 transactions_qs = self.subscription.transactions
 
+                has_paid_products = subscription.subscription_products.filter(
+                    optional_price__gt=0
+                ).count() > 0
+                has_paid_services = subscription.subscription_services.filter(
+                    optional_price__gt=0
+                ).count() > 0
+
+                has_paid_optionals = has_paid_products or has_paid_services
+                is_free = has_paid_optionals is False and subscription.free
+
                 new_account = self.request.user.last_login is None
 
-                if subscription.free is True:
+                if is_free:
                     subscription.status = Subscription.CONFIRMED_STATUS
                     subscription.save()
 
@@ -775,7 +893,7 @@ class SubscriptionWizardView(SessionWizardView):
 
     def get_exhibition_code_lot(self, code):
         if code:
-            for lot in self.event.lots.filter(private=True):
+            for lot in self.event.lots.filter(private=True, active=True):
                 running = lot.status == lot.LOT_STATUS_RUNNING
                 lot_code = lot.exhibition_code
                 if lot_code and lot_code.upper() == code.upper() and running:

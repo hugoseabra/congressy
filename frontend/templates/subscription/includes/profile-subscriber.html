@@ -1,5 +1,6 @@
-{% load static humanize %}
+{% load static humanize subscription_tags %}
 {% now "Y-m-d" as today %}
+{% is_subscription_free object as is_free %}
 
 <div class="row tooltip-wrapper">
     <div class="col-xl-11 col-lg-11 col-md-12">
@@ -85,8 +86,7 @@
                             <td class="message"
                                 style="cursor: default;border-top:0">
                                 <span class="title">Presente</span>
-                                {% if object.attended %}Sim{% else %}
-                                    Não{% endif %}
+                                {% if object.attended %}Sim{% else %}Não{% endif %}
                                 {#                                        Sim <small class="text-muted">- 27/05/2018 17h03</small>#}
                             </td>
                         </tr>
@@ -133,7 +133,7 @@
             </div>
         </div>
     </div>
-    {% if not object.free and last_transaction %}
+    {% if is_free is False and last_transaction %}
     <div class="col-xl-5 col-lg-5 col-md-6">
         <div class="panel">
             <div class="panel-body" style="padding:0">
@@ -292,7 +292,7 @@
                                     {% else %}
                                         <span class="title">Valor inscrição</span>
                                         <strong class="text-danger">
-                                            R$ {{ object.lot.get_calculated_price|intcomma }}
+                                            R$ {{ last_transaction.amount|intcomma }}
                                         </strong>
                                     {% endif %}
                                 </div>
@@ -315,7 +315,7 @@
             </div>
         </div>
     </div>
-    {% elif new_boleto_allowed and not object.free and not last_transaction %}
+    {% elif new_boleto_allowed and is_free is False and not last_transaction %}
     <div class="col-xl-5 col-lg-5 col-md-6">
         <div class="panel">
             <div class="panel-body" style="padding:0">
@@ -422,12 +422,12 @@
                                        title="Participante sem dívidas."
                                     ></i>
                                 {% endif %}
-                            {% elif object.free is False %}
+                            {% elif is_free is False %}
                                 <i class="fas fa-exclamation-triangle text-warning animated shake" style="margin-left:20px"
                                    data-toggle="tooltip"
                                    title="Participante com dívidas."
                                 ></i>
-                            {% elif object.free is True %}
+                            {% elif is_free is True %}
                                 <i class="fas fa-check text-success" style="margin-left:20px"
                                    data-toggle="tooltip"
                                    title="Participante sem dívidas."
@@ -495,7 +495,7 @@
                     <div class="row" style="padding-left:16px;">
                         <div class="connect social">
                             <ul>
-                                {% if not object.free %}
+                                {% if is_free is False %}
                                 <li>
                                     <button type="button"
                                             class="btn btn-info btn-trans"

@@ -39,10 +39,10 @@ class PaymentReportCalculator(object):
                 'subscription__created'):
 
             lot = trans.lot
-            if not lot.price or not trans.amount:
-                continue
+            # if not lot.price and not trans.amount:
+            #     continue
 
-            price = lot.get_calculated_price()
+            price = trans.amount
 
             self.lots[lot.pk] = lot
             # Calculo reverso para refletir o fluxo de caixa:
@@ -67,9 +67,8 @@ class PaymentReportCalculator(object):
     def _fetch_transactions(self):
         transactions = {}
         for pk, lot in self.lots.items():
-            if not lot.price:
-                continue
-
+            # if not lot.price:
+            #     continue
             transactions[lot.pk] = []
 
         queryset = self.queryset.order_by(
