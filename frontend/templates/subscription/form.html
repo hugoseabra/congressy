@@ -32,10 +32,12 @@
 
         $(document).ready(function () {
             var birthDate = createDatePicker();
-            var date = $('#id_person-birth_date').attr('value');
-            birthDate.data("DateTimePicker").minDate(false);
-            birthDate.data("DateTimePicker").useCurrent(false);
-            birthDate.data("DateTimePicker").date(date);
+            if (birthDate) {
+                var date = $('#id_person-birth_date').attr('value');
+                birthDate.data("DateTimePicker").minDate(false);
+                birthDate.data("DateTimePicker").useCurrent(false);
+                birthDate.data("DateTimePicker").date(date);
+            }
         });
         $(document).ready(function () {
             $('#id_person-phone').mask("(99) 99999-9999");

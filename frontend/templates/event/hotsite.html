@@ -12,7 +12,8 @@
 
 {% block styles %}
 
-    <link href="{% static "assets/plugins/croppie/croppie.css" %}" rel="stylesheet">
+    <link href="{% static "assets/plugins/croppie/croppie.css" %}"
+          rel="stylesheet">
 
     <style>
         .event-info-status-item {
@@ -71,13 +72,14 @@
             src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
-        <script src="{% static 'assets/js/user_notification.js' %}"></script>
+    <script src="{% static 'assets/js/user_notification.js' %}"></script>
 
     <script>
         $(document).ready(function () {
 
-            if(! $('#id_show_location').is(':checked')) {
+            if (!$('#id_show_location').is(':checked')) {
                 $('#map-block').hide();
+                $('#address').hide();
                 $('#place-form-block').removeClass('col-md-6');
                 $('#place-form-block').addClass('col-md-12');
             }
@@ -85,6 +87,7 @@
 
             $('.switchery').on('click', function () {
                 $('#map-block').toggle();
+                $('#address').toggle();
                 $('#place-form-block').toggleClass('col-md-6');
                 $('#place-form-block').toggleClass('col-md-12');
             })
@@ -730,6 +733,7 @@
                                         {% render_switchery_field form.show_location %}
                                     </div>
                                 </div>
+                                <div id="address">
                                 <div class="row name-row">
                                     <div class="col-md-12 col-lg-8 col-xl-9">
                                         {% render_generic_field form.name help_text='Pesquise pelo nome do local.' %}
@@ -794,6 +798,7 @@
                                     do Google.
                                 </div>
                             </div>
+                                </div>
                             <div class="col-md-6" id="map-block">
                                 <div id="map-loader"
                                      class="fas info-color fa-2x fa-circle-notch fa-spin"
@@ -865,7 +870,8 @@
                     margin-bottom: 5px">
 
                                 <button class="btn btn-md btn-info"
-                                        onclick="askForFile();" id="edit_btn" type="button">
+                                        onclick="askForFile();" id="edit_btn"
+                                        type="button">
                                     <i class="fas fa-exchange-alt"></i>
                                     Trocar
                                 </button>
@@ -879,7 +885,8 @@
                                 </button>
 
 
-                                <button type="button" class="btn btn-md  btn-danger banner-remove"
+                                <button type="button"
+                                        class="btn btn-md  btn-danger banner-remove"
                                         data-dismiss="modal">
                                     <i class="fas fa-trash"></i>
                                     Deletar
@@ -895,7 +902,8 @@
 
 
                     <div class="pull-right">
-                        <button type="button" class="btn btn-md btn-success banner-save"
+                        <button type="button"
+                                class="btn btn-md btn-success banner-save"
                                 data-dismiss="modal"
                                 onclick="submitImage()"
                                 id="edit_banner_modal_btn">
