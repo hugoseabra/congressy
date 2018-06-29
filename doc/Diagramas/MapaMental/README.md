@@ -1,0 +1,1 @@
+Software utilizado: FreeMind v1.0.0 Beta 2
