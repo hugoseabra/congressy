@@ -259,10 +259,13 @@ class Certificate(models.Model):
     @property
     def is_ready(self):
 
+        if not self.background_image:
+            return False
+
         if not hasattr(self.background_image, 'default'):
             return False
 
-        if not self.background_image.file.readable():
+        if not self.background_image.default.readable():
             return False
 
         return True
