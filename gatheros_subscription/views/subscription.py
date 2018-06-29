@@ -376,7 +376,16 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         response = super().dispatch(request, *args, **kwargs)
 
         if self.financial is True:
-            if self.object.free:
+            has_paid_products = self.object.subscription_products.filter(
+                optional_price__gt=0
+            ).count() > 0
+            has_paid_services = self.object.subscription_services.filter(
+                optional_price__gt=0
+            ).count() > 0
+
+            if not has_paid_products \
+                    and not has_paid_products \
+                    and self.object.free:
                 messages.warning(
                     request,
                     'Este evento não possui relatório financeiro.'
@@ -897,6 +906,7 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
     event = None
     person = None
     lot = None
+    place = None
     show_content_in_browser = True
     permission_denied_url = reverse_lazy('front:start')
 
@@ -960,6 +970,7 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
         self.event = self.subscription.event
         self.person = self.subscription.person
         self.lot = self.subscription.lot
+        self.place = self.subscription.event.place
 
     def can_access(self):
         return self.subscription.confirmed is True

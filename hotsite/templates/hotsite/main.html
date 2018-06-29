@@ -5,7 +5,9 @@
 {% block content %}
     {% include 'hotsite/includes/2_cover.html' %}
     {% include 'hotsite/includes/3_description.html' %}
-    {% include 'hotsite/includes/4_subscription_call_to_action.html' %}
+    {% if not is_subscribed %}
+        {% include 'hotsite/includes/4_subscription_call_to_action.html' %}
+    {% endif %}
     {% include 'hotsite/includes/5_map.html' %}
     {% include 'hotsite/includes/6_event_owner.html' %}
 {% endblock %}

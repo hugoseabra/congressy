@@ -242,7 +242,10 @@ class ProfileForm(forms.ModelForm):
     cpf = BRCPFField(required=False, label="CPF")
 
     remove_image = forms.CharField(
-        max_length=10,
+        widget=forms.HiddenInput,
+        required=False,
+    )
+    avatar = forms.CharField(
         widget=forms.HiddenInput,
         required=False,
     )
@@ -253,8 +256,6 @@ class ProfileForm(forms.ModelForm):
         fields = [
             'name',
             'email',
-            'new_password1',
-            'new_password2',
             'gender',
             'birth_date',
             'zip_code',
@@ -268,7 +269,6 @@ class ProfileForm(forms.ModelForm):
             'institution',
             'institution_cnpj',
             'function',
-            'avatar',
         ]
 
         widgets = {
@@ -295,27 +295,37 @@ class ProfileForm(forms.ModelForm):
         data = kwargs.get('data')
 
         if data:
+            # TODO: this isn't DRY. Separate this logic into a helper.
 
-            possible_base64 = data.get('avatar')
             possible_remove_image = data.get('remove_image')
+            possible_base64 = data.get('avatar')
 
-            # Decoding from base64 avatar into a file obj.
-            if possible_base64:
-                try:
-                    file_ext, imgstr = possible_base64.split(';base64,')
-                    ext = file_ext.split('/')[-1]
-                    file_name = str(user.person.pk) + "." + ext
-                    data['avatar'] = ContentFile(
-                        base64.b64decode(imgstr),
-                        name=file_name
-                    )
-                except (binascii.Error, ValueError):
-                    pass
-
-            if possible_remove_image:
+            if possible_remove_image and possible_remove_image == 'True':
                 user.person.avatar.delete(save=True)
+                data._mutable = True
+                del data['avatar']
+                data._mutable = False
+                kwargs.update({'data': data})
+            else:
+
+                if possible_base64:
+                    # Decoding from base64 avatar into a file obj.
+                    try:
+                        file_ext, imgstr = possible_base64.split(';base64,')
+                        ext = file_ext.split('/')[-1]
+                        file_name = str(user.person.pk) + "." + ext
+                        data._mutable = True
+                        data['avatar'] = ContentFile(
+                            base64.b64decode(imgstr),
+                            name=file_name
+                        )
+                        data._mutable = False
+                        kwargs.update({'data': data})
+                    except (binascii.Error, ValueError):
+                        pass
 
         super(ProfileForm, self).__init__(*args, **kwargs)
+        self.fields['avatar'].required = False
         self.user = user
 
         if self.instance.pk:
@@ -368,11 +378,11 @@ class ProfileForm(forms.ModelForm):
             return clear_string(cpf)
         return cpf
 
-    def clean_phone(self):
-        phone = self.cleaned_data.get('phone')
-        if phone:
-            phone = phone_cleaner('+55{}'.format(phone))
-        return phone
+    # def clean_phone(self):
+    #     phone = self.cleaned_data.get('phone')
+    #     if phone:
+    #         phone = phone_cleaner('+55{}'.format(phone))
+    #     return phone
 
     def save(self, **_):
         """ Salva dados. """
@@ -382,6 +392,10 @@ class ProfileForm(forms.ModelForm):
         if self.cleaned_data["new_password1"]:
             self.user.set_password(self.cleaned_data["new_password1"])
         self.user.save()
+
+        avatar = self.data.get('avatar')
+        if isinstance(avatar, ContentFile):
+            self.instance.avatar = avatar
 
         self.instance.user = self.user
         self.instance.save()

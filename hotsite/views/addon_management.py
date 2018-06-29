@@ -58,6 +58,9 @@ class ProductOptionalManagementView(generic.TemplateView):
             SubscriptionProduct.objects.filter(
                 subscription=subscription,
                 optional__lot_category=subscription.lot.category
+            ).order_by(
+                "optional__optional_type__name",
+                "optional__name",
             )
 
         if self.fetch_in_storage:
@@ -66,7 +69,12 @@ class ProductOptionalManagementView(generic.TemplateView):
 
         else:
             event_optionals_products = Product.objects.filter(
-                lot_category=category, published=True)
+                lot_category=category,
+                published=True
+            ).order_by(
+                "optional_type__name",
+                "name",
+            )
 
             for optional in event_optionals_products:
 
@@ -160,7 +168,8 @@ class ServiceOptionalManagementView(generic.TemplateView):
                 subscription=subscription,
                 optional__lot_category=subscription.lot.category
             ).order_by("optional__theme__name",
-                       "optional__optional_type__name")
+                       "optional__optional_type__name",
+                       "optional__name", )
             # @TODO add user validation here, only if request.user == sub.user
 
             if self.fetch_in_storage:
@@ -191,8 +200,13 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
                 # All service optionals
                 all_services = Service.objects.filter(
-                    lot_category=category, published=True).order_by(
-                    'theme__name', "optional_type__name")
+                    lot_category=category,
+                    published=True
+                ).order_by(
+                    'theme__name',
+                    "optional_type__name",
+                    "name"
+                )
                 pre_selected_services = subscription.subscription_services.all()
 
                 available = get_all_options(all_services,

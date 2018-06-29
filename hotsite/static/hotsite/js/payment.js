@@ -84,6 +84,10 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
         })
     };
 
+    payment.get_items = function() {
+        return items;
+    };
+
     payment.get_payment_data = function() {
 
         if (!interest_rate) {

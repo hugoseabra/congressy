@@ -214,14 +214,16 @@
                 window.cgsy.payment.set_max_installments('{{ lot.installment_limit }}');
                 window.cgsy.payment.set_free_rate_installments('{{ lot.num_install_interest_absortion }}');
 
+                {% if lot.get_calculated_price %}
                 // Adiciona billing de inscrição
                 window.cgsy.payment.add_item(
                     'subscription',
                     '{{ subscription.pk }}',
                     'Inscrição: {{ lot.event.name }}',
                     1,
-                    parseFloat('{{ lot.get_calculated_price|unlocalize|intcomma }}')
+                    parseFloat('{{ lot.get_calculated_price|unlocalize }}')
                 );
+                {% endif %}
 
                 {% if products %}
                     // Adiciona billing de opcionais de produtos/serviços
@@ -230,9 +232,9 @@
                         window.cgsy.payment.add_item(
                             'optional-product',
                             '{{ subscription.pk }}',
-                            'Produto/Serviço: {{ lot.event.name }}',
+                            'Produto/Serviço: {{ product.optional.name }}',
                             1,
-                            parseFloat('{{ product.optional_price|unlocalize|intcomma }}')
+                            parseFloat('{{ product.optional_price|unlocalize }}')
                         );
                         {% endif %}
                     {% endfor %}
@@ -245,9 +247,9 @@
                         window.cgsy.payment.add_item(
                             'optional-service',
                             '{{ subscription.pk }}',
-                            'Atividade extra: {{ lot.event.name }}',
+                            'Atividade extra: {{ service.optional.name }}',
                             1,
-                            parseFloat('{{ service.optional_price|unlocalize|intcomma }}')
+                            parseFloat('{{ service.optional_price|unlocalize }}')
                         );
                         {% endif %}
                     {% endfor %}

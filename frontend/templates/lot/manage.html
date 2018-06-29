@@ -17,85 +17,89 @@
         ul.block-list li:hover {
             background: #f5f5f5;
         }
+
         ul.block-list li.active {
             background-color: #337ab7;
         }
+
         ul.block-list li .list-icons .well {
             padding: 3px !important;
             margin-bottom: 0;
         }
+
         ul.block-list li .list-icons .well:hover {
             background-color: #DDD;
         }
+
         .tab-wrapper .tab-content div.active {
             outline: none;
         }
     </style>
 
     {% if object_list %}
-    <link rel="stylesheet"
-          href="{% static 'assets/plugins/dataTables/css/dataTables.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'assets/plugins/dataTables/css/dataTables.css' %}">
     {% endif %}
 {% endblock %}
 
 {% block scripts %}
     <script src="{% static 'assets/js/lot.js' %}"></script>
     <script>
-    $(document).ready(function() {
-        selectFromHash();
-        createAnchorEvents();
-    });
+        $(document).ready(function () {
+            selectFromHash();
+            createAnchorEvents();
+        });
     </script>
 
     {% if object_list %}
-    <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.js' %}"></script>
-    <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.js' %}"></script>
-    <script>
-        $(document).ready(function () {
-            $('#lot_table').DataTable({
-                "language": {
-                    sEmptyTable: "Nenhum registro encontrado",
-                    sInfo: "Mostrando de _START_ até _END_ de _TOTAL_ registros",
-                    sInfoEmpty: "Mostrando 0 até 0 de 0 registros",
-                    sInfoFiltered: "(Filtrados de _MAX_ registros)",
-                    sInfoPostFix: "",
-                    sInfoThousands: ".",
-                    sLengthMenu: "_MENU_ resultados por página",
-                    sLoadingRecords: "Carregando...",
-                    sProcessing: "Processando...",
-                    sZeroRecords: "Nenhum registro encontrado",
-                    sSearch: "Pesquisar",
-                    oPaginate: {
-                        sNext: "Próximo",
-                        sPrevious: "Anterior",
-                        sFirst: "Primeiro",
-                        sLast: "Último"
+        <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.js' %}"></script>
+        <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.js' %}"></script>
+        <script>
+            $(document).ready(function () {
+                $('#lot_table').DataTable({
+                    "language": {
+                        sEmptyTable: "Nenhum registro encontrado",
+                        sInfo: "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                        sInfoEmpty: "Mostrando 0 até 0 de 0 registros",
+                        sInfoFiltered: "(Filtrados de _MAX_ registros)",
+                        sInfoPostFix: "",
+                        sInfoThousands: ".",
+                        sLengthMenu: "_MENU_ resultados por página",
+                        sLoadingRecords: "Carregando...",
+                        sProcessing: "Processando...",
+                        sZeroRecords: "Nenhum registro encontrado",
+                        sSearch: "Pesquisar",
+                        oPaginate: {
+                            sNext: "Próximo",
+                            sPrevious: "Anterior",
+                            sFirst: "Primeiro",
+                            sLast: "Último"
+                        },
+                        oAria: {
+                            sSortAscending: ": Ordenar colunas de forma ascendente",
+                            sSortDescending: ": Ordenar colunas de forma descendente"
+                        }
                     },
-                    oAria: {
-                        sSortAscending: ": Ordenar colunas de forma ascendente",
-                        sSortDescending: ": Ordenar colunas de forma descendente"
-                    }
-                },
-                "columnDefs": [
-                    // Disable sort in first, last column
-                    {
-                        "searchable": false,
-                        "orderable": false,
-                        "className": "text-center",
-                        "targets": [-1]
-                    },
-                    {
-                        "searchable": false,
-                        "orderable": false,
-                        "className": null,
-                        "targets": [-2]
-                    }
-                ],
-                // Default order
-                "order": [[0, 'asc']]
+                    "columnDefs": [
+                        // Disable sort in first, last column
+                        {
+                            "searchable": false,
+                            "orderable": false,
+                            "className": "text-center",
+                            "targets": [-1]
+                        },
+                        {
+                            "searchable": false,
+                            "orderable": false,
+                            "className": null,
+                            "targets": [-2]
+                        }
+                    ],
+                    // Default order
+                    "order": [[0, 'asc']]
+                });
             });
-        });
-    </script>
+        </script>
     {% endif %}
 {% endblock %}
 
@@ -107,12 +111,12 @@
                     <div class="buttonbar">
                         <div class="float-left">
                             <a href="{% url 'subscription:category-list' event.pk %}"
-                                class="btn btn-primary">
+                               class="btn btn-primary">
                                 <i class="fab fa-stack-exchange"></i>
                                 Gerenciar Categorias
                             </a>
                             <a href="{% url 'subscription:lot-add' event.pk %}"
-                                class="btn btn-success">
+                               class="btn btn-success">
                                 <i class="fa fa-plus"></i>
                                 Novo Lote
                             </a>
@@ -123,51 +127,65 @@
             </div>
 
             {% if categories.count %}
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <div class="panel-title">
-                                Gerenciamento de Lotes por Categoria
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="panel-title">
+                                    Gerenciamento de Lotes por Categoria
+                                </div>
                             </div>
-                        </div>
-                        <div class="panel-body" id="lot-list-main-block">
-                            {% include 'lot/categories-lots-list.html' %}
+
+                            <div class="panel-body" id="lot-list-main-block">
+                                {% if event_is_full %}
+                                    <h3>
+                                        <i class="fas fa-exclamation-circle warning-color"></i>
+                                        Todos os lotes foram finalizados porque
+                                        o evento está lotado
+                                    </h3>
+                                    <br>
+                                {% endif %}
+                                {% include 'lot/categories-lots-list.html' %}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             {% endif %}
 
             {# LEGACY - LOTES SEM CATEGORIA #}
             {% if object_list %}
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="panel panel-primary">
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-md-12 table-responsive">
-                                    <table id="lot_table" class="table table-striped table-bordered">
-                                        <thead>
-                                        <tr>
-                                            <th>Nome</th>
-                                            <th class="hidden-xs hidden-sm">Tipo</th>
-                                            <th class="hidden-xs hidden-sm">Inscrições</th>
-                                            <th>Preço</th>
-                                            <th width="8%">Código</th>
-                                            <th width="3%"></th>
-                                        </tr>
-                                        </thead>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-12 table-responsive">
+                                        <table id="lot_table"
+                                               class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Nome</th>
+                                                <th class="hidden-xs hidden-sm">
+                                                    Tipo
+                                                </th>
+                                                <th class="hidden-xs hidden-sm">
+                                                    Inscrições
+                                                </th>
+                                                <th>Preço</th>
+                                                <th width="8%">Código</th>
+                                                <th width="3%"></th>
+                                            </tr>
+                                            </thead>
 
-                                        <tbody>
-                                        {% for lot in object_list %}
-                                            {% if lot.status == lot.LOT_STATUS_RUNNING %}
-                                                <tr class="success">
-                                            {% elif lot.status == lot.LOT_STATUS_FINISHED %}
-                                                <tr class="danger">
-                                            {% else %}
-                                                <tr>
-                                            {% endif %}
+                                            <tbody>
+                                            {% for lot in object_list %}
+                                                {% if lot.status == lot.LOT_STATUS_RUNNING %}
+                                                    <tr class="success">
+                                                        {% elif lot.status == lot.LOT_STATUS_FINISHED %}
+                                                    <tr class="danger">
+                                                        {% else %}
+                                                    <tr>
+                                                {% endif %}
 
                                             <td>
                                                 {% if lot.rsvp_restrict %}
@@ -181,12 +199,14 @@
                                                 {% else %}
                                                     {{ lot.name }}
                                                 {% endif %}
-                                                <br />
+                                                <br/>
                                                 <small class="text-muted">{{ lot.get_period }}</small>
                                             </td>
 
-                                            <td class="hidden-xs hidden-sm">{% if lot.price and lot.price > 0 %}
-                                                Pago{% else %}Gratuito{% endif %}</td>
+                                            <td class="hidden-xs hidden-sm">
+                                                {% if lot.price and lot.price > 0 %}
+                                                    Pago{% else %}
+                                                    Gratuito{% endif %}</td>
 
 
                                             <td class="hidden-xs hidden-sm">
@@ -221,12 +241,12 @@
                                             <td>
                                                 <div class="btn-group">
                                                     <button
-                                                        type="button"
-                                                        class="btn
+                                                            type="button"
+                                                            class="btn
                                                         btn-primary btn-trans
                                                         btn-sm dropdown-toggle"
-                                                        data-toggle="dropdown"
-                                                        aria-expanded="false">
+                                                            data-toggle="dropdown"
+                                                            aria-expanded="false">
                                                         <span class="fas fa-cog"></span>
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-right"
@@ -250,16 +270,16 @@
                                                     </ul>
                                                 </div>
                                             </td>
-                                        </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
+                                            </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
             {% endif %}
         </div>
@@ -267,21 +287,28 @@
 {% endblock %}
 {% block modals %}
     <!-- Lot survey Modal -->
-    <div class="modal fade" id="survey-lot-form" tabindex="-1" role="dialog" aria-labelledby="survey-lot-form-title" aria-hidden="true">
+    <div class="modal fade" id="survey-lot-form" tabindex="-1" role="dialog"
+         aria-labelledby="survey-lot-form-title" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="survey-lot-form-title">Gerenciar Formulário Personalizado</h4>
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;
+                    </button>
+                    <h4 class="modal-title" id="survey-lot-form-title">
+                        Gerenciar Formulário Personalizado</h4>
                 </div>
                 <div class="modal-body">
-                    <form class="form-horizontal" role="form" onsubmit="save_survey();return false;">
+                    <form class="form-horizontal" role="form"
+                          onsubmit="save_survey();return false;">
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <label for="lot-survey">Formulários:</label>
                                 <div>
-                                    <select name="lot-survey" id="lot-survey" class="form-control">
-                                        <option value="">- Sem formulário -</option>
+                                    <select name="lot-survey" id="lot-survey"
+                                            class="form-control">
+                                        <option value="">- Sem formulário -
+                                        </option>
                                         {% for event_survey in event.surveys.all %}
                                             <option value="{{ event_survey.pk }}">{{ event_survey }}</option>
                                         {% endfor %}
@@ -289,7 +316,9 @@
                                 </div>
                                 <div>
                                     <small class="text-muted help-text">
-                                        Exibir o formulário selecionado para o lote <strong id="survey-lot-name"></strong>.
+                                        Exibir o formulário selecionado para o
+                                        lote <strong
+                                            id="survey-lot-name"></strong>.
                                     </small>
                                 </div>
                             </div>
@@ -297,9 +326,14 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" onclick="save_survey();">Vincular formulário</button>
-                    <input type="hidden" name="survey-lot_id" id="survey-lot_id" value="" />
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">Fechar
+                    </button>
+                    <button type="button" class="btn btn-primary"
+                            onclick="save_survey();">Vincular formulário
+                    </button>
+                    <input type="hidden" name="survey-lot_id"
+                           id="survey-lot_id" value=""/>
                 </div>
             </div>
         </div>
@@ -307,25 +341,37 @@
     <!-- / Lot survey Modal -->
 
     <!-- Lot Limit Modal -->
-    <div class="modal fade" id="lot-limit-form" tabindex="-1" role="dialog" aria-labelledby="lot-limit-form-title" aria-hidden="true">
+    <div class="modal fade" id="lot-limit-form" tabindex="-1" role="dialog"
+         aria-labelledby="lot-limit-form-title" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="lot-limit-form-title">Gerenciar Limite de Vagas</h4>
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;
+                    </button>
+                    <h4 class="modal-title" id="lot-limit-form-title">Gerenciar
+                        Limite de Vagas</h4>
                 </div>
                 <div class="modal-body">
-                    <form class="form-horizontal" role="form" onsubmit="save_limit();return false;">
+                    <form class="form-horizontal" role="form"
+                          onsubmit="save_limit();return false;">
                         <div class="form-group">
                             <div class="col-sm-12">
-                                <label for="lot-survey">Limite de Vagas:</label>
+                                <label for="lot-survey">Limite de
+                                    Vagas:</label>
                                 <div>
-                                    <input type="number" min="0" class="form-control" name="lot-limit" id="lot-limit" value="" />
+                                    <input type="number" min="0"
+                                           class="form-control"
+                                           name="lot-limit" id="lot-limit"
+                                           value=""/>
                                 </div>
                                 <div>
                                     <small class="text-muted help-text">
-                                        Exibir o formulário selecionado para o lote <strong id="lot-limit-name"></strong>.
-                                        Caso queira deixar ilimitado, informe <strong>0</strong>.
+                                        Exibir o formulário selecionado para o
+                                        lote <strong
+                                            id="lot-limit-name"></strong>.
+                                        Caso queira deixar ilimitado, informe
+                                        <strong>0</strong>.
                                     </small>
                                 </div>
                             </div>
@@ -333,39 +379,50 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" onclick="save_limit()">Salvar Limite de Vagas</button>
-                    <input type="hidden" name="lot-limit-lot_id" id="lot-limit-lot_id" value="" />
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">Fechar
+                    </button>
+                    <button type="button" class="btn btn-primary"
+                            onclick="save_limit()">Salvar Limite de Vagas
+                    </button>
+                    <input type="hidden" name="lot-limit-lot_id"
+                           id="lot-limit-lot_id" value=""/>
                 </div>
             </div>
         </div>
     </div>
     <!-- / Lot Limit Modal -->
-        
+
     <!-- Lot Privacy Modal -->
-    <div class="modal fade" id="lot-privacy_form" tabindex="-1" role="dialog" aria-labelledby="lot-privacy_form-title" aria-hidden="true">
+    <div class="modal fade" id="lot-privacy_form" tabindex="-1" role="dialog"
+         aria-labelledby="lot-privacy_form-title" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="lot-privacy_form-title">Gerenciar Privacidade</h4>
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;
+                    </button>
+                    <h4 class="modal-title" id="lot-privacy_form-title">
+                        Gerenciar Privacidade</h4>
                 </div>
                 <div class="modal-body">
-                    <form class="form-horizontal" role="form" onsubmit="save_privacy();return false;">
+                    <form class="form-horizontal" role="form"
+                          onsubmit="save_privacy();return false;">
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <label for="lot-privacy_private">Privado:</label>
                                 <div>
                                     <input
-                                        type="checkbox"
-                                        name="lot-privacy_private"
-                                        id="lot-privacy_private"
-                                        style="display:none"
-                                        class="js-switch" />
+                                            type="checkbox"
+                                            name="lot-privacy_private"
+                                            id="lot-privacy_private"
+                                            style="display:none"
+                                            class="js-switch"/>
                                 </div>
                                 <div>
                                     <small class="text-muted help-text">
-                                        Configurar privacidade do lote <strong id="lot-privacy_name"></strong>.
+                                        Configurar privacidade do lote <strong
+                                            id="lot-privacy_name"></strong>.
                                     </small>
                                 </div>
                             </div>
@@ -373,27 +430,72 @@
                                 <label for="lot-survey">Cupom:</label>
                                 <div>
                                     <input
-                                        type="text"
-                                        name="lot-privacy_exhibition-code"
-                                        value=""
-                                        maxlength="15"
-                                        class="form-control"
-                                        id="lot-privacy_exhibition-code">
+                                            type="text"
+                                            name="lot-privacy_exhibition-code"
+                                            value=""
+                                            maxlength="15"
+                                            class="form-control"
+                                            id="lot-privacy_exhibition-code">
                                 </div>
                                 <div class="text-muted">
-                                    O lote estará disponível através do cupom utilizado.
+                                    O lote estará disponível através do cupom
+                                    utilizado.
                                 </div>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" onclick="save_privacy()">Salvar Privacidade</button>
-                    <input type="hidden" name="lot-privacy-lot_id" id="lot-privacy-lot_id" value="" />
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">Fechar
+                    </button>
+                    <button type="button" class="btn btn-primary"
+                            onclick="save_privacy()">Salvar Privacidade
+                    </button>
+                    <input type="hidden" name="lot-privacy-lot_id"
+                           id="lot-privacy-lot_id" value=""/>
                 </div>
             </div>
         </div>
     </div>
     <!-- / Lot Privacy Modal -->
+
+
+    <div class="modal" id="lot-delete-modal" role="dialog"
+         data-backdrop="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <form action="" method="post" class="form-horizontal"
+                      role="form" id="lot-delete-form">
+                    <div class="modal-header">
+                        <button type="button" class="close"
+                                data-dismiss="modal"
+                                aria-label="Close"><span
+                                aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title text-bold">
+                            Excluir Lote
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+
+                        <p>Deseja realmente excluir o lote ?</p>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-success" type="submit">
+                            Confirmar
+                        </button>
+
+                        <button class="btn btn-danger"
+                                data-dismiss="modal">Voltar
+                        </button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}

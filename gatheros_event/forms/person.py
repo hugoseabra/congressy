@@ -105,7 +105,9 @@ class PersonForm(forms.ModelForm):
 
         widgets = {
             # CPF como telefone para aparecer como número no mobile
-            'cpf': TelephoneInput,
+            'cpf': TelephoneInput(
+                attrs={'placeholder': '999.999.999-99'}
+            ),
             'name': forms.TextInput(attrs={'placeholder': 'Nome completo'}),
             'email': forms.EmailInput(attrs={
                 'placeholder': 'me@you.com',
@@ -117,7 +119,10 @@ class PersonForm(forms.ModelForm):
             'birth_date': forms.SelectDateWidget(
                 attrs=({'style': 'width: 30%; display: inline-block;'}),
                 years=create_years_list(),
-            )
+            ),
+            'institution_cnpj': forms.TextInput(
+                attrs={'placeholder': '99.999.999/0001-99'}
+            ),
         }
 
     def __init__(self, is_chrome=False, **kwargs):

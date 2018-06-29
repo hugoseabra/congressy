@@ -1,4 +1,3 @@
-
 {% extends "base/base.html" %}
 {% load l10n static event_tags  base_tags  widget_tweaks form_config_tags %}
 {% load humanize %}
@@ -17,7 +16,9 @@
         {{ form_title }}
     {% endif %}
 {% endblock %}
-
+{% block scripts %}
+    <script src="{% static 'assets/js/user_notification.js' %}"></script>
+{% endblock %}
 {% block nav_aside_itens %}
     {% include 'addon/optional/includes/side-menu.html' %}
 {% endblock %}

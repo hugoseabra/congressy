@@ -116,6 +116,7 @@ class BaseFormLotView(BaseLotView, generic.FormView):
 class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
     """Lista de lotes de acordo com o evento do contexto"""
     template_name = 'lot/manage.html'
+
     queryset = Lot.objects.filter(category__isnull=True).order_by(
         'date_start',
         'date_end'
@@ -138,8 +139,24 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
         context['full_banking'] = self._get_full_banking()
         context['exhibition_code'] = Lot.objects.generate_exhibition_code()
         context['categories'] = self.event.lot_categories.all().order_by('pk')
-
+        context['event_is_full'] = self.event_is_full()
         return context
+
+    def event_is_full(self):
+        if self.event.expected_subscriptions and \
+                self.event.expected_subscriptions > 0:
+
+            total_subscriptions_event = 0
+            for lot in self.event.lots.all():
+                total_subscriptions_event += lot.subscriptions.filter(
+                    completed=True
+                ).exclude(
+                    status='canceled'
+                ).count()
+            return total_subscriptions_event >= self.event.expected_subscriptions
+
+        else:
+            return False
 
     def get_subscription_stats(self):
         stats = {

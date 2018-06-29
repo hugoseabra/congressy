@@ -1,3 +1,5 @@
+{% load humanize %}
+
 <div id="currently_selected">
     {% if  object_list %}
         <label for="selected_products_table">Produtos</label>
@@ -21,7 +23,7 @@
                             {% if product.optional.price == 0.00 %}
                                 Grátis
                             {% else %}
-                                R$ {{ product.optional.price }}
+                                R$ {{ product.optional.price|intcomma }}
                             {% endif %}
                         </td>
                         <td>
@@ -41,3 +43,6 @@
         Nenhum produtos/serviço escolhido até o momento.
     {% endif %}
 </div>
+<script>
+    num_selected_optionals = parseInt('{{ object_list|length }}');
+</script>

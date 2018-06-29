@@ -122,11 +122,11 @@ class PaymentForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
 
-        if self.subscription.free is True:
-            raise forms.ValidationError(
-                'Pagamentos não podem ser processados para inscrições'
-                ' gratuitas.'
-            )
+        # if self.subscription.free is True:
+        #     raise forms.ValidationError(
+        #         'Pagamentos não podem ser processados para inscrições'
+        #         ' gratuitas.'
+        #     )
 
         if not self.subscription_debt_form.is_valid():
             error_msgs = []
@@ -338,7 +338,7 @@ class PaymentForm(forms.Form):
             debt_kwargs = {
                 'subscription': self.subscription,
                 'data': {
-                    'name': 'Atividade extra: {} ({})'.format(
+                    'name': 'Produto/Serviço: {} ({})'.format(
                         product.optional.name,
                         product.optional.pk,
                     ),

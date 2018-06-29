@@ -8,13 +8,24 @@
 {% block page_description %}Todos os eventos da sua organização.{% endblock %}
 
 {% block styles %}
+
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/dataTables/css/responsive.bootstrap.min.css' %}">
     <link rel="stylesheet"
           href="{% static 'assets/plugins/dataTables/css/dataTables.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/icheck/css/all.css' %}">
+
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.js' %}"></script>
-    <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.js' %}"></script>
+    <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/dataTables/js/dataTables.responsive.min.js' %}"></script>
+
+    <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.min.js' %}"></script>
+
+    <script src="{% static 'assets/plugins/dataTables/js/responsive.bootstrap.min.js' %}"></script>
+
     <script>
         $(document).ready(function () {
             $('#event_table').DataTable({
@@ -66,8 +77,15 @@
                     }
                 ],
                 // Default order
-                "order": [[0, 'asc']]
+                "order": [[0, 'asc']],
+                responsive: true
             });
+
+            function delete_event(event_pk) {
+                $('#event-delete-modal').modal();
+                $('#transaction_id').val(event_pk);
+
+            }
         });
     </script>
 {% endblock %}
@@ -116,7 +134,7 @@
                     <a href="{% url 'event:event-add' %}" class="btn
                     btn-success">
                         <i class="fa fa-plus"></i>
-                        Adicionar
+                        Novo Evento
                     </a>
                 </div>
                 <div class="clearfix"></div>
@@ -138,9 +156,9 @@
                                 <thead>
                                 <tr>
                                     <th>Nome</th>
-                                    <th class="hidden-xs hidden-sm">Categoria
+                                    <th>Categoria
                                     </th>
-                                    <th class="hidden-xs hidden-sm">Tipo</th>
+                                    <th>Tipo</th>
                                     <th># Insc.</th>
                                     <th></th>
                                 </tr>
@@ -172,14 +190,14 @@
 
                                             </a>
                                         </td>
-                                        <td class="hidden-xs hidden-sm">{{ event.category.name }}</td>
-                                        <td class="hidden-xs hidden-sm">
+                                        <td>{{ event.category.name }}</td>
+                                        <td>
                                             {% if event.event_type == event.EVENT_TYPE_FREE %}
-                                            Gratuito
+                                                Gratuito
                                             {% elif event.event_type == event.EVENT_TYPE_PAID %}
-                                            Pago
+                                                Pago
                                             {% elif event.event_type == event.EVENT_TYPE_SCIENTIFIC %}
-                                            Científico
+                                                Científico
                                             {% endif %}
                                         </td>
 
@@ -214,7 +232,8 @@
                                                         {% endif %}
                                                         {% if event.is_deletable and user has 'gatheros_event.delete_event' of event %}
                                                             <li>
-                                                                <a href="{% url 'event:event-delete' event.pk %}">
+                                                                <a href="javascript:void(0)"
+                                                                   onclick="$('#event-delete-form').attr('action','{% url 'event:event-delete' event.pk %}');$('#event-delete-modal').modal();">
                                                                     <i class="fas fa-trash-alt"></i>
                                                                     Excluir
                                                                 </a>
@@ -242,4 +261,7 @@
         </div>
     </div>
 
+{% endblock %}
+{% block modals %}
+    {% include 'event/event-delete-modal.html' %}
 {% endblock %}

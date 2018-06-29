@@ -250,11 +250,11 @@ class ReceiverPublisher(object):
         Verifica todos os critérios para continuidade dos processos do
         publisher.
         """
-        if self.subscription.free is True:
-            raise Exception(
-                'A inscrição "{}" é gratuita e não pode possuir um'
-                ' receber.'.format(self.subscription.pk)
-            )
+        # if self.subscription.free is True:
+        #     raise Exception(
+        #         'A inscrição "{}" é gratuita e não pode possuir um'
+        #         ' recebedor.'.format(self.subscription.pk)
+        #     )
 
         if not hasattr(settings, 'CONGRESSY_INSTALLMENT_INTERESTS_RATE'):
             raise Exception(
@@ -274,7 +274,7 @@ class ReceiverPublisher(object):
                 ' settings.'
             )
 
-        if not self.organization.recipient_id:
+        if settings.DEBUG is False and not self.organization.recipient_id:
             raise Exception(
                 'A organização "{} (ID: {})" não possui um'
                 ' "recipient_id".'.format(

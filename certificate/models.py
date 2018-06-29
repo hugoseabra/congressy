@@ -190,6 +190,14 @@ class Certificate(models.Model):
         verbose_name='apenas para presentes(check-in)',
     )
 
+    font_color = models.CharField(
+        max_length=20,
+        verbose_name='cor da fonte',
+        null=True,
+        blank=True,
+        default='#565656'
+    )
+
     def __str__(self):
         return '{}'.format(self.event)
 
@@ -251,11 +259,14 @@ class Certificate(models.Model):
     @property
     def is_ready(self):
 
+        if not self.background_image:
+            return False
+
         if not hasattr(self.background_image, 'default'):
             return False
 
-        if not self.background_image.file.readable():
-            return False
+        if self.background_image.file:
+            return self.background_image.file.readable()
 
         return True
 
@@ -270,7 +281,15 @@ class Certificate(models.Model):
 
         return False
 
+    @property
+    def event_has_location(self):
+
+        if bool(self.event_location):
+            return True
+
+        return False
+
     def event_has_any_type_of_location(self):
-        return self.event_has_city or bool(self.event_location)
+        return self.event_has_city or self.event_has_location
 
 

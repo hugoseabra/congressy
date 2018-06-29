@@ -1,5 +1,5 @@
 <div class="progress">
-    <div class="progress-bar progress-bar-info"
+    <div id="progress_event" class="progress-bar progress-bar-info"
          role="progressbar"
          aria-valuemin="0" aria-valuemax="100">
     </div>
@@ -208,7 +208,7 @@
                 </button>
             </td>
             <td>
-                {% if status_addons.products == True %}
+                {% if status_addons.services == True %}
                     <i class="fas fa-check-circle success-color
                                         pull-right fa-2x"></i>
                 {% else %}

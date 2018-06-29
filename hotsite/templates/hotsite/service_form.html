@@ -81,8 +81,7 @@
                                             {% include 'hotsite/optionals_service_form.html' %}
 
 
-                                            <form method="post" action=""
-                                                  id="optional_form">
+                                            <form method="post" action="" id="optional_form" onsubmit="if(parseInt(num_selected_optionals)===0){return confirm('Você não selecionou nenhum item. Tem certeza que deseja prosseguir?')}">
 
                                                 {% csrf_token %}
                                                 {{ wizard.management_form }}
@@ -126,5 +125,9 @@
 
 {% endblock %}
 
-
+{% block scripts %}
+    <script>
+        var num_selected_optionals = 0;
+    </script>
+{% endblock %}
 

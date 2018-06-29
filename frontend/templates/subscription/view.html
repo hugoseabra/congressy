@@ -37,11 +37,11 @@
         }
 
         function delete_payment(transaction_id, amount) {
-            if (!confirm('Tem certeza que deseja deletar o lançamento de R$ '+amount+'?')) {
-                return;
-            }
+            var message = "Tem certeza que deseja deletar o lançamento de R$ " +amount+ " ?";
+
+            document.getElementById('delete-message').innerHTML = message;
+            $('#manual-delete-payment-form-modal').modal();
             $('#transaction_id').val(transaction_id);
-            $('#payment-delete-form').submit();
         }
 
         function open_checkout() {
@@ -62,13 +62,13 @@
                 // Adiciona billing de opcionais de produtos/serviços
                 {% for product in products %}
                     {% if product.optional_price %}
-                    window.cgsy.payment.add_item(
-                        'optional-product',
-                        '{{ object.pk }}',
-                        'Produto/Serviço: {{ event.name }}',
-                        1,
-                        parseFloat('{{ product.optional_price|unlocalize }}')
-                    );
+                        window.cgsy.payment.add_item(
+                            'optional-product',
+                            '{{ object.pk }}',
+                            'Produto/Serviço: {{ event.name }}',
+                            1,
+                            parseFloat('{{ product.optional_price|unlocalize }}')
+                        );
                     {% endif %}
                 {% endfor %}
             {% endif %}
@@ -76,27 +76,27 @@
                 // Adiciona billing de opcionais de produtos/serviços
                 {% for service in services %}
                     {% if service.optional_price %}
-                    window.cgsy.payment.add_item(
-                        'optional-product',
-                        '{{ object.pk }}',
-                        'Produto/Serviço: {{ event.name }}',
-                        1,
-                        parseFloat('{{ service.optional_price|unlocalize }}')
-                    );
+                        window.cgsy.payment.add_item(
+                            'optional-product',
+                            '{{ object.pk }}',
+                            'Produto/Serviço: {{ event.name }}',
+                            1,
+                            parseFloat('{{ service.optional_price|unlocalize }}')
+                        );
                     {% endif %}
                 {% endfor %}
             {% endif %}
 
-            checkout.setSuccessCallback(function() {
+            checkout.setSuccessCallback(function () {
                 var form = new window.cgsy.pagarme.CheckoutForm($('#checkout_form_block'));
-                    form.setNextUrl("{% url 'subscription:subscription-view' event.pk object.pk %}");
-                    form.send("{% url 'public:payment-checkout' %}");
+                form.setNextUrl("{% url 'subscription:subscription-view' event.pk object.pk %}");
+                form.send("{% url 'public:payment-checkout' %}");
             });
 
             checkout.run();
         }
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             Messenger.options = {
                 extraClasses: 'messenger-fixed messenger-on-bottom ' +
                 'messenger-on-right',
@@ -104,14 +104,14 @@
             };
 
             {% if modal == 'manual-payment' %}
-            window.setTimeout(function() {
-                $('#manual-payment-form-modal').modal();
-            }, 300);
+                window.setTimeout(function () {
+                    $('#manual-payment-form-modal').modal();
+                }, 300);
             {% endif %}
             {% if show_details %}
-            window.setTimeout(function() {
-                window.location.hash='report_detail_hidden';
-            }, 500);
+                window.setTimeout(function () {
+                    window.location.hash = 'report_detail_hidden';
+                }, 500);
             {% endif %}
 
             {% if messenger %}
@@ -124,8 +124,8 @@
             {% endif %}
 
             {% if last_transaction and last_transaction.type == last_transaction.BOLETO and not last_transaction.boleto_url %}
-                window.setTimeout(function() {
-                    window.location.href=window.location.href;
+                window.setTimeout(function () {
+                    window.location.href = window.location.href;
                 }, 7500);
             {% endif %}
         });
@@ -133,30 +133,31 @@
 {% endblock %}
 
 {% block styles %}
-<style>
-    .transaction-list span {
-        font-size: 12px;
-    }
-    .transaction-list small {
-        font-size: 10px;
-    }
+    <style>
+        .transaction-list span {
+            font-size: 12px;
+        }
 
-    .transaction-list hr {
-        margin: 5px 0;
+        .transaction-list small {
+            font-size: 10px;
+        }
 
-    }
+        .transaction-list hr {
+            margin: 5px 0;
 
-    .transaction-list ul {
-        padding-left:20px;
-    }
+        }
 
-    .cancelled,
-    .cancelled span,
-    .cancelled small {
-        text-decoration: line-through;
-        color: #CCC;
-    }
-</style>
+        .transaction-list ul {
+            padding-left: 20px;
+        }
+
+        .cancelled,
+        .cancelled span,
+        .cancelled small {
+            text-decoration: line-through;
+            color: #CCC;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -167,23 +168,24 @@
             {% include 'subscription/includes/profile-subscriber.html' %}
         {% endif %}
     </div>
-    <form action="{% url 'subscription:payment-delete' event.pk object.pk %}" method="post" id="payment-delete-form" style="display:none">
-        {% csrf_token %}
-        <input type="hidden" name="transaction_id" id="transaction_id" value="" />
-    </form>
+
     <div id="checkout_form_block" style="display:none">
-        <form id="checkout_form" action="{% url 'public:payment-checkout' %}" method="POST">
+        <form id="checkout_form" action="{% url 'public:payment-checkout' %}"
+              method="POST">
             {% csrf_token %}
             {{ form.as_p }}
         </form>
     </div>
-    <form action="" method="post" id="payment-notify-boleto" style="display:none" onsubmit="this.next_url.value=window.location.pathname">
+    <form action="" method="post" id="payment-notify-boleto"
+          style="display:none"
+          onsubmit="this.next_url.value=window.location.pathname">
         {% csrf_token %}
-        <input type="hidden" name="action" value="notify_boleto" />
-        <input type="hidden" name="next_url" value="" />
+        <input type="hidden" name="action" value="notify_boleto"/>
+        <input type="hidden" name="next_url" value=""/>
     </form>
 
 {% endblock %}
 {% block modals %}
     {% include 'subscription/includes/modal-manual-payment-form.html' with form=manual_payment_form %}
+    {% include 'subscription/includes/modal-delete-manual-payment-form.html' with form=manual_payment_form %}
 {% endblock %}

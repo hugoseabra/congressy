@@ -3460,16 +3460,22 @@ label.valid {
 .theme-cgsy-full .principal_content {
   padding-left: 51px;
 }
+.theme-cgsy-full .sidebar-section {
+  width: 20%;
+  position: relative;
+  z-index: 1000;
+}
 .theme-cgsy-full .sidebar-section .navbar-collapse {
   padding-left: 0;
 }
 .theme-cgsy-full .main-page-full {
-  width: 79%;
+  width: 80%;
   padding-bottom: 50px;
 }
 .theme-cgsy-full .main-page-sidebar {
   width: 100%;
-  padding-left: 50px;
+  padding-left: 65px;
+  position: relative;
 }
 .theme-cgsy-full .main-page-sidebar .cgsy-footer {
   padding-left: 25px;
@@ -3497,7 +3503,7 @@ label.valid {
 }
 .theme-cgsy-full .manage_sidebar {
   margin-top: 60px;
-  margin-left: 50px;
+  margin-left: 65px;
   padding-left: 1px;
   width: 200px;
   padding-right: 10px;
@@ -3595,6 +3601,8 @@ label.valid {
 }
 .theme-cgsy-full .main-content-wrapper {
   padding-bottom: 105px !important;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 @media only screen and (max-width: 768px) {
   .theme-cgsy-full .main-page-sidebar {
