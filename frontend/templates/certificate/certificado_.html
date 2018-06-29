@@ -131,10 +131,10 @@
                             text-align: justify;"
                          id="cert-date">
                         {% language 'pt-br' %}
-                            {% if object.has_city %}
+                            {% if has_city %}
                                 {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
-                            {% else %}
-                                {{ object.event_location }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
+                            {% elif has_location %}
+                                {{ object.event_location }},{{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
                             {% endif %}
                         {% endlanguage %}
                     </div>
@@ -487,18 +487,22 @@
                                     Esconder título
                                 </label></td>
                         </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" class="js-switch"
-                                       {% if object.date_hide %}checked{% endif %}
-                                       id="dateCheckBox"
-                                       name="dateCheckBox">
-                            </td>
-                            <td>
-                                <label for="dateCheckBox">
-                                    Esconder data
-                                </label></td>
-                        </tr>
+
+
+                        {% if object.event_has_any_type_of_location %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="js-switch"
+                                           {% if object.date_hide %}checked{% endif %}
+                                           id="dateCheckBox"
+                                           name="dateCheckBox">
+                                </td>
+                                <td>
+                                    <label for="dateCheckBox">
+                                        Esconder data
+                                    </label></td>
+                            </tr>
+                        {% endif %}
                         <tr>
                             <td>
                                 <input class="js-switch" type="checkbox" id='centralizar' name="centralizar" {% if object.text_center %}checked{% endif %}>
