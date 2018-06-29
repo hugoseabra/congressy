@@ -67,3 +67,29 @@ def lot_count_completed_subscriptions(lot):
             Subscription.AWAITING_STATUS
         ],
     ).count()
+
+
+@register.simple_tag
+def is_subscription_free(subscription):
+    if not subscription:
+        return False
+
+    has_products = subscription.subscription_products.filter(
+        optional_price__gt=0
+    ).count() > 0
+
+    if has_products is True:
+        return False
+
+    has_services = subscription.subscription_services.filter(
+        optional_price__gt=0
+    ).count() > 0
+
+    if has_services is True:
+        return False
+
+    is_free = subscription.free is True
+    if is_free is False:
+        return False
+
+    return True
