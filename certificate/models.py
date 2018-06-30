@@ -265,8 +265,8 @@ class Certificate(models.Model):
         if not hasattr(self.background_image, 'default'):
             return False
 
-        if not self.background_image.default.readable():
-            return False
+        if self.background_image.file:
+            return self.background_image.file.readable()
 
         return True
 
@@ -281,7 +281,15 @@ class Certificate(models.Model):
 
         return False
 
+    @property
+    def event_has_location(self):
+
+        if bool(self.event_location):
+            return True
+
+        return False
+
     def event_has_any_type_of_location(self):
-        return self.event_has_city or bool(self.event_location)
+        return self.event_has_city or self.event_has_location
 
 

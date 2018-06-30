@@ -41,7 +41,7 @@
 {% block content %}
 
     <div class="row">
-        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+        <div class="col-lg-6 col-lg-push-1 col-xl-6 col-xl-push-1">
             <div class="buttonbar">
                 <div class="float-left">
                     <a href="{% url 'subscription:form-config' event.pk %}"
@@ -56,9 +56,31 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+
+        <div class="col-lg-5 col-lg-push-1 col-xl-5 col-xl-push-1">
 
             <div class="panel panel-primary">
+
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Vínculo com Lotes
+                    </h3>
+                </div>
+
+                <div class="panel-body">
+
+                    {% include 'subscription/includes/lot_event_survey_change_panel.html' %}
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+        <div class="col-lg-6 col-lg-push-1 col-xl-6 col-xl-push-1">
+
+            <div class="panel panel-primary" id="form-preview">
 
                 <div class="panel-heading">
                     <h3 class="panel-title">
@@ -75,15 +97,6 @@
                 </div>
 
             </div>
-
-
-        </div>
-    </div>
-
-    <div class="row">
-
-        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-
             <div class="panel panel-primary">
 
                 <div class="panel-heading">
@@ -193,8 +206,6 @@
 
     </div>
 
-
-
 {% endblock %}
 
 {% block modals %}
@@ -223,7 +234,7 @@
                     {% csrf_token %}
 
 
-                <div class="modal-body" style="padding: 30px">
+                    <div class="modal-body" style="padding: 30px">
 
 
                         <strong style="font-size: 25px">
@@ -460,7 +471,6 @@
     </div>
 {% endblock %}
 {% block scripts %}
-    <script src="{% static 'assets/js/user_notification.js' %}"></script>
 
     <script type="application/javascript">
 
@@ -601,7 +611,7 @@
             if (!question_label) {
                 throw 'cgsy-manage: Can\'t find the question field element.'
             }
-
+            question_label = question_label.replace('<span style="color#C9302C">*</span>', '');
             question_label = $.trim(question_label);
 
             name_field.val(question_label);
@@ -663,6 +673,67 @@
             $(this).submit();
         });
 
+        $('.change-lot').on('change', function () {
+
+
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+            var url;
+
+
+            if (this.checked) {
+                url = $(this).data("selected-url");
+                $.ajax({
+                    type: "PATCH",
+                    url: url,
+                    beforeSend: function (request) {
+                        request.setRequestHeader("X-CSRFToken", csrftoken);
+                    },
+                    success: function () {
+                        Messenger().post({
+                            message: 'Vinculada removida com sucesso!',
+                            type: 'success'
+                        });
+                    },
+                    error: function (err) {
+                        console.error(err);
+                        Messenger().post({
+                            message: 'Não foi possivel vincular seu ' +
+                            'questionario.',
+                            type: 'error'
+                        });
+                    }
+                });
+
+
+            } else {
+                url = $(this).data("url");
+                $.ajax({
+                    type: "PATCH",
+                    url: url,
+                    beforeSend: function (request) {
+                        request.setRequestHeader("X-CSRFToken", csrftoken);
+                    },
+                    success: function () {
+                        Messenger().post({
+                            message: 'Desvinculada removida com sucesso!',
+                            type: 'success'
+                        });
+                    },
+                    error: function (err) {
+                        console.error(err);
+                        Messenger().post({
+                            message: 'Não foi possivel desvincular seu ' +
+                            'questionario.',
+                            type: 'error'
+                        });
+                    }
+                });
+            }
+
+
+        });
+
 
         function editQuestion(form) {
 
@@ -712,8 +783,8 @@
 
             window.setTimeout(function () {
 
-                var radios = $('input[type=radio]');
-                var checkboxes = $('input[type=checkbox]');
+                var radios = $('#form-preview input[type=radio]');
+                var checkboxes = $('#form-preview input[type=checkbox]');
                 radios.iCheck({
                     checkboxClass: 'icheckbox_flat-grey',
                     radioClass: 'iradio_flat-grey'
