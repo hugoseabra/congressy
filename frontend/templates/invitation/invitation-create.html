@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load i18n static base_tags %}
+{% load i18n static base_tags form_config_tags %}
 
 {% block title %}Convites | Congressy{% endblock %}
 {% block page_title %}Novo Convite{% endblock %}
@@ -28,12 +28,20 @@
 {% endblock %}
 
 {% block content %}
-    <form role="form" action="" method="post"
-          class="form-horizontal">{% csrf_token %}
+    <form role="form" action="" method="post" class="form-horizontal">
+        {% csrf_token %}
 
         {% if form.non_field_errors %}
             {% render_errors form.non_field_errors %}
         {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
         <div class="row">
             <div class="col-md-12">
                 <div class="buttonbar">
