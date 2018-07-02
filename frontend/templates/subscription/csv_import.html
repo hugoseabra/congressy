@@ -1,1 +1,56 @@
-<h1>Import </h1>
+{% extends "base/base.html" %}
+{% load i18n static url_tags  form_config_tags %}
+
+{% block title %}Importar | Congressy{% endblock %}
+
+{% block page_title %}Importar via CSV{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_description %}
+    Importação de dados via CSV
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <form>
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        {% if form.non_field_errors %}
+                            {% render_errors form.non_field_errors %}
+                        {% endif %}
+
+                        {% for hidden_field in form.hidden_fields %}
+                            {% if hidden_field.errors %}
+                                {% render_errors hidden_field.errors %}
+                            {% endif %}
+                            {{ hidden_field }}
+                        {% endfor %}
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% render_generic_field form.csv_file %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Resultados</h3>
+                </div>
+                <div class="panel-body">
+
+                    <h2>Conteudo parseado aqui.</h2>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
