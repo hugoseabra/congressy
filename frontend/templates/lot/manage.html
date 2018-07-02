@@ -121,6 +121,14 @@
                                 Novo Lote
                             </a>
                         </div>
+                        <div class="float-right">
+                            {% if event.allow_importing %}
+                                <a href="#" class="btn btn-primary">
+                                    <i class="fas fa-file-excel"></i>
+                                    Importar via CSV
+                                </a>
+                            {% endif %}
+                        </div>
                         <div class="clearfix"></div>
                     </div>
                 </div>
