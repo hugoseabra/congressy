@@ -267,6 +267,11 @@ class Event(models.Model, GatherosModelMixin):
         blank=True,
     )
 
+    allow_importing = models.BooleanField(
+        default=False,
+        verbose_name='permitir importação via csv',
+    )
+
     class Meta:
         verbose_name = 'evento'
         verbose_name_plural = 'eventos'
