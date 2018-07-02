@@ -29,6 +29,7 @@ from .subscription import (
     SubscriptionViewFormView,
     VoucherSubscriptionPDFView,
     SubscriptionAttendanceListView,
+    SubscriptionCSVImportView,
 )
 from .subscription_api import (
     SubscriptionSearchViewSet,

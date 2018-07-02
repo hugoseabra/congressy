@@ -74,6 +74,11 @@ urls = [
         name='subscriptions-export'
     ),
     url(
+        r'^import/csv/$',
+        views.SubscriptionCSVImportView.as_view(),
+        name='subscriptions-csv-import'
+    ),
+    url(
         r'^$',
         views.SubscriptionListView.as_view(),
         name='subscription-list'

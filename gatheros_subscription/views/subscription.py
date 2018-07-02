@@ -29,6 +29,7 @@ from gatheros_subscription.forms import (
     SubscriptionPersonForm,
     SubscriptionFilterForm,
     SubscriptionForm,
+    SubscriptionCSVUploadForm,
 )
 from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.helpers.report_payment import \
@@ -1086,3 +1087,12 @@ class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
             completed=True,
             event=self.get_event(),
         ).exclude(status=Subscription.CANCELED_STATUS).order_by('-attended_on')
+
+
+class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
+
+    form_class = SubscriptionCSVUploadForm
+    template_name = "subscription/csv_import.html"
+
+
+

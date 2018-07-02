@@ -5,6 +5,7 @@ from django import forms
 
 from gatheros_event.forms import PersonForm
 from gatheros_subscription.models import Subscription, Lot, FormConfig
+from .validators import validate_csv_only_file
 
 
 class SubscriptionPersonForm(PersonForm):
@@ -147,3 +148,7 @@ class SubscriptionAttendanceForm(forms.Form):
         self.instance.attended_on = datetime.now() if attended else None
         self.instance.attended = attended
         self.instance.save()
+
+
+class SubscriptionCSVUploadForm(forms.Form):
+    file = forms.FileField(validators=[validate_csv_only_file])
