@@ -101,9 +101,7 @@
                                                                            value="change_group"/>
                                                                     <input type="hidden"
                                                                            name="group"
-                                                                           value="
-
-                                                                                   {% if item.group == item.HELPER %}{{ item.ADMIN }}{% else %}{{ item.HELPER }}{% endif %}"/>
+                                                                           value="{% if item.group == item.HELPER %}{{ item.ADMIN }}{% else %}{{ item.HELPER }}{% endif %}"/>
                                                                 </form>
                                                             </li>
                                                             <li style="padding: 0 10px">
