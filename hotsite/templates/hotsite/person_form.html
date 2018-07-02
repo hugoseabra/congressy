@@ -286,7 +286,7 @@
         $(document).ready(function () {
             var birthDate = createDatePicker();
             var dateInput = $('#id_person-birth_date');
-            if (dateInput) {
+            if (birthDate.length && dateInput.length) {
                 birthDate.data("DateTimePicker").minDate(false);
                 birthDate.data("DateTimePicker").useCurrent(false);
                 var datePerson = dateInput.attr('value');
@@ -297,7 +297,7 @@
         });
 
         function set_form_as_international() {
-            console.log('settin form as international.');
+            console.log('setting form as international.');
 
             var country = $('#id_person-country');
             var ddi_el = $('#id_person-ddi');
@@ -352,7 +352,7 @@
         }
 
         function set_form_as_national() {
-            console.log('settin form as national.');
+            console.log('setting form as national.');
 
             var country = $('#id_person-country');
             var ddi_el = $('#id_person-ddi');
