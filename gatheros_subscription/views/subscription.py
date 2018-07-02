@@ -852,7 +852,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
                 for transaction in subscription.transactions.all():
                     if transaction.status == transaction.WAITING_PAYMENT and \
-                                    transaction.type == 'boleto':
+                            transaction.type == 'boleto':
                         return True
 
         return False
@@ -1090,9 +1090,22 @@ class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
 
 
 class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
-
     form_class = SubscriptionCSVUploadForm
     template_name = "subscription/csv_import.html"
 
+    def dispatch(self, request, *args, **kwargs):
+
+        response = super().dispatch(request, *args, **kwargs)
+
+        if not self.event.allow_importing:
+            messages.error(request, "Evento não permite importação via CSV.")
+            return redirect(
+                reverse_lazy("subscription:subscription-list",
+                             kwargs={
+                                 'event_pk': self.event.pk
+                             })
+            )
+
+        return response
 
 
