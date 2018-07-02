@@ -297,7 +297,6 @@ class EventSlugUpdaterView(AccountMixin, generic.View):
 
             url = absoluteuri.build_absolute_uri('/{}'.format(slug))
 
-            print(url)
             return HttpResponse(url)
 
         except ReservedSlugException as e:

@@ -21,6 +21,17 @@
 
 {% block scripts %}
     <script>
+        $(document).ready(function () {
+            $('#test-sub').on('change', function () {
+                switchState = $('#test-sub').is(":checked");
+                var messageState = switchState ? "True" : "False";
+                $.post("{% url 'subscription:subscription-switch-test' %}", {state: messageState}).done(function (data) {
+                    console.log("foi");
+                });
+
+            });
+        });
+
         function show_block(el_to_show, el_to_hide) {
             el_to_show = $(el_to_show);
             el_to_hide = $(el_to_hide);
@@ -37,7 +48,7 @@
         }
 
         function delete_payment(transaction_id, amount) {
-            var message = "Tem certeza que deseja deletar o lançamento de R$ " +amount+ " ?";
+            var message = "Tem certeza que deseja deletar o lançamento de R$ " + amount + " ?";
 
             document.getElementById('delete-message').innerHTML = message;
             $('#manual-delete-payment-form-modal').modal();

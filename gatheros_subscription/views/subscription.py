@@ -1086,3 +1086,35 @@ class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
             completed=True,
             event=self.get_event(),
         ).exclude(status=Subscription.CANCELED_STATUS).order_by('-attended_on')
+
+
+class SwitchSubscriptionTestView(EventViewMixin, generic.View):
+    object = None
+
+    def get_object(self):
+        if self.object:
+            return self.object
+
+        try:
+            self.object = Subscription.objects.get(pk=self.kwargs.get('pk'))
+
+        except Subscription.DoesNotExist:
+            return None
+
+        else:
+            return self.object
+
+    def post(self, request, *args, **kwargs):
+        state = request.Post.get('state')
+        if state == "True":
+            is_test = True
+        else:
+            is_test = False
+
+        subscription = self.get_object()
+        subscription.test_subscription = is_test
+        subscription.save()
+        return HttpResponse(state)
+        #
+        # except ReservedSlugException as e:
+        #     return HttpResponse(str(e), status=200)

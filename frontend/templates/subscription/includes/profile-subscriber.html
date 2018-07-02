@@ -16,17 +16,19 @@
                 </button>
             </div>
             <div class="float-left">
-                <h3 class="text-bold" style="margin: 8px 0 0 20px;font-size:22px">Painel Geral do Participante</h3>
+                <h3 class="text-bold"
+                    style="margin: 8px 0 0 20px;font-size:22px">Painel Geral do
+                    Participante</h3>
             </div>
             {% if event.allow_internal_subscription %}
-            <div class="float-right">
-                <button onclick="window.location.href='{% url 'subscription:subscription-edit' event.pk object.pk %}'"
-                        class="btn btn-info btn-trans"
-                        data-toggle="tooltip"
-                        title="Editar">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
-            </div>
+                <div class="float-right">
+                    <button onclick="window.location.href='{% url 'subscription:subscription-edit' event.pk object.pk %}'"
+                            class="btn btn-info btn-trans"
+                            data-toggle="tooltip"
+                            title="Editar">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
             {% endif %}
             <div class="clearfix"></div>
         </div>
@@ -86,7 +88,8 @@
                             <td class="message"
                                 style="cursor: default;border-top:0">
                                 <span class="title">Presente</span>
-                                {% if object.attended %}Sim{% else %}Não{% endif %}
+                                {% if object.attended %}Sim{% else %}
+                                    Não{% endif %}
                                 {#                                        Sim <small class="text-muted">- 27/05/2018 17h03</small>#}
                             </td>
                         </tr>
@@ -134,255 +137,282 @@
         </div>
     </div>
     {% if is_free is False and last_transaction %}
-    <div class="col-xl-5 col-lg-5 col-md-6">
-        <div class="panel">
-            <div class="panel-body" style="padding:0">
-                <div style="border:1px solid #ddd">
-                    <table class="table table-inbox table-hover"
-                           style="margin-bottom:0">
-                        <thead>
-                        <tr>
-                            <th>Sobre o Pagamento</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr class="unread">
-                            <td class="message" style="cursor: default;border-top:0">
-                                <div>
-                                    {% if last_transaction.manual is True %}
-                                        {% if last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_MONEY %}
-                                            <div class="float-left">
-                                                <i style="font-size: 40px" class="far fa-money-bill-alt"></i>
-                                            </div>
-                                            <div class="float-left" style="margin-left:10px">
-                                                <span class="title">Método</span>
-                                                <span>Dinheiro</span>
-                                                <small>(manual)</small>
-                                            </div>
-                                        {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_PAYCHECK %}
-                                            <div class="float-left">
-                                                <i style="font-size: 40px" class="fas fa-money-check-alt"></i>
-                                            </div>
-                                            <div class="float-left" style="margin-left:10px">
-                                                <span class="title">Método</span>
-                                                <span>Cheque</span>
-                                                <small>(manual)</small>
-                                            </div>
-                                        {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_DEBIT_CARD %}
-                                            <div class="float-left">
-                                                <i style="font-size: 40px" class="far fa-credit-card"></i>
-                                            </div>
-                                            <div class="float-left" style="margin-left:10px">
-                                                <span class="title">Método</span>
-                                                <span>Cartão de Débito</span>
-                                                <small>(manual)</small>
-                                            </div>
-                                        {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_CREDIT_CARD %}
-                                            <div class="float-left">
-                                                <i style="font-size: 40px" class="far fa-credit-card"></i>
-                                            </div>
-                                            <div class="float-left" style="margin-left:10px">
-                                                <span class="title">Método</span>
-                                                <span>Cartão de Crédito</span>
-                                                <small>(manual)</small>
-                                            </div>
-                                        {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_BANK_DEPOSIT %}
-                                            <div class="float-left">
-                                                <i style="font-size: 40px" class="fas fa-university"></i>
-                                            </div>
-                                            <div class="float-left" style="margin-left:10px">
-                                                <span class="title">Método</span>
-                                                <span>Depósito</span>
-                                                <small>(manual)</small>
-                                            </div>
-                                        {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_BANK_TRANSFER %}
-                                            <div class="float-left">
-                                                <i style="font-size: 40px" class="fas fa-exchange-alt"></i>
-                                            </div>
-                                            <div class="float-left" style="margin-left:10px">
-                                                <span class="title">Método</span>
-                                                <span>Transferência bancária</span>
-                                                <small>(manual)</small>
-                                            </div>
-                                        {% endif %}
-                                    {% else %}
-                                        {% if last_transaction.type == last_transaction.BOLETO %}
-                                            <div class="float-left">
-                                                <i style="font-size: 40px" class="fas fa-barcode"></i>
-                                            </div>
-                                            <div class="float-left"
-                                                 style="margin-left:10px">
-                                                <span class="title">Método</span>
-                                                Boleto
-                                                {% if last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
-                                                    <strong class="text-warning">(vencido)</strong>
-                                                {% endif %}
-                                            </div>
-                                            {% if last_transaction.status != last_transaction.PAID and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
-                                            <div class="float-right">
-                                                <button type="button"
-                                                        data-toggle="tooltip"
-                                                        title="{% if last_transaction.boleto_url %}Abrir boleto{% else %}Aguardando processamento{% endif %}"
-                                                        class="btn btn-success btn-sm btn-trans {% if not last_transaction.boleto_url %}disabled{% endif %}"
-                                                        onclick="window.open('{{ last_transaction.boleto_url }}')">
-                                                    <i class="far fa-file-alt"></i>
-                                                    {% if last_transaction.boleto_url %}abrir{% else %}aguarde ...{% endif %}
-                                                </button>
-                                                {% if last_transaction.boleto_url and object.person.email %}
-                                                <button type="button"
-                                                        data-toggle="tooltip"
-                                                        title="Enviar boleto para o participante"
-                                                        class="btn btn-info btn-sm btn-trans"
-                                                        onclick="if(!$(this).hasClass('disabled') && confirm('Confirme para enviar o boleto ao participante!')){$(this).addClass('disabled').text('aguarde ...');$('#payment-notify-boleto').submit();}">
-                                                        <i class="far fa-envelope"></i>
-                                                        enviar
-                                                </button>
-                                                {% endif %}
-                                            </div>
-                                            {% endif %}
-                                            {% if new_boleto_allowed and last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
-                                                <div class="float-right">
-                                                    <button type="button"
-                                                        data-toggle="tooltip"
-                                                        title="Abrir documento"
-                                                        class="btn btn-info btn-sm btn-trans"
-                                                        onclick="open_checkout()">
-                                                        novo boleto
-                                                    </button>
+        <div class="col-xl-5 col-lg-5 col-md-6">
+            <div class="panel">
+                <div class="panel-body" style="padding:0">
+                    <div style="border:1px solid #ddd">
+                        <table class="table table-inbox table-hover"
+                               style="margin-bottom:0">
+                            <thead>
+                            <tr>
+                                <th>Sobre o Pagamento</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="unread">
+                                <td class="message"
+                                    style="cursor: default;border-top:0">
+                                    <div>
+                                        {% if last_transaction.manual is True %}
+                                            {% if last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_MONEY %}
+                                                <div class="float-left">
+                                                    <i style="font-size: 40px"
+                                                       class="far fa-money-bill-alt"></i>
+                                                </div>
+                                                <div class="float-left"
+                                                     style="margin-left:10px">
+                                                    <span class="title">Método</span>
+                                                    <span>Dinheiro</span>
+                                                    <small>(manual)</small>
+                                                </div>
+                                            {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_PAYCHECK %}
+                                                <div class="float-left">
+                                                    <i style="font-size: 40px"
+                                                       class="fas fa-money-check-alt"></i>
+                                                </div>
+                                                <div class="float-left"
+                                                     style="margin-left:10px">
+                                                    <span class="title">Método</span>
+                                                    <span>Cheque</span>
+                                                    <small>(manual)</small>
+                                                </div>
+                                            {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_DEBIT_CARD %}
+                                                <div class="float-left">
+                                                    <i style="font-size: 40px"
+                                                       class="far fa-credit-card"></i>
+                                                </div>
+                                                <div class="float-left"
+                                                     style="margin-left:10px">
+                                                    <span class="title">Método</span>
+                                                    <span>Cartão de Débito</span>
+                                                    <small>(manual)</small>
+                                                </div>
+                                            {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_CREDIT_CARD %}
+                                                <div class="float-left">
+                                                    <i style="font-size: 40px"
+                                                       class="far fa-credit-card"></i>
+                                                </div>
+                                                <div class="float-left"
+                                                     style="margin-left:10px">
+                                                    <span class="title">Método</span>
+                                                    <span>Cartão de Crédito</span>
+                                                    <small>(manual)</small>
+                                                </div>
+                                            {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_BANK_DEPOSIT %}
+                                                <div class="float-left">
+                                                    <i style="font-size: 40px"
+                                                       class="fas fa-university"></i>
+                                                </div>
+                                                <div class="float-left"
+                                                     style="margin-left:10px">
+                                                    <span class="title">Método</span>
+                                                    <span>Depósito</span>
+                                                    <small>(manual)</small>
+                                                </div>
+                                            {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_BANK_TRANSFER %}
+                                                <div class="float-left">
+                                                    <i style="font-size: 40px"
+                                                       class="fas fa-exchange-alt"></i>
+                                                </div>
+                                                <div class="float-left"
+                                                     style="margin-left:10px">
+                                                    <span class="title">Método</span>
+                                                    <span>Transferência bancária</span>
+                                                    <small>(manual)</small>
                                                 </div>
                                             {% endif %}
-                                        {% elif new_boleto_allowed and last_transaction.type == last_transaction.CREDIT_CARD %}
-                                            <div class="float-left">
-                                                <i style="font-size: 40px" class="far fa-credit-card"></i>
-                                            </div>
-                                            <div class="float-left" style="margin-left:10px">
-                                                <span class="title">Método</span>
-                                                Cartão de Crédito
-                                            </div>
-                                            {% if new_boleto_allowed and last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
-                                                <div class="float-right">
-                                                    <button type="button"
-                                                        data-toggle="tooltip"
-                                                        title="Abrir documento"
-                                                        class="btn btn-info btn-sm btn-trans"
-                                                        onclick="open_checkout()">
-                                                        novo boleto
-                                                    </button>
+                                        {% else %}
+                                            {% if last_transaction.type == last_transaction.BOLETO %}
+                                                <div class="float-left">
+                                                    <i style="font-size: 40px"
+                                                       class="fas fa-barcode"></i>
                                                 </div>
+                                                <div class="float-left"
+                                                     style="margin-left:10px">
+                                                    <span class="title">Método</span>
+                                                    Boleto
+                                                    {% if last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                        <strong class="text-warning">(vencido)</strong>
+                                                    {% endif %}
+                                                </div>
+                                                {% if last_transaction.status != last_transaction.PAID and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                    <div class="float-right">
+                                                        <button type="button"
+                                                                data-toggle="tooltip"
+                                                                title="{% if last_transaction.boleto_url %}Abrir boleto{% else %}Aguardando processamento{% endif %}"
+                                                                class="btn btn-success btn-sm btn-trans {% if not last_transaction.boleto_url %}disabled{% endif %}"
+                                                                onclick="window.open('{{ last_transaction.boleto_url }}')">
+                                                            <i class="far fa-file-alt"></i>
+                                                            {% if last_transaction.boleto_url %}
+                                                                abrir{% else %}
+                                                                aguarde
+                                                                ...{% endif %}
+                                                        </button>
+                                                        {% if last_transaction.boleto_url and object.person.email %}
+                                                            <button type="button"
+                                                                    data-toggle="tooltip"
+                                                                    title="Enviar boleto para o participante"
+                                                                    class="btn btn-info btn-sm btn-trans"
+                                                                    onclick="if(!$(this).hasClass('disabled') && confirm('Confirme para enviar o boleto ao participante!')){$(this).addClass('disabled').text('aguarde ...');$('#payment-notify-boleto').submit();}">
+                                                                <i class="far fa-envelope"></i>
+                                                                enviar
+                                                            </button>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endif %}
+                                                {% if new_boleto_allowed and last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                    <div class="float-right">
+                                                        <button type="button"
+                                                                data-toggle="tooltip"
+                                                                title="Abrir documento"
+                                                                class="btn btn-info btn-sm btn-trans"
+                                                                onclick="open_checkout()">
+                                                            novo boleto
+                                                        </button>
+                                                    </div>
+                                                {% endif %}
+                                            {% elif new_boleto_allowed and last_transaction.type == last_transaction.CREDIT_CARD %}
+                                                <div class="float-left">
+                                                    <i style="font-size: 40px"
+                                                       class="far fa-credit-card"></i>
+                                                </div>
+                                                <div class="float-left"
+                                                     style="margin-left:10px">
+                                                    <span class="title">Método</span>
+                                                    Cartão de Crédito
+                                                </div>
+                                                {% if new_boleto_allowed and last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                    <div class="float-right">
+                                                        <button type="button"
+                                                                data-toggle="tooltip"
+                                                                title="Abrir documento"
+                                                                class="btn btn-info btn-sm btn-trans"
+                                                                onclick="open_checkout()">
+                                                            novo boleto
+                                                        </button>
+                                                    </div>
+                                                {% endif %}
                                             {% endif %}
                                         {% endif %}
-                                    {% endif %}
-                                    <div class="clearfix"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="unread">
-                            <td class="message" style="cursor: default">
-                                <div class="float-left">
-                                    {% if total_paid  %}
-                                        <span class="title">Valor pago</span>
-                                        <strong class="text-success">
-                                            R$ {{ total_paid|intcomma }} (pago)
-                                        </strong>
-                                        {% if dividend_amount < 0 %}
-                                        restante: <span class="text-danger">R$ {{ dividend_amount|intcomma }}</span>
-                                        {% elif dividend_amount > 0 %}
-                                        em ver: <span class="text-primary">R$ {{ dividend_amount|intcomma }}</span>
-                                        {% endif %}
-                                    {% else %}
-                                        <span class="title">Valor inscrição</span>
-                                        <strong class="text-danger">
-                                            R$ {{ last_transaction.amount|intcomma }}
-                                        </strong>
-                                    {% endif %}
-                                </div>
-                                <div class="float-right"
-                                     style="margin-left:10px;margin-top:5px;">
-                                    <button type="button"
-                                            data-toggle="tooltip"
-                                            title="Ver detalhes do pagamento"
-                                            onclick="window.location.href='{% url 'subscription:subscription-payments' event.pk object.pk %}?details=1'"
-                                            class="btn btn-info btn-sm btn-trans">
-                                        detalhamento
-                                    </button>
-                                </div>
-                                <div class="clearfix"></div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% elif new_boleto_allowed and is_free is False and not last_transaction %}
-    <div class="col-xl-5 col-lg-5 col-md-6">
-        <div class="panel">
-            <div class="panel-body" style="padding:0">
-                <div style="border:1px solid #ddd">
-                    <table class="table table-inbox table-hover"
-                           style="margin-bottom:0">
-                        <thead>
-                        <tr>
-                            <th>Sobre o Pagamento</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr class="unread">
-                            <td class="message" style="cursor: default;border-top:0">
-                                <div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="unread">
+                                <td class="message" style="cursor: default">
                                     <div class="float-left">
-                                        <i style="font-size: 40px" class="fas fa-minus"></i>
-                                    </div>
-                                    <div class="float-left"
-                                         style="margin-left:10px">
-                                        <span class="title">Método</span>
-                                        Nenhum
-                                        {% if last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
-                                            <strong class="text-warning">(vencido)</strong>
+                                        {% if total_paid %}
+                                            <span class="title">Valor pago</span>
+                                            <strong class="text-success">
+                                                R$ {{ total_paid|intcomma }}
+                                                (pago)
+                                            </strong>
+                                            {% if dividend_amount < 0 %}
+                                                restante:
+                                                <span class="text-danger">R$ {{ dividend_amount|intcomma }}</span>
+                                            {% elif dividend_amount > 0 %}
+                                                em ver:
+                                                <span class="text-primary">R$ {{ dividend_amount|intcomma }}</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="title">Valor inscrição</span>
+                                            <strong class="text-danger">
+                                                R$ {{ last_transaction.amount|intcomma }}
+                                            </strong>
                                         {% endif %}
                                     </div>
-                                    <div class="float-right">
+                                    <div class="float-right"
+                                         style="margin-left:10px;margin-top:5px;">
                                         <button type="button"
-                                            data-toggle="tooltip"
-                                            title="Abrir documento"
-                                            class="btn btn-info btn-sm btn-trans"
-                                            onclick="open_checkout()">
-                                            novo boleto
+                                                data-toggle="tooltip"
+                                                title="Ver detalhes do pagamento"
+                                                onclick="window.location.href='{% url 'subscription:subscription-payments' event.pk object.pk %}?details=1'"
+                                                class="btn btn-info btn-sm btn-trans">
+                                            detalhamento
                                         </button>
+                                    </div>
                                     <div class="clearfix"></div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="unread">
-                            <td class="message" style="cursor: default">
-                                <div class="float-left">
-                                    {% if total_paid  %}
-                                        <span class="title">Valor pago</span>
-                                        <strong class="text-success">
-                                            R$ {{ total_paid|intcomma }} (pago)
-                                        </strong>
-                                        {% if dividend_amount < 0 %}
-                                        restante: <span class="text-danger">R$ {{ dividend_amount|intcomma }}</span>
-                                        {% elif dividend_amount > 0 %}
-                                        em ver: <span class="text-primary">R$ {{ dividend_amount|intcomma }}</span>
-                                        {% endif %}
-                                    {% else %}
-                                        <span class="title">Valor inscrição</span>
-                                        <strong class="text-danger">
-                                            R$ {{ object.lot.get_calculated_price|intcomma }}
-                                        </strong>
-                                    {% endif %}
-                                </div>
-                                <div class="clearfix"></div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    {% elif new_boleto_allowed and is_free is False and not last_transaction %}
+        <div class="col-xl-5 col-lg-5 col-md-6">
+            <div class="panel">
+                <div class="panel-body" style="padding:0">
+                    <div style="border:1px solid #ddd">
+                        <table class="table table-inbox table-hover"
+                               style="margin-bottom:0">
+                            <thead>
+                            <tr>
+                                <th>Sobre o Pagamento</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="unread">
+                                <td class="message"
+                                    style="cursor: default;border-top:0">
+                                    <div>
+                                        <div class="float-left">
+                                            <i style="font-size: 40px"
+                                               class="fas fa-minus"></i>
+                                        </div>
+                                        <div class="float-left"
+                                             style="margin-left:10px">
+                                            <span class="title">Método</span>
+                                            Nenhum
+                                            {% if last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                <strong class="text-warning">(vencido)</strong>
+                                            {% endif %}
+                                        </div>
+                                        <div class="float-right">
+                                            <button type="button"
+                                                    data-toggle="tooltip"
+                                                    title="Abrir documento"
+                                                    class="btn btn-info btn-sm btn-trans"
+                                                    onclick="open_checkout()">
+                                                novo boleto
+                                            </button>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                </td>
+                            </tr>
+                            <tr class="unread">
+                                <td class="message" style="cursor: default">
+                                    <div class="float-left">
+                                        {% if total_paid %}
+                                            <span class="title">Valor pago</span>
+                                            <strong class="text-success">
+                                                R$ {{ total_paid|intcomma }}
+                                                (pago)
+                                            </strong>
+                                            {% if dividend_amount < 0 %}
+                                                restante:
+                                                <span class="text-danger">R$ {{ dividend_amount|intcomma }}</span>
+                                            {% elif dividend_amount > 0 %}
+                                                em ver:
+                                                <span class="text-primary">R$ {{ dividend_amount|intcomma }}</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="title">Valor inscrição</span>
+                                            <strong class="text-danger">
+                                                R$ {{ object.lot.get_calculated_price|intcomma }}
+                                            </strong>
+                                        {% endif %}
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endif %}
 </div>
 
@@ -407,28 +437,33 @@
                         <div class="float-right">
                             {% if last_transaction %}
                                 {% if dividend_amount < 0 %}
-                                    <i class="fas fa-exclamation-triangle text-warning animated shake" style="margin-left:20px"
+                                    <i class="fas fa-exclamation-triangle text-warning animated shake"
+                                       style="margin-left:20px"
                                        data-toggle="tooltip"
                                        title="Participante com dívidas."
                                     ></i>
                                 {% elif dividend_amount > 0 %}
-                                    <i class="fas fa-exclamation-triangle text-warning animated shake" style="margin-left:20px"
+                                    <i class="fas fa-exclamation-triangle text-warning animated shake"
+                                       style="margin-left:20px"
                                        data-toggle="tooltip"
                                        title="Participante com valor em ver com o evento."
                                     ></i>
                                 {% elif dividend_amount == 0 %}
-                                    <i class="fas fa-check text-success" style="margin-left:20px"
+                                    <i class="fas fa-check text-success"
+                                       style="margin-left:20px"
                                        data-toggle="tooltip"
                                        title="Participante sem dívidas."
                                     ></i>
                                 {% endif %}
                             {% elif is_free is False %}
-                                <i class="fas fa-exclamation-triangle text-warning animated shake" style="margin-left:20px"
+                                <i class="fas fa-exclamation-triangle text-warning animated shake"
+                                   style="margin-left:20px"
                                    data-toggle="tooltip"
                                    title="Participante com dívidas."
                                 ></i>
                             {% elif is_free is True %}
-                                <i class="fas fa-check text-success" style="margin-left:20px"
+                                <i class="fas fa-check text-success"
+                                   style="margin-left:20px"
                                    data-toggle="tooltip"
                                    title="Participante sem dívidas."
                                 ></i>
@@ -496,17 +531,32 @@
                         <div class="connect social">
                             <ul>
                                 {% if is_free is False %}
-                                <li>
-                                    <button type="button"
-                                            class="btn btn-info btn-trans"
-                                            data-toggle="tooltip"
-                                            title="Abrir informações financeiras do participante"
-                                            onclick="window.location.href='{% url 'subscription:subscription-payments' event.pk object.pk %}'">
-                                        <span class="far fa-money-bill-alt"></span>
-                                        Ver Painel Financeiro
-                                    </button>
-                                </li>
+
+                                    <li>
+                                        <button type="button"
+                                                class="btn btn-info btn-trans"
+                                                data-toggle="tooltip"
+                                                title="Abrir informações financeiras do participante"
+                                                onclick="window.location.href='{% url 'subscription:subscription-payments' event.pk object.pk %}'">
+                                            <span class="far fa-money-bill-alt"></span>
+                                            Ver Painel Financeiro
+                                        </button>
+                                    </li>
                                 {% endif %}
+
+                                <li class="float-right">
+
+                                    <label for="test-sub">Inscrição de teste?</label>
+
+                                        <input id="test-sub"
+                                               type="checkbox"
+                                               class="js-switch"
+                                               data-toggle="tooltip"
+                                               title="Esta inscrição é uma inscrição de teste ?"
+                                        >
+                                        </input>
+                                </li>
+
                                 <li>
                                     <button type="button" style="display:none"
                                             class="btn btn-primary btn-trans"
