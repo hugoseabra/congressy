@@ -11,4 +11,4 @@ def validate_csv_only_file(value):
     ]
 
     if not ext.lower() in valid_extensions:
-        raise ValidationError(u'Unsupported file extension.')
+        raise ValidationError(u'Tipo de arquivo não permitido.')

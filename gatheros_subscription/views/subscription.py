@@ -39,7 +39,8 @@ from mailer import exception as mailer_exception, services as mailer
 from payment import forms
 from payment.helpers import payment_helpers
 from payment.models import Transaction
-
+from django.utils.datastructures import MultiValueDictKeyError
+import csv
 
 class EventViewMixin(TemplateNameableMixin, AccountMixin):
     """ Mixin de view para vincular com informações de event. """
@@ -1092,6 +1093,8 @@ class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
 class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
     form_class = SubscriptionCSVUploadForm
     template_name = "subscription/csv_import.html"
+    csv_obj = None
+    is_valid = False
 
     def dispatch(self, request, *args, **kwargs):
 
@@ -1107,5 +1110,23 @@ class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
             )
 
         return response
+
+    def form_valid(self, form):
+        self.is_valid = True
+
+        in_memory_file = self.request.FILES.get('csv_file', False)
+
+        if in_memory_file is not False:
+            self.csv_obj = csv.DictReader(in_memory_file.read())
+
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if isinstance(self.csv_obj, csv.DictReader) and self.is_valid:
+            pass
+        return context
+
+
 
 

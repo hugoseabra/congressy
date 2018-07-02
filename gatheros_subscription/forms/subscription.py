@@ -152,10 +152,41 @@ class SubscriptionAttendanceForm(forms.Form):
 
 class SubscriptionCSVUploadForm(forms.Form):
 
+    ENCODING_UTF8 = "utf-8"
+    ENCODING_8859_1 = "iso-8859-1"
+
+    ENCODING_CHOICES  = (
+        (ENCODING_UTF8, "UTF-8"),
+        (ENCODING_8859_1, "ISO 8859-1(Latim)")
+    )
+
     csv_file = forms.FileField(
         validators=[validate_csv_only_file],
         label="Arquivo CSV:"
     )
+
+    separator = forms.CharField(
+        label="Separador",
+        max_length=1,
+        required=False,
+        initial='"',
+    )
+
+    delimiter = forms.CharField(
+        label="Delimitador",
+        max_length=1,
+        required=False,
+        initial=",",
+    )
+
+    encoding = forms.ChoiceField(
+        label="Tipo de Codificação",
+        required=False,
+        choices=ENCODING_CHOICES,
+        initial=ENCODING_UTF8,
+    )
+
+
 
 
 
