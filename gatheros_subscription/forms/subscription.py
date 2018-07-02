@@ -151,4 +151,11 @@ class SubscriptionAttendanceForm(forms.Form):
 
 
 class SubscriptionCSVUploadForm(forms.Form):
-    file = forms.FileField(validators=[validate_csv_only_file])
+
+    csv_file = forms.FileField(
+        validators=[validate_csv_only_file],
+        label="Arquivo CSV:"
+    )
+
+
+
