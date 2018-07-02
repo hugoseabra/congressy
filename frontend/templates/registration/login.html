@@ -118,7 +118,7 @@
                 if (e.which == null) {
                     return String.fromCharCode(e.keyCode); // IE
                 }
-                if (e.which != 0 && e.charCode != 0) {
+                if (e.which !== 0 && e.charCode !== 0) {
                     return String.fromCharCode(e.which); // rest
                 }
 
