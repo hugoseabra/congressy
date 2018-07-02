@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import RedirectView
+from datetime import datetime
 
 from gatheros_event.helpers import account
 from gatheros_event.models import Organization
@@ -52,7 +53,10 @@ class OrganizationSwitch(RedirectView):
             context = "está na organização '{}'".format(organization.name)
 
         messages.info(request, "Agora você {}.".format(context))
+        organization.last_acess = datetime.now().strftime(
+                "%Y-%m-%dT%H:%M:%S.%fZ")
 
+        organization.save()
         return super(OrganizationSwitch, self).post(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):

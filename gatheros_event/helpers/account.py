@@ -167,7 +167,7 @@ def get_organizations(request):
             Organization.objects.filter(
                 pk__in=account.get('organizations'),
                 active=True
-            ).order_by('-internal', 'name')
+            ).order_by('-last_acess', '-internal', 'name')
         )
 
     return request.cached_organizations
