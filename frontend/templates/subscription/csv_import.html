@@ -18,6 +18,7 @@
         function processCSV() {
 
             var formData = new FormData($('#csvForm')[0]);
+            formData.append('preview', true);
 
             var sender = new cgsy.AjaxFormDataSender("{% url 'subscription:subscriptions-csv-import-upload' event.pk %}");
 
@@ -143,7 +144,6 @@
                                 {% render_generic_field form.encoding %}
                             </div>
 
-
                         </div>
                         <div class="row">
                             <div class="col-md-6">
@@ -167,11 +167,9 @@
         <div class="col-md-12">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Resultados</h3>
+                    <h3 class="panel-title">Preview</h3>
                 </div>
                 <div class="panel-body">
-
-                    <h2>Conteudo parseado aqui.</h2>
 
                 </div>
             </div>

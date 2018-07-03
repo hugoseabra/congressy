@@ -1,6 +1,5 @@
 import base64
 import csv
-import json
 from datetime import datetime
 
 import qrcode
@@ -8,6 +7,7 @@ import qrcode.image.svg
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.files.base import ContentFile
 from django.db.transaction import atomic
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
@@ -21,6 +21,7 @@ from wkhtmltopdf.views import PDFTemplateView
 
 from core.forms.cleaners import clear_string
 from core.views.mixins import TemplateNameableMixin
+from csv_importer.forms import CSVForm
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Person
 from gatheros_event.views.mixins import (
@@ -41,8 +42,6 @@ from mailer import exception as mailer_exception, services as mailer
 from payment import forms
 from payment.helpers import payment_helpers
 from payment.models import Transaction
-
-from csv_importer.forms import CSVForm
 
 
 class EventViewMixin(TemplateNameableMixin, AccountMixin):
@@ -1116,78 +1115,61 @@ class SubscriptionCSVConfigView(EventViewMixin, generic.TemplateView):
         return context
 
 
-# class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
-#     form_class = SubscriptionCSVUploadForm
-#     template_name = "subscription/csv_import.html"
-#     csv_obj = None
-#     is_valid = False
-#
-#     def dispatch(self, request, *args, **kwargs):
-#
-#         response = super().dispatch(request, *args, **kwargs)
-#
-#         if not self.event.allow_importing:
-#
-#             if request.is_ajax():
-#                 message = 'Evento não permite importação via CSV'
-#                 return JsonResponse({'error': message}, status=403)
-#
-#             else:
-#                 messages.error(request,
-#                                "Evento não permite importação via CSV.")
-#                 return redirect(
-#                     reverse_lazy("subscription:subscription-list",
-#                                  kwargs={
-#                                      'event_pk': self.event.pk
-#                                  })
-#                 )
-#
-#         return response
-#
-#     def form_valid(self, form):
-#         self.is_valid = True
-#
-#         in_memory_file = self.request.FILES.get('csv_file', False)
-#
-#         if in_memory_file is False:
-#             return JsonResponse({'error': 'Nenhum arquivo fornecido.'},
-#                                 status=400)
-#
-#         file_contents = in_memory_file.read()
-#         encoding = form.cleaned_data['encoding']
-#         # TODO add try catch here;
-#         content = file_contents.decode(encoding)
-#
-#         content = content.splitlines()
-#
-#         d = form.cleaned_data['delimiter']
-#         q = form.cleaned_data['separator']
-#         data = [row for row in csv.reader(content, delimiter=d, quotechar=q)]
-#
-#         keys = data.pop(0)
-#         main_json = {
-#             'keys': keys,
-#             'data': data,
-#         }
-#
-#         return JsonResponse(json.dumps(main_json), safe=False)
-#
-#     def form_invalid(self, form):
-#
-#         if self.request.is_ajax():
-#             response = JsonResponse(dict(form.errors.items()))
-#         else:
-#             response = super().form_invalid(form)
-#
-#         return response
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         if isinstance(self.csv_obj, csv.DictReader) and self.is_valid:
-#             print('sdsadasda')
-#             pass
-#         return context
+class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
+    form_class = CSVForm
+    preview = False
 
+    def dispatch(self, request, *args, **kwargs):
 
-class SubscriptionCSVImportView(EventViewMixin, generic.TemplateView):
-    template_name = "subscription/csv_import.html"
+        if not request.is_ajax():
+            message = 'Apenas requisições do tipo XMLHttpRequest são ' \
+                      'permitidas.'
+            return JsonResponse({'error': message}, status=403)
+
+        is_preview = request.POST.get('preview', False)
+
+        if is_preview and is_preview == 'true':
+            self.preview = True
+
+        response = super().dispatch(request, *args, **kwargs)
+
+        if not self.event.allow_importing:
+            message = 'Evento não permite importação via CSV'
+            return JsonResponse({'error': message}, status=403)
+
+        return response
+
+    def form_valid(self, form):
+
+        instance = form.save()
+
+        encoding = form.cleaned_data['encoding']
+
+        file_content = instance.csv_file.file.read()
+
+        encoded_content = file_content.decode(encoding)
+
+        content = encoded_content.splitlines()
+
+        d = form.cleaned_data['delimiter']
+        q = form.cleaned_data['separator']
+
+        reader = csv.reader(content, delimiter=d, quotechar=q)
+        full_string = ''
+        for row in reader:
+            line = ', '.join(row) + '\n'
+            full_string += line
+
+        if self.preview:
+            lines = full_string.splitlines()
+            print('sdsadas')
+            return JsonResponse({'ok': 'success'})
+        else:
+            file_obj = ContentFile(full_string, name=instance.csv_file.name)
+            instance.csv_file = file_obj
+            instance.save()
+
+        return JsonResponse({'ok': 'success'})
+
+    def form_invalid(self, form):
+        return JsonResponse(dict(form.errors.items()))
