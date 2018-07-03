@@ -185,8 +185,3 @@ class SubscriptionCSVUploadForm(forms.Form):
         choices=ENCODING_CHOICES,
         initial=ENCODING_UTF8,
     )
-
-
-
-
-
