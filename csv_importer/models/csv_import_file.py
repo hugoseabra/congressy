@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from django.db import models
 
-from csv_importer.forms.validators import validate_csv_only_file
+from csv_importer.validators import validate_csv_only_file
 
 
 def get_file_path(instance, filename):
