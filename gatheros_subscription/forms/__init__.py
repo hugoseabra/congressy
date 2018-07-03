@@ -6,8 +6,6 @@ from .subscription import (
     SubscriptionAttendanceForm,
     SubscriptionForm,
     SubscriptionPersonForm,
-    SubscriptionCSVUploadForm,
 )
 from .export import SubscriptionFilterForm
 from .survey import EventSurveyForm, SurveyForm
-from .validators import validate_csv_only_file
