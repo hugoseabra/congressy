@@ -64,7 +64,14 @@
 {% block content %}
 
     <form method="post" enctype="multipart/form-data" id="csvForm">
+
         {% csrf_token %}
+
+        {# Include the hidden fields #}
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+
 
         <!-- Form errors -->
         <div class="row">
