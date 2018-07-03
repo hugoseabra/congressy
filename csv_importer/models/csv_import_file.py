@@ -3,6 +3,8 @@ from uuid import uuid4
 
 from django.db import models
 
+from csv_importer.forms.validators import validate_csv_only_file
+
 
 def get_file_path(instance, filename):
     """ Resgata localização onde os arquivos csv serão salvos. """
@@ -10,6 +12,13 @@ def get_file_path(instance, filename):
 
 
 class CSVImportFile(models.Model):
+    ENCODING_UTF8 = "utf-8"
+    ENCODING_8859_1 = "iso-8859-1"
+
+    ENCODING_CHOICES = (
+        (ENCODING_UTF8, "UTF-8"),
+        (ENCODING_8859_1, "ISO 8859-1(Latim)")
+    )
 
     uuid = models.UUIDField(
         default=uuid4,
@@ -27,6 +36,7 @@ class CSVImportFile(models.Model):
 
     csv_file = models.FileField(
         upload_to=get_file_path,
+        validators=[validate_csv_only_file],
     )
 
     created = models.DateTimeField(
@@ -34,3 +44,21 @@ class CSVImportFile(models.Model):
         verbose_name='criado em'
     )
 
+    separator = models.CharField(
+        max_length=1,
+        default='"',
+        verbose_name="separador",
+    )
+
+    delimiter = models.CharField(
+        max_length=1,
+        default=",",
+        verbose_name="delimitador",
+    )
+
+    encoding = models.CharField(
+        choices=ENCODING_CHOICES,
+        default=ENCODING_UTF8,
+        max_length=10,
+        verbose_name="tipo de codificação",
+    )
