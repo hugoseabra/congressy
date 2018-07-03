@@ -68,7 +68,8 @@ class CSVImportFile(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        if not self.id:
+
+        if not self.pk:
             self.created = timezone.now()
         self.modified = timezone.now()
         return super().save(*args, **kwargs)
