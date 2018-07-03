@@ -6,7 +6,7 @@ from .subscription import (
     SubscriptionAttendanceForm,
     SubscriptionForm,
     SubscriptionPersonForm,
-    SubscriptionCSVUploadForm
+    SubscriptionCSVUploadForm,
 )
 from .export import SubscriptionFilterForm
 from .survey import EventSurveyForm, SurveyForm
