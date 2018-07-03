@@ -1,7 +1,6 @@
 from django import forms
 
 from csv_importer.models import CSVImportFile
-from gatheros_event.models import Event
 
 
 class CSVForm(forms.ModelForm):
@@ -21,7 +20,9 @@ class CSVForm(forms.ModelForm):
             'event': forms.HiddenInput(),
         }
 
-    def __init__(self, event_pk, *args, **kwargs):
-        self.event = Event.objects.get(pk=event_pk)
+        labels = {
+            'csv_file': 'Arquivo CSV:'
+        }
+
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['event'].inital = self.event.pk
