@@ -1153,24 +1153,23 @@ class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
                                 status=400)
 
         file_contents = in_memory_file.read()
-
         encoding = form.cleaned_data['encoding']
-        delimiter = form.cleaned_data['delimiter']
-        quotechar = form.cleaned_data['separator']
-
         # TODO add try catch here;
         content = file_contents.decode(encoding)
 
-        reader = csv.reader(
-            content,
-            delimiter=delimiter,
-            quotechar=quotechar
-        )
+        content = content.splitlines()
 
-        for row in reader:
-            print(', '.join(row))
+        d = form.cleaned_data['delimiter']
+        q = form.cleaned_data['separator']
+        data = [row for row in csv.reader(content, delimiter=d, quotechar=q)]
 
-        return JsonResponse({'errors': 'oi'})
+        keys = data.pop(0)
+        main_json = {
+            'keys': keys,
+            'data': data,
+        }
+
+        return JsonResponse(json.dumps(main_json), safe=False)
 
     def form_invalid(self, form):
 
