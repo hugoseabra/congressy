@@ -9,50 +9,152 @@
     Importação de dados via CSV
 {% endblock %}
 
+{% block scripts %}
+    <!-- Custom AJAX lib -->
+    <script src="{% static 'assets/js/ajax.js' %}"></script>
+
+    <script type="application/javascript">
+
+        function processCSV() {
+
+            var formData = new FormData($('#csvForm')[0]);
+
+            var sender = new cgsy.AjaxFormDataSender("{% url 'subscription:subscriptions-csv-import-upload' event.pk %}");
+
+            sender.setSuccessCallback(function (res) {
+                console.log(res)
+            });
+
+            sender.setFailCallback(function (err) {
+                console.error(err.responseText);
+            });
+
+            sender.send('POST', formData)
+
+
+        }
+
+        $(document).ready(function () {
+
+            var file_el = $('#id_csv_file');
+
+
+            file_el.on('change', function () {
+
+                var filename = file_el.val().replace(/.*(\/|\\)/, '');
+                var ext = filename.split('.').pop();
+
+                if (ext.toLowerCase() !== "csv") {
+                    $('#csv-file-field-error').show();
+                } else {
+                    $('.csv-file-field').hide();
+                    $('.csv-file-loader').show();
+                    processCSV();
+                }
+
+            })
+
+        });
+
+    </script>
+
+{% endblock %}
+
+
 {% block content %}
 
-    <div class="row">
-        <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" id="csvForm">
+        {% csrf_token %}
 
-            {% csrf_token %}
+        <!-- Form errors -->
+        <div class="row">
 
             <div class="col-md-12">
+
+                {% if form.non_field_errors %}
+                    {% render_errors form.non_field_errors %}
+                {% endif %}
+
+                {% for hidden_field in form.hidden_fields %}
+                    {% if hidden_field.errors %}
+                        {% render_errors hidden_field.errors %}
+                    {% endif %}
+                    {{ hidden_field }}
+                {% endfor %}
+            </div>
+
+        </div>
+
+
+        <div class="row">
+
+            <div class="col-md-6">
                 <div class="panel panel-primary">
+
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            Arquivo CSV
+                        </h3>
+                    </div>
+
                     <div class="panel-body">
-                        {% if form.non_field_errors %}
-                            {% render_errors form.non_field_errors %}
-                        {% endif %}
 
-                        {% for hidden_field in form.hidden_fields %}
-                            {% if hidden_field.errors %}
-                                {% render_errors hidden_field.errors %}
-                            {% endif %}
-                            {{ hidden_field }}
-                        {% endfor %}
-
-                        <div class="row">
+                        <div class="row csv-file-field">
+                            <div class="alert alert-danger alert-dismissable"
+                                 style="display: none" id="csv-file-field-error">
+                                Tipo de arquivo não permitido!
+                            </div>
                             <div class="col-md-6">
                                 {% render_generic_field form.csv_file %}
+                            </div>
+                        </div>
+
+                        <div class="row text-center csv-file-loader"
+                             style="margin-top:20px; display: none">
+                            <h3>Processando, aguarde...</h3>
+                            <i class="fas info-color fa-circle-notch fa-spin
+                        fa-6x" style="margin-top: 20px"></i>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" id="config-settings">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            Configurações do CSV
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+
+                            <div class="col-md-6">
                                 {% render_generic_field form.separator %}
                                 {% render_generic_field form.delimiter %}
                                 {% render_generic_field form.encoding %}
                             </div>
+
+
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <button class="btn btn-success">
                                     <i class="fa fa-save"></i>
-                                    Fazer upload
+                                    Salvar
                                 </button>
                             </div>
-                        </div>
 
+                        </div>
 
                     </div>
                 </div>
             </div>
-        </form>
-    </div>
+
+        </div>
+
+    </form>
 
     <div class="row">
         <div class="col-md-12">

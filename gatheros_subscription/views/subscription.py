@@ -1,4 +1,6 @@
 import base64
+import csv
+import json
 from datetime import datetime
 
 import qrcode
@@ -9,6 +11,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.transaction import atomic
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
+from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import six
@@ -39,8 +42,7 @@ from mailer import exception as mailer_exception, services as mailer
 from payment import forms
 from payment.helpers import payment_helpers
 from payment.models import Transaction
-from django.utils.datastructures import MultiValueDictKeyError
-import csv
+
 
 class EventViewMixin(TemplateNameableMixin, AccountMixin):
     """ Mixin de view para vincular com informações de event. """
@@ -1090,14 +1092,10 @@ class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
         ).exclude(status=Subscription.CANCELED_STATUS).order_by('-attended_on')
 
 
-class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
-    form_class = SubscriptionCSVUploadForm
+class SubscriptionCSVConfigView(EventViewMixin, generic.TemplateView):
     template_name = "subscription/csv_import.html"
-    csv_obj = None
-    is_valid = False
 
     def dispatch(self, request, *args, **kwargs):
-
         response = super().dispatch(request, *args, **kwargs)
 
         if not self.event.allow_importing:
@@ -1111,22 +1109,81 @@ class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
 
         return response
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = SubscriptionCSVUploadForm()
+        return context
+
+
+class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
+    form_class = SubscriptionCSVUploadForm
+    template_name = "subscription/csv_import.html"
+    csv_obj = None
+    is_valid = False
+
+    def dispatch(self, request, *args, **kwargs):
+
+        response = super().dispatch(request, *args, **kwargs)
+
+        if not self.event.allow_importing:
+
+            if request.is_ajax():
+                message = 'Evento não permite importação via CSV'
+                return JsonResponse({'error': message}, status=403)
+
+            else:
+                messages.error(request,
+                               "Evento não permite importação via CSV.")
+                return redirect(
+                    reverse_lazy("subscription:subscription-list",
+                                 kwargs={
+                                     'event_pk': self.event.pk
+                                 })
+                )
+
+        return response
+
     def form_valid(self, form):
         self.is_valid = True
 
         in_memory_file = self.request.FILES.get('csv_file', False)
 
-        if in_memory_file is not False:
-            self.csv_obj = csv.DictReader(in_memory_file.read())
+        if in_memory_file is False:
+            return JsonResponse({'error': 'Nenhum arquivo fornecido.'},
+                                status=400)
 
-        return self.render_to_response(self.get_context_data(form=form))
+        file_contents = in_memory_file.read()
+
+        encoding = form.cleaned_data['encoding']
+        delimiter = form.cleaned_data['delimiter']
+        quotechar = form.cleaned_data['separator']
+
+        # TODO add try catch here;
+        content = file_contents.decode(encoding)
+
+        reader = csv.reader(
+            content,
+            delimiter=delimiter,
+            quotechar=quotechar
+        )
+
+        for row in reader:
+            print(', '.join(row))
+
+        return JsonResponse({'errors': 'oi'})
+
+    def form_invalid(self, form):
+
+        if self.request.is_ajax():
+            response = JsonResponse(dict(form.errors.items()))
+        else:
+            response = super().form_invalid(form)
+
+        return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if isinstance(self.csv_obj, csv.DictReader) and self.is_valid:
+            print('sdsadasda')
             pass
         return context
-
-
-
-
