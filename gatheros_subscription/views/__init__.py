@@ -18,7 +18,6 @@ from .lot_api import (
 from .payment import PaymentDeleteView
 from .subscription import (
     MySubscriptionsListView,
-    SwitchSubscriptionTestView,
     SubscriptionAddFormView,
     SubscriptionAttendanceView,
     SubscriptionAttendanceSearchView,
@@ -30,6 +29,8 @@ from .subscription import (
     SubscriptionViewFormView,
     VoucherSubscriptionPDFView,
     SubscriptionAttendanceListView,
+    SwitchSubscriptionTestView,
+
 )
 from .subscription_api import (
     SubscriptionSearchViewSet,

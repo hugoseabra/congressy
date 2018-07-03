@@ -546,15 +546,14 @@
 
                                 <li class="float-right">
 
-                                    <label for="test-sub">Inscrição de teste?</label>
-
+                                    <label for="test-sub">Inscrição de
+                                        teste?</label>
                                         <input id="test-sub"
                                                type="checkbox"
                                                class="js-switch"
                                                data-toggle="tooltip"
-                                               title="Esta inscrição é uma inscrição de teste ?"
-                                        >
-                                        </input>
+                                               {% if object.test_subscription %} checked {% endif %}
+                                               title="Esta inscrição é uma inscrição de teste ?">
                                 </li>
 
                                 <li>

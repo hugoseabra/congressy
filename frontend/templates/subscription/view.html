@@ -23,10 +23,9 @@
     <script>
         $(document).ready(function () {
             $('#test-sub').on('change', function () {
-                switchState = $('#test-sub').is(":checked");
+                var switchState = $('#test-sub').is(":checked");
                 var messageState = switchState ? "True" : "False";
-                $.post("{% url 'subscription:subscription-switch-test' %}", {state: messageState}).done(function (data) {
-                    console.log("foi");
+                $.post("{% url 'subscription:subscription-switch-test' event.pk object.pk %}", {state: messageState, csrfmiddlewaretoken: '{{ csrf_token }}' }).done(function (data) {
                 });
 
             });

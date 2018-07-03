@@ -851,7 +851,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
                 for transaction in subscription.transactions.all():
                     if transaction.status == transaction.WAITING_PAYMENT and \
-                                    transaction.type == 'boleto':
+                            transaction.type == 'boleto':
                         return True
 
         return False
@@ -1090,6 +1090,7 @@ class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
 
 class SwitchSubscriptionTestView(EventViewMixin, generic.View):
     object = None
+    success_message = ""
 
     def get_object(self):
         if self.object:
@@ -1105,16 +1106,16 @@ class SwitchSubscriptionTestView(EventViewMixin, generic.View):
             return self.object
 
     def post(self, request, *args, **kwargs):
-        state = request.Post.get('state')
+        state = request.POST.get('state')
         if state == "True":
             is_test = True
+            self.success_message = "A inscrição agora é uma inscrição de teste"
         else:
             is_test = False
+            self.success_message = "A inscrição não é mais uma inscrição de teste"
 
         subscription = self.get_object()
         subscription.test_subscription = is_test
         subscription.save()
-        return HttpResponse(state)
-        #
-        # except ReservedSlugException as e:
-        #     return HttpResponse(str(e), status=200)
+        messages.success(request, self.success_message)
+        return HttpResponse(status=200)
