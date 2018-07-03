@@ -166,7 +166,7 @@ class FormConfig(models.Model):
 
     @property
     def cpf_required(self):
-        return self.birth_date == FormConfig.CPF_REQUIRED
+        return self.cpf == FormConfig.CPF_REQUIRED
 
     @property
     def birth_date_show(self):
