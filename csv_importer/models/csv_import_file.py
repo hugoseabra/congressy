@@ -2,7 +2,7 @@ import os
 from uuid import uuid4
 
 from django.db import models
-
+from django.utils import timezone
 from csv_importer.validators import validate_csv_only_file
 
 
@@ -40,8 +40,12 @@ class CSVImportFile(models.Model):
     )
 
     created = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='criado em'
+        verbose_name='criado em',
+        editable=False,
+    )
+
+    modified = models.DateTimeField(
+        verbose_name='modificado em'
     )
 
     separator = models.CharField(
@@ -62,3 +66,10 @@ class CSVImportFile(models.Model):
         max_length=10,
         verbose_name="tipo de codificação",
     )
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.created = timezone.now()
+        self.modified = timezone.now()
+        return super().save(*args, **kwargs)
+
