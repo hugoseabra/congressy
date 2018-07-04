@@ -1155,16 +1155,11 @@ class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
         delimiter = form.cleaned_data['delimiter']
         quotechar = form.cleaned_data['separator']
 
-        reader = csv.reader(content, delimiter=delimiter, quotechar=quotechar)
-        full_string = ''
-        for row in reader:
-            line = ', '.join(row) + '\n'
-            full_string += line
-
         if self.preview:
-            lines = full_string.splitlines()[:30]
 
-            first_line = lines.pop(0)
+            all_lines = content.splitlines()
+
+            first_line = all_lines.pop(0)
 
             table_keys = first_line.split(delimiter)
 
@@ -1174,13 +1169,13 @@ class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
             for key in table_keys:
                 table_heading += '<th>' + key + '</th>'
 
-            for line in lines:
+            for line in all_lines:
 
-                l = line.split(delimiter)
+                current_line = line.split(delimiter)
 
                 table_body += '<tr>'
 
-                for entry in l:
+                for entry in current_line:
                     entry = entry.strip()
                     if entry:
 
@@ -1202,9 +1197,10 @@ class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
 
             return HttpResponse(html)
         else:
-            file_obj = ContentFile(full_string, name=instance.csv_file.name)
-            instance.csv_file = file_obj
-            instance.save()
+            raise NotImplementedError()
+            # file_obj = ContentFile(, name=instance.csv_file.name)
+            # instance.csv_file = file_obj
+            # instance.save()
 
             # TODO: Generate a redirect to confirm subscriptions.
 
