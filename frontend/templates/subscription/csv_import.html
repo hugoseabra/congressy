@@ -27,7 +27,6 @@
                 $('.csv-file-field').show();
                 $('.csv-file-loader').hide();
                 $('#preview-content').html(res);
-                $('#preview').show();
 
             });
 
@@ -36,7 +35,6 @@
             });
 
             sender.send('POST', formData)
-
 
         }
 
@@ -85,8 +83,6 @@
         {% for hidden in form.hidden_fields %}
             {{ hidden }}
         {% endfor %}
-
-
         <!-- Form errors -->
         <div class="row">
 
@@ -106,9 +102,34 @@
 
         </div>
 
+        <div class="row" id="preview">
+            <div class="col-md-8 col-md-offset-2">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Preview</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12" id="preview-content">
+                                <h2>Nenhum arquivo enviado até o momento.</h2>
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-top: 25px">
+                            <div class="col-md-3">
+                                <button class="btn btn-success">
+                                    <i class="fa fa-save"></i>
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="row">
-
             <div class="col-md-6">
                 <div class="panel panel-primary">
 
@@ -177,29 +198,5 @@
 
     </form>
 
-    <div class="row" id="preview" style="display: none">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h3 class="panel-title">Preview</h3>
-            </div>
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-12" id="preview-content">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-3">
-                        <button class="btn btn-success">
-                            <i class="fa fa-save"></i>
-                            Salvar
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
 
 {% endblock %}
