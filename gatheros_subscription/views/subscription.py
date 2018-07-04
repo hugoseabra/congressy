@@ -1,5 +1,6 @@
 import base64
 import csv
+import json
 from datetime import datetime
 
 import qrcode
@@ -1162,14 +1163,13 @@ class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
 
         if self.preview:
             lines = full_string.splitlines()
-            print('sdsadas')
-            return JsonResponse({'ok': 'success'})
+            return JsonResponse({'preview': json.dumps(lines)})
         else:
             file_obj = ContentFile(full_string, name=instance.csv_file.name)
             instance.csv_file = file_obj
             instance.save()
 
-        return JsonResponse({'ok': 'success'})
+            # TODO: Generate a redirect to confirm subscriptions.
 
     def form_invalid(self, form):
         return JsonResponse(dict(form.errors.items()))
