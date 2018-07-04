@@ -46,24 +46,25 @@
                        class="form-control with-icon"
                        id="password"
                        placeholder="Senha"
-                       onkeyup="checkCapsWarning(event)"
-                       onfocus="checkCapsWarning(event)"
-                       onblur="removeCapsWarning()">
+                >
                 <i class="fa fa-lock"></i>
                 <small class="text-danger">{{ form.password.errors }}</small>
+                <p style="display:none;" class="danger-color" id="caps">
+                    CapsLock está
+                    ativado
+                </p>
             </div>
         </div>
-        <p style="display:none;" class="danger-color" id="caps">CapsLock está
-            ativado
-        </p>
+
         {% if show_captcha %}
             <div class="form-group">
-            <div class="col-md-12">
-                {#                    {{ form.captcha }}#}
-                {#                    <small class="text-danger">{{ form.captcha.errors }}</small>#}
-                <div class="g-recaptcha"
-                     style="transform:scale(0.77);-webkit-transform:scale(0.77);transform-origin:0 0;-webkit-transform-origin:0 0;"
-                     data-sitekey="6Lerw18UAAAAANaVK-G5QZEM2My-iumnxVFbDrpZ">
+                <div class="col-md-12">
+                    {#                    {{ form.captcha }}#}
+                    {#                    <small class="text-danger">{{ form.captcha.errors }}</small>#}
+                    <div class="g-recaptcha"
+                         style="transform:scale(0.77);-webkit-transform:scale(0.77);transform-origin:0 0;-webkit-transform-origin:0 0;"
+                         data-sitekey="6Lerw18UAAAAANaVK-G5QZEM2My-iumnxVFbDrpZ">
+                    </div>
                 </div>
             </div>
         {% endif %}
@@ -80,12 +81,6 @@
                     <a href="
 
 
-
-
-
-
-
-
                             {% url 'public:profile_create' %}{% if is_embeded %}?embeded=1{% endif %}"
                        style="font-weight: bold;">Criar conta</a>
                 </div>
@@ -100,6 +95,7 @@
             </div>
         </div>
     </form>
+
 {% endblock %}
 
 {% block local_js %}
@@ -125,39 +121,52 @@
                 return null;
             }
 
-            document.onkeydown = function (e) {
+            $(document).on('keydown', function (e) {
                 e = e || event;
 
-                if (e.keyCode == 20 && capsLockEnabled !== null) {
+                if (e.keyCode === 20 && capsLockEnabled !== null) {
                     capsLockEnabled = !capsLockEnabled;
                 }
-            }
+            });
 
-            document.onkeypress = function (e) {
+            $(document).on('keypress', function (e) {
                 e = e || event;
 
                 var chr = getChar(e);
                 if (!chr) return; // special key
 
-                if (chr.toLowerCase() == chr.toUpperCase()) {
+                if (chr.toLowerCase() === chr.toUpperCase()) {
                     // caseless symbol, like whitespace
                     // can't use it to detect Caps Lock
                     return;
                 }
 
-                capsLockEnabled = (chr.toLowerCase() == chr && e.shiftKey) || (chr.toUpperCase() == chr && !e.shiftKey);
-            }
+                capsLockEnabled = (chr.toLowerCase() === chr && e.shiftKey) || (chr.toUpperCase() === chr && !e.shiftKey);
+            });
 
             /**
              * Check caps lock
              */
             function checkCapsWarning() {
-                document.getElementById('caps').style.display = capsLockEnabled ? 'block' : 'none';
+                capsLockEnabled ? $('#caps').show() : $('#caps').hide();
             }
 
             function removeCapsWarning() {
-                document.getElementById('caps').style.display = 'none';
+                $('#caps').hide();
             }
+
+            $('#password').on('keyup', function () {
+                checkCapsWarning();
+            });
+            $('#password').on('focus', function () {
+                checkCapsWarning();
+            });
+
+            $('#password').on('blur', function () {
+                removeCapsWarning();
+            });
+
         });
+
     </script>
 {% endblock %}
