@@ -75,13 +75,18 @@ urls = [
     ),
     url(
         r'^import/csv/upload$',
-        views.SubscriptionCSVImportView.as_view(),
+        views.CSVImportView.as_view(),
         name='subscriptions-csv-import-upload'
     ),
     url(
-        r'^import/csv/$',
-        views.SubscriptionCSVConfigView.as_view(),
+        r'^import/csv/config$',
+        views.CSVConfigView.as_view(),
         name='subscriptions-csv-import'
+    ),
+    url(
+        r'^import/csv/$',
+        views.CSVFileListView.as_view(),
+        name='subscriptions-csv-list'
     ),
     url(
         r'^$',

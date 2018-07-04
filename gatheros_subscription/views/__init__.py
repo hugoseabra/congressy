@@ -29,8 +29,6 @@ from .subscription import (
     SubscriptionViewFormView,
     VoucherSubscriptionPDFView,
     SubscriptionAttendanceListView,
-    SubscriptionCSVImportView,
-    SubscriptionCSVConfigView,
 )
 from .subscription_api import (
     SubscriptionSearchViewSet,
@@ -43,4 +41,9 @@ from .survey import (
     EventSurveyLotsEditAjaxView,
     SurveyEditView,
     SurveyListView,
+)
+from .csv_import import (
+    CSVFileListView,
+    CSVImportView,
+    CSVConfigView,
 )

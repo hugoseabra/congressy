@@ -1,0 +1,87 @@
+{% extends "base/base.html" %}
+
+{% block title %}Importar | Congressy{% endblock %}
+
+{% block page_title %}Importar via CSV{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_description %}
+    Importação de dados via CSV
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script type="application/javascript">
+        $(document).ready(function () {
+
+            //TODO Implement filetype check.
+
+            $('#trigger-import').on('click', function () {
+                $('#id_csv_file').trigger('click');
+            })
+
+        });
+    </script>
+
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Lista de Arquivos
+                    </h3>
+                </div>
+
+
+                {% if object_list %}
+                    <div class="panel-body">
+
+                        <div class="col-md-12">
+
+                            <ul>
+                                {% for file in object_list %}
+                                    <li>
+                                        {{ file.url }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="panel-body text-center" style="height: 200px;">
+
+                        <h1 style="margin-top: 50px">
+
+                            <strong>
+                                Nenhum arquivo até o momento =(
+                            </strong>
+
+                        </h1>
+                        <button class="btn btn-primary" style="margin-top: 15px" id="trigger-import">
+                            <i class="fas fa-upload"></i>
+                            Importar
+                        </button>
+                        <form method="post" action="{% url 'subscription:subscriptions-csv-import-upload' event.pk %}">
+
+                            <input name="csv_file" id="id_csv_file" type="file" accept=".csv">
+
+                        </form>
+
+                    </div>
+
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
