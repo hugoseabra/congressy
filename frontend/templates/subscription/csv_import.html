@@ -131,6 +131,7 @@
 
         <div class="row">
             <div class="col-md-6">
+
                 <div class="panel panel-primary">
 
                     <div class="panel-heading">
@@ -142,13 +143,13 @@
                     <div class="panel-body">
 
                         <div class="row csv-file-field">
-                            <div class="alert alert-danger alert-dismissable"
-                                 style="display: none" id="csv-file-field-error">
+                            <div class="alert alert-danger alert-dismissable" style="display: none" id="csv-file-field-error">
                                 Tipo de arquivo não permitido!
                             </div>
                             <div class="col-md-6">
                                 {% render_generic_field form.csv_file %}
                             </div>
+
                         </div>
 
                         <div class="row text-center csv-file-loader"
@@ -160,6 +161,245 @@
 
                     </div>
                 </div>
+
+                <div class="panel panel-primary">
+
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            Campos Disponíveis
+                        </h3>
+                    </div>
+
+                    <div class="panel-body">
+
+                        <div class="row">
+
+                            <div class="col-md-12">
+
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>Nome da coluna</th>
+                                        <th>Descrição</th>
+                                        <th>Possiveis valores</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>status</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Inscrição confirmada?
+                                        </td>
+                                        <td>
+                                            <ul>
+                                                <li>Sim</li>
+                                                <li>Não</li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>credenciado (check-in)</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Já foi realizado o check-in?
+                                        </td>
+                                        <td>
+                                            <ul>
+                                                <li>Sim</li>
+                                                <li>Não</li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>nome</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Nome do participante
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>doc internacional</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Passaporte ou Documento de Identificação para inscrições internacionais
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>cpf</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            CPF do participante sem formatação
+                                        </td>
+                                        <td>
+                                            Exemplo: 05235400003
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>data nasc</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Data de nascimento no formato dd/mm/aaaa
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>email</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Email do participante
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>celular</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Número de telefone celular com o DDI.
+                                            Caso DDI não seja informado, será assumido '+55', DDI do Brasil.
+                                        </td>
+                                        <td>
+                                            Exemplo: +5562999999999
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>rua/logradouro</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Endereço do participante
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>complemento</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Completo como quadra, lote, afins.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>numero</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Número do endereço
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>bairro</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Bairro ou setor
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>cep</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            CEP do endereço
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>uf</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Estado do Participante
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>cidade</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Cidade do Participante
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>instituicao/empresa</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Empresa do Participante
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>cnpj</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            CNPJ da empresa do sem formatação
+                                        </td>
+                                        <td>
+                                            Exemplo: 02562513000111
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                <mark>função/cargo</mark>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            Cargo do Participante
+                                        </td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
             </div>
             <div class="col-md-6" id="config-settings">
                 <div class="panel panel-primary">
@@ -181,8 +421,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <button class="btn btn-success save-config"
-                                        type="button">
+                                <button class="btn btn-success save-config" type="button">
                                     <i class="fa fa-save"></i>
                                     Ajustar
                                 </button>
@@ -195,7 +434,6 @@
             </div>
 
         </div>
-
     </form>
 
 
