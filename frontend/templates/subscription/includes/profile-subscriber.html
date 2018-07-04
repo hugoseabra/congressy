@@ -20,16 +20,27 @@
                     style="margin: 8px 0 0 20px;font-size:22px">Painel Geral do
                     Participante</h3>
             </div>
-            {% if event.allow_internal_subscription %}
-                <div class="float-right">
+            <div class="float-right">
+                {% if event.allow_internal_subscription %}
+
                     <button onclick="window.location.href='{% url 'subscription:subscription-edit' event.pk object.pk %}'"
                             class="btn btn-info btn-trans"
                             data-toggle="tooltip"
                             title="Editar">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
-                </div>
-            {% endif %}
+                {% endif %}
+
+                <label for="test-sub">Inscrição de
+                    teste?</label>
+                <input id="test-sub"
+                       type="checkbox"
+                       class="js-switch"
+                       data-toggle="tooltip"
+                        {% if object.test_subscription %}
+                       checked {% endif %}
+                       title="Esta inscrição é uma inscrição de teste ?">
+            </div>
             <div class="clearfix"></div>
         </div>
     </div>
@@ -543,18 +554,6 @@
                                         </button>
                                     </li>
                                 {% endif %}
-
-                                <li class="float-right">
-
-                                    <label for="test-sub">Inscrição de
-                                        teste?</label>
-                                        <input id="test-sub"
-                                               type="checkbox"
-                                               class="js-switch"
-                                               data-toggle="tooltip"
-                                               {% if object.test_subscription %} checked {% endif %}
-                                               title="Esta inscrição é uma inscrição de teste ?">
-                                </li>
 
                                 <li>
                                     <button type="button" style="display:none"

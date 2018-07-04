@@ -20,13 +20,23 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="{% static "assets/js/messenger.js" %}"></script>
     <script>
         $(document).ready(function () {
             $('#test-sub').on('change', function () {
                 var switchState = $('#test-sub').is(":checked");
                 var messageState = switchState ? "True" : "False";
-                $.post("{% url 'subscription:subscription-switch-test' event.pk object.pk %}", {state: messageState, csrfmiddlewaretoken: '{{ csrf_token }}' }).done(function (data) {
+
+                var sender = new cgsy.AjaxSender("{% url 'subscription:subscription-switch-test' event.pk object.pk %}");
+
+                sender.setSuccessCallback(function () {
+                    var switchState = $('#test-sub').is(":checked");
+                    var messengerMessage = switchState ?
+                        "A inscrição agora é uma inscrição de teste" :
+                        "A inscrição não é mais uma inscrição de teste";
+                    window.cgsy.messenger.triggerSuccess(messengerMessage);
                 });
+                sender.send('POST', {'state': messageState});
 
             });
         });

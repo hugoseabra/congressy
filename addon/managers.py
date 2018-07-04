@@ -67,7 +67,7 @@ class ProductManager(managers.Manager):
         if self.instance.pk \
                 and self.instance.has_changed('liquid_price') \
                 and self.instance.subscription_products \
-                        .filter(subscription__completed=True) \
+                        .filter(subscription__completed=True, subscription__test_subscription=False) \
                         .count() > 0:
             raise forms.ValidationError(
                 'Este opcional já possui inscrições. Seu valor não pode ser'
@@ -109,7 +109,7 @@ class ServiceManager(managers.Manager):
         if self.instance.pk \
                 and self.instance.has_changed('liquid_price') \
                 and self.instance.subscription_services \
-                        .filter(subscription__completed=True) \
+                        .filter(subscription__completed=True, subscription__test_subscription=False) \
                         .count() > 0:
             raise forms.ValidationError(
                 'Este opcional já possui inscrições. Seu valor não pode ser'

@@ -53,7 +53,7 @@ class OrganizationSwitch(RedirectView):
             context = "está na organização '{}'".format(organization.name)
 
         messages.info(request, "Agora você {}.".format(context))
-        organization.last_acess = datetime.now().strftime(
+        organization.last_access = datetime.now().strftime(
                 "%Y-%m-%dT%H:%M:%S.%fZ")
 
         organization.save()

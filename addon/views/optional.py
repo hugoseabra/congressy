@@ -310,7 +310,7 @@ class OptionalProductEditView(EventOptionalMixin, generic.UpdateView):
         context['optional_active'] = 'product'
         context['optonal_has_subscriptions'] = \
             self.object.subscription_products.filter(
-                subscription__completed=True
+                subscription__completed=True, test_subscription=False
             ).count()
         return context
 
@@ -340,7 +340,7 @@ class OptionalServiceEditView(EventOptionalMixin, generic.UpdateView):
         context['optional_active'] = 'service'
         context['has_subscriptions'] = \
             self.object.subscription_services.filter(
-                subscription__completed=True
+                subscription__completed=True, test_subscription=False
             ).count()
         return context
 

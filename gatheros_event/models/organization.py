@@ -231,7 +231,7 @@ class Organization(models.Model, GatherosModelMixin):
                   ' manualmente.'
     )
 
-    last_acess = models.DateTimeField(auto_now=True, blank=True, null=True)
+    last_access = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     class Meta:
         verbose_name = 'organização'
