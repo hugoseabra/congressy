@@ -554,7 +554,6 @@
 
             var question = $(this).closest('tr');
             var question_label = question.find('label').html().replace(':', '');
-            var question_help_text = question.find('*[data-toggle="tooltip"]').attr('title');
             var question_type = question.find('[data-question-type]').data('question-type');
             var question_id = question.find('[data-question-id]').data('question-id');
 
@@ -616,10 +615,16 @@
 
             name_field.val(question_label);
 
+            // ---- help_text --- //
+            var question_help_text = question.find('*[data-toggle="tooltip"]').attr('title');
+            if (!question_help_text) {
+                question_help_text = question.find('*[data-toggle="tooltip"]').attr('original-title');
+            }
+            question_help_text = $.trim(question_help_text);
+
             if (question_help_text) {
                 help_text_field.val(question_help_text);
             }
-
 
             $('#editQuestion').modal('show');
             question_id_field.val(question_id);
@@ -831,7 +836,7 @@
                             question_id: this.dataset.name
                         },
                         success: function (res) {
-                            //updateFields();
+                            updateFields();
                         },
                         error: function (err) {
                             Messenger().post({
