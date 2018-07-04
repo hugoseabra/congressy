@@ -618,7 +618,7 @@
             // ---- help_text --- //
             var question_help_text = question.find('*[data-toggle="tooltip"]').attr('title');
             if (!question_help_text) {
-                question_help_text = question.find('*[data-toggle="tooltip"]').attr('original-title');
+                question_help_text = question.find('*[data-toggle="tooltip"]').attr('data-original-title');
             }
             question_help_text = $.trim(question_help_text);
 
