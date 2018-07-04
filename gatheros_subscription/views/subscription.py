@@ -1152,18 +1152,55 @@ class SubscriptionCSVImportView(EventViewMixin, generic.FormView):
 
         content = encoded_content.splitlines()
 
-        d = form.cleaned_data['delimiter']
-        q = form.cleaned_data['separator']
+        delimiter = form.cleaned_data['delimiter']
+        quotechar = form.cleaned_data['separator']
 
-        reader = csv.reader(content, delimiter=d, quotechar=q)
+        reader = csv.reader(content, delimiter=delimiter, quotechar=quotechar)
         full_string = ''
         for row in reader:
             line = ', '.join(row) + '\n'
             full_string += line
 
         if self.preview:
-            lines = full_string.splitlines()
-            return JsonResponse({'preview': json.dumps(lines)})
+            lines = full_string.splitlines()[:30]
+
+            first_line = lines.pop(0)
+
+            table_keys = first_line.split(delimiter)
+
+            table_heading = ''
+            table_body = ''
+
+            for key in table_keys:
+                table_heading += '<th>' + key + '</th>'
+
+            for line in lines:
+
+                l = line.split(delimiter)
+
+                table_body += '<tr>'
+
+                for entry in l:
+                    entry = entry.strip()
+                    if entry:
+
+                        entry = entry.split(quotechar)
+                        table_body += '<td>'
+
+                        for item in entry:
+                            table_body += item
+
+                        table_body += '</td>'
+                    else:
+                        table_body += '<td> --- </td>'
+
+                table_body += '</tr>'
+
+            html = '<table class="table"><thead><tr>' + \
+                   table_heading + '</tr></thead><tbody>' + table_body + \
+                   '</tbody></table>'
+
+            return HttpResponse(html)
         else:
             file_obj = ContentFile(full_string, name=instance.csv_file.name)
             instance.csv_file = file_obj
