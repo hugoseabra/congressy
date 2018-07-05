@@ -4,9 +4,30 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 
-from csv_importer.forms import CSVForm, CSVFileForm
+from csv_importer.forms import CSVFileForm
 from csv_importer.models import CSVImportFile
 from .subscription import EventViewMixin
+
+allowed_keys = [
+    'função/cargo',
+    'cnpj',
+    'instituição/empresa',
+    'cidade'
+    'uf',
+    'cep',
+    'bairro',
+    'número',
+    'complemento',
+    'rua/logradouro',
+    'celular',
+    'email',
+    'data nasc',
+    'cpf',
+    'doc internacional',
+    'nome',
+    'credenciado',
+    'status',
+]
 
 
 class CSVViewMixin(EventViewMixin):
@@ -76,13 +97,98 @@ class CSVImportView(CSVViewMixin, generic.FormView):
         return HttpResponse("Método não permitido.", status=405)
 
 
-class CSVProcessView(CSVViewMixin, generic.TemplateView):
-    template_name = "subscription/csv_import.html"
+class CSVProcessView(CSVViewMixin, generic.DetailView):
+    template_name = "subscription/csv_process.html"
+
+    def get_object(self, queryset=None):
+        return CSVImportFile.objects.get(
+            pk=self.kwargs.get('csv_pk'),
+            event=self.kwargs.get('event_pk'),
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = CSVForm(initial={'event': self.event})
+        context['preview'] = self.get_preview()
         return context
+
+    def get_preview(self) -> dict:
+
+        table = None
+
+        instance = self.object
+
+        encoding = instance.encoding
+        delimiter = instance.delimiter
+        quotechar = instance.separator
+
+        file_content = instance.csv_file.file.read()
+        encoded_content = file_content.decode(encoding)
+        content = encoded_content.splitlines()
+
+        first_line = content.pop(0)
+
+        table_keys = self.get_table_keys(first_line.split(delimiter))
+
+        if len(table_keys['valid_keys']) > 0:
+
+            table_heading = ''
+            table_body = ''
+
+            for key in table_keys['valid_keys']:
+                table_heading += '<th>' + key + '</th>'
+
+            # for line in all_lines:
+            #
+            #     current_line = line.split(delimiter)
+            #
+            #     table_body += '<tr>'
+            #
+            #     for entry in current_line:
+            #         entry = entry.strip()
+            #         if entry:
+            #
+            #             entry = entry.split(quotechar)
+            #             table_body += '<td>'
+            #
+            #             for item in entry:
+            #                 table_body += item
+            #
+            #             table_body += '</td>'
+            #         else:
+            #             table_body += '<td> --- </td>'
+            #
+            #     table_body += '</tr>'
+            #
+            # table = '<table class="table"><thead><tr>' + \
+            #         table_heading + '</tr></thead><tbody>' + table_body + \
+            #         '</tbody></table>'
+
+        return {
+            'table': table,
+            'invalid_keys': table_keys['invalid_keys'],
+            'valid_keys': table_keys['valid_keys'],
+        }
+
+    @staticmethod
+    def get_table_keys(line: list) -> dict:
+
+        valid_keys = []
+        invalid_keys = []
+
+        for key in line:
+
+            lower_key = key.lower().strip()
+
+            if lower_key in allowed_keys:
+                valid_keys.append(lower_key)
+            else:
+                invalid_keys.append(key)
+
+        return {
+            'valid_keys': valid_keys,
+            'invalid_keys': invalid_keys,
+        }
+
 # class CSVImportView(CSVViewMixin, generic.FormView):
 #     form_class = CSVForm
 #     preview = False
