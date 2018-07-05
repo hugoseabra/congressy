@@ -24,5 +24,21 @@ class CSVForm(forms.ModelForm):
             'csv_file': 'Arquivo CSV:'
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+
+class CSVFileForm(forms.ModelForm):
+    event = None
+
+    class Meta:
+        model = CSVImportFile
+        fields = [
+            'event',
+            'csv_file',
+        ]
+
+        widgets = {
+            'event': forms.HiddenInput(),
+        }
+
+        labels = {
+            'csv_file': 'Arquivo CSV:'
+        }
