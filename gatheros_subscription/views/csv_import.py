@@ -10,6 +10,9 @@ from .subscription import EventViewMixin
 
 
 class CSVViewMixin(EventViewMixin):
+    """
+        Mixin utilizado para não permitir acesso sem determinada flag ativada.
+    """
 
     def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
@@ -35,6 +38,10 @@ class CSVViewMixin(EventViewMixin):
 
 
 class CSVFileListView(CSVViewMixin, generic.ListView):
+    """
+        View responsavel por fazer a listagem dos arquivos CSV de determinado
+        evento.
+    """
     template_name = "subscription/csv_file_list.html"
 
     def get_queryset(self):
@@ -46,19 +53,13 @@ class CSVFileListView(CSVViewMixin, generic.ListView):
         return context
 
 
-class CSVConfigView(CSVViewMixin, generic.TemplateView):
-    template_name = "subscription/csv_import.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'] = CSVForm(initial={'event': self.event})
-        return context
-
-
 class CSVImportView(CSVViewMixin, generic.FormView):
+    """
+        View usada para fazer upload de arquivos.
+    """
     form_class = CSVFileForm
 
-    def get_success_url(self):  
+    def get_success_url(self):
         return reverse_lazy('subscription:subscriptions-csv-list', kwargs={
             'event_pk': self.event.pk
         })
@@ -68,6 +69,14 @@ class CSVImportView(CSVViewMixin, generic.FormView):
         messages.success(self.request, "Arquivo submetido com sucesso!")
         return super().form_valid(form)
 
+
+class CSVConfigView(CSVViewMixin, generic.TemplateView):
+    template_name = "subscription/csv_import.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = CSVForm(initial={'event': self.event})
+        return context
 # class CSVImportView(CSVViewMixin, generic.FormView):
 #     form_class = CSVForm
 #     preview = False
