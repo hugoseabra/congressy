@@ -67,6 +67,12 @@ class CSVImportFile(models.Model):
         verbose_name="tipo de codificação",
     )
 
+    processed = models.BooleanField(
+        default=False,
+        verbose_name='arquivo já foi processado'
+    )
+
+
     def save(self, *args, **kwargs):
 
         if not self.created:
