@@ -1,3 +1,5 @@
+import csv
+
 from django.contrib import messages
 from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import redirect
@@ -9,24 +11,24 @@ from csv_importer.models import CSVImportFile
 from .subscription import EventViewMixin
 
 allowed_keys = [
-    'função/cargo',
-    'cnpj',
-    'instituição/empresa',
-    'cidade'
-    'uf',
-    'cep',
-    'bairro',
-    'número',
-    'complemento',
-    'rua/logradouro',
-    'celular',
+    'nome',
     'email',
     'data nasc',
     'cpf',
     'doc internacional',
-    'nome',
-    'credenciado',
+    'cep',
+    'bairro',
+    'número',
+    'rua/logradouro',
+    'complemento',
+    'cidade'
+    'uf',
+    'celular',
+    'função/cargo',
+    'cnpj',
+    'instituição/empresa',
     'status',
+    'credenciado',
 ]
 
 
@@ -123,71 +125,97 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
 
         file_content = instance.csv_file.file.read()
         encoded_content = file_content.decode(encoding)
-        content = encoded_content.splitlines()
+        parsed_dict = self.parse_file(encoded_content, delimiter, quotechar)
 
-        first_line = content.pop(0)
+        table_heading = ''
+        table_body = ''
 
-        table_keys = self.get_table_keys(first_line.split(delimiter))
+        for key in parsed_dict.keys():
+            table_heading += '<th>' + key.title() + '</th>'
 
-        if len(table_keys['valid_keys']) > 0:
+        all_items_list = []
 
-            table_heading = ''
-            table_body = ''
+        for item in parsed_dict.items():
+            all_items_list.append(item[1])
 
-            for key in table_keys['valid_keys']:
-                table_heading += '<th>' + key + '</th>'
+        all_rows = zip(*all_items_list)
 
-            # for line in all_lines:
-            #
-            #     current_line = line.split(delimiter)
-            #
-            #     table_body += '<tr>'
-            #
-            #     for entry in current_line:
-            #         entry = entry.strip()
-            #         if entry:
-            #
-            #             entry = entry.split(quotechar)
-            #             table_body += '<td>'
-            #
-            #             for item in entry:
-            #                 table_body += item
-            #
-            #             table_body += '</td>'
-            #         else:
-            #             table_body += '<td> --- </td>'
-            #
-            #     table_body += '</tr>'
-            #
-            # table = '<table class="table"><thead><tr>' + \
-            #         table_heading + '</tr></thead><tbody>' + table_body + \
-            #         '</tbody></table>'
+        for row in all_rows:
+            table_body += '<tr>'
+            for item in row:
+                table_body += '<td>'
+                table_body += item
+                table_body += '</td>'
+            table_body += '</tr>'
+
+        table = '<table class="table"><thead><tr>' + \
+                table_heading + '</tr></thead><tbody>' + table_body + \
+                '</tbody></table>'
 
         return {
             'table': table,
-            'invalid_keys': table_keys['invalid_keys'],
-            'valid_keys': table_keys['valid_keys'],
+            'invalid_keys': None,
+            'valid_keys': None,
         }
 
     @staticmethod
-    def get_table_keys(line: list) -> dict:
+    def validate_table_keys(line: list) -> dict:
 
-        valid_keys = []
-        invalid_keys = []
+        main_dict = {}
 
         for key in line:
 
             lower_key = key.lower().strip()
+            is_valid = False
+            index = line.index(key)
 
             if lower_key in allowed_keys:
-                valid_keys.append(lower_key)
-            else:
-                invalid_keys.append(key)
+                is_valid = True
+                key = lower_key
 
-        return {
-            'valid_keys': valid_keys,
-            'invalid_keys': invalid_keys,
-        }
+            current_dict = {
+                'valid': is_valid,
+                'name': key,
+            }
+
+            main_dict.update({index: current_dict})
+
+        return main_dict
+
+    def parse_file(self, encoded_content: str, delimiter: str, quotechar: str):
+
+        content = encoded_content.splitlines()
+
+        first_line = content[0].split(delimiter)
+
+        table_keys = self.validate_table_keys(first_line)
+
+        valid_keys = []
+
+        for entry in table_keys.items():
+            if entry[1]['valid']:
+                valid_keys.append(entry[1]['name'])
+
+        main_dict = {}
+        for key in valid_keys:
+            main_dict[key] = []
+
+        reader = csv.DictReader(
+            content,
+            delimiter=delimiter,
+            quotechar=quotechar,
+        )
+
+        for row in reader:
+            for item in row.items():
+
+                possible_key = item[0].lower().strip()
+                possible_value = item[1].strip()
+
+                if possible_value and possible_key in valid_keys:
+                    main_dict[possible_key].append(possible_value)
+
+        return main_dict
 
 # class CSVImportView(CSVViewMixin, generic.FormView):
 #     form_class = CSVForm
