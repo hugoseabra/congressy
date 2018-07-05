@@ -125,6 +125,19 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
         encoded_content = file_content.decode(encoding)
         parsed_dict = self.parse_file(encoded_content, delimiter, quotechar)
 
+        # TODO: this is not DRY
+        content = encoded_content.splitlines()
+
+        first_line = content[0].split(delimiter)
+
+        table_keys = self.validate_table_keys(first_line)
+
+        invalid_keys = []
+
+        for entry in table_keys.items():
+            if not entry[1]['valid']:
+                invalid_keys.append(entry[1]['name'])
+
         table_heading = ''
         table_body = ''
 
@@ -168,8 +181,7 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
 
         return {
             'table': table,
-            'invalid_keys': None,
-            'valid_keys': None,
+            'invalid_keys': invalid_keys,
         }
 
     @staticmethod
