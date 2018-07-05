@@ -69,6 +69,11 @@ class CSVImportView(CSVViewMixin, generic.FormView):
         messages.success(self.request, "Arquivo submetido com sucesso!")
         return super().form_valid(form)
 
+    def get(self, request, *args, **kwargs):
+        return HttpResponse("Método não permitido.", status=405)
+
+    def put(self, *args, **kwargs):
+        return HttpResponse("Método não permitido.", status=405)
 
 class CSVConfigView(CSVViewMixin, generic.TemplateView):
     template_name = "subscription/csv_import.html"
