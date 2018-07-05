@@ -157,6 +157,9 @@ class MemberManageView(BaseOrganizationMixin, FormView):
 
         if action == 'change_group':
             group = request.POST.get('group')
+            if group:
+                group = group.strip()
+
             available_groups = [Member.ADMIN, Member.HELPER]
 
             if group not in available_groups:

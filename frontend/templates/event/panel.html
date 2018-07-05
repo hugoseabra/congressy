@@ -75,7 +75,7 @@
                 this.render = function (main_el, callback) {
                     main_el = $(main_el);
 
-                    var sender = new cgsy.AjaxSender("{% url 'event:event-panel' event.pk %}?template_name=event/todo_list");
+                    var sender = new cgsy.AjaxSender("{% url 'event:event-panel' event.pk %}?template_name=event/includes/todo_list");
                     sender.setSuccessCallback(function (response) {
                         main_el.html(response);
                         if (callback) {

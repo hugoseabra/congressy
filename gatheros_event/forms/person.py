@@ -127,6 +127,8 @@ class PersonForm(forms.ModelForm):
 
         uf = None
 
+        self.required_fields = []
+
         instance = kwargs.get('instance')
         initial = kwargs.get('initial')
 
@@ -150,6 +152,7 @@ class PersonForm(forms.ModelForm):
         if field_name not in self.fields:
             return
 
+        self.required_fields.append(field_name)
         self.fields[field_name].required = True
 
     def clean_zip_code(self):

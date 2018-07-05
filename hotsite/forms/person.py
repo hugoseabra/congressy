@@ -109,6 +109,15 @@ class SubscriptionPersonForm(PersonForm):
         if has_paid_lots or config.birth_date_required:
             required_fields.append('birth_date')
 
+        if config.institution_required:
+            required_fields.append('institution')
+
+        if config.institution_cnpj_required:
+            required_fields.append('institution_cnpj')
+
+        if config.function_required:
+            required_fields.append('function')
+
         for field_name in required_fields:
             self.setAsRequired(field_name)
 

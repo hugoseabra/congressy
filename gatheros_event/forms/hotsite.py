@@ -99,7 +99,11 @@ class InfoForm(BaseModelFileForm):
                 data._mutable = True
                 del data['image_main']
                 data._mutable = False
-                event.info.image_main.delete(save=True)
+
+                try:
+                    event.info.image_main.delete(save=True)
+                except AttributeError:
+                    pass
 
             else:
 
