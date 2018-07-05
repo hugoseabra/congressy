@@ -72,7 +72,6 @@ class CSVImportFile(models.Model):
         verbose_name='arquivo já foi processado'
     )
 
-
     def save(self, *args, **kwargs):
 
         if not self.created:
@@ -80,4 +79,7 @@ class CSVImportFile(models.Model):
 
         self.modified = timezone.now()
         return super().save(*args, **kwargs)
+
+    def filename(self):
+        return os.path.basename(self.csv_file.name)
 
