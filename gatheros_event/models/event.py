@@ -105,7 +105,8 @@ class Event(models.Model, GatherosModelMixin):
     has_optionals = models.BooleanField(
         default=False,
         verbose_name='Opcionais',
-        help_text="Você irá vender, opcionais como: hospedagem, alimentação, camisetas?"
+        help_text="Você irá vender, opcionais como: hospedagem, alimentação,"
+                  " camisetas?"
     )
 
     has_extra_activities = models.BooleanField(
