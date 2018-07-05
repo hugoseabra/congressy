@@ -1,5 +1,6 @@
 {% load static l10n humanize %}
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -72,7 +73,8 @@
                             <strong>Local</strong>
                         </td>
                         <td class="col-sm-2" style="border-width: 0;">
-                            {{ event.place.name }} - {{ event.place.get_complete_address }}
+                            {{ event.place.name }}
+                            - {{ event.place.get_complete_address }}
                         </td>
                     </tr>
                 {% endif %}
@@ -99,8 +101,11 @@
                 {% endif %}
 
                 </tbody>
-            </table>
 
+            </table>
+            <div class="col-sm-4" style="border-width: 0; text-align: center; width: 50%">
+                <img src="data:image/png;base64,{{ barcode }}">
+            </div>
 
             {#            <p style="margin-top: 5px; font-size: 25px">{{ person.name|upper }}</p>#}
             {#            <p style="font-size: 20px;margin-top: 30px">Data / horário</p>#}
