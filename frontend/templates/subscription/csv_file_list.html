@@ -80,6 +80,16 @@
                     </h3>
                 </div>
 
+                <form method="POST" action="{% url 'subscription:subscriptions-csv-import-upload' event.pk %}" id="file-form" enctype=multipart/form-data>
+
+                    {% csrf_token %}
+
+                    {{ form.event }}
+
+                    <input name="csv_file" id="id_csv_file" type="file" accept=".csv">
+
+                </form>
+
                 <div class="panel-body text-center" id="csv-file-loader" style="height: 200px; display: none;">
 
                     <div class="row text-center"
@@ -98,7 +108,7 @@
                         <div class="col-md-12">
 
 
-                            <table class="table table-bordered" >
+                            <table class="table table-bordered">
                                 <thead>
                                 <tr>
                                     <th>Nome do arquivo</th>
@@ -131,20 +141,6 @@
                         </div>
 
 
-                        <button class="btn btn-primary" style="margin-top: 15px" id="trigger-import">
-                            <i class="fas fa-upload"></i>
-                            Importar
-                        </button>
-                        <form method="POST" action="{% url 'subscription:subscriptions-csv-import-upload' event.pk %}" id="file-form" enctype=multipart/form-data>
-
-                            {% csrf_token %}
-
-                            {{ form.event }}
-
-                            <input name="csv_file" id="id_csv_file" type="file" accept=".csv">
-
-                        </form>
-
                     </div>
 
                 {% else %}
@@ -159,15 +155,10 @@
 
                         </h1>
 
-                        <form method="POST" action="{% url 'subscription:subscriptions-csv-import-upload' event.pk %}" id="file-form" enctype=multipart/form-data>
-
-                            {% csrf_token %}
-
-                            {{ form.event }}
-
-                            <input name="csv_file" id="id_csv_file" type="file" accept=".csv">
-
-                        </form>
+                        <button class="btn btn-primary" style="margin-top: 15px" id="trigger-import">
+                            <i class="fas fa-upload"></i>
+                            Importar
+                        </button>
 
                     </div>
 
