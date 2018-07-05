@@ -115,8 +115,6 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
 
     def get_preview(self) -> dict:
 
-        table = None
-
         instance = self.object
 
         encoding = instance.encoding
@@ -136,7 +134,10 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
         all_items_list = []
 
         for item in parsed_dict.items():
-            all_items_list.append(item[1])
+            # Limiting list size to not overload the frontend.  
+            parsed_list = item[1][:50]
+            
+            all_items_list.append(parsed_list)
 
         all_rows = zip(*all_items_list)
 
