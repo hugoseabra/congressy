@@ -144,7 +144,20 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
             table_body += '<tr>'
             for item in row:
                 table_body += '<td>'
-                table_body += item
+                
+                multi_item = item.split(delimiter)
+
+                if len(multi_item) > 1:
+                    table_body += '<ul>'
+
+                    for i in multi_item:
+                        table_body += '<li>' + i + '</li>'
+
+                    table_body += '</ul>'
+
+                else:
+                    table_body += item
+                    
                 table_body += '</td>'
             table_body += '</tr>'
 
