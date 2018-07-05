@@ -21,7 +21,7 @@
                     <div class="row">
                         <div class="col-md-12" id="preview-content">
                             {% if preview.table %}
-                                {{ preview.table }}
+                                {{ preview.table|safe }}
                             {% else %}
                                 <div class="text-center">
                                     <h1>
@@ -37,8 +37,7 @@
         </div>
     </div>
 
-
-    <div class="row">
+    <div class="row" id="keys">
 
         <div class="col-md-6">
 
@@ -323,12 +322,5 @@
 
 
     </div>
-
-
-
-
-
-
-
 
 {% endblock %}
