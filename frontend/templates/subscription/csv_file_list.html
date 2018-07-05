@@ -114,6 +114,7 @@
                                     <th>Nome do arquivo</th>
                                     <th class="col-md-2">Data de Envio</th>
                                     <th class="col-md-2">Já foi processada?</th>
+                                    <th class="col-md-1"></th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -129,6 +130,12 @@
                                             {% else %}
                                                 <i class="fas fa-times-circle" style="color: #dd0901"></i>
                                             {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="#" class="btn btn-primary"  {% if csv.processed %}disabled {% endif %}>
+                                                <i class="fas fa-exchange-alt"></i>
+                                                Processar
+                                            </a>
                                         </td>
                                     </tr>
                                 {% endfor %}
