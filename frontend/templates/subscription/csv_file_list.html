@@ -42,6 +42,35 @@
 
 {% block content %}
 
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-right">
+
+                    {% if object_list %}
+
+                        <button class="btn btn-success" id="trigger-import">
+                            <i class="fa fa-plus"></i>
+                            Adicionar
+                        </button>
+
+                    {% endif %}
+
+                </div>
+                <div class="float-left">
+                    <a href="{% url 'subscription:subscriptions-csv-list' event.pk %}"
+                       class="btn btn-primary">
+                        <i class="fas fa-arrow-circle-left"></i>
+                        Voltar
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-primary">
@@ -68,15 +97,53 @@
 
                         <div class="col-md-12">
 
-                            <ul>
-                                {% for file in object_list %}
-                                    <li>
-                                        {{ file.url }}
-                                    </li>
+
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>Nome do arquivo</th>
+                                    <th>Data de Envio</th>
+                                    <th>Já foi processada?</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+
+                                {% for csv in object_list %}
+                                    <tr>
+                                        <td>{{ csv.filename }}</td>
+                                        <td>{{ csv.created|date:"d/m/Y H\hi" }}</td>
+                                        <td class="text-center">
+                                            {% if csv.processed %}
+                                                <i class="fas fa-check-circle" style="color: #00dd1c"></i>
+                                            {% else %}
+                                                <i class="fas fa-times-circle" style="color: #dd0901"></i>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
                                 {% endfor %}
-                            </ul>
+
+
+                                </tbody>
+                            </table>
+
 
                         </div>
+
+
+                        <button class="btn btn-primary" style="margin-top: 15px" id="trigger-import">
+                            <i class="fas fa-upload"></i>
+                            Importar
+                        </button>
+                        <form method="POST" action="{% url 'subscription:subscriptions-csv-import-upload' event.pk %}" id="file-form" enctype=multipart/form-data>
+
+                            {% csrf_token %}
+
+                            {{ form.event }}
+
+                            <input name="csv_file" id="id_csv_file" type="file" accept=".csv">
+
+                        </form>
 
                     </div>
 
@@ -91,13 +158,12 @@
                             </strong>
 
                         </h1>
-                        <button class="btn btn-primary" style="margin-top: 15px" id="trigger-import">
-                            <i class="fas fa-upload"></i>
-                            Importar
-                        </button>
-                        <form method="post" action="{% url 'subscription:subscriptions-csv-import-upload' event.pk %}" id="file-form">
+
+                        <form method="POST" action="{% url 'subscription:subscriptions-csv-import-upload' event.pk %}" id="file-form" enctype=multipart/form-data>
 
                             {% csrf_token %}
+
+                            {{ form.event }}
 
                             <input name="csv_file" id="id_csv_file" type="file" accept=".csv">
 
