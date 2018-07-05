@@ -45,5 +45,5 @@ from .survey import (
 from .csv_import import (
     CSVFileListView,
     CSVImportView,
-    CSVConfigView,
+    CSVProcessView,
 )

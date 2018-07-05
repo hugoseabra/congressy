@@ -80,7 +80,7 @@
                     </h3>
                 </div>
 
-                <form method="POST" action="{% url 'subscription:subscriptions-csv-import-upload' event.pk %}" id="file-form" enctype=multipart/form-data>
+                <form method="POST" action="{% url 'subscription:subscriptions-csv-file-import' event.pk %}" id="file-form" enctype=multipart/form-data>
 
                     {% csrf_token %}
 
@@ -132,7 +132,7 @@
                                             {% endif %}
                                         </td>
                                         <td class="text-center">
-                                            <a href="#" class="btn btn-primary"  {% if csv.processed %}disabled {% endif %}>
+                                            <a href="{% url 'subscription:subscriptions-csv-file-process' event.pk csv.pk  %}" class="btn btn-primary"  {% if csv.processed %}disabled {% endif %}>
                                                 <i class="fas fa-exchange-alt"></i>
                                                 Processar
                                             </a>

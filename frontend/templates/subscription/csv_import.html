@@ -20,7 +20,7 @@
             var formData = new FormData($('#csvForm')[0]);
             formData.append('preview', true);
 
-            var sender = new cgsy.AjaxFormDataSender("{% url 'subscription:subscriptions-csv-import-upload' event.pk %}");
+            var sender = new cgsy.AjaxFormDataSender("{% url 'subscription:subscriptions-csv-file-import' event.pk %}");
 
             sender.setSuccessCallback(function (res) {
 

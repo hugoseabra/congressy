@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.http.response import JsonResponse
+from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
@@ -75,7 +75,8 @@ class CSVImportView(CSVViewMixin, generic.FormView):
     def put(self, *args, **kwargs):
         return HttpResponse("Método não permitido.", status=405)
 
-class CSVConfigView(CSVViewMixin, generic.TemplateView):
+
+class CSVProcessView(CSVViewMixin, generic.TemplateView):
     template_name = "subscription/csv_import.html"
 
     def get_context_data(self, **kwargs):
