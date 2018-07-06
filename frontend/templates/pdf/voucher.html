@@ -1,5 +1,6 @@
 {% load static l10n humanize %}
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -62,8 +63,9 @@
                     <td class="col-sm-2">
                         {{ event.get_period }}
                     </td>
-                    <td class="col-sm-8">
+                    <td class="col-sm-8 text-center">
                         <img src="data:image/png;base64,{{ qrcode }}">
+                        <img src="data:image/png;base64,{{ barcode }}">
                     </td>
                 </tr>
                 {% if event.place.show_location %}
@@ -72,7 +74,8 @@
                             <strong>Local</strong>
                         </td>
                         <td class="col-sm-2" style="border-width: 0;">
-                            {{ event.place.name }} - {{ event.place.get_complete_address }}
+                            {{ event.place.name }}
+                            - {{ event.place.get_complete_address }}
                         </td>
                     </tr>
                 {% endif %}
@@ -99,8 +102,8 @@
                 {% endif %}
 
                 </tbody>
-            </table>
 
+            </table>
 
             {#            <p style="margin-top: 5px; font-size: 25px">{{ person.name|upper }}</p>#}
             {#            <p style="font-size: 20px;margin-top: 30px">Data / horário</p>#}
