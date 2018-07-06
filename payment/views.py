@@ -25,11 +25,13 @@ from mailer import exception as mailer_notification
 from mailer.services import (
     notify_chargedback_subscription,
     notify_new_paid_subscription_credit_card,
+    notify_new_refused_subscription_boleto,
     notify_new_refused_subscription_credit_card,
     notify_new_unpaid_subscription_boleto,
     notify_new_unpaid_subscription_credit_card,
     notify_new_user_and_paid_subscription_boleto,
     notify_new_user_and_paid_subscription_credit_card,
+    notify_new_user_and_refused_subscription_boleto,
     notify_new_user_and_refused_subscription_credit_card,
     notify_new_user_and_unpaid_subscription_boleto,
     notify_new_user_and_unpaid_subscription_credit_card,
@@ -386,6 +388,12 @@ def postback_url_view(request, uidb64):
                             event,
                             transaction
                         )
+                    elif is_refused:
+                        # Quando a emissão do boleto falha por algum motivo.
+                        notify_new_user_and_refused_subscription_boleto(
+                            event,
+                            transaction
+                        )
 
                     elif is_refunded:
                         notify_refunded_subscription_boleto(event, transaction)
@@ -488,6 +496,13 @@ def postback_url_view(request, uidb64):
                     # Se não é status inicial, certamente o boleto foi pago.
                     elif is_paid:
                         notify_paid_subscription_boleto(event, transaction)
+
+                    elif is_refused:
+                        # Possivelmente por alguma falha.
+                        notify_new_refused_subscription_boleto(
+                            event,
+                            transaction
+                        )
 
                     elif is_refunded:
                         notify_refunded_subscription_boleto(event, transaction)

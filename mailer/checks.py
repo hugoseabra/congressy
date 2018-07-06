@@ -108,6 +108,26 @@ def check_notification_transaction_refused_credit_card(transaction):
         )
 
 
+def check_notification_transaction_refused_boleto(transaction):
+    """
+    Verifica notificação de transação paga do tipo 'credit_card'
+
+    - inscrição deve estar como 'confirmada';
+    - transação deve ser do tipo 'credit_card';
+    - transação deve pode estar com status de 'paga';
+    """
+    _check_refused_transaction(transaction)
+
+    if transaction.type != transaction.BOLETO:
+        raise exception.NotifcationError(
+            "Tipo de transação inválido para esta notificação: '{type}'. Esta"
+            " notificação é para transações do tipo '{boleto}'".format(
+                type=transaction.type,
+                boleto=transaction.BOLETO
+            )
+        )
+
+
 def check_notification_transaction_refunded_boleto(transaction):
     """
     Verifica notificação de transação paga do tipo 'boleto'

@@ -40,10 +40,10 @@ FORMS = [
 TEMPLATES = {
     "private_lot": "hotsite/private_lot_form.html",
     "lot": "hotsite/lot_form.html",
-    "person": "hotsite/person_form.html",
-    "survey": "hotsite/survey_form.html",
     "service": "hotsite/service_form.html",
     "product": "hotsite/product_form.html",
+    "person": "hotsite/person_form.html",
+    "survey": "hotsite/survey_form.html",
     "payment": "hotsite/payment_form.html"
 }
 
@@ -212,7 +212,7 @@ def has_products(wizard):
 
     try:
         optionals = lot.category.product_optionals
-        return optionals.count() > 0
+        return optionals.filter(published=True).count() > 0
 
     except AttributeError:
         return False
@@ -241,7 +241,7 @@ def has_services(wizard):
 
     try:
         optionals = lot.category.service_optionals
-        return optionals.count() > 0
+        return optionals.filter(published=True).count() > 0
 
     except AttributeError:
         return False
