@@ -52,8 +52,11 @@
     </script>
 
     {% if object_list %}
-        <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.js' %}"></script>
-        <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.js' %}"></script>
+        <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.min.js' %}"></script>
+        <script src="{% static 'assets/plugins/dataTables/js/dataTables.responsive.min.js' %}"></script>
+        <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.min.js' %}"></script>
+        <script src="{% static 'assets/plugins/dataTables/js/responsive.bootstrap.min.js' %}"></script>
+
         <script>
             $(document).ready(function () {
                 $('#lot_table').DataTable({
@@ -96,7 +99,8 @@
                         }
                     ],
                     // Default order
-                    "order": [[0, 'asc']]
+                    "order": [[0, 'asc']],
+                    "responsive": true
                 });
             });
         </script>
