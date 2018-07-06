@@ -139,7 +139,8 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
             'instance': self.object,
         }
 
-        if 'csv_file' not in self.request.FILES:
+        if 'csv_file' not in self.request.FILES and \
+                'csv_file' in self.request.POST:
             self.request.POST._mutable = True
             del self.request.POST['csv_file']
             self.request.POST._mutable = False
@@ -186,7 +187,15 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
         quotechar = instance.separator
 
         file_content = instance.csv_file.file.read()
-        encoded_content = file_content.decode(encoding)
+        try:
+            encoded_content = file_content.decode(encoding)
+        except UnicodeDecodeError:
+            return {
+                'table': '<div class="text-center"><h2><strong>Não foi '
+                         'possivel fazer a decodificação!</strong></h2></div>',
+                'invalid_keys': None,
+            }
+
         parsed_dict = self.parse_file(encoded_content, delimiter, quotechar)
 
         # TODO: this is not DRY
