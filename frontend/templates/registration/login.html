@@ -50,11 +50,11 @@
                        onfocus="checkCapsWarning(event)"
                        onblur="removeCapsWarning()">
                 <i class="fa fa-lock"></i>
+                <p style="display:none;" class="warning-color" id="caps">CapsLock está ativado.</p>
                 <small class="text-danger">{{ form.password.errors }}</small>
             </div>
         </div>
-        <p style="display:none;" class="danger-color" id="caps">CapsLock está ativado
-        </p>
+
         {% if show_captcha %}
             <div class="form-group">
                 <div class="col-md-12">
@@ -128,7 +128,7 @@
             if (e.keyCode == 20 && capsLockEnabled !== null) {
                 capsLockEnabled = !capsLockEnabled;
             }
-        }
+        };
 
         document.onkeypress = function (e) {
             e = e || event;
@@ -143,7 +143,7 @@
             }
 
             capsLockEnabled = (chr.toLowerCase() == chr && e.shiftKey) || (chr.toUpperCase() == chr && !e.shiftKey);
-        }
+        };
 
         /**
          * Check caps lock
