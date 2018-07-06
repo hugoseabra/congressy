@@ -25,7 +25,6 @@ $(document).ready(function () {
         el.prop('disabled', true);
     }
 
-    debugger;
     $("input").change(function (event) {
         event.preventDefault();
 
