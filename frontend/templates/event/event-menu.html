@@ -48,6 +48,16 @@ Variáveis:
             <i class="fas fa-graduation-cap"></i>Certificado
         </a>
     </li>
+
+    <li {% if active == 'certificate-manual' %}class=  "active"{% endif %}>
+        <a class="sidebar-itens" href="{% url 'certificate:event-certificate-manual' event.pk %}"
+           title="Lançador de Certificados Manual">
+            <i class="fas fa-graduation-cap"></i>
+            Certificado Manual
+        </a>
+    </li>
+
+
 </ul>
 
 <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
@@ -174,15 +184,15 @@ Variáveis:
                 </a>
             </li>
         {% endif %}
-    {% if event.has_optionals %}
-        <li {% if active == 'addon-opcionais' %}class="active"{% endif %}>
-            <a class="sidebar-itens"
-               href="{% url 'addon:optional-product-list' event.pk %}"
-               title="Opcionais">
-                <i class="fas fa-shopping-basket"></i>
-                Opcionais
-            </a>
-        </li>
+        {% if event.has_optionals %}
+            <li {% if active == 'addon-opcionais' %}class="active"{% endif %}>
+                <a class="sidebar-itens"
+                   href="{% url 'addon:optional-product-list' event.pk %}"
+                   title="Opcionais">
+                    <i class="fas fa-shopping-basket"></i>
+                    Opcionais
+                </a>
+            </li>
         {% endif %}
     </ul>
 {% endif %}
