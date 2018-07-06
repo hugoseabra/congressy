@@ -1,10 +1,11 @@
 from django.shortcuts import get_object_or_404
 from django.template import Template, Context
 from django.urls import reverse_lazy
+from django.views import generic
 from wkhtmltopdf.views import PDFTemplateView
 
 from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.views.mixins import AccountMixin, EventViewMixin
 from gatheros_subscription.models import Subscription
 
 
@@ -119,3 +120,13 @@ class CertificatePDFExampleView(AccountMixin, PDFTemplateView):
         )
 
         return text_template.render(context)
+
+
+class CertificateManualView(EventViewMixin, generic.TemplateView):
+    template_name = 'certificate/manual.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['has_inside_bar'] = True
+        context['active'] = 'certificate-manual'
+        return context
