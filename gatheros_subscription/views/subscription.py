@@ -1090,32 +1090,18 @@ class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
 
 
 class SwitchSubscriptionTestView(EventViewMixin, generic.View):
-    object = None
+    """
+    Gerenciamento de inscrições que podem ou não serem setados como Teste.
+    """
     success_message = ""
 
     def get_object(self):
-        if self.object:
-            return self.object
-
-        try:
-            self.object = Subscription.objects.get(pk=self.kwargs.get('pk'))
-
-        except Subscription.DoesNotExist:
-            return None
-
-        else:
-            return self.object
+        return get_object_or_404(Subscription, pk=self.kwargs.get('pk'))
 
     def post(self, request, *args, **kwargs):
         state = request.POST.get('state')
-        if state == "True":
-            is_test = True
-            self.success_message = "A inscrição agora é uma inscrição de teste"
-        else:
-            is_test = False
-            self.success_message = "A inscrição não é mais uma inscrição de teste"
 
         subscription = self.get_object()
-        subscription.test_subscription = is_test
+        subscription.test_subscription = state == "True"
         subscription.save()
         return HttpResponse(status=200)
