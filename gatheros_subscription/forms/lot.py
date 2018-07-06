@@ -86,7 +86,7 @@ class LotForm(forms.ModelForm):
         self.fields['event_survey'].empty_label = '- Selecione -'
 
         if self.instance.pk and self.instance.subscriptions.filter(
-                completed=True
+                completed=True, test_subscription=False
         ).count() > 0:
             self.fields['price'].widget.attrs['disabled'] = 'disabled'
             self.fields['price'].disabled = True

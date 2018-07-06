@@ -50,6 +50,8 @@ def event_count_completed_subscriptions(event):
     return Subscription.objects.filter(
         lot__event=event,
         completed=True,
+        test_subscription=False,
+
         status__in=[
             Subscription.CONFIRMED_STATUS,
             Subscription.AWAITING_STATUS
@@ -62,6 +64,7 @@ def lot_count_completed_subscriptions(lot):
     return Subscription.objects.filter(
         lot=lot,
         completed=True,
+        test_subscription=False,
         status__in=[
             Subscription.CONFIRMED_STATUS,
             Subscription.AWAITING_STATUS

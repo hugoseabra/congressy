@@ -231,6 +231,8 @@ class Organization(models.Model, GatherosModelMixin):
                   ' manualmente.'
     )
 
+    last_access = models.DateTimeField(auto_now=True, blank=True, null=True)
+
     class Meta:
         verbose_name = 'organização'
         verbose_name_plural = 'organizações'
