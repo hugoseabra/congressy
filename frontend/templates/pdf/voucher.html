@@ -63,8 +63,9 @@
                     <td class="col-sm-2">
                         {{ event.get_period }}
                     </td>
-                    <td class="col-sm-8">
+                    <td class="col-sm-8 text-center">
                         <img src="data:image/png;base64,{{ qrcode }}">
+                        <img src="data:image/png;base64,{{ barcode }}">
                     </td>
                 </tr>
                 {% if event.place.show_location %}
@@ -103,9 +104,6 @@
                 </tbody>
 
             </table>
-            <div class="col-sm-4" style="border-width: 0; text-align: center; width: 50%">
-                <img src="data:image/png;base64,{{ barcode }}">
-            </div>
 
             {#            <p style="margin-top: 5px; font-size: 25px">{{ person.name|upper }}</p>#}
             {#            <p style="font-size: 20px;margin-top: 30px">Data / horário</p>#}
