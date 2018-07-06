@@ -45,7 +45,7 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
             self.subscription = Subscription.objects.get(
                 event=self.event,
                 person=self.person,
-                completed=True,
+                completed=True, test_subscription=False
             )
 
             if not self.get_transactions():
@@ -80,7 +80,7 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
             sub = Subscription.objects.get(
                 person=self.person,
                 event=self.event,
-                completed=True,
+                completed=True, test_subscription=False
             )
 
             has_products = sub.subscription_products.filter(

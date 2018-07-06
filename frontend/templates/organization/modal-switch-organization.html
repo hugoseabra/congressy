@@ -1,4 +1,5 @@
-<div class="modal fade" id="change_organization" role="dialog" data-backdrop="static">
+<div class="modal fade" id="change_organization" role="dialog"
+     data-backdrop="static">
     <div class="modal-dialog " role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -24,13 +25,17 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for item in organizations %}
+                                {% for item in organizations|slice:":5" %}
                                     <tr>
                                         <td>
                                             <a>{{ item.name }}</a>
                                         </td>
-                                        <td class=" text-center">
-                                            <button type="button" class="btn btn-success btn-trans btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true"
+                                        <td class=" text-center" >
+                                            <button type="button"
+                                                    class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                                                    data-toggle="dropdown"
+                                                    aria-expanded="false"
+                                                    aria-haspopup="true"
                                                     onclick="cgsy_submit({{ item.pk }})">
                                                 <span>Entrar</span>
                                             </button>
@@ -39,6 +44,18 @@
                                 {% endfor %}
                                 </tbody>
                             </table>
+                            {% if organizations|length > 5 %}
+                                <div class="text-center">
+                                    <button type="button"
+                                            class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                                            data-toggle="dropdown"
+                                            aria-expanded="false"
+                                            aria-haspopup="true"
+                                            onclick="location.href='{% url 'event:organization-list' %}'">
+                                        <span>Ver todas organizações</span>
+                                    </button>
+                                </div>
+                            {% endif %}
                         {% else %}
                             <h3>Nenhum dado.</h3>
                         {% endif %}
@@ -47,9 +64,11 @@
             </div>
         </div>
     </div>
-    <form action="{% url 'event:organization-switch' %}" method="post" id="organization_context">
+    <form action="{% url 'event:organization-switch' %}" method="post"
+          id="organization_context">
         {% csrf_token %}
-        <input type="hidden" name="organization-context-pk" id="organization-context-pk"/>
+        <input type="hidden" name="organization-context-pk"
+               id="organization-context-pk"/>
         <input type="hidden" name="next" value="{{ request.path }}"/>
     </form>
 </div>
