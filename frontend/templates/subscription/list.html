@@ -111,8 +111,10 @@
         <div class="col-md-12">
             <div class="buttonbar">
                 <div class="float-left">
-                    <button type="button" class="btn btn-primary {% if not object_list %}disabled{% endif %}"
-                            {% if not object_list %}disabled title="Nenhuma inscrição para exportar."{% endif %}
+                    <button type="button"
+                            class="btn btn-primary {% if not object_list %}disabled{% endif %}"
+                            {% if not object_list %}disabled
+                            title="Nenhuma inscrição para exportar."{% endif %}
                             onclick="$('#export-form').submit();">
                         <i class="fa fa-download"></i>
                         Exportar
@@ -125,12 +127,13 @@
                     </div>
                 </div>
                 {% if event.allow_internal_subscription %}
-                <div class="float-right">
-                    <a role="button" class="btn btn-success" href="{% url 'subscription:subscription-add' event.pk%}">
-                        <i class="fa fa-plus"></i>
-                        Nova inscrição
-                    </a>
-                </div>
+                    <div class="float-right">
+                        <a role="button" class="btn btn-success"
+                           href="{% url 'subscription:subscription-add' event.pk %}">
+                            <i class="fa fa-plus"></i>
+                            Nova inscrição
+                        </a>
+                    </div>
                 {% endif %}
                 <div class="clearfix"></div>
             </div>
@@ -191,14 +194,18 @@
                                             <a href="{% url 'subscription:subscription-view' event.pk item.pk %}">
                                                 {{ item.person.name }}
                                             </a>
-                                            <div  style="margin-left:18px;">
+                                            {% if item.test_subscription %}
+                                                <span class="badge badge-primary">Inscrição de teste</span>
+                                            {% endif %}
+
+                                            <div style="margin-left:18px;">
                                                 <small class="text-muted">
                                                     {{ item.code }}
                                                 </small>
                                             </div>
 
                                         </td>
-                                        <td >
+                                        <td>
                                             {{ item.code }}
                                         </td>
                                         <td>
@@ -219,7 +226,8 @@
                                                 >
                                                     <span class="fas fa-cog"></span>
                                                 </button>
-                                                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                <ul class="dropdown-menu dropdown-menu-right"
+                                                    role="menu">
                                                     <li>
                                                         <a href="{% url 'subscription:subscription-view' event.pk item.pk %}">
                                                             <i class="fa fa-eye"></i>
@@ -227,12 +235,12 @@
                                                         </a>
                                                     </li>
                                                     {% if event.allow_internal_subscription %}
-                                                    <li>
-                                                        <a href="{% url 'subscription:subscription-edit' event.pk item.pk %}">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                            Editar
-                                                        </a>
-                                                    </li>
+                                                        <li>
+                                                            <a href="{% url 'subscription:subscription-edit' event.pk item.pk %}">
+                                                                <i class="fas fa-pencil-alt"></i>
+                                                                Editar
+                                                            </a>
+                                                        </li>
                                                     {% endif %}
                                                     {% if item.confirmed %}
                                                         <li>
@@ -255,19 +263,25 @@
                                 {% endfor %}
                                 </tbody>
                             </table>
-                            <br />
-                            <br />
+                            <br/>
+                            <br/>
                         </div>
 
                         {% if has_paid_lots %}
-                            <div class="text-muted" style="margin-top: 15px;margin-bottom:5px;"><small>Legenda de status:</small></div>
+                            <div class="text-muted"
+                                 style="margin-top: 15px;margin-bottom:5px;">
+                                <small>Legenda de status:</small>
+                            </div>
                             <small style="margin-left: 10px;">
                                 <strong>
-                                    <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i> Confirmado
-                                     &ensp;  &ensp;  &ensp;
-                                    <i class="fa fa-circle" aria-hidden="true" style="color:#f0ad4e"></i> Pendente
-                                     &ensp;  &ensp;  &ensp;
-                                    <i class="fa fa-circle" aria-hidden="true" style="color:#d9534f"></i> Cancelado
+                                    <i class="fa fa-circle" aria-hidden="true"
+                                       style="color:#5cb85c"></i> Confirmado
+                                    &ensp; &ensp; &ensp;
+                                    <i class="fa fa-circle" aria-hidden="true"
+                                       style="color:#f0ad4e"></i> Pendente
+                                    &ensp; &ensp; &ensp;
+                                    <i class="fa fa-circle" aria-hidden="true"
+                                       style="color:#d9534f"></i> Cancelado
                                 </strong>
                             </small>
                         {% endif %}
