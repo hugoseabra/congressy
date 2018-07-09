@@ -5,10 +5,11 @@ source /scripts.sh
 # Define settings
 export DJANGO_SETTINGS_MODULE=project.manage.settings.prod
 
-# Configura dadosde sincronização.
-run_python_script "Configurando SYNC" /configure-sync.py
+run_python_script "Configurando SETTINGS" /configure-settings.py
 
-run_bash_script "Verificando existência do Bucket" /create-s3bucket.sh
+run_python_script_with_output "Executando migrate" "manage.py migrate"
+run_python_script_with_output "Atualizando Site ID" "manage.py loaddata 000_site_staging"
 
-# Puxa arquivos do S3, se necessário.
-run_bash_script_with_output "Baixando arquivos do S3" /in-sync.sh
+# TEMP
+run_python_script_with_output "Migrando infraestrutura de debitos" "manage.py update_debts"
+run_python_script_with_output "Migrando infraestrutura de pagamento" "manage.py update_payments"

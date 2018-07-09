@@ -19,15 +19,15 @@ function error_msg() {
     echo ;
 }
 
-docker-compose -f ./bin/env/staging/docker-compose.yml down --remove-orphans
-docker-compose -f ./bin/env/staging/docker-compose.yml up -d;
+docker-compose -f ./conf/staging/docker-compose.yml down --remove-orphans
+docker-compose -f ./conf/staging/docker-compose.yml up -d;
 sleep 20
 
 echo ;
-docker-compose -f ./bin/env/staging/docker-compose.yml logs migration
-docker-compose -f ./bin/env/staging/docker-compose.yml logs volume
-docker-compose -f ./bin/env/staging/docker-compose.yml logs cron
-docker-compose -f ./bin/env/staging/docker-compose.yml logs manage
+docker-compose -f ./conf/staging/docker-compose.yml logs migration
+docker-compose -f ./conf/staging/docker-compose.yml logs volume
+docker-compose -f ./conf/staging/docker-compose.yml logs cron
+docker-compose -f ./conf/staging/docker-compose.yml logs manage
 echo ;
 
 RUNNING=$(docker inspect -f {{.State.Running}} manage-staging)

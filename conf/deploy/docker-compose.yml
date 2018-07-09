@@ -8,9 +8,19 @@ services:
     volumes:
       - "redis:/data"
 
+  migration:
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    entrypoint:
+      - /services/migration/container-entry.sh
+    env_file: /tmp/staging-files/env-manage-staging
+    networks:
+      - postgres
+
   # Preparação de volumes.
   volume:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    depends_on:
+      - migration
     entrypoint:
       - /services/volume/container-entry.sh
     volumes:
@@ -34,6 +44,7 @@ services:
   manage:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     depends_on:
+      - migration
       - volume
     networks:
       - redis
