@@ -123,7 +123,8 @@ pipeline:
       - sh ./bin/env/staging/03_start-cgsy-staging.sh
       - docker system prune -a -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
     when:
-      branch: [ hotfix/*, release/* ]
+#      branch: [ hotfix/*, release/* ]
+      branch: [ feature/deploy-env-files-migrate ]
 
 #  notify-staging-on-telegram:
 #    image: appleboy/drone-telegram
