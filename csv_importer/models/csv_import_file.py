@@ -34,6 +34,13 @@ class CSVImportFile(models.Model):
         related_name='csv_file'
     )
 
+    lot = models.ForeignKey(
+        'gatheros_subscription.Lot',
+        on_delete=models.CASCADE,
+        verbose_name='lot',
+        related_name='csv_file',
+    )
+
     csv_file = models.FileField(
         upload_to=get_file_path,
         validators=[validate_csv_only_file],
