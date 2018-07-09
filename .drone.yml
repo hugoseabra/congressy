@@ -112,86 +112,18 @@ pipeline:
     when:
       branch: [ feature/deploy-env-files-migrate ]
 
-#  running-db-migration:
-#    image: tmaier/docker-compose
-#    pull: true
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    secrets: [
-#      aws_key,
-#      aws_secret,
-#      domain_staging,
-#      force_https_staging,
-#      bucket_location,
-#      bucket_name,
-#      dbhost_staging,
-#      dbuser_staging,
-#      dbpass_staging,
-#      dbname_staging,
-#      dbport_staging,
-#      sentry_public_dsn,
-#      sentry_private_dsn
-#    ]
-#    commands:
-#      - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.staging" > ./bin/env/staging/env-manage-staging
-#      - echo "AWS_KEY=$${AWS_KEY}" >> ./bin/env/staging/env-manage-staging
-#      - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/staging/env-manage-staging
-#      - echo "DOMAIN=$${DOMAIN_STAGING}" >> ./bin/env/staging/env-manage-staging
-#      - echo "FORCE_HTTPS=$${FORCE_HTTPS_STAGING}" >> ./bin/env/staging/env-manage-staging
-#      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ./bin/env/staging/env-manage-staging
-#      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ./bin/env/staging/env-manage-staging
-#      - echo "DBHOST=$${DBHOST_STAGING}" >> ./bin/env/staging/env-manage-staging
-#      - echo "DBUSER=$${DBUSER_STAGING}" >> ./bin/env/staging/env-manage-staging
-#      - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-manage-staging
-#      - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-manage-staging
-#      - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-manage-staging
-#      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ./bin/env/staging/env-manage-staging
-#      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ./bin/env/staging/env-manage-staging
-#      - sh ./bin/env/staging/03_start-cgsy-staging.sh
-#      - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
-#    when:
-#      branch: [ hotfix/*, release/* ]
-
-#  deploy-staging-env:
-#    image: tmaier/docker-compose
-#    pull: true
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#      - /tmp/cgsy-media:/media
-#    secrets: [
-#      aws_key,
-#      aws_secret,
-#      domain_staging,
-#      force_https_staging,
-#      bucket_location,
-#      bucket_name,
-#      dbhost_staging,
-#      dbuser_staging,
-#      dbpass_staging,
-#      dbname_staging,
-#      dbport_staging,
-#      sentry_public_dsn,
-#      sentry_private_dsn
-#    ]
-#    commands:
-#      - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.staging" > ./bin/env/staging/env-manage-staging
-#      - echo "AWS_KEY=$${AWS_KEY}" >> ./bin/env/staging/env-manage-staging
-#      - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/staging/env-manage-staging
-#      - echo "DOMAIN=$${DOMAIN_STAGING}" >> ./bin/env/staging/env-manage-staging
-#      - echo "FORCE_HTTPS=$${FORCE_HTTPS_STAGING}" >> ./bin/env/staging/env-manage-staging
-#      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ./bin/env/staging/env-manage-staging
-#      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ./bin/env/staging/env-manage-staging
-#      - echo "DBHOST=$${DBHOST_STAGING}" >> ./bin/env/staging/env-manage-staging
-#      - echo "DBUSER=$${DBUSER_STAGING}" >> ./bin/env/staging/env-manage-staging
-#      - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-manage-staging
-#      - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-manage-staging
-#      - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-manage-staging
-#      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ./bin/env/staging/env-manage-staging
-#      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ./bin/env/staging/env-manage-staging
-#      - sh ./bin/env/staging/03_start-cgsy-staging.sh
-#      - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
-#    when:
-#      branch: [ hotfix/*, release/* ]
+  deploy-staging-env:
+    image: tmaier/docker-compose
+    pull: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /media:/var/www/cgsy/media
+      - /tmp/staging-files:/tmp/staging-files
+    commands:
+      - sh ./bin/env/staging/03_start-cgsy-staging.sh
+      - docker system prune -a -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
+    when:
+      branch: [ hotfix/*, release/* ]
 
 #  notify-staging-on-telegram:
 #    image: appleboy/drone-telegram
