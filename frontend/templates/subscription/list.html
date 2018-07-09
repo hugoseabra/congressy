@@ -135,6 +135,13 @@
                         </a>
                     </div>
                 {% endif %}
+
+                {% if event.allow_importing %}
+                    <a href="{% url 'subscription:subscriptions-csv-list' event.pk %}" class="btn btn-primary">
+                        <i class="fas fa-file-excel"></i>
+                        Importar via CSV
+                    </a>
+                {% endif %}
                 <div class="clearfix"></div>
             </div>
         </div>
