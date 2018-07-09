@@ -117,6 +117,7 @@
                                 <thead>
                                 <tr>
                                     <th>Nome do arquivo</th>
+                                    <th class="col-md-2">Lote</th>
                                     <th class="col-md-2">Data de Envio</th>
                                     <th class="col-md-2">Já foi processada?</th>
                                     <th class="col-md-1"></th>
@@ -128,6 +129,7 @@
                                 {% for csv in object_list %}
                                     <tr>
                                         <td>{{ csv.filename }}</td>
+                                        <td>{{ csv.lot.name }}</td>
                                         <td>{{ csv.created|date:"d/m/Y H\hi" }}</td>
                                         <td class="text-center">
                                             {% if csv.processed %}
@@ -158,7 +160,7 @@
                 {% else %}
 
                     <div class="panel-body text-center csv-file" style="height: 200px;">
-                    
+
                         <h1 style="margin-top: 50px">
 
                             <strong>
