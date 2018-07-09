@@ -33,23 +33,11 @@
 
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row" id="csv-form">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        Editar as configurações
-                    </h3>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <form class="form-inline" method="post" enctype="multipart/form-data">
+                    <hr style="height:1px;border:none;color:#333;background-color:#333;">
+                
+                    <form class="form-inline" method="post" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-12">
 
                                 {% csrf_token %}
                                 {% for hidden_field in form.hidden_fields %}
@@ -62,7 +50,11 @@
                                 {% render_generic_field form.encoding %}
                                 {% render_generic_field form.separator %}
 
+                            </div>
+                        </div>
 
+                        <div class="row" style="margin-top: 15px">
+                            <div class="col-md-12">
                                 <div class="form-group">
                                     <div>
                                         <button type="submit" class="btn btn-success">
@@ -71,10 +63,10 @@
                                     </div>
                                 </div>
 
-                            </form>
-
+                            </div>
                         </div>
-                    </div>
+                    </form>
+
                 </div>
             </div>
         </div>
@@ -380,7 +372,7 @@
                                     </strong>
                                 </h3>
 
-                                <a href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}" class="btn btn-primary" type="button" style="margin-top: 15px">
+                                <a href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}" class="btn btn-success" type="button" style="margin-top: 15px">
                                     Continuar a importação
                                     <i class="fas fa-arrow-right"></i>
                                 </a>
