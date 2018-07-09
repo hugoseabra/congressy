@@ -12,9 +12,7 @@ services:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     entrypoint:
       - /services/migration/container-entry.sh
-    env_file: /tmp/staging-files/env-manage-staging
-    networks:
-      - postgres
+    env_file: ./env-file
 
   # Preparação de volumes.
   volume:
@@ -26,26 +24,26 @@ services:
     volumes:
       - "/etc/localtime:/etc/localtime"
       - "./media:/var/www/cgsy/media"
-    env_file:
-      - ./env-file
+    env_file: ./env-file
 
   cron:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     depends_on:
+      - migration
       - volume
     entrypoint:
       - /services/cron/container-entry.sh
     volumes:
       - "/etc/localtime:/etc/localtime"
       - "./media:/var/www/cgsy/media"
-    env_file:
-      - ./env-file
+    env_file: ./env-file
 
   manage:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     depends_on:
       - migration
       - volume
+      - redis
     networks:
       - redis
     ports:
@@ -62,6 +60,7 @@ services:
   partner:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     networks:
+      - migration
       - redis
     ports:
       - "8001:80"

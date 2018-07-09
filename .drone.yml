@@ -185,268 +185,268 @@ pipeline:
     when:
       branch: [ master ]
 
-#  save-prod-version:
-#    image: indiehosters/git
-#    pull: true
-#    commands:
-#      - export REF_TAG=$(git for-each-ref refs/tags --sort=-taggerdate --format='%(refname)' --count=1)
-#      - export LAST_TAG=$(basename $${REF_TAG})
-#      - echo $${LAST_TAG} > version
-#      - cat version
-#    when:
-#      branch: [ master ]
-#
-#  check-latest-version:
-#    image: docker
-#    pull: true
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    commands:
-#      - apk add --no-cache python3
-#      - pip3 install --no-cache-dir semver clint
-#      - python3 ./bin/env/prod/02_check-latest-version.py
-#      - cat ./bin/env/prod/previous_version
-#    when:
-#      branch: [ master ]
-#
-#  build-prod-images:
-#    image: docker
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    commands:
-#      - export REPO="871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy"
-#      - docker build --rm -t $${REPO}:latest -f ./conf/deploy/Dockerfile .
-#      - docker tag $${REPO}:latest $${REPO}:`cat ./version`
-#    when:
-#      branch: [ master ]
-#
-#  publish-images:
-#    image: docker
-#    pull: true
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    commands:
-#      - ./bin/env/prod/03_publish-tagged-version.sh
-#    when:
-#      branch: [ master ]
-#
-#  prepare-production-server:
-#    image: appleboy/drone-ssh
-#    pull: true
-#    host:
-#      - 172.31.45.193
-#    username: admin
-#    port: 22
-#    secrets:
-#      - source: CONGRESSY_DEPLOY
-#        target: ssh_key
-#      - source: AWS_KEY
-#        target: AWS_KEY
-#      - source: AWS_SECRET
-#        target: AWS_SECRET
-#      - source: AWS_ACCOUNT_ID
-#        target: AWS_ACCOUNT_ID
-#      - source: DOMAIN_MANAGE
-#        target: DOMAIN_MANAGE
-#      - source: DOMAIN_PARTNER
-#        target: DOMAIN_PARTNER
-#      - source: FORCE_HTTPS
-#        target: FORCE_HTTPS
-#      - source: BUCKET_LOCATION
-#        target: BUCKET_LOCATION
-#      - source: BUCKET_NAME
-#        target: BUCKET_NAME
-#      - source: DBHOST
-#        target: DBHOST
-#      - source: DBUSER
-#        target: DBUSER
-#      - source: DBPASS
-#        target: DBPASS
-#      - source: DBNAME
-#        target: DBNAME
-#      - source: DBPORT
-#        target: DBPORT
-#      - source: SENTRY_PUBLIC_DSN
-#        target: SENTRY_PUBLIC_DSN
-#      - source: SENTRY_PRIVATE_DSN
-#        target: SENTRY_PRIVATE_DSN
-#    envs: [
-#      congressy_deploy,
-#      aws_key,
-#      aws_secret,
-#      aws_account_id,
-#      domain_manage,
-#      domain_partner,
-#      force_https,
-#      bucket_location,
-#      bucket_name,
-#      dbhost,
-#      dbuser,
-#      dbpass,
-#      dbname,
-#      dbport,
-#      sentry_public_dsn,
-#      sentry_private_dsn
-#    ]
-#    script:
-#      - mkdir -p ~/awsecr
-#      # env-file do awsecr
-#      - echo "AWS_KEY=$${AWS_KEY}" > ~/awsecr/env-awsecr
-#      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/awsecr/env-awsecr
-#      - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ~/awsecr/env-awsecr
-#      - echo "AWS_REGION=us-east-1" >> ~/awsecr/env-awsecr
-#      - echo "AWS_FORMAT=json" >> ~/awsecr/env-awsecr
-#
-#      - mkdir -p ~/cgsy
-#      # env-file do stack de produção - common
-#      - echo "AWS_KEY=$${AWS_KEY}" >> ~/cgsy/env-file
-#      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
-#      - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> ~/cgsy/env-file
-#      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ~/cgsy/env-file
-#      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ~/cgsy/env-file
-#      - echo "DBHOST=$${DBHOST}" >> ~/cgsy/env-file
-#      - echo "DBUSER=$${DBUSER}" >> ~/cgsy/env-file
-#      - echo "DBPASS=$${DBPASS}" >> ~/cgsy/env-file
-#      - echo "DBNAME=$${DBNAME}" >> ~/cgsy/env-file
-#      - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
-#      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
-#      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
-#      # env-file do stack de produção - manage
-#      - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.prod" > ~/cgsy/env-manage-file
-#      - echo "DOMAIN=$${DOMAIN_MANAGE}" >> ~/cgsy/env-manage-file
-#      # env-file do stack de produção - partner
-#      - echo "DJANGO_SETTINGS_MODULE=project.partner.settings.prod" > ~/cgsy/env-partner-file
-#      - echo "DOMAIN=$${DOMAIN_PARTNER}" >> ~/cgsy/env-partner-file
-#    when:
-#      branch: [ master ]
-#
-#  tranfer-stackfile-awsecr:
-#    image: drillster/drone-rsync
-#    pull: true
-#    hosts:
-#      - 172.31.45.193
-#    port: 22
-#    user: admin
-#    source: ./bin/env/prod/01_create-awsecr-container.sh
-#    target: ~/awsecr/.
-#    secrets:
-#      - source: CONGRESSY_DEPLOY
-#        target: RSYNC_KEY
-#    when:
-#      branch: [ master ]
-#
-#  transfer-previous-version-file:
-#    image: drillster/drone-rsync
-#    pull: true
-#    hosts:
-#      - 172.31.45.193
-#    port: 22
-#    user: admin
-#    source: ./bin/env/prod/previous_version
-#    target: ~/cgsy/.
-#    secrets:
-#      - source: CONGRESSY_DEPLOY
-#        target: RSYNC_KEY
-#    when:
-#      branch: [ master ]
-#
-#  transfer-build-version-file:
-#    image: drillster/drone-rsync
-#    pull: true
-#    hosts:
-#      - 172.31.45.193
-#    port: 22
-#    user: admin
-#    source: ./version
-#    target: ~/cgsy/.
-#    secrets:
-#      - source: CONGRESSY_DEPLOY
-#        target: RSYNC_KEY
-#    when:
-#      branch: [ master ]
-#
-#  tranfer-stackfile-production-server:
-#    image: drillster/drone-rsync
-#    pull: true
-#    hosts:
-#      - 172.31.45.193
-#    port: 22
-#    user: admin
-#    source: ./conf/deploy/docker-compose.yml
-#    target: ~/cgsy/.
-#    secrets:
-#      - source: CONGRESSY_DEPLOY
-#        target: RSYNC_KEY
-#    when:
-#      branch: [ master ]
-#
-#  tranfer-deploy-script:
-#    image: drillster/drone-rsync
-#    pull: true
-#    hosts:
-#      - 172.31.45.193
-#    port: 22
-#    user: admin
-#    source: ./bin/env/prod/04_deploy-latest-image.sh
-#    target: ~/cgsy/.
-#    secrets:
-#      - source: CONGRESSY_DEPLOY
-#        target: RSYNC_KEY
-#    when:
-#      branch: [ master ]
-#
-#  deploy-latest-version:
-#    image: appleboy/drone-ssh
-#    pull: true
-#    host:
-#      - 172.31.45.193
-#    username: admin
-#    port: 22
-#    secrets:
-#      - source: CONGRESSY_DEPLOY
-#        target: ssh_key
-#    script:
-#      - ~/awsecr/01_create-awsecr-container.sh
-#      - ~/cgsy/04_deploy-latest-image.sh
-#    when:
-#      branch: [ master ]
-#
-#  notify-production-on-telegram:
-#    image: appleboy/drone-telegram
-#    pull: true
-#    token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
-#    to: -275808686 # ID chat Congressy
-##    to: 245012348 # ID hugoseabra
-#    format: markdown
-#    message: >
-#      *{{uppercase build.status }} - Produção*
-#
-#
-#      *Repo:* {{ repo.name }} das {{datetime build.started "3:04PM" "UTC"}} às {{datetime build.finished"3:04PM" "UTC"}}
-#
-#      *Branch:* {{ commit.branch }}
-#
-#      *Build:* {{build.number}}
-#
-#      *Duração:* {{duration build.started build.finished}}
-#
-#      *Autor:* {{ commit.author }}
-#
-#      *Mensagem:*
-#
-#      ```
-#      {{ commit.message }}
-#      ```
-#
-#      *Ambiente:* https://ev.congressy.com/login/
-#
-#
-#      *Build Link:* {{ build.link }}
-#
-#
-#      *Commit:* {{ commit.link }}
-#
-#
-#    when:
-#      status: [ success, failure ]
-#      branch: [ master ]
+  save-prod-version:
+    image: indiehosters/git
+    pull: true
+    commands:
+      - export REF_TAG=$(git for-each-ref refs/tags --sort=-taggerdate --format='%(refname)' --count=1)
+      - export LAST_TAG=$(basename $${REF_TAG})
+      - echo $${LAST_TAG} > version
+      - cat version
+    when:
+      branch: [ master ]
+
+  check-latest-version:
+    image: docker
+    pull: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - apk add --no-cache python3
+      - pip3 install --no-cache-dir semver clint
+      - python3 ./bin/env/prod/02_check-latest-version.py
+      - cat ./bin/env/prod/previous_version
+    when:
+      branch: [ master ]
+
+  build-prod-images:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - export REPO="871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy"
+      - docker build --rm -t $${REPO}:latest -f ./conf/deploy/Dockerfile .
+      - docker tag $${REPO}:latest $${REPO}:`cat ./version`
+    when:
+      branch: [ master ]
+
+  publish-images:
+    image: docker
+    pull: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - ./bin/env/prod/03_publish-tagged-version.sh
+    when:
+      branch: [ master ]
+
+  prepare-production-server:
+    image: appleboy/drone-ssh
+    pull: true
+    host:
+      - 172.31.45.193
+    username: admin
+    port: 22
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: ssh_key
+      - source: AWS_KEY
+        target: AWS_KEY
+      - source: AWS_SECRET
+        target: AWS_SECRET
+      - source: AWS_ACCOUNT_ID
+        target: AWS_ACCOUNT_ID
+      - source: DOMAIN_MANAGE
+        target: DOMAIN_MANAGE
+      - source: DOMAIN_PARTNER
+        target: DOMAIN_PARTNER
+      - source: FORCE_HTTPS
+        target: FORCE_HTTPS
+      - source: BUCKET_LOCATION
+        target: BUCKET_LOCATION
+      - source: BUCKET_NAME
+        target: BUCKET_NAME
+      - source: DBHOST
+        target: DBHOST
+      - source: DBUSER
+        target: DBUSER
+      - source: DBPASS
+        target: DBPASS
+      - source: DBNAME
+        target: DBNAME
+      - source: DBPORT
+        target: DBPORT
+      - source: SENTRY_PUBLIC_DSN
+        target: SENTRY_PUBLIC_DSN
+      - source: SENTRY_PRIVATE_DSN
+        target: SENTRY_PRIVATE_DSN
+    envs: [
+      congressy_deploy,
+      aws_key,
+      aws_secret,
+      aws_account_id,
+      domain_manage,
+      domain_partner,
+      force_https,
+      bucket_location,
+      bucket_name,
+      dbhost,
+      dbuser,
+      dbpass,
+      dbname,
+      dbport,
+      sentry_public_dsn,
+      sentry_private_dsn
+    ]
+    script:
+      - mkdir -p ~/awsecr
+      # env-file do awsecr
+      - echo "AWS_KEY=$${AWS_KEY}" > ~/awsecr/env-awsecr
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/awsecr/env-awsecr
+      - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ~/awsecr/env-awsecr
+      - echo "AWS_REGION=us-east-1" >> ~/awsecr/env-awsecr
+      - echo "AWS_FORMAT=json" >> ~/awsecr/env-awsecr
+
+      - mkdir -p ~/cgsy
+      # env-file do stack de produção - common
+      - echo "AWS_KEY=$${AWS_KEY}" >> ~/cgsy/env-file
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
+      - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> ~/cgsy/env-file
+      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ~/cgsy/env-file
+      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ~/cgsy/env-file
+      - echo "DBHOST=$${DBHOST}" >> ~/cgsy/env-file
+      - echo "DBUSER=$${DBUSER}" >> ~/cgsy/env-file
+      - echo "DBPASS=$${DBPASS}" >> ~/cgsy/env-file
+      - echo "DBNAME=$${DBNAME}" >> ~/cgsy/env-file
+      - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
+      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
+      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
+      # env-file do stack de produção - manage
+      - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.prod" > ~/cgsy/env-manage-file
+      - echo "DOMAIN=$${DOMAIN_MANAGE}" >> ~/cgsy/env-manage-file
+      # env-file do stack de produção - partner
+      - echo "DJANGO_SETTINGS_MODULE=project.partner.settings.prod" > ~/cgsy/env-partner-file
+      - echo "DOMAIN=$${DOMAIN_PARTNER}" >> ~/cgsy/env-partner-file
+    when:
+      branch: [ master ]
+
+  tranfer-stackfile-awsecr:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.45.193
+    port: 22
+    user: admin
+    source: ./bin/env/prod/01_create-awsecr-container.sh
+    target: ~/awsecr/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  transfer-previous-version-file:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.45.193
+    port: 22
+    user: admin
+    source: ./bin/env/prod/previous_version
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  transfer-build-version-file:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.45.193
+    port: 22
+    user: admin
+    source: ./version
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  tranfer-stackfile-production-server:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.45.193
+    port: 22
+    user: admin
+    source: ./conf/deploy/docker-compose.yml
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  tranfer-deploy-script:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.45.193
+    port: 22
+    user: admin
+    source: ./bin/env/prod/04_deploy-latest-image.sh
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  deploy-latest-version:
+    image: appleboy/drone-ssh
+    pull: true
+    host:
+      - 172.31.45.193
+    username: admin
+    port: 22
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: ssh_key
+    script:
+      - ~/awsecr/01_create-awsecr-container.sh
+      - ~/cgsy/04_deploy-latest-image.sh
+    when:
+      branch: [ master ]
+
+  notify-production-on-telegram:
+    image: appleboy/drone-telegram
+    pull: true
+    token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
+    to: -275808686 # ID chat Congressy
+#    to: 245012348 # ID hugoseabra
+    format: markdown
+    message: >
+      *{{uppercase build.status }} - Produção*
+
+
+      *Repo:* {{ repo.name }} das {{datetime build.started "3:04PM" "UTC"}} às {{datetime build.finished"3:04PM" "UTC"}}
+
+      *Branch:* {{ commit.branch }}
+
+      *Build:* {{build.number}}
+
+      *Duração:* {{duration build.started build.finished}}
+
+      *Autor:* {{ commit.author }}
+
+      *Mensagem:*
+
+      ```
+      {{ commit.message }}
+      ```
+
+      *Ambiente:* https://ev.congressy.com/login/
+
+
+      *Build Link:* {{ build.link }}
+
+
+      *Commit:* {{ commit.link }}
+
+
+    when:
+      status: [ success, failure ]
+      branch: [ master ]
