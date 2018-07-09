@@ -314,7 +314,9 @@
                                         <option value="">- Sem formulário -
                                         </option>
                                         {% for event_survey in event.surveys.all %}
-                                            <option value="{{ event_survey.pk }}">{{ event_survey }}</option>
+                                            {% if event_survey.survey.questions.count > 0 %}
+                                                <option value="{{ event_survey.pk }}">{{ event_survey }}</option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select>
                                 </div>

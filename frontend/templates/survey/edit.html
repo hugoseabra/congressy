@@ -1,4 +1,4 @@
- {% extends "base/base.html" %}
+{% extends "base/base.html" %}
 {% load static base_tags form_config_tags %}
 {% load subscription_tags %}
 
@@ -66,11 +66,19 @@
                         Vínculo com Lotes
                     </h3>
                 </div>
-
                 <div class="panel-body">
+                    {% if survey.questions.count > 0 %}
 
-                    {% include 'subscription/includes/lot_event_survey_change_panel.html' %}
+                        {% include 'subscription/includes/lot_event_survey_change_panel.html' %}
 
+
+                    {% else %}
+                        <div>
+                            <strong>Não é permitido vincular formulários sem
+                                perguntas a
+                                lotes</strong>
+                        </div>
+                    {% endif %}
                 </div>
 
             </div>
