@@ -32,6 +32,10 @@ allowed_keys = [
 ]
 
 
+class CannotGeneratePreviewError(Exception):
+    pass
+
+
 class CSVViewMixin(EventViewMixin):
     """
         Mixin utilizado para não permitir acesso sem determinada flag ativada.
@@ -177,7 +181,21 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
         if form is None:
             form = CSVForm(instance=self.object)
 
-        context['preview'] = self.get_preview()
+        try:
+            context['preview'] = self.get_preview()
+        except CannotGeneratePreviewError as e:
+
+            context['preview'] = {
+                'table': None,
+                'invalid_keys': None,
+            }
+
+            if str(e) == 'Decode error':
+                context['preview']['table'] = \
+                    '<div class="text-center"><h2><strong>Não foi possivel ' \
+                    'fazer a decodificação! Verifique o tipo ' \
+                    'de encodificação.</strong></h2></div>'
+
         context['form'] = form
         return context
 
@@ -193,11 +211,8 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
         try:
             encoded_content = file_content.decode(encoding)
         except UnicodeDecodeError:
-            return {
-                'table': '<div class="text-center"><h2><strong>Não foi '
-                         'possivel fazer a decodificação!</strong></h2></div>',
-                'invalid_keys': None,
-            }
+
+            raise CannotGeneratePreviewError("Decode error")
 
         parsed_dict = self.parse_file(encoded_content, delimiter, quotechar)
 
