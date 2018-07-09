@@ -20,7 +20,7 @@ services:
     container_name: volume-staging
     entrypoint:
       - /services/volume/container-entry.sh
-    env_file: ./env-manage-staging
+    env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
       - /media:/var/www/cgsy/media
@@ -30,7 +30,7 @@ services:
     container_name: migration-staging
     entrypoint:
       - /services/migration/container-entry.sh
-    env_file: ./env-manage-staging
+    env_file: /tmp/staging-files/env-manage-staging
 
 #  cron:
 #    image: cgsy-staging
