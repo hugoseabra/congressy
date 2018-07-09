@@ -32,6 +32,10 @@ $(document).ready(function () {
         event.preventDefault();
         verificarEdicaoForm()
     });
+    $("select").change(function (event) {
+        event.preventDefault();
+        verificarEdicaoForm()
+    });
 
     function verificarEdicaoForm() {
         var submitButton = $('form').find(':submit');
