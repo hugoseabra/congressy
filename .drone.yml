@@ -78,7 +78,7 @@ pipeline:
     image: alpine
     pull: true
     volumes:
-      - /tmp/env-files:/tmp/env-files
+      - /tmp/staging-files:/tmp/staging-files
     secrets: [
       aws_key,
       aws_secret,
@@ -95,20 +95,20 @@ pipeline:
       sentry_private_dsn
     ]
     commands:
-      - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.staging" > /tmp/env-files/env-manage-staging
-      - echo "AWS_KEY=$${AWS_KEY}" >> /tmp/env-files/env-manage-staging
-      - echo "AWS_SECRET=$${AWS_SECRET}" >> /tmp/env-files/env-manage-staging
-      - echo "DOMAIN=$${DOMAIN_STAGING}" >> /tmp/env-files/env-manage-staging
-      - echo "FORCE_HTTPS=$${FORCE_HTTPS_STAGING}" >> /tmp/env-files/env-manage-staging
-      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> /tmp/env-files/env-manage-staging
-      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> /tmp/env-files/env-manage-staging
-      - echo "DBHOST=$${DBHOST_STAGING}" >> /tmp/env-files/env-manage-staging
-      - echo "DBUSER=$${DBUSER_STAGING}" >> /tmp/env-files/env-manage-staging
-      - echo "DBPASS=$${DBPASS_STAGING}" >> /tmp/env-files/env-manage-staging
-      - echo "DBNAME=$${DBNAME_STAGING}" >> /tmp/env-files/env-manage-staging
-      - echo "DBPORT=$${DBPORT_STAGING}" >> /tmp/env-files/env-manage-staging
-      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> /tmp/env-files/env-manage-staging
-      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> /tmp/env-files/env-manage-staging
+      - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.staging" > /tmp/staging-files/env-manage-staging
+      - echo "AWS_KEY=$${AWS_KEY}" >> /tmp/staging-files/env-manage-staging
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> /tmp/staging-files/env-manage-staging
+      - echo "DOMAIN=$${DOMAIN_STAGING}" >> /tmp/staging-files/env-manage-staging
+      - echo "FORCE_HTTPS=$${FORCE_HTTPS_STAGING}" >> /tmp/staging-files/env-manage-staging
+      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> /tmp/staging-files/env-manage-staging
+      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> /tmp/staging-files/env-manage-staging
+      - echo "DBHOST=$${DBHOST_STAGING}" >> /tmp/staging-files/env-manage-staging
+      - echo "DBUSER=$${DBUSER_STAGING}" >> /tmp/staging-files/env-manage-staging
+      - echo "DBPASS=$${DBPASS_STAGING}" >> /tmp/staging-files/env-manage-staging
+      - echo "DBNAME=$${DBNAME_STAGING}" >> /tmp/staging-files/env-manage-staging
+      - echo "DBPORT=$${DBPORT_STAGING}" >> /tmp/staging-files/env-manage-staging
+      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> /tmp/staging-files/env-manage-staging
+      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> /tmp/staging-files/env-manage-staging
     when:
       branch: [ feature/deploy-env-files-migrate ]
 
