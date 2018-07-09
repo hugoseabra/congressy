@@ -257,20 +257,12 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 class CSVProcessView(CSVViewMixin, generic.DetailView):
     template_name = "subscription/csv_process.html"
     object = None
+    preview = None
 
-    def get_object(self, queryset=None):
-        return CSVImportFile.objects.get(
-            pk=self.kwargs.get('csv_pk'),
-            event=self.kwargs.get('event_pk'),
-        )
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        raise NotImplementedError('POST NOT READY')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        self.preview = self.get_preview()
+        return response
 
     def get_preview(self) -> dict:
 
@@ -286,63 +278,18 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
         except UnicodeDecodeError:
             raise CannotGeneratePreviewError("Decode error")
 
-        parsed_dict = parse_file(encoded_content, delimiter, quotechar)
+        return parse_file(encoded_content, delimiter, quotechar)
 
-        # TODO: this is not DRY
-        content = encoded_content.splitlines()
+    def get_object(self, queryset=None):
+        return CSVImportFile.objects.get(
+            pk=self.kwargs.get('csv_pk'),
+            event=self.kwargs.get('event_pk'),
+        )
 
-        first_line = content[0].split(delimiter)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
 
-        table_keys = validate_table_keys(first_line)
-
-        invalid_keys = []
-
-        for entry in table_keys.items():
-            if not entry[1]['valid']:
-                invalid_keys.append(entry[1]['name'])
-
-        table_heading = ''
-        table_body = ''
-
-        for key in parsed_dict.keys():
-            table_heading += '<th>' + key.title() + '</th>'
-
-        all_items_list = []
-
-        for item in parsed_dict.items():
-            # Limiting list size to not overload the frontend.
-            parsed_list = item[1][:20]
-
-            all_items_list.append(parsed_list)
-
-        all_rows = zip(*all_items_list)
-
-        for row in all_rows:
-            table_body += '<tr>'
-            for item in row:
-                table_body += '<td>'
-
-                multi_item = item.split(delimiter)
-
-                if len(multi_item) > 1:
-                    table_body += '<ul>'
-
-                    for i in multi_item:
-                        table_body += '<li>' + i + '</li>'
-
-                    table_body += '</ul>'
-
-                else:
-                    table_body += item
-
-                table_body += '</td>'
-            table_body += '</tr>'
-
-        table = '<table class="table"><thead><tr>' + \
-                table_heading + '</tr></thead><tbody>' + table_body + \
-                '</tbody></table>'
-
-        return {
-            'table': table,
-            'invalid_keys': invalid_keys,
-        }
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        raise NotImplementedError('POST NOT READY')
