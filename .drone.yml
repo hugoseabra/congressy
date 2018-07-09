@@ -59,19 +59,20 @@ pipeline:
 #    when:
 #      branch: [ hotfix/*, release/* ]
 #
-#  build-staging-image:
-#    image: docker
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    commands:
-#      - |
-#        printf "Building version: `cat ./version` - build `cat ./build_number`"
-#        printf " , por `cat ./build_author`\n\n"
-#      - |
-#        docker build --rm \
-#          -t cgsy-staging \
-#          -f ./conf/staging/Dockerfile .
-#    when:
+  build-staging-image:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - |
+        printf "Building version: `cat ./version` - build `cat ./build_number`"
+        printf " , por `cat ./build_author`\n\n"
+      - |
+        docker build --rm \
+          -t cgsy-staging \
+          -f ./conf/staging/Dockerfile .
+    when:
+      branch: [ feature/deploy-env-files-migrate ]
 #      branch: [ hotfix/*, release/* ]
 
   create-env-file:
