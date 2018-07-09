@@ -21,6 +21,8 @@ services:
     entrypoint:
       - /services/migration/container-entry.sh
     env_file: /tmp/staging-files/env-manage-staging
+    networks:
+      - postgres
 
   volume:
     image: cgsy-staging
