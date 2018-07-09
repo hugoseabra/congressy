@@ -113,17 +113,6 @@
 
                         <div class="col-md-12">
 
-                            {% for field in form %}
-                                <div>
-                                    {% if field.errors %}
-                                        {% for error in field.errors %}
-                                            <p style="color: red">Oh no! {{ error }}</p>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-
-
                             <table class="table table-bordered">
                                 <thead>
                                 <tr>
@@ -169,17 +158,7 @@
                 {% else %}
 
                     <div class="panel-body text-center csv-file" style="height: 200px;">
-
-                        {% for field in form %}
-                            <div>
-                                {% if field.errors %}
-                                    {% for error in field.errors %}
-                                        <p style="color: red">Oh no! {{ error }}</p>
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-
+                    
                         <h1 style="margin-top: 50px">
 
                             <strong>
