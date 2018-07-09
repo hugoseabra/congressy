@@ -378,7 +378,7 @@
                                 </strong>
                             </h3>
 
-                            <a href="#" class="btn btn-primary" type="button" style="margin-top: 15px">
+                            <a href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}" class="btn btn-primary" type="button" style="margin-top: 15px">
                                 Continuar a importação
                                 <i class="fas fa-arrow-right"></i>
                             </a>
