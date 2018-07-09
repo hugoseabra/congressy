@@ -36,37 +36,37 @@ services:
       - /etc/localtime:/etc/localtime
       - /media:/var/www/cgsy/media
 
-#  cron:
-#    image: cgsy-staging
-#    container_name: cron-staging
-#    depends_on:
-#      - volume
-#    entrypoint:
-#      - /services/cron/container-entry.sh
-#    networks:
-#      - postgres
-#      - mailhog
-#    env_file: ./env-manage-staging
-#    volumes:
-#      - /etc/localtime:/etc/localtime
-#      - /media:/var/www/cgsy/media
-#
-#  manage:
-#    image: cgsy-staging
-#    container_name: manage-staging
-#    depends_on:
-#      - volume
-#    entrypoint:
-#      - /services/web/manage/container-entry.sh
-#    networks:
-#      - postgres
-#      - mailhog
-#    ports:
-#      - "8080:80"
-#    env_file: ./env-manage-staging
-#    volumes:
-#      - /etc/localtime:/etc/localtime
-#      - /media:/var/www/cgsy/media
+  cron:
+    image: cgsy-staging
+    container_name: cron-staging
+    depends_on:
+      - volume
+    entrypoint:
+      - /services/cron/container-entry.sh
+    networks:
+      - postgres
+      - mailhog
+    env_file: ./env-manage-staging
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /media:/var/www/cgsy/media
+
+  manage:
+    image: cgsy-staging
+    container_name: manage-staging
+    depends_on:
+      - volume
+    entrypoint:
+      - /services/web/manage/container-entry.sh
+    networks:
+      - postgres
+      - mailhog
+    ports:
+      - "8080:80"
+    env_file: ./env-manage-staging
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /media:/var/www/cgsy/media
 
 networks:
   postgres:
