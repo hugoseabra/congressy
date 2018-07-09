@@ -265,8 +265,11 @@ class Certificate(models.Model):
         if not hasattr(self.background_image, 'default'):
             return False
 
-        if self.background_image.file:
-            return self.background_image.file.readable()
+        try:
+            if self.background_image.file:
+                return self.background_image.file.readable()
+        except FileNotFoundError:
+            return False
 
         return True
 
