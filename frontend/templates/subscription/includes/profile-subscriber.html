@@ -33,6 +33,10 @@
 
                 <label for="test-sub">Inscrição de
                     teste?</label>
+                <i class="fas fa-question-circle"
+                   data-toggle="tooltip"
+                   title="Inscrições de teste não serão contabilizadas pelo sistema, nem irão aparecer em relatórios financeiros "
+                ></i>
                 <input id="test-sub"
                        type="checkbox"
                        class="js-switch"
@@ -40,6 +44,7 @@
                         {% if object.test_subscription %}
                        checked {% endif %}
                        title="Esta inscrição é uma inscrição de teste ?">
+
             </div>
             <div class="clearfix"></div>
         </div>
