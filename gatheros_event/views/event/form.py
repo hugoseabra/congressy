@@ -223,13 +223,12 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
         return initial
 
     def get_success_url(self):
-        form_kwargs = self.get_form_kwargs()
-        data = form_kwargs.get('data', {})
-        next_path = data.get('next')
-        if next_path:
-            return next_path
-
-        return super(EventEditFormView, self).get_success_url()
+        form = self.get_form()
+        event = form.instance
+        return reverse(
+            'event:event-edit',
+            kwargs={'pk': event.pk}
+        )
 
     def has_paid_lots(self):
         """ Retorna se evento possui algum lote pago. """
