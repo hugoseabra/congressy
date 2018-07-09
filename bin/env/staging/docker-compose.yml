@@ -40,6 +40,7 @@ services:
     image: cgsy-staging
     container_name: cron-staging
     depends_on:
+      - migration
       - volume
     entrypoint:
       - /services/cron/container-entry.sh
@@ -55,7 +56,7 @@ services:
     image: cgsy-staging
     container_name: manage-staging
     depends_on:
-      - volume
+      - migration
     entrypoint:
       - /services/web/manage/container-entry.sh
     networks:
