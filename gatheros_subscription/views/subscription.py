@@ -30,6 +30,8 @@ from gatheros_subscription.forms import (
     SubscriptionFilterForm,
     SubscriptionForm,
 )
+from gatheros_subscription.helpers.barcode import create_barcode
+from gatheros_subscription.helpers.qrcode import create_qrcode
 from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.helpers.report_payment import \
     PaymentReportCalculator
@@ -929,7 +931,8 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
     def get_context_data(self, **kwargs):
         context = super(VoucherSubscriptionPDFView, self).get_context_data(
             **kwargs)
-        context['qrcode'] = self.generate_qr_code()
+        context['qrcode'] = create_qrcode(self.subscription)
+        context['barcode'] = create_barcode(self.subscription)
         context['logo'] = self.get_logo()
         context['event'] = self.event
         context['person'] = self.person
@@ -947,22 +950,6 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
 
         return base64.b64encode(read_data)
 
-    def generate_qr_code(self):
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=5,
-            border=4,
-        )
-
-        qr.add_data(self.subscription.uuid)
-
-        qr.make(fit=True)
-
-        img = qr.make_image()
-
-        buffer = six.BytesIO()
-        img.save(buffer)
 
         return base64.b64encode(buffer.getvalue())
 

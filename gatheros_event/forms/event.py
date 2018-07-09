@@ -46,6 +46,7 @@ class EventForm(forms.ModelForm):
 
         }
 
+
     def __init__(self, user, lang='pt-br', *args, **kwargs):
         self.user = user
 

@@ -1,5 +1,6 @@
 {% load static l10n humanize %}
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -62,10 +63,17 @@
                     <td class="col-sm-2">
                         {{ event.get_period }}
                     </td>
-                    <td class="col-sm-8">
-                        <img src="data:image/png;base64,{{ qrcode }}">
-                    </td>
+{#                    <td class="col-sm-8">#}
+{#                        <img src="data:image/png;base64,{{ qrcode }}">#}
+{#                    </td>#}
                 </tr>
+{#                <tr style="border-width: 0;">#}
+{#                    <td class="col-sm-2"></td>#}
+{#                    <td class="col-sm-2"></td>#}
+{#                    <td class="col-sm-8">#}
+{#                        <img src="data:image/png;base64,{{ barcode }}">#}
+{#                    </td>#}
+{#                </tr>#}
                 {% if event.place.show_location %}
                     <tr style="border-width: 0;">
                         <td class="col-sm-2" style="border-width: 0;">
@@ -100,6 +108,9 @@
 
                 </tbody>
             </table>
+        <div class="col-sm-12">
+                        <img src="data:image/png;base64,{{ barcode }}">
+                    </div>
 
 
             {#            <p style="margin-top: 5px; font-size: 25px">{{ person.name|upper }}</p>#}
