@@ -10,7 +10,6 @@ class CSVForm(forms.ModelForm):
         model = CSVImportFile
         fields = [
             'event',
-            'csv_file',
             'separator',
             'delimiter',
             'encoding',
@@ -18,16 +17,10 @@ class CSVForm(forms.ModelForm):
 
         widgets = {
             'event': forms.HiddenInput(),
-            # 'csv_file': forms.HiddenInput(),
-        }
-
-        labels = {
-            'csv_file': 'Arquivo CSV:'
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['csv_file'].required = False
 
 
 class CSVFileForm(forms.ModelForm):
