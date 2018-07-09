@@ -20,13 +20,14 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-12" id="preview-content">
+
                             {% if preview.table %}
                                 {{ preview.table|safe }}
                             {% else %}
                                 <div class="text-center">
-                                    <h1>
-                                        <strong>Não foi possivel realizar um preview do seu documento CSV.</strong>
-                                    </h1>
+                                    <h2>
+                                        <strong>{{ denied_reason }}</strong>
+                                    </h2>
                                 </div>
                             {% endif %}
 
@@ -362,34 +363,36 @@
 
         {% endif %}
 
-        <div class="col-md-3">
+        {% if preview.table %}
+            <div class="col-md-3">
 
-            <div class="panel panel-primary">
-                <div class="panel-body">
+                <div class="panel panel-primary">
+                    <div class="panel-body">
 
-                    <div class="row">
+                        <div class="row">
 
 
-                        <div class="col-md-12">
+                            <div class="col-md-12">
 
-                            <h3>
-                                <strong>
-                                    Caso todas as informações estejam ok, você já pode prosseguir com a importação.
-                                </strong>
-                            </h3>
+                                <h3>
+                                    <strong>
+                                        Caso todas as informações estejam ok, você já pode prosseguir com a importação.
+                                    </strong>
+                                </h3>
 
-                            <a href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}" class="btn btn-primary" type="button" style="margin-top: 15px">
-                                Continuar a importação
-                                <i class="fas fa-arrow-right"></i>
-                            </a>
+                                <a href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}" class="btn btn-primary" type="button" style="margin-top: 15px">
+                                    Continuar a importação
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+
+                            </div>
 
                         </div>
 
                     </div>
-
                 </div>
             </div>
-        </div>
+        {% endif %}
 
 
     </div>

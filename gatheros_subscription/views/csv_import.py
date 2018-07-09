@@ -216,20 +216,18 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         if form is None:
             form = CSVForm(instance=self.object)
 
+        context['denied_reason'] = None
+        context['preview'] = None
+
         try:
             context['preview'] = self.get_preview()
         except CannotGeneratePreviewError as e:
 
-            context['preview'] = {
-                'table': None,
-                'invalid_keys': None,
-            }
-
             if str(e) == 'Decode error':
-                context['preview']['table'] = \
-                    '<div class="text-center"><h2><strong>Não foi possivel ' \
-                    'fazer a decodificação! Verifique o tipo ' \
-                    'de encodificação.</strong></h2></div>'
+                context['denied_reason'] = 'Não foi possivel ' \
+                    'fazer a decodificação do arquivo! Verifique o tipo de encodificação.'
+            else:
+                context['denied_reason'] = str(e)
 
         context['form'] = form
         return context
