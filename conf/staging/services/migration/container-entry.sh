@@ -11,5 +11,5 @@ run_python_script_with_output "Executando migrate" "manage.py migrate"
 run_python_script_with_output "Atualizando Site ID" "manage.py loaddata 000_site_staging"
 
 # TEMP
-run_python_script_with_output "Migrando infraestrutura de pagamento" "manage.py update_debts"
+run_python_script_with_output "Migrando infraestrutura de debitos" "manage.py update_debts"
 run_python_script_with_output "Migrando infraestrutura de pagamento" "manage.py update_payments"
