@@ -48,10 +48,12 @@ class Subscription(models.Model, GatherosModelMixin):
 
     DEVICE_ORIGIN_HOTSITE = 'hotsite'
     DEVICE_ORIGIN_MANAGE = 'manage'
+    DEVICE_ORIGIN_CSV_IMPORT = 'csv_import'
 
     DEVICE_ORIGINS = (
         (DEVICE_ORIGIN_HOTSITE, 'Hotsite do evento'),
         (DEVICE_ORIGIN_MANAGE, 'Manage'),
+        (DEVICE_ORIGIN_CSV_IMPORT, 'Import via CSV'),
     )
 
     CONFIRMED_STATUS = 'confirmed'
