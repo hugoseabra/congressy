@@ -84,7 +84,7 @@ urls = [
         name='subscriptions-csv-file-prepare'
     ),
     url(                                                        
-        r'^import/csv/(?P<csv_pk>[0-9A-Fa-f-]+)/process',
+        r'^import/csv/(?P<csv_pk>[0-9A-Fa-f-]+)/process$',
         views.CSVProcessView.as_view(),
         name='subscriptions-csv-file-process'
     ),
