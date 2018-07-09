@@ -139,6 +139,8 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
             'instance': self.object,
         }
 
+        # A file in the POST dict and no file can cause a form to not validate
+        # correctly, that is why we need this treatment/cleanup.
         if 'csv_file' not in self.request.FILES and \
                 'csv_file' in self.request.POST:
             self.request.POST._mutable = True
@@ -257,30 +259,6 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
             'invalid_keys': invalid_keys,
         }
 
-    @staticmethod
-    def validate_table_keys(line: list) -> dict:
-
-        main_dict = {}
-
-        for key in line:
-
-            lower_key = key.lower().strip()
-            is_valid = False
-            index = line.index(key)
-
-            if lower_key in allowed_keys:
-                is_valid = True
-                key = lower_key
-
-            current_dict = {
-                'valid': is_valid,
-                'name': key,
-            }
-
-            main_dict.update({index: current_dict})
-
-        return main_dict
-
     def parse_file(self, encoded_content: str, delimiter: str, quotechar: str):
 
         content = encoded_content.splitlines()
@@ -313,6 +291,30 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
 
                 if possible_value and possible_key in valid_keys:
                     main_dict[possible_key].append(possible_value)
+
+        return main_dict
+
+    @staticmethod
+    def validate_table_keys(line: list) -> dict:
+
+        main_dict = {}
+
+        for key in line:
+
+            lower_key = key.lower().strip()
+            is_valid = False
+            index = line.index(key)
+
+            if lower_key in allowed_keys:
+                is_valid = True
+                key = lower_key
+
+            current_dict = {
+                'valid': is_valid,
+                'name': key,
+            }
+
+            main_dict.update({index: current_dict})
 
         return main_dict
 
