@@ -340,7 +340,8 @@ class OptionalServiceEditView(EventOptionalMixin, generic.UpdateView):
         context['optional_active'] = 'service'
         context['has_subscriptions'] = \
             self.object.subscription_services.filter(
-                subscription__completed=True, subscription__test_subscription=False
+                subscription__completed=True,
+                subscription__test_subscription=False
             ).count()
         return context
 
