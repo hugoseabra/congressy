@@ -103,7 +103,7 @@ class CSVImportView(CSVViewMixin, generic.FormView):
         return HttpResponse("Método não permitido.", status=405)
 
 
-class CSVProcessView(CSVViewMixin, generic.DetailView):
+class CSVPrepareView(CSVViewMixin, generic.DetailView):
     template_name = "subscription/csv_process.html"
 
     prefix = None

@@ -132,7 +132,7 @@
                                             {% endif %}
                                         </td>
                                         <td class="text-center">
-                                            <a href="{% url 'subscription:subscriptions-csv-file-process' event.pk csv.pk  %}" class="btn btn-primary"  {% if csv.processed %}disabled {% endif %}>
+                                            <a href="{% url 'subscription:subscriptions-csv-file-prepare' event.pk csv.pk  %}" class="btn btn-primary"  {% if csv.processed %}disabled {% endif %}>
                                                 <i class="fas fa-exchange-alt"></i>
                                                 Processar
                                             </a>
