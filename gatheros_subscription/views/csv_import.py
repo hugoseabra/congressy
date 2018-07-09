@@ -139,8 +139,9 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
             'instance': self.object,
         }
 
-        # A file in the POST dict and no file can cause a form to not validate
-        # correctly, that is why we need this treatment/cleanup.
+        # A file in the POST dict and no file in the FILES dicts can cause a
+        # form to not validate correctly, that is why we need this
+        # treatment/cleanup.
         if 'csv_file' not in self.request.FILES and \
                 'csv_file' in self.request.POST:
             self.request.POST._mutable = True
