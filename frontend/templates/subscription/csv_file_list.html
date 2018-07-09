@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-
+{% load  form_config_tags static %}
 {% block title %}Importar | Congressy{% endblock %}
 
 {% block page_title %}Importar via CSV{% endblock %}
@@ -8,33 +8,48 @@
     Importação de dados via CSV
 {% endblock %}
 
+{% block styles %}
+
+    <!-- Select2 lib -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
+
+{% endblock %}
 
 {% block scripts %}
 
+    <!-- Select2 lib -->
+    <script src="{% static 'assets/plugins/select2/js/select2.min.js' %}"></script>
+
     <script type="application/javascript">
+
         $(document).ready(function () {
 
-            var file_el = $('#id_csv_file');
             var file_loader_el = $('#csv-file-loader');
             var csv_file_els = $('.csv-file');
+            var lot_select_el = $('#id_lot');
 
             $('#trigger-import').on('click', function () {
-                file_el.trigger('click');
+                $('#import_modal').modal('show');
+                // Starting select2
+                lot_select_el.select2({
+                    theme: "classic",
+                    width: 'resolve'
+                });
             });
 
-            file_el.on('change', function () {
 
-                //TODO Implement filetype check, verify that the file is a csv before submitting this form. 
-
+            $("#save-submission").on('click', function () {
+                //TODO Implement filetype check, verify that the file is a csv before submitting this form.
+                $('#import_modal').modal('hide');
                 csv_file_els.hide();
                 file_loader_el.show();
 
                 $('#file-form').submit();
-
             });
 
 
         });
+
     </script>
 
 {% endblock %}
@@ -59,7 +74,7 @@
 
                 </div>
                 <div class="float-left">
-                    <a href="{% url 'subscription:subscriptions-csv-list' event.pk %}"
+                    <a href="{% url 'subscription:subscription-list' event.pk %}"
                        class="btn btn-primary">
                         <i class="fas fa-arrow-circle-left"></i>
                         Voltar
@@ -80,15 +95,6 @@
                     </h3>
                 </div>
 
-                <form method="POST" action="{% url 'subscription:subscriptions-csv-file-import' event.pk %}" id="file-form" enctype=multipart/form-data>
-
-                    {% csrf_token %}
-
-                    {{ form.event }}
-
-                    <input name="csv_file" id="id_csv_file" type="file" accept=".csv">
-
-                </form>
 
                 <div class="panel-body text-center" id="csv-file-loader" style="height: 200px; display: none;">
 
@@ -106,6 +112,16 @@
                     <div class="panel-body csv-file">
 
                         <div class="col-md-12">
+
+                            {% for field in form %}
+                                <div>
+                                    {% if field.errors %}
+                                        {% for error in field.errors %}
+                                            <p style="color: red">Oh no! {{ error }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
 
 
                             <table class="table table-bordered">
@@ -132,7 +148,7 @@
                                             {% endif %}
                                         </td>
                                         <td class="text-center">
-                                            <a href="{% url 'subscription:subscriptions-csv-file-prepare' event.pk csv.pk  %}" class="btn btn-primary"  {% if csv.processed %}disabled {% endif %}>
+                                            <a href="{% url 'subscription:subscriptions-csv-file-prepare' event.pk csv.pk %}" class="btn btn-primary" {% if csv.processed %}disabled {% endif %}>
                                                 <i class="fas fa-exchange-alt"></i>
                                                 Processar
                                             </a>
@@ -154,6 +170,16 @@
 
                     <div class="panel-body text-center csv-file" style="height: 200px;">
 
+                        {% for field in form %}
+                            <div>
+                                {% if field.errors %}
+                                    {% for error in field.errors %}
+                                        <p style="color: red">Oh no! {{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
                         <h1 style="margin-top: 50px">
 
                             <strong>
@@ -174,5 +200,49 @@
         </div>
     </div>
 
+
+{% endblock %}
+
+{% block modals %}
+
+    <div class="modal" id="import_modal" role="dialog"
+         aria-labelledby="import_modal_label">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">×
+                    </button>
+                    <h4 class="modal-title"
+                        id="import_modal_label">
+                        Importação de arquio CSV
+                    </h4>
+                </div>
+                <div class="modal-body">
+
+                    <form method="POST" action="{% url 'subscription:subscriptions-csv-file-import' event.pk %}" id="file-form" enctype=multipart/form-data>
+
+                        {% csrf_token %}
+
+                        {{ form.event }}
+
+                        {% render_generic_field form.lot %}
+                        {% render_generic_field form.csv_file %}
+                        <input name="csv_file" id="id_csv_file" type="file" accept=".csv">
+
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger"
+                            data-dismiss="modal">Fechar
+                    </button>
+                    <button type="button" class="btn btn-success" id="save-submission">
+                        Enviar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

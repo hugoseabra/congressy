@@ -8,9 +8,14 @@ from csv_importer.forms import CSVFileForm, CSVForm
 from csv_importer.models import CSVImportFile
 from .helpers import validate_table_keys, parse_file
 from .subscription import EventViewMixin
+from gatheros_subscription.models import Subscription
 
 
 class CannotGeneratePreviewError(Exception):
+    pass
+
+
+class CannotCreateSubscriptionsError(Exception):
     pass
 
 
@@ -58,11 +63,13 @@ class CSVFileListView(CSVViewMixin, generic.ListView):
         return context
 
 
-class CSVImportView(CSVViewMixin, generic.FormView):
+class CSVImportView(CSVViewMixin, generic.View):
     """
         View usada para fazer upload de arquivos.
     """
     form_class = CSVFileForm
+    initial = {}
+    prefix = None
 
     def get_success_url(self):
         return reverse_lazy('subscription:subscriptions-csv-list', kwargs={
@@ -72,13 +79,63 @@ class CSVImportView(CSVViewMixin, generic.FormView):
     def form_valid(self, form):
         form.save()
         messages.success(self.request, "Arquivo submetido com sucesso!")
-        return super().form_valid(form)
+        return redirect(self.get_success_url())
 
     def get(self, request, *args, **kwargs):
         return HttpResponse("Método não permitido.", status=405)
 
     def put(self, *args, **kwargs):
         return HttpResponse("Método não permitido.", status=405)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests: instantiate a form instance with the passed
+        POST variables and then check if it's valid.
+        """
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def get_form(self, form_class=None):
+        """Return an instance of the form to be used in this view."""
+        if form_class is None:
+            form_class = self.get_form_class()
+        return form_class(**self.get_form_kwargs())
+
+    def get_form_class(self):
+        """Return the form class to use."""
+        return self.form_class
+
+    def get_form_kwargs(self):
+        """Return the keyword arguments for instantiating the form."""
+        kwargs = {
+            'initial': self.get_initial(),
+            'prefix': self.get_prefix(),
+        }
+        if self.request.method in ('POST', 'PUT'):
+            kwargs.update({
+                'data': self.request.POST,
+                'files': self.request.FILES,
+            })
+        return kwargs
+
+    def get_initial(self):
+        """Return the initial data to use for forms on this view."""
+        return self.initial.copy()
+
+    def get_prefix(self):
+        """Return the prefix to use for forms."""
+        return self.prefix
+
+    def form_invalid(self, form):
+        """If the form is invalid, render the invalid form."""
+
+        for error, value in form.errors.items():
+            messages.error(self.request, "Erro no campo {}: {}".format(error, value[0]))
+
+        return redirect(self.get_success_url())
 
 
 class CSVPrepareView(CSVViewMixin, generic.DetailView):
@@ -259,6 +316,11 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
     object = None
     preview = None
 
+    required_keys = [
+        'email',
+        'nome',
+    ]
+
     def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
         self.preview = self.get_preview()
@@ -288,8 +350,44 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['possible_subscriptions'] = 0
+        context['denied_reason'] = None
+
+        try:
+            context['possible_subscriptions'] = \
+                self.get_possible_subscriptions()
+        except CannotCreateSubscriptionsError as e:
+            context['denied_reason'] = str(e)
+
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         raise NotImplementedError('POST NOT READY')
+
+    def get_possible_subscriptions(self) -> int:
+
+        if self.object is None:
+            raise CannotCreateSubscriptionsError(
+                'Não foi possivel pegar o arquivo.'
+            )
+
+        if self.preview is None:
+            raise CannotCreateSubscriptionsError(
+                'Não foi possivel processar seu arquivo.'
+            )
+
+        for key in self.required_keys:
+            if key not in self.preview:
+
+                msg = 'Não será possivel gerar inscrições sem o ' \
+                    'campo {}.'.format(key)
+                raise CannotCreateSubscriptionsError(msg)
+
+        possible_subscriptions = 0
+
+        
+
+
+
+        return possible_subscriptions
