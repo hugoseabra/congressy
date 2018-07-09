@@ -16,6 +16,11 @@ private_certificate_urls = [
         name='event-certificate-example-pdf'
     ),
     url(
+        r'^manual/',
+        views.CertificateManualView.as_view(),
+        name='event-certificate-manual'
+    ),
+    url(
         r'^',
         views.CertificateConfigView.as_view(),
         name='event-certificate-config'

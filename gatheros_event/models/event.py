@@ -313,7 +313,7 @@ class Event(models.Model, GatherosModelMixin):
         attended = 0.0
         if hasattr(self, 'subscriptions'):
             queryset = self.subscriptions
-            num = queryset.filter(completed=True).exclude(
+            num = queryset.filter(completed=True, test_subscription=False).exclude(
                 status='canceled'
             ).count()
 
@@ -411,7 +411,7 @@ class Event(models.Model, GatherosModelMixin):
             return '{0:.2f}%'.format((num * 100) / num_total)
 
         queryset = self.subscriptions \
-            .filter(completed=True) \
+            .filter(completed=True, test_subscription=False) \
             .exclude(status='canceled')
 
         if only_attended is True:

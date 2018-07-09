@@ -73,7 +73,7 @@ class LotAdmin(admin.ModelAdmin):
             return 'Livre'
 
         remaining = instance.limit - instance.subscriptions.filter(
-            completed=True
+            completed=True, test_subscription=False
         ).exclude(
             status=Subscription.CANCELED_STATUS,
         ).count()
@@ -82,7 +82,7 @@ class LotAdmin(admin.ModelAdmin):
 
     def get_percent_attended(self, instance):
         queryset = instance.subscriptions.filter(
-            completed=True
+            completed=True, test_subscription=False
         ).exclude(
             status=Subscription.CANCELED_STATUS,
         )

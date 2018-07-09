@@ -4,8 +4,42 @@
  *   Copyright 2014 Authentic Goods Co. http://authenticgoods.co
  *
 */
-@import url("https://fonts.googleapis.com/css?family=Montserrat:400,700");
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800");
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Montserrat Regular'), local('Montserrat-Regular'), url(https://fonts.gstatic.com/s/montserrat/v12/JTUSjIg1_i6t8kCHKm459Wlhzg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Montserrat Bold'), local('Montserrat-Bold'), url(https://fonts.gstatic.com/s/montserrat/v12/JTURjIg1_i6t8kCHKm45_dJE3gnD-w.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans Regular'), local('OpenSans-Regular'), url(https://fonts.gstatic.com/s/opensans/v15/mem8YaGs126MiZpBA-UFVZ0e.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Open Sans SemiBold'), local('OpenSans-SemiBold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UNirkOUuhs.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UN7rgOUuhs.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 800;
+  src: local('Open Sans ExtraBold'), local('OpenSans-ExtraBold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UN8rsOUuhs.ttf) format('truetype');
+}
 html {
   height: 100%;
   font-size: 100%;
@@ -3501,7 +3535,7 @@ label.valid {
   width: 200px;
   padding-right: 10px;
   background-color: #F0F3F3;
-  z-index: 100;
+  z-index: 150;
 }
 .theme-cgsy-full .sidebar-itens {
   color: #4c4c4c;
@@ -3514,11 +3548,6 @@ label.valid {
   color: #F0F3F3;
   background-color: #1f7bb6;
   outline: 0;
-}
-@media only screen and (min-width: 1600px) {
-  .theme-cgsy-full .col-xl-2 {
-    width: auto;
-  }
 }
 .theme-cgsy-full #header .brand {
   background: #F0F3F3;
@@ -3616,7 +3645,7 @@ label.valid {
   }
   .theme-cgsy-full .manage_sidebar {
     margin-top: 0;
-    position: fixed;
+    position: relative;
   }
   .theme-cgsy-full .main-content-wrapper {
     padding-top: 0;

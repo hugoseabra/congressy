@@ -132,7 +132,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
                 'name': lot.name,
                 'limit': lot.limit,
                 'number_subscription': lot.subscriptions.filter(
-                    completed=True
+                    completed=True, test_subscription=False
                 ).exclude(
                     status='canceled'
                 ).count(),
@@ -229,7 +229,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
 
     def _get_total_subscriptions(self):
         return self.event.subscriptions.filter(
-            completed=True,
+            completed=True, test_subscription=False
         ).exclude(
             status=Subscription.CANCELED_STATUS
         ).count()
@@ -347,6 +347,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
             Transaction.objects.filter(
                 Q(subscription__event=self.event) &
                 Q(subscription__completed=True) &
+                Q(subscription__test_subscription=False) &
                 (
                         Q(status=Transaction.PAID) |
                         Q(status=Transaction.WAITING_PAYMENT)
@@ -370,6 +371,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
             Subscription.objects.filter(
                 status=Subscription.AWAITING_STATUS,
                 completed=True,
+                test_subscription=False,
                 event=self.event,
             ).exclude(
                 status=Subscription.CANCELED_STATUS

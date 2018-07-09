@@ -10,9 +10,8 @@ $(document).ready(function () {
     });
     $("button").on("click", function (e) {
         $(window).off("beforeunload");
-        var submitButton = $('form').find(':submit');
-        setTimeout(function (submitButton) {
-            disableButton(submitButton);
+        setTimeout(function () {
+            disableButton($('form').find(':submit'));
         }, 0);
     });
 
@@ -22,17 +21,18 @@ $(document).ready(function () {
 
     $("input").change(function (event) {
         event.preventDefault();
-
         verificarEdicaoForm()
     });
 
     $(".radio").click(function (event) {
-
         event.preventDefault();
         verificarEdicaoForm()
     });
     $(".iCheck-helper").click(function (event) {
-
+        event.preventDefault();
+        verificarEdicaoForm()
+    });
+    $("select").change(function (event) {
         event.preventDefault();
         verificarEdicaoForm()
     });

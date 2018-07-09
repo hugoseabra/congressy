@@ -30,6 +30,7 @@ from gatheros_subscription.forms import (
     SubscriptionFilterForm,
     SubscriptionForm,
 )
+from gatheros_subscription.helpers.barcode import create_barcode
 from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.helpers.report_payment import \
     PaymentReportCalculator
@@ -719,6 +720,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin, generic.TemplateView):
             list = Subscription.objects.filter(
                 attended=True,
                 completed=True,
+                test_subscription=False,
                 event=self.get_event(),
             ).order_by('-attended_on')
             return list[0:5]
@@ -731,7 +733,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin, generic.TemplateView):
         try:
             return Subscription.objects.filter(
                 attended=True,
-                completed=True,
+                completed=True,test_subscription=False,
                 event=self.get_event(),
             ).count()
 
@@ -743,7 +745,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin, generic.TemplateView):
         total = \
             Subscription.objects.filter(
                 event=self.get_event(),
-                completed=True,
+                completed=True, test_subscription=False
             ).exclude(status=Subscription.CANCELED_STATUS).count()
 
         return total
@@ -753,7 +755,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin, generic.TemplateView):
         confirmed = \
             Subscription.objects.filter(
                 status=Subscription.CONFIRMED_STATUS,
-                completed=True,
+                completed=True, test_subscription=False,
                 event=self.get_event()
             ).count()
 
@@ -793,7 +795,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
         return query_set.filter(
             person=person,
-            completed=True,
+            completed=True, test_subscription=False
             # event__published=True,
         )
 
@@ -929,6 +931,7 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
         context = super(VoucherSubscriptionPDFView, self).get_context_data(
             **kwargs)
         context['qrcode'] = self.generate_qr_code()
+        context['barcode'] = create_barcode(self.subscription)
         context['logo'] = self.get_logo()
         context['event'] = self.event
         context['person'] = self.person
@@ -1085,3 +1088,21 @@ class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
             completed=True,
             event=self.get_event(),
         ).exclude(status=Subscription.CANCELED_STATUS).order_by('-attended_on')
+
+
+class SwitchSubscriptionTestView(EventViewMixin, generic.View):
+    """
+    Gerenciamento de inscrições que podem ou não serem setados como Teste.
+    """
+    success_message = ""
+
+    def get_object(self):
+        return get_object_or_404(Subscription, pk=self.kwargs.get('pk'))
+
+    def post(self, request, *args, **kwargs):
+        state = request.POST.get('state')
+
+        subscription = self.get_object()
+        subscription.test_subscription = state == "True"
+        subscription.save()
+        return HttpResponse(status=200)

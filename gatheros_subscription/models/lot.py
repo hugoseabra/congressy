@@ -239,7 +239,7 @@ class Lot(models.Model, GatherosModelMixin):
         completed = 0.00
         if self.limit:
             queryset = self.subscriptions.filter(
-                completed=True
+                completed=True, test_subscription=False
             ).exclude(
                 status='canceled'
             )
@@ -251,7 +251,7 @@ class Lot(models.Model, GatherosModelMixin):
     def percent_attended(self):
         """ Resgata percentual de inscritos que compareceram no evento. """
         queryset = self.subscriptions.filter(
-            completed=True
+            completed=True, test_subscription=False
         ).exclude(
             status='canceled'
         )
@@ -300,7 +300,7 @@ class Lot(models.Model, GatherosModelMixin):
             return self.LOT_LIMIT_UNLIMIED
 
         num = self.subscriptions.filter(
-            completed=True
+            completed=True, test_subscription=False
         ).exclude(
             status='canceled',
         ).count()
@@ -314,7 +314,7 @@ class Lot(models.Model, GatherosModelMixin):
         """
         if self.limit and self.limit > 0:
             queryset = self.subscriptions.filter(
-                completed=True,
+                completed=True, test_subscription=False
             ).exclude(status__in=['canceled'], )
 
             if queryset.count() >= self.limit:
@@ -326,7 +326,7 @@ class Lot(models.Model, GatherosModelMixin):
                 total_subscriptions_event = 0
                 for lot in self.event.lots.all():
                     total_subscriptions_event += lot.subscriptions.filter(
-                        completed=True
+                        completed=True, test_subscription=False
                     ).exclude(
                         status='canceled'
                     ).count()

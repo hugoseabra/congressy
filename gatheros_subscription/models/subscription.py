@@ -167,6 +167,8 @@ class Subscription(models.Model, GatherosModelMixin):
         editable=False
     )
 
+    test_subscription = models.BooleanField(default=False)
+
     objects = SubscriptionManager()
 
     class Meta:

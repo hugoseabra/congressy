@@ -9,7 +9,7 @@ class ReservedSlugException(Exception):
     """
 
 
-reserved_slug = (
+reserved_slugs = (
     'manage',
     'login',
     'logout',
@@ -28,8 +28,8 @@ def model_field_slugify(
         slug_field='slug'):
     """Slugify string based on another string and saves slug in model"""
 
-    if string in reserved_slug:
-        raise ReservedSlugException('Este nome é reservado')
+    if str(string).lower() in reserved_slugs:
+        raise ReservedSlugException('Este nome não poderá ser utilizado.')
 
     original_slug = lib_slugify(string)
     if exclude_keys:
