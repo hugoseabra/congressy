@@ -63,24 +63,19 @@
                     <td class="col-sm-2">
                         {{ event.get_period }}
                     </td>
-{#                    <td class="col-sm-8">#}
-{#                        <img src="data:image/png;base64,{{ qrcode }}">#}
-{#                    </td>#}
+                    <td class="col-sm-8 text-center">
+                        <img src="data:image/png;base64,{{ qrcode }}">
+                        <img src="data:image/png;base64,{{ barcode }}">
+                    </td>
                 </tr>
-{#                <tr style="border-width: 0;">#}
-{#                    <td class="col-sm-2"></td>#}
-{#                    <td class="col-sm-2"></td>#}
-{#                    <td class="col-sm-8">#}
-{#                        <img src="data:image/png;base64,{{ barcode }}">#}
-{#                    </td>#}
-{#                </tr>#}
                 {% if event.place.show_location %}
                     <tr style="border-width: 0;">
                         <td class="col-sm-2" style="border-width: 0;">
                             <strong>Local</strong>
                         </td>
                         <td class="col-sm-2" style="border-width: 0;">
-                            {{ event.place.name }} - {{ event.place.get_complete_address }}
+                            {{ event.place.name }}
+                            - {{ event.place.get_complete_address }}
                         </td>
                     </tr>
                 {% endif %}
@@ -107,11 +102,8 @@
                 {% endif %}
 
                 </tbody>
-            </table>
-        <div class="col-sm-12">
-                        <img src="data:image/png;base64,{{ barcode }}">
-                    </div>
 
+            </table>
 
             {#            <p style="margin-top: 5px; font-size: 25px">{{ person.name|upper }}</p>#}
             {#            <p style="font-size: 20px;margin-top: 30px">Data / horário</p>#}

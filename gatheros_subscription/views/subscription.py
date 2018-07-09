@@ -31,7 +31,6 @@ from gatheros_subscription.forms import (
     SubscriptionForm,
 )
 from gatheros_subscription.helpers.barcode import create_barcode
-from gatheros_subscription.helpers.qrcode import create_qrcode
 from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.helpers.report_payment import \
     PaymentReportCalculator
@@ -722,6 +721,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
             list = Subscription.objects.filter(
                 attended=True,
                 completed=True,
+                test_subscription=False,
                 event=self.get_event(),
             ).order_by('-attended_on')
             return list[0:5]
@@ -734,7 +734,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
         try:
             return Subscription.objects.filter(
                 attended=True,
-                completed=True,
+                completed=True,test_subscription=False,
                 event=self.get_event(),
             ).count()
 
@@ -746,7 +746,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
         total = \
             Subscription.objects.filter(
                 event=self.get_event(),
-                completed=True,
+                completed=True, test_subscription=False
             ).exclude(status=Subscription.CANCELED_STATUS).count()
 
         return total
@@ -756,7 +756,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
         confirmed = \
             Subscription.objects.filter(
                 status=Subscription.CONFIRMED_STATUS,
-                completed=True,
+                completed=True, test_subscription=False,
                 event=self.get_event()
             ).count()
 
@@ -796,7 +796,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
         return query_set.filter(
             person=person,
-            completed=True,
+            completed=True, test_subscription=False
             # event__published=True,
         )
 
@@ -853,7 +853,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
                 for transaction in subscription.transactions.all():
                     if transaction.status == transaction.WAITING_PAYMENT and \
-                                    transaction.type == 'boleto':
+                            transaction.type == 'boleto':
                         return True
 
         return False
@@ -931,7 +931,7 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
     def get_context_data(self, **kwargs):
         context = super(VoucherSubscriptionPDFView, self).get_context_data(
             **kwargs)
-        context['qrcode'] = create_qrcode(self.subscription)
+        context['qrcode'] = self.generate_qr_code()
         context['barcode'] = create_barcode(self.subscription)
         context['logo'] = self.get_logo()
         context['event'] = self.event
@@ -950,6 +950,22 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
 
         return base64.b64encode(read_data)
 
+    def generate_qr_code(self):
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=5,
+            border=4,
+        )
+
+        qr.add_data(self.subscription.uuid)
+
+        qr.make(fit=True)
+
+        img = qr.make_image()
+
+        buffer = six.BytesIO()
+        img.save(buffer)
 
         return base64.b64encode(buffer.getvalue())
 
@@ -1073,3 +1089,21 @@ class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
             completed=True,
             event=self.get_event(),
         ).exclude(status=Subscription.CANCELED_STATUS).order_by('-attended_on')
+
+
+class SwitchSubscriptionTestView(EventViewMixin, generic.View):
+    """
+    Gerenciamento de inscrições que podem ou não serem setados como Teste.
+    """
+    success_message = ""
+
+    def get_object(self):
+        return get_object_or_404(Subscription, pk=self.kwargs.get('pk'))
+
+    def post(self, request, *args, **kwargs):
+        state = request.POST.get('state')
+
+        subscription = self.get_object()
+        subscription.test_subscription = state == "True"
+        subscription.save()
+        return HttpResponse(status=200)

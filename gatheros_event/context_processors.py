@@ -25,7 +25,7 @@ def account(request):
     try:
         person = request.user.person
         subs = Subscription.objects \
-            .filter(person=person, completed=True) \
+            .filter(person=person, completed=True, test_subscription=False) \
             .exclude(status=Subscription.CANCELED_STATUS) \
             .count()
         has_subscriptions = subs > 0

@@ -109,6 +109,7 @@
                                 <thead>
                                 <tr>
                                     <th>Nome</th>
+                                    <th></th>
                                     <th>Cargo</th>
                                     <th></th>
                                 </tr>
@@ -120,6 +121,16 @@
                                         {% get_member_group item user as member_group %}
                                         <td>
                                             <a href="{% url 'event:organization-panel' item.pk %}">{{ item.name }}</a>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <button type="button"
+                                                    class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                                                    data-toggle="dropdown"
+                                                    aria-expanded="false"
+                                                    aria-haspopup="true"
+                                                    onclick="cgsy_submit({{ item.pk }})">
+                                                <span>Entrar</span>
+                                            </button>
                                         </td>
                                         <td>
                                             {% get_member_group_name item user %}

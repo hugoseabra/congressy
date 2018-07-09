@@ -7,6 +7,7 @@ from django.template import loader
 from wkhtmltopdf.utils import render_to_temporary_file, convert_to_pdf
 
 from gatheros_subscription.helpers.qrcode import create_qrcode
+from gatheros_subscription.helpers.barcode import create_barcode
 
 
 def get_logo():

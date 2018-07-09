@@ -8,6 +8,7 @@ from django import forms
 from django.shortcuts import get_object_or_404
 
 from core.forms.widgets import SplitDateTimeBootsrapWidget
+from core.util import model_field_slugify, ReservedSlugException
 from gatheros_event.models import Event, Member, Organization
 from gatheros_subscription.models import LotCategory
 
@@ -80,6 +81,29 @@ class EventForm(forms.ModelForm):
         self.fields['organization'].widget = forms.Select()
         self.fields['organization'].choices = orgs
         self.fields['organization'].label = 'Realizador'
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if not name:
+            return name
+
+        if not self.instance.pk:
+            instance = Event()
+
+            try:
+                model_field_slugify(
+                    model_class=Event,
+                    instance=instance,
+                    string=name,
+                )
+
+            except ReservedSlugException:
+                raise forms.ValidationError(
+                    'Verifique o nome do seu evento. Este nome não poderá ser'
+                    ' usado.'
+                )
+
+        return name
 
     def clean_event_type(self):
         event_type = self.cleaned_data.get('event_type')
