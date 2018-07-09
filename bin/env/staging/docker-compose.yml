@@ -46,7 +46,7 @@ services:
     networks:
       - postgres
       - mailhog
-    env_file: ./env-manage-staging
+    env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
       - /media:/var/www/cgsy/media
@@ -63,7 +63,7 @@ services:
       - mailhog
     ports:
       - "8080:80"
-    env_file: ./env-manage-staging
+    env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
       - /media:/var/www/cgsy/media
