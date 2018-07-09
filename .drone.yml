@@ -36,18 +36,18 @@ pipeline:
 #    when:
 #      branch: [ hotfix/*, release/* ]
 #
-#  recreate-staging-db:
-#    image: tmaier/docker-compose
-#    pull: true
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#      - /tmp/bkp:/tmp/bkp
-#    commands:
-#      - sh ./bin/env/staging/02_recreate-db-staging.sh
-#    when:
-#      branch:
-#        include: [ hotfix/*, release/* ]
-#
+  recreate-staging-db:
+    image: tmaier/docker-compose
+    pull: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/bkp:/tmp/bkp
+    commands:
+      - sh ./bin/env/staging/02_recreate-db-staging.sh
+    when:
+      branch: [ feature/deploy-env-files-migrate ]
+#      branch: [ hotfix/*, release/* ]
+
 #  save-staging-version:
 #    image: alpine
 #    pull: true
