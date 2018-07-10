@@ -324,9 +324,10 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
     object = None
     preview = None
 
+    # Must be a key from the KEY_MAP
     required_keys = [
         'email',
-        'nome',
+        'name',
     ]
 
     def dispatch(self, request, *args, **kwargs):
