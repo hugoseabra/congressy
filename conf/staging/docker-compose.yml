@@ -15,12 +15,23 @@
 version: '3'
 services:
   # Preparação de volumes.
+  migration:
+    image: cgsy-staging
+    container_name: migration-staging
+    entrypoint:
+      - /services/migration/container-entry.sh
+    env_file: /tmp/staging-files/env-manage-staging
+    networks:
+      - postgres
+
   volume:
     image: cgsy-staging
     container_name: volume-staging
+    depends_on:
+      - migration
     entrypoint:
       - /services/volume/container-entry.sh
-    env_file: ./env-manage-staging
+    env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
       - /media:/var/www/cgsy/media
@@ -29,13 +40,14 @@ services:
     image: cgsy-staging
     container_name: cron-staging
     depends_on:
+      - migration
       - volume
     entrypoint:
       - /services/cron/container-entry.sh
     networks:
       - postgres
       - mailhog
-    env_file: ./env-manage-staging
+    env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
       - /media:/var/www/cgsy/media
@@ -44,7 +56,7 @@ services:
     image: cgsy-staging
     container_name: manage-staging
     depends_on:
-      - volume
+      - migration
     entrypoint:
       - /services/web/manage/container-entry.sh
     networks:
@@ -52,7 +64,7 @@ services:
       - mailhog
     ports:
       - "8080:80"
-    env_file: ./env-manage-staging
+    env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
       - /media:/var/www/cgsy/media
