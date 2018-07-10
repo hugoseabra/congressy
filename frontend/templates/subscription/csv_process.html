@@ -39,7 +39,7 @@
                     <div class="row">
                         <div class="col-md-12 text-center">
 
-                            {% if possible_subscriptions == 0 %}
+                            {% if generated_subscriptions.successful_subscriptions == 0 %}
 
                                 <h1>
                                     <i class="fas fa-exclamation-triangle warning-color"></i>
@@ -58,7 +58,56 @@
 
 
                             {% else %}
-                                we has subs
+
+                                <table class="table table-bordered">
+                                    <tbody>
+                                    <tr>
+                                        <td class="col-md-1">
+                                            <h2>
+                                                <i class="fas fa-check-circle success-color"></i>
+                                                Sucesso
+                                            </h2>
+                                        </td>
+                                        <td class="col-md-2">
+                                            <strong>
+                                                {{ generated_subscriptions.successful_subscriptions }}
+                                            </strong>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="col-md-1">
+                                            <h2>
+                                                <i class="fas fa-exclamation-circle danger-color"></i>
+                                                Falharam
+                                            </h2>
+
+                                        </td>
+                                        <td class="col-md-2">
+                                            <strong>
+                                                {{ generated_subscriptions.failed_subscriptions }}
+                                            </strong>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="col-md-1">
+                                            <h2>
+                                                Total
+                                            </h2>
+                                        </td>
+                                        <td class="col-md-2">
+                                            <strong>
+                                                {{ generated_subscriptions.total_subscriptions }}
+                                            </strong>
+                                        </td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+
+
+
                             {% endif %}
 
 

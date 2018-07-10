@@ -364,18 +364,17 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
         context['denied_reason'] = None
 
         try:
-            context['possible_subscriptions'] = \
-                self.get_possible_subscriptions()
+            context['generated_subscriptions'] = \
+                self.generate_subscriptions()
         except CannotCreateSubscriptionsError as e:
             context['denied_reason'] = str(e)
 
         return context
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        raise NotImplementedError('POST NOT READY')
+        return HttpResponse("Método não permitido", status=403)
 
-    def get_possible_subscriptions(self) -> int:
+    def generate_subscriptions(self) -> dict:
 
         if self.object is None:
             raise CannotCreateSubscriptionsError(
@@ -395,6 +394,10 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
                       'campo {}.'.format(key.title())
                 raise CannotCreateSubscriptionsError(msg)
 
-        possible_subscriptions = 0
+        subscriptions = {
+            'total_subscriptions': 15,
+            'successful_subscriptions': 2,
+            'failed_subscriptions': 13,
+        }
 
-        return possible_subscriptions
+        return subscriptions
