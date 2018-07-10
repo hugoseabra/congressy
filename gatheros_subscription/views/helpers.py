@@ -9,14 +9,17 @@ ALLOWED_KEYS = [
     'cep',
     'bairro',
     'número',
+    'numero',
     'rua/logradouro',
     'complemento',
-    'cidade'
+    'cidade',
     'uf',
     'celular',
     'função/cargo',
+    'funcao/cargo',
     'cnpj',
     'instituição/empresa',
+    'instituicao/empresa',
     'status',
     'credenciado',
 ]
