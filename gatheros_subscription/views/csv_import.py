@@ -225,6 +225,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
         context['denied_reason'] = None
         context['preview'] = None
+        context['has_inside_bar'] = False
 
         try:
             context['preview'] = self.get_preview()
@@ -279,7 +280,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
         for item in parsed_dict.items():
             # Limiting list size to not overload the frontend.  
-            parsed_list = item[1][:20]
+            parsed_list = item[1][:10]
 
             all_items_list.append(parsed_list)
 
