@@ -347,8 +347,8 @@
 
         {% if preview.invalid_keys|length > 0 %}
 
-            <div class="col-md-3" id="invalid-keys">
-                <div class="panel panel-danger">
+            <div class="col-md-6">
+                <div id="invalid-keys" class="panel panel-danger">
                     <div class="panel-heading">
                         <h3 class="panel-title">
                             Campos que serão ignorados
@@ -366,39 +366,38 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-        {% endif %}
+                {% if preview.table %}
 
-        {% if preview.table %}
-            <div class="col-md-3">
+                    <div class="panel panel-primary">
+                        <div class="panel-body">
 
-                <div class="panel panel-primary">
-                    <div class="panel-body">
-
-                        <div class="row">
+                            <div class="row">
 
 
-                            <div class="col-md-12">
+                                <div class="col-md-12">
 
-                                <h3>
-                                    <strong>
-                                        Caso todas as informações estejam ok, você já pode prosseguir com a importação.
-                                    </strong>
-                                </h3>
+                                    <h3>
+                                        <strong>
+                                            Caso todas as informações estejam ok, você já pode prosseguir com a importação.
+                                        </strong>
+                                    </h3>
 
-                                <a href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}" class="btn btn-success" type="button" style="margin-top: 15px">
-                                    Continuar a importação
-                                    <i class="fas fa-arrow-right"></i>
-                                </a>
+                                    <a href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}" class="btn btn-success" type="button" style="margin-top: 15px">
+                                        Continuar a importação
+                                        <i class="fas fa-arrow-right"></i>
+                                    </a>
+
+                                </div>
 
                             </div>
 
                         </div>
-
                     </div>
-                </div>
+
+                {% endif %}
             </div>
+
         {% endif %}
 
 
