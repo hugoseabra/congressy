@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'captcha',
     'wkhtmltopdf',
     'formtools',
+    'django_cron',
 
     # KANU_APPS
     'kanu_locations',
