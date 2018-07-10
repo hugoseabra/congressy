@@ -6,7 +6,7 @@ from django.views import generic
 
 from csv_importer.forms import CSVFileForm, CSVForm
 from csv_importer.models import CSVImportFile
-from .helpers import validate_table_keys, parse_file
+from .helpers import validate_table_keys, parse_file, KEY_MAP
 from .subscription import EventViewMixin
 from gatheros_subscription.models import Subscription
 
@@ -66,6 +66,7 @@ class CSVFileListView(CSVViewMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CSVFileForm(initial={'event': self.event.pk})
+        context['supported_keys'] = KEY_MAP
         return context
 
 

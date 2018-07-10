@@ -4,13 +4,15 @@ KEY_MAP = {
     'name': {
         'verbose_name': 'Nome',
         'description': 'Nome do participante',
-        'keys': ['nome']
+        'keys': ['nome'],
+        'possible_values': [],
     },
 
     'email': {
         'verbose_name': 'Email',
         'description': 'Email do participante',
-        'keys': ['email', 'e-mail']
+        'keys': ['email', 'e-mail'],
+        'possible_values': [],
     },
 }
 
