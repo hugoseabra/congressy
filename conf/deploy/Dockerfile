@@ -106,6 +106,7 @@ COPY ./conf/deploy/services /services
 COPY ./. ./.
 
 RUN chmod 775 /services/volume/container-entry.sh \
+              /services/migration/container-entry.sh \
               /services/cron/container-entry.sh \
               /services/web/manage/container-entry.sh \
               /services/web/partner/container-entry.sh
