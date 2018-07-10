@@ -8,7 +8,24 @@ from csv_importer.validators import validate_csv_only_file
 
 def get_file_path(instance, filename):
     """ Resgata localização onde os arquivos csv serão salvos. """
-    return os.path.join('event', str(instance.event.id), filename)
+    return os.path.join(
+        "event",
+        str(instance.event.id),
+        "import", 
+        "csv",
+        filename
+    )
+
+
+def get_err_file_path(instance, filename):
+    """ Resgata localização onde os arquivos de erro do csv serão salvos. """
+    return os.path.join(
+        "event",
+        str(instance.event.id),
+        "import",
+        "csv",
+        "err_" + filename
+    )
 
 
 class CSVImportFile(models.Model):
@@ -46,6 +63,11 @@ class CSVImportFile(models.Model):
         validators=[validate_csv_only_file],
     )
 
+    error_csv_file = models.FileField(
+        upload_to=get_err_file_path,
+        validators=[validate_csv_only_file],
+    )
+
     created = models.DateTimeField(
         verbose_name='criado em',
         editable=False,
@@ -80,7 +102,6 @@ class CSVImportFile(models.Model):
     )
 
     def save(self, *args, **kwargs):
-
         if not self.created:
             self.created = timezone.now()
 
@@ -89,4 +110,3 @@ class CSVImportFile(models.Model):
 
     def filename(self):
         return os.path.basename(self.csv_file.name)
-
