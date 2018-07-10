@@ -112,20 +112,14 @@ def has_events(user):
     """ Retorna se o usuário possui mais de uma organização """
 
     person = None
-    membership = None
-    org = None
 
     if user.person:
         person = user.person
 
     if person:
-        if person.members.all().count() > 1:
-            membership = person.members.first()
-
-    if membership:
-        if hasattr(membership, 'organization'):
-            org = membership.organization
-    if org:
-        return org.events.all().count() > 0 or has_many_organizations(user)
+        for member in person.members.all():
+            org = member.organization
+            if org.events.count() > 0:
+                return True
 
     return False
