@@ -33,6 +33,32 @@
                     <h3 class="panel-title">Preview</h3>
                 </div>
                 <div class="panel-body">
+                    <form class="form-inline" method="post" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                {% csrf_token %}
+                                {% for hidden_field in form.hidden_fields %}
+                                    {% if hidden_field.errors %}
+                                        {% render_errors hidden_field.errors %}
+                                    {% endif %}
+                                    {{ hidden_field }}
+                                {% endfor %}
+                                {% render_generic_field form.delimiter %}
+                                {% render_generic_field form.encoding %}
+                                {% render_generic_field form.separator %}
+                                <div class="form-group" style="margin-top: 25px;">
+                                    <div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-retweet"></i>
+                                            Recarregar
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
                     <div class="row">
                         <div class="col-md-12" id="preview-content">
 
@@ -48,39 +74,30 @@
 
                         </div>
                     </div>
-                    <hr style="height:1px;border:none;color:#333;background-color:#333;">
 
-                    <form class="form-inline" method="post" enctype="multipart/form-data">
-                        <div class="row">
-                            <div class="col-md-12">
+                    <div class="row">
+                        {% if preview.table %}
+                            <div class="row" style=" margin-left: 15px;">
 
-                                {% csrf_token %}
-                                {% for hidden_field in form.hidden_fields %}
-                                    {% if hidden_field.errors %}
-                                        {% render_errors hidden_field.errors %}
-                                    {% endif %}
-                                    {{ hidden_field }}
-                                {% endfor %}
-                                {% render_generic_field form.delimiter %}
-                                {% render_generic_field form.encoding %}
-                                {% render_generic_field form.separator %}
+                                <div class="col-md-12">
 
-                            </div>
-                        </div>
+                                    <h3>
+                                        <strong>
+                                            Os dados acima são apenas um preview 
+                                        </strong>
+                                    </h3>
 
-                        <div class="row" style="margin-top: 15px">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <div>
-                                        <button type="submit" class="btn btn-success">
-                                            Salvar
-                                        </button>
-                                    </div>
+                                    <a href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}" class="btn btn-success" type="button" style="margin-top: 15px">
+                                        <i class="fas fa-save"></i>
+                                        Salvar
+                                    </a>
+
                                 </div>
 
                             </div>
-                        </div>
-                    </form>
+
+                        {% endif %}
+                    </div>
 
                 </div>
             </div>
@@ -114,225 +131,31 @@
                                 </thead>
                                 <tbody>
 
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            status
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Inscrição confirmada?
-                                    </td>
-                                    <td>
-                                        <ul>
-                                            <li>Sim</li>
-                                            <li>Não</li>
-                                        </ul>
-                                    </td>
-                                </tr>
+                                {% for _, entry in supported_keys.items %}
 
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            credenciado
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Já foi realizado o check-in?
-                                    </td>
-                                    <td>
-                                        <ul>
-                                            <li>Sim</li>
-                                            <li>Não</li>
-                                        </ul>
-                                    </td>
-                                </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                {{ entry.verbose_name }}
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            {{ entry.description }}
+                                        </td>
 
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            nome
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Nome do participante
-                                    </td>
-                                </tr>
+                                        {% if entry.possible_values|length > 0 %}
+                                            <td>
+                                                <ul>
+                                                    {% for value in entry.possible_values %}
+                                                        <li>{{ value }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
 
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            doc internacional
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Passaporte ou Documento de Identificação para inscrições internacionais
-                                    </td>
-                                </tr>
+                                {% endfor %}
 
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            cpf
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        CPF do participante sem formatação
-                                    </td>
-                                    <td>
-                                        Exemplo: 05235400003
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            data nasc
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Data de nascimento no formato dd/mm/aaaa
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            email
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Email do participante
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            celular
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Número de telefone celular com o DDI.
-                                        Caso DDI não seja informado, será assumido '+55', DDI do Brasil.
-                                    </td>
-                                    <td>
-                                        Exemplo: +5562999999999
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            rua/logradouro
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Endereço do participante
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            complemento
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Completo como quadra, lote, afins.
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            número
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Número do endereço
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            bairro
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Bairro ou setor
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            cep
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        CEP do endereço
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            uf
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Estado do Participante
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            cidade
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Cidade do Participante
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            instituição/empresa
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Empresa do Participante
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            cnpj
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        CNPJ da empresa do sem formatação
-                                    </td>
-                                    <td>
-                                        Exemplo: 02562513000111
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <strong>
-                                            função/cargo
-                                        </strong>
-                                    </td>
-                                    <td>
-                                        Cargo do Participante
-                                    </td>
-                                </tr>
 
                                 </tbody>
                             </table>
@@ -367,35 +190,7 @@
                     </div>
                 </div>
 
-                {% if preview.table %}
 
-                    <div class="panel panel-primary">
-                        <div class="panel-body">
-
-                            <div class="row">
-
-
-                                <div class="col-md-12">
-
-                                    <h3>
-                                        <strong>
-                                            Caso todas as informações estejam ok, você já pode prosseguir com a importação.
-                                        </strong>
-                                    </h3>
-
-                                    <a href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}" class="btn btn-success" type="button" style="margin-top: 15px">
-                                        Continuar a importação
-                                        <i class="fas fa-arrow-right"></i>
-                                    </a>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-                    </div>
-
-                {% endif %}
             </div>
 
         {% endif %}

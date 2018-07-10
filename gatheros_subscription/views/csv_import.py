@@ -227,6 +227,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         context['denied_reason'] = None
         context['preview'] = None
         context['has_inside_bar'] = False
+        context['supported_keys'] = KEY_MAP
 
         try:
             context['preview'] = self.get_preview()
