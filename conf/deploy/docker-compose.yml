@@ -59,8 +59,11 @@ services:
 
   partner:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
-    networks:
+    depends_on:
       - migration
+      - redis
+    networks:
+      - redis
     ports:
       - "8001:80"
     volumes:
