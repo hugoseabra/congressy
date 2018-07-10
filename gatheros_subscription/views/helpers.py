@@ -72,8 +72,13 @@ def parse_file(encoded_content: str, delimiter: str, quotechar: str):
         for row in reader:
             for item in row.items():
 
-                possible_key = item[0].lower().strip()
-                possible_value = item[1].strip()
+                possible_key = item[0]
+                if possible_key:
+                    possible_key = possible_key.lower().strip()
+
+                possible_value = item[1]
+                if possible_value:
+                    possible_value.strip()
 
                 if possible_value and possible_key in valid_keys:
                     main_dict[possible_key].append(possible_value)

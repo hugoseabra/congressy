@@ -46,6 +46,12 @@ class CSVViewMixin(EventViewMixin):
 
         return response
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['has_inside_bar'] = True
+        context['active'] = 'inscricoes'
+        return context
+
 
 class CSVFileListView(CSVViewMixin, generic.ListView):
     """
@@ -133,7 +139,8 @@ class CSVImportView(CSVViewMixin, generic.View):
         """If the form is invalid, render the invalid form."""
 
         for error, value in form.errors.items():
-            messages.error(self.request, "Erro no campo {}: {}".format(error, value[0]))
+            messages.error(self.request,
+                           "Erro no campo {}: {}".format(error, value[0]))
 
         return redirect(self.get_success_url())
 
@@ -225,7 +232,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
             if str(e) == 'Decode error':
                 context['denied_reason'] = 'Não foi possivel ' \
-                    'fazer a decodificação do arquivo! Verifique o tipo de encodificação.'
+                                           'fazer a decodificação do arquivo! Verifique o tipo de encodificação.'
             else:
                 context['denied_reason'] = str(e)
 
@@ -321,7 +328,8 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
-        self.preview = self.get_preview()
+        if self.preview is None:
+            self.preview = self.get_preview()
         return response
 
     def get_preview(self) -> dict:
@@ -371,21 +379,18 @@ class CSVProcessView(CSVViewMixin, generic.DetailView):
             )
 
         if self.preview is None:
-            raise CannotCreateSubscriptionsError(
-                'Não foi possivel processar seu arquivo.'
-            )
+            self.preview = self.get_preview()
+            if self.preview is None:
+                raise CannotCreateSubscriptionsError(
+                    'Não foi possivel processar seu arquivo.'
+                )
 
         for key in self.required_keys:
             if key not in self.preview:
-
                 msg = 'Não será possivel gerar inscrições sem o ' \
-                    'campo {}.'.format(key)
+                      'campo {}.'.format(key.title())
                 raise CannotCreateSubscriptionsError(msg)
 
         possible_subscriptions = 0
-
-        
-
-
 
         return possible_subscriptions

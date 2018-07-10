@@ -8,7 +8,53 @@
 {% block page_description %}
     Processar importação de dados via CSV
 {% endblock %}
-     
+
 {% block content %}
-    <h1>Process</h1>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Inscrições
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+
+                            {% if possible_subscriptions == 0 %}
+
+                                <h1>
+                                    <i class="fas fa-exclamation-triangle warning-color"></i>
+                                    Não será possivel gerar nenhuma inscrição.
+                                    <i class="fas fa-exclamation-triangle warning-color"></i>
+                                </h1>
+
+
+
+                                {% if denied_reason %}
+                                    <h2 style="margin-top: 25px">
+                                        Motivo:
+                                        <strong>{{ denied_reason }}</strong>
+                                    </h2>
+                                {% endif %}
+
+
+                            {% else %}
+                                we has subs
+                            {% endif %}
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 {% endblock %}
