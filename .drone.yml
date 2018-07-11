@@ -19,23 +19,23 @@ pipeline:
 #=============================================================================#
 # STAGING
 #=============================================================================#
-#  backup-db-staging:
-#    image: postgres:9.6-alpine
-#    pull: true
-#    secrets: [
-#      dbhost,
-#      dbuser,
-#      dbpass,
-#      dbname,
-#      dbport
-#    ]
-#    volumes:
-#      - /tmp/bkp:/tmp/bkp
-#    commands:
-#      - ./bin/env/staging/01_backup-db-staging.sh
-#    when:
-#      branch: [ hotfix/*, release/* ]
-#
+  backup-db-staging:
+    image: postgres:9.6-alpine
+    pull: true
+    secrets: [
+      dbhost,
+      dbuser,
+      dbpass,
+      dbname,
+      dbport
+    ]
+    volumes:
+      - /tmp/bkp:/tmp/bkp
+    commands:
+      - ./bin/env/staging/01_backup-db-staging.sh
+    when:
+      branch: [ hotfix/*, release/* ]
+
   recreate-staging-db:
     image: tmaier/docker-compose
     pull: true
