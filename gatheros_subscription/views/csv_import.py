@@ -37,12 +37,15 @@ class CSVViewMixin(EventViewMixin):
 
                 messages.error(request,
                                "Evento não permite importação via CSV.")
-                return redirect(
-                    reverse_lazy("subscription:subscription-list",
-                                 kwargs={
-                                     'event_pk': self.event.pk
-                                 })
+
+                url = reverse_lazy(
+                    "subscription:subscription-list",
+                    kwargs={
+                        'event_pk': self.event.pk
+                    }
                 )
+
+                return redirect(url)
 
         return response
 
@@ -72,7 +75,8 @@ class CSVFileListView(CSVViewMixin, generic.ListView):
 
 class CSVImportView(CSVViewMixin, generic.View):
     """
-        View usada para fazer upload de arquivos.
+        View usada para fazer apenas upload de arquivos via POST, qualquer outra
+        solicitação irá gerar um HTTP 403.
     """
     form_class = CSVFileForm
     initial = {}
