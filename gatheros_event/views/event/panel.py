@@ -104,6 +104,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         context['has_survey_create'] = self.has_survey_create()
         context['number_attendances'] = self.get_number_attendances()
         context['status_addons'] = self.get_status_addons()
+        context['event_is_full'] = self.event_is_full()
         try:
             context['is_configured'] = self.event.work_config.is_configured
         except AttributeError:
@@ -390,3 +391,19 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
                 return True
 
         return False
+
+    def event_is_full(self):
+        if self.event.expected_subscriptions and \
+                self.event.expected_subscriptions > 0:
+
+            total_subscriptions_event = 0
+            for lot in self.event.lots.all():
+                total_subscriptions_event += lot.subscriptions.filter(
+                    completed=True, test_subscription=False
+                ).exclude(
+                    status='canceled'
+                ).count()
+            return total_subscriptions_event >= self.event.expected_subscriptions
+
+        else:
+            return False
