@@ -102,10 +102,14 @@ class PagarmeDataBuilder:
             "split_rules": self._create_split_rules(amount, installments),
         }
 
-        if transaction_type == Transaction.BOLETO and self.has_expiration_date:
+        if transaction_type == Transaction.BOLETO:
             lot = self.subscription.lot
-            formatted_date_end = lot.date_end.strftime('%Y-%m-%d')
-            data['boleto_expiration_date'] = formatted_date_end
+
+            data['soft_descriptor'] = lot.event.organization.name[:13]
+
+            if self.has_expiration_date:
+                formatted_date_end = lot.date_end.strftime('%Y-%m-%d')
+                data['boleto_expiration_date'] = formatted_date_end
 
         if transaction_type == Transaction.CREDIT_CARD:
             data['card_hash'] = card_hash
