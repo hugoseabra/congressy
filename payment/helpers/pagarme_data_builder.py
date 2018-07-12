@@ -33,7 +33,11 @@ class PagarmeDataBuilder:
         self.debt_items = {}
         self.debt_amount = Decimal(0)
         self.liquid_amount = Decimal(0)
+        self.has_expiration_date = False
 
+        if subscription.event.allow_boleto_expiration_on_lot_expiration:
+            self.has_expiration_date = True
+        
         lot = subscription.lot
         self.metadata_items = {
             'lote': '{} ({})'.format(lot.display_publicly, lot.pk),
@@ -97,6 +101,11 @@ class PagarmeDataBuilder:
             "items": [item for id, item in self.debt_items.items()],
             "split_rules": self._create_split_rules(amount, installments),
         }
+
+        if transaction_type == Transaction.BOLETO and self.has_expiration_date:
+            lot = self.subscription.lot
+            formatted_date_end = lot.date_end.strftime('%Y-%m-%d')
+            data['boleto_expiration_date'] = formatted_date_end
 
         if transaction_type == Transaction.CREDIT_CARD:
             data['card_hash'] = card_hash
