@@ -83,7 +83,7 @@ if [ "$RECREATE" == "1" ]; then
     # certeza que o container não está rodando para destruir o banco, caso
     # contrário, o Docker não irá destruir informando que há um container
     # utilizando a rede.
-    docker-compose -f ./bin/env/staging/docker-compose.yml down --remove-orphans
+    docker-compose -f ./conf/staging/docker-compose.yml down --remove-orphans
 
     # Mata image e destroi rede, volumes e container
     docker-compose -f ./bin/env/docker-compose.yml down --remove-orphans
