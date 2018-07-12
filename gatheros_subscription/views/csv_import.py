@@ -1,3 +1,6 @@
+import csv
+from collections import OrderedDict
+
 from django.contrib import messages
 from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import redirect
@@ -6,9 +9,13 @@ from django.views import generic
 
 from csv_importer.forms import CSVFileForm, CSVForm
 from csv_importer.models import CSVImportFile
-from .helpers import validate_table_keys, parse_file, KEY_MAP
+from .helpers import (
+    KEY_MAP,
+    REQUIRED_KEYS,
+    get_mapping_key_from_csv_key,
+    MappingNotFoundError,
+)
 from .subscription import EventViewMixin
-from gatheros_subscription.models import Subscription
 
 
 class CannotGeneratePreviewError(Exception):
@@ -248,79 +255,139 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
     def get_preview(self) -> dict:
 
-        instance = self.object
+        serialized_csv = self.get_serialized_csv()
 
-        encoding = instance.encoding
-        delimiter = instance.delimiter
-        quotechar = instance.separator
+        # Fetching invalid keys
+        invalid_keys = self.get_invalid_keys(serialized_csv['table_keys'])
 
-        file_content = instance.csv_file.file.read()
-        try:
-            encoded_content = file_content.decode(encoding)
-        except UnicodeDecodeError:
+        # Fetching valid keys
+        valid_keys = self.get_valid_keys(serialized_csv['table_keys'])
 
-            raise CannotGeneratePreviewError("Decode error")
+        # Fetching valid lines
+        valid_lines = self.get_valid_lines(serialized_csv['csv_dict_list'])
 
-        parsed_dict = parse_file(encoded_content, delimiter, quotechar)
+        table = None
 
-        # TODO: this is not DRY
-        content = encoded_content.splitlines()
+        if valid_keys and valid_lines:
 
-        first_line = content[0].split(delimiter)
+            table_heading = ''
+            table_body = ''
 
-        table_keys = validate_table_keys(first_line)
+            for key in valid_keys:
+                table_heading += '<th>' + key.title() + '</th>'
 
-        invalid_keys = []
+            
 
-        for entry in table_keys.items():
-            if not entry[1]['valid']:
-                invalid_keys.append(entry[1]['name'])
 
-        table_heading = ''
-        table_body = ''
-
-        for key in parsed_dict.keys():
-            table_heading += '<th>' + key.title() + '</th>'
-
-        all_items_list = []
-
-        for item in parsed_dict.items():
-            # Limiting list size to not overload the frontend.  
-            parsed_list = item[1][:10]
-
-            all_items_list.append(parsed_list)
-
-        all_rows = zip(*all_items_list)
-
-        for row in all_rows:
-            table_body += '<tr>'
-            for item in row:
-                table_body += '<td>'
-
-                multi_item = item.split(delimiter)
-
-                if len(multi_item) > 1:
-                    table_body += '<ul>'
-
-                    for i in multi_item:
-                        table_body += '<li>' + i + '</li>'
-
-                    table_body += '</ul>'
-
-                else:
-                    table_body += item
-
-                table_body += '</td>'
-            table_body += '</tr>'
-
-        table = '<table class="table"><thead><tr>' + \
-                table_heading + '</tr></thead><tbody>' + table_body + \
-                '</tbody></table>'
+            table = '<table class="table"><thead><tr>' + \
+                    table_heading + '</tr></thead><tbody>' + table_body + \
+                    '</tbody></table>'
 
         return {
             'table': table,
             'invalid_keys': invalid_keys,
         }
+
+    def get_serialized_csv(self) -> dict:
+
+        instance = self.object
+
+        encoding = instance.encoding
+        delimiter = instance.delimiter
+        quotechar = instance.separator
+        file_path = instance.csv_file.path
+
+        # Decoding and marshalling into a list of dicts
+        try:
+            reader = csv.DictReader(
+                open(file_path, 'r', encoding=encoding),
+                delimiter=delimiter,
+                quotechar=quotechar,
+            )
+            dict_list = []
+            for line in reader:
+                dict_list.append(line)
+            table_keys = reader.fieldnames
+        except UnicodeDecodeError:
+            raise CannotGeneratePreviewError("Decode error")
+
+        return {
+            'csv_dict_list': dict_list,
+            'table_keys': table_keys,
+        }
+
+    def get_valid_lines(self, csv_dict_list: list):
+
+        valid_lines = []
+
+        for line in csv_dict_list:
+            is_valid = self.is_valid_line(line)
+            if is_valid:
+                valid_lines.append(line)
+
+        return valid_lines
+
+    @staticmethod
+    def get_invalid_keys(table_keys: list) -> list:
+
+        invalid_keys = []
+        for entry in table_keys:
+
+            is_valid = False
+
+            parsed_entry = entry.lower().strip()
+
+            for key, value in KEY_MAP.items():
+                if parsed_entry in value['csv_keys']:
+                    is_valid = True
+                    break
+
+            if not is_valid:
+                invalid_keys.append(entry)
+
+        return invalid_keys
+
+    @staticmethod
+    def get_valid_keys(table_keys: list) -> list:
+
+        valid_keys = []
+        for entry in table_keys:
+
+            is_valid = False
+
+            parsed_entry = entry.lower().strip()
+
+            for key, value in KEY_MAP.items():
+                if parsed_entry in value['csv_keys']:
+                    is_valid = True
+                    break
+
+            if is_valid:
+                valid_keys.append(entry)
+
+        return valid_keys
+
+    @staticmethod
+    def is_valid_line(line: OrderedDict) -> bool:
+
+        line_keys = [key.lower().strip() for key in line.keys()]
+        line_mapping_keys = []
+
+        for key in line_keys:
+            mapping_key = False
+            try:
+                mapping_key, _ = get_mapping_key_from_csv_key(key)
+            except MappingNotFoundError:
+                pass
+
+            if mapping_key:
+                line_mapping_keys.append(mapping_key)
+
+        for key in REQUIRED_KEYS:
+            if key not in line_mapping_keys:
+                return False
+
+        return True
 
 
 class CSVProcessView(CSVViewMixin, generic.DetailView):
