@@ -83,7 +83,7 @@ class CertificatePDFExampleView(AccountMixin, generic.View):
     template_name = 'pdf/certificate.html'
     event = None
     long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
-    url = 'http://wkhtml.nathanmartins.com:5000'
+    url = 'http://localhost:5000'
 
     def create_html_string(self):
         return render_to_string(
