@@ -1,5 +1,6 @@
 import os
 import uuid
+from datetime import timedelta
 from decimal import Decimal
 
 import absoluteuri
@@ -106,7 +107,10 @@ class PagarmeDataBuilder:
         }
 
         if transaction_type == Transaction.BOLETO and self.has_expiration_date:
-            formatted_date_end = lot.date_end.strftime('%Y-%m-%d')
+            # Pagarme sets to one day before, so we set one day forward.
+            next_day = lot.date_end + timedelta(days=1)
+            formatted_date_end = next_day.strftime('%Y-%m-%d')
+
             data['boleto_expiration_date'] = formatted_date_end
 
         if transaction_type == Transaction.CREDIT_CARD:
