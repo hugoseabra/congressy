@@ -19,7 +19,8 @@ class PaymentDeleteView(EventViewMixin, generic.View):
             return self.object
 
         self.object = get_object_or_404(
-            Transaction, pk=self.request.POST.get('transaction_id')
+            Transaction,
+            pk=self.request.POST.get('transaction_id')
         )
         self.subscription = self.object.subscription
         return self.object
