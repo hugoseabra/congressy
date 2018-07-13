@@ -12,7 +12,7 @@
 # - env-file "env-manage-staging" é construído pelo CI dinamicamente por causa
 #   das informações sensíveis.
 ###############################################################################
-version: '3'
+version: '3.5'
 services:
   # Preparação de volumes.
   migration:
@@ -73,10 +73,10 @@ services:
 networks:
   postgres:
     external:
-      name: env_postgres
+      name: local_postgres
   mailhog:
     external:
-      name: env_mailhog
+      name: local_mailhog
   wkhtmltopdf:
     external:
-      name: env_wkhtmltopdf
+      name: local_wkhtmltopdf
