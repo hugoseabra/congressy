@@ -57,7 +57,7 @@ pipeline:
       - echo "${DRONE_BUILD_LINK}" > ./build_link
     when:
       branch: [ hotfix/*, release/* ]
-#
+
   build-staging-image:
     image: docker
     volumes:
