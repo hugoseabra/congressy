@@ -45,3 +45,6 @@ PAGARME_RECIPIENT_ID = 're_cjcupb1iq0200zl6d89r92s32'
 PAGARME_TEST_RECIPIENT_ID = 're_cjdagxm5q00fqok6eeuukmmtp'
 # ============================ DEBUG TOOL BAR =============================== #
 INTERNAL_IPS = ['127.0.0.1']
+
+# ============================ WKHTMLTOPDF  ================================== #
+WKHTMLTOPDF_WS_URL = 'http://localhost:5010'

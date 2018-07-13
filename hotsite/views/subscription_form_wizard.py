@@ -388,7 +388,7 @@ class SubscriptionWizardView(SessionWizardView):
 
             if self.event.is_scientific:
                 if not self.event.work_config or not \
-                        self.event.work_config.is_submittable:
+                        self.event.work_config.is_configured:
                     return redirect('public:hotsite', slug=self.event.slug)
 
             return super().dispatch(request, *args, **kwargs)

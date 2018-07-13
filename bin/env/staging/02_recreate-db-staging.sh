@@ -77,7 +77,8 @@ if [ "$RECREATE" == "1" ]; then
 
     # o docker-compose do staging pode depender de um env-file que pode não
     # existir
-    touch ./bin/env/staging/env-manage-staging
+    mkdir -p /tmp/staging-files
+    touch /tmp/staging-files/env-manage-staging
 
     # manage-staging depende da rede criada pelo stack do banco. Devemos ter
     # certeza que o container não está rodando para destruir o banco, caso

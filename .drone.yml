@@ -299,7 +299,7 @@ pipeline:
 
       - mkdir -p ~/cgsy
       # env-file do stack de produção - common
-      - echo "AWS_KEY=$${AWS_KEY}" >> ~/cgsy/env-file
+      - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
       - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> ~/cgsy/env-file
       - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ~/cgsy/env-file
