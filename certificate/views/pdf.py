@@ -11,13 +11,14 @@ from django.template import Template, Context
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views import generic
+from wkhtmltopdf.views import PDFTemplateView
 
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin, EventViewMixin
 from gatheros_subscription.models import Subscription
 
 
-class CertificatePDFView(AccountMixin, generic.View):
+class CertificatePDFView(AccountMixin, PDFTemplateView):
     template_name = 'pdf/certificate.html'
     subscription = None
     event = None
