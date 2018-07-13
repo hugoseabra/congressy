@@ -8,6 +8,12 @@ services:
     volumes:
       - "redis:/data"
 
+  wkhtmltopdf:
+    image: openlabs/docker-wkhtmltopdf-aas
+    container_name: wkhtmltopdf
+    networks:
+      - wkhtmltopdf
+
   migration:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     entrypoint:
@@ -31,12 +37,15 @@ services:
     depends_on:
       - migration
       - volume
+      - wkhtmltopdf
     entrypoint:
       - /services/cron/container-entry.sh
     volumes:
       - "/etc/localtime:/etc/localtime"
       - "./media:/var/www/cgsy/media"
     env_file: ./env-file
+    networks:
+      - wkhtmltopdf
 
   manage:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
@@ -44,8 +53,10 @@ services:
       - migration
       - volume
       - redis
+      - wkhtmltopdf
     networks:
       - redis
+      - wkhtmltopdf
     ports:
       - "8000:80"
     entrypoint:
@@ -76,6 +87,7 @@ services:
 
 networks:
   redis:
+  wkhtmltopdf:
 
 volumes:
   redis:

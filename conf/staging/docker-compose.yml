@@ -62,6 +62,7 @@ services:
     networks:
       - postgres
       - mailhog
+      - wkhtmltopdf
     ports:
       - "8080:80"
     env_file: /tmp/staging-files/env-manage-staging
@@ -76,3 +77,6 @@ networks:
   mailhog:
     external:
       name: env_mailhog
+  wkhtmltopdf:
+    external:
+      name: env_wkhtmltopdf
