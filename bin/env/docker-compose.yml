@@ -47,10 +47,11 @@ services:
 
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas
+    container_name: wkhtmltopdf
     networks:
       - wkhtmltopdf
     ports:
-      - "5000:80"
+      - "5010:80"
 
 networks:
   postgres:
