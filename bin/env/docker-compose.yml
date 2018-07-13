@@ -45,6 +45,14 @@ services:
       - "1025:1025"
       - "8025:8025"
 
+  wkhtml:
+    image: openlabs/docker-wkhtmltopdf-aas
+    networks:
+      - wkhtml
+    ports:
+      - "5000:80"
+
 networks:
   postgres:
   mailhog:
+  wkhtml:

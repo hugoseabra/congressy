@@ -33,7 +33,11 @@ class PagarmeDataBuilder:
         self.debt_items = {}
         self.debt_amount = Decimal(0)
         self.liquid_amount = Decimal(0)
+        self.has_expiration_date = False
 
+        if subscription.event.allow_boleto_expiration_on_lot_expiration:
+            self.has_expiration_date = True
+        
         lot = subscription.lot
         self.metadata_items = {
             'lote': '{} ({})'.format(lot.display_publicly, lot.pk),
@@ -74,6 +78,8 @@ class PagarmeDataBuilder:
 
     def build(self, amount, transaction_type, installments=1, card_hash=None):
 
+        lot = self.subscription.lot
+
         self._check_transaction_type(transaction_type, card_hash)
         self._check_debts(amount, installments)
 
@@ -88,6 +94,7 @@ class PagarmeDataBuilder:
             'api_key': settings.PAGARME_API_KEY,
             'transaction_id': transaction_id,
             'postback_url': postback_url,
+            'soft_descriptor': lot.event.organization.name[:13],
             'amount': self.as_payment_format(amount),
             'liquid_amount': self.as_payment_format(self.liquid_amount),
             'price': self.as_payment_format(amount),
@@ -97,6 +104,10 @@ class PagarmeDataBuilder:
             "items": [item for id, item in self.debt_items.items()],
             "split_rules": self._create_split_rules(amount, installments),
         }
+
+        if transaction_type == Transaction.BOLETO and self.has_expiration_date:
+            formatted_date_end = lot.date_end.strftime('%Y-%m-%d')
+            data['boleto_expiration_date'] = formatted_date_end
 
         if transaction_type == Transaction.CREDIT_CARD:
             data['card_hash'] = card_hash
