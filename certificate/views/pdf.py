@@ -2,6 +2,7 @@ import base64
 import json
 
 import requests
+from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.files.base import ContentFile
@@ -22,7 +23,7 @@ class CertificatePDFView(AccountMixin, generic.View):
     subscription = None
     event = None
     permission_denied_url = reverse_lazy('front:start')
-    wkhtml_ws_url = 'http://localhost:5000'
+    wkhtml_ws_url = settings.WKHTMLTOPDF_WS_URL
 
     def get_filename(self):
         return "CERTIFICADO--{}-{}.pdf".format(self.subscription.person.name,
@@ -127,7 +128,7 @@ class CertificatePDFExampleView(AccountMixin, generic.View):
     template_name = 'pdf/certificate.html'
     event = None
     long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
-    wkhtml_ws_url = 'http://localhost:5000'
+    wkhtml_ws_url = settings.WKHTMLTOPDF_WS_URL
 
     def create_html_string(self):
         return render_to_string(

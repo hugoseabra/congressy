@@ -92,3 +92,6 @@ RAVEN_CONFIG = {
     'dsn': '{{ SENTRY_PRIVATE_DSN }}',
     'release': '{{ APP_VERSION }}',
 }
+
+# ============================ WKHTMLTOPDF  ================================== #
+WKHTMLTOPDF_WS_URL = 'http://wkhtmltopdf'
