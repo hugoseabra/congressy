@@ -11,14 +11,13 @@ from django.template import Template, Context
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views import generic
-from wkhtmltopdf.views import PDFTemplateView
 
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin, EventViewMixin
 from gatheros_subscription.models import Subscription
 
 
-class CertificatePDFView(AccountMixin, PDFTemplateView):
+class CertificatePDFView(AccountMixin, generic.View):
     template_name = 'pdf/certificate.html'
     subscription = None
     event = None
@@ -44,7 +43,7 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
         return super().pre_dispatch(request)
 
     def get_context_data(self, **kwargs):
-        context = super(CertificatePDFView, self).get_context_data(**kwargs)
+        context = {}
 
         if self.event.certificate.background_image:
             image_url = self.event.certificate.background_image.default.path
