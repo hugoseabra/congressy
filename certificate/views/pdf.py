@@ -1,6 +1,5 @@
 import base64
 import json
-import time
 
 import requests
 from django.contrib.sites.models import Site
@@ -140,10 +139,6 @@ class CertificatePDFExampleView(AccountMixin, generic.View):
 
     def get(self, request, *args, **kwargs):
         html = self.create_html_string()
-        epoch = str(int(time.time()))
-        with open('/tmp/wk_' + epoch + '.html', 'w') as f:
-            f.write(html)
-
         encoded = base64.b64encode(html.encode()).decode()
 
         data = {
