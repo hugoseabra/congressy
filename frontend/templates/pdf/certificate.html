@@ -42,7 +42,7 @@
             -webkit-transform: translate({{ certificate.converted_date_position_x|unlocalize}}px,{{ certificate.converted_date_position_y|unlocalize}}px);
             transform: translate({{ certificate.converted_date_position_x|unlocalize}}px,{{ certificate.converted_date_position_y|unlocalize}}px);
             color: {{ certificate.font_color }};
-            border: 1px solid red;
+            white-space: nowrap;
         }
 
     </style>
@@ -59,8 +59,10 @@
         {{ certificate.title_content }}
     </div>
 
-    <div style="position:absolute;
-            {% if certificate.date_hide or not certificate.event_has_any_type_of_location %}display: none;{% endif %}"
+    <div style=" position: absolute;
+            {% if certificate.date_hide or not certificate.event_has_any_type_of_location %}
+                display: none;
+            {% endif %}"
          id="cert-date">
         {% language 'pt-br' %}
             {% if certificate.event_has_any_type_of_location %}
