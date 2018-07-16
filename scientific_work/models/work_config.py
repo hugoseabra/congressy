@@ -6,6 +6,11 @@ from gatheros_event.models import Event
 
 
 class WorkConfig(models.Model):
+
+    class Meta:
+        verbose_name = 'Configuração de Submissão'
+        verbose_name_plural = 'Configurações de Submissões'
+
     ORAL = 'oral'
     POSTER = 'poster'
     ORAL_AND_POSTER = 'oral e poster'
