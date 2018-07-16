@@ -1,3 +1,6 @@
+from .column_validator import ColumnValidator
+
+
 class DataColumnError(Exception):
 
     def __init__(self,
@@ -9,6 +12,17 @@ class DataColumnError(Exception):
         self.error = error
 
         self.message = '{}: {}'.format(column_name, error)
+        super().__init__(*args, **kwargs)
+
+
+class NoValidColumnsError(Exception):
+
+    def __init__(
+            self,
+            column_validator: ColumnValidator,
+            *args: object,
+            **kwargs: object) -> None:
+        self.column_validator = column_validator
         super().__init__(*args, **kwargs)
 
 
