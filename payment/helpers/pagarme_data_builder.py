@@ -125,7 +125,7 @@ class PagarmeDataBuilder:
 
             data['boleto_instructions'] = instructions
 
-            if subscription.event.allow_boleto_expiration_on_lot_expiration:
+            if self.subscription.event.allow_boleto_expiration_on_lot_expiration:
                 # Pagarme sets to one day before, so we set one day forward.
                 next_day = lot.date_end + timedelta(days=1)
                 exp_date = next_day.strftime('%Y-%m-%d')
