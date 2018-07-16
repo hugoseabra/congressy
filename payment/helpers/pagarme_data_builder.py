@@ -77,6 +77,7 @@ class PagarmeDataBuilder:
     def build(self, amount, transaction_type, installments=1, card_hash=None):
 
         lot = self.subscription.lot
+        event = self.subscription.event
 
         self._check_transaction_type(transaction_type, card_hash)
         self._check_debts(amount, installments)
@@ -125,7 +126,7 @@ class PagarmeDataBuilder:
 
             data['boleto_instructions'] = instructions
 
-            if subscription.event.allow_boleto_expiration_on_lot_expiration:
+            if event.allow_boleto_expiration_on_lot_expiration:
                 # Pagarme sets to one day before, so we set one day forward.
                 next_day = lot.date_end + timedelta(days=1)
                 exp_date = next_day.strftime('%Y-%m-%d')
