@@ -1,5 +1,6 @@
 from gatheros_subscription.models import Lot
-from .constants import REQUIRED_KEYS
+from .constants import REQUIRED_KEYS, KEY_MAP
+from .exceptions import MappingNotFoundError
 
 
 class CSVFormIntegrator(object):
@@ -11,33 +12,40 @@ class CSVFormIntegrator(object):
         super().__init__()
 
     def get_required_keys(self) -> list:
-        keys = REQUIRED_KEYS
-        
+        required_keys = REQUIRED_KEYS
+        required_keys_mapping = []
+
         config = self.form_config
 
         if config.phone:
-            keys.append('phone')
+            required_keys.append('phone')
 
         if config.city:
-            keys.append('city')
-            keys.append('uf')
+            required_keys.append('city')
+            required_keys.append('uf')
 
         if config.cpf == config.CPF_REQUIRED:
-            keys.append('cpf')
+            required_keys.append('cpf')
 
         if config.birth_date == config.BIRTH_DATE_REQUIRED:
-            keys.append('birth_date')
+            required_keys.append('birth_date')
 
         if config.address == config.ADDRESS_SHOW:
-            keys.append('address')
+            required_keys.append('address')
 
         if config.institution == config.INSTITUTION_CNPJ_REQUIRED:
-            keys.append('institution')
+            required_keys.append('institution')
 
         if config.institution_cnpj == config.INSTITUTION_CNPJ_REQUIRED:
-            keys.append('institution_cnpj')
+            required_keys.append('institution_cnpj')
 
         if config.function == config.FUNCTION_REQUIRED:
-            keys.append('function')
-        
-        return keys
+            required_keys.append('function')
+
+        for key in required_keys:
+            mapping = KEY_MAP.get(key, None)
+            if mapping is None:
+                raise MappingNotFoundError(key)
+            required_keys_mapping.append(mapping)
+
+        return required_keys_mapping
