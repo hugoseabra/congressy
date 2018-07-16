@@ -48,5 +48,4 @@ from .csv_import import (
     CSVFileListView,
     CSVImportView,
     CSVPrepareView,
-    CSVProcessView,
 )

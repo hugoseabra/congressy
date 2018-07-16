@@ -4,7 +4,7 @@
 {% block title %}Processar importação | Congressy{% endblock %}
 
 {% block page_title %}Processar importação via CSV{% endblock %}
-{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_sub_title %}{{ event.name }} | object.filename{% endblock %}
 {% block page_description %}
     Processar importação de dados via CSV
 {% endblock %}
@@ -26,182 +26,186 @@
         </div>
     </div>
 
-    <div class="row" id="preview">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Preview</h3>
-                </div>
-                <div class="panel-body">
 
-                    <form class="form-inline" method="post" enctype="multipart/form-data">
+    {% if preview and denied_reason is None %}
+        <div class="row" id="preview">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Preview</h3>
+                    </div>
+                    <div class="panel-body">
+
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-12" id="preview-content" style="margin-top: 15px">
 
-                                {% csrf_token %}
-                                {% for hidden_field in form.hidden_fields %}
-                                    {% if hidden_field.errors %}
-                                        {% render_errors hidden_field.errors %}
-                                    {% endif %}
-                                    {{ hidden_field }}
-                                {% endfor %}
-                                {% render_generic_field form.delimiter %}
-                                {% render_generic_field form.encoding %}
-                                {% render_generic_field form.separator %}
-                                <div class="form-group" style="margin-top: 25px;">
-                                    <div>
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-retweet"></i>
-                                            Recarregar
-                                        </button>
-                                    </div>
-                                </div>
+                                nada.
 
                             </div>
                         </div>
-                    </form>
-                    <div class="row">
-                        <div class="col-md-12" id="preview-content" style="margin-top: 15px">
 
-                            {% if preview.table %}
-                                {{ preview.table|safe }}
-                            {% else %}
-                                <div class="text-center">
-                                    <h1>
-                                        <strong>
-                                            <i class="fas fa-exclamation-triangle warning-color"></i>
-                                            {{ denied_reason }}
-                                            <i class="fas fa-exclamation-triangle warning-color"></i>
-                                        </strong>
-                                    </h1>
-                                </div>
-                            {% endif %}
-
-                        </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    {% elif denied_reason %}
+        <div class="row" id="preview_error">
+            <div class="col-md-12">
+                <div class="panel panel-warning">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Preview</h3>
+                    </div>
+                    <div class="panel-body">
 
-                    <div class="row">
-                        {% if preview.table %}
-                            <div class="row" style=" margin-left: 15px;">
+                        <div class="row">
+                            <div class="col-md-12 text-center" id="preview-content" style="margin-top: 15px">
 
-                                <div class="col-md-12">
+                                <h1>
+                                    <strong>
+                                        <i class="fas fa-exclamation-triangle warning-color"></i>
+                                        Atenção!
+                                        <i class="fas fa-exclamation-triangle warning-color"></i>
+                                    </strong>
+                                </h1>
 
-                                    <h3>
-                                        <strong>
-                                            Os dados acima são apenas uma pequena parcela dos dados do seu arquivo.
-                                            Servem apenas como uma previsão de como os dados serão lidos.
-                                        </strong>
-                                    </h3>
-
-                                    <a href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}" class="btn btn-success" type="button" style="margin-top: 15px">
-                                        <i class="fas fa-save"></i>
-                                        Salvar configuração
-                                    </a>
-
-                                </div>
+                                <h2 style="margin-top: 5px">
+                                    {{ denied_reason }}
+                                </h2>
 
                             </div>
-
-                        {% endif %}
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row" id="keys">
-
-        <div class="col-md-6">
-
-            <div class="panel panel-primary">
-
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        Campos Disponíveis
-                    </h3>
-                </div>
-                <div class="panel-body">
-
-                    <div class="row">
-
-                        <div class="col-md-12">
-
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th>Nome da coluna</th>
-                                    <th>Descrição</th>
-                                    <th>Possiveis valores</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-
-                                {% for _, entry in supported_keys.items %}
-
-                                    <tr>
-                                        <td>
-                                            <strong>
-                                                {{ entry.verbose_name }}
-                                            </strong>
-                                        </td>
-                                        <td>
-                                            {{ entry.description }}
-                                        </td>
-
-                                        {% if entry.possible_values|length > 0 %}
-                                            <td>
-                                                <ul>
-                                                    {% for value in entry.possible_values %}
-                                                        <li>{{ value }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </td>
-                                        {% endif %}
-                                    </tr>
-
-                                {% endfor %}
-
-
-                                </tbody>
-                            </table>
-
                         </div>
 
                     </div>
-
                 </div>
             </div>
         </div>
+    {% else %}
+        <div class="row" id="unknown_preview_error">
+            <div class="col-md-12">
+                <div class="panel panel-warning">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Preview</h3>
+                    </div>
+                    <div class="panel-body">
 
-        {% if preview.invalid_keys|length > 0 %}
+                        <div class="row">
+                            <div class="col-md-12 text-center" id="preview-content" style="margin-top: 15px">
+
+                                <h1>
+                                    <strong>
+                                        <i class="fas fa-exclamation-triangle warning-color"></i>
+                                        Atenção!
+                                        <i class="fas fa-exclamation-triangle warning-color"></i>
+                                    </strong>
+                                </h1>
+
+                                <h2 style="margin-top: 5px">
+                                    Ocorreu algum erro desconhecido. Por favor entre em contato com a equipe Congressy para maiores informações.
+                                </h2>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if preview %}
+
+        <div class="row" id="keys">
 
             <div class="col-md-6">
-                <div id="invalid-keys" class="panel panel-danger">
+
+                <div class="panel panel-primary">
+
                     <div class="panel-heading">
                         <h3 class="panel-title">
-                            Campos que serão ignorados
+                            Campos Obrigatórios
                         </h3>
                     </div>
                     <div class="panel-body">
+
                         <div class="row">
-                            <h3>
-                                <ul>
-                                    {% for key in  preview.invalid_keys %}
-                                        <li>{{ key|truncatechars:40 }}</li>
+
+                            <div class="col-md-12">
+                                <div class="alert alert-warning alert-dismissable">
+                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                    <strong>Atenção!</strong>
+                                    Todos os campos abaixo são necessarios para a criação de uma inscrição no lote selecionado.
+                                </div>
+
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>Nome da coluna</th>
+                                        <th>Descrição</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for entry in required_keys %}
+
+                                        <tr>
+                                            <td>
+                                                <strong>
+
+                                                    {% with entry.csv_keys|first as first_key %}
+                                                        {{ first_key }}
+                                                    {% endwith %}
+
+                                                </strong>
+                                            </td>
+                                            <td>
+                                                {{ entry.description|capfirst }}
+                                            </td>
+                                        </tr>
+
                                     {% endfor %}
-                                </ul>
-                            </h3>
+
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+
                         </div>
+
                     </div>
                 </div>
-
-
             </div>
 
-        {% endif %}
+            {% if preview.invalid_keys|length > 0 %}
+
+                <div class="col-md-6">
+                    <div id="invalid-keys" class="panel panel-danger">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Campos que serão ignorados
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <h3>
+                                    <ul>
+                                        {% for key in  preview.invalid_keys %}
+                                            <li>{{ key|truncatechars:40 }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
 
 
-    </div>
+                </div>
+
+            {% endif %}
+
+
+        </div>
+
+    {% endif %}
 
 {% endblock %}
