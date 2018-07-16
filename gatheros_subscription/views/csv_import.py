@@ -10,7 +10,9 @@ from subscription_importer import (
     KEY_MAP,
     CSVFormIntegrator,
     DataFileTransformer,
+    ColumnValidator,
     MappingNotFoundError,
+    NoValidColumnsError,
 )
 from .subscription import EventViewMixin
 
@@ -155,14 +157,19 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
         preview = None
         denied_reason = None
+        invalid_keys = None
 
         try:
             preview = self.get_preview()
         except UnicodeDecodeError:
             denied_reason = "Não foi possivel decodificar seu arquivo!"
+        except NoValidColumnsError as e:
+            invalid_keys = e.column_validator.invalid_keys
+            denied_reason = "Seu arquivo não possui nenhum campo valido!"
 
         context['preview'] = preview
         context['denied_reason'] = denied_reason
+        context['invalid_keys'] = invalid_keys
 
         return context
 
@@ -187,14 +194,26 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         separator = self.object.separator
         encoding = self.object.encoding
 
-        dict_list = DataFileTransformer(
+        data_transformer = DataFileTransformer(
             file_path=file_path,
             delimiter=delimiter,
             separator=separator,
             encoding=encoding,
-        ).get_dict_list()
-        
+        )
 
+        # Validating columns
+        column_validator = ColumnValidator(data_transformer.get_columns())
+
+        if not column_validator.has_valid():
+            raise NoValidColumnsError(column_validator)
+
+        valid_keys = column_validator.valid_columns
+
+        # Validating lines lines
+        dict_list = data_transformer.get_dict_list(size=50)
+        valid_lines = []
+        for line in dict_list:
+            print('assd')
 
 
 
