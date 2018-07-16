@@ -1,1 +1,1 @@
-from .csv_import_file import CSVImportFile
+from .csv_file_config import CSVFileConfig

@@ -1,6 +1,6 @@
 from django import forms
 
-from csv_importer.models import CSVImportFile
+from csv_importer.models import CSVFileConfig
 from gatheros_subscription.models import Lot
 from gatheros_event.models import Event
 
@@ -9,7 +9,7 @@ class CSVForm(forms.ModelForm):
     event = None
 
     class Meta:
-        model = CSVImportFile
+        model = CSVFileConfig
         fields = [
             'event',
             'separator',
@@ -29,7 +29,7 @@ class CSVFileForm(forms.ModelForm):
     event = None
 
     class Meta:
-        model = CSVImportFile
+        model = CSVFileConfig
         fields = [
             'event',
             'csv_file',
@@ -56,4 +56,3 @@ class CSVFileForm(forms.ModelForm):
             self.fields['lot'].queryset = Lot.objects.filter(
                 event=self.event
             )
-        

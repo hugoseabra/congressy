@@ -28,7 +28,7 @@ def get_err_file_path(instance, filename):
     )
 
 
-class CSVImportFile(models.Model):
+class CSVFileConfig(models.Model):
     ENCODING_UTF8 = "utf-8"
     ENCODING_8859_1 = "iso-8859-1"
 
