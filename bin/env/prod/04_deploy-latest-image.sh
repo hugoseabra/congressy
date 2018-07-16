@@ -38,8 +38,12 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     echo ;
     docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
     echo ;
+    docker-compose -f ~/cgsy/docker-compose.yml logs redis
+    docker-compose -f ~/cgsy/docker-compose.yml logs wkhtmltopdf
+    docker-compose -f ~/cgsy/docker-compose.yml logs migration
+    docker-compose -f ~/cgsy/docker-compose.yml logs volume
+    docker-compose -f ~/cgsy/docker-compose.yml logs cron
     docker-compose -f ~/cgsy/docker-compose.yml logs manage
-    echo ;
     docker-compose -f ~/cgsy/docker-compose.yml logs partner
     echo ;
 

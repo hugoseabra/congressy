@@ -45,8 +45,7 @@ pipeline:
     commands:
       - sh ./bin/env/staging/02_recreate-db-staging.sh
     when:
-      branch:
-        include: [ hotfix/*, release/* ]
+      branch: [ hotfix/*, release/* ]
 
   save-staging-version:
     image: alpine
@@ -74,12 +73,11 @@ pipeline:
     when:
       branch: [ hotfix/*, release/* ]
 
-  deploy-staging-env:
-    image: tmaier/docker-compose
+  create-env-file:
+    image: alpine
     pull: true
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /tmp/cgsy-media:/media
+      - /tmp/staging-files:/tmp/staging-files
     secrets: [
       aws_key,
       aws_secret,
@@ -96,22 +94,33 @@ pipeline:
       sentry_private_dsn
     ]
     commands:
-      - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.staging" > ./bin/env/staging/env-manage-staging
-      - echo "AWS_KEY=$${AWS_KEY}" >> ./bin/env/staging/env-manage-staging
-      - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/staging/env-manage-staging
-      - echo "DOMAIN=$${DOMAIN_STAGING}" >> ./bin/env/staging/env-manage-staging
-      - echo "FORCE_HTTPS=$${FORCE_HTTPS_STAGING}" >> ./bin/env/staging/env-manage-staging
-      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ./bin/env/staging/env-manage-staging
-      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ./bin/env/staging/env-manage-staging
-      - echo "DBHOST=$${DBHOST_STAGING}" >> ./bin/env/staging/env-manage-staging
-      - echo "DBUSER=$${DBUSER_STAGING}" >> ./bin/env/staging/env-manage-staging
-      - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-manage-staging
-      - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-manage-staging
-      - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-manage-staging
-      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ./bin/env/staging/env-manage-staging
-      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ./bin/env/staging/env-manage-staging
+      - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.staging" > /tmp/staging-files/env-manage-staging
+      - echo "AWS_KEY=$${AWS_KEY}" >> /tmp/staging-files/env-manage-staging
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> /tmp/staging-files/env-manage-staging
+      - echo "DOMAIN=$${DOMAIN_STAGING}" >> /tmp/staging-files/env-manage-staging
+      - echo "FORCE_HTTPS=$${FORCE_HTTPS_STAGING}" >> /tmp/staging-files/env-manage-staging
+      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> /tmp/staging-files/env-manage-staging
+      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> /tmp/staging-files/env-manage-staging
+      - echo "DBHOST=$${DBHOST_STAGING}" >> /tmp/staging-files/env-manage-staging
+      - echo "DBUSER=$${DBUSER_STAGING}" >> /tmp/staging-files/env-manage-staging
+      - echo "DBPASS=$${DBPASS_STAGING}" >> /tmp/staging-files/env-manage-staging
+      - echo "DBNAME=$${DBNAME_STAGING}" >> /tmp/staging-files/env-manage-staging
+      - echo "DBPORT=$${DBPORT_STAGING}" >> /tmp/staging-files/env-manage-staging
+      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> /tmp/staging-files/env-manage-staging
+      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> /tmp/staging-files/env-manage-staging
+    when:
+      branch: [ hotfix/*, release/* ]
+
+  deploy-staging-env:
+    image: tmaier/docker-compose
+    pull: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /media:/var/www/cgsy/media
+      - /tmp/staging-files:/tmp/staging-files
+    commands:
       - sh ./bin/env/staging/03_start-cgsy-staging.sh
-      - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
+      - docker system prune -a -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
     when:
       branch: [ hotfix/*, release/* ]
 
@@ -290,7 +299,7 @@ pipeline:
 
       - mkdir -p ~/cgsy
       # env-file do stack de produção - common
-      - echo "AWS_KEY=$${AWS_KEY}" >> ~/cgsy/env-file
+      - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
       - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> ~/cgsy/env-file
       - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ~/cgsy/env-file

@@ -272,6 +272,11 @@ class Event(models.Model, GatherosModelMixin):
         verbose_name='permitir importação via csv',
     )
 
+    allow_boleto_expiration_on_lot_expiration = models.BooleanField(
+        default=False,
+        verbose_name='vencimento dos boletos na da data de vencimento dos lotes',
+    )
+
     class Meta:
         verbose_name = 'evento'
         verbose_name_plural = 'eventos'

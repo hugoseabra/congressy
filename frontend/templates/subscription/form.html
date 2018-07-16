@@ -82,7 +82,7 @@
 {% endblock %}
 
 {% block content %}
-    <form action="" method="post" class="" name="subscription_form">
+    <form action="" method="post" class="skip-submition-check" name="subscription_form">
         {% csrf_token %}
 
         {% if form.non_field_errors %}

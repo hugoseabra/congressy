@@ -1,5 +1,6 @@
 import os
 import uuid
+from datetime import timedelta
 from decimal import Decimal
 
 import absoluteuri
@@ -33,6 +34,7 @@ class PagarmeDataBuilder:
         self.debt_items = {}
         self.debt_amount = Decimal(0)
         self.liquid_amount = Decimal(0)
+        self.has_expiration_date = False
 
         lot = subscription.lot
         self.metadata_items = {
@@ -74,6 +76,8 @@ class PagarmeDataBuilder:
 
     def build(self, amount, transaction_type, installments=1, card_hash=None):
 
+        lot = self.subscription.lot
+
         self._check_transaction_type(transaction_type, card_hash)
         self._check_debts(amount, installments)
 
@@ -88,6 +92,8 @@ class PagarmeDataBuilder:
             'api_key': settings.PAGARME_API_KEY,
             'transaction_id': transaction_id,
             'postback_url': postback_url,
+            # 13 caracteres
+            'soft_descriptor': lot.event.organization.name[:13],
             'amount': self.as_payment_format(amount),
             'liquid_amount': self.as_payment_format(self.liquid_amount),
             'price': self.as_payment_format(amount),
@@ -97,6 +103,34 @@ class PagarmeDataBuilder:
             "items": [item for id, item in self.debt_items.items()],
             "split_rules": self._create_split_rules(amount, installments),
         }
+
+        if transaction_type == Transaction.BOLETO:
+            # TOTAL: 255 caracteres
+            # Instrução 1: 111 caracteres
+            instructions = 'Após o vencimento não há garantia de que o' \
+                            ' Lote estará disponível. Isso pode mudar o' \
+                            ' preço de sua inscrição.'
+
+            # Instrução 2: 97 caracteres
+            instructions += ' IMPORTANTE: após 3 dias de vencimento do' \
+                            ' boleto, sua vaga será liberada para outro' \
+                            ' participante.'
+
+            # Instrução 3: 47 caracteres
+            instructions += 'Ev.: {}. Lote: {}. Insc.: {}.'.format(
+                self.subscription.event.name[:8],
+                self.subscription.lot.name[:8],
+                self.subscription.code, # 8 caracteres
+            )
+
+            data['boleto_instructions'] = instructions
+
+            if subscription.event.allow_boleto_expiration_on_lot_expiration:
+                # Pagarme sets to one day before, so we set one day forward.
+                next_day = lot.date_end + timedelta(days=1)
+                exp_date = next_day.strftime('%Y-%m-%d')
+
+                data['boleto_expiration_date'] = exp_date
 
         if transaction_type == Transaction.CREDIT_CARD:
             data['card_hash'] = card_hash
@@ -109,8 +143,12 @@ class PagarmeDataBuilder:
             'name': person.name,
             'type': 'individual',
             'email': person.email,
-            'birthday': person.birth_date.strftime('%Y-%m-%d'),
         }
+
+        if person.birth_date:
+            data['customer'].update({
+                'birthday': person.birth_date.strftime('%Y-%m-%d')
+            })
 
         if is_brazil is True:
             data['customer'].update({
