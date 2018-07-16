@@ -7,12 +7,12 @@ from django.views import generic
 from csv_importer.forms import CSVFileForm
 from csv_importer.models import CSVFileConfig
 from subscription_importer import (
-    KEY_MAP,
     CSVFormIntegrator,
     DataFileTransformer,
     ColumnValidator,
-    MappingNotFoundError,
+    LineKeyValidator,
     NoValidColumnsError,
+    NoValidLinesError,
 )
 from .subscription import EventViewMixin
 
@@ -160,12 +160,20 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         invalid_keys = None
 
         try:
-            preview = self.get_preview()
+            full_preview = self.get_preview()
+
+            if len(full_preview['invalid_keys']) > 0:
+                invalid_keys = full_preview['invalid_keys']
+
+            preview = full_preview['table']
+
         except UnicodeDecodeError:
             denied_reason = "Não foi possivel decodificar seu arquivo!"
         except NoValidColumnsError as e:
             invalid_keys = e.column_validator.invalid_keys
-            denied_reason = "Seu arquivo não possui nenhum campo valido!"
+            denied_reason = "Seu arquivo não possui nenhum campo válido!"
+        except NoValidLinesError:
+            denied_reason = "Seu arquivo não possui nenhuma linha válida"
 
         context['preview'] = preview
         context['denied_reason'] = denied_reason
@@ -174,18 +182,8 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         return context
 
     def get_required_keys(self) -> list:
-        required_keys_mapping = []
         lot_pk = self.object.lot.pk
-
-        required_keys_list = CSVFormIntegrator(lot_pk).get_required_keys()
-
-        for key in required_keys_list:
-            mapping = KEY_MAP.get(key, None)
-            if mapping is None:
-                raise MappingNotFoundError(key)
-            required_keys_mapping.append(mapping)
-
-        return required_keys_mapping
+        return CSVFormIntegrator(lot_pk).get_required_keys()
 
     def get_preview(self) -> dict:
 
@@ -201,6 +199,8 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
             encoding=encoding,
         )
 
+        # TODO: maybe move all this to a separate class 'preview maker'
+
         # Validating columns
         column_validator = ColumnValidator(data_transformer.get_columns())
 
@@ -213,8 +213,38 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         dict_list = data_transformer.get_dict_list(size=50)
         valid_lines = []
         for line in dict_list:
-            print('assd')
 
+            validator = LineKeyValidator(
+                line=line,
+                valid_keys=valid_keys, 
+            )
+
+            if validator.is_valid():
+                valid_lines.append(line)
+
+        if len(valid_lines) == 0:
+            raise NoValidLinesError()
+
+        
+        # NOTE to start from: we have a dilema, we must match valid_keys with
+        # there apropriate line value from valid_lines
+
+        table_heading = ''
+        table_body = ''
+
+        for key in valid_keys:
+            table_heading += '<th>' + key.title() + '</th>'
+
+
+
+        table = '<table class="table"><thead><tr>' + \
+                table_heading + '</tr></thead><tbody>' + table_body + \
+                '</tbody></table>'
+
+        return {
+            'table': table,
+            'invalid_keys': column_validator.invalid_columns,
+        }
 
 
 
