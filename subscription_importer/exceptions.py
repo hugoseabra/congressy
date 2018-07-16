@@ -26,6 +26,10 @@ class NoValidColumnsError(Exception):
         super().__init__(*args, **kwargs)
 
 
+class NoValidLinesError(Exception):
+    pass
+
+
 class MappingNotFoundError(Exception):
     def __init__(self, key, *args: object, **kwargs: object) -> None:
         self.message = '{} not found'.format(key)
