@@ -18,13 +18,13 @@ class DataFileTransformer(object):
 
         super().__init__()
 
-    def get_dict_list(self) -> list:
+    def get_dict_list(self, size: int = 20) -> list:
         dict_list = []
 
         for line in self.reader:
             dict_list.append(line)
 
-        return dict_list
+        return dict_list[:size]
 
     def get_columns(self) -> list:
         return self.reader.fieldnames
