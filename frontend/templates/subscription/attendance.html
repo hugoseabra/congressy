@@ -172,161 +172,165 @@
             return cookieValue;
         }
 
-        let csrftoken = getCookie('csrftoken');
+        var csrftoken = getCookie('csrftoken');
 
         function create_result_list(res) {
 
+            var row = document.createElement('div');
+            var cols = document.createElement('div');
+            var panel = document.createElement('div');
+            var panel_body = document.createElement('div');
+            var title = document.createElement('h3');
+
+
             if (res.length === 0) {
-                const row = document.createElement('div');
+
                 row.className = 'row res';
-                const cols = document.createElement('div');
                 cols.className = 'col-md-8';
                 row.appendChild(cols);
-                const panel = document.createElement('div');
                 panel.className = 'panel panel-primary';
                 cols.appendChild(panel);
-                const panel_body = document.createElement('div');
+
                 panel_body.className = 'panel-body';
                 panel.appendChild(panel_body);
 
-                const title = document.createElement('h3');
                 $(title).text('Nenhum resultado encontrado.');
                 panel_body.appendChild(title);
 
                 $('#result_list').append(row);
             }
+            else {
+                var i;
+                for (i = 0; i < res.length; i++) {
+                    var s = res[i];
+                    
+                    row.className = 'row res';
+                    cols.className = 'col-md-8';
+                    row.appendChild(cols);
+                    panel.className = 'panel panel-primary';
+                    cols.appendChild(panel);
+                    panel_body.className = 'panel-body';
+                    panel.appendChild(panel_body);
+                    $(title).text('Nome: ' + s['person']['name']);
+                    var email = document.createElement('h3');
+                    $(email).text('Email: ' + s['person']['email']);
+                    var document_id = document.createElement('h3');
+                    document_id.className = 'cpf_field';
+                    if (s['person']['cpf']) {
+                        $(document_id).text('CPF: ' + s['person']['cpf'].replace(/^(\d{3})(\d{3})?(\d{3})?(\d{2})?/, "$1.$2.$3-$4"));
+                    } else if (s['person']['institution_cnpj']) {
+                        $(document_id).text('CNPJ: ' + s['person']['institution_cnpj']
+                            .replace(/\D/g, '')
+                            .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5"));
+                    }
+                    var code = document.createElement('h3');
+                    $(code).text('Código: ' + s['code']);
 
-            for (const s of res) {
-                const row = document.createElement('div');
-                row.className = 'row res';
-                const cols = document.createElement('div');
-                cols.className = 'col-md-8';
-                row.appendChild(cols);
-                const panel = document.createElement('div');
-                panel.className = 'panel panel-primary';
-                cols.appendChild(panel);
-                const panel_body = document.createElement('div');
-                panel_body.className = 'panel-body';
-                panel.appendChild(panel_body);
+                    var check_in = document.createElement('h3s');
+                    var subscription_status = document.createElement('h3s');
+                    var check_in_html = "";
+                    var subscription_status_html = "";
 
-                const title = document.createElement('h3');
-                $(title).text('Nome: ' + s['person']['name']);
-                const email = document.createElement('h3');
-                $(email).text('Email: ' + s['person']['email']);
-                const document_id = document.createElement('h3');
-                document_id.className = 'cpf_field';
-                if (s['person']['cpf']) {
-                    $(document_id).text('CPF: ' + s['person']['cpf'].replace(/^(\d{3})(\d{3})?(\d{3})?(\d{2})?/, "$1.$2.$3-$4"));
-                } else if (s['person']['institution_cnpj']) {
-                    $(document_id).text('CNPJ: ' + s['person']['institution_cnpj']
-                        .replace(/\D/g, '')
-                        .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5"));
+                    var details_url = '';
+
+                    details_url += window.location.origin + '/';
+                    var current_url = new URL(window.location.href);
+                    details_url += current_url.pathname.split('/')[1] + '/';
+                    details_url += current_url.pathname.split('/')[2] + '/';
+                    details_url += current_url.pathname.split('/')[3] + '/';
+                    details_url += current_url.pathname.split('/')[4] + '/';
+
+                    details_url += s['pk'] +
+                        '/payments/?details=1#report_detail_hidden/';
+
+
+                    if (s['status'] === 'canceled') {
+                        subscription_status_html =
+                            "<i class='fas fa-times-circle danger-color'" +
+                            "Inscrição Cancelada: <a target='_blank' href='" + details_url
+                            + "'>Ver " +
+                            "detalhes</a><br/>"
+                    } else if (s['status'] === 'awaiting') {
+                        subscription_status_html =
+                            "<i class='fas fa-exclamation-triangle " +
+                            "warning-color'>" +
+                            "</i> Inscrição pendente: <a target='_blank' href='" + details_url + "'>Ver " +
+                            "detalhes</a><br/>"
+                    }
+
+                    var formatted_cpf = '';
+                    var formatted_cnpj = '';
+
+                    if (s['person']['cpf']) {
+                        formatted_cpf = s['person']['cpf']
+                            .replace(/^(\d{3})(\d{3})?(\d{3})?(\d{2})?/, "$1.$2.$3-$4");
+                    }
+
+                    if (s['person']['institution_cnpj']) {
+                        formatted_cnpj = s['person']['institution_cnpj']
+                            .replace(/\D/g, '')
+                            .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5");
+                    }
+                    if (s['attended']) {
+                        var attended_on = new Date(Date.parse(s['attended_on']));
+                        check_in_html +=
+                            "Status de Check-in: <i class='fas fa-check-circle " +
+                            "success-color'> " + "</i> <br> Realizado ás: " +
+                            attended_on.toLocaleString('pt-BR', {
+                                timeZone:
+                                    'America/Sao_Paulo'
+                            }) + '<br/>' +
+
+
+                            "<button " +
+                            "style='margin-top:5px' class='btn btn-md btn-danger" +
+                            " undo-checkin' " +
+                            "data-name='" + s['person']['name'] + "'" +
+                            "data-email='" + s['person']['email'] + "'" +
+                            "data-document_cpf='" + formatted_cpf + "'" +
+                            "data-document_cnpj='" + formatted_cnpj + "'" +
+                            "data-pk='" + s['pk'] + "'" +
+                            "data-code='" + s['code'] + "'>" +
+                            "Realizar Check-out" +
+                            "</button>";
+                    } else {
+                        check_in_html +=
+                            "Status de Check-in: <i class='fas fa-times-circle" +
+                            " danger-color'></i> Não realizado.<br/>" +
+                            "<button " +
+                            "style='margin-top:5px' class='btn btn-md btn-success do-checkin' " +
+                            "data-name='" + s['person']['name'] + "'" +
+                            "data-email='" + s['person']['email'] + "'" +
+                            "data-document_cpf='" + formatted_cpf + "'" +
+                            "data-document_cnpj='" + formatted_cnpj + "'" +
+                            "data-pk='" + s['pk'] + "'" +
+                            "data-code='" + s['code'] + "'>" +
+                            "Realizar Check-in" +
+                            "</button>";
+                    }
+                    $(check_in).html(check_in_html);
+                    $(subscription_status).html(subscription_status_html);
+                    panel_body.appendChild(title);
+                    panel_body.appendChild(email);
+
+                    if (s['person']['cpf'] || s['person']['institution_cnpj']) {
+                        panel_body.appendChild(document_id);
+                    }
+
+                    panel_body.appendChild(code);
+
+                    if (s['status'] !== 'confirmed') {
+                        panel_body.appendChild(subscription_status);
+                    }
+                    if (s['status'] === 'confirmed') {
+                        panel_body.appendChild(check_in);
+                    }
+                    $('#result_list').append(row);
+
+
                 }
-                const code = document.createElement('h3');
-                $(code).text('Código: ' + s['code']);
-
-                const check_in = document.createElement('h3s');
-                const subscription_status = document.createElement('h3s');
-                let check_in_html = "";
-                let subscription_status_html = "";
-
-                let details_url = '';
-
-                details_url += window.location.origin + '/';
-                const current_url = new URL(window.location.href);
-                details_url += current_url.pathname.split('/')[1] + '/';
-                details_url += current_url.pathname.split('/')[2] + '/';
-                details_url += current_url.pathname.split('/')[3] + '/';
-                details_url += current_url.pathname.split('/')[4] + '/';
-
-                details_url += s['pk'] +
-                    '/payments/?details=1#report_detail_hidden/';
-
-
-                if (s['status'] === 'canceled') {
-                    subscription_status_html =
-                        "<i class='fas fa-times-circle danger-color'" +
-                        "Inscrição Cancelada: <a target='_blank' href='" + details_url
-                        + "'>Ver " +
-                        "detalhes</a><br/>"
-                } else if (s['status'] === 'awaiting') {
-                    subscription_status_html =
-                        "<i class='fas fa-exclamation-triangle " +
-                        "warning-color'>" +
-                        "</i> Inscrição pendente: <a target='_blank' href='" + details_url + "'>Ver " +
-                        "detalhes</a><br/>"
-                }
-
-                let formatted_cpf = '';
-                let formatted_cnpj = '';
-
-                if (s['person']['cpf']) {
-                    formatted_cpf = s['person']['cpf']
-                        .replace(/^(\d{3})(\d{3})?(\d{3})?(\d{2})?/, "$1.$2.$3-$4");
-                }
-
-                if (s['person']['institution_cnpj']) {
-                    formatted_cnpj = s['person']['institution_cnpj']
-                        .replace(/\D/g, '')
-                        .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5");
-                }
-                if (s['attended']) {
-                    const attended_on = new Date(Date.parse(s['attended_on']));
-                    check_in_html +=
-                        "Status de Check-in: <i class='fas fa-check-circle " +
-                        "success-color'> " + "</i> <br> Realizado ás: " +
-                        attended_on.toLocaleString('pt-BR', {
-                            timeZone:
-                                'America/Sao_Paulo'
-                        }) + '<br/>' +
-
-
-                        "<button " +
-                        "style='margin-top:5px' class='btn btn-md btn-danger" +
-                        " undo-checkin' " +
-                        "data-name='" + s['person']['name'] + "'" +
-                        "data-email='" + s['person']['email'] + "'" +
-                        "data-document_cpf='" + formatted_cpf + "'" +
-                        "data-document_cnpj='" + formatted_cnpj + "'" +
-                        "data-pk='" + s['pk'] + "'" +
-                        "data-code='" + s['code'] + "'>" +
-                        "Realizar Check-out" +
-                        "</button>";
-                } else {
-                    check_in_html +=
-                        "Status de Check-in: <i class='fas fa-times-circle" +
-                        " danger-color'></i> Não realizado.<br/>" +
-                        "<button " +
-                        "style='margin-top:5px' class='btn btn-md btn-success do-checkin' " +
-                        "data-name='" + s['person']['name'] + "'" +
-                        "data-email='" + s['person']['email'] + "'" +
-                        "data-document_cpf='" + formatted_cpf + "'" +
-                        "data-document_cnpj='" + formatted_cnpj + "'" +
-                        "data-pk='" + s['pk'] + "'" +
-                        "data-code='" + s['code'] + "'>" +
-                        "Realizar Check-in" +
-                        "</button>";
-                }
-                $(check_in).html(check_in_html);
-                $(subscription_status).html(subscription_status_html);
-                panel_body.appendChild(title);
-                panel_body.appendChild(email);
-
-                if (s['person']['cpf'] || s['person']['institution_cnpj']) {
-                    panel_body.appendChild(document_id);
-                }
-
-                panel_body.appendChild(code);
-
-                if (s['status'] !== 'confirmed') {
-                    panel_body.appendChild(subscription_status);
-                }
-                if (s['status'] === 'confirmed') {
-                    panel_body.appendChild(check_in);
-                }
-                $('#result_list').append(row);
-
             }
+
 
             recreate_events();
 
@@ -338,10 +342,10 @@
             $('.res').remove();
             $('#results').hide();
 
-            const raw_query = $('#searchBarInput').val();
-            let query = '?query=' + raw_query;
+            var raw_query = $('#searchBarInput').val();
+            var query = '?query=' + raw_query;
 
-            const option = document.createElement('option');
+            var option = document.createElement('option');
             option.setAttribute('value', raw_query);
             $('#recent_searches').append(option);
 
@@ -356,18 +360,16 @@
             }).fail(function (err) {
                 console.error(err);
             });
-
-            return
         }
 
         function recreate_events() {
 
-            const check_in_modal_trigger = $('.do-checkin');
-            const check_out_modal_trigger = $('.undo-checkin');
-            const check_in_btn = $('#check_in_btn');
-            const check_out_btn = $('#check_out_btn');
-            const check_in_modal = $('#check_in_modal');
-            const check_out_modal = $('#check_out_modal');
+            var check_in_modal_trigger = $('.do-checkin');
+            var check_out_modal_trigger = $('.undo-checkin');
+            var check_in_btn = $('#check_in_btn');
+            var check_out_btn = $('#check_out_btn');
+            var check_in_modal = $('#check_in_modal');
+            var check_out_modal = $('#check_out_modal');
 
             check_in_modal_trigger.unbind('click');
             check_out_modal_trigger.unbind('click');
@@ -406,10 +408,10 @@
             });
             check_in_btn.on('click', function () {
                 check_in_modal.modal('hide');
-                const formData = new FormData();
-                const pk = $('#confirmPk').val();
-                const current_url = new URL(window.location.href);
-                let url = '';
+                var formData = new FormData();
+                var pk = $('#confirmPk').val();
+                var current_url = new URL(window.location.href);
+                var url = '';
 
                 url += window.location.origin + '/';
                 url += current_url.pathname.split('/')[1] + '/';
@@ -420,7 +422,7 @@
                 url += pk + '/check-in';
 
                 formData.append('attended', true);
-                let now = moment(new Date()).format('YYYY-MM-DD HH:mm');
+                var now = moment(new Date()).format('YYYY-MM-DD HH:mm');
                 formData.append('attended_on', now);
 
 
@@ -454,10 +456,10 @@
             });
             check_out_btn.on('click', function () {
                 check_out_modal.modal('hide');
-                const formData = new FormData();
-                const pk = $('#unconfirmPk').val();
-                const current_url = new URL(window.location.href);
-                let url = '';
+                var formData = new FormData();
+                var pk = $('#unconfirmPk').val();
+                var current_url = new URL(window.location.href);
+                var url = '';
 
                 url += window.location.origin + '/';
                 url += current_url.pathname.split('/')[1] + '/';
@@ -539,14 +541,13 @@
                     <input type="hidden" id="confirmPk"/>
 
 
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger"
                             data-dismiss="modal">Fechar
                     </button>
                     <button type="button" class="btn btn-success"
-                             id="check_in_btn">
+                            id="check_in_btn">
                         Confirmar!
                     </button>
                 </div>
@@ -587,11 +588,10 @@
                     <input type="hidden" id="unconfirmPk"/>
 
 
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success"
-                             id="check_out_btn">
+                            id="check_out_btn">
                         Confirmar!
                     </button>
                     <button type="button" class="btn btn-danger"
