@@ -24,15 +24,21 @@ class SubscriptionSearchViewSet(generics.ListAPIView):
     def get_queryset(self):
         event_pk = self.kwargs.get('event_pk')
         if self.query is not None and self.query != '':
+
+            # All subscriptions in the event
             queryset = Subscription.objects.filter(event=event_pk)
+
+            # Filter by name
             name_query = queryset.filter(person__name__icontains=self.query)
             if name_query.count() > 0:
                 return name_query[:15]
 
+            # Filter by email
             email_query = queryset.filter(person__email__icontains=self.query)
             if email_query.count() > 0:
                 return email_query[:15]
 
+            # Fetch by subscription code
             try:
                 return [queryset.get(code=self.query.upper())]
             except Subscription.DoesNotExist:
