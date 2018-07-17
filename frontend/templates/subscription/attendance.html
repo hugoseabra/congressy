@@ -177,19 +177,21 @@
         function create_result_list(res) {
 
             if (res.length === 0) {
-                const row = document.createElement('div');
+                var row = document.createElement('div');
+                var cols = document.createElement('div');
+                var panel_body = document.createElement('div');
+                var panel = document.createElement('div');
+                var title = document.createElement('h3');
+
                 row.className = 'row res';
-                const cols = document.createElement('div');
                 cols.className = 'col-md-8';
-                row.appendChild(cols);
-                const panel = document.createElement('div');
                 panel.className = 'panel panel-primary';
-                cols.appendChild(panel);
-                const panel_body = document.createElement('div');
                 panel_body.className = 'panel-body';
+
+                row.appendChild(cols);
+                cols.appendChild(panel);
                 panel.appendChild(panel_body);
 
-                const title = document.createElement('h3');
                 $(title).text('Nenhum resultado encontrado.');
                 panel_body.appendChild(title);
 
@@ -235,7 +237,7 @@
                 var details_url = '';
 
                 details_url += window.location.origin + '/';
-                const current_url = new URL(window.location.href);
+                var current_url = new URL(window.location.href);
                 details_url += current_url.pathname.split('/')[1] + '/';
                 details_url += current_url.pathname.split('/')[2] + '/';
                 details_url += current_url.pathname.split('/')[3] + '/';
@@ -273,7 +275,7 @@
                         .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5");
                 }
                 if (s['attended']) {
-                    const attended_on = new Date(Date.parse(s['attended_on']));
+                    var attended_on = new Date(Date.parse(s['attended_on']));
                     check_in_html +=
                         "Status de Check-in: <i class='fas fa-check-circle " +
                         "success-color'> " + "</i> <br> Realizado ás: " +
