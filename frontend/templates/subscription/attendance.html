@@ -210,6 +210,7 @@
                 var email = document.createElement('h3');
                 var document_id = document.createElement('h3');
                 var code = document.createElement('h3');
+                var event_count = document.createElement('h3');
                 var check_in = document.createElement('h3s');
                 var subscription_status = document.createElement('h3s');
 
@@ -226,6 +227,8 @@
                 $(title).text('Nome: ' + s['person']['name']);
                 $(email).text('Email: ' + s['person']['email']);
                 $(code).text('Código: ' + s['code']);
+                $(event_count).text('Número geral de Inscrição: ' + s['event_count']);
+
 
                 if (s['person']['cpf']) {
                     $(document_id).text('CPF: ' + s['person']['cpf'].replace(/^(\d{3})(\d{3})?(\d{3})?(\d{2})?/, "$1.$2.$3-$4"));
@@ -279,6 +282,7 @@
                         .replace(/\D/g, '')
                         .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5");
                 }
+
                 if (s['attended']) {
                     var attended_on = new Date(Date.parse(s['attended_on']));
                     check_in_html +=
@@ -326,6 +330,7 @@
                 }
 
                 panel_body.appendChild(code);
+                panel_body.appendChild(event_count);
 
                 if (s['status'] !== 'confirmed') {
                     panel_body.appendChild(subscription_status);
