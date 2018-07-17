@@ -9,7 +9,7 @@ from csv_importer.models import CSVFileConfig
 from subscription_importer import (
     CSVFormIntegrator,
     DataFileTransformer,
-    ColumnValidator,
+    HeaderNormalizer,
     LineKeyValidator,
     NoValidColumnsError,
     NoValidLinesError,
@@ -201,13 +201,13 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
         # TODO: maybe move all this to a separate class 'preview maker'
 
-        # Validating columns
-        column_validator = ColumnValidator(data_transformer.get_header())
+        # Normalize headers
+        header = HeaderNormalizer(data_transformer.get_header())
 
-        if not column_validator.has_valid():
-            raise NoValidColumnsError(column_validator)
+        if not header.has_valid():
+            raise NoValidColumnsError(header)
 
-        valid_keys = column_validator.valid_columns
+        valid_header_keys = header.keys
 
         # Validating lines lines
         dict_list = data_transformer.get_lines(size=50)
@@ -216,7 +216,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
             validator = LineKeyValidator(
                 line=line,
-                valid_keys=valid_keys, 
+                valid_keys=valid_header_keys,
             )
 
             if validator.is_valid():
@@ -225,17 +225,14 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         if len(valid_lines) == 0:
             raise NoValidLinesError()
 
-        
-        # NOTE to start from: we have a dilema, we must match valid_keys with
+        # NOTE: to start from: we have a dilema, we must match valid_keys with
         # there appropriate line value from valid_lines
 
         table_heading = ''
         table_body = ''
 
-        for key in valid_keys:
+        for key in valid_header_keys:
             table_heading += '<th>' + key.title() + '</th>'
-
-
 
         table = '<table class="table"><thead><tr>' + \
                 table_heading + '</tr></thead><tbody>' + table_body + \
@@ -243,7 +240,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
         return {
             'table': table,
-            'invalid_keys': column_validator.invalid_columns,
+            'invalid_keys': header.invalid_keys,
         }
 
 

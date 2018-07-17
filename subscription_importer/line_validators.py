@@ -1,16 +1,20 @@
 import abc
 
 from gatheros_subscription.models import Lot
+from collections import OrderedDict
 
 
-class ValidatorMixin(object):
+class DataError(object):
+    """
+        Define uma maneira de como os dados são verificados e validados,
+        coletando os possiveis erross
+    """
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self,line: dict) -> None:
+    def __init__(self, data: OrderedDict) -> None:
         self.errors = {}
         self.valid = False
-        self.line = line
-        super().__init__()
+        self.data = data
 
     @abc.abstractmethod
     def is_valid(self):
@@ -19,8 +23,14 @@ class ValidatorMixin(object):
     def get_errors(self):
         return self.errors
 
+    def add_error(self, key, error):
+        if key not in self.errors:
+            self.errors[key] = []
 
-class LineDataIntegrityValidator(ValidatorMixin):
+        self.errors[key].append(error)
+
+
+class DataValueIntegrityValidator(DataError):
 
     def __init__(self,
                  lot_pk: int,
@@ -31,13 +41,12 @@ class LineDataIntegrityValidator(ValidatorMixin):
         self.lot = Lot.objects.get(pk=lot_pk)
         super().__init__(*args, **kwargs)
 
-
     def is_valid(self):
         # TODO implement clean logic here
         return self.valid
 
 
-class LineKeyValidator(ValidatorMixin):
+class LineKeyValidator(DataError):
 
     def __init__(self, valid_keys: list, *args, **kwargs) -> None:
         self.valid_keys = valid_keys
@@ -63,4 +72,19 @@ class LineKeyValidator(ValidatorMixin):
 
         self.valid = True
         return self.valid
+
+
+class DataErrorManager(object):
+    """
+        Gerencia a sequencia de validações de uma coleção de dados a serem
+        processados
+    """
+    def __init__(self, valid_keys: list, data: OrderedDict) -> None:
+        self.errors = {}
+        self.valid = False
+        self.data = data
+
+
+
+
 

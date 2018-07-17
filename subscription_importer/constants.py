@@ -1,3 +1,6 @@
+def force11digits(string: str):
+    return string
+
 KEY_MAP = {
     'name': {
         'verbose_name': 'nome',
@@ -16,6 +19,7 @@ KEY_MAP = {
         'description': 'documento CPF do participante',
         'csv_keys': ['cpf'],
         'possible_values': [],
+        'normalizers': [force11digits]
     },
     'phone': {
         'verbose_name': 'telefone',

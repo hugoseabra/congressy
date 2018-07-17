@@ -1,4 +1,4 @@
-from .column_validator import ColumnValidator
+from .header_normalizer import HeaderNormalizer
 
 
 class DataColumnError(Exception):
@@ -19,10 +19,10 @@ class NoValidColumnsError(Exception):
 
     def __init__(
             self,
-            column_validator: ColumnValidator,
+            header_normalizer: HeaderNormalizer,
             *args: object,
             **kwargs: object) -> None:
-        self.column_validator = column_validator
+        self.header_normalizer = header_normalizer
         super().__init__(*args, **kwargs)
 
 
