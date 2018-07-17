@@ -177,48 +177,56 @@
         function create_result_list(res) {
 
             if (res.length === 0) {
-                var row = document.createElement('div');
-                var cols = document.createElement('div');
-                var panel_body = document.createElement('div');
-                var panel = document.createElement('div');
-                var title = document.createElement('h3');
+                var empty_row = document.createElement('div');
+                var empty_cols = document.createElement('div');
+                var empty_panel_body = document.createElement('div');
+                var empty_panel = document.createElement('div');
+                var empty_title = document.createElement('h3');
 
-                row.className = 'row res';
-                cols.className = 'col-md-8';
-                panel.className = 'panel panel-primary';
-                panel_body.className = 'panel-body';
+                empty_row.className = 'row res';
+                empty_cols.className = 'col-md-8';
+                empty_panel.className = 'panel panel-primary';
+                empty_panel_body.className = 'panel-body';
 
-                row.appendChild(cols);
-                cols.appendChild(panel);
-                panel.appendChild(panel_body);
+                empty_row.appendChild(empty_cols);
+                empty_cols.appendChild(empty_panel);
+                empty_panel.appendChild(empty_panel_body);
 
-                $(title).text('Nenhum resultado encontrado.');
-                panel_body.appendChild(title);
+                $(empty_title).text('Nenhum resultado encontrado.');
+                empty_panel_body.appendChild(empty_title);
 
-                $('#result_list').append(row);
+                $('#result_list').append(empty_row);
             }
 
             var i;
             for (i = 0; i < res.length; i++) {
                 var s = res[i];
-                const row = document.createElement('div');
+
+                var row = document.createElement('div');
+                var cols = document.createElement('div');
+                var panel = document.createElement('div');
+                var panel_body = document.createElement('div');
+                var title = document.createElement('h3');
+                var email = document.createElement('h3');
+                var document_id = document.createElement('h3');
+                var code = document.createElement('h3');
+                var check_in = document.createElement('h3s');
+                var subscription_status = document.createElement('h3s');
+
                 row.className = 'row res';
-                const cols = document.createElement('div');
                 cols.className = 'col-md-8';
-                row.appendChild(cols);
-                const panel = document.createElement('div');
-                panel.className = 'panel panel-primary';
-                cols.appendChild(panel);
-                const panel_body = document.createElement('div');
                 panel_body.className = 'panel-body';
+                panel.className = 'panel panel-primary';
+                document_id.className = 'cpf_field';
+                
+                cols.appendChild(panel);
+                row.appendChild(cols);
                 panel.appendChild(panel_body);
 
-                const title = document.createElement('h3');
                 $(title).text('Nome: ' + s['person']['name']);
-                const email = document.createElement('h3');
                 $(email).text('Email: ' + s['person']['email']);
-                const document_id = document.createElement('h3');
-                document_id.className = 'cpf_field';
+                $(code).text('Código: ' + s['code']);
+
                 if (s['person']['cpf']) {
                     $(document_id).text('CPF: ' + s['person']['cpf'].replace(/^(\d{3})(\d{3})?(\d{3})?(\d{2})?/, "$1.$2.$3-$4"));
                 } else if (s['person']['institution_cnpj']) {
@@ -226,11 +234,6 @@
                         .replace(/\D/g, '')
                         .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5"));
                 }
-                const code = document.createElement('h3');
-                $(code).text('Código: ' + s['code']);
-
-                const check_in = document.createElement('h3s');
-                const subscription_status = document.createElement('h3s');
                 var check_in_html = "";
                 var subscription_status_html = "";
 
