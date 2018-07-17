@@ -196,7 +196,9 @@
                 $('#result_list').append(row);
             }
 
-            for (const s of res) {
+            var i;
+            for (i = 0; i < res.length; i++) {
+                var s = res[i];
                 const row = document.createElement('div');
                 row.className = 'row res';
                 const cols = document.createElement('div');
@@ -326,7 +328,9 @@
                 }
                 $('#result_list').append(row);
 
+
             }
+
 
             recreate_events();
 
@@ -338,10 +342,10 @@
             $('.res').remove();
             $('#results').hide();
 
-            const raw_query = $('#searchBarInput').val();
+            var raw_query = $('#searchBarInput').val();
             var query = '?query=' + raw_query;
 
-            const option = document.createElement('option');
+            var option = document.createElement('option');
             option.setAttribute('value', raw_query);
             $('#recent_searches').append(option);
 
@@ -357,17 +361,16 @@
                 console.error(err);
             });
 
-            return
         }
 
         function recreate_events() {
 
-            const check_in_modal_trigger = $('.do-checkin');
-            const check_out_modal_trigger = $('.undo-checkin');
-            const check_in_btn = $('#check_in_btn');
-            const check_out_btn = $('#check_out_btn');
-            const check_in_modal = $('#check_in_modal');
-            const check_out_modal = $('#check_out_modal');
+            var check_in_modal_trigger = $('.do-checkin');
+            var check_out_modal_trigger = $('.undo-checkin');
+            var check_in_btn = $('#check_in_btn');
+            var check_out_btn = $('#check_out_btn');
+            var check_in_modal = $('#check_in_modal');
+            var check_out_modal = $('#check_out_modal');
 
             check_in_modal_trigger.unbind('click');
             check_out_modal_trigger.unbind('click');
@@ -406,9 +409,9 @@
             });
             check_in_btn.on('click', function () {
                 check_in_modal.modal('hide');
-                const formData = new FormData();
-                const pk = $('#confirmPk').val();
-                const current_url = new URL(window.location.href);
+                var formData = new FormData();
+                var pk = $('#confirmPk').val();
+                var current_url = new URL(window.location.href);
                 var url = '';
 
                 url += window.location.origin + '/';
@@ -454,9 +457,9 @@
             });
             check_out_btn.on('click', function () {
                 check_out_modal.modal('hide');
-                const formData = new FormData();
-                const pk = $('#unconfirmPk').val();
-                const current_url = new URL(window.location.href);
+                var formData = new FormData();
+                var pk = $('#unconfirmPk').val();
+                var current_url = new URL(window.location.href);
                 var url = '';
 
                 url += window.location.origin + '/';
@@ -539,14 +542,13 @@
                     <input type="hidden" id="confirmPk"/>
 
 
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger"
                             data-dismiss="modal">Fechar
                     </button>
                     <button type="button" class="btn btn-success"
-                             id="check_in_btn">
+                            id="check_in_btn">
                         Confirmar!
                     </button>
                 </div>
@@ -587,11 +589,10 @@
                     <input type="hidden" id="unconfirmPk"/>
 
 
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success"
-                             id="check_out_btn">
+                            id="check_out_btn">
                         Confirmar!
                     </button>
                     <button type="button" class="btn btn-danger"
