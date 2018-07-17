@@ -26,7 +26,11 @@ class SubscriptionSearchViewSet(generics.ListAPIView):
         if self.query is not None and self.query != '':
 
             # All subscriptions in the event
-            queryset = Subscription.objects.filter(event=event_pk)
+            queryset = Subscription.objects.filter(
+                event=event_pk,
+                completed=True,
+                test_subscription=False,
+            )
 
             # Fetch by event code
             if self.query.isdigit():
