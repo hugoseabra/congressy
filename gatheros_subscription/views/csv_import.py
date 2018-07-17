@@ -227,7 +227,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
         
         # NOTE to start from: we have a dilema, we must match valid_keys with
-        # there apropriate line value from valid_lines
+        # there appropriate line value from valid_lines
 
         table_heading = ''
         table_body = ''
