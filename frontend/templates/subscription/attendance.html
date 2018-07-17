@@ -172,49 +172,61 @@
             return cookieValue;
         }
 
-        let csrftoken = getCookie('csrftoken');
+        var csrftoken = getCookie('csrftoken');
 
         function create_result_list(res) {
 
             if (res.length === 0) {
-                const row = document.createElement('div');
-                row.className = 'row res';
-                const cols = document.createElement('div');
-                cols.className = 'col-md-8';
-                row.appendChild(cols);
-                const panel = document.createElement('div');
-                panel.className = 'panel panel-primary';
-                cols.appendChild(panel);
-                const panel_body = document.createElement('div');
-                panel_body.className = 'panel-body';
-                panel.appendChild(panel_body);
+                var empty_row = document.createElement('div');
+                var empty_cols = document.createElement('div');
+                var empty_panel_body = document.createElement('div');
+                var empty_panel = document.createElement('div');
+                var empty_title = document.createElement('h3');
 
-                const title = document.createElement('h3');
-                $(title).text('Nenhum resultado encontrado.');
-                panel_body.appendChild(title);
+                empty_row.className = 'row res';
+                empty_cols.className = 'col-md-8';
+                empty_panel.className = 'panel panel-primary';
+                empty_panel_body.className = 'panel-body';
 
-                $('#result_list').append(row);
+                empty_row.appendChild(empty_cols);
+                empty_cols.appendChild(empty_panel);
+                empty_panel.appendChild(empty_panel_body);
+
+                $(empty_title).text('Nenhum resultado encontrado.');
+                empty_panel_body.appendChild(empty_title);
+
+                $('#result_list').append(empty_row);
             }
 
-            for (const s of res) {
-                const row = document.createElement('div');
+            var i;
+            for (i = 0; i < res.length; i++) {
+                var s = res[i];
+
+                var row = document.createElement('div');
+                var cols = document.createElement('div');
+                var panel = document.createElement('div');
+                var panel_body = document.createElement('div');
+                var title = document.createElement('h3');
+                var email = document.createElement('h3');
+                var document_id = document.createElement('h3');
+                var code = document.createElement('h3');
+                var check_in = document.createElement('h3s');
+                var subscription_status = document.createElement('h3s');
+
                 row.className = 'row res';
-                const cols = document.createElement('div');
                 cols.className = 'col-md-8';
-                row.appendChild(cols);
-                const panel = document.createElement('div');
-                panel.className = 'panel panel-primary';
-                cols.appendChild(panel);
-                const panel_body = document.createElement('div');
                 panel_body.className = 'panel-body';
+                panel.className = 'panel panel-primary';
+                document_id.className = 'cpf_field';
+                
+                cols.appendChild(panel);
+                row.appendChild(cols);
                 panel.appendChild(panel_body);
 
-                const title = document.createElement('h3');
                 $(title).text('Nome: ' + s['person']['name']);
-                const email = document.createElement('h3');
                 $(email).text('Email: ' + s['person']['email']);
-                const document_id = document.createElement('h3');
-                document_id.className = 'cpf_field';
+                $(code).text('Código: ' + s['code']);
+
                 if (s['person']['cpf']) {
                     $(document_id).text('CPF: ' + s['person']['cpf'].replace(/^(\d{3})(\d{3})?(\d{3})?(\d{2})?/, "$1.$2.$3-$4"));
                 } else if (s['person']['institution_cnpj']) {
@@ -222,18 +234,15 @@
                         .replace(/\D/g, '')
                         .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5"));
                 }
-                const code = document.createElement('h3');
-                $(code).text('Código: ' + s['code']);
 
-                const check_in = document.createElement('h3s');
-                const subscription_status = document.createElement('h3s');
-                let check_in_html = "";
-                let subscription_status_html = "";
-
-                let details_url = '';
+                var check_in_html = "";
+                var subscription_status_html = "";
+                var details_url = '';
 
                 details_url += window.location.origin + '/';
-                const current_url = new URL(window.location.href);
+
+                var current_url = new URL(window.location.href);
+
                 details_url += current_url.pathname.split('/')[1] + '/';
                 details_url += current_url.pathname.split('/')[2] + '/';
                 details_url += current_url.pathname.split('/')[3] + '/';
@@ -257,8 +266,8 @@
                         "detalhes</a><br/>"
                 }
 
-                let formatted_cpf = '';
-                let formatted_cnpj = '';
+                var formatted_cpf = '';
+                var formatted_cnpj = '';
 
                 if (s['person']['cpf']) {
                     formatted_cpf = s['person']['cpf']
@@ -271,7 +280,7 @@
                         .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5");
                 }
                 if (s['attended']) {
-                    const attended_on = new Date(Date.parse(s['attended_on']));
+                    var attended_on = new Date(Date.parse(s['attended_on']));
                     check_in_html +=
                         "Status de Check-in: <i class='fas fa-check-circle " +
                         "success-color'> " + "</i> <br> Realizado ás: " +
@@ -326,7 +335,9 @@
                 }
                 $('#result_list').append(row);
 
+
             }
+
 
             recreate_events();
 
@@ -338,10 +349,10 @@
             $('.res').remove();
             $('#results').hide();
 
-            const raw_query = $('#searchBarInput').val();
-            let query = '?query=' + raw_query;
+            var raw_query = $('#searchBarInput').val();
+            var query = '?query=' + raw_query;
 
-            const option = document.createElement('option');
+            var option = document.createElement('option');
             option.setAttribute('value', raw_query);
             $('#recent_searches').append(option);
 
@@ -357,17 +368,16 @@
                 console.error(err);
             });
 
-            return
         }
 
         function recreate_events() {
 
-            const check_in_modal_trigger = $('.do-checkin');
-            const check_out_modal_trigger = $('.undo-checkin');
-            const check_in_btn = $('#check_in_btn');
-            const check_out_btn = $('#check_out_btn');
-            const check_in_modal = $('#check_in_modal');
-            const check_out_modal = $('#check_out_modal');
+            var check_in_modal_trigger = $('.do-checkin');
+            var check_out_modal_trigger = $('.undo-checkin');
+            var check_in_btn = $('#check_in_btn');
+            var check_out_btn = $('#check_out_btn');
+            var check_in_modal = $('#check_in_modal');
+            var check_out_modal = $('#check_out_modal');
 
             check_in_modal_trigger.unbind('click');
             check_out_modal_trigger.unbind('click');
@@ -406,10 +416,10 @@
             });
             check_in_btn.on('click', function () {
                 check_in_modal.modal('hide');
-                const formData = new FormData();
-                const pk = $('#confirmPk').val();
-                const current_url = new URL(window.location.href);
-                let url = '';
+                var formData = new FormData();
+                var pk = $('#confirmPk').val();
+                var current_url = new URL(window.location.href);
+                var url = '';
 
                 url += window.location.origin + '/';
                 url += current_url.pathname.split('/')[1] + '/';
@@ -420,7 +430,7 @@
                 url += pk + '/check-in';
 
                 formData.append('attended', true);
-                let now = moment(new Date()).format('YYYY-MM-DD HH:mm');
+                var now = moment(new Date()).format('YYYY-MM-DD HH:mm');
                 formData.append('attended_on', now);
 
 
@@ -454,10 +464,10 @@
             });
             check_out_btn.on('click', function () {
                 check_out_modal.modal('hide');
-                const formData = new FormData();
-                const pk = $('#unconfirmPk').val();
-                const current_url = new URL(window.location.href);
-                let url = '';
+                var formData = new FormData();
+                var pk = $('#unconfirmPk').val();
+                var current_url = new URL(window.location.href);
+                var url = '';
 
                 url += window.location.origin + '/';
                 url += current_url.pathname.split('/')[1] + '/';
@@ -539,14 +549,13 @@
                     <input type="hidden" id="confirmPk"/>
 
 
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger"
                             data-dismiss="modal">Fechar
                     </button>
                     <button type="button" class="btn btn-success"
-                             id="check_in_btn">
+                            id="check_in_btn">
                         Confirmar!
                     </button>
                 </div>
@@ -587,11 +596,10 @@
                     <input type="hidden" id="unconfirmPk"/>
 
 
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success"
-                             id="check_out_btn">
+                            id="check_out_btn">
                         Confirmar!
                     </button>
                     <button type="button" class="btn btn-danger"
