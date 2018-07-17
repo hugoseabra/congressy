@@ -234,13 +234,15 @@
                         .replace(/\D/g, '')
                         .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5"));
                 }
+
                 var check_in_html = "";
                 var subscription_status_html = "";
-
                 var details_url = '';
 
                 details_url += window.location.origin + '/';
+
                 var current_url = new URL(window.location.href);
+
                 details_url += current_url.pathname.split('/')[1] + '/';
                 details_url += current_url.pathname.split('/')[2] + '/';
                 details_url += current_url.pathname.split('/')[3] + '/';
