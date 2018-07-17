@@ -1,4 +1,4 @@
-from .column_validator import ColumnValidator
+from .header_normalizer import HeaderNormalizer
 from .constants import (
     KEY_MAP,
 )

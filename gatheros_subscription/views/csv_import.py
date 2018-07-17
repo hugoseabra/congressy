@@ -202,7 +202,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         # TODO: maybe move all this to a separate class 'preview maker'
 
         # Validating columns
-        column_validator = ColumnValidator(data_transformer.get_columns())
+        column_validator = ColumnValidator(data_transformer.get_header())
 
         if not column_validator.has_valid():
             raise NoValidColumnsError(column_validator)
@@ -210,7 +210,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         valid_keys = column_validator.valid_columns
 
         # Validating lines lines
-        dict_list = data_transformer.get_dict_list(size=50)
+        dict_list = data_transformer.get_lines(size=50)
         valid_lines = []
         for line in dict_list:
 
