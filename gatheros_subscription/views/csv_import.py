@@ -170,7 +170,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         except UnicodeDecodeError:
             denied_reason = "Não foi possivel decodificar seu arquivo!"
         except NoValidColumnsError as e:
-            invalid_keys = e.column_validator.invalid_keys
+            invalid_keys = e.header_normalizer.invalid_keys
             denied_reason = "Seu arquivo não possui nenhum campo válido!"
         except NoValidLinesError:
             denied_reason = "Seu arquivo não possui nenhuma linha válida"
@@ -204,13 +204,14 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         # Normalize headers
         header = HeaderNormalizer(data_transformer.get_header())
 
+        # We need at least one header to proceed
         if not header.has_valid():
             raise NoValidColumnsError(header)
 
         valid_header_keys = header.keys
 
         # Validating lines lines
-        dict_list = data_transformer.get_lines(size=50)
+        data_list = data_transformer.get_lines(size=50)
         valid_lines = []
         for line in dict_list:
 
