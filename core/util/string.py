@@ -1,3 +1,12 @@
+def clear_string(string):
+    return string \
+        .replace('.', '') \
+        .replace('-', '') \
+        .replace('/', '') \
+        .replace('(', '') \
+        .replace(')', '') \
+        .replace('+', '') \
+        .replace(' ', '')
 
 
 def represents_int(s):
