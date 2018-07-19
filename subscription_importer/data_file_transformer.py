@@ -23,14 +23,15 @@ class DataFileTransformer(object):
 
         self._reader = None
 
-    def get_lines(self, size: int = 20) -> list:
+    def get_lines(self, size: int) -> list:
         lines = []
 
         counter = 1
         for line in self._get_reader():
             lines.append(line)
-            if counter == size:
-                break
+
+            if size and counter == size:
+                    break
 
             counter += 1
 
