@@ -9,8 +9,7 @@ from csv_importer.models import CSVFileConfig
 from subscription_importer import (
     CSVFormIntegrator,
     DataFileTransformer,
-    HeaderNormalizer,
-    LineKeyValidator,
+    LineData,
     NoValidColumnsError,
     NoValidLinesError,
 )
@@ -199,40 +198,22 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
             encoding=encoding,
         )
 
-        # TODO: maybe move all this to a separate class 'preview maker'
-
-        # Normalize headers
-        header = HeaderNormalizer(data_transformer.get_header())
-
-        # We need at least one header to proceed
-        if not header.has_valid():
-            raise NoValidColumnsError(header)
-
-        valid_header_keys = header.keys
-
-        # Validating lines lines
+        # Parsing
         data_list = data_transformer.get_lines(size=50)
-        valid_lines = []
-        for line in dict_list:
 
-            validator = LineKeyValidator(
-                line=line,
-                valid_keys=valid_header_keys,
-            )
+        parsed_lines = []
+        for line in data_list:
+            parsed_lines.append(LineData(raw_data=line))
 
-            if validator.is_valid():
-                valid_lines.append(line)
-
-        if len(valid_lines) == 0:
+        if len(parsed_lines) == 0:
             raise NoValidLinesError()
 
-        # NOTE: to start from: we have a dilema, we must match valid_keys with
-        # there appropriate line value from valid_lines
+        first_line = parsed_lines[0]
 
         table_heading = ''
         table_body = ''
 
-        for key in valid_header_keys:
+        for key, _ in first_line:
             table_heading += '<th>' + key.title() + '</th>'
 
         table = '<table class="table"><thead><tr>' + \
@@ -241,7 +222,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
         return {
             'table': table,
-            'invalid_keys': header.invalid_keys,
+            'invalid_keys': first_line.get_invalid_keys(),
         }
 
 

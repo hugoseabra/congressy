@@ -18,8 +18,8 @@ class LineData(object):
 
         for raw_key, raw_value in raw_data.items():
 
-            is_valid = False
             parsed_key = raw_key.lower().strip()
+            is_valid = False
 
             for key, value in KEY_MAP.items():
                 if parsed_key in value['csv_keys']:
@@ -35,3 +35,6 @@ class LineData(object):
     def __iter__(self):
         for i in self.__dict__.items():
             yield i
+
+    def get_invalid_keys(self):
+        return self.__invalid_keys

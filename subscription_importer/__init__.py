@@ -9,3 +9,4 @@ from .exceptions import (
     NoValidColumnsError,
     NoValidLinesError,
 )
+from .line_data import LineData

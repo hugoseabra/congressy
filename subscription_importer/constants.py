@@ -4,7 +4,7 @@ KEY_MAP = {
     'name': {
         'verbose_name': 'nome',
         'description': 'nome do participante',
-        'csv_keys': ['nome'],
+        'csv_keys': ['nome', 'name',],
         'possible_values': [],
     },
     'email': {
