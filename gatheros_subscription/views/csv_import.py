@@ -261,7 +261,6 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
     form_class = CSVProcessForm
     object = None
 
-
     def get_object(self):
         return CSVFileConfig.objects.get(
             pk=self.kwargs.get('csv_pk'),
