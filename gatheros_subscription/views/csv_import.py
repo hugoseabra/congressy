@@ -178,6 +178,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
             denied_reason = "Seu arquivo não possui nenhuma linha válida"
 
         context['form'] = form
+        context['has_inside_bar'] = False
         context['preview_table'] = preview_table
         context['denied_reason'] = denied_reason
         context['invalid_keys'] = invalid_keys
