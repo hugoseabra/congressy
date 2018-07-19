@@ -10,3 +10,4 @@ from .exceptions import (
     NoValidLinesError,
 )
 from .line_data import LineData
+from .preview_factory import PreviewFactory
