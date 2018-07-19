@@ -9,7 +9,7 @@ from csv_importer.models import CSVFileConfig
 from subscription_importer import (
     CSVFormIntegrator,
     DataFileTransformer,
-    LineData,
+    PreviewFactory,
     NoValidColumnsError,
     NoValidLinesError,
 )
@@ -154,27 +154,21 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         context = super().get_context_data(**kwargs)
         context['required_keys'] = self.get_required_keys()
 
-        preview = None
+        preview_table = None
         denied_reason = None
         invalid_keys = None
 
         try:
-            full_preview = self.get_preview()
-
-            if len(full_preview['invalid_keys']) > 0:
-                invalid_keys = full_preview['invalid_keys']
-
-            preview = full_preview['table']
-
+            preview_table, invalid_keys = self.get_preview()
         except UnicodeDecodeError:
             denied_reason = "Não foi possivel decodificar seu arquivo!"
         except NoValidColumnsError as e:
-            invalid_keys = e.header_normalizer.invalid_keys
+            invalid_keys = e.line_data.get_invalid_keys()
             denied_reason = "Seu arquivo não possui nenhum campo válido!"
         except NoValidLinesError:
             denied_reason = "Seu arquivo não possui nenhuma linha válida"
 
-        context['preview'] = preview
+        context['preview_table'] = preview_table
         context['denied_reason'] = denied_reason
         context['invalid_keys'] = invalid_keys
 
@@ -184,7 +178,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         lot_pk = self.object.lot.pk
         return CSVFormIntegrator(lot_pk).get_required_keys()
 
-    def get_preview(self) -> dict:
+    def get_preview(self) -> tuple:
 
         file_path = self.object.csv_file.path
         delimiter = self.object.delimiter
@@ -198,34 +192,9 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
             encoding=encoding,
         )
 
-        # Parsing
-        data_list = data_transformer.get_lines(size=50)
+        preview_factory = PreviewFactory(data_transformer.get_lines(size=3))
 
-        parsed_lines = []
-        for line in data_list:
-            parsed_lines.append(LineData(raw_data=line))
-
-        if len(parsed_lines) == 0:
-            raise NoValidLinesError()
-
-        first_line = parsed_lines[0]
-
-        table_heading = ''
-        table_body = ''
-
-        for key, _ in first_line:
-            table_heading += '<th>' + key.title() + '</th>'
-
-        table = '<table class="table"><thead><tr>' + \
-                table_heading + '</tr></thead><tbody>' + table_body + \
-                '</tbody></table>'
-
-        return {
-            'table': table,
-            'invalid_keys': first_line.get_invalid_keys(),
-        }
-
-
+        return preview_factory.table, preview_factory.invalid_keys
 
 #
 #     def post(self, request, *args, **kwargs):
