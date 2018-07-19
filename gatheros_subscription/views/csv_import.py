@@ -143,6 +143,9 @@ class CSVImportView(CSVViewMixin, generic.View):
 
 class CSVPrepareView(CSVViewMixin, generic.DetailView):
     template_name = "subscription/csv_prepare.html"
+    initial = {}
+    prefix = None
+    object = None
 
     def get_object(self, queryset=None):
         return CSVFileConfig.objects.get(
@@ -154,7 +157,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
         form = kwargs.pop('form', None)
         context = super().get_context_data(**kwargs)
-        
+
         if form is None:
             form = CSVFileConfigForm(instance=self.object)
 
@@ -203,229 +206,56 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
         return preview_factory.table, preview_factory.invalid_keys
 
-#
-#     def post(self, request, *args, **kwargs):
-#         """
-#         Handle POST requests: instantiate a form instance with the passed
-#         POST variables and then check if it's valid.
-#         """
-#         self.object = self.get_object()
-#         form = self.get_form()
-#
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, 'Configurações salvas com sucesso.')
-#             return self.render_to_response(self.get_context_data())
-#         else:
-#             return self.form_invalid(form)
-#
-#     def get_form(self):
-#         """Return an instance of the form to be used in this view."""
-#         return CSVForm(**self.get_form_kwargs())
-#
-#     def get_form_kwargs(self):
-#         """Return the keyword arguments for instantiating the form."""
-#         kwargs = {
-#             'initial': self.get_initial(),
-#             'prefix': self.get_prefix(),
-#             'instance': self.object,
-#         }
-#
-#         # A file in the POST dict and no file in the FILES dicts can cause a
-#         # form to not validate correctly, that is why we need this
-#         # treatment/cleanup.
-#         if 'csv_file' not in self.request.FILES and \
-#                 'csv_file' in self.request.POST:
-#             self.request.POST._mutable = True
-#             del self.request.POST['csv_file']
-#             self.request.POST._mutable = False
-#
-#         if self.request.method in ('POST', 'PUT'):
-#             kwargs.update({
-#                 'data': self.request.POST,
-#                 'files': self.request.FILES,
-#             })
-#         return kwargs
-#
-#     def form_invalid(self, form):
-#         """If the form is invalid, render the invalid form."""
-#         messages.error(self.request, "Erro ao salvar configurações")
-#         return self.render_to_response(self.get_context_data(form=form))
-#
-#     def get_initial(self):
-#         """Return the initial data to use for forms on this view."""
-#         return self.initial.copy()
-#
-#     def get_prefix(self):
-#         """Return the prefix to use for forms."""
-#         return self.prefix
-#
-#     def get_context_data(self, **kwargs):
-#
-#         form = kwargs.pop('form', None)
-#
-#         context = super().get_context_data(**kwargs)
-#
-#         if form is None:
-#             form = CSVForm(instance=self.object)
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests: instantiate a form instance with the passed
+        POST variables and then check if it's valid.
+        """
+        self.object = self.get_object()
+        form = self.get_form()
 
-#         context['form'] = form
-#
-#         context['denied_reason'] = None
-#         context['preview'] = None
-#         context['has_inside_bar'] = False
-#         context['supported_keys'] = KEY_MAP
-#
-#         try:
-#             context['preview'] = self.get_preview()
-#         except CannotGeneratePreviewError as e:
-#
-#             if str(e) == 'Decode error':
-#                 context['denied_reason'] = 'Não foi possivel ' \
-#                                            'fazer a decodificação do arquivo! Verifique o tipo de encodificação.'
-#             else:
-#                 context['denied_reason'] = str(e)
-#
-#
-#         return context
-#
-#     def get_preview(self) -> dict:
-#
-#         serialized_csv = self.get_serialized_csv()
-#
-#         # Fetching invalid keys
-#         invalid_keys = self.get_invalid_keys(serialized_csv['table_keys'])
-#
-#         # Fetching valid keys
-#         valid_keys = self.get_valid_keys(serialized_csv['table_keys'])
-#
-#         # Fetching valid lines
-#         valid_lines = self.get_valid_lines(serialized_csv['csv_dict_list'])
-#
-#         table = None
-#
-#         if valid_keys and valid_lines:
-#
-#             table_heading = ''
-#             table_body = ''
-#
-#             for key in valid_keys:
-#                 table_heading += '<th>' + key.title() + '</th>'
-#
-#
-#
-#
-#             table = '<table class="table"><thead><tr>' + \
-#                     table_heading + '</tr></thead><tbody>' + table_body + \
-#                     '</tbody></table>'
-#
-#         return {
-#             'table': table,
-#             'invalid_keys': invalid_keys,
-#         }
-#
-#     def get_serialized_csv(self) -> dict:
-#
-#         instance = self.object
-#
-#         encoding = instance.encoding
-#         delimiter = instance.delimiter
-#         quotechar = instance.separator
-#         file_path = instance.csv_file.path
-#
-#         # Decoding and marshalling into a list of dicts
-#         try:
-#             reader = csv.DictReader(
-#                 open(file_path, 'r', encoding=encoding),
-#                 delimiter=delimiter,
-#                 quotechar=quotechar,
-#             )
-#             dict_list = []
-#             for line in reader:
-#                 dict_list.append(line)
-#             table_keys = reader.fieldnames
-#         except UnicodeDecodeError:
-#             raise CannotGeneratePreviewError("Decode error")
-#
-#         return {
-#             'csv_dict_list': dict_list,
-#             'table_keys': table_keys,
-#         }
-#
-#     def get_valid_lines(self, csv_dict_list: list):
-#
-#         valid_lines = []
-#
-#         for line in csv_dict_list:
-#             is_valid = self.is_valid_line(line)
-#             if is_valid:
-#                 valid_lines.append(line)
-#
-#         return valid_lines
-#
-#     @staticmethod
-#     def get_invalid_keys(table_keys: list) -> list:
-#
-#         invalid_keys = []
-#         for entry in table_keys:
-#
-#             is_valid = False
-#
-#             parsed_entry = entry.lower().strip()
-#
-#             for key, value in KEY_MAP.items():
-#                 if parsed_entry in value['csv_keys']:
-#                     is_valid = True
-#                     break
-#
-#             if not is_valid:
-#                 invalid_keys.append(entry)
-#
-#         return invalid_keys
-#
-#     @staticmethod
-#     def get_valid_keys(table_keys: list) -> list:
-#
-#         valid_keys = []
-#         for entry in table_keys:
-#
-#             is_valid = False
-#
-#             parsed_entry = entry.lower().strip()
-#
-#             for key, value in KEY_MAP.items():
-#                 if parsed_entry in value['csv_keys']:
-#                     is_valid = True
-#                     break
-#
-#             if is_valid:
-#                 valid_keys.append(entry)
-#
-#         return valid_keys
-#
-#     @staticmethod
-#     def is_valid_line(line: OrderedDict) -> bool:
-#
-#         line_keys = [key.lower().strip() for key in line.keys()]
-#         line_mapping_keys = []
-#
-#         for key in line_keys:
-#             mapping_key = False
-#             try:
-#                 mapping_key, _ = get_mapping_key_from_csv_key(key)
-#             except MappingNotFoundError:
-#                 pass
-#
-#             if mapping_key:
-#                 line_mapping_keys.append(mapping_key)
-#
-#         for key in REQUIRED_KEYS:
-#             if key not in line_mapping_keys:
-#                 return False
-#
-#         return True
-#
-#
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Configurações salvas com sucesso.')
+            return self.render_to_response(self.get_context_data())
+        else:
+            return self.form_invalid(form)
+
+    def get_form(self):
+        """Return an instance of the form to be used in this view."""
+        return CSVFileConfigForm(**self.get_form_kwargs())
+
+    def get_form_kwargs(self):
+        """Return the keyword arguments for instantiating the form."""
+        kwargs = {
+            'initial': self.get_initial(),
+            'prefix': self.get_prefix(),
+            'instance': self.object,
+        }
+
+        if self.request.method in ('POST', 'PUT'):
+            kwargs.update({
+                'data': self.request.POST,
+                'files': self.request.FILES,
+            })
+        return kwargs  
+
+    def form_invalid(self, form):
+        """If the form is invalid, render the invalid form."""
+        messages.error(self.request, "Erro ao salvar configurações")
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_initial(self):
+        """Return the initial data to use for forms on this view."""
+        return self.initial.copy()
+
+    def get_prefix(self):
+        """Return the prefix to use for forms."""
+        return self.prefix
+
+
+
+
 # class CSVProcessView(CSVViewMixin, generic.DetailView):
 #     template_name = "subscription/csv_process.html"
 #     object = None
