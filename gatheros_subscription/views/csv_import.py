@@ -53,7 +53,7 @@ class CSVViewMixin(EventViewMixin):
         return context
 
 
-class CSVFileListView(CSVViewMixin, generic.ListView):
+class CSVListView(CSVViewMixin, generic.ListView):
     """
         View responsavel por fazer a listagem dos arquivos CSV de determinado
         evento e de engatilhar novas importações.
@@ -69,7 +69,7 @@ class CSVFileListView(CSVViewMixin, generic.ListView):
         return context
 
 
-class CSVImportView(CSVViewMixin, generic.View):
+class CSVFileImportView(CSVViewMixin, generic.View):
     """
         View usada para fazer apenas upload de arquivos via POST, qualquer outra
         solicitação irá gerar um HTTP 403.
