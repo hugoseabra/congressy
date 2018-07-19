@@ -1,4 +1,4 @@
-from .header_normalizer import HeaderNormalizer
+from .line_data import LineData
 
 
 class DataColumnError(Exception):
@@ -19,10 +19,10 @@ class NoValidColumnsError(Exception):
 
     def __init__(
             self,
-            header_normalizer: HeaderNormalizer,
+            line_data: LineData,
             *args: object,
             **kwargs: object) -> None:
-        self.header_normalizer = header_normalizer
+        self.line_data = line_data
         super().__init__(*args, **kwargs)
 
 
