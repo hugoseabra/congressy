@@ -21,9 +21,10 @@ class LineData(object):
             is_valid = False
             parsed_key = raw_key.lower().strip()
 
-            for _, value in KEY_MAP.items():
+            for key, value in KEY_MAP.items():
                 if parsed_key in value['csv_keys']:
                     is_valid = True
+                    parsed_key = key
                     break
 
             if is_valid:
