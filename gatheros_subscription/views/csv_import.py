@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 
-from csv_importer.forms import CSVFileForm
+from csv_importer.forms import CSVFileForm, CSVFileConfigForm
 from csv_importer.models import CSVFileConfig
 from subscription_importer import (
     CSVFormIntegrator,
@@ -151,7 +151,13 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         )
 
     def get_context_data(self, **kwargs):
+
+        form = kwargs.pop('form', None)
         context = super().get_context_data(**kwargs)
+        
+        if form is None:
+            form = CSVFileConfigForm(instance=self.object)
+
         context['required_keys'] = self.get_required_keys()
 
         preview_table = None
@@ -168,6 +174,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         except NoValidLinesError:
             denied_reason = "Seu arquivo não possui nenhuma linha válida"
 
+        context['form'] = form
         context['preview_table'] = preview_table
         context['denied_reason'] = denied_reason
         context['invalid_keys'] = invalid_keys
@@ -261,6 +268,8 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 #
 #         if form is None:
 #             form = CSVForm(instance=self.object)
+
+#         context['form'] = form
 #
 #         context['denied_reason'] = None
 #         context['preview'] = None
@@ -277,7 +286,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 #             else:
 #                 context['denied_reason'] = str(e)
 #
-#         context['form'] = form
+#
 #         return context
 #
 #     def get_preview(self) -> dict:

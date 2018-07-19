@@ -28,6 +28,7 @@
 
 
     {% if preview_table and denied_reason is None %}
+
         <div class="row" id="preview">
             <div class="col-md-12">
                 <div class="panel panel-primary">
@@ -50,7 +51,9 @@
                 </div>
             </div>
         </div>
+
     {% elif denied_reason %}
+
         <div class="row" id="preview_error">
             <div class="col-md-12">
                 <div class="panel panel-warning">
@@ -81,7 +84,9 @@
                 </div>
             </div>
         </div>
+
     {% else %}
+
         <div class="row" id="unknown_preview_error">
             <div class="col-md-12">
                 <div class="panel panel-warning">
@@ -112,7 +117,54 @@
                 </div>
             </div>
         </div>
+
     {% endif %}
+
+    <div class="row">
+
+        <div class="col-md-12">
+
+            <div class="panel panel-primary">
+
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Configuração do arquivo
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <form class="form-inline" method="post" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                {% csrf_token %}
+                                {% for hidden_field in form.hidden_fields %}
+                                    {% if hidden_field.errors %}
+                                        {% render_errors hidden_field.errors %}
+                                    {% endif %}
+                                    {{ hidden_field }}
+                                {% endfor %}
+                                {% render_generic_field form.delimiter %}
+                                {% render_generic_field form.encoding %}
+                                {% render_generic_field form.separator %}
+                                <div class="form-group" style="margin-top: 25px;">
+                                    <div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-retweet"></i>
+                                            Recarregar
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
 
 
 
@@ -132,10 +184,11 @@
                     <div class="row">
 
                         <div class="col-md-12">
-                            <div class="alert alert-warning alert-dismissable">
-                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <div class="alert alert-warning">
                                 <strong>Atenção!</strong>
-                                Todos os campos abaixo são necessarios para a criação de uma inscrição no lote selecionado.
+                                Todos os campos abaixo são
+                                <strong>obrigatórios</strong> para a
+                                criação de uma inscrição no lote selecionado.
                             </div>
 
                             <table class="table">
@@ -204,7 +257,7 @@
             </div>
 
         {% endif %}
-    
+
     </div>
 
 
