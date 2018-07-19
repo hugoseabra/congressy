@@ -18,29 +18,52 @@ class CSVFormIntegrator(object):
         config = self.form_config
 
         if config.phone:
-            required_keys.append('phone')
+            if 'phone' not in required_keys:
+                required_keys.append('phone')
 
         if config.city:
-            required_keys.append('city')
-            required_keys.append('uf')
+
+            if 'city' not in required_keys:
+                required_keys.append('city')
+
+            if 'uf' not in required_keys:
+                required_keys.append('uf')
 
         if config.cpf == config.CPF_REQUIRED:
-            required_keys.append('cpf')
+            if 'cpf' not in required_keys:
+                required_keys.append('cpf')
 
         if config.birth_date == config.BIRTH_DATE_REQUIRED:
-            required_keys.append('birth_date')
+            if 'birth_date' not in required_keys:
+                required_keys.append('birth_date')
 
         if config.address == config.ADDRESS_SHOW:
-            required_keys.append('address')
+            if 'street' not in required_keys:
+                required_keys.append('street')
 
-        if config.institution == config.INSTITUTION_CNPJ_REQUIRED:
-            required_keys.append('institution')
+            if 'complement' not in required_keys:
+                required_keys.append('complement')
+
+            if 'number' not in required_keys:
+                required_keys.append('number')
+
+            if 'village' not in required_keys:
+                required_keys.append('village')
+
+            if 'zip_code' not in required_keys:
+                required_keys.append('zip_code')
+
+        if config.institution == config.INSTITUTION_REQUIRED:
+            if 'institution' not in required_keys:
+                required_keys.append('institution')
 
         if config.institution_cnpj == config.INSTITUTION_CNPJ_REQUIRED:
-            required_keys.append('institution_cnpj')
+            if 'institution_cnpj' not in required_keys:
+                required_keys.append('institution_cnpj')
 
         if config.function == config.FUNCTION_REQUIRED:
-            required_keys.append('function')
+            if 'function' not in required_keys:
+                required_keys.append('function')
 
         for key in required_keys:
             mapping = KEY_MAP.get(key, None)
