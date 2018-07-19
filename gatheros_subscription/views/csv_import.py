@@ -255,6 +255,9 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         return self.prefix
 
 
+class CSVProcessView(CSVViewMixin, generic.FormView):
+    pass
+
 
 
 # class CSVProcessView(CSVViewMixin, generic.DetailView):
