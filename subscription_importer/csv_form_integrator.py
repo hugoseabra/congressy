@@ -21,14 +21,6 @@ class CSVFormIntegrator(object):
             if 'phone' not in required_keys:
                 required_keys.append('phone')
 
-        if config.city:
-
-            if 'city' not in required_keys:
-                required_keys.append('city')
-
-            if 'uf' not in required_keys:
-                required_keys.append('uf')
-
         if config.cpf == config.CPF_REQUIRED:
             if 'cpf' not in required_keys:
                 required_keys.append('cpf')
@@ -52,6 +44,12 @@ class CSVFormIntegrator(object):
 
             if 'zip_code' not in required_keys:
                 required_keys.append('zip_code')
+
+            if 'city' not in required_keys:
+                required_keys.append('city')
+
+            if 'uf' not in required_keys:
+                required_keys.append('uf')
 
         if config.institution == config.INSTITUTION_REQUIRED:
             if 'institution' not in required_keys:
