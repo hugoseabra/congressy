@@ -6,8 +6,8 @@ from subscription_importer.constants import KEY_MAP
 class LineData(object):
     """
         Essa classe é responsavel por preparar os dados em um iterável já
-        mapeado os atributos já processados
-        tem a responsabilidade de normalizar os campos de um cabeçalho:
+        mapeado os atributos já normalizados:
+        
             - setar os nomes corretos das chaves do cabeçalho
             - fornecer informações de chaves invalidas
     """
