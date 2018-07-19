@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 
-from csv_importer.forms import CSVFileForm, CSVFileConfigForm
+from csv_importer.forms import CSVFileForm, CSVFileConfigForm, CSVProcessForm
 from csv_importer.models import CSVFileConfig
 from subscription_importer import (
     CSVFormIntegrator,
@@ -256,9 +256,28 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
 
 class CSVProcessView(CSVViewMixin, generic.FormView):
-    pass
+
+    template_name = 'subscription/csv_process.html'
+    form_class = CSVProcessForm
+    object = None
 
 
+    def get_object(self):
+        return CSVFileConfig.objects.get(
+            pk=self.kwargs.get('csv_pk'),
+            event=self.kwargs.get('event_pk'),
+        )
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        
+        context = super().get_context_data(**kwargs)
+        context['object'] = self.object
+
+        return context
 
 # class CSVProcessView(CSVViewMixin, generic.DetailView):
 #     template_name = "subscription/csv_process.html"
