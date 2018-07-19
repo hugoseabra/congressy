@@ -26,7 +26,7 @@ class DataFileTransformer(object):
     def get_lines(self, size: int = 20) -> list:
         lines = []
 
-        counter = 0
+        counter = 1
         for line in self._get_reader():
             lines.append(line)
             if counter == size:
