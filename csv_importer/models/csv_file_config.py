@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from django.db import models
 from django.utils import timezone
+
 from csv_importer.validators import validate_csv_only_file
 
 
@@ -11,7 +12,7 @@ def get_file_path(instance, filename):
     return os.path.join(
         "event",
         str(instance.event.id),
-        "import", 
+        "import",
         "csv",
         filename
     )
@@ -25,6 +26,17 @@ def get_err_file_path(instance, filename):
         "import",
         "csv",
         "err_" + filename
+    )
+
+
+def get_success_file_path(instance, filename):
+    """ Resgata localização onde os arquivos de sucesso do csv serão salvos. """
+    return os.path.join(
+        "event",
+        str(instance.event.id),
+        "import",
+        "csv",
+        "success_" + filename
     )
 
 
@@ -65,6 +77,11 @@ class CSVFileConfig(models.Model):
 
     error_csv_file = models.FileField(
         upload_to=get_err_file_path,
+        validators=[validate_csv_only_file],
+    )
+
+    success_csv_file = models.FileField(
+        upload_to=get_success_file_path,
         validators=[validate_csv_only_file],
     )
 

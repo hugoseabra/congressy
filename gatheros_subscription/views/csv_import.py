@@ -298,8 +298,7 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
     def process(self, commit: bool = False) -> dict:
         raw_data_list = self.get_transformer().get_lines()
 
-        valid_line_counter = 0
-        invalid_line_counter = 0
+        valid_lines_list = []
         invalid_lines_list = []
 
         for line in raw_data_list:
@@ -310,22 +309,23 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
                            lot=self.object.lot, user=self.request.user)
 
             if line_data.is_valid():
-                valid_line_counter += 1
+                valid_lines_list.append(line_data)
             else:
-                invalid_line_counter += 1
                 invalid_lines_list.append(line_data)
 
         if len(invalid_lines_list) > 0:
             self._create_error_csv(invalid_lines_list)
-            self._create_error_xls(invalid_lines_list)
+
+        if len(valid_lines_list) > 0:
+            self._create_success_csv(valid_lines_list)
 
         return {
-            'valid': valid_line_counter,
-            'invalid': invalid_line_counter,
+            'valid': len(valid_lines_list),
+            'invalid': len(invalid_lines_list),
         }
 
     def _create_error_csv(self, data_line_list: list):
         pass
 
-    def _create_error_xls(self, data_line_list: list):
+    def _create_success_csv(self, data_line_list: list):
         pass
