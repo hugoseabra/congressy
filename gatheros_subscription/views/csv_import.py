@@ -7,11 +7,12 @@ from django.views import generic
 from csv_importer.forms import CSVFileForm, CSVFileConfigForm, CSVProcessForm
 from csv_importer.models import CSVFileConfig
 from subscription_importer import (
-    CSVFormIntegrator,
     DataFileTransformer,
     PreviewFactory,
     NoValidColumnsError,
     NoValidLinesError,
+    LineData,
+    get_required_keys_mappings,
 )
 from .subscription import EventViewMixin
 
@@ -186,24 +187,28 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         return context
 
     def get_required_keys(self) -> list:
-        lot_pk = self.object.lot.pk
-        return CSVFormIntegrator(lot_pk).get_required_keys()
+        form_config = self.object.lot.event.formconfig
+        return get_required_keys_mappings(form_config=form_config)
 
-    def get_preview(self) -> tuple:
+    def get_transformer(self):
 
         file_path = self.object.csv_file.path
         delimiter = self.object.delimiter
         separator = self.object.separator
         encoding = self.object.encoding
 
-        data_transformer = DataFileTransformer(
+        return DataFileTransformer(
             file_path=file_path,
             delimiter=delimiter,
             separator=separator,
             encoding=encoding,
         )
 
-        preview_factory = PreviewFactory(data_transformer.get_lines(size=3))
+    def get_preview(self) -> tuple:
+
+        transformer = self.get_transformer()
+
+        preview_factory = PreviewFactory(transformer.get_lines(size=3))
 
         return preview_factory.table, preview_factory.invalid_keys
 
@@ -239,7 +244,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
                 'data': self.request.POST,
                 'files': self.request.FILES,
             })
-        return kwargs  
+        return kwargs
 
     def form_invalid(self, form):
         """If the form is invalid, render the invalid form."""
@@ -256,7 +261,6 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
 
 class CSVProcessView(CSVViewMixin, generic.FormView):
-
     template_name = 'subscription/csv_process.html'
     form_class = CSVProcessForm
     object = None
@@ -272,91 +276,56 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        
         context = super().get_context_data(**kwargs)
         context['object'] = self.object
+        context['process_results'] = self.process()
 
         return context
 
-# class CSVProcessView(CSVViewMixin, generic.DetailView):
-#     template_name = "subscription/csv_process.html"
-#     object = None
-#     preview = None
-#
-#     # Must be a key from the KEY_MAP
-#     required_keys = [
-#         'email',
-#         'name',
-#     ]
-#
-#     def dispatch(self, request, *args, **kwargs):
-#         response = super().dispatch(request, *args, **kwargs)
-#         if self.preview is None:
-#             self.preview = self.get_preview()
-#         return response
-#
-#     def get_preview(self) -> dict:
-#
-#         instance = self.object
-#
-#         encoding = instance.encoding
-#         delimiter = instance.delimiter
-#         quotechar = instance.separator
-#
-#         file_content = instance.csv_file.file.read()
-#         try:
-#             encoded_content = file_content.decode(encoding)
-#         except UnicodeDecodeError:
-#             raise CannotGeneratePreviewError("Decode error")
-#
-#         return parse_file(encoded_content, delimiter, quotechar)
-#
-#     def get_object(self, queryset=None):
-#         return CSVImportFile.objects.get(
-#             pk=self.kwargs.get('csv_pk'),
-#             event=self.kwargs.get('event_pk'),
-#         )
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['possible_subscriptions'] = 0
-#         context['denied_reason'] = None
-#
-#         try:
-#             context['generated_subscriptions'] = \
-#                 self.generate_subscriptions()
-#         except CannotCreateSubscriptionsError as e:
-#             context['denied_reason'] = str(e)
-#
-#         return context
-#
-#     def post(self, request, *args, **kwargs):
-#         return HttpResponse("Método não permitido", status=403)
-#
-#     def generate_subscriptions(self) -> dict:
-#
-#         if self.object is None:
-#             raise CannotCreateSubscriptionsError(
-#                 'Não foi possivel pegar o arquivo.'
-#             )
-#
-#         if self.preview is None:
-#             self.preview = self.get_preview()
-#             if self.preview is None:
-#                 raise CannotCreateSubscriptionsError(
-#                     'Não foi possivel processar seu arquivo.'
-#                 )
-#
-#         for key in self.required_keys:
-#             if key not in self.preview:
-#                 msg = 'Não será possivel gerar inscrições sem o ' \
-#                       'campo {}.'.format(key.title())
-#                 raise CannotCreateSubscriptionsError(msg)
-#
-#         subscriptions = {
-#             'total_subscriptions': 15,
-#             'successful_subscriptions': 2,
-#             'failed_subscriptions': 13,
-#         }
-#
-#         return subscriptions
+    def get_transformer(self):
+        file_path = self.object.csv_file.path
+        delimiter = self.object.delimiter
+        separator = self.object.separator
+        encoding = self.object.encoding
+
+        return DataFileTransformer(
+            file_path=file_path,
+            delimiter=delimiter,
+            separator=separator,
+            encoding=encoding,
+        )
+
+    def process(self, commit: bool = False) -> dict:
+        raw_data_list = self.get_transformer().get_lines()
+
+        valid_line_counter = 0
+        invalid_line_counter = 0
+        invalid_lines_list = []
+
+        for line in raw_data_list:
+
+            line_data = LineData(line)
+            line_data.save(commit=commit,
+                           form_config=self.event.formconfig,
+                           lot=self.object.lot, user=self.request.user)
+
+            if line_data.is_valid():
+                valid_line_counter += 1
+            else:
+                invalid_line_counter += 1
+                invalid_lines_list.append(line_data)
+
+        if len(invalid_lines_list) > 0:
+            self._create_error_csv(invalid_lines_list)
+            self._create_error_xls(invalid_lines_list)
+
+        return {
+            'valid': valid_line_counter,
+            'invalid': invalid_line_counter,
+        }
+
+    def _create_error_csv(self, data_line_list: list):
+        pass
+
+    def _create_error_xls(self, data_line_list: list):
+        pass
