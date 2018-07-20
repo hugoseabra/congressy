@@ -1,4 +1,7 @@
+import csv
+
 from django.contrib import messages
+from django.core.files.base import ContentFile
 from django.http.response import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -314,18 +317,32 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
                 invalid_lines_list.append(line_data)
 
         if len(invalid_lines_list) > 0:
-            self._create_error_csv(invalid_lines_list)
+            self._create_csv(invalid_lines_list, 'error')
 
         if len(valid_lines_list) > 0:
-            self._create_success_csv(valid_lines_list)
+            self._create_csv(valid_lines_list, 'success')
 
         return {
             'valid': len(valid_lines_list),
             'invalid': len(invalid_lines_list),
         }
 
-    def _create_error_csv(self, data_line_list: list):
-        pass
+    def _create_csv(self, data_line_list: list, type_of_csv: str):
 
-    def _create_success_csv(self, data_line_list: list):
-        pass
+        csvfile = ContentFile('')
+
+        headers = []
+        for key, _ in data_line_list[0]:
+            headers.append(key)
+
+        writer = csv.DictWriter(csvfile, fieldnames=headers)
+        writer.writeheader()
+        for line in data_line_list:
+            data = {}
+            for key, value in line:
+                data.update({key: value})
+            writer.writerow(data)
+        if type_of_csv == 'error':
+            self.object.error_csv_file.save(self.object.filename(), csvfile)
+        elif type_of_csv == 'success':
+            self.object.success_csv_file.save(self.object.filename(), csvfile)
