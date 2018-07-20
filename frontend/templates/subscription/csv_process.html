@@ -35,10 +35,21 @@
                         Inscrições
                     </h3>
                 </div>
-                <div class="panel-body">
+
+                <div class="panel-body text-center" id="csv-loader" style="height: 200px; display: none;">
+
+                    <div class="row text-center"
+                         style="margin-top:20px;">
+                        <h3>Processando arquivo, aguarde...</h3>
+                        <i class="fas info-color fa-circle-notch fa-spin
+                        fa-6x" style="margin-top: 20px"></i>
+                    </div>
+
+                </div>
+                <div class="panel-body" id="csv-form-panel">
                     <div class="row">
                         <div class="col-md-12 text-center">
-                            <form method="post">
+                            <form method="post" id="csv-form">
 
                                 {% if process_results.valid > 0 %}
 
@@ -47,7 +58,7 @@
                                         <strong>{{ process_results.valid }}</strong> inscrições.
                                     </h1>
                                     {% render_generic_field form.create_subscriptions %}
-                                    <button type="button" class="btn btn-md btn-success">
+                                    <button type="button" class="btn btn-md btn-success" id="generate-success-subscriptions">
                                         Gerar inscrições
                                     </button>
 
@@ -56,7 +67,7 @@
                                         <strong>Atenção!</strong> Não será possivel gerar {{ process_results.invalid }} inscrições.
                                     </div>
                                     {% render_generic_field form.create_error_xls %}
-                                    <button type="button" class="btn btn-md btn-danger">
+                                    <button type="button" class="btn btn-md btn-danger" id="generate-error-xls">
                                         Gerar XLS de erros
                                     </button>
                                 {% endif %}
@@ -75,5 +86,38 @@
     </div>
 
 
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script type="application/javascript">
+
+        $(document).ready(function () {
+
+            $('#generate-error-xls').on('click', function () {
+                $('#id_create_error_xls').val(true);
+
+                $('#csv-form-panel').hide();
+                $('#csv-loader').show();
+                $('#csv-form').submit();
+
+            });
+
+
+            $('#generate-success-subscriptions').on('click', function () {
+                //$('#id_create_error_xls').val(true);
+
+                //$('#csv-form-panel').hide();
+                //$('#csv-loader').show();
+                //$('#csv-form').submit();
+                alert('not implemented yet.');
+
+            });
+
+
+        });
+
+    </script>
 
 {% endblock %}

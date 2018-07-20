@@ -285,21 +285,8 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
 
         return context
 
-    def get_transformer(self):
-        file_path = self.object.csv_file.path
-        delimiter = self.object.delimiter
-        separator = self.object.separator
-        encoding = self.object.encoding
-
-        return DataFileTransformer(
-            file_path=file_path,
-            delimiter=delimiter,
-            separator=separator,
-            encoding=encoding,
-        )
-
     def process(self, commit: bool = False) -> dict:
-        raw_data_list = self.get_transformer().get_lines()
+        raw_data_list = self._get_transformer().get_lines()
 
         valid_lines_list = []
         invalid_lines_list = []
@@ -347,3 +334,16 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
             self.object.error_csv_file.save(self.object.filename(), csvfile)
         elif type_of_csv == 'success':
             self.object.success_csv_file.save(self.object.filename(), csvfile)
+
+    def _get_transformer(self):
+        file_path = self.object.csv_file.path
+        delimiter = self.object.delimiter
+        separator = self.object.separator
+        encoding = self.object.encoding
+
+        return DataFileTransformer(
+            file_path=file_path,
+            delimiter=delimiter,
+            separator=separator,
+            encoding=encoding,
+        )
