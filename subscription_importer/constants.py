@@ -3,7 +3,7 @@
 KEY_MAP = {
     'name': {
         'description': 'nome do participante',
-        'csv_keys': ['nome', 'name',],
+        'csv_keys': ['nome', 'name', ],
         'possible_values': [],
     },
     'gender': {

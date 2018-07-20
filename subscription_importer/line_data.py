@@ -1,5 +1,10 @@
 from collections import OrderedDict
 
+from django.contrib.auth.models import User
+
+from csv_importer.forms import CSVSubscriptionForm
+from gatheros_subscription.models import FormConfig, Lot
+from gatheros_event.models import Event
 from subscription_importer.constants import KEY_MAP
 
 
@@ -12,9 +17,13 @@ class LineData(object):
             - fornecer informações de chaves invalidas
     """
 
-    def __init__(self, raw_data: OrderedDict) -> None:
+    def __init__(self,
+                 raw_data: OrderedDict,
+                 ) -> None:
 
         self.__invalid_keys = []
+        self.__errors = None
+        self.__valid = False
 
         for raw_key, raw_value in raw_data.items():
 
@@ -40,3 +49,36 @@ class LineData(object):
 
     def get_invalid_keys(self):
         return self.__invalid_keys
+
+    def save(self,
+             form_config: FormConfig,
+             lot: Lot,
+             user: User,
+             commit: bool = False):
+
+        required_keys = form_config.get_required_keys()
+
+        data = {'lot_id': lot.pk}
+
+        for key, value in self:
+            data.update({key: value})
+
+        form = CSVSubscriptionForm(
+            event=lot.event,
+            user=user,
+            required_keys=required_keys,
+            data=data,
+        )
+
+        if form.is_valid():
+            self.__valid = True
+            if commit:
+                form.save()
+        else:
+            self.__errors = form.errors
+
+    def is_valid(self):
+        return self.__valid
+
+    def get_errors(self):
+        return self.__errors
