@@ -1,4 +1,8 @@
 def clear_string(string):
+
+    if not string:
+        return string
+
     return string \
         .replace('.', '') \
         .replace('-', '') \
