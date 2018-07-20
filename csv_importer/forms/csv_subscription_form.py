@@ -3,7 +3,6 @@ from django.db.models import Q
 from kanu_locations.models import City
 
 from core.util.string import clear_string
-
 from gatheros_event.forms import PersonForm
 from gatheros_subscription.forms import SubscriptionForm
 from gatheros_subscription.models import Subscription
@@ -59,9 +58,11 @@ class CSVSubscriptionForm(forms.Form):
     city = forms.CharField(max_length=255)
     institution = forms.CharField(max_length=255)
     institution_cnpj = forms.CharField(max_length=14)
-    institution_function = forms.CharField(max_length=255)
+    function = forms.CharField(max_length=255)
 
-    def __init__(self, event, user, *args, **kwargs):
+    def __init__(self, event, user, required_keys: list, *args, **kwargs):
+
+        self.required_keys = required_keys
         self.event = event
         self.user = user
         self.person_form = None
@@ -69,7 +70,8 @@ class CSVSubscriptionForm(forms.Form):
 
         super().__init__(*args, **kwargs)
 
-
+        for key in self.required_keys:
+            self.set_as_required(key)
 
     def clean_gender(self):
         gender = self.cleaned_data.get('gender')
@@ -144,7 +146,7 @@ class CSVSubscriptionForm(forms.Form):
 
         if not person_form.is_valid():
             error_msgs = []
-            for field, errs in person_form.items():
+            for field, errs in person_form.errors.items():
                 error_msgs.append(str(errs))
 
             raise forms.ValidationError(
@@ -166,7 +168,7 @@ class CSVSubscriptionForm(forms.Form):
 
         if not subscription_form.is_valid():
             error_msgs = []
-            for field, errs in subscription_form.items():
+            for field, errs in subscription_form.errors.items():
                 error_msgs.append(str(errs))
 
             raise forms.ValidationError(
@@ -187,3 +189,9 @@ class CSVSubscriptionForm(forms.Form):
 
         self.person_form.save()
         return self.subscription_form.save()
+
+    def set_as_required(self, field_name):
+
+        if field_name not in self.fields:
+            raise ValueError('Unknown field name: {}'.format(field_name))
+        self.fields[field_name].required = True
