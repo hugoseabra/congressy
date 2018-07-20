@@ -38,83 +38,33 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-12 text-center">
+                            <form method="post">
 
-                            {% if process.success > 0 %}
+                                {% if process_results.valid > 0 %}
 
-                                <h1>
-                                    Será possivel gerar
-                                    <strong>{{ process.success }}</strong> inscrições.
-                                </h1>
-                                <form method="post">
-                                    {% csrf_token %}
-
-                                    {% render_generic_field form.confirm %}                   
-                                    <button type="submit" class="btn btn-success">
-                                        Confirmar
+                                    <h1>
+                                        Será possivel gerar
+                                        <strong>{{ process_results.valid }}</strong> inscrições.
+                                    </h1>
+                                    {% render_generic_field form.create_subscriptions %}
+                                    <button type="button" class="btn btn-md btn-success">
+                                        Gerar inscrições
                                     </button>
 
-                                </form>
-                            {% else %}
-                                <div class="alert alert-danger">
-                                    <strong>Erro:</strong> Não foi possivel gerar nenhuma inscrição a partir do seu arquio.
-                                </div>
+                                {% elif  process_results.invalid > 0 %}
+                                    <div class="alert alert-danger">
+                                        <strong>Atenção!</strong> Não será possivel gerar {{ process_results.invalid }} inscrições.
+                                    </div>
+                                    {% render_generic_field form.create_error_xls %}
+                                    <button type="button" class="btn btn-md btn-danger">
+                                        Gerar XLS de erros
+                                    </button>
+                                {% endif %}
 
-                                <h1>
-                                    Será possivel gerar
-                                    <strong>{{ process.success }}</strong> inscrições.
-                                </h1>
-
-
-                            {% endif %}
+                                {% csrf_token %}
 
 
-                            <!-- <table class="table table-bordered">
-                                <tbody>
-                                <tr>
-                                    <td class="col-md-1">
-                                        <h2>
-                                            <i class="fas fa-check-circle success-color"></i>
-                                            Sucesso
-                                        </h2>
-                                    </td>
-                                    <td class="col-md-2">
-                                        <strong>
-                                            {{ generated_subscriptions.successful_subscriptions }}
-                                        </strong>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="col-md-1">
-                                        <h2>
-                                            <i class="fas fa-exclamation-circle danger-color"></i>
-                                            Falharam
-                                        </h2>
-
-                                    </td>
-                                    <td class="col-md-2">
-                                        <strong>
-                                            {{ generated_subscriptions.failed_subscriptions }}
-                                        </strong>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="col-md-1">
-                                        <h2>
-                                            Total
-                                        </h2>
-                                    </td>
-                                    <td class="col-md-2">
-                                        <strong>
-                                            {{ generated_subscriptions.total_subscriptions }}
-                                        </strong>
-                                    </td>
-                                </tr>
-
-                                </tbody>
-                            </table> -->
-
+                            </form>
 
                         </div>
                     </div>
