@@ -342,6 +342,7 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
             for key, value in line:
                 data.update({key: value})
             writer.writerow(data)
+
         if type_of_csv == 'error':
             self.object.error_csv_file.save(self.object.filename(), csvfile)
         elif type_of_csv == 'success':
