@@ -2,6 +2,7 @@ import json
 from ast import literal_eval
 
 from django.contrib import messages
+from django.db.transaction import atomic
 from django.db.models.functions import Lower
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, get_object_or_404
@@ -49,8 +50,12 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
     def dispatch(self, request, *args, **kwargs):
         self.event = self.get_event()
-        self.survey = self.get_survey()
-        self.event_survey = EventSurvey.objects.get(survey=self.survey)
+        self.event_survey = EventSurvey.objects.get(
+            pk=self.kwargs.get('survey_pk'),
+            event=self.event,
+        )
+        self.survey = self.event_survey.survey
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -200,18 +205,6 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
             'survey_pk': self.survey.pk,
         }))
 
-    def get_survey(self):
-        """ Resgata questionário do contexto da view. """
-
-        if self.survey:
-            return self.survey
-
-        self.survey = get_object_or_404(
-            Survey,
-            pk=self.kwargs.get('survey_pk')
-        )
-        return self.survey
-
     def _get_selected_lots(self):
         lots_list = []
         all_lots = self.event.lots.all().order_by(Lower('name'))
@@ -275,6 +268,51 @@ class EventSurveyCreateView(EventViewMixin, AccountMixin, generic.View):
             return JsonResponse(object_json, status=201, safe=False)
 
         return HttpResponse(status=400)
+
+
+class EventSurveyDuplicateView(EventViewMixin, AccountMixin, generic.View):
+    def post(self, request, *args, **kwargs):
+
+        event_survey = get_object_or_404(
+            EventSurvey,
+            pk=self.kwargs.get('survey_pk')
+        )
+
+        with atomic():
+            survey = event_survey.survey
+            questions = survey.questions.all()
+
+            new_survey = survey
+
+            # Duplicando survey
+            new_survey.pk = None
+            new_survey.name = 'Cópia - {}'.format(new_survey.name)
+            new_survey.save()
+
+            new_event_survey = event_survey
+            new_event_survey.pk = None
+            new_event_survey.survey = new_survey
+            new_event_survey.save()
+
+            # Duplicando perguntas
+            for question in questions:
+                options = question.options.all()\
+                    if question.has_options\
+                    else []
+
+                new_question = question
+                new_question.pk = None
+                new_question.survey = new_survey
+                new_question.save()
+
+                # Duplicando opções
+                for option in options:
+                    new_option = option
+                    new_option.pk = None
+                    new_option.question = new_question
+                    new_option.save()
+
+        return HttpResponse(status=200)
 
 
 class EventSurveyDeleteAjaxView(EventViewMixin, AccountMixin,
@@ -375,3 +413,4 @@ class EventSurveyLotsEditAjaxView(EventViewMixin, AccountMixin):
                 lot.save()
 
         return HttpResponse(status=200)
+
