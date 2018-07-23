@@ -360,13 +360,13 @@ class EventSurveyLotsEditAjaxView(EventViewMixin, AccountMixin):
             if 'lots' in key:
                 lot_pk = key.replace('lots[', '').replace(']', '')
                 status = item[0].replace('[', '').replace(']', '')
-                status = True if status == 'true' else False
+                status = status == 'true'
                 lots.append({'lot': lot_pk, 'status': status})
 
         for item in lots:
             lot = Lot.objects.get(pk=item['lot'], event=self.event.pk)
-        
-            if item['status']:
+
+            if item['status'] is True:
                 lot.event_survey = self.event_survey
             else:
                 lot.event_survey = None
