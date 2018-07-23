@@ -116,7 +116,7 @@ class CSVSubscriptionForm(forms.Form):
                 'Foram encontradas mais de uma cidade com o mesmo nome'
             )
 
-        return city_qs.first()
+        return city_qs.first().pk
 
     def clean(self):
         """
@@ -141,7 +141,7 @@ class CSVSubscriptionForm(forms.Form):
                 'number': cleaned_data.get('number'),
                 'village': cleaned_data.get('village'),
                 'city': cleaned_data.get('city'),
-                'country': 'br',
+                'country': 'BR',
                 'phone': cleaned_data.get('phone'),
                 'cpf': cleaned_data.get('cpf'),
                 'institution': cleaned_data.get('institution'),
@@ -151,21 +151,21 @@ class CSVSubscriptionForm(forms.Form):
         )
 
         if not person_form.is_valid():
-            error_msgs = []
-            for field, errs in person_form.errors.items():
-                error_msgs.append(str(errs))
 
-            raise forms.ValidationError(
-                'Dados de pessoa não válidos:'
-                ' {}'.format("".join(error_msgs))
-            )
+            for field, errs in person_form.errors.items():
+                if field not in self.fields:
+                    raise Exception(
+                        "Field({}) não existe em formulario de pessoa".format(
+                            field))
+
+                raise forms.ValidationError({field: [errs[0], ]})
 
         person = person_form.save(commit=False)
 
         subscription_form = SubscriptionForm(
             event=self.event,
             data={
-                'person': person,
+                'person': person.pk,
                 'lot': cleaned_data.get('lot_id'),
                 'origin': Subscription.DEVICE_ORIGIN_CSV_IMPORT,
                 'created_by': self.user.pk,
@@ -177,7 +177,7 @@ class CSVSubscriptionForm(forms.Form):
             for field, errs in subscription_form.errors.items():
                 error_msgs.append(str(errs))
 
-            raise forms.ValidationError(
+            raise Exception(
                 'Dados de inscrição não válidos:'
                 ' {}'.format("".join(error_msgs))
             )

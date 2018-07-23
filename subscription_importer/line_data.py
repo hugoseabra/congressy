@@ -20,7 +20,6 @@ class LineData(object):
 
         self.__invalid_keys = []
         self.__errors = None
-        self.__valid = False
 
         for raw_key, raw_value in raw_data.items():
 
@@ -68,14 +67,10 @@ class LineData(object):
         )
 
         if form.is_valid():
-            self.__valid = True
             if commit:
                 form.save()
         else:
             self.__errors = form.errors
-
-    def is_valid(self):
-        return self.__valid
 
     def get_errors(self):
         return self.__errors

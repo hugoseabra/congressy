@@ -63,6 +63,7 @@ class ErrorXLSMaker(object):
 
         cell_mapping = OrderedDict()
         i = 0
+        #TODO add support for survey headers
         for key in headers:
             letter = chr(ord('a') + i)
             cell_mapping.update({key: letter.upper()})

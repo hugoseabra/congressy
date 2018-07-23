@@ -16,7 +16,6 @@ from subscription_importer import (
     NoValidColumnsError,
     NoValidLinesError,
     LineData,
-    KEY_MAP,
     ErrorXLSMaker,
     get_required_keys_mappings,
 )
@@ -344,12 +343,12 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
                            form_config=self.event.formconfig,
                            lot=self.object.lot, user=self.request.user)
 
-            if line_data.is_valid():
-                valid_lines_list.append(line_data)
-            else:
+            if line_data.get_errors():
                 invalid_lines_list.append(line_data)
+            else:
+                valid_lines_list.append(line_data)
 
-        if len(invalid_lines_list) > 0:
+        if invalid_lines_list:
             self._create_error_csv(invalid_lines_list)
 
         return {
