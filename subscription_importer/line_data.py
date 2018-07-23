@@ -1,7 +1,6 @@
 from collections import OrderedDict
 
 from django.contrib.auth.models import User
-from django.utils.translation import ugettext_lazy as _
 
 from csv_importer.forms import CSVSubscriptionForm
 from gatheros_subscription.models import FormConfig, Lot
@@ -20,7 +19,7 @@ class LineData(object):
     def __init__(self, raw_data: OrderedDict) -> None:
 
         self.__invalid_keys = []
-        self.__errors = []
+        self.__errors = None
         self.__valid = False
 
         for raw_key, raw_value in raw_data.items():
@@ -73,9 +72,7 @@ class LineData(object):
             if commit:
                 form.save()
         else:
-            for key, error in form.errors.items():
-                error_string = _(error[0])
-                self.__errors.append({key: error_string})
+            self.__errors = form.errors
 
     def is_valid(self):
         return self.__valid
