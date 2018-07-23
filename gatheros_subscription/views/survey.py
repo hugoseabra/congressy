@@ -254,7 +254,6 @@ class SurveyListView(EventViewMixin, AccountMixin, generic.ListView):
 
 
 class EventSurveyCreateView(EventViewMixin, AccountMixin, generic.View):
-
     def post(self, request, *args, **kwargs):
         data = request.POST.copy()
 
@@ -368,9 +367,11 @@ class EventSurveyLotsEditAjaxView(EventViewMixin, AccountMixin):
 
             if item['status'] is True:
                 lot.event_survey = self.event_survey
-            else:
-                lot.event_survey = None
+                lot.save()
 
-            lot.save()
+            if item['status'] is False and \
+                            lot.event_survey == self.event_survey:
+                lot.event_survey = None
+                lot.save()
 
         return HttpResponse(status=200)
