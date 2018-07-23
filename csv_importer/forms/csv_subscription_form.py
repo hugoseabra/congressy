@@ -20,6 +20,12 @@ class CNPJField(forms.CharField):
         return clear_string(value)
 
 
+class ZipCodeField(forms.CharField):
+
+    def to_python(self, value):
+        return clear_string(value)
+
+
 class PhoneField(forms.CharField):
 
     def to_python(self, value):
@@ -53,11 +59,11 @@ class CSVSubscriptionForm(forms.Form):
     complement = forms.CharField(max_length=255)
     number = forms.CharField(max_length=255)
     village = forms.CharField(max_length=255)
-    zip_code = forms.CharField(max_length=8)
+    zip_code = ZipCodeField(max_length=8)
     uf = forms.CharField(max_length=2)
     city = forms.CharField(max_length=255)
     institution = forms.CharField(max_length=255)
-    institution_cnpj = forms.CharField(max_length=14)
+    institution_cnpj = CNPJField(max_length=14)
     function = forms.CharField(max_length=255)
 
     def __init__(self, event, user, required_keys: list, *args, **kwargs):
@@ -95,7 +101,7 @@ class CSVSubscriptionForm(forms.Form):
         cleaned_uf = self.cleaned_data.get('uf')
         city_qs = City.objects.filter(
             Q(name=str(cleaned_city).upper()) |
-            Q(name_ascii_=str(cleaned_city).upper())
+            Q(name_ascii=str(cleaned_city).upper())
         )
         if cleaned_uf:
             city_qs.filter(uf=cleaned_uf)
