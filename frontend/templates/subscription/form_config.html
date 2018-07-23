@@ -597,6 +597,7 @@
 {% block modals %}
 
     <div class="modals">
+
         <div class="modal fade" id="addSurvey"
              role="dialog">
 
@@ -641,6 +642,7 @@
             </div>
 
         </div>
+
         <div class="modal fade" id="editSurvey"
              role="dialog">
 
@@ -659,7 +661,6 @@
                     </div>
 
                     <form onsubmit="editEventSurvey(this); return false;">
-
                         {% csrf_token %}
 
 
@@ -737,7 +738,7 @@
                                 Cancelar
                             </button>
                             <button type="submit"
-                                    class="btn btn-success new_survey_save ">
+                                    class="btn btn-success">
                                 Salvar
                             </button>
                         </div>
@@ -750,6 +751,9 @@
             </div>
 
         </div>
+
+
+
         <div class="modal fade" id="deleteSurvey"
              role="dialog">
             <div class="modal-dialog modal-lg">
@@ -760,6 +764,8 @@
                 </div>
             </div>
         </div>
+
+
     </div>
 
 

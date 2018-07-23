@@ -116,5 +116,6 @@ class CheckInSubscriptionSerializer(serializers.ModelSerializer):
             'lot',
             'status',
             'attended',
+            'event_count',
             'attended_on',
         ]

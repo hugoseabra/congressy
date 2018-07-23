@@ -19,7 +19,7 @@ $(document).ready(function () {
         el.prop('disabled', true);
     }
 
-    $("input").change(function (event) {
+    $("input").on('keyup', function (event) {
         event.preventDefault();
         verificarEdicaoForm(true)
     });
@@ -39,7 +39,7 @@ $(document).ready(function () {
         verificarEdicaoForm(true)
     });
 
-    $("textarea").change(function (event) {
+    $("textarea").on('keyup', function (event) {
         event.preventDefault();
         verificarEdicaoForm(true)
     });
