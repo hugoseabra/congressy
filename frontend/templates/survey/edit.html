@@ -832,6 +832,9 @@
 
                     var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
+                    $('[data-checkbox-name="' + this.dataset.name +  '"]').hide();
+                    $('[data-loader="' + this.dataset.name +  '"]').show();
+
                     $.ajax({
                         type: "POST",
                         url: location.pathname,
