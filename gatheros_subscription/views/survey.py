@@ -364,9 +364,13 @@ class EventSurveyLotsEditAjaxView(EventViewMixin, AccountMixin):
                 lots.append({'lot': lot_pk, 'status': status})
 
         for item in lots:
+            lot = Lot.objects.get(pk=item['lot'], event=self.event.pk)
+        
             if item['status']:
-                lot = Lot.objects.get(pk=item['lot'], event=self.event.pk)
                 lot.event_survey = self.event_survey
-                lot.save()
+            else:
+                lot.event_survey = None
+
+            lot.save()
 
         return HttpResponse(status=200)
