@@ -344,9 +344,7 @@
         });
 
 
-        function editEventSurvey() {
-            
-            var form = $('#editEventSurvey');
+        function editEventSurvey(form) {
 
             $('#editSurvey').modal('hide');
 
@@ -662,8 +660,7 @@
                             Editar questionário</h4>
                     </div>
 
-                    <form id="editEventSurvey">
-
+                    <form onsubmit="editEventSurvey(this); return false;">
                         {% csrf_token %}
 
 
@@ -740,8 +737,7 @@
                                     data-dismiss="modal">
                                 Cancelar
                             </button>
-                            <button type="button"
-                                    onclick="editEventSurvey()"
+                            <button type="submit"
                                     class="btn btn-success">
                                 Salvar
                             </button>
