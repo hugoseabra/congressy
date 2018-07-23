@@ -10,4 +10,5 @@ from .exceptions import (
 )
 from .line_data import LineData
 from .preview_factory import PreviewFactory
-from .helpers import get_required_keys_mappings
+from .helpers import get_required_keys_mappings, get_mapping_from_csv_key
+from .error_XLS_maker import ErrorXLSMaker

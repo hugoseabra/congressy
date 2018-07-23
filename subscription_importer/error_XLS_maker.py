@@ -1,0 +1,106 @@
+import csv
+import json
+import locale
+from collections import OrderedDict
+
+from openpyxl import Workbook, styles
+from openpyxl.comments import Comment
+from openpyxl.styles import colors
+from six import BytesIO
+
+from .constants import KEY_MAP
+from .helpers import get_mapping_from_csv_key
+
+
+class ErrorXLSMaker(object):
+
+    def __init__(self, err_csv_file_path) -> None:
+
+        self.file_path = err_csv_file_path
+
+        self._reader = None
+
+        self.redFill = styles.PatternFill(
+            patternType='solid',
+            fill_type='solid',
+            start_color=colors.RED,
+            end_color=colors.RED,
+        )
+
+    def _get_reader(self):
+
+        self._reader = csv.DictReader(open(self.file_path, 'r'))
+
+        return self._reader
+
+    def _get_header(self) -> list:
+
+        form_keys = []
+        headers = []
+        for line in self._get_reader():
+
+            raw_data = json.loads(line['raw_data'])
+
+            raw_data_keys = raw_data.keys()
+            for key in raw_data_keys:
+                if key not in form_keys:
+                    form_keys.append(key)
+
+            errors = json.loads(line['errors'])
+            error_keys = errors.keys()
+            for key in error_keys:
+                if key not in form_keys:
+                    form_keys.append(key)
+
+        for key in form_keys:
+            headers.append(KEY_MAP[key]['csv_keys'][0])
+
+        return headers
+
+    def make(self) -> bytes:
+
+        headers = self._get_header()
+
+        cell_mapping = OrderedDict()
+        i = 0
+        for key in headers:
+            letter = chr(ord('a') + i)
+            cell_mapping.update({key: letter.upper()})
+            i += 1
+
+        stream = BytesIO()
+
+        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+
+        wb = Workbook()
+
+        ws1 = wb.active
+        ws1.title = 'Inscrições com erros'
+
+        ws1.append(headers)
+
+        line_counter = 2
+
+        for line in self._get_reader():
+            raw_data = json.loads(line['raw_data'])
+            errors = json.loads(line['errors'])
+
+            for key in headers:
+                cell = cell_mapping[key] + str(line_counter)
+
+                form_key, _ = get_mapping_from_csv_key(key)
+
+                if form_key in raw_data:
+                    ws1[cell] = raw_data[form_key]
+                else:
+                    ws1[cell] = '---'
+
+                if key in errors:
+                    ws1[cell].fill = self.redFill
+                    ws1[cell].comment = Comment(errors[key], 'Congressy')
+
+            line_counter += 1
+
+        wb.save(stream)
+
+        return stream.getvalue()

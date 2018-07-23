@@ -1,8 +1,9 @@
 import csv
+import json
 
 from django.contrib import messages
 from django.core.files.base import ContentFile
-from django.http.response import JsonResponse
+from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
@@ -15,6 +16,8 @@ from subscription_importer import (
     NoValidColumnsError,
     NoValidLinesError,
     LineData,
+    KEY_MAP,
+    ErrorXLSMaker,
     get_required_keys_mappings,
 )
 from .subscription import EventViewMixin
@@ -278,12 +281,56 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
         self.object = self.get_object()
         return super().get(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().post(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['object'] = self.object
         context['process_results'] = self.process()
 
         return context
+
+    def form_valid(self, form):
+        cleaned_data = form.cleaned_data
+        create_subs = cleaned_data.get('create_subscriptions')
+        create_xls = cleaned_data.get('create_error_xls')
+
+        if create_subs:
+            raise NotImplementedError('not ready')
+        elif create_xls:
+
+            xls = self._create_xls()
+
+            response = HttpResponse(xls, content_type=self._get_mime_type())
+            response[
+                'Content-Disposition'] = 'attachment; filename="{}"'.format(
+                self.object.err_filename().split('.')[0] + '.xls',
+            )
+
+            return response
+
+
+    # if create_subs and not create_xls:
+    #     commit = True
+    #     results = self.process(commit=commit)
+    #     self.object.processed = True
+    #     self.object.save()
+    #
+    #     messages.success(self.request,
+    #                      "Criadas {} inscrições com sucesso".format(
+    #                          results['valid']))
+    #
+    #     return redirect(
+    #         reverse_lazy('subscription:subscriptions-csv-list', kwargs={
+    #             'event_pk': self.event.pk,
+    #         })
+    #     )
+
+    # def form_invalid(self, form):
+    #     print('sdsadsadas')
+    #     return super().form_invalid(form)
 
     def process(self, commit: bool = False) -> dict:
         raw_data_list = self._get_transformer().get_lines()
@@ -304,38 +351,50 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
                 invalid_lines_list.append(line_data)
 
         if len(invalid_lines_list) > 0:
-            self._create_csv(invalid_lines_list, 'error')
-
-        if len(valid_lines_list) > 0:
-            self._create_csv(valid_lines_list, 'success')
+            self._create_error_csv(invalid_lines_list)
 
         return {
             'valid': len(valid_lines_list),
             'invalid': len(invalid_lines_list),
+            'valid_list': valid_lines_list,
+            'invalid_list': invalid_lines_list,
         }
 
-    def _create_csv(self, data_line_list: list, type_of_csv: str):
+    def _create_error_csv(self, data_line_list: list):
 
         csvfile = ContentFile('')
 
-        headers = []
-        for key, _ in data_line_list[0]:
-            headers.append(key)
-
-        writer = csv.DictWriter(csvfile, fieldnames=headers)
+        writer = csv.DictWriter(csvfile, fieldnames=['raw_data', 'errors'])
         writer.writeheader()
         for line in data_line_list:
-            data = {}
+
+            raw_data = {}
             for key, value in line:
-                data.update({key: value})
+                raw_data.update({key: value})
+
+            errors = {}
+            for fieldname, error_list in line.get_errors().items():
+
+                if fieldname == '__all__':
+                    continue
+
+                error = error_list[0]
+                errors.update({fieldname: error})
+
+            raw_data = json.dumps(raw_data, ensure_ascii=False)
+            errors = json.dumps(errors, ensure_ascii=False)
+
+            data = {
+                'raw_data': raw_data,
+                'errors': errors,
+            }
+
             writer.writerow(data)
 
-        if type_of_csv == 'error':
-            self.object.error_csv_file.save(self.object.filename(), csvfile)
-        elif type_of_csv == 'success':
-            self.object.success_csv_file.save(self.object.filename(), csvfile)
+        self.object.error_csv_file.save(self.object.filename(), csvfile)
 
     def _get_transformer(self):
+
         file_path = self.object.csv_file.path
         delimiter = self.object.delimiter
         separator = self.object.separator
@@ -347,3 +406,38 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
             separator=separator,
             encoding=encoding,
         )
+
+    def _create_xls(self) -> bytes:
+
+        error_csv = self.object.error_csv_file.path
+        xls_maker = ErrorXLSMaker(err_csv_file_path=error_csv)
+        return xls_maker.make()
+
+    @staticmethod
+    def _get_mime_type() -> str:
+        mime = 'application'
+        content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        return '{}/{}'.format(mime, content_type)
+
+    @staticmethod
+    def _fetch_xls_headers(data: dict) -> list:
+
+        form_keys = []
+        headers = []
+        raw_data = json.loads(data['raw_data'])
+
+        raw_data_keys = raw_data.keys()
+        for key in raw_data_keys:
+            if key not in form_keys:
+                form_keys.append(key)
+
+        errors = json.loads(data['errors'])
+        error_keys = errors.keys()
+        for key in error_keys:
+            if key not in form_keys:
+                form_keys.append(key)
+
+        for key in form_keys:
+            headers.append(KEY_MAP[key]['csv_keys'][0])
+                
+        return headers
