@@ -311,7 +311,6 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
 
             return response
 
-
     # if create_subs and not create_xls:
     #     commit = True
     #     results = self.process(commit=commit)
@@ -360,6 +359,20 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
             'invalid_list': invalid_lines_list,
         }
 
+    def _get_transformer(self):
+
+        file_path = self.object.csv_file.path
+        delimiter = self.object.delimiter
+        separator = self.object.separator
+        encoding = self.object.encoding
+
+        return DataFileTransformer(
+            file_path=file_path,
+            delimiter=delimiter,
+            separator=separator,
+            encoding=encoding,
+        )
+
     def _create_error_csv(self, data_line_list: list):
 
         csvfile = ContentFile('')
@@ -393,20 +406,6 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
 
         self.object.error_csv_file.save(self.object.filename(), csvfile)
 
-    def _get_transformer(self):
-
-        file_path = self.object.csv_file.path
-        delimiter = self.object.delimiter
-        separator = self.object.separator
-        encoding = self.object.encoding
-
-        return DataFileTransformer(
-            file_path=file_path,
-            delimiter=delimiter,
-            separator=separator,
-            encoding=encoding,
-        )
-
     def _create_xls(self) -> bytes:
 
         error_csv = self.object.error_csv_file.path
@@ -418,26 +417,3 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
         mime = 'application'
         content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         return '{}/{}'.format(mime, content_type)
-
-    @staticmethod
-    def _fetch_xls_headers(data: dict) -> list:
-
-        form_keys = []
-        headers = []
-        raw_data = json.loads(data['raw_data'])
-
-        raw_data_keys = raw_data.keys()
-        for key in raw_data_keys:
-            if key not in form_keys:
-                form_keys.append(key)
-
-        errors = json.loads(data['errors'])
-        error_keys = errors.keys()
-        for key in error_keys:
-            if key not in form_keys:
-                form_keys.append(key)
-
-        for key in form_keys:
-            headers.append(KEY_MAP[key]['csv_keys'][0])
-                
-        return headers
