@@ -8,6 +8,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views import generic
+from django.utils.text import slugify
 
 from core.util import represents_int
 from core.views.mixins import TemplateNameableMixin
@@ -25,9 +26,6 @@ class SurveyMixin(TemplateNameableMixin, generic.View):
 
     def dispatch(self, request, *args, **kwargs):
         pk = self.kwargs.get('survey_pk')
-
-        if not pk:
-            return redirect('https://congressy.com')
 
         self.survey = get_object_or_404(
             Survey,
@@ -157,6 +155,31 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
                 return HttpResponse(status=500)
 
+            elif action == 'duplicate':
+
+                question = get_object_or_404(
+                    Question,
+                    pk=question_id,
+                    survey=self.survey
+                )
+
+                with atomic():
+                    options = question.options.all().order_by('pk') \
+                        if question.has_options \
+                        else []
+
+                    question.pk = None
+                    question.label = 'Cópia - {}'.format(question.label)
+                    question.name = slugify(question.label)
+                    question.save()
+
+                    for option in options:
+                        option.pk = None
+                        option.question = question
+                        option.save()
+
+                return HttpResponse(status=200)
+
             return HttpResponse(status=500)
 
         question_type = self.request.POST.get('question_type', None)
@@ -202,7 +225,7 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
         return redirect(reverse_lazy('subscription:survey-edit', kwargs={
             'event_pk': self.event.pk,
-            'survey_pk': self.survey.pk,
+            'survey_pk': self.event_survey.pk,
         }))
 
     def _get_selected_lots(self):
@@ -280,7 +303,7 @@ class EventSurveyDuplicateView(EventViewMixin, AccountMixin, generic.View):
 
         with atomic():
             survey = event_survey.survey
-            questions = survey.questions.all()
+            questions = survey.questions.all().order_by('pk')
 
             new_survey = survey
 
@@ -296,8 +319,8 @@ class EventSurveyDuplicateView(EventViewMixin, AccountMixin, generic.View):
 
             # Duplicando perguntas
             for question in questions:
-                options = question.options.all()\
-                    if question.has_options\
+                options = question.options.all().order_by('pk') \
+                    if question.has_options \
                     else []
 
                 new_question = question
@@ -413,4 +436,3 @@ class EventSurveyLotsEditAjaxView(EventViewMixin, AccountMixin):
                 lot.save()
 
         return HttpResponse(status=200)
-

@@ -60,6 +60,12 @@
                                                 Editar
                                             </a>
                                         </li>
+                                        <li class="js-duplicate">
+                                            <a href="javascript:void(0)" onclick="duplicateField('{{ field.field.label }}', '{{ field.field.question_id }}')">
+                                                <i class="far fa-clone"></i>
+                                                Duplicar
+                                            </a>
+                                        </li>
 
 
                                         <li class="js-remove">
@@ -73,6 +79,7 @@
                                 </div>
 
                                 <div class="checkbox" data-checkbox-name="{{ field.name }}">
+                                    {{ field.field.type }}
                                     <input type="checkbox"
                                            class="update_required"
                                            data-name="{{ field.name }}"
