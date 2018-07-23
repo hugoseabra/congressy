@@ -47,9 +47,6 @@ class QuestionModelForm(forms.ModelForm):
 
 
 class QuestionForm(forms.Form):
-    question = None
-    options_list = []
-
     name = forms.CharField(
         label='Nome do campo',
         required=True,
@@ -79,6 +76,10 @@ class QuestionForm(forms.Form):
 
     def __init__(self, survey, instance=None, **kwargs):
         self.survey = survey
+
+        self.question = None
+        self.options_list = []
+
         super().__init__(**kwargs)
         self.service = QuestionService(instance=instance, **kwargs)
 
@@ -110,7 +111,7 @@ class QuestionForm(forms.Form):
 
                     option_service = OptionService(data=option_data)
                     if not option_service.is_valid():
-                        self.question.delete()
+                        # self.question.delete()
                         for key, err in option_service.errors.items():
                             raise forms.ValidationError("Problema ao "
                                                         "salvar uma opção: "
