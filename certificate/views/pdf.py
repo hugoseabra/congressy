@@ -1,3 +1,4 @@
+import absoluteuri
 import base64
 import json
 
@@ -26,8 +27,10 @@ class CertificatePDFView(AccountMixin, generic.View):
     wkhtml_ws_url = settings.WKHTMLTOPDF_WS_URL
 
     def get_filename(self):
-        return "CERTIFICADO--{}-{}.pdf".format(self.subscription.person.name,
-                                               self.event.name)
+        return "CERTIFICADO-{}-{}.pdf".format(
+            self.subscription.pk,
+            self.event.slug,
+        )
 
     def create_html_string(self):
         return render_to_string(
@@ -53,15 +56,14 @@ class CertificatePDFView(AccountMixin, generic.View):
                 encoded_image = base64.b64encode(f.read()).decode()
             context['background_image'] = encoded_image
 
-        protocol = 'https' if self.request.is_secure() else 'http'
-        site_url = protocol + "://" + Site.objects.get_current().domain
-
         bootstrap_path = static(
             'assets/plugins/bootstrap/css/bootstrap.min.css')
         main_css_path = static('assets/css/main.css')
 
-        context['bootstrap_min_css'] = site_url + bootstrap_path
-        context['main_css'] = site_url + main_css_path
+        context['bootstrap_min_css'] = absoluteuri.build_absolute_uri(
+            bootstrap_path
+        )
+        context['main_css'] = absoluteuri.build_absolute_uri(main_css_path)
 
         context['event'] = self.event
         context['certificate'] = self.event.certificate
@@ -121,7 +123,12 @@ class CertificatePDFView(AccountMixin, generic.View):
             raise Exception('Could not create PDF')
 
         pdf = ContentFile(response.content, name=self.get_filename())
-        return HttpResponse(pdf, content_type='application/pdf')
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="{}"'.format(
+            self.get_filename()
+        )
+
+        return response
 
 
 class CertificatePDFExampleView(AccountMixin, generic.View):
@@ -129,6 +136,9 @@ class CertificatePDFExampleView(AccountMixin, generic.View):
     event = None
     long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
     wkhtml_ws_url = settings.WKHTMLTOPDF_WS_URL
+
+    def get_filename(self):
+        return "CERTIFICADO-SAMPLE-{}.pdf".format(self.event.slug)
 
     def create_html_string(self):
         return render_to_string(
@@ -151,15 +161,14 @@ class CertificatePDFExampleView(AccountMixin, generic.View):
                 encoded_image = base64.b64encode(f.read()).decode()
             context['background_image'] = encoded_image
 
-        protocol = 'https' if self.request.is_secure() else 'http'
-        site_url = protocol + "://" + Site.objects.get_current().domain
-
-        bootstrap_path = static(
-            'assets/plugins/bootstrap/css/bootstrap.min.css')
+        bootstrap_path = \
+            static('assets/plugins/bootstrap/css/bootstrap.min.css')
         main_css_path = static('assets/css/main.css')
 
-        context['bootstrap_min_css'] = site_url + bootstrap_path
-        context['main_css'] = site_url + main_css_path
+        context['bootstrap_min_css'] = absoluteuri.build_absolute_uri(
+            bootstrap_path
+        )
+        context['main_css'] = absoluteuri.build_absolute_uri(main_css_path)
 
         context['event'] = self.event
         context['certificate'] = self.event.certificate
@@ -212,8 +221,13 @@ class CertificatePDFExampleView(AccountMixin, generic.View):
         if response.status_code != 200:
             raise Exception('Could not create PDF')
 
-        pdf = ContentFile(response.content, name="file.pdf")
-        return HttpResponse(pdf, content_type='application/pdf')
+        pdf = ContentFile(response.content, name=self.get_filename())
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="{}"'.format(
+            self.get_filename()
+        )
+
+        return response
 
 
 class CertificateManualView(EventViewMixin, generic.TemplateView):

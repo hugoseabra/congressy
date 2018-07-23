@@ -60,7 +60,7 @@ class Login(auth_views.LoginView):
 
             recaptcha_response = self.request.POST.get('g-recaptcha-response')
             url = 'https://www.google.com/recaptcha/api/siteverify'
-            print(settings.GOOGLE_MAPS_API_KEY)
+
             values = {
                 'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
                 'response': recaptcha_response

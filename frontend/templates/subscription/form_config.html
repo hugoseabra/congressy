@@ -344,7 +344,9 @@
         });
 
 
-        function editEventSurvey(form) {
+        function editEventSurvey() {
+            
+            var form = $('#editEventSurvey');
 
             $('#editSurvey').modal('hide');
 
@@ -597,6 +599,7 @@
 {% block modals %}
 
     <div class="modals">
+
         <div class="modal fade" id="addSurvey"
              role="dialog">
 
@@ -641,6 +644,7 @@
             </div>
 
         </div>
+
         <div class="modal fade" id="editSurvey"
              role="dialog">
 
@@ -658,7 +662,7 @@
                             Editar questionário</h4>
                     </div>
 
-                    <form onsubmit="editEventSurvey(this); return false;">
+                    <form id="editEventSurvey">
 
                         {% csrf_token %}
 
@@ -736,8 +740,9 @@
                                     data-dismiss="modal">
                                 Cancelar
                             </button>
-                            <button type="submit"
-                                    class="btn btn-success new_survey_save ">
+                            <button type="button"
+                                    onclick="editEventSurvey()"
+                                    class="btn btn-success">
                                 Salvar
                             </button>
                         </div>
@@ -750,6 +755,9 @@
             </div>
 
         </div>
+
+
+
         <div class="modal fade" id="deleteSurvey"
              role="dialog">
             <div class="modal-dialog modal-lg">
@@ -760,6 +768,8 @@
                 </div>
             </div>
         </div>
+
+
     </div>
 
 

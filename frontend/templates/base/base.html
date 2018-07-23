@@ -21,6 +21,11 @@
     {#    <meta name="viewport"#}
     {#          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>#}
 
+    <!-- FAVICONS -->
+    <link rel="icon" href="{% static 'assets/img/favicons/favicon.ico' %}">
+    <link rel="apple-touch-icon"
+          href="{% static 'assets/img/favicons/apple-touch-icon.png' %}">
+
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet"
           href="{% static "assets/plugins/bootstrap/css/bootstrap.min.css" %}">
@@ -140,13 +145,10 @@
 
                         {% endif %}
                         {% if has_events %}
-                            <ul class="dropdown-menu animated fadeInRight "
-                                role="menu">
-
+                            <ul class="dropdown-menu animated fadeInRight" role="menu">
                                 <li style="padding-left:
                                  5px; padding-right: 5px;">
-                                    <a href="
-{% url 'event:organization-edit' organization.pk %}">
+                                    <a href="{% url 'event:organization-edit' organization.pk %}">
                                             <span class="icon">
                                                 <i class="fas fa-list-alt"></i>
                                             </span>
@@ -159,8 +161,7 @@
                                     <li role="presentation" style="padding-left:
                                  5px; padding-right: 5px;">
                                         <button type="button"
-                                                class="btn  btn-sm btn-primary
-                                       btn-block"
+                                                class="btn  btn-sm btn-primary btn-block"
                                                 tabindex="-1"
                                                 data-toggle="modal"
                                                 data-target="#change_organization">

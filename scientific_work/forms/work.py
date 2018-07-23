@@ -12,7 +12,9 @@ class NewWorkForm(forms.ModelForm):
         self.fields['area_category'] = forms.ModelChoiceField(
             queryset=AreaCategory.objects.filter(
                 event=self.subscription.event),
+
         )
+        self.fields['area_category'].label = 'áreas temáticas'
 
     class Meta:
         model = Work
