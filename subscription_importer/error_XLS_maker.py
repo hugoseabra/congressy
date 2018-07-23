@@ -91,13 +91,19 @@ class ErrorXLSMaker(object):
                 form_key, _ = get_mapping_from_csv_key(key)
 
                 if form_key in raw_data:
-                    ws1[cell] = raw_data[form_key]
+
+                    value = raw_data[form_key]
+
+                    if value == "":
+                        value = '---'
+
+                    ws1[cell] = value
                 else:
                     ws1[cell] = '---'
 
-                if key in errors:
+                if form_key in errors:
                     ws1[cell].fill = self.redFill
-                    ws1[cell].comment = Comment(errors[key], 'Congressy')
+                    ws1[cell].comment = Comment(errors[form_key], 'Congressy')
 
             line_counter += 1
 
