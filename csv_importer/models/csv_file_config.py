@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from django.db import models
 from django.utils import timezone
+from .storage import OverwriteStorage
 
 from csv_importer.validators import validate_csv_only_file
 
@@ -78,11 +79,7 @@ class CSVFileConfig(models.Model):
     error_csv_file = models.FileField(
         upload_to=get_err_file_path,
         validators=[validate_csv_only_file],
-    )
-
-    success_csv_file = models.FileField(
-        upload_to=get_success_file_path,
-        validators=[validate_csv_only_file],
+        storage=OverwriteStorage(),
     )
 
     created = models.DateTimeField(
@@ -127,3 +124,7 @@ class CSVFileConfig(models.Model):
 
     def filename(self):
         return os.path.basename(self.csv_file.name)
+
+    def err_filename(self):
+        return os.path.basename(self.error_csv_file.name)
+
