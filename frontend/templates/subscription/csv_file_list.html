@@ -166,22 +166,22 @@
                                                     <span class="fas fa-cog"></span>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                                                    <li>
+                                                    <li class="text-center">
 
-                                                        <a href="
+                                                        <button onclick="
                                                                 {% if csv.processed %}
-                                                                    javascript:void(0)
+                                                                    void(0);
                                                                 {% else %}
-                                                                    {% url 'subscription:subscriptions-csv-file-prepare' event.pk csv.pk %}
+                                                                    window.location='{% url 'subscription:subscriptions-csv-file-prepare' event.pk csv.pk %}'
                                                                 {% endif %}"
-                                                           class="btn btn-primary" {% if csv.processed %}disabled {% endif %}>
+                                                                class="btn btn-primary btn-md" {% if csv.processed %}disabled {% endif %}>
                                                             <i class="fas fa-exchange-alt"></i>
                                                             Processar
-                                                        </a>
+                                                        </button>
 
                                                     </li>
 
-                                                    <li>
+                                                    <li class="text-center">
                                                         <button
                                                                 onclick='
                                                                         {% if csv.processed %}
@@ -189,7 +189,7 @@
                                                                         {% else %}
                                                                             openDeleteModal("{{ csv.pk }}", "{{ csv.filename }}");
                                                                         {% endif %}'
-                                                                type="button" class="btn btn-danger btn-trans btn-sm" {% if csv.processed %}disabled {% endif %}>
+                                                                type="button" class="btn btn-danger btn-md" {% if csv.processed %}disabled {% endif %}>
                                                             <i class="far fa-trash-alt"></i>
                                                             Apagar
                                                         </button>
@@ -313,15 +313,16 @@
                         </h1>
 
 
-                        <h3 class="text-center" style="margin-top: 15px">
+                        <h3 class="text-center text-uppercase" style="margin-top: 15px">
                             Tem certeza que deseja deletar o arquivo:
                             <strong>
                                 <span id="csv_file_name"></span>
                             </strong>
-                            <small class="text-muted">
-                                Essa ação é irreversivel!
-                            </small>
+                            <br/>
                         </h3>
+                        <h4 class="text-muted text-center" style="margin-top: 15px">
+                            Essa ação é irreversivel!
+                        </h4>
 
 
                     </div>
@@ -330,6 +331,7 @@
                                 data-dismiss="modal">Fechar
                         </button>
                         <button type="submit" class="btn btn-danger" id="delete_csv">
+                            <i class="far fa-trash-alt"></i>
                             Apagar
                         </button>
                     </div>

@@ -4,7 +4,7 @@ import json
 from django.contrib import messages
 from django.core.files.base import ContentFile
 from django.http.response import JsonResponse, HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
 
@@ -211,7 +211,9 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         return response
 
     def get_object(self, queryset=None):
-        return CSVFileConfig.objects.get(
+
+        return get_object_or_404(
+            CSVFileConfig,
             pk=self.kwargs.get('csv_pk'),
             event=self.kwargs.get('event_pk'),
         )
@@ -343,7 +345,9 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
         return response
 
     def get_object(self):
-        return CSVFileConfig.objects.get(
+
+        return get_object_or_404(
+            CSVFileConfig,
             pk=self.kwargs.get('csv_pk'),
             event=self.kwargs.get('event_pk'),
         )

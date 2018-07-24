@@ -59,29 +59,82 @@
                         <div class="col-md-12 text-center">
                             <form method="post" id="csv-form">
 
-                                {% if process_results.valid > 0 %}
+                                {% csrf_token %}
+                                {% render_generic_field form.create_subscriptions %}
+                                {% render_generic_field form.create_error_xls %}
+                                {% render_generic_field form.create_subscriptions_and_error_xls %}
+
+                                {% if process_results.valid > 0 and process_results.invalid == 0 %}
 
                                     <h1>
-                                        Será possivel gerar
-                                        <strong>{{ process_results.valid }}</strong> inscrições.
+                                        <strong>Sucesso!</strong> Será possivel gerar<strong>{{ process_results.valid }}</strong> inscrições.
                                     </h1>
-                                    {% render_generic_field form.create_subscriptions %}
+
                                     <button type="button" class="btn btn-md btn-success" id="generate-success-subscriptions" style="margin-top: 15px">
                                         Gerar inscrições
                                     </button>
-                                {% endif %}
 
-                                {% if  process_results.invalid > 0 %}
+
+                                {% elif process_results.invalid > 0 and process_results.valid == 0 %}
+
                                     <div class="alert alert-danger">
-                                        <strong>Atenção!</strong> Não será possivel gerar {{ process_results.invalid }} inscrições.
+                                        <strong>Atenção!</strong> Não será possivel gerar nenhuma das {{ process_results.invalid }} linhas no seu arquivo
                                     </div>
-                                    {% render_generic_field form.create_error_xls %}
+
                                     <button type="button" class="btn btn-md btn-danger" id="generate-error-xls">
                                         Gerar XLS de erros
                                     </button>
-                                {% endif %}
 
-                                {% csrf_token %}
+                                {% elif process_results.invalid > 0 and process_results.valid > 0 %}
+
+                                    <table class="table">
+
+                                        <thead>
+                                        <tr>
+                                            <th>Quantidade</th>
+                                            <th>Ação</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr class="success">
+                                            <td>{{ process_results.valid }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-md btn-success" id="generate-success-subscriptions" style="margin-top: 15px">
+                                                    Gerar inscrições
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr class="danger">
+                                            <td>{{ process_results.invalid }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-md btn-danger" id="generate-error-xls">
+                                                    Gerar XLS de erros
+                                                </button>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                <button type="button" class="btn btn-md btn-success" id="generate-subscriptions-error-xls">
+                                                    Gerar inscrições e XLS de erros
+                                                </button>
+                                            </td>
+                                        </tr>
+
+
+                                        </tbody>
+                                    </table>
+
+                                {% elif process_results.invalid == 0 and process_results.valid == 0 %}
+
+                                    <div class="alert alert-danger">
+                                        <strong>Atenção!</strong>
+                                        Não foi possivel gerar nenhuma inscrição do seu arquivo e também não encontramos nenhum erro.
+                                        Por gentiliza verifique seu arquivo.
+                                    </div>
+
+                                {% endif %}
 
 
                             </form>
