@@ -1,6 +1,7 @@
 from subscription_importer import (
     LineData,
     NoValidLinesError,
+    KEY_MAP,
 )
 
 
@@ -36,7 +37,11 @@ class PreviewFactory(object):
         table_heading = ''
         table_body = ''
 
+        header_names = []
         for key, _ in first_line:
+            header_names.append(KEY_MAP[key]['verbose_name'])
+
+        for key in header_names:
             table_heading += '<th>' + key.title() + '</th>'
 
         for line in self.parsed_lines:
