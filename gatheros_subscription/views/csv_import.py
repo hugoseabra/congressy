@@ -75,6 +75,37 @@ class CSVListView(CSVViewMixin, generic.ListView):
         return context
 
 
+class CSVDeleteView(CSVViewMixin, generic.DeleteView):
+    template_name = "subscription/csv_delete.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+
+        if self.object.processed:
+            messages.error(request,
+                           "Arquivo já processado não pode ser apagado")
+            return redirect(self.get_success_url())
+
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['next_path'] = self.get_success_url()
+
+        return context
+
+    def get_object(self, queryset=None):
+        return CSVFileConfig.objects.get(
+            pk=self.kwargs.get('csv_pk'),
+            event=self.kwargs.get('event_pk'),
+        )
+
+    def get_success_url(self):
+        return reverse_lazy('subscription:subscriptions-csv-list', kwargs={
+            'event_pk': self.event.pk
+        })
+
+
 class CSVFileImportView(CSVViewMixin, generic.View):
     """
         View usada para fazer apenas upload de arquivos via POST, qualquer outra
@@ -152,6 +183,16 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
     initial = {}
     prefix = None
     object = None
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+
+        if self.object.processed:
+            messages.error(request,
+                           "Arquivo já processado não pode ser processado novamente")
+            return redirect(self.get_success_url())
+
+        return response
 
     def get_object(self, queryset=None):
         return CSVFileConfig.objects.get(
@@ -264,11 +305,26 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         """Return the prefix to use for forms."""
         return self.prefix
 
+    def get_success_url(self):
+        return reverse_lazy('subscription:subscriptions-csv-list', kwargs={
+            'event_pk': self.event.pk
+        })
+
 
 class CSVProcessView(CSVViewMixin, generic.FormView):
     template_name = 'subscription/csv_process.html'
     form_class = CSVProcessForm
     object = None
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+
+        if self.object.processed:
+            messages.error(request,
+                           "Arquivo já processado não pode ser processado novamente")
+            return redirect(self.get_success_url())
+
+        return response
 
     def get_object(self):
         return CSVFileConfig.objects.get(

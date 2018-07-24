@@ -120,7 +120,7 @@
                                     <th class="col-md-2">Lote</th>
                                     <th class="col-md-2">Data de Envio</th>
                                     <th class="col-md-2">Já foi processada?</th>
-                                    <th class="col-md-1"></th>
+                                    <th class="col-md-1">Ações</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -136,13 +136,58 @@
                                                 <i class="fas fa-check-circle" style="color: #00dd1c"></i>
                                             {% else %}
                                                 <i class="fas fa-times-circle" style="color: #dd0901"></i>
+
                                             {% endif %}
                                         </td>
                                         <td class="text-center">
-                                            <a href="{% url 'subscription:subscriptions-csv-file-prepare' event.pk csv.pk %}" class="btn btn-primary" {% if csv.processed %}disabled {% endif %}>
-                                                <i class="fas fa-exchange-alt"></i>
-                                                Processar
-                                            </a>
+
+
+                                            <div class="btn-group">
+                                                <button
+                                                        type="button"
+                                                        class="btn
+                                                    btn-primary btn-trans
+                                                    btn-sm dropdown-toggle"
+                                                        data-toggle="dropdown"
+                                                        aria-expanded="false"
+                                                >
+                                                    <span class="fas fa-cog"></span>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                    <li>
+
+                                                        <a href="
+                                                                {% if csv.processed %}
+                                                                    javascript:void(0)
+                                                                {% else %}
+                                                                    {% url 'subscription:subscriptions-csv-file-prepare' event.pk csv.pk %}
+                                                                {% endif %}"
+                                                           class="btn btn-primary" {% if csv.processed %}disabled {% endif %}>
+                                                            <i class="fas fa-exchange-alt"></i>
+                                                            Processar
+                                                        </a>
+
+                                                    </li>
+
+                                                    <li>
+                                                        <a
+                                                                href="
+                                                                {% if csv.processed %}
+                                                                    javascript:void(0)
+                                                                {% else %}
+                                                                    {% url 'subscription:subscriptions-csv-file-delete' event.pk csv.pk %}
+                                                                {% endif %}"
+
+                                                                type="button" class="btn btn-danger btn-trans btn-sm" {% if csv.processed %}disabled {% endif %}>
+                                                            <i class="far fa-trash-alt"></i>
+                                                            Apagar
+                                                        </a>
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+
+
                                         </td>
                                     </tr>
                                 {% endfor %}

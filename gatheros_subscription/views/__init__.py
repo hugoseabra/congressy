@@ -50,4 +50,5 @@ from .csv_import import (
     CSVFileImportView,
     CSVPrepareView,
     CSVProcessView,
+    CSVDeleteView,
 )
