@@ -1,6 +1,7 @@
 from django import forms
 from django.db.models import Q
 from kanu_locations.models import City
+from django.db import transaction
 
 from core.util.string import clear_string
 from gatheros_event.forms import PersonForm
@@ -160,30 +161,35 @@ class CSVSubscriptionForm(forms.Form):
 
                 raise forms.ValidationError({field: [errs[0], ]})
 
-        person = person_form.save(commit=False)
+        # Dry run.
+        with transaction.atomic():
 
-        subscription_form = SubscriptionForm(
-            event=self.event,
-            data={
-                'person': person.pk,
-                'lot': cleaned_data.get('lot_id'),
-                'origin': Subscription.DEVICE_ORIGIN_CSV_IMPORT,
-                'created_by': self.user.pk,
-            }
-        )
+            person = person_form.save()
 
-        if not subscription_form.is_valid():
-            error_msgs = []
-            for field, errs in subscription_form.errors.items():
-                error_msgs.append(str(errs))
-
-            raise Exception(
-                'Dados de inscrição não válidos:'
-                ' {}'.format("".join(error_msgs))
+            subscription_form = SubscriptionForm(
+                event=self.event,
+                data={
+                    'person': person.pk,
+                    'lot': cleaned_data.get('lot_id'),
+                    'origin': Subscription.DEVICE_ORIGIN_CSV_IMPORT,
+                    'created_by': self.user.pk,
+                }
             )
 
-        self.person_form = person_form
-        self.subscription_form = subscription_form
+            if not subscription_form.is_valid():
+                error_msgs = []
+                for field, errs in subscription_form.errors.items():
+                    for err in errs:
+                        error_msgs.append('{}: {}'.format(field, err))
+
+                raise Exception(
+                    'Dados de inscrição não válidos:'
+                    ' {}'.format("".join(error_msgs))
+                )
+
+            self.person_form = person_form
+            self.subscription_form = subscription_form
+            transaction.set_rollback(True)
 
         return cleaned_data
 
