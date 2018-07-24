@@ -15,17 +15,19 @@
         <div class="col-md-12">
             <div class="buttonbar">
                 <div class="float-left">
-                    <a href="{% url 'subscription:subscriptions-csv-file-prepare' event.pk object.pk %}"
-                       class="btn btn-primary">
-                        <i class="fas fa-arrow-circle-left"></i>
-                        Configurações
-                    </a>
-                    <br>
+
                     <a href="{% url 'subscription:subscriptions-csv-list' event.pk %}"
-                       class="btn btn-primary" style="margin-top: 5px">
+                       class="btn btn-primary" style="margin-left: 5px">
                         <i class="fas fa-arrow-circle-left"></i>
-                        Lista de arquivos
+                        Voltar Lista de arquivos
                     </a>
+
+                    <a href="{% url 'subscription:subscriptions-csv-file-prepare' event.pk object.pk %}"
+                       class="btn btn-success">
+                        <i class="fas fa-pencil-alt"></i>
+                        Voltar as configurações
+                    </a>
+
                 </div>
                 <div class="clearfix"></div>
             </div>

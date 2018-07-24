@@ -252,25 +252,29 @@
 
     {% endif %}
 
-    <div class="col-md-4">
+    {% if  preview_table and denied_reason is None %}
 
-        <div class="panel panel-success">
+        <div class="col-md-4">
 
-            <div class="panel-heading">
-                <h3 class="panel-title">
-                    Processar arquivo
-                </h3>
-            </div>
+            <div class="panel panel-success">
 
-            <div class="panel-body">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Processar arquivo
+                    </h3>
+                </div>
 
-                <div class="row">
+                <div class="panel-body">
 
-                    <div class="col-md-12">
-                        <a class="btn btn-lg btn-success" href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}" class="btn btn-primary" {% if object.processed %}disabled {% endif %}>
-                            <i class="fas fa-cogs"></i>
-                            Processar o arquivo
-                        </a>
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <a class="btn btn-lg btn-success" href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}" class="btn btn-primary" {% if object.processed %}disabled {% endif %}>
+                                <i class="fas fa-cogs"></i>
+                                Processar o arquivo
+                            </a>
+
+                        </div>
 
                     </div>
 
@@ -280,8 +284,6 @@
 
         </div>
 
-    </div>
-
-
+    {% endif %}
 
 {% endblock %}

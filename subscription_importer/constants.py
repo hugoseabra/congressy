@@ -26,13 +26,27 @@ KEY_MAP = {
     'phone': {
         'verbose_name': 'Telefone',
         'description': 'telefone do participante',
-        'csv_keys': ['phone', 'telephone', 'fone', 'telefone'],
+        'csv_keys': [
+            'fone',
+            'telephone',
+            'phone',
+            'telefone',
+            'celular',
+            'telefone celular'
+        ],
         'possible_values': [],
     },
     'birth_date': {
         'verbose_name': 'Data de Nascimento',
         'description': 'data de nascimento no seguinte formato: dd/mm/aaaa',
-        'csv_keys': ['data de nasc'],
+        'csv_keys': [
+            'data de nasc',
+            'data de nasc.',
+            'nascimento',
+            'data de nascimento',
+            'nasc.',
+            'nasc',
+        ],
         'possible_values': [],
     },
     'street': {

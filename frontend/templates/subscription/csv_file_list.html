@@ -22,6 +22,18 @@
 
     <script type="application/javascript">
 
+
+        function openDeleteModal(csv_pk, csv_file_name) {
+            var event_pk = "{{ event.pk }}";
+
+            var url = "/manage/events/" + event_pk + "/subscriptions/import/csv/" + csv_pk + "/delete";
+
+            $('#csv_file_name').text(csv_file_name);
+            $('#delete-form').attr('action', url);
+            $('#delete_modal').modal('show');
+
+        }
+
         $(document).ready(function () {
 
             var file_loader_el = $('#csv-file-loader');
@@ -170,18 +182,17 @@
                                                     </li>
 
                                                     <li>
-                                                        <a
-                                                                href="
-                                                                {% if csv.processed %}
-                                                                    javascript:void(0)
-                                                                {% else %}
-                                                                    {% url 'subscription:subscriptions-csv-file-delete' event.pk csv.pk %}
-                                                                {% endif %}"
-
+                                                        <button
+                                                                onclick='
+                                                                        {% if csv.processed %}
+                                                                            void(0);
+                                                                        {% else %}
+                                                                            openDeleteModal("{{ csv.pk }}", "{{ csv.filename }}");
+                                                                        {% endif %}'
                                                                 type="button" class="btn btn-danger btn-trans btn-sm" {% if csv.processed %}disabled {% endif %}>
                                                             <i class="far fa-trash-alt"></i>
                                                             Apagar
-                                                        </a>
+                                                        </button>
                                                     </li>
 
                                                 </ul>
@@ -222,6 +233,7 @@
                     </div>
 
                 {% endif %}
+
             </div>
         </div>
     </div>
@@ -241,7 +253,7 @@
                     </button>
                     <h4 class="modal-title"
                         id="import_modal_label">
-                        Importação de arquio CSV
+                        Importação de arquivo CSV
                     </h4>
                 </div>
                 <div class="modal-body">
@@ -267,6 +279,61 @@
                         Enviar
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal" id="delete_modal" role="dialog"
+         aria-labelledby="delete_modal_label">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">×
+                    </button>
+                    <h4 class="modal-title"
+                        id="delete_modal_label">
+                        Deletar arquivo CSV
+                    </h4>
+                </div>
+                <form method="POST" id="delete-form">
+                    <div class="modal-body">
+
+
+                        {% csrf_token %}
+
+
+                        <h1 class="text-center">
+                            <strong>
+                                <i class="fas fa-exclamation-triangle danger-color"></i>
+                                Atenção!
+                                <i class="fas fa-exclamation-triangle danger-color"></i>
+                            </strong>
+                        </h1>
+
+
+                        <h3 class="text-center" style="margin-top: 15px">
+                            Tem certeza que deseja deletar o arquivo:
+                            <strong>
+                                <span id="csv_file_name"></span>
+                            </strong>
+                            <small class="text-muted">
+                                Essa ação é irreversivel!
+                            </small>
+                        </h3>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default"
+                                data-dismiss="modal">Fechar
+                        </button>
+                        <button type="submit" class="btn btn-danger" id="delete_csv">
+                            Apagar
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

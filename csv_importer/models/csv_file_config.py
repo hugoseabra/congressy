@@ -74,6 +74,7 @@ class CSVFileConfig(models.Model):
     csv_file = models.FileField(
         upload_to=get_file_path,
         validators=[validate_csv_only_file],
+        verbose_name="Arquivo CSV",
     )
 
     error_csv_file = models.FileField(

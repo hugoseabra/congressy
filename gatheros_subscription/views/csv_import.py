@@ -76,23 +76,29 @@ class CSVListView(CSVViewMixin, generic.ListView):
 
 
 class CSVDeleteView(CSVViewMixin, generic.DeleteView):
-    template_name = "subscription/csv_delete.html"
+    object = None
 
     def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-
+        self.object = self.get_object()
         if self.object.processed:
             messages.error(request,
-                           "Arquivo já processado não pode ser apagado")
+                           "Arquivo já processado não pode ser apagado!")
             return redirect(self.get_success_url())
 
-        return response
+        return super().dispatch(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['next_path'] = self.get_success_url()
+    def get(self, request, *args, **kwargs):
+        return self.delete(request, *args, **kwargs)
 
-        return context
+    def delete(self, request, *args, **kwargs):
+        """
+        Call the delete() method on the fetched object and then redirect to the
+        success URL.
+        """
+        self.object = self.get_object()
+        self.object.delete()
+        messages.success(request, "Arquivo apagado com sucesso!")
+        return redirect(self.get_success_url())
 
     def get_object(self, queryset=None):
         return CSVFileConfig.objects.get(
@@ -114,15 +120,18 @@ class CSVFileImportView(CSVViewMixin, generic.View):
     form_class = CSVFileForm
     initial = {}
     prefix = None
+    object = None
     http_method_names = ['post']
 
     def get_success_url(self):
-        return reverse_lazy('subscription:subscriptions-csv-list', kwargs={
-            'event_pk': self.event.pk
-        })
+        return reverse_lazy('subscription:subscriptions-csv-file-prepare',
+                            kwargs={
+                                'csv_pk': self.object.pk,
+                                'event_pk': self.event.pk
+                            })
 
     def form_valid(self, form):
-        form.save()
+        self.object = form.save()
         messages.success(self.request, "Arquivo submetido com sucesso!")
         return redirect(self.get_success_url())
 
@@ -172,10 +181,17 @@ class CSVFileImportView(CSVViewMixin, generic.View):
         """If the form is invalid, render the invalid form."""
 
         for error, value in form.errors.items():
+
+            if error == 'csv_file':
+                error = "Arquivo CSV"
+
             messages.error(self.request,
                            "{}: {}".format(error, value[0]))
 
-        return redirect(self.get_success_url())
+        return redirect(
+            reverse_lazy('subscription:subscriptions-csv-list', kwargs={
+                'event_pk': self.event.pk,
+            }))
 
 
 class CSVPrepareView(CSVViewMixin, generic.DetailView):
@@ -384,6 +400,11 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
                 messages.error(self.request, 'Erro: {}: {}'.format(field, err))
 
         return super().form_invalid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('subscription:subscriptions-csv-list', kwargs={
+            'event_pk': self.event.pk
+        })
 
     def process(self, commit: bool = False) -> dict:
         raw_data_list = self._get_transformer().get_lines()
