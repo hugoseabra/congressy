@@ -69,7 +69,7 @@
                                         <strong>Sucesso!</strong> Será possivel gerar<strong>{{ process_results.valid }}</strong> inscrições.
                                     </h1>
 
-                                    <button type="button" class="btn btn-md btn-success" id="generate-success-subscriptions" style="margin-top: 15px">
+                                    <button type="button" class="btn btn-md btn-success generate-success-subscriptions" style="margin-top: 15px">
                                         Gerar inscrições
                                     </button>
 
@@ -80,7 +80,7 @@
                                         <strong>Atenção!</strong> Não será possivel gerar nenhuma das {{ process_results.invalid }} linhas no seu arquivo
                                     </div>
 
-                                    <button type="button" class="btn btn-md btn-danger" id="generate-error-xls">
+                                    <button type="button" class="btn btn-md btn-danger generate-error-xls">
                                         Gerar XLS de erros
                                     </button>
 
@@ -99,7 +99,7 @@
                                         <tr>
                                             <td>{{ process_results.valid }}</td>
                                             <td>
-                                                <button type="button" class="btn btn-md btn-success" id="generate-success-subscriptions">
+                                                <button type="button" class="btn btn-md btn-success generate-success-subscriptions">
                                                     Gerar inscrições
                                                 </button>
                                                 <br>
@@ -111,7 +111,7 @@
                                         <tr>
                                             <td>{{ process_results.invalid }}</td>
                                             <td>
-                                                <button type="button" class="btn btn-md btn-danger" id="generate-error-xls">
+                                                <button type="button" class="btn btn-md btn-danger generate-error-xls">
                                                     Gerar XLS de erros
                                                 </button>
                                             </td>
@@ -151,7 +151,7 @@
 
         $(document).ready(function () {
 
-            $('#generate-error-xls').on('click', function () {
+            $('.generate-error-xls').on('click', function () {
                 $('#id_create_error_xls').val(true);
                 $('#id_create_subscriptions').val(false);
 
@@ -162,12 +162,14 @@
             });
 
 
-            $('#generate-success-subscriptions').on('click', function () {
+            $('.generate-success-subscriptions').on('click', function () {
+
+                $('#csv-form-panel').hide();
+                $('#csv-loader').show();
+
                 $('#id_create_subscriptions').val(true);
                 $('#id_create_error_xls').val(false);
 
-                //$('#csv-form-panel').hide();
-                //$('#csv-loader').show();
                 $('#csv-form').submit();
 
             });
