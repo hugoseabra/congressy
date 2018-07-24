@@ -1,4 +1,5 @@
 import absoluteuri
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.models import User
@@ -14,6 +15,9 @@ from core.forms.cleaners import clear_string
 from gatheros_event.forms import ProfileCreateForm, ProfileForm
 from gatheros_event.views.mixins import AccountMixin
 from mailer.services import notify_reset_password
+
+
+ALLOW_ACCOUNT_REGISTRATION = getattr(settings, 'ACCOUNT_REGISTRATION', False)
 
 
 class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
@@ -103,10 +107,18 @@ class ProfileCreateView(TemplateView, FormView):
     success_url = reverse_lazy('front:start')
     messages = {
         'success': 'Sua conta foi criada com sucesso! '
-                   'Enviamos um email para "%s", click no link do email para ativar sua conta.'
+                   'Enviamos um email para "%s", click no link do email para'
+                   ' ativar sua conta.'
     }
 
     def dispatch(self, request, *args, **kwargs):
+        if ALLOW_ACCOUNT_REGISTRATION is False:
+            messages.warning(
+                self.request,
+                'Não é possível criar conta neste ambiente.'
+            )
+            return redirect('front:start')
+
         if request.user.is_authenticated:
             return redirect('front:start')
 
@@ -138,6 +150,7 @@ class ProfileCreateView(TemplateView, FormView):
 
 class PasswordResetView(auth_views.PasswordResetView):
     title = 'Recuperar Conta'
+
     def dispatch(self, request, *args, **kwargs):
 
         if request.user.is_authenticated:

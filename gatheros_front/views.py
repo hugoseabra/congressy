@@ -1,4 +1,8 @@
+import json
+import urllib
+
 import absoluteuri
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
@@ -15,10 +19,8 @@ from django.views.generic import TemplateView, View
 from gatheros_front.forms import AuthenticationForm
 from gatheros_subscription.views.subscription import MySubscriptionsListView
 from mailer.services import notify_set_password
-import urllib
-import json
-from django.conf import settings
 
+ALLOW_ACCOUNT_REGISTRATION = getattr(settings, 'ACCOUNT_REGISTRATION', False)
 
 @login_required
 def start(request):
@@ -46,6 +48,7 @@ class Login(auth_views.LoginView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+        ctx['allow_account_registration'] = ALLOW_ACCOUNT_REGISTRATION
         ctx['is_embeded'] = self.request.GET.get('embeded') == '1'
         if 'show_captcha' in self.request.session \
                 and self.request.session['show_captcha'] is True:
