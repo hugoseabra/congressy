@@ -213,7 +213,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
         transformer = self.get_transformer()
 
-        preview_factory = PreviewFactory(transformer.get_lines(size=3))
+        preview_factory = PreviewFactory(transformer.get_lines(size=25))
 
         return preview_factory.table, preview_factory.invalid_keys
 
