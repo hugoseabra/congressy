@@ -143,6 +143,7 @@ TEMPLATES = [
             os.path.join(BASE_DIR, 'hotsite', 'templates'),
             os.path.join(BASE_DIR, 'mailer', 'templates'),
             os.path.join(BASE_DIR, 'bitly', 'templates'),
+            os.path.join(BASE_DIR, 'admin', 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
