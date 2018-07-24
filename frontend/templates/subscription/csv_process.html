@@ -62,7 +62,6 @@
                                 {% csrf_token %}
                                 {% render_generic_field form.create_subscriptions %}
                                 {% render_generic_field form.create_error_xls %}
-                                {% render_generic_field form.create_subscriptions_and_error_xls %}
 
                                 {% if process_results.valid > 0 and process_results.invalid == 0 %}
 
@@ -103,6 +102,10 @@
                                                 <button type="button" class="btn btn-md btn-success" id="generate-success-subscriptions">
                                                     Gerar inscrições
                                                 </button>
+                                                <br>
+                                                <small class="text-muted warning-color">
+                                                    Atenção: Ao girar as inscrições você será redirecionado.
+                                                </small>
                                             </td>
                                         </tr>
                                         <tr>
@@ -113,17 +116,6 @@
                                                 </button>
                                             </td>
                                         </tr>
-
-                                        <tr>
-                                            <td></td>
-                                            <td>
-                                                <button type="button" class="btn btn-md btn-primary" id="generate-subscriptions-error-xls">
-                                                    Gerar inscrições e XLS de erros
-                                                </button>
-                                            </td>
-                                        </tr>
-
-
                                         </tbody>
                                     </table>
 

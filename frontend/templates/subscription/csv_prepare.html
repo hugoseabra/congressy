@@ -264,17 +264,31 @@
                     </h3>
                 </div>
 
-                <div class="panel-body">
+
+                <div class="panel-body text-center" id="csv-loader" style="display: none">
+
+                    <div class="row text-center"
+                         style="margin-top:20px;">
+                        <h3>Processando arquivo, aguarde...</h3>
+                        <i class="fas info-color fa-circle-notch fa-spin
+                        fa-6x" style="margin-top: 20px"></i>
+                    </div>
+
+                </div>
+                <div class="panel-body" id="csv-process">
 
                     <div class="row">
 
                         <div class="col-md-12">
-                            <a class="btn btn-lg btn-success" href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}" class="btn btn-primary" {% if object.processed %}disabled {% endif %}>
+                            <a class="btn btn-lg btn-success"
+                               href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}"
+                               class="btn btn-primary"
+                               {% if object.processed %}disabled {% endif %} id="csv-process-btn">
                                 <i class="fas fa-cogs"></i>
                                 Processar o arquivo
                             </a>
-
                         </div>
+
 
                     </div>
 
@@ -285,5 +299,24 @@
         </div>
 
     {% endif %}
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script type="application/javascript">
+
+        $(document).ready(function () {
+
+            $('#csv-process-btn').on('click', function () {
+                $('#csv-process').hide();
+                $('#csv-loader').show();
+            });
+            
+
+        });
+
+    </script>
 
 {% endblock %}
