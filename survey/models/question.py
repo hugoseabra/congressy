@@ -148,10 +148,9 @@ class Question(Entity, models.Model):
         """ Pergunta só pode ser editado caso não possua nenhuma respostas """
         return self.answers.count() > 0
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+    def save(self, *args, **kwargs):
 
         if not self.order:
             self.order = Question.objects.next_order(self.survey)
 
-        super().save(force_insert, force_update, using, update_fields)
+        super().save(*args, **kwargs)

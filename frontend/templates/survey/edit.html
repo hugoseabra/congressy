@@ -41,7 +41,7 @@
 {% block content %}
 
     <div class="row">
-        <div class="col-lg-6 col-lg-push-1 col-xl-6 col-xl-push-1">
+        <div class="col-lg-6 col-xl-12">
             <div class="buttonbar">
                 <div class="float-left">
                     <a href="{% url 'subscription:form-config' event.pk %}"
@@ -57,7 +57,7 @@
 
     <div class="row">
 
-        <div class="col-lg-5 col-lg-push-1 col-xl-5 col-xl-push-1">
+        <div class="col-lg-12 col-xl-5">
 
             <div class="panel panel-primary">
 
@@ -86,7 +86,7 @@
 
         </div>
 
-        <div class="col-lg-6 col-lg-push-1 col-xl-6 col-xl-push-1">
+        <div class="col-lg-12 col-xl-7">
 
             <div class="panel panel-primary" id="form-preview">
 
@@ -211,7 +211,6 @@
             </div>
 
         </div>
-
     </div>
 
 {% endblock %}
@@ -820,7 +819,10 @@
                 });
 
 
+                var checkbox_requirment_watcher = null;
                 required_checkboxes.on('ifChanged', function (e) {
+
+                    var question_id = this.dataset.name;
 
                     var setTo = null;
 
@@ -832,29 +834,31 @@
 
                     var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
-                    $.ajax({
-                        type: "POST",
-                        url: location.pathname,
-                        beforeSend: function (request) {
-                            request.setRequestHeader("X-CSRFToken", csrftoken);
-                        },
-                        data: {
-                            action: 'update_required',
-                            setTo: setTo,
-                            question_id: this.dataset.name
-                        },
-                        success: function (res) {
-                            updateFields();
-                        },
-                        error: function (err) {
-                            Messenger().post({
-                                message: 'Não foi possivel atualizar a ' +
-                                'obrigatoriedade da pergunta.',
-                                type: 'danger'
-                            });
-                        }
-                    });
-
+                    window.clearTimeout(checkbox_requirment_watcher);
+                    checkbox_requirment_watcher = window.setTimeout(function() {
+                        $.ajax({
+                            type: "POST",
+                            url: location.pathname,
+                            beforeSend: function (request) {
+                                request.setRequestHeader("X-CSRFToken", csrftoken);
+                            },
+                            data: {
+                                action: 'update_required',
+                                setTo: setTo,
+                                question_id: question_id
+                            },
+                            success: function (res) {
+                                updateFields();
+                            },
+                            error: function (err) {
+                                Messenger().post({
+                                    message: 'Não foi possivel atualizar a ' +
+                                    'obrigatoriedade da pergunta.',
+                                    type: 'danger'
+                                });
+                            }
+                        });
+                    }, 300);
                 });
 
             }, 200);
@@ -933,6 +937,39 @@
 
         function byId(id) {
             return document.getElementById(id);
+        }
+
+        function duplicateField(question_name, questionId) {
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+            if (!confirm('Deseja realmente duplicar a pergunta "'+question_name+'"?')) {
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: location.pathname,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: {
+                    question_id: questionId,
+                    action: 'duplicate'
+                },
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Pergunta duplicada com sucesso!',
+                        type: 'success'
+                    });
+                    updateFields();
+                },
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel duplicar pergunta.',
+                        type: 'error'
+                    });
+                }
+            });
         }
 
     </script>

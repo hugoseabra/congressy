@@ -9,7 +9,7 @@
 
 
                 <div class="table">
-                    <table class="table noborder">
+                    <table class="table noborder" >
                         <thead>
                         <tr>
                             <th></th>
@@ -60,6 +60,12 @@
                                                 Editar
                                             </a>
                                         </li>
+                                        <li class="js-duplicate">
+                                            <a href="javascript:void(0)" onclick="duplicateField('{{ field.field.label }}', '{{ field.field.question_id }}')">
+                                                <i class="far fa-clone"></i>
+                                                Duplicar
+                                            </a>
+                                        </li>
 
 
                                         <li class="js-remove">
@@ -72,7 +78,8 @@
                                     </ul>
                                 </div>
 
-                                <div class="checkbox">
+                                <div class="checkbox" data-checkbox-name="{{ field.name }}">
+                                    {{ field.field.type }}
                                     <input type="checkbox"
                                            class="update_required"
                                            data-name="{{ field.name }}"
@@ -88,11 +95,20 @@
                                 </div>
 
 
+                                <div class="row text-center"
+                                     data-loader="{{ field.name }}"
+                                     style="display: none">
+                                    <i class="fas info-color fa-circle-notch fa-spin fa-2x" style="margin-top: 5px"></i>
+                                </div>
+
+
                             </td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
+
+
             </li>
         {% endfor %}
     </ul>

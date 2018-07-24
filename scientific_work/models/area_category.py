@@ -9,7 +9,7 @@ class AreaCategory(models.Model):
         verbose_name_plural = 'Categorias de Àreas'
 
     name = models.CharField(
-        max_length=25,
+        max_length=80,
         verbose_name="área temática",
     )
 
