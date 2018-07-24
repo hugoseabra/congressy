@@ -156,6 +156,9 @@
                                     <th>Lote</th>
                                     <th width="14%">Criado em</th>
                                     <th width="10%" class="text-center"># Insc.</th>
+                                    {% if event.is_scientific %}
+                                        <th width="20%" class="text-center">Trabalhos Científicos</th>
+                                    {% endif %}
                                     <th class="text-center" width="3%"></th>
                                 </tr>
                                 </thead>
@@ -218,6 +221,47 @@
                                         <td class="text-center">
                                             {{ item.event_count }}
                                         </td>
+
+                                        {% if event.is_scientific %}
+                                            <td class="text-center">
+
+
+                                                {% with work=item.works.all.first %}
+
+                                                    Publicado:
+                                                    {% if work.published %}
+                                                        <i class="fa fa-circle"
+                                                           aria-hidden="true"
+                                                           style="color:#5cb85c"></i>
+                                                    {% else %}
+                                                        <i class="fa fa-circle"
+                                                           aria-hidden="true"
+                                                           style="color: #d9534f"></i>
+                                                    {% endif %}
+                                                    <br/>
+                                                    
+                                                    {% if work.modality == 'artigo' %}
+                                                        {% if work.article_file %}
+                                                            <a target="_blank"
+                                                               href="{{ work.article_file.url }}">
+                                                                Arquivo
+                                                            </a>
+                                                        {% endif %}
+
+                                                    {% elif work.modality == 'banner' %}
+                                                        {% if work.banner_file %}
+                                                            <a target="_blank"
+                                                               href="{{ work.banner_file.url }}">
+                                                                Arquivo
+                                                            </a>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endwith %}
+
+
+                                            </td>
+                                        {% endif %}
+
                                         <td>
                                             <div class="btn-group">
                                                 <button
