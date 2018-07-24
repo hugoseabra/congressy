@@ -297,7 +297,18 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
         create_xls = cleaned_data.get('create_error_xls')
 
         if create_subs:
-            raise NotImplementedError('not ready')
+            results = self.process(commit=True)
+            self.object.processed = True
+            self.object.save()
+
+            messages.success(self.request,
+                             "Criadas {} inscrições com sucesso".format(
+                                 results['valid']))
+
+            return redirect(
+                reverse_lazy('subscription:subscriptions-csv-list', kwargs={
+                    'event_pk': self.event.pk,
+                }))
         elif create_xls:
 
             xls = self._create_xls()
@@ -310,25 +321,13 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
 
             return response
 
-    # if create_subs and not create_xls:
-    #     commit = True
-    #     results = self.process(commit=commit)
-    #     self.object.processed = True
-    #     self.object.save()
-    #
-    #     messages.success(self.request,
-    #                      "Criadas {} inscrições com sucesso".format(
-    #                          results['valid']))
-    #
-    #     return redirect(
-    #         reverse_lazy('subscription:subscriptions-csv-list', kwargs={
-    #             'event_pk': self.event.pk,
-    #         })
-    #     )
+    def form_invalid(self, form):
 
-    # def form_invalid(self, form):
-    #     print('sdsadsadas')
-    #     return super().form_invalid(form)
+        for field, errs in form.errors.items():
+            for err in errs:
+                messages.error(self.request, 'Erro: {}: {}'.format(field, err))
+
+        return super().form_invalid(form)
 
     def process(self, commit: bool = False) -> dict:
         raw_data_list = self._get_transformer().get_lines()
