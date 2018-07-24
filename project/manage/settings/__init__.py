@@ -25,7 +25,8 @@ INSTALLED_APPS += [
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/manage/'
 LOGOUT_REDIRECT_URL = '/login/'
-ACCOUNT_REGISTRATION = False
+LOGIN_SUPERUSER_ONLY = False
+ACCOUNT_REGISTRATION = True
 # ========================= SERVER CONFIGURATION ============================ #
 WSGI_APPLICATION = 'project.wsgi.application'
 

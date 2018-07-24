@@ -3,7 +3,7 @@
 source /scripts.sh
 
 # Define settings
-export DJANGO_SETTINGS_MODULE=project.manage.settings.prod
+export DJANGO_SETTINGS_MODULE=project.admin.settings.prod
 
 run_python_script_with_output "Atualizando Site ID" "manage.py loaddata 000_site"
 run_python_script "Configurando WSGI" /configure-wsgi.py
