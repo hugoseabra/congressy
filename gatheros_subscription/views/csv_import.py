@@ -335,14 +335,15 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
     object = None
 
     def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
+
+        self.object = self.get_object()
 
         if self.object.processed:
             messages.error(request,
                            "Arquivo já processado não pode ser processado novamente")
             return redirect(self.get_success_url())
 
-        return response
+        return super().dispatch(request, *args, **kwargs)
 
     def get_object(self):
 

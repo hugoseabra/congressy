@@ -96,11 +96,11 @@ class ErrorXLSMaker(object):
                     value = raw_data[form_key]
 
                     if value == "":
-                        value = '---'
+                        value = ''
 
                     ws1[cell] = value
                 else:
-                    ws1[cell] = '---'
+                    ws1[cell] = ''
 
                 if form_key in errors:
                     ws1[cell].fill = self.redFill
