@@ -10,7 +10,6 @@ services:
 
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas
-    container_name: wkhtmltopdf
     networks:
       - wkhtmltopdf
 
@@ -84,6 +83,27 @@ services:
     env_file:
       - ./env-file
       - ./env-partner-file
+
+  admin:
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    depends_on:
+      - migration
+      - volume
+      - redis
+      - wkhtmltopdf
+    networks:
+      - redis
+      - wkhtmltopdf
+    ports:
+      - "8002:80"
+    entrypoint:
+      - /services/web/admin/container-entry.sh
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "./media:/var/www/cgsy/media"
+    env_file:
+      - ./env-file
+      - ./env-admin-file
 
 networks:
   redis:

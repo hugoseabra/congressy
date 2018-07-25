@@ -5,6 +5,7 @@ source /scripts.sh
 # Define settings
 export DJANGO_SETTINGS_MODULE=project.partner.settings.prod
 
+run_python_script_with_output "Atualizando Site ID" "manage.py loaddata 000_site"
 run_python_script "Configurando WSGI" /configure-wsgi.py
 run_python_script "Configurando NGINX" /configure-nginx.py
 
