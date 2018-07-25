@@ -42,6 +42,10 @@ def get_success_file_path(instance, filename):
 
 
 class CSVFileConfig(models.Model):
+    """
+        Representação de todas as configurações de leitura de um arquivo CSV
+    """
+    
     ENCODING_UTF8 = "utf-8"
     ENCODING_8859_1 = "iso-8859-1"
 
