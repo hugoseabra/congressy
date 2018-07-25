@@ -250,6 +250,8 @@ pipeline:
         target: DOMAIN_MANAGE
       - source: DOMAIN_PARTNER
         target: DOMAIN_PARTNER
+      - source: DOMAIN_ADMIN
+        target: DOMAIN_ADMIN
       - source: FORCE_HTTPS
         target: FORCE_HTTPS
       - source: BUCKET_LOCATION
@@ -277,6 +279,7 @@ pipeline:
       aws_account_id,
       domain_manage,
       domain_partner,
+      domain_admin,
       force_https,
       bucket_location,
       bucket_name,
