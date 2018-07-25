@@ -115,7 +115,7 @@ class ProfileCreateView(TemplateView, FormView):
         if ALLOW_ACCOUNT_REGISTRATION is False:
             messages.warning(
                 self.request,
-                'Não é possível criar conta neste ambiente.'
+                'Não é possível redefinir sua senha neste ambiente.'
             )
             return redirect('front:start')
 
@@ -152,6 +152,13 @@ class PasswordResetView(auth_views.PasswordResetView):
     title = 'Recuperar Conta'
 
     def dispatch(self, request, *args, **kwargs):
+
+        if ALLOW_ACCOUNT_REGISTRATION is False:
+            messages.warning(
+                self.request,
+                'Não é possível criar conta neste ambiente.'
+            )
+            return redirect('front:start')
 
         if request.user.is_authenticated:
             return redirect('front:start')
