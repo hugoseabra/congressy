@@ -1,8 +1,4 @@
-import csv
-import json
-
 from django.contrib import messages
-from django.core.files.base import ContentFile
 from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -12,15 +8,19 @@ from csv_importer.forms import CSVFileForm, CSVFileConfigForm, CSVProcessForm
 from csv_importer.models import CSVFileConfig
 from subscription_importer import (
     DataFileTransformer,
-    PreviewFactory,
+    PreviewRenderer,
     NoValidColumnsError,
     NoValidLinesError,
-    LineData,
-    ErrorXLSMaker,
     get_required_keys_mappings,
 )
+from subscription_importer.line_data import (
+    LineDataPersistenceCollection,
+    LineDataCollection,
+)
+from subscription_importer.file_build import ErrorXLSBuilder, ErrorCSVMaker
 from .subscription import EventViewMixin
 
+# @TODO create a view mixin to check if file has been processed
 
 class CSVViewMixin(EventViewMixin):
     """
@@ -233,12 +233,10 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         invalid_keys = None
 
         try:
-            preview_table, invalid_keys = self.get_preview()
+            preview_table = self.get_html_preview_table()
+            invalid_keys = self.get_invalid_keys()
         except UnicodeDecodeError:
             denied_reason = "Não foi possivel decodificar seu arquivo!"
-        except NoValidColumnsError as e:
-            invalid_keys = e.line_data.get_invalid_keys()
-            denied_reason = "Seu arquivo não possui nenhum campo válido!"
         except NoValidLinesError:
             denied_reason = "Seu arquivo não possui nenhuma linha válida"
 
@@ -253,28 +251,6 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
     def get_required_keys(self) -> list:
         form_config = self.object.lot.event.formconfig
         return get_required_keys_mappings(form_config=form_config)
-
-    def get_transformer(self):
-
-        file_path = self.object.csv_file.path
-        delimiter = self.object.delimiter
-        separator = self.object.separator
-        encoding = self.object.encoding
-
-        return DataFileTransformer(
-            file_path=file_path,
-            delimiter=delimiter,
-            separator=separator,
-            encoding=encoding,
-        )
-
-    def get_preview(self) -> tuple:
-
-        transformer = self.get_transformer()
-
-        preview_factory = PreviewFactory(transformer.get_lines(size=25))
-
-        return preview_factory.table, preview_factory.invalid_keys
 
     def post(self, request, *args, **kwargs):
         """
@@ -327,6 +303,38 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         return reverse_lazy('subscription:subscriptions-csv-list', kwargs={
             'event_pk': self.event.pk
         })
+
+    # --------- CUSTOM --------------
+    def get_data_collection(self, size):
+
+        file_path = self.object.csv_file.path
+        delimiter = self.object.delimiter
+        separator = self.object.separator
+        encoding = self.object.encoding
+
+
+        lines = DataFileTransformer(
+            file_path=file_path,
+            delimiter=delimiter,
+            separator=separator,
+            encoding=encoding,
+        ).get_lines(size)
+
+        return LineDataCollection(lines)
+
+    def get_html_preview_table(self) -> str:
+
+        line_data_collection = self.get_data_collection(size=25)
+
+        preview_table = PreviewRenderer(
+            line_data_collection).render_html_table()
+
+        return preview_table
+
+    def get_invalid_keys(self):
+
+        line_data_collection = self.get_data_collection(size=1)
+        return line_data_collection[0].get_invalid_keys()
 
 
 class CSVProcessView(CSVViewMixin, generic.FormView):
@@ -412,22 +420,20 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
         })
 
     def process(self, commit: bool = False) -> dict:
-        raw_data_list = self._get_transformer().get_lines()
+        line_data_persistence_collection = self.get_data_collection()
 
-        valid_lines_list = []
-        invalid_lines_list = []
+        valid_lines_list = LineDataCollection()
+        invalid_lines_list = LineDataCollection()
 
-        for line in raw_data_list:
+        for line in line_data_persistence_collection:
+            line.save(commit=commit,
+                      form_config=self.event.formconfig,
+                      lot=self.object.lot, user=self.request.user)
 
-            line_data = LineData(line)
-            line_data.save(commit=commit,
-                           form_config=self.event.formconfig,
-                           lot=self.object.lot, user=self.request.user)
-
-            if line_data.get_errors():
-                invalid_lines_list.append(line_data)
+            if line.get_errors():
+                invalid_lines_list.append(line)
             else:
-                valid_lines_list.append(line_data)
+                valid_lines_list.append(line)
 
         if invalid_lines_list:
             self._create_error_csv(invalid_lines_list)
@@ -439,51 +445,24 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
             'invalid_list': invalid_lines_list,
         }
 
-    def _get_transformer(self):
+    def get_data_collection(self):
 
         file_path = self.object.csv_file.path
         delimiter = self.object.delimiter
         separator = self.object.separator
         encoding = self.object.encoding
 
-        return DataFileTransformer(
+        lines = DataFileTransformer(
             file_path=file_path,
             delimiter=delimiter,
             separator=separator,
             encoding=encoding,
-        )
+        ).get_lines()
 
-    def _create_error_csv(self, data_line_list: list):
+        return LineDataPersistenceCollection(lines)
 
-        csvfile = ContentFile('')
-
-        writer = csv.DictWriter(csvfile, fieldnames=['raw_data', 'errors'])
-        writer.writeheader()
-        for line in data_line_list:
-
-            raw_data = {}
-            for key, value in line:
-                raw_data.update({key: value})
-
-            errors = {}
-            for fieldname, error_list in line.get_errors().items():
-
-                if fieldname == '__all__':
-                    continue
-
-                error = error_list[0]
-                errors.update({fieldname: error})
-
-            raw_data = json.dumps(raw_data, ensure_ascii=False)
-            errors = json.dumps(errors, ensure_ascii=False)
-
-            data = {
-                'raw_data': raw_data,
-                'errors': errors,
-            }
-
-            writer.writerow(data)
-
+    def _create_error_csv(self, line_data_collection: LineDataCollection):
+        csvfile = ErrorCSVPersister(line_data_collection)
         self.object.error_csv_file.save(self.object.filename(), csvfile)
 
     def _create_xls(self) -> bytes:
