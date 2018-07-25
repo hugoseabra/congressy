@@ -30,7 +30,7 @@ ACCOUNT_REGISTRATION = False
 # ========================= SERVER CONFIGURATION ============================ #
 WSGI_APPLICATION = 'project.wsgi.application'
 
-SITE_ID = 2
+SITE_ID = 3
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
