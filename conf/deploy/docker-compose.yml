@@ -10,7 +10,6 @@ services:
 
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas
-    container_name: wkhtmltopdf
     networks:
       - wkhtmltopdf
 
