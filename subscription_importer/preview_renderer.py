@@ -1,38 +1,22 @@
 from subscription_importer import (
-    LineData,
-    NoValidLinesError,
     KEY_MAP,
 )
 
+from subscription_importer.line_data import LineDataCollection
 
-class PreviewFactory(object):
+
+class PreviewRenderer(object):
     """
         Essa classe serve como helper para as view que a usa para gerar preview 
         dos dados passados para essa factory. 
     """
 
-    def __init__(self, data_list: list, ) -> None:
+    def __init__(self, line_data_collection: LineDataCollection):
+        self.line_data_collection = line_data_collection
 
-        self.data_list = data_list
+    def render_html_table(self):
 
-        self.parsed_lines = self._parse_data()
-        self.table = self._make_html_table()
-        self.invalid_keys = self._get_invalid_keys()
-
-    def _parse_data(self):
-
-        parsed_lines = []
-        for line in self.data_list:
-            parsed_lines.append(LineData(raw_data=line))
-
-        if len(parsed_lines) == 0:
-            raise NoValidLinesError()
-
-        return parsed_lines
-
-    def _make_html_table(self):
-
-        first_line = self.parsed_lines[0]
+        first_line = self.line_data_collection[0]
 
         table_heading = ''
         table_body = ''
@@ -44,7 +28,7 @@ class PreviewFactory(object):
         for key in header_names:
             table_heading += '<th>' + key.title() + '</th>'
 
-        for line in self.parsed_lines:
+        for line in self.line_data_collection:
             table_body += '<tr>'
             for _, value in line:
                 table_body += '<td>'
@@ -58,7 +42,3 @@ class PreviewFactory(object):
                 '</tbody></table>'
 
         return table
-
-    def _get_invalid_keys(self):
-        first_line = self.parsed_lines[0]
-        return first_line.get_invalid_keys()
