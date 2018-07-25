@@ -18,8 +18,6 @@ ABSOLUTEURI_PROTOCOL = 'https'
 INSTALLED_APPS.extend([
     'raven.contrib.django.raven_compat',
 ])
-# ========================= SERVER CONFIGURATION ============================ #
-SITE_ID = 2
 # ============================== DATABASE =================================== #
 DATABASES = {
     'default': {
