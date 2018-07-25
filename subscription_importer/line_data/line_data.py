@@ -37,14 +37,8 @@ class LineData(object):
             else:
                 self.__invalid_keys.append(raw_key)
 
-    def __iter__(self):
-        for i in self.__dict__.items():
-            # Ignore mangled invalid keys
-            if not i[0].startswith('_'):
-                yield i
-
-    def get_invalid_keys(self):
-        return self.__invalid_keys
+    def get_errors(self):
+        return self.__errors
 
     def save(self,
              form_config: FormConfig,
@@ -72,5 +66,11 @@ class LineData(object):
         else:
             self.__errors = form.errors
 
-    def get_errors(self):
-        return self.__errors
+    def __iter__(self):
+        for i in self.__dict__.items():
+            # Ignore mangled invalid keys
+            if not i[0].startswith('_'):
+                yield i
+
+    def get_invalid_keys(self):
+        return self.__invalid_keys

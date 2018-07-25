@@ -1,13 +1,13 @@
 import csv
 
+from subscription_importer.line_data import LineDataCollection
 
-class DataFileTransformer(object):
+
+class LineDataCollectionBuilder(object):
     """
         Essa classe possui a responsabilidade de abrir, ler um arquivo e
-        retornar o conteudo que podem ser:
-            - conteudo linha a linha
-            - cabeçalho
-
+        retornar uma coleção de objetos do tipo LineData
+        chamado LineDataCollection
     """
 
     def __init__(self,
@@ -23,15 +23,15 @@ class DataFileTransformer(object):
 
         self._reader = None
 
-    def get_lines(self, size: int = 0) -> list:
-        lines = []
+    def get_collection(self, size: int = 0) -> LineDataCollection:
+        lines = LineDataCollection()
 
         counter = 1
         for line in self._get_reader():
             lines.append(line)
 
             if size != 0 and counter == size:
-                    break
+                break
 
             counter += 1
 
