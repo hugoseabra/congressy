@@ -1,4 +1,3 @@
 from .line_data import LineData
-from .line_data_collection import LineDataCollection
+from .line_data_collection import LineDataCollection, NoValidLinesError
 from .line_data_collection_builder import LineDataCollectionBuilder
-from .line_data_persistence_collection import LineDataPersistenceCollection

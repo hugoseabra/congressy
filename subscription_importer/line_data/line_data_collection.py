@@ -5,8 +5,11 @@
 
 from collections import UserList
 
-from subscription_importer import NoValidLinesError
 from .line_data import LineData
+
+
+class NoValidLinesError(Exception):
+    pass
 
 
 class LineDataCollection(UserList):

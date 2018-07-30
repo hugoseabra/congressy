@@ -7,18 +7,20 @@ from django.views import generic
 from csv_importer.forms import CSVFileForm, CSVFileConfigForm, CSVProcessForm
 from csv_importer.models import CSVFileConfig
 from subscription_importer import (
-    DataFileTransformer,
     PreviewRenderer,
-    NoValidColumnsError,
-    NoValidLinesError,
     get_required_keys_mappings,
 )
 from subscription_importer.line_data import (
-    LineDataPersistenceCollection,
     LineDataCollection,
+    LineDataCollectionBuilder,
+    NoValidLinesError,
 )
-from subscription_importer.file_build import ErrorXLSBuilder, ErrorCSVMaker
+from subscription_importer.persistence import (
+    CSVErrorPersister,
+    XLSErrorPersister,
+)
 from .subscription import EventViewMixin
+
 
 # @TODO create a view mixin to check if file has been processed
 
@@ -312,15 +314,12 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         separator = self.object.separator
         encoding = self.object.encoding
 
-
-        lines = DataFileTransformer(
+        return LineDataCollectionBuilder(
             file_path=file_path,
             delimiter=delimiter,
             separator=separator,
             encoding=encoding,
-        ).get_lines(size)
-
-        return LineDataCollection(lines)
+        ).get_collection(size)
 
     def get_html_preview_table(self) -> str:
 
@@ -452,23 +451,21 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
         separator = self.object.separator
         encoding = self.object.encoding
 
-        lines = DataFileTransformer(
+        return LineDataCollectionBuilder(
             file_path=file_path,
             delimiter=delimiter,
             separator=separator,
             encoding=encoding,
-        ).get_lines()
-
-        return LineDataPersistenceCollection(lines)
+        ).get_collection()
 
     def _create_error_csv(self, line_data_collection: LineDataCollection):
-        csvfile = ErrorCSVPersister(line_data_collection)
+        csvfile = CSVErrorPersister(line_data_collection)
         self.object.error_csv_file.save(self.object.filename(), csvfile)
 
     def _create_xls(self) -> bytes:
 
         error_csv = self.object.error_csv_file.path
-        xls_maker = ErrorXLSMaker(err_csv_file_path=error_csv)
+        xls_maker = XLSErrorPersister(error_csv)
         return xls_maker.make()
 
     @staticmethod
