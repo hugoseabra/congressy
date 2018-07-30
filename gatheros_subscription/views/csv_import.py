@@ -344,6 +344,7 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
     def dispatch(self, request, *args, **kwargs):
 
         self.object = self.get_object()
+        self.event = self.get_event()
 
         if self.object.processed:
             messages.error(request,
