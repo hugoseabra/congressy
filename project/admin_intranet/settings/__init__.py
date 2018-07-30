@@ -2,9 +2,10 @@
 from project.base_settings import *
 
 # ========================== BASE CONFIGURATION ============================= #
-ROOT_URLCONF = 'project.admin.urls'
+ROOT_URLCONF = 'project.admin_intranet.urls'
 # ================================= APPS ==================================== #
 INSTALLED_APPS += [
+    'admin_intranet',
     'gatheros_event',
     'gatheros_subscription',
     'gatheros_front',
@@ -40,7 +41,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 # ============================== FIXTURES =================================== #
 FIXTURE_DIRS += [
-    os.path.join(BASE_DIR, 'project', 'admin', 'fixtures'),
+    os.path.join(BASE_DIR, 'project', 'admin_intranet', 'fixtures'),
 ]
 # ========================== PARTNER ======================================== #
 # Valor maximo em que a soma de todos os parceiros do evento não deve

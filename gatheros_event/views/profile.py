@@ -17,6 +17,7 @@ from gatheros_event.views.mixins import AccountMixin
 from mailer.services import notify_reset_password
 
 
+LOGIN_SUPERUSER_ONLY = getattr(settings, 'LOGIN_SUPERUSER_ONLY', False)
 ALLOW_ACCOUNT_REGISTRATION = getattr(settings, 'ACCOUNT_REGISTRATION', False)
 
 
@@ -112,7 +113,7 @@ class ProfileCreateView(TemplateView, FormView):
     }
 
     def dispatch(self, request, *args, **kwargs):
-        if ALLOW_ACCOUNT_REGISTRATION is False:
+        if LOGIN_SUPERUSER_ONLY is True or ALLOW_ACCOUNT_REGISTRATION is False:
             messages.warning(
                 self.request,
                 'Não é possível redefinir sua senha neste ambiente.'
@@ -153,7 +154,7 @@ class PasswordResetView(auth_views.PasswordResetView):
 
     def dispatch(self, request, *args, **kwargs):
 
-        if ALLOW_ACCOUNT_REGISTRATION is False:
+        if LOGIN_SUPERUSER_ONLY is True or ALLOW_ACCOUNT_REGISTRATION is False:
             messages.warning(
                 self.request,
                 'Não é possível criar conta neste ambiente.'

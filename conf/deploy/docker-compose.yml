@@ -84,7 +84,7 @@ services:
       - ./env-file
       - ./env-partner-file
 
-  admin:
+  admin_intranet:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     depends_on:
       - migration
@@ -97,13 +97,13 @@ services:
     ports:
       - "8002:80"
     entrypoint:
-      - /services/web/admin/container-entry.sh
+      - /services/web/admin_intranet/container-entry.sh
     volumes:
       - "/etc/localtime:/etc/localtime"
       - "./media:/var/www/cgsy/media"
     env_file:
       - ./env-file
-      - ./env-admin-file
+      - ./env-admin_intranet-file
 
 networks:
   redis:

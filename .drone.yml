@@ -320,9 +320,9 @@ pipeline:
       # env-file do stack de produção - partner
       - echo "DJANGO_SETTINGS_MODULE=project.partner.settings.prod" > ~/cgsy/env-partner-file
       - echo "DOMAIN=$${DOMAIN_PARTNER}" >> ~/cgsy/env-partner-file
-      # env-file do stack de produção - admin
-      - echo "DJANGO_SETTINGS_MODULE=project.admin.settings.prod" > ~/cgsy/env-admin-file
-      - echo "DOMAIN=$${DOMAIN_ADMIN}" >> ~/cgsy/env-admin-file
+      # env-file do stack de produção - admin_intranet
+      - echo "DJANGO_SETTINGS_MODULE=project.admin_intranet.settings.prod" > ~/cgsy/env-admin_intranet-file
+      - echo "DOMAIN=$${DOMAIN_ADMIN}" >> ~/cgsy/env-admin_intranet-file
     when:
       branch: [ master ]
 

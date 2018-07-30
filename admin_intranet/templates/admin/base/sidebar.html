@@ -1,0 +1,43 @@
+<div class="collapse navbar-collapse collapse" id="sidebar" data-animated="fadeInRight">
+    <div class="principal_sidebar new_nav  sidebar-left sidebar" style=" padding-top: 0; left: 0">
+        <ul class="col nav nav-pills nav-stacked " style="
+                            font-size: 25px;text-align: center; margin: 0">
+            <li class="dropdown" style="width: 50px;">
+                <ul id="profile-navbar" class="col nav nav-pills nav-stacked " role="menu"></ul>
+                <a id="profile-button"
+                   data-toggle="tooltip"
+                   data-placement="right"
+                   data-original-title="{{ user.get_full_name }}";>
+                    <span class="meta">
+                       <span style="cursor: pointer;" class="text">
+                       {% if user.person.avatar %}
+                           <img src="{{ user.person.avatar.url }}" class="img-circle img-responsive" />
+                       {% else %}
+                       <i class="fas fa-user-circle" style=" font-size: 30px"></i>
+                       {% endif %}
+                       </span>
+                    </span>
+                </a>
+                <ul id="profile-navbar" class="col nav nav-pills nav-stacked" role="menu" style="display: block;font-size: 20px">
+                    <li>
+                        <a href="{% url 'public:logout' %}"
+                           data-toggle="tooltip"
+                           data-placement="right"
+                           title=""
+                           data-original-title="Sair">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="manage_sidebar">
+        <div>
+            <nav style="color: #383838">
+                {% include 'admin/base/admin-menu.html' %}
+            </nav>
+        </div>
+    </div>
+</div>
