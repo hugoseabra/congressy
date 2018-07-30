@@ -14,7 +14,7 @@ reserved_slugs = (
     'login',
     'logout',
     'register',
-    'cgsy-admin-18',
+    'cgsy-admin18',
     'reset-password'
 )
 

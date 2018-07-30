@@ -75,6 +75,6 @@ setup(
 # Admin
 setup(
     env_dict,
-    '/var/www/cgsy/project/admin/settings/prod.py',
-    '/var/www/cgsy/project/admin/settings/prod.py'
+    '/var/www/cgsy/project/admin_intranet/settings/prod.py',
+    '/var/www/cgsy/project/admin_intranet/settings/prod.py'
 )

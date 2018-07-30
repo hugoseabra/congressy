@@ -1,0 +1,211 @@
+{% load i18n static base_tags %}
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+<!DOCTYPE html>
+<!--[if lt IE 7 ]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="{{ LANGUAGE_CODE|default:"pt-br"}}">
+<![endif]-->
+<!--[if IE 7 ]>
+<html class="no-js lt-ie9 lt-ie8" lang="{{ LANGUAGE_CODE|default:"pt-br"}}">
+<![endif]-->
+<!--[if IE 8 ]>
+<html class="no-js lt-ie9" lang="{{ LANGUAGE_CODE|default:"pt-br"}}">
+<![endif]-->
+<!--[if (gte IE 9)|!(IE)]>
+<html class="no-js" lang="{{ LANGUAGE_CODE|default:"pt-br"}}">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}Congressy{% endblock %}</title>
+    <meta name="description" content="">
+    {#    <meta name="viewport"#}
+    {#          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>#}
+
+    <!-- FAVICONS -->
+    <link rel="icon" href="{% static 'assets/img/favicons/favicon.ico' %}">
+    <link rel="apple-touch-icon"
+          href="{% static 'assets/img/favicons/apple-touch-icon.png' %}">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap/css/bootstrap.min.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap/css/bootstrap-xl.css" %}">
+
+    <!-- Bootstrap Accessibility -->
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap-accessibility/css/bootstrap-accessibility_1.0.3.css" %}">
+
+    <!-- Fonts  -->
+    <link rel="stylesheet"
+          href="{% static "assets/css/fontawesome-all.min.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/css/font-awesome-animation.min.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/css/simple-line-icons.css" %}">
+    <!-- CSS Animate -->
+    <link rel="stylesheet" href="{% static "assets/css/animate.css" %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/icheck/css/all.css' %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/switchery/switchery.min.css" %}">
+
+    <!-- Messenger -->
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/messenger/css/messenger.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/messenger/css/messenger-theme-flat.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/messenger/css/location-sel.css" %}">
+
+
+    <!-- Custom styles for this theme -->
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+
+    {% if form %}
+        {{ form.media.css }}
+    {% endif %}
+
+    <style>
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            border: 1px solid #ccc;
+            display: inline-block;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+
+    </style>
+
+    {% block styles %}{% endblock %}
+
+    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+
+    {% block headscripts %}{% endblock %}
+
+    <!-- Feature detection -->
+    <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="{% static "assets/js/vendor/html5shiv.js"%}"></script>
+        <script src="{% static "assets/js/vendor/respond.min.js"%}"></script>
+    <![endif]-->
+</head>
+<body>
+
+<section id="main-wrapper" class="theme-cgsy-full {% if apponly %}app-only{% endif %} {% if notitle %}no-app-title{% endif %} tooltip-wrapper">
+    <header id="header">
+        <!--logo start-->
+        <div class="brand">
+            <a href="{% url 'front:start' %}">
+                <img class="img base_logo" src="{% static "assets/img/header-logo_black.png" %}" />
+            </a>
+        </div>
+        <!--logo end-->
+    </header>
+    <div class="float-right navbar-header"></div>
+    <div class="row">
+        <div class="col-sm-4 col-md-3 col-lg-3 col-xl-2  sidebar-section">
+            {% include "admin/base/sidebar.html" %}
+        </div>
+        <div class="main-page-full col-xs-12 col-sm-8 col-md-9 col-lg-9 col-xl-10">
+            <div class=" main-content-wrapper">
+                <!--main content start-->
+                <section class="main-content-wrapper" style="position: relative;padding-top: 0;">
+                    <div class="pageheader">
+                        <h1>{% block page_title %}{% endblock %}</h1>
+                        <h2>{% block page_sub_title %}{% endblock %}</h2>
+                        <p class="text-muted">
+                            {% block page_description %}{% endblock %}
+                        </p>
+                    </div>
+                    <section id="main-content" class="animated fadeInUp">
+                        {% block messages %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags }} alert-dismissable">
+                                        <button type="button" class="close"
+                                                data-dismiss="alert"
+                                                aria-hidden="true">×
+                                        </button>
+                                        {{ message|capfirst }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endblock messages %}
+                        {% block content %}{% endblock %}
+                    </section>
+                    <!-- main content end -->
+                </section>
+            </div>
+        </div>
+    </div>
+    <section class="cgsy-footer footer-wrapper">
+        {% include "base/footer.html" %}
+    </section>
+    <div class="clearfix"></div>
+</section>
+
+<!-- Modals -->
+<div class="tooltip-wrapper">
+{% block modals %}{% endblock %}
+</div>
+
+{% include 'sentry-javascript-sdk.html' %}
+
+{% block support %}
+    {% include 'tawto.html' %}
+    {% include 'hotjar.html' %}
+    {% include 'smartlook.html' %}
+{% endblock %}
+
+<!--Global JS-->
+<script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
+<script src="{% static "assets/plugins/bootstrap-accessibility/js/bootstrap-accessibility_1.0.3.js" %}"></script>
+<script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
+<script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
+<script src="{% static "assets/plugins/switchery/switchery.min.js" %}"></script>
+<script src="{% static 'assets/plugins/icheck/js/icheck.min.js' %}"></script>
+<script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+<script src="{% static "assets/plugins/messenger/js/messenger.min.js" %}"></script>
+<script src="{% static "assets/plugins/messenger/js/messenger-theme-flat.js" %}"></script>
+<script src="{% static "assets/plugins/messenger/js/messenger-theme-future.js" %}"></script>
+<script src="{% static "assets/plugins/sortable/js/Sortable.min.js" %}"></script>
+<script src="{% static "assets/js/src/app.js" %}"></script>
+<script src="{% static "assets/js/cgsy.js" %}"></script>
+<script src="{% static "assets/js/ajax.js" %}"></script>
+
+{% if form %}
+    {{ form.media.js }}
+{% endif %}
+
+<script type="application/javascript">
+    $(document).ready(function () {
+        $('.cgsy-date-input').mask("99/99/9999");
+        $('.cgsy-time-input').mask("99:99");
+    });
+
+    $(function () {
+        var button = $("#org-button");
+        var navMain = $(".navbar-collapse");
+        button.click(function () {
+            navMain.collapse('hide');
+        });
+    });
+
+    $(function () {
+        $('#button-toggle').click(function () {
+            $('#sidebar').toggle();
+        });
+    });
+
+</script>
+
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

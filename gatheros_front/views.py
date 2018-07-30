@@ -20,6 +20,7 @@ from gatheros_front.forms import AuthenticationForm
 from gatheros_subscription.views.subscription import MySubscriptionsListView
 from mailer.services import notify_set_password
 
+LOGIN_SUPERUSER_ONLY = getattr(settings, 'LOGIN_SUPERUSER_ONLY', False)
 ALLOW_ACCOUNT_REGISTRATION = getattr(settings, 'ACCOUNT_REGISTRATION', False)
 
 @login_required
@@ -48,7 +49,10 @@ class Login(auth_views.LoginView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['allow_account_registration'] = ALLOW_ACCOUNT_REGISTRATION
+
+        ctx['allow_account_registration'] = \
+            LOGIN_SUPERUSER_ONLY or ALLOW_ACCOUNT_REGISTRATION
+
         ctx['is_embeded'] = self.request.GET.get('embeded') == '1'
         if 'show_captcha' in self.request.session \
                 and self.request.session['show_captcha'] is True:

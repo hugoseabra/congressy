@@ -15,7 +15,7 @@ from gatheros_front.urls import (
 handler500 = 'project.views.handler500'
 
 private_urlpatterns = [
-    url(r'^', include('admin.urls', 'front')),
+    url(r'^', include('admin_intranet.urls', 'front')),
 ]
 
 public_urls = gatheros_front_public
