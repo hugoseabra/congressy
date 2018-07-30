@@ -45,6 +45,7 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     docker-compose -f ~/cgsy/docker-compose.yml logs cron
     docker-compose -f ~/cgsy/docker-compose.yml logs manage
     docker-compose -f ~/cgsy/docker-compose.yml logs partner
+    docker-compose -f ~/cgsy/docker-compose.yml logs admin
     echo ;
 
     # Sucesso

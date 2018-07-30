@@ -71,3 +71,10 @@ setup(
     '/var/www/cgsy/project/partner/settings/prod.py',
     '/var/www/cgsy/project/partner/settings/prod.py'
 )
+
+# Admin
+setup(
+    env_dict,
+    '/var/www/cgsy/project/admin/settings/prod.py',
+    '/var/www/cgsy/project/admin/settings/prod.py'
+)

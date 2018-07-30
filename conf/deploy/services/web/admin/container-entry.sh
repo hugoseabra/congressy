@@ -3,7 +3,7 @@
 source /scripts.sh
 
 # Define settings
-export DJANGO_SETTINGS_MODULE=project.manage.settings.prod
+export DJANGO_SETTINGS_MODULE=project.admin.settings.prod
 
 run_python_script "Configurando WSGI" /configure-wsgi.py
 run_python_script "Configurando NGINX" /configure-nginx.py
