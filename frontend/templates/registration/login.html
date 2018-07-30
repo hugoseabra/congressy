@@ -77,13 +77,13 @@
         </div>
         <div class="form-group" style="margin-bottom: 0">
             <div class="col-md-6 secondary-links">
+                {% if allow_account_registration %}
                 <div class="help-block">
-                    <a href="
-
-
-                            {% url 'public:profile_create' %}{% if is_embeded %}?embeded=1{% endif %}"
-                       style="font-weight: bold;">Criar conta</a>
+                    <a href="{% url 'public:profile_create' %}{% if is_embeded %}?embeded=1{% endif %}" style="font-weight: bold;">
+                        Criar conta
+                    </a>
                 </div>
+                {% endif %}
             </div>
             <div class="col-md-6 secondary-links">
                 <div class="help-block text-right left-when-small">

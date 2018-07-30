@@ -8,7 +8,6 @@ export DJANGO_SETTINGS_MODULE=project.manage.settings.staging
 run_python_script "Configurando SETTINGS" /configure-settings.py
 
 run_python_script_with_output "Executando migrate" "manage.py migrate"
-run_python_script_with_output "Atualizando Site ID" "manage.py loaddata 000_site_staging"
 
 # TEMP
 run_python_script_with_output "Migrando infraestrutura de debitos" "manage.py update_debts"
