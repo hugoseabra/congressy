@@ -95,6 +95,11 @@ urls = [
         name='subscriptions-csv-file-delete'
     ),
     url(
+        r'^import/csv/(?P<csv_pk>[0-9A-Fa-f-]+)/error_file/xls',
+        views.CSVErrorXLSView.as_view(),
+        name='subscriptions-csv-file-error-xls'
+    ),
+    url(
         r'^import/csv/upload$',
         views.CSVFileImportView.as_view(),
         name='subscriptions-csv-file-import'
