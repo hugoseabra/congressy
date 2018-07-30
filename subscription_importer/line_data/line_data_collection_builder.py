@@ -1,6 +1,6 @@
 import csv
 
-from subscription_importer.line_data import LineDataCollection
+from subscription_importer.line_data import LineDataCollection, LineData
 
 
 class LineDataCollectionBuilder(object):
@@ -15,7 +15,7 @@ class LineDataCollectionBuilder(object):
                  delimiter: str,
                  separator: str,
                  encoding: str, ) -> None:
-        
+
         self.file_path = file_path
         self.delimiter = delimiter
         self.separator = separator
@@ -28,7 +28,7 @@ class LineDataCollectionBuilder(object):
 
         counter = 1
         for line in self._get_reader():
-            lines.append(line)
+            lines.append(LineData(line))
 
             if size != 0 and counter == size:
                 break

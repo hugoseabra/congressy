@@ -228,7 +228,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         if form is None:
             form = CSVFileConfigForm(instance=self.object)
 
-        context['required_keys'] = self.get_required_keys()
+        context['required_keys'] = self.get_required_key_mappings()
 
         preview_table = None
         denied_reason = None
@@ -250,7 +250,7 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
 
         return context
 
-    def get_required_keys(self) -> list:
+    def get_required_key_mappings(self) -> list:
         form_config = self.object.lot.event.formconfig
         return get_required_keys_mappings(form_config=form_config)
 
@@ -426,7 +426,7 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
 
         for line in line_data_persistence_collection:
             line.save(commit=commit,
-                      form_config=self.event.formconfig,
+                      form_config=self.object.lot.event.formconfig,
                       lot=self.object.lot, user=self.request.user)
 
             if line.get_errors():
@@ -459,7 +459,7 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
         ).get_collection()
 
     def _create_error_csv(self, line_data_collection: LineDataCollection):
-        csvfile = CSVErrorPersister(line_data_collection)
+        csvfile = CSVErrorPersister(line_data_collection).write()
         self.object.error_csv_file.save(self.object.filename(), csvfile)
 
     def _create_xls(self) -> bytes:

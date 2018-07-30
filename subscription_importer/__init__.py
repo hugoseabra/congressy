@@ -2,7 +2,6 @@ from .constants import (
     KEY_MAP,
 )
 from .exceptions import (
-    MappingNotFoundError,
     DataColumnError,
     NoValidColumnsError,
 )

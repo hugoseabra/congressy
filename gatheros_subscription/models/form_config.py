@@ -253,6 +253,13 @@ class FormConfig(models.Model):
             if 'birth_date' not in required_keys:
                 required_keys.append('birth_date')
 
+        if config.city is True:
+            if 'city' not in required_keys:
+                required_keys.append('city')
+
+            if 'uf' not in required_keys:
+                required_keys.append('uf')
+
         if config.address == config.ADDRESS_SHOW:
             if 'street' not in required_keys:
                 required_keys.append('street')
@@ -268,12 +275,6 @@ class FormConfig(models.Model):
 
             if 'zip_code' not in required_keys:
                 required_keys.append('zip_code')
-
-            if 'city' not in required_keys:
-                required_keys.append('city')
-
-            if 'uf' not in required_keys:
-                required_keys.append('uf')
 
         if config.institution == config.INSTITUTION_REQUIRED:
             if 'institution' not in required_keys:

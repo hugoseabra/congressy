@@ -22,9 +22,6 @@ class LineDataCollection(UserList):
         self.data = []
         super().__init__()
 
-        if not self.data:
-            raise NoValidLinesError()
-
     def append(self, line: LineData):
 
         if not isinstance(line, LineData):

@@ -1,7 +1,7 @@
 from django import forms
+from django.db import transaction
 from django.db.models import Q
 from kanu_locations.models import City
-from django.db import transaction
 
 from core.util.string import clear_string
 from gatheros_event.forms import PersonForm
@@ -43,10 +43,10 @@ class CSVSubscriptionForm(forms.Form):
 
     """
 
-    lot_id = forms.IntegerField(required=True)
-    name = forms.CharField(max_length=255, required=True)
-    email = forms.EmailField(required=True)
-    gender = forms.CharField()
+    lot_id = forms.IntegerField()
+    name = forms.CharField(max_length=255)
+    email = forms.EmailField()
+    gender = forms.CharField(max_length=50)
     cpf = CPFField(max_length=11)
     phone = PhoneField(max_length=11)
     birth_date = forms.DateField(
@@ -61,7 +61,7 @@ class CSVSubscriptionForm(forms.Form):
     number = forms.CharField(max_length=255)
     village = forms.CharField(max_length=255)
     zip_code = ZipCodeField(max_length=8)
-    uf = forms.CharField(max_length=2)
+    uf = forms.CharField(max_length=100)
     city = forms.CharField(max_length=255)
     institution = forms.CharField(max_length=255)
     institution_cnpj = CNPJField(max_length=14)
@@ -77,20 +77,38 @@ class CSVSubscriptionForm(forms.Form):
 
         super().__init__(*args, **kwargs)
 
-        for key in self.required_keys:
-            self.set_as_required(key)
+        for field in self.fields:
+            
+            if field in required_keys:
+                self.set_as_required(field)
+            else:
+                self.set_as_not_required(field)
 
     def clean_gender(self):
         gender = self.cleaned_data.get('gender')
         if not gender:
             return gender
 
-        return str(gender).upper()
+        gender = str(gender).lower()
+
+        if gender == "feminino":
+            gender = 'f'
+        elif gender == "masculino":
+            gender = 'm'
+
+        if len(str(gender)) > 1:
+            raise forms.ValidationError("Sexo deve ser apenas uma letra")
+
+        return gender.upper()
 
     def clean_uf(self):
         cleaned_uf = self.cleaned_data.get("uf")
         if not cleaned_uf:
             return cleaned_uf
+
+        if len(str(cleaned_uf)) > 2:
+            raise forms.ValidationError(
+                "Estados devem ser informados em forma de sigla.")
 
         return str(cleaned_uf).upper()
 
@@ -207,3 +225,9 @@ class CSVSubscriptionForm(forms.Form):
         if field_name not in self.fields:
             raise ValueError('Unknown field name: {}'.format(field_name))
         self.fields[field_name].required = True
+
+    def set_as_not_required(self, field_name):
+
+        if field_name not in self.fields:
+            raise ValueError('Unknown field name: {}'.format(field_name))
+        self.fields[field_name].required = False
