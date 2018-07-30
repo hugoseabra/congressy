@@ -5,7 +5,15 @@ from .models import (
     LotCategory,
     Lot,
     Subscription,
+    FormConfig,
 )
+
+
+@admin.register(FormConfig)
+class FormConfigAdmin(admin.ModelAdmin):
+    search_fields = (
+        'event__name',      
+    )
 
 
 @admin.register(LotCategory)
