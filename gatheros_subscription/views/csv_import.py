@@ -336,6 +336,56 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         return line_data_collection[0].get_invalid_keys()
 
 
+class CSVErrorXLSView(CSVViewMixin):
+    object = None
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+
+        if not self.object.processed:
+            messages.error(request,
+                           "Arquivo ainda não foi processado.")
+            return redirect(self.get_success_url())
+
+        return response
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(
+            CSVFileConfig,
+            pk=self.kwargs.get('csv_pk'),
+            event=self.kwargs.get('event_pk'),
+        )
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        xls = self._create_xls()
+
+        response = HttpResponse(xls, content_type=self._get_mime_type())
+        response[
+            'Content-Disposition'] = 'attachment; filename="{}"'.format(
+            self.object.err_filename().split('.')[0] + '.xls',
+        )
+
+        return response
+
+    def _create_xls(self) -> bytes:
+        error_csv = self.object.error_csv_file.path
+        xls_maker = XLSErrorPersister(error_csv)
+        return xls_maker.make()
+
+    def get_success_url(self):
+        return reverse_lazy('subscription:subscriptions-csv-list', kwargs={
+            'event_pk': self.event.pk
+        })
+
+    @staticmethod
+    def _get_mime_type() -> str:
+        mime = 'application'
+        content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        return '{}/{}'.format(mime, content_type)
+
+
 class CSVProcessView(CSVViewMixin, generic.FormView):
     template_name = 'subscription/csv_process.html'
     form_class = CSVProcessForm
@@ -344,6 +394,7 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
     def dispatch(self, request, *args, **kwargs):
 
         self.object = self.get_object()
+        self.event = self.get_event()
 
         if self.object.processed:
             messages.error(request,

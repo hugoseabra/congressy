@@ -166,6 +166,7 @@
                                                     <span class="fas fa-cog"></span>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-right" role="menu">
+
                                                     <li class="text-center">
 
                                                         <button onclick="
@@ -194,7 +195,16 @@
                                                             Apagar
                                                         </button>
                                                     </li>
-
+                                                    {% if csv.processed %}
+                                                        <li class="text-center">
+                                                            <a
+                                                                    href="{% url 'subscription:subscriptions-csv-file-error-xls' event.pk csv.pk %}"
+                                                                    class="btn btn-danger btn-md">
+                                                                <i class="far fa-file-excel"></i>
+                                                                Arquivo de Erros
+                                                            </a>
+                                                        </li>
+                                                    {% endif %}
                                                 </ul>
                                             </div>
 
