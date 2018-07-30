@@ -21,6 +21,7 @@ INSTALLED_APPS += [
     'scientific_work',
     'certificate',
     'raffle',
+    'csv_importer',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'
