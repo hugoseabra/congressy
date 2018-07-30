@@ -154,7 +154,7 @@ class Migration(migrations.Migration):
             name='Subscription',
             fields=[
                 ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('origin', models.CharField(choices=[('hotsite', 'Hotsite do evento'), ('manage', 'Manage')], default='hotsite', max_length=15, verbose_name='origem')),
+                ('origin', models.CharField(choices=[('hotsite', 'Hotsite do evento'), ('manage', 'Manage'), ('csv_import', 'Import via CSV')], default='hotsite', max_length=15, verbose_name='origem')),
                 ('created_by', models.PositiveIntegerField(verbose_name='criado por')),
                 ('attended', models.BooleanField(default=False, verbose_name='compareceu')),
                 ('code', models.CharField(blank=True, max_length=15, verbose_name='código')),

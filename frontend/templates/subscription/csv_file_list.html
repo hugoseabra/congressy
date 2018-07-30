@@ -1,0 +1,343 @@
+{% extends "base/base.html" %}
+{% load  form_config_tags static %}
+{% block title %}Importar | Congressy{% endblock %}
+
+{% block page_title %}Importar via CSV{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_description %}
+    Importação de dados via CSV
+{% endblock %}
+
+{% block styles %}
+
+    <!-- Select2 lib -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
+
+{% endblock %}
+
+{% block scripts %}
+
+    <!-- Select2 lib -->
+    <script src="{% static 'assets/plugins/select2/js/select2.min.js' %}"></script>
+
+    <script type="application/javascript">
+
+
+        function openDeleteModal(csv_pk, csv_file_name) {
+            var event_pk = "{{ event.pk }}";
+
+            var url = "/manage/events/" + event_pk + "/subscriptions/import/csv/" + csv_pk + "/delete";
+
+            $('#csv_file_name').text(csv_file_name);
+            $('#delete-form').attr('action', url);
+            $('#delete_modal').modal('show');
+
+        }
+
+        $(document).ready(function () {
+
+            var file_loader_el = $('#csv-file-loader');
+            var csv_file_els = $('.csv-file');
+            var lot_select_el = $('#id_lot');
+
+            $('#trigger-import').on('click', function () {
+                $('#import_modal').modal('show');
+                // Starting select2
+                lot_select_el.select2({
+                    theme: "classic",
+                    width: 'resolve'
+                });
+            });
+
+
+            $("#save-submission").on('click', function () {
+                //TODO Implement filetype check, verify that the file is a csv before submitting this form.
+                $('#import_modal').modal('hide');
+                csv_file_els.hide();
+                file_loader_el.show();
+
+                $('#file-form').submit();
+            });
+
+
+        });
+
+    </script>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-right">
+
+                    {% if object_list %}
+
+                        <button class="btn btn-success" id="trigger-import">
+                            <i class="fa fa-plus"></i>
+                            Adicionar
+                        </button>
+
+                    {% endif %}
+
+                </div>
+                <div class="float-left">
+                    <a href="{% url 'subscription:subscription-list' event.pk %}"
+                       class="btn btn-primary">
+                        <i class="fas fa-arrow-circle-left"></i>
+                        Voltar
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Lista de Arquivos
+                    </h3>
+                </div>
+
+
+                <div class="panel-body text-center" id="csv-file-loader" style="height: 200px; display: none;">
+
+                    <div class="row text-center"
+                         style="margin-top:20px;">
+                        <h3>Processando arquivo, aguarde...</h3>
+                        <i class="fas info-color fa-circle-notch fa-spin
+                        fa-6x" style="margin-top: 20px"></i>
+                    </div>
+
+                </div>
+
+
+                {% if object_list %}
+                    <div class="panel-body csv-file">
+
+                        <div class="col-md-12">
+
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>Nome do arquivo</th>
+                                    <th class="col-md-2">Lote</th>
+                                    <th class="col-md-2">Data de Envio</th>
+                                    <th class="col-md-2">Já foi processada?</th>
+                                    <th class="col-md-1">Ações</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+
+                                {% for csv in object_list %}
+                                    <tr>
+                                        <td>{{ csv.filename }}</td>
+                                        <td>{{ csv.lot.name }}</td>
+                                        <td>{{ csv.created|date:"d/m/Y H\hi" }}</td>
+                                        <td class="text-center">
+                                            {% if csv.processed %}
+                                                <i class="fas fa-check-circle" style="color: #00dd1c"></i>
+                                            {% else %}
+                                                <i class="fas fa-times-circle" style="color: #dd0901"></i>
+
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+
+
+                                            <div class="btn-group">
+                                                <button
+                                                        type="button"
+                                                        class="btn
+                                                    btn-primary btn-trans
+                                                    btn-sm dropdown-toggle"
+                                                        data-toggle="dropdown"
+                                                        aria-expanded="false"
+                                                >
+                                                    <span class="fas fa-cog"></span>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                    <li class="text-center">
+
+                                                        <button onclick="
+                                                                {% if csv.processed %}
+                                                                    void(0);
+                                                                {% else %}
+                                                                    window.location='{% url 'subscription:subscriptions-csv-file-prepare' event.pk csv.pk %}'
+                                                                {% endif %}"
+                                                                class="btn btn-primary btn-md" {% if csv.processed %}disabled {% endif %}>
+                                                            <i class="fas fa-exchange-alt"></i>
+                                                            Processar
+                                                        </button>
+
+                                                    </li>
+
+                                                    <li class="text-center">
+                                                        <button
+                                                                onclick='
+                                                                        {% if csv.processed %}
+                                                                            void(0);
+                                                                        {% else %}
+                                                                            openDeleteModal("{{ csv.pk }}", "{{ csv.filename }}");
+                                                                        {% endif %}'
+                                                                type="button" class="btn btn-danger btn-md" {% if csv.processed %}disabled {% endif %}>
+                                                            <i class="far fa-trash-alt"></i>
+                                                            Apagar
+                                                        </button>
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+
+                                </tbody>
+                            </table>
+
+
+                        </div>
+
+
+                    </div>
+
+                {% else %}
+
+                    <div class="panel-body text-center csv-file" style="height: 200px;">
+
+                        <h1 style="margin-top: 50px">
+
+                            <strong>
+                                Nenhum arquivo até o momento =(
+                            </strong>
+
+                        </h1>
+
+                        <button class="btn btn-primary" style="margin-top: 15px" id="trigger-import">
+                            <i class="fas fa-upload"></i>
+                            Importar
+                        </button>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block modals %}
+
+    <div class="modal" id="import_modal" role="dialog"
+         aria-labelledby="import_modal_label">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">×
+                    </button>
+                    <h4 class="modal-title"
+                        id="import_modal_label">
+                        Importação de arquivo CSV
+                    </h4>
+                </div>
+                <div class="modal-body">
+
+                    <form method="POST" action="{% url 'subscription:subscriptions-csv-file-import' event.pk %}" id="file-form" enctype=multipart/form-data>
+
+                        {% csrf_token %}
+
+                        {{ form.event }}
+
+                        {% render_generic_field form.lot %}
+                        {% render_generic_field form.csv_file %}
+                        <input name="csv_file" id="id_csv_file" type="file" accept=".csv">
+
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger"
+                            data-dismiss="modal">Fechar
+                    </button>
+                    <button type="button" class="btn btn-success" id="save-submission">
+                        Enviar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal" id="delete_modal" role="dialog"
+         aria-labelledby="delete_modal_label">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">×
+                    </button>
+                    <h4 class="modal-title"
+                        id="delete_modal_label">
+                        Deletar arquivo CSV
+                    </h4>
+                </div>
+                <form method="POST" id="delete-form">
+                    <div class="modal-body">
+
+
+                        {% csrf_token %}
+
+
+                        <h1 class="text-center">
+                            <strong>
+                                <i class="fas fa-exclamation-triangle danger-color"></i>
+                                Atenção!
+                                <i class="fas fa-exclamation-triangle danger-color"></i>
+                            </strong>
+                        </h1>
+
+
+                        <h3 class="text-center text-uppercase" style="margin-top: 15px">
+                            Tem certeza que deseja deletar o arquivo:
+                            <strong>
+                                <span id="csv_file_name"></span>
+                            </strong>
+                            <br/>
+                        </h3>
+                        <h4 class="text-muted text-center" style="margin-top: 15px">
+                            Essa ação é irreversivel!
+                        </h4>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default"
+                                data-dismiss="modal">Fechar
+                        </button>
+                        <button type="submit" class="btn btn-danger" id="delete_csv">
+                            <i class="far fa-trash-alt"></i>
+                            Apagar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

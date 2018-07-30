@@ -51,6 +51,7 @@ class EventAdmin(admin.ModelAdmin):
                 'published',
                 'slug',
                 'allow_boleto_expiration_on_lot_expiration',
+                'allow_importing',
             ),
         }),
         ('Inscrições', {

@@ -80,6 +80,31 @@ urls = [
         name='subscriptions-export'
     ),
     url(
+        r'^import/csv/(?P<csv_pk>[0-9A-Fa-f-]+)/prepare$',
+        views.CSVPrepareView.as_view(),
+        name='subscriptions-csv-file-prepare'
+    ),
+    url(
+        r'^import/csv/(?P<csv_pk>[0-9A-Fa-f-]+)/process$',
+        views.CSVProcessView.as_view(),
+        name='subscriptions-csv-file-process'
+    ),
+    url(
+        r'^import/csv/(?P<csv_pk>[0-9A-Fa-f-]+)/delete',
+        views.CSVDeleteView.as_view(),
+        name='subscriptions-csv-file-delete'
+    ),
+    url(
+        r'^import/csv/upload$',
+        views.CSVFileImportView.as_view(),
+        name='subscriptions-csv-file-import'
+    ),
+    url(
+        r'^import/csv/$',
+        views.CSVListView.as_view(),
+        name='subscriptions-csv-list'
+    ),
+    url(
         r'^$',
         views.SubscriptionListView.as_view(),
         name='subscription-list'

@@ -694,8 +694,7 @@ class SubscriptionCancelView(EventViewMixin, generic.DetailView):
         })
 
 
-class SubscriptionAttendanceDashboardView(EventViewMixin,
-                                          generic.TemplateView):
+class SubscriptionAttendanceDashboardView(EventViewMixin, generic.TemplateView):
     template_name = 'subscription/attendance-dashboard.html'
     search_by = 'name'
 
