@@ -1,15 +1,32 @@
 import os
+from datetime import datetime
 from uuid import uuid4
 
 from django.db import models
 from django.utils import timezone
-from .storage import OverwriteStorage
 
 from csv_importer.validators import validate_csv_only_file
+from .storage import OverwriteStorage
 
 
-def get_file_path(instance, filename):
+def get_file_path(instance, *args, **kwargs):
     """ Resgata localização onde os arquivos csv serão salvos. """
+
+    now = datetime.now()
+    day = str(now.day)
+    month = str(now.month)
+    year = str(now.year)
+    hour = str(now.hour)
+    minute = str(now.minute)
+
+    filename = "Import_Congressy_{}_{}_{}_{}h{}m.csv".format(
+        day,
+        month,
+        year,
+        hour,
+        minute,
+    )
+
     return os.path.join(
         "event",
         str(instance.event.id),
@@ -19,8 +36,24 @@ def get_file_path(instance, filename):
     )
 
 
-def get_err_file_path(instance, filename):
+def get_err_file_path(instance, *args, **kwargs):
     """ Resgata localização onde os arquivos de erro do csv serão salvos. """
+
+    now = datetime.now()
+    day = str(now.day)
+    month = str(now.month)
+    year = str(now.year)
+    hour = str(now.hour)
+    minute = str(now.minute)
+
+    filename = "Import_com_errors_Congressy_{}_{}_{}_{}h{}m.csv".format(
+        day,
+        month,
+        year,
+        hour,
+        minute,
+    )
+
     return os.path.join(
         "event",
         str(instance.event.id),
@@ -45,7 +78,7 @@ class CSVFileConfig(models.Model):
     """
         Representação de todas as configurações de leitura de um arquivo CSV
     """
-    
+
     ENCODING_UTF8 = "utf-8"
     ENCODING_8859_1 = "iso-8859-1"
 
@@ -132,4 +165,3 @@ class CSVFileConfig(models.Model):
 
     def err_filename(self):
         return os.path.basename(self.error_csv_file.name)
-
