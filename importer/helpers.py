@@ -17,8 +17,11 @@ def get_mapping_from_csv_key(key):
 
 
 def get_required_keys(form_config) -> list:
-    found_keys = []
-    required_keys = REQUIRED_KEYS
+    found_keys = list()
+    required_keys = list()
+    
+    required_keys.extend(REQUIRED_KEYS)
+
     form_config_keys = form_config.get_required_keys()
     required_keys.extend(
         x for x in form_config_keys if x not in required_keys)
