@@ -21,7 +21,8 @@ class LineData(object):
 
     def __init__(self, raw_data: OrderedDict) -> None:
 
-        self.__invalid_keys = []
+        self.__invalid_keys = list()
+        self.__internal_mapping = dict()
         self.__errors = None
 
         for raw_key, raw_value in raw_data.items():
@@ -30,12 +31,13 @@ class LineData(object):
             is_valid = False
 
             for key, value in KEY_MAP.items():
-                if parsed_key in value['csv_keys']:
+                if parsed_key in value['csv_keys'] or parsed_key == key:
                     is_valid = True
                     parsed_key = key
                     break
 
             if is_valid:
+                self.__internal_mapping.update({parsed_key: raw_key})
                 setattr(self, parsed_key, raw_value)
             else:
                 self.__invalid_keys.append(raw_key)
@@ -88,3 +90,6 @@ class LineData(object):
 
     def get_invalid_keys(self):
         return self.__invalid_keys
+
+    def get_raw_header_key(self, key: str):
+        return self.__internal_mapping.get(key)

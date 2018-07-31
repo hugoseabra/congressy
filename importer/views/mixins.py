@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.views import generic
 
 from gatheros_subscription.views.subscription import EventViewMixin
 from importer.models import CSVFileConfig
@@ -44,7 +45,7 @@ class CSVViewMixin(EventViewMixin):
         return context
 
 
-class CSVProcessedViewMixin(CSVViewMixin):
+class CSVProcessedViewMixin(CSVViewMixin, generic.DetailView):
     """
         Mixin utilizado para não permitir acesso caso
         arquivo já tenha sido processado.
