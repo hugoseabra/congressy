@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from django.contrib.auth.models import User
 
-from csv_importer.forms import CSVSubscriptionForm
+from importer.forms import CSVSubscriptionForm
 from gatheros_subscription.models import FormConfig, Lot
 from subscription_importer.constants import KEY_MAP
 from subscription_importer.helpers import get_required_keys

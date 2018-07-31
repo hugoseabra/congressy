@@ -1,6 +1,6 @@
 from django import forms
 
-from csv_importer.models import CSVFileConfig
+from importer.models import CSVFileConfig
 from gatheros_event.models import Event
 from gatheros_subscription.models import Lot
 

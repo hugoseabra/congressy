@@ -4,21 +4,19 @@ from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
 
-from csv_importer.forms import CSVFileForm, CSVFileConfigForm, CSVProcessForm
-from csv_importer.models import CSVFileConfig
-from subscription_importer import (
-    PreviewRenderer,
-    get_required_keys_mappings,
-)
-from subscription_importer.line_data import (
+from importer.forms import CSVFileForm, CSVFileConfigForm, CSVProcessForm
+from importer.helpers import get_required_keys_mappings
+from importer.line_data import (
     LineDataCollection,
     LineDataCollectionBuilder,
     NoValidLinesError,
 )
-from subscription_importer.persistence import (
+from importer.models import CSVFileConfig
+from importer.persistence import (
     CSVErrorPersister,
     XLSErrorPersister,
 )
+from importer.preview_renderer import PreviewRenderer
 from .subscription import EventViewMixin
 
 
