@@ -153,36 +153,26 @@
                                         </td>
                                         <td class="text-center">
 
-
                                             <div class="btn-group">
-                                                <button
-                                                        type="button"
-                                                        class="btn
-                                                    btn-primary btn-trans
-                                                    btn-sm dropdown-toggle"
-                                                        data-toggle="dropdown"
-                                                        aria-expanded="false"
-                                                >
+                                                <button type="button" class="btn btn-md btn-primary dropdown-toggle btn-trans" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                     <span class="fas fa-cog"></span>
                                                 </button>
-                                                <ul class="dropdown-menu dropdown-menu-right" role="menu">
-
+                                                <ul class="dropdown-menu dropdown-menu-right">
                                                     <li class="text-center">
-
                                                         <button onclick="
                                                                 {% if csv.processed %}
                                                                     void(0);
                                                                 {% else %}
-                                                                    window.location='{% url 'subscription:subscriptions-csv-file-prepare' event.pk csv.pk %}'
+                                                                    window.location='{% url 'importer:csv-file-prepare' event.pk csv.pk %}'
                                                                 {% endif %}"
-                                                                class="btn btn-primary btn-md" {% if csv.processed %}disabled {% endif %}>
+                                                                class="btn btn-primary btn-sm" {% if csv.processed %}disabled {% endif %}>
                                                             <i class="fas fa-exchange-alt"></i>
                                                             Processar
                                                         </button>
-
                                                     </li>
-
                                                     <li class="text-center">
+
+
                                                         <button
                                                                 onclick='
                                                                         {% if csv.processed %}
@@ -190,24 +180,29 @@
                                                                         {% else %}
                                                                             openDeleteModal("{{ csv.pk }}", "{{ csv.filename }}");
                                                                         {% endif %}'
-                                                                type="button" class="btn btn-danger btn-md" {% if csv.processed %}disabled {% endif %}>
+                                                                type="button" class="btn btn-danger btn-sm" {% if csv.processed %}disabled {% endif %}>
                                                             <i class="far fa-trash-alt"></i>
                                                             Apagar
                                                         </button>
+
+
                                                     </li>
-                                                    {% if csv.processed %}
+
+                                                    {% if csv.processed and error_csv_file %}
+                                                        <li role="separator" class="divider"></li>
                                                         <li class="text-center">
                                                             <a
-                                                                    href="{% url 'subscription:subscriptions-csv-file-error-xls' event.pk csv.pk %}"
-                                                                    class="btn btn-danger btn-md">
+                                                                    href="{% url 'importer:csv-file-error-xls' event.pk csv.pk %}"
+                                                                    class="btn btn-danger btn-sm">
                                                                 <i class="far fa-file-excel"></i>
                                                                 Arquivo de Erros
                                                             </a>
                                                         </li>
                                                     {% endif %}
+
+
                                                 </ul>
                                             </div>
-
 
                                         </td>
                                     </tr>
@@ -230,7 +225,7 @@
                         <h1 style="margin-top: 50px">
 
                             <strong>
-                                Nenhum arquivo até o momento =(
+                                Nenhum arquivo
                             </strong>
 
                         </h1>
@@ -268,7 +263,7 @@
                 </div>
                 <div class="modal-body">
 
-                    <form method="POST" action="{% url 'subscription:subscriptions-csv-file-import' event.pk %}" id="file-form" enctype=multipart/form-data>
+                    <form method="POST" action="{% url 'importer:csv-file-import' event.pk %}" id="file-form" enctype=multipart/form-data>
 
                         {% csrf_token %}
 

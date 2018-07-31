@@ -5,7 +5,7 @@ from uuid import uuid4
 from django.db import models
 from django.utils import timezone
 
-from csv_importer.validators import validate_csv_only_file
+from importer.validators import validate_csv_only_file
 from .storage import OverwriteStorage
 
 

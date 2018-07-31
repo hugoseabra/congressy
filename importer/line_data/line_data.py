@@ -2,10 +2,10 @@ from collections import OrderedDict
 
 from django.contrib.auth.models import User
 
-from csv_importer.forms import CSVSubscriptionForm
 from gatheros_subscription.models import FormConfig, Lot
-from subscription_importer.constants import KEY_MAP
-from subscription_importer.helpers import get_required_keys
+from importer.constants import KEY_MAP
+from importer.forms import CSVSubscriptionForm
+from importer.helpers import get_required_keys
 
 
 class LineData(object):
@@ -15,6 +15,8 @@ class LineData(object):
         
             - setar os nomes corretos das chaves do cabeçalho
             - fornecer informações de chaves invalidas
+
+        Além de também realizar a persistencia através do método save.
     """
 
     def __init__(self, raw_data: OrderedDict) -> None:
@@ -45,7 +47,18 @@ class LineData(object):
              form_config: FormConfig,
              lot: Lot,
              user: User,
-             commit: bool = False):                     
+             commit: bool = False):
+        """
+
+        Esse método faz a delegação da persistencia para um Form, passando pra
+        ele os campos obrigatorios através de um objeto FormConfig.
+
+        :param form_config: Object FormConfig
+        :param lot: Object Lot
+        :param user: Object User
+        :param commit: Boolean
+        :return: None
+        """
 
         required_keys = get_required_keys(form_config=form_config)
 

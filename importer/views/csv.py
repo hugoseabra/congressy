@@ -1,64 +1,23 @@
 from django.contrib import messages
-from django.http.response import JsonResponse, HttpResponse
-from django.shortcuts import redirect, get_object_or_404
+from django.http.response import HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 
-from csv_importer.forms import CSVFileForm, CSVFileConfigForm, CSVProcessForm
-from csv_importer.models import CSVFileConfig
-from subscription_importer import (
-    PreviewRenderer,
-    get_required_keys_mappings,
-)
-from subscription_importer.line_data import (
+from importer.forms import CSVFileForm, CSVFileConfigForm, CSVProcessForm
+from importer.helpers import get_required_keys_mappings
+from importer.line_data import (
     LineDataCollection,
     LineDataCollectionBuilder,
     NoValidLinesError,
 )
-from subscription_importer.persistence import (
+from importer.models import CSVFileConfig
+from importer.persistence import (
     CSVErrorPersister,
     XLSErrorPersister,
 )
-from .subscription import EventViewMixin
-
-
-# @TODO create a view mixin to check if file has been processed
-
-class CSVViewMixin(EventViewMixin):
-    """
-        Mixin utilizado para não permitir acesso sem determinada flag ativada.
-    """
-
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-
-        if not self.event.allow_importing:
-
-            if request.is_ajax():
-                message = 'Evento não permite importação via CSV'
-                return JsonResponse({'error': message}, status=403)
-
-            else:
-
-                messages.error(request,
-                               "Evento não permite importação via CSV.")
-
-                url = reverse_lazy(
-                    "subscription:subscription-list",
-                    kwargs={
-                        'event_pk': self.event.pk
-                    }
-                )
-
-                return redirect(url)
-
-        return response
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['has_inside_bar'] = True
-        context['active'] = 'inscricoes'
-        return context
+from importer.preview_renderer import PreviewRenderer
+from .mixins import CSVViewMixin, CSVProcessedViewMixin
 
 
 class CSVListView(CSVViewMixin, generic.ListView):
@@ -66,7 +25,7 @@ class CSVListView(CSVViewMixin, generic.ListView):
         View responsavel por fazer a listagem dos arquivos CSV de determinado
         evento e de engatilhar novas importações.
     """
-    template_name = "subscription/csv_file_list.html"
+    template_name = "importer/csv_file_list.html"
 
     def get_queryset(self):
         return CSVFileConfig.objects.filter(event=self.event)
@@ -75,43 +34,6 @@ class CSVListView(CSVViewMixin, generic.ListView):
         context = super().get_context_data(**kwargs)
         context['form'] = CSVFileForm(initial={'event': self.event.pk})
         return context
-
-
-class CSVDeleteView(CSVViewMixin, generic.DeleteView):
-    object = None
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.object.processed:
-            messages.error(request,
-                           "Arquivo já processado não pode ser apagado!")
-            return redirect(self.get_success_url())
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        return self.delete(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        """
-        Call the delete() method on the fetched object and then redirect to the
-        success URL.
-        """
-        self.object = self.get_object()
-        self.object.delete()
-        messages.success(request, "Arquivo apagado com sucesso!")
-        return redirect(self.get_success_url())
-
-    def get_object(self, queryset=None):
-        return CSVFileConfig.objects.get(
-            pk=self.kwargs.get('csv_pk'),
-            event=self.kwargs.get('event_pk'),
-        )
-
-    def get_success_url(self):
-        return reverse_lazy('subscription:subscriptions-csv-list', kwargs={
-            'event_pk': self.event.pk
-        })
 
 
 class CSVFileImportView(CSVViewMixin, generic.View):
@@ -126,7 +48,7 @@ class CSVFileImportView(CSVViewMixin, generic.View):
     http_method_names = ['post']
 
     def get_success_url(self):
-        return reverse_lazy('subscription:subscriptions-csv-file-prepare',
+        return reverse_lazy('importer:csv-file-prepare',
                             kwargs={
                                 'csv_pk': self.object.pk,
                                 'event_pk': self.event.pk
@@ -191,34 +113,36 @@ class CSVFileImportView(CSVViewMixin, generic.View):
                            "{}: {}".format(error, value[0]))
 
         return redirect(
-            reverse_lazy('subscription:subscriptions-csv-list', kwargs={
+            reverse_lazy('importer:csv-list', kwargs={
                 'event_pk': self.event.pk,
             }))
 
 
-class CSVPrepareView(CSVViewMixin, generic.DetailView):
-    template_name = "subscription/csv_prepare.html"
+class CSVDeleteView(CSVProcessedViewMixin, generic.DeleteView):
+
+    def get(self, request, *args, **kwargs):
+        return self.delete(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Call the delete() method on the fetched object and then redirect to the
+        success URL.
+        """
+        self.object = self.get_object()
+        self.object.delete()
+        messages.success(request, "Arquivo apagado com sucesso!")
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse_lazy('importer:csv-list', kwargs={
+            'event_pk': self.event.pk
+        })
+
+
+class CSVPrepareView(CSVProcessedViewMixin, generic.DetailView):
+    template_name = "importer/csv_prepare.html"
     initial = {}
     prefix = None
-    object = None
-
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-
-        if self.object.processed:
-            messages.error(request,
-                           "Arquivo já processado não pode ser processado novamente")
-            return redirect(self.get_success_url())
-
-        return response
-
-    def get_object(self, queryset=None):
-
-        return get_object_or_404(
-            CSVFileConfig,
-            pk=self.kwargs.get('csv_pk'),
-            event=self.kwargs.get('event_pk'),
-        )
 
     def get_context_data(self, **kwargs):
 
@@ -301,11 +225,6 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         """Return the prefix to use for forms."""
         return self.prefix
 
-    def get_success_url(self):
-        return reverse_lazy('subscription:subscriptions-csv-list', kwargs={
-            'event_pk': self.event.pk
-        })
-
     # --------- CUSTOM --------------
     def get_data_collection(self, size):
 
@@ -336,80 +255,9 @@ class CSVPrepareView(CSVViewMixin, generic.DetailView):
         return line_data_collection[0].get_invalid_keys()
 
 
-class CSVErrorXLSView(CSVViewMixin):
-    object = None
-
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-
-        if not self.object.processed:
-            messages.error(request,
-                           "Arquivo ainda não foi processado.")
-            return redirect(self.get_success_url())
-
-        return response
-
-    def get_object(self, queryset=None):
-        return get_object_or_404(
-            CSVFileConfig,
-            pk=self.kwargs.get('csv_pk'),
-            event=self.kwargs.get('event_pk'),
-        )
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-
-        xls = self._create_xls()
-
-        response = HttpResponse(xls, content_type=self._get_mime_type())
-        response[
-            'Content-Disposition'] = 'attachment; filename="{}"'.format(
-            self.object.err_filename().split('.')[0] + '.xls',
-        )
-
-        return response
-
-    def _create_xls(self) -> bytes:
-        error_csv = self.object.error_csv_file.path
-        xls_maker = XLSErrorPersister(error_csv)
-        return xls_maker.make()
-
-    def get_success_url(self):
-        return reverse_lazy('subscription:subscriptions-csv-list', kwargs={
-            'event_pk': self.event.pk
-        })
-
-    @staticmethod
-    def _get_mime_type() -> str:
-        mime = 'application'
-        content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        return '{}/{}'.format(mime, content_type)
-
-
-class CSVProcessView(CSVViewMixin, generic.FormView):
-    template_name = 'subscription/csv_process.html'
+class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
+    template_name = 'importer/csv_process.html'
     form_class = CSVProcessForm
-    object = None
-
-    def dispatch(self, request, *args, **kwargs):
-
-        self.object = self.get_object()
-        self.event = self.get_event()
-
-        if self.object.processed:
-            messages.error(request,
-                           "Arquivo já processado não pode ser processado novamente")
-            return redirect(self.get_success_url())
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_object(self):
-
-        return get_object_or_404(
-            CSVFileConfig,
-            pk=self.kwargs.get('csv_pk'),
-            event=self.kwargs.get('event_pk'),
-        )
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -440,10 +288,8 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
                              "Criadas {} inscrições com sucesso".format(
                                  results['valid']))
 
-            return redirect(
-                reverse_lazy('subscription:subscriptions-csv-list', kwargs={
-                    'event_pk': self.event.pk,
-                }))
+            return redirect(self.get_success_url())
+
         elif create_xls:
 
             xls = self._create_xls()
@@ -465,7 +311,7 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
         return super().form_invalid(form)
 
     def get_success_url(self):
-        return reverse_lazy('subscription:subscriptions-csv-list', kwargs={
+        return reverse_lazy('importer:csv-list', kwargs={
             'event_pk': self.event.pk
         })
 
@@ -515,6 +361,33 @@ class CSVProcessView(CSVViewMixin, generic.FormView):
 
     def _create_xls(self) -> bytes:
 
+        error_csv = self.object.error_csv_file.path
+        xls_maker = XLSErrorPersister(error_csv)
+        return xls_maker.make()
+
+    @staticmethod
+    def _get_mime_type() -> str:
+        mime = 'application'
+        content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        return '{}/{}'.format(mime, content_type)
+
+
+class CSVErrorXLSView(CSVProcessedViewMixin):
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        xls = self._create_xls()
+
+        response = HttpResponse(xls, content_type=self._get_mime_type())
+        response[
+            'Content-Disposition'] = 'attachment; filename="{}"'.format(
+            self.object.err_filename().split('.')[0] + '.xls',
+        )
+
+        return response
+
+    def _create_xls(self) -> bytes:
         error_csv = self.object.error_csv_file.path
         xls_maker = XLSErrorPersister(error_csv)
         return xls_maker.make()

@@ -15,7 +15,7 @@
         <div class="col-md-12">
             <div class="buttonbar">
                 <div class="float-left">
-                    <a href="{% url 'subscription:subscriptions-csv-list' event.pk %}"
+                    <a href="{% url 'importer:csv-list' event.pk %}"
                        class="btn btn-primary">
                         <i class="fas fa-arrow-circle-left"></i>
                         Voltar
@@ -281,7 +281,7 @@
 
                         <div class="col-md-12">
                             <a class="btn btn-lg btn-success"
-                               href="{% url 'subscription:subscriptions-csv-file-process' event.pk object.pk %}"
+                               href="{% url 'importer:csv-file-process' event.pk object.pk %}"
                                class="btn btn-primary"
                                {% if object.processed %}disabled {% endif %} id="csv-process-btn">
                                 <i class="fas fa-cogs"></i>

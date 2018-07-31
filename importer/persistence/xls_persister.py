@@ -9,7 +9,8 @@ from openpyxl.comments import Comment
 from openpyxl.styles import colors
 from six import BytesIO
 
-from subscription_importer import KEY_MAP, get_mapping_from_csv_key
+from importer.constants import KEY_MAP
+from importer.helpers import get_mapping_from_csv_key
 
 
 class XLSPersister(abc.ABC):
@@ -19,7 +20,6 @@ class XLSPersister(abc.ABC):
         self._reader = None
 
     def _get_reader(self) -> DictReader:
-
         self._reader = DictReader(open(self.file_path, 'r'))
 
         return self._reader

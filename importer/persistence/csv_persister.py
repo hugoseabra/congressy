@@ -4,7 +4,7 @@ import json
 
 from django.core.files.base import ContentFile
 
-from subscription_importer.line_data import LineDataCollection
+from importer.line_data import LineDataCollection
 
 
 class CSVPersister(abc.ABC):
