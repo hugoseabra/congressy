@@ -163,7 +163,7 @@
                                                                 {% if csv.processed %}
                                                                     void(0);
                                                                 {% else %}
-                                                                    window.location='{% url 'subscription:subscriptions-csv-file-prepare' event.pk csv.pk %}'
+                                                                    window.location='{% url 'importer:csv-file-prepare' event.pk csv.pk %}'
                                                                 {% endif %}"
                                                                 class="btn btn-primary btn-sm" {% if csv.processed %}disabled {% endif %}>
                                                             <i class="fas fa-exchange-alt"></i>
@@ -192,7 +192,7 @@
                                                         <li role="separator" class="divider"></li>
                                                         <li class="text-center">
                                                             <a
-                                                                    href="{% url 'subscription:subscriptions-csv-file-error-xls' event.pk csv.pk %}"
+                                                                    href="{% url 'importer:csv-file-error-xls' event.pk csv.pk %}"
                                                                     class="btn btn-danger btn-sm">
                                                                 <i class="far fa-file-excel"></i>
                                                                 Arquivo de Erros
@@ -263,7 +263,7 @@
                 </div>
                 <div class="modal-body">
 
-                    <form method="POST" action="{% url 'subscription:subscriptions-csv-file-import' event.pk %}" id="file-form" enctype=multipart/form-data>
+                    <form method="POST" action="{% url 'importer:csv-file-import' event.pk %}" id="file-form" enctype=multipart/form-data>
 
                         {% csrf_token %}
 

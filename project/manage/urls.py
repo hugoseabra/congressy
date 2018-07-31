@@ -33,6 +33,7 @@ private_urlpatterns = [
     url(r'^manage/', include('addon.urls', 'addon')),
     url(r'^manage/', include('scientific_work.urls', 'scientific_work')),
     url(r'^manage/', include('gatheros_subscription.urls', 'subscription')),
+    url(r'^manage/', include('importer.urls', 'importer')),
     url(r'^manage/', include(urlpatterns_certificate_urls, 'certificate')),
     url(r'^manage/', include(urlpatterns_private_raffles, 'raffle')),
     # url(r'^manage/', include('bitly.urls', 'bitly')),

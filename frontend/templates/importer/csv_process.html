@@ -16,13 +16,13 @@
             <div class="buttonbar">
                 <div class="float-left">
 
-                    <a href="{% url 'subscription:subscriptions-csv-list' event.pk %}"
+                    <a href="{% url 'importer:csv-list' event.pk %}"
                        class="btn btn-primary" style="margin-left: 5px">
                         <i class="fas fa-arrow-circle-left"></i>
                         Voltar Lista de arquivos
                     </a>
 
-                    <a href="{% url 'subscription:subscriptions-csv-file-prepare' event.pk object.pk %}"
+                    <a href="{% url 'importer:csv-file-prepare' event.pk object.pk %}"
                        class="btn btn-success">
                         <i class="fas fa-pencil-alt"></i>
                         Voltar as configurações
