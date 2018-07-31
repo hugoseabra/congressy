@@ -36,27 +36,6 @@ class CSVListView(CSVViewMixin, generic.ListView):
         return context
 
 
-class CSVDeleteView(CSVProcessedViewMixin, generic.DeleteView):
-
-    def get(self, request, *args, **kwargs):
-        return self.delete(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        """
-        Call the delete() method on the fetched object and then redirect to the
-        success URL.
-        """
-        self.object = self.get_object()
-        self.object.delete()
-        messages.success(request, "Arquivo apagado com sucesso!")
-        return redirect(self.get_success_url())
-
-    def get_success_url(self):
-        return reverse_lazy('importer:csv-list', kwargs={
-            'event_pk': self.event.pk
-        })
-
-
 class CSVFileImportView(CSVViewMixin, generic.View):
     """
         View usada para fazer apenas upload de arquivos via POST, qualquer outra
@@ -137,6 +116,27 @@ class CSVFileImportView(CSVViewMixin, generic.View):
             reverse_lazy('importer:csv-list', kwargs={
                 'event_pk': self.event.pk,
             }))
+
+
+class CSVDeleteView(CSVProcessedViewMixin, generic.DeleteView):
+
+    def get(self, request, *args, **kwargs):
+        return self.delete(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Call the delete() method on the fetched object and then redirect to the
+        success URL.
+        """
+        self.object = self.get_object()
+        self.object.delete()
+        messages.success(request, "Arquivo apagado com sucesso!")
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse_lazy('importer:csv-list', kwargs={
+            'event_pk': self.event.pk
+        })
 
 
 class CSVPrepareView(CSVProcessedViewMixin, generic.DetailView):
@@ -255,33 +255,6 @@ class CSVPrepareView(CSVProcessedViewMixin, generic.DetailView):
         return line_data_collection[0].get_invalid_keys()
 
 
-class CSVErrorXLSView(CSVProcessedViewMixin):
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-
-        xls = self._create_xls()
-
-        response = HttpResponse(xls, content_type=self._get_mime_type())
-        response[
-            'Content-Disposition'] = 'attachment; filename="{}"'.format(
-            self.object.err_filename().split('.')[0] + '.xls',
-        )
-
-        return response
-
-    def _create_xls(self) -> bytes:
-        error_csv = self.object.error_csv_file.path
-        xls_maker = XLSErrorPersister(error_csv)
-        return xls_maker.make()
-
-    @staticmethod
-    def _get_mime_type() -> str:
-        mime = 'application'
-        content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        return '{}/{}'.format(mime, content_type)
-
-
 class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
     template_name = 'importer/csv_process.html'
     form_class = CSVProcessForm
@@ -388,6 +361,33 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
 
     def _create_xls(self) -> bytes:
 
+        error_csv = self.object.error_csv_file.path
+        xls_maker = XLSErrorPersister(error_csv)
+        return xls_maker.make()
+
+    @staticmethod
+    def _get_mime_type() -> str:
+        mime = 'application'
+        content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        return '{}/{}'.format(mime, content_type)
+
+
+class CSVErrorXLSView(CSVProcessedViewMixin):
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        xls = self._create_xls()
+
+        response = HttpResponse(xls, content_type=self._get_mime_type())
+        response[
+            'Content-Disposition'] = 'attachment; filename="{}"'.format(
+            self.object.err_filename().split('.')[0] + '.xls',
+        )
+
+        return response
+
+    def _create_xls(self) -> bytes:
         error_csv = self.object.error_csv_file.path
         xls_maker = XLSErrorPersister(error_csv)
         return xls_maker.make()
