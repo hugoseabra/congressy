@@ -1,8 +1,5 @@
-from subscription_importer import (
-    KEY_MAP,
-)
-
-from subscription_importer.line_data import LineDataCollection
+from importer.constants import KEY_MAP
+from importer.line_data import LineDataCollection
 
 
 class PreviewRenderer(object):

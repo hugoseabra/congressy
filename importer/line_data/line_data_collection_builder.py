@@ -1,6 +1,6 @@
 import csv
 
-from subscription_importer.line_data import LineDataCollection, LineData
+from importer.line_data import LineDataCollection, LineData
 
 
 class LineDataCollectionBuilder(object):
