@@ -142,7 +142,7 @@
                         </a>
                     {% endif %}
                 </div>
-            
+
                 <div class="clearfix"></div>
             </div>
         </div>
@@ -167,6 +167,12 @@
                                     {% if event.is_scientific %}
                                         <th width="20%" class="text-center">Trabalhos Científicos</th>
                                     {% endif %}
+
+                                    {% if event.allow_importing %}
+                                        <th width="20%" class="text-center">Origem</th>
+                                    {% endif %}
+
+
                                     <th class="text-center" width="3%"></th>
                                 </tr>
                                 </thead>
@@ -247,7 +253,7 @@
                                                            style="color: #d9534f"></i>
                                                     {% endif %}
                                                     <br/>
-                                                    
+
                                                     {% if work.modality == 'artigo' %}
                                                         {% if work.article_file %}
                                                             <a target="_blank"
@@ -267,6 +273,12 @@
                                                 {% endwith %}
 
 
+                                            </td>
+                                        {% endif %}
+
+                                        {% if event.allow_importing %}
+                                            <td class="text-center">
+                                               {{ item.get_origin_display }}
                                             </td>
                                         {% endif %}
 
