@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 
-from importer.forms import CSVFileForm, CSVFileConfigForm, CSVProcessForm
+from importer.forms import CSVFileForm, CSVFileConfigForm, CSVProcessForm, CSVCityForm
 from importer.helpers import get_required_keys_mappings
 from importer.line_data import (
     LineDataCollection,
@@ -427,3 +427,46 @@ class CSVErrorXLSView(CSVProcessedViewMixin):
 
 class CSVFixCitiesView(CSVProcessedViewMixin, generic.DetailView):
     template_name = 'importer/fix_cities.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        invalid_city = self.get_invalid_city_line()
+
+        context['form'] = CSVCityForm()
+        context['invalid_city'] = invalid_city
+
+        return context
+
+    def get_invalid_city_line(self):
+
+        line_data_persistence_collection = self.get_data_collection()
+
+        for line in line_data_persistence_collection:
+
+            line.save(commit=False,
+                      form_config=self.object.lot.event.formconfig,
+                      lot=self.object.lot, user=self.request.user)
+
+            errors = line.get_errors()
+
+            if errors:
+                # Test if only has city error
+                if len(errors) == 1 and 'city' in errors:
+                    return line.city
+
+        return None
+
+    def get_data_collection(self):
+
+        file_path = self.object.csv_file.path
+        delimiter = self.object.delimiter
+        separator = self.object.separator
+        encoding = self.object.encoding
+
+        return LineDataCollectionBuilder(
+            file_path=file_path,
+            delimiter=delimiter,
+            separator=separator,
+            encoding=encoding,
+        ).get_collection()

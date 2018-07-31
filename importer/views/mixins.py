@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.http.response import JsonResponse
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 
 from gatheros_subscription.views.subscription import EventViewMixin

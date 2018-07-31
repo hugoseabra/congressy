@@ -36,22 +36,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        Correções de Cidades
-                    </h3>
-                </div>
-
-                <div class="panel-body">
-
-                    <div class="row">
-                        Cities.
-                    </div>
-
-                </div>
-
-            </div>
+            {% include 'importer/includes/form_city.html' %}
         </div>
     </div>
 
@@ -62,8 +47,68 @@
     <script type="application/javascript">
 
         $(document).ready(function () {
-            console.log('ready.');
+
+            window.setTimeout(function () {
+
+                var city_el = $('#id_city_name');
+
+                $('#id_state').change(function () {
+                    city_el.html($('<option>').text('Carregando...'));
+
+                    var that = $(this);
+                    window.setTimeout(function () {
+                        fetch_cities($(that), $('#id_city_name'), $('#id_city'));
+                    }, 500);
+                });
+                
+                city_el.change(function () {
+                    $("#id_city").val($(this).val());
+                });
+
+            }, 350);
         });
+
+        function fetch_cities(uf_el, city_list_el, city_hidden_el, selected_value, callback) {
+            uf_el = $(uf_el);
+            city_list_el = $(city_list_el);
+            city_hidden_el = $(city_hidden_el);
+            selected_value = selected_value || '';
+            callback = callback || null;
+
+            $.ajax({
+                url: "/api/cities/?uf=" + $(uf_el).val() + '&length=1000',
+                success: function (result) {
+
+                    var listitems = [];
+                    var ids = [];
+
+                    $.each(result.results, function (key, value) {
+                        listitems.push('<option value=' + value.id + '>' + value.name + '</option>');
+                        ids.push(value.id)
+                    });
+
+                    city_list_el.html(listitems.join(''));
+                    city_list_el.prop('disabled', false);
+
+                    if (selected_value) {
+                        window.setTimeout(function () {
+                            city_list_el.val(selected_value);
+                            city_hidden_el.val(selected_value);
+                        }, 500);
+                    } else {
+                        city_list_el.val(ids[0]);
+                        city_hidden_el.val(ids[0]);
+                    }
+
+                    if (callback) {
+                        callback(result.results)
+                    }
+                },
+                error: function (err) {
+                    throw err;
+                }
+            });
+        }
 
     </script>
 

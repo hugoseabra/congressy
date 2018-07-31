@@ -78,7 +78,7 @@ class CSVSubscriptionForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         for field in self.fields:
-            
+
             if field in required_keys:
                 self.set_as_required(field)
             else:
@@ -118,6 +118,18 @@ class CSVSubscriptionForm(forms.Form):
             return cleaned_city
 
         cleaned_uf = self.cleaned_data.get('uf')
+
+        found_city = None
+
+        try:
+            city_pk = int(cleaned_city)
+            found_city = City.objects.get(pk=city_pk).pk
+        except (ValueError, City.DoesNotExist):
+            pass
+
+        if found_city:
+            return found_city
+
         city_qs = City.objects.filter(
             Q(name=str(cleaned_city).upper()) |
             Q(name_ascii=str(cleaned_city).upper())
@@ -143,7 +155,7 @@ class CSVSubscriptionForm(forms.Form):
 
                 - Dados de pessoas são entregues a um PersonForm e qualquer
                   erro gerador por esse form é repassado para esse form
-                  
+
                 - Dados de inscrição são entregues para um SubscriptionForm e
                   qualquer erro gerador por esse form é repassado para esse form
 

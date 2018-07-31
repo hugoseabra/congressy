@@ -1,0 +1,72 @@
+{% load i18n static url_tags  form_config_tags %}
+
+
+{% if invalid_city %}
+    <form method="post">
+
+        {% csrf_token %}
+
+
+        <div style="margin-bottom: 20px">
+
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        Correção de Cidades
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px">
+
+                    <div class="panel panel-primary">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+
+                                    <div class="alert alert-warning">
+                                        <strong>Atenção! </strong>
+                                        Houve um erro durante a importação e não foi possivel identificar a cidade abaixo.
+                                    </div>
+
+
+                                </div>
+
+                                <div class="col-md-12">
+
+                                    <h1 class="text-uppercase">
+                                        Correção:
+                                        <strong class="text-bold ">{{ invalid_city }}</strong>
+                                    </h1>
+
+                                </div>
+                            </div>
+
+
+                            <div class="row" style="margin-top: 20px">
+
+                                {% render_generic_field form.city %}
+
+                                <div class="col-md-2">
+                                    {% render_generic_field form.state required=True %}
+                                </div>
+                                <div class="col-md-8">
+                                    {% render_generic_field form.city_name required=True %}
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-success pull-left">
+                                Salvar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+    </form>
+{% else %}
+    nenhuma cidade com problema.
+{% endif %}
+
