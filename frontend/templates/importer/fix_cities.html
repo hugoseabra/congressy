@@ -1,0 +1,70 @@
+{% extends "base/base.html" %}
+{% load i18n static url_tags  form_config_tags %}
+
+{% block title %}Processar importação | Congressy{% endblock %}
+
+{% block page_title %}Processar importação via CSV{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_description %}
+    Processar importação de dados via CSV | {{ object.filename }}
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-left">
+
+                    <a href="{% url 'importer:csv-list' event.pk %}"
+                       class="btn btn-primary" style="margin-left: 5px">
+                        <i class="fas fa-arrow-circle-left"></i>
+                        Voltar Lista de arquivos
+                    </a>
+
+                    <a href="{% url 'importer:csv-file-prepare' event.pk object.pk %}"
+                       class="btn btn-success">
+                        <i class="fas fa-pencil-alt"></i>
+                        Voltar as configurações
+                    </a>
+
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Correções de Cidades
+                    </h3>
+                </div>
+
+                <div class="panel-body">
+
+                    <div class="row">
+                        Cities.
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script type="application/javascript">
+
+        $(document).ready(function () {
+            console.log('ready.');
+        });
+
+    </script>
+
+{% endblock %}

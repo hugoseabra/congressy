@@ -5,4 +5,5 @@ from .csv import (
     CSVProcessView,
     CSVDeleteView,
     CSVErrorXLSView,
+    CSVFixCitiesView,
 )

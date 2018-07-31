@@ -261,6 +261,14 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
+
+        # Redirect to fix cities
+        if self._check_for_invalid_cities():
+            return redirect(reverse_lazy('importer:csv-fix-cities', kwargs={
+                'event_pk': self.event.pk,
+                'csv_pk': self.object.pk,
+            }))
+
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -365,6 +373,24 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
         xls_maker = XLSErrorPersister(error_csv)
         return xls_maker.make()
 
+    def _check_for_invalid_cities(self):
+        line_data_persistence_collection = self.get_data_collection()
+
+        for line in line_data_persistence_collection:
+
+            line.save(commit=False,
+                      form_config=self.object.lot.event.formconfig,
+                      lot=self.object.lot, user=self.request.user)
+
+            errors = line.get_errors()
+
+            if errors:
+                # Test if only has city error
+                if len(errors) == 1 and 'city' in errors:
+                    return True
+
+        return False
+
     @staticmethod
     def _get_mime_type() -> str:
         mime = 'application'
@@ -397,3 +423,7 @@ class CSVErrorXLSView(CSVProcessedViewMixin):
         mime = 'application'
         content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         return '{}/{}'.format(mime, content_type)
+
+
+class CSVFixCitiesView(CSVProcessedViewMixin, generic.DetailView):
+    template_name = 'importer/fix_cities.html'

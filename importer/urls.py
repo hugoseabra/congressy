@@ -19,6 +19,11 @@ urls = [
         name='csv-file-delete'
     ),
     url(
+        r'^csv/(?P<csv_pk>[0-9A-Fa-f-]+)/cities/',
+        views.CSVFixCitiesView.as_view(),
+        name='csv-fix-cities'
+    ),
+    url(
         r'^csv/(?P<csv_pk>[0-9A-Fa-f-]+)/error_file/xls',
         views.CSVErrorXLSView.as_view(),
         name='csv-file-error-xls'
