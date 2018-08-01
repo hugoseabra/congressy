@@ -4,8 +4,15 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 
-from importer.forms import CSVFileForm, CSVFileConfigForm, CSVProcessForm
-from importer.helpers import get_required_keys_mappings
+from importer.forms import (
+    CSVFileForm,
+    CSVFileConfigForm,
+    CSVProcessForm,
+    CSVCityForm,
+)
+from importer.helpers import (
+    get_required_keys_mappings,
+)
 from importer.line_data import (
     LineDataCollection,
     LineDataCollectionBuilder,
@@ -15,6 +22,8 @@ from importer.models import CSVFileConfig
 from importer.persistence import (
     CSVErrorPersister,
     XLSErrorPersister,
+    CSVCorrectionPersister,
+    CSVCityCorrectionPersister,
 )
 from importer.preview_renderer import PreviewRenderer
 from .mixins import CSVViewMixin, CSVProcessedViewMixin
@@ -118,28 +127,7 @@ class CSVFileImportView(CSVViewMixin, generic.View):
             }))
 
 
-class CSVDeleteView(CSVProcessedViewMixin, generic.DeleteView):
-
-    def get(self, request, *args, **kwargs):
-        return self.delete(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        """
-        Call the delete() method on the fetched object and then redirect to the
-        success URL.
-        """
-        self.object = self.get_object()
-        self.object.delete()
-        messages.success(request, "Arquivo apagado com sucesso!")
-        return redirect(self.get_success_url())
-
-    def get_success_url(self):
-        return reverse_lazy('importer:csv-list', kwargs={
-            'event_pk': self.event.pk
-        })
-
-
-class CSVPrepareView(CSVProcessedViewMixin, generic.DetailView):
+class CSVPrepareView(CSVProcessedViewMixin):
     template_name = "importer/csv_prepare.html"
     initial = {}
     prefix = None
@@ -255,12 +243,68 @@ class CSVPrepareView(CSVProcessedViewMixin, generic.DetailView):
         return line_data_collection[0].get_invalid_keys()
 
 
+class CSVErrorXLSView(CSVProcessedViewMixin):
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        xls = self._create_xls()
+
+        response = HttpResponse(xls, content_type=self._get_mime_type())
+        response[
+            'Content-Disposition'] = 'attachment; filename="{}"'.format(
+            self.object.err_filename().split('.')[0] + '.xls',
+        )
+
+        return response
+
+    def _create_xls(self) -> bytes:
+        error_csv = self.object.error_csv_file.path
+        xls_maker = XLSErrorPersister(error_csv)
+        return xls_maker.make()
+
+    @staticmethod
+    def _get_mime_type() -> str:
+        mime = 'application'
+        content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        return '{}/{}'.format(mime, content_type)
+
+
+class CSVDeleteView(CSVProcessedViewMixin, generic.DeleteView):
+
+    def get(self, request, *args, **kwargs):
+        return self.delete(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Call the delete() method on the fetched object and then redirect to the
+        success URL.
+        """
+        self.object = self.get_object()
+        self.object.delete()
+        messages.success(request, "Arquivo apagado com sucesso!")
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse_lazy('importer:csv-list', kwargs={
+            'event_pk': self.event.pk
+        })
+
+
 class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
     template_name = 'importer/csv_process.html'
     form_class = CSVProcessForm
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
+
+        # Redirect to fix cities
+        if self._check_for_invalid_cities():
+            return redirect(reverse_lazy('importer:csv-fix-cities', kwargs={
+                'event_pk': self.event.pk,
+                'csv_pk': self.object.pk,
+            }))
+
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -343,7 +387,11 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
 
     def get_data_collection(self):
 
-        file_path = self.object.csv_file.path
+        if self.object.correction_csv_file:
+            file_path = self.object.correction_csv_file.path
+        else:
+            file_path = self.object.csv_file.path
+
         delimiter = self.object.delimiter
         separator = self.object.separator
         encoding = self.object.encoding
@@ -365,6 +413,24 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
         xls_maker = XLSErrorPersister(error_csv)
         return xls_maker.make()
 
+    def _check_for_invalid_cities(self):
+        line_data_persistence_collection = self.get_data_collection()
+
+        for line in line_data_persistence_collection:
+
+            line.save(commit=False,
+                      form_config=self.object.lot.event.formconfig,
+                      lot=self.object.lot, user=self.request.user)
+
+            errors = line.get_errors()
+
+            if errors:
+                # Test if only has city error
+                if len(errors) == 1 and 'city' in errors:
+                    return True
+
+        return False
+
     @staticmethod
     def _get_mime_type() -> str:
         mime = 'application'
@@ -372,28 +438,101 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
         return '{}/{}'.format(mime, content_type)
 
 
-class CSVErrorXLSView(CSVProcessedViewMixin):
+class CSVFixCitiesView(CSVProcessedViewMixin, generic.FormView):
+    template_name = 'importer/fix_cities.html'
+    form_class = CSVCityForm
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
+        if not self.object.correction_csv_file:
+            self._create_correction_csv()
+        return super().dispatch(request, *args, **kwargs)
 
-        xls = self._create_xls()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-        response = HttpResponse(xls, content_type=self._get_mime_type())
-        response[
-            'Content-Disposition'] = 'attachment; filename="{}"'.format(
-            self.object.err_filename().split('.')[0] + '.xls',
-        )
+        invalid_city = self.get_invalid_city_line()
+        context['invalid_city'] = invalid_city
 
-        return response
+        return context
 
-    def _create_xls(self) -> bytes:
-        error_csv = self.object.error_csv_file.path
-        xls_maker = XLSErrorPersister(error_csv)
-        return xls_maker.make()
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().post(request, *args, **kwargs)
 
-    @staticmethod
-    def _get_mime_type() -> str:
-        mime = 'application'
-        content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        return '{}/{}'.format(mime, content_type)
+    def form_valid(self, form):
+
+        invalid_city = self.get_invalid_city_line()
+
+        if invalid_city:
+            csvfile = CSVCityCorrectionPersister(
+                old=invalid_city,
+                new=form.cleaned_data['city'],
+                line_data_collection=self.get_data_collection(raw=False)
+            ).write()
+
+            self.object.correction_csv_file.save(self.object.filename(),
+                                                 csvfile)
+
+        if self.get_invalid_city_line():
+            messages.success(self.request,
+                             "Cidade corrigida com sucesso!")
+            return redirect(reverse_lazy('importer:csv-fix-cities',
+                                         kwargs={
+                                             'event_pk': self.event.pk,
+                                             'csv_pk': self.object.pk,
+                                         }))
+
+        messages.success(self.request,
+                         "Todas as cidades corrigidas com sucesso!")
+        return redirect(reverse_lazy('importer:csv-file-process', kwargs={
+            'event_pk': self.event.pk,
+            'csv_pk': self.object.pk,
+        }))
+
+    def form_invalid(self, form):
+        print('breakpoint')
+        return super().form_invalid(form)
+
+    # ------- CUSTOM ------------
+
+    def get_invalid_city_line(self):
+
+        line_data_persistence_collection = self.get_data_collection(raw=False)
+
+        for line in line_data_persistence_collection:
+
+            line.save(commit=False,
+                      form_config=self.object.lot.event.formconfig,
+                      lot=self.object.lot, user=self.request.user)
+
+            errors = line.get_errors()
+
+            if errors:
+                # Test if only has city error
+                if len(errors) == 1 and 'city' in errors:
+                    return line.city
+
+        return None
+
+    def get_data_collection(self, size: int = 0, raw: bool = True):
+
+        if raw:
+            file_path = self.object.csv_file.path
+        else:
+            file_path = self.object.correction_csv_file.path
+
+        delimiter = self.object.delimiter
+        separator = self.object.separator
+        encoding = self.object.encoding
+
+        return LineDataCollectionBuilder(
+            file_path=file_path,
+            delimiter=delimiter,
+            separator=separator,
+            encoding=encoding,
+        ).get_collection(size)
+
+    def _create_correction_csv(self):
+        csvfile = CSVCorrectionPersister(self.get_data_collection()).write()
+        self.object.correction_csv_file.save(self.object.filename(), csvfile)

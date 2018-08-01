@@ -51,3 +51,71 @@ class CSVErrorPersister(CSVPersister):
             writer.writerow(data)
 
         return self._file
+
+
+class CSVCorrectionPersister(CSVPersister):
+
+    def write(self) -> ContentFile:
+
+        headers = list()
+
+        for line in self.line_data_collection:
+            for key, _ in line:
+                if key not in headers:
+                    headers.append(key)
+
+        writer = csv.DictWriter(self._file, fieldnames=headers)
+        writer.writeheader()
+
+        for line in self.line_data_collection:
+
+            data = {}
+            for key, value in line:
+                data.update({key: value})
+
+            writer.writerow(data)
+
+        return self._file
+
+
+class CSVCityCorrectionPersister(CSVPersister):
+    """
+        Esse driver de persistencia serve para atualizar as cidades de um
+        csv, alterando um valor por outro valor
+    """
+
+    def __init__(self,
+                 old: str,
+                 new: str,
+                 line_data_collection: LineDataCollection) -> None:
+
+        self.old = old
+        self.new = new
+
+        super().__init__(line_data_collection)
+
+    def write(self) -> ContentFile:
+
+        headers = list()
+
+        for line in self.line_data_collection:
+            for key, _ in line:
+                if key not in headers:
+                    headers.append(key)
+
+        writer = csv.DictWriter(self._file, fieldnames=headers)
+        writer.writeheader()
+
+        for line in self.line_data_collection:
+
+            data = {}
+            for key, value in line:
+
+                if key == 'city' and value == self.old:
+                    value = self.new
+
+                data.update({key: value})
+
+            writer.writerow(data)
+
+        return self._file

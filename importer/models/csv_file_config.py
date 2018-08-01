@@ -39,20 +39,7 @@ def get_file_path(instance, *args, **kwargs):
 def get_err_file_path(instance, *args, **kwargs):
     """ Resgata localização onde os arquivos de erro do csv serão salvos. """
 
-    now = datetime.now()
-    day = str(now.day)
-    month = str(now.month)
-    year = str(now.year)
-    hour = str(now.hour)
-    minute = str(now.minute)
-
-    filename = "Import_com_errors_Congressy_{}_{}_{}_{}h{}m.csv".format(
-        day,
-        month,
-        year,
-        hour,
-        minute,
-    )
+    filename = "Import_Congressy.csv"
 
     return os.path.join(
         "event",
@@ -63,14 +50,17 @@ def get_err_file_path(instance, *args, **kwargs):
     )
 
 
-def get_success_file_path(instance, filename):
-    """ Resgata localização onde os arquivos de sucesso do csv serão salvos. """
+def get_correction_file_path(instance, *args, **kwargs):
+    """ Resgata localização onde os arquivos de erro do csv serão salvos. """
+
+    filename = "Import_Congressy_.csv"
+
     return os.path.join(
         "event",
         str(instance.event.id),
         "import",
         "csv",
-        "success_" + filename
+        "fix_" + filename
     )
 
 
@@ -118,6 +108,13 @@ class CSVFileConfig(models.Model):
         upload_to=get_err_file_path,
         validators=[validate_csv_only_file],
         storage=OverwriteStorage(),
+    )
+
+    correction_csv_file = models.FileField(
+        upload_to=get_correction_file_path,
+        validators=[validate_csv_only_file],
+        storage=OverwriteStorage(),
+        null=True,
     )
 
     created = models.DateTimeField(

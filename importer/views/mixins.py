@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.http.response import JsonResponse
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.views import generic
 
 from gatheros_subscription.views.subscription import EventViewMixin
 from importer.models import CSVFileConfig
@@ -44,7 +45,7 @@ class CSVViewMixin(EventViewMixin):
         return context
 
 
-class CSVProcessedViewMixin(CSVViewMixin):
+class CSVProcessedViewMixin(CSVViewMixin, generic.DetailView):
     """
         Mixin utilizado para não permitir acesso caso
         arquivo já tenha sido processado.
@@ -53,24 +54,21 @@ class CSVProcessedViewMixin(CSVViewMixin):
     object = None
 
     def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-
-        if not self.object:
-            self.object = self.get_object()
+        self.object = self.get_object()
+        self.event = self.get_event()
 
         if self.object.processed:
-            messages.error(request,
-                           "Arquivo já processado não pode ser processado novamente")
+            msg = "Arquivo já processado não pode ser processado novamente"
+            messages.error(request, msg)
             return redirect(
                 reverse_lazy('importer:csv-list', kwargs={
                     'event_pk': self.event.pk
                 })
             )
 
-        return response
+        return super().dispatch(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
-
         return get_object_or_404(
             CSVFileConfig,
             pk=self.kwargs.get('csv_pk'),

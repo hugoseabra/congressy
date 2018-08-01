@@ -8,7 +8,7 @@ KEY_MAP = {
     'gender': {
         'verbose_name': 'Sexo',
         'description': 'sexo do participante',
-        'csv_keys': ['sexo', 'genero', 'género'],
+        'csv_keys': ['sexo', 'genero', 'género', 'gender'],
         'possible_values': [],
     },
     'email': {
