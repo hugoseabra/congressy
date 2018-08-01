@@ -298,13 +298,12 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        if not self.object.correction_csv_file:
-            # Redirect to fix cities
-            if self._check_for_invalid_cities():
-                return redirect(reverse_lazy('importer:csv-fix-cities', kwargs={
-                    'event_pk': self.event.pk,
-                    'csv_pk': self.object.pk,
-                }))
+        # Redirect to fix cities
+        if self._check_for_invalid_cities():
+            return redirect(reverse_lazy('importer:csv-fix-cities', kwargs={
+                'event_pk': self.event.pk,
+                'csv_pk': self.object.pk,
+            }))
 
         return super().get(request, *args, **kwargs)
 
@@ -469,7 +468,7 @@ class CSVFixCitiesView(CSVProcessedViewMixin, generic.FormView):
             csvfile = CSVCityCorrectionPersister(
                 old=invalid_city,
                 new=form.cleaned_data['city'],
-                line_data_collection=self.get_data_collection()
+                line_data_collection=self.get_data_collection(raw=False)
             ).write()
 
             self.object.correction_csv_file.save(self.object.filename(),
@@ -478,7 +477,7 @@ class CSVFixCitiesView(CSVProcessedViewMixin, generic.FormView):
         if self.get_invalid_city_line():
             messages.success(self.request,
                              "Cidade corrigida com sucesso!")
-            return redirect(reverse_lazy('importer:csv-file-process',
+            return redirect(reverse_lazy('importer:csv-fix-cities',
                                          kwargs={
                                              'event_pk': self.event.pk,
                                              'csv_pk': self.object.pk,
