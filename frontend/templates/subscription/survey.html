@@ -1,0 +1,103 @@
+{% extends "base/base.html" %}
+{% load form_config_tags %}
+
+{{% block title %}
+    Formulário de Inscrição | Congressy
+{% endblock %}
+
+{% block page_title %}
+    Formulário de Inscrição
+{% endblock %}
+
+{% block page_sub_title %}
+    {{ event.name }}
+{% endblock %}
+
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar">
+                    <div class="float-right">
+                        <a href="{% url 'subscription:subscription-list' event.pk %}"
+                           class="btn btn-danger">
+                            <i class="fas fa-times-circle"></i>
+                            Cancelar
+                        </a>
+
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Formulário
+                        </div>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% for field in form.visible_fields %}
+                                    {% render_generic_field field %}
+                                {% endfor %}
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar bottom">
+                    <div class="float-right">
+                        <a href="{% url 'subscription:subscription-list' event.pk %}"
+                           class="btn btn-danger">
+                            <i class="fas fa-times-circle"></i>
+                            Cancelar
+                        </a>
+
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+
+
+    </form>
+{% endblock %}
+

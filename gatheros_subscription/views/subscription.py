@@ -39,6 +39,8 @@ from mailer import exception as mailer_exception, services as mailer
 from payment import forms
 from payment.helpers import payment_helpers
 from payment.models import Transaction
+from survey.directors import SurveyDirector
+from survey.models import Author
 
 
 class EventViewMixin(TemplateNameableMixin, AccountMixin):
@@ -427,6 +429,7 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         ctx['full_prices'] = calculator.full_prices
         ctx['installments'] = calculator.installments
         ctx['has_manual'] = calculator.has_manual
+        ctx['has_survey'] = True if self.object.lot.event_survey else False
         ctx['total_paid'] = calculator.total_paid
         ctx['dividend_amount'] = calculator.dividend_amount
         ctx['financial'] = self.financial
@@ -733,7 +736,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin, generic.TemplateView):
         try:
             return Subscription.objects.filter(
                 attended=True,
-                completed=True,test_subscription=False,
+                completed=True, test_subscription=False,
                 event=self.get_event(),
             ).count()
 
@@ -1106,3 +1109,69 @@ class SwitchSubscriptionTestView(EventViewMixin, generic.View):
         subscription.test_subscription = state == "True"
         subscription.save()
         return HttpResponse(status=200)
+
+
+class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
+
+    subscription = None
+    template_name = "subscription/survey.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        uuid = self.kwargs.get('pk')
+        self.subscription = get_object_or_404(Subscription,
+                                              uuid=uuid)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+
+        survey_director = SurveyDirector(event=self.event)
+        survey = self.subscription.lot.event_survey.survey
+        author = self.get_author()
+            
+        form_kwargs = self.get_form_kwargs()
+
+        data = form_kwargs.get('data')
+
+        return survey_director.get_form(
+            survey=survey,
+            data=data,
+            author=author,
+        )
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, "Respostas salvas com sucesso!")
+        return redirect(
+            reverse_lazy('subscription:subscription-view', kwargs={
+                'event_pk': self.event.pk,
+                'pk': self.subscription.pk,
+            })
+        )
+
+    # --------- CUSTOM ------------
+    def get_author(self):
+
+        author = self.subscription.author
+
+        if author is None:
+            self.subscription.author = self._create_author()
+            self.subscription.save()
+
+        return author
+
+    def _create_author(self):
+
+        survey = self.subscription.lot.event_survey.survey
+        name = self.subscription.person.name
+
+        return Author.objects.create(
+            survey=survey,
+            name=name,
+        )
+
+
+
+
+
+
+

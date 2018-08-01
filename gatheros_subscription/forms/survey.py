@@ -2,7 +2,7 @@
 from django import forms
 
 from gatheros_subscription.models import EventSurvey
-from gatheros_subscription.survey_director import SurveyDirector
+from survey.directors import SurveyDirector
 from survey.services import SurveyService
 
 
@@ -40,12 +40,29 @@ class EventSurveyForm(forms.Form):
 
 class SurveyForm(forms.Form):
 
-    def __init__(self, event_survey, user, **kwargs):
-        self.user = user
+    def __init__(self, event, event_survey, **kwargs):
 
-        survey_director = SurveyDirector(user=self.user)
+        survey_director = SurveyDirector(event=event)
 
         super().__init__(**kwargs)
 
         instance = survey_director.get_form(survey=event_survey.survey)
         self.fields = instance.fields
+
+    # def save(self):
+    #
+    #     survey_director = SurveyDirector(event=self.event)
+    #
+    #     lot = self.get_lot()
+    #
+    #     survey_form = survey_director.get_form(
+    #         survey=lot.event_survey.survey,
+    #         data=form_data.items()
+    #     )
+    #
+    #     if survey_form.is_valid():
+    #         survey_form.save_answers()
+    #     else:
+    #         raise Exception('SurveyForm was invalid: {}'.format(
+    #             survey_form.errors
+    #         ))

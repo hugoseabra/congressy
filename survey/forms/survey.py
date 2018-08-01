@@ -10,7 +10,9 @@ from .field import SurveyField
 class SurveyForm(forms.Form):
     """ Formulário Dinâmico. """
 
-    def __init__(self, survey, user=None, *args, **kwargs):
+    answer_service_list = None
+
+    def __init__(self, survey, user=None, author=None, *args, **kwargs):
 
         if not isinstance(survey, Survey):
             msg = '{} não é uma instância de Survey'.format(
@@ -19,6 +21,7 @@ class SurveyForm(forms.Form):
 
         self.survey = survey
         self.user = user
+        self.author = author
         super(SurveyForm, self).__init__(*args, **kwargs)
 
         if self.survey.questions:
@@ -55,7 +58,12 @@ class SurveyForm(forms.Form):
                             help_text=help_text, select_intro=intro, **kwargs)
         self.fields[name] = field.get_django_field()
 
-    def save_answers(self) -> list:
+    def clean(self):
+        clean_data = super().clean()
+        self.answer_service_list = self._clean_answers()
+        return clean_data
+
+    def _clean_answers(self) -> list:
         """
 
         :return: list: uma lista de objetos do tipo Answer que corresponde a
@@ -71,8 +79,14 @@ class SurveyForm(forms.Form):
 
             if answer:
 
-                author = Author.objects.get_or_create(survey=self.survey,
-                                                      user=self.user)[0]
+                if not self.author and self.user:
+                    self.author = \
+                        Author.objects.get_or_create(survey=self.survey,
+                                                     user=self.user)[0]
+
+                if self.author is None:
+                    raise Exception(
+                        'Não foi possivel resgatar ou criar um autor')
 
                 question = Question.objects.get(name=question,
                                                 survey=self.survey)
@@ -81,7 +95,7 @@ class SurveyForm(forms.Form):
 
                 try:
                     existing_answer = Answer.objects.get(question=question.pk,
-                                                         author=author)
+                                                         author=self.author)
                 except Answer.DoesNotExist:
                     pass
 
@@ -89,13 +103,13 @@ class SurveyForm(forms.Form):
                     answer_service = AnswerService(instance=existing_answer,
                                                    data={
                                                        'question': question.pk,
-                                                       'author': author.pk,
+                                                       'author': self.author.pk,
                                                        'value': answer,
                                                    })
                 else:
                     answer_service = AnswerService(data={
                         'question': question.pk,
-                        'author': author.pk,
+                        'author': self.author.pk,
                         'value': answer,
                     })
 
@@ -108,3 +122,7 @@ class SurveyForm(forms.Form):
                     raise ValidationError(msg)
 
         return answer_list
+
+    def save(self):
+        for answer in self.answer_service_list:
+            answer.save()

@@ -2,7 +2,6 @@
     Intenção: Este diretor tem a intenção de integrar o módulo neste módulo
     'survey' neste módulo de hotsite.
 """
-from ast import literal_eval
 from gatheros_event.models import Event
 from gatheros_subscription.models import EventSurvey
 from survey.forms import SurveyForm
@@ -14,7 +13,7 @@ class SurveyDirector(object):
         Implementação principal do diretor conforme as especificações do módulo
     """
 
-    def __init__(self, event, user) -> None:
+    def __init__(self, event, user=None) -> None:
         """
 
         Este construtor tem como intenção buscar todos os objetos de survey
@@ -100,7 +99,7 @@ class SurveyDirector(object):
 
         return survey_forms_list
 
-    def get_form(self, survey, data=None) -> SurveyForm:
+    def get_form(self, survey, author=None, data=None) -> SurveyForm:
         """
 
         Este método é responsável por retornar um objeto do tipo
@@ -112,16 +111,18 @@ class SurveyDirector(object):
 
 
         :param survey: uma instância de um objeto de formulário
+        :param author: uma instância de um objeto de Author já existente
         :param data: um dict contendo as novas respostas que serão
                 vinculadas ao form
 
         :return SurveyForm: um objeto de SurveyForm
         """
 
-        try:
-            author = Author.objects.get(survey=survey, user=self.user)
-        except Author.DoesNotExist:
-            author = None
+        if author is None:
+            try:
+                author = Author.objects.get(survey=survey, user=self.user)
+            except Author.DoesNotExist:
+                pass
 
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
 
@@ -150,11 +151,13 @@ class SurveyDirector(object):
                 survey=survey,
                 initial=answers,
                 data=data,
-                user=self.user
+                user=self.user,
+                author=author,
             )
 
         return SurveyForm(
             survey=survey,
             data=data,
-            user=self.user
+            user=self.user,
+            author=author,
         )
