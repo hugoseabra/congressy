@@ -54,24 +54,21 @@ class CSVProcessedViewMixin(CSVViewMixin, generic.DetailView):
     object = None
 
     def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-
-        if not self.object:
-            self.object = self.get_object()
+        self.object = self.get_object()
+        self.event = self.get_event()
 
         if self.object.processed:
-            messages.error(request,
-                           "Arquivo já processado não pode ser processado novamente")
+            msg = "Arquivo já processado não pode ser processado novamente"
+            messages.error(request, msg)
             return redirect(
                 reverse_lazy('importer:csv-list', kwargs={
                     'event_pk': self.event.pk
                 })
             )
 
-        return response
+        return super().dispatch(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
-
         return get_object_or_404(
             CSVFileConfig,
             pk=self.kwargs.get('csv_pk'),
