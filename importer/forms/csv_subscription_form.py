@@ -230,7 +230,12 @@ class CSVSubscriptionForm(forms.Form):
             )
 
         self.person_form.save()
-        return self.subscription_form.save()
+
+        subscription = self.subscription_form.save()
+        subscription.completed = True
+        subscription.status = Subscription.CONFIRMED_STATUS
+        subscription.origin = Subscription.DEVICE_ORIGIN_CSV_IMPORT
+        return subscription.save()
 
     def set_as_required(self, field_name):
 
