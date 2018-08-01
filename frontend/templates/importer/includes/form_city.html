@@ -10,15 +10,19 @@
         <div style="margin-bottom: 20px">
 
             <div class="panel panel-primary">
+
                 <div class="panel-heading">
                     <div class="panel-title">
                         Correção de Cidades
                     </div>
                 </div>
+
                 <div style="margin-bottom: 20px">
 
                     <div class="panel panel-primary">
-                        <div class="panel-body">
+
+                        <div class="panel-body" id="form-body">
+
                             <div class="row">
                                 <div class="col-md-12">
 
@@ -41,7 +45,6 @@
                                 </div>
                             </div>
 
-
                             <div class="row" style="margin-top: 20px">
 
                                 {% render_generic_field form.city %}
@@ -54,14 +57,30 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-success pull-left">
+                            <button id="submit_btn" type="submit" class="btn btn-success pull-left">
                                 Salvar
                             </button>
+
                         </div>
+
+                        <div class="panel-body text-center" id="csv-loader" style="height: 200px; display: none;">
+
+                            <div class="row text-center"
+                                 style="margin-top:20px;">
+                                <h3>Processando arquivo, aguarde...</h3>
+                                <i class="fas info-color fa-circle-notch fa-spin
+                        fa-6x" style="margin-top: 20px"></i>
+                            </div>
+
+                        </div>
+
                     </div>
+
+
                 </div>
 
             </div>
+
         </div>
 
 

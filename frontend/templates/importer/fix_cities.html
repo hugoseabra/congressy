@@ -60,12 +60,20 @@
                         fetch_cities($(that), $('#id_city_name'), $('#id_city'));
                     }, 500);
                 });
-                
+
                 city_el.change(function () {
                     $("#id_city").val($(this).val());
                 });
 
             }, 350);
+
+            $('#submit_btn').on('click', function () {
+
+                $('#form-body').hide();
+                $('#csv-loader').show();
+            });
+
+
         });
 
         function fetch_cities(uf_el, city_list_el, city_hidden_el, selected_value, callback) {
