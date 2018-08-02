@@ -553,8 +553,20 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
             answer = 'Sem resposta.'
 
             try:
-                answer = Answer.objects.get(question=question,
-                                            author=author).human_display
+                person = self.object.person
+
+                answer = Answer.objects.filter(
+                    question__survey=survey,
+                    author__user=person.user,
+                )
+
+                if answer.count() == 0:
+                    answer = Answer.objects.get(question=question,
+                                                author=author).human_display
+                elif answer.count() == 1:
+                    answer = answer.first().human_display
+                elif answer.count() > 1:
+                    raise Exception('Temos ambiguidade de respostas')
             except Answer.DoesNotExist:
                 pass
 
