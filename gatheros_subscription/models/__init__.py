@@ -5,3 +5,4 @@ from .lot_category import LotCategory
 from .lot import Lot
 from .subscription import Subscription
 from .event_survey import EventSurvey
+from .subscription_author import SubscriptionAuthor

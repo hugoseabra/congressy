@@ -164,15 +164,6 @@ class Subscription(models.Model, GatherosModelMixin):
         help_text="Valor percentual da congressy."
     )
 
-    author = models.OneToOneField(
-        Author,
-        on_delete=models.DO_NOTHING,
-        verbose_name='autor de resposta',
-        related_name='subscription',
-        blank=True,
-        null=True,
-    )
-
     completed = models.BooleanField(
         default=False,
         verbose_name='completa',
