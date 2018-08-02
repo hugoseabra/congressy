@@ -330,16 +330,16 @@
                     }
                 });
 
-                var has_optionals = false;
+{#                var has_optionals = false;#}
+{##}
+{#                {% if has_optionals %}#}
+{#                    has_optionals = true;#}
+{#                {% endif %}#}
 
-                {% if has_optionals %}
-                    has_optionals = true;
-                {% endif %}
-
-                if (has_optionals && parseFloat(price_el.val()) === 0.00) {
-                    $('#has_optionals_warning').show();
-                    $('.btn-success').prop('disabled', true);
-                }
+{#                if (has_optionals && parseFloat(price_el.val()) === 0.00) {#}
+{#                    $('#has_optionals_warning').show();#}
+{#                    $('.btn-success').prop('disabled', true);#}
+{#                }#}
 
                 price_el.mask('#.##0,00', {reverse: true});
 
