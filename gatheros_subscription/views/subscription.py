@@ -1192,7 +1192,17 @@ class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
 
     # --------- CUSTOM ------------
     def get_author(self):
+        survey = self.subscription.lot.event_survey.survey
         author = self.subscription.author
+
+        if author is None and self.subscription.person.user:
+            try:
+                author = Author.objects.get(
+                    survey=survey,
+                    user=self.subscription.person.user,
+                )
+            except Author.DoesNotExist:
+                pass
 
         if author is None:
             self.subscription.author = self._create_author()
