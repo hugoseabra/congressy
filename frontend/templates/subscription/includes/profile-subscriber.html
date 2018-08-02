@@ -560,7 +560,7 @@
                                     </li>
                                 {% endif %}
 
-                                {% if has_survey %}
+                                {% if survey_answers|length > 0 %}
 
                                     <li>
                                         <button type="button"
@@ -569,7 +569,7 @@
                                                 title="Abrir formulário de perguntas do participante"
                                                 onclick="window.location.href='{% url 'subscription:subscription-internal-survey' event.pk object.pk %}'">
                                             <span class="fas fa-clipboard-list"></span>
-                                            Ver Formulário Personalizado
+                                            Editar respostas do participante
                                         </button>
                                     </li>
 
@@ -686,6 +686,56 @@
         </div>
     </div>
 {% endif %}
+
+{% if survey_answers|length > 0 %}
+    <div class="row">
+        <div class="col-xl-11 col-lg-11 col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel" id="survey-block-hidden">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Respostas <a href="#"
+                                                                 onclick="show_block('#survey-block-visible', '#survey-block-hidden');return false;"
+                                                                 class="btn btn-link"
+                                                                 style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a>
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="panel panel-primary" style="display:none"
+                         id="survey-block-visible">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Respostas <a href="#"
+                                             onclick="show_block('#survey-block-hidden', '#survey-block-visible');return false;"
+                                             class="btn btn-link"
+                                             style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(ocultar)</a>
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    {% for item in survey_answers %}
+                                        <div class="form-group">
+                                            <label>{{ item.question }}</label>
+                                            <div>
+                                                {{ item.answer }}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+
 {% if config.institution_show or config.institution_cnpj_show or config.function_show %}
     <div class="row">
         <div class="col-xl-11 col-lg-11 col-md-12">

@@ -33,7 +33,7 @@
             <div class="col-md-12">
                 <div class="buttonbar">
                     <div class="float-right">
-                        <a href="{% url 'subscription:subscription-list' event.pk %}"
+                        <a href="{% url 'subscription:subscription-view' event.pk subscription.pk %}"
                            class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>
                             Cancelar
@@ -81,7 +81,7 @@
             <div class="col-md-12">
                 <div class="buttonbar bottom">
                     <div class="float-right">
-                        <a href="{% url 'subscription:subscription-list' event.pk %}"
+                        <a href="{% url 'subscription:subscription-view' event.pk subscription.pk %}"
                            class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>
                             Cancelar
