@@ -1170,10 +1170,3 @@ class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
         )
 
         return author
-
-
-
-
-
-
-
