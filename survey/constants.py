@@ -10,6 +10,11 @@ FIELD_SELECT = 'select'
 FIELD_CHECKBOX_GROUP = 'checkbox-group'
 FIELD_RADIO_GROUP = 'radio-group'
 
+PREDEFIENED_CPF = 'input-phone-cpf'
+PREDEFIENED_CNPJ = 'input-phone-cnpj'
+PREDEFIENED_PHONE = 'input-phone-phone'
+PREDEFIENED_CELLPHONE = 'input-phone-cellphone'
+
 TYPE_LIST = [
     'input-text',
     'input-number',
@@ -17,13 +22,16 @@ TYPE_LIST = [
     'input-datetime-local',
     'input-email',
     'input-phone',
+    'input-phone-cpf',
+    'input-phone-cnpj',
+    'input-phone-phone',
+    'input-phone-cellphone',
     'textarea',
     'boolean',
     'select',
     'checkbox-group',
     'radio-group',
 ]
-
 
 TYPES = (
     (FIELD_INPUT_TEXT, 'Texto (255 caracteres)'),
@@ -37,4 +45,8 @@ TYPES = (
     (FIELD_SELECT, 'Lista simples'),
     (FIELD_CHECKBOX_GROUP, 'Múltipla escolha'),
     (FIELD_RADIO_GROUP, 'Escolha única'),
+    (PREDEFIENED_CPF, 'CPF'),
+    (PREDEFIENED_CNPJ, 'CNPJ'),
+    (PREDEFIENED_PHONE, 'Número de Telefone Fixo'),
+    (PREDEFIENED_CELLPHONE, 'Número de Celular'),
 )
