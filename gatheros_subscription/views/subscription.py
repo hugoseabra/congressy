@@ -556,7 +556,7 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
                 person = self.object.person
 
                 answer = Answer.objects.filter(
-                    question__survey=survey,
+                    question=question, 
                     author__user=person.user,
                 )
 
