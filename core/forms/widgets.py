@@ -37,10 +37,14 @@ class PriceInput(forms.TextInput):
 class TelephoneInput(forms.TextInput):
     input_type = 'tel'
 
+    def __init__(self, clear_string=True, attrs=None):
+        self.clear_string = clear_string
+        super().__init__(attrs)
+
     def value_from_datadict(self, data, files, name):
         data = super().value_from_datadict(data, files, name)
         if data:
-            data = clear_string(str(data))
+            data = clear_string(str(data)) if self.clear_string else str(data)
 
         return data
 

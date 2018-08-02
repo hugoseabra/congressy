@@ -64,6 +64,10 @@
         }
     </style>
 
+    {% if form %}
+        {{ form.media.css }}
+    {% endif %}
+
     {% block styles %}{% endblock %}
 </head>
 
@@ -100,6 +104,10 @@
 <script src="{% static 'assets/js/cgsy.js' %}"></script>
 
 {% block scripts %}{% endblock %}
+
+{% if form %}
+    {{ form.media.js }}
+{% endif %}
 
 <script>
     $(document).ready(function () {
