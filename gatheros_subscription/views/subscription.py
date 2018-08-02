@@ -1164,10 +1164,12 @@ class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
         survey = self.subscription.lot.event_survey.survey
         name = self.subscription.person.name
 
-        return Author.objects.create(
+        author, _ = Author.objects.get_or_create(
             survey=survey,
             name=name,
         )
+
+        return author
 
 
 
