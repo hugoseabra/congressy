@@ -1015,8 +1015,19 @@ class SubscriptionWizardView(SessionWizardView):
         ).count() > 0
 
     def get_author(self):
+        lot = self.get_lot()
 
         author = self.subscription.author
+        survey = lot.event_survey.survey
+
+        if author is None and self.subscription.person.user:
+            try:
+                author = Author.objects.get(
+                    survey=survey,
+                    user=self.subscription.person.user,
+                )
+            except Author.DoesNotExist:
+                pass
 
         if author is None:
             self.subscription.author = self._create_author()
