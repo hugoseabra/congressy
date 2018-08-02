@@ -40,7 +40,7 @@ from payment import forms
 from payment.helpers import payment_helpers
 from payment.models import Transaction
 from survey.directors import SurveyDirector
-from survey.models import Author
+from survey.models import Author, Question, Answer
 
 
 class EventViewMixin(TemplateNameableMixin, AccountMixin):
@@ -429,7 +429,7 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         ctx['full_prices'] = calculator.full_prices
         ctx['installments'] = calculator.installments
         ctx['has_manual'] = calculator.has_manual
-        ctx['has_survey'] = True if self.object.lot.event_survey else False
+        ctx['survey_answers'] = self.get_survey_answers()
         ctx['total_paid'] = calculator.total_paid
         ctx['dividend_amount'] = calculator.dividend_amount
         ctx['financial'] = self.financial
@@ -537,6 +537,33 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
 
     def get_services(self):
         return self.object.subscription_services.all()
+
+    def get_survey_answers(self):
+        survey_answers = list()
+
+        if not self.object.lot.event_survey:
+            return survey_answers
+
+        author = self.object.author
+        survey = self.object.lot.event_survey.survey
+        questions = Question.objects.filter(survey=survey)
+
+        for question in questions:
+
+            answer = 'Sem resposta.'
+
+            try:
+                answer = Answer.objects.get(question=question,
+                                            author=author).human_display
+            except Answer.DoesNotExist:
+                pass
+
+            survey_answers.append({
+                'question': question.label,
+                'answer': answer
+            })
+
+        return survey_answers
 
 
 class SubscriptionAddFormView(SubscriptionFormMixin):
@@ -1112,7 +1139,6 @@ class SwitchSubscriptionTestView(EventViewMixin, generic.View):
 
 
 class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
-
     subscription = None
     template_name = "subscription/survey.html"
 
@@ -1123,11 +1149,10 @@ class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
-
         survey_director = SurveyDirector(event=self.event)
         survey = self.subscription.lot.event_survey.survey
         author = self.get_author()
-            
+
         form_kwargs = self.get_form_kwargs()
 
         data = form_kwargs.get('data')
@@ -1148,9 +1173,13 @@ class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
             })
         )
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['subscription'] = self.subscription
+        return context
+
     # --------- CUSTOM ------------
     def get_author(self):
-
         author = self.subscription.author
 
         if author is None:
@@ -1160,7 +1189,6 @@ class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
         return author
 
     def _create_author(self):
-
         survey = self.subscription.lot.event_survey.survey
         name = self.subscription.person.name
 
