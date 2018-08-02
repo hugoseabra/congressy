@@ -26,6 +26,7 @@ from payment.helpers.payment_helpers import (
 )
 from payment.models import Transaction
 from survey.directors import SurveyDirector
+from survey.models import Author
 
 FORMS = [
     ("private_lot", forms.PrivateLotForm),
@@ -432,7 +433,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and
-                    self.storage.current_step is not None):
+                self.storage.current_step is not None):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
 
@@ -574,6 +575,8 @@ class SubscriptionWizardView(SessionWizardView):
 
             lot = self.get_lot()
 
+            # Tratamento especial para extrair as respostas do form_data,
+            # causado pelo uso do FormWizard que adiciona prefixos nas respostas
             survey_response = QueryDict('', mutable=True)
             for form_question, form_response in form_data.items():
                 if form_question == 'csrfmiddlewaretoken':
@@ -585,15 +588,14 @@ class SubscriptionWizardView(SessionWizardView):
 
             survey_form = survey_director.get_form(
                 survey=lot.event_survey.survey,
-                data=survey_response
+                data=survey_response,
+                author=self.get_author(),
             )
 
-            if survey_form.is_valid():
-                survey_form.save_answers()
-            else:
-                raise Exception('SurveyForm was invalid: {}'.format(
-                    survey_form.errors
-                ))
+            if not survey_form.is_valid():
+                raise ValidationError(form.errors)
+
+            survey_form.save()
 
         # Persisting payments:
         if isinstance(form, forms.PaymentForm):
@@ -1011,6 +1013,28 @@ class SubscriptionWizardView(SessionWizardView):
         return subscription.transactions.filter(
             status=Transaction.PAID
         ).count() > 0
+
+    def get_author(self):
+
+        author = self.subscription.author
+
+        if author is None:
+            self.subscription.author = self._create_author()
+
+        return author
+
+    def _create_author(self):
+
+        lot = self.get_lot()
+
+        survey = lot.event_survey.survey
+
+        author, _ = Author.objects.get_or_create(
+            survey=survey,
+            user=self.request.user,
+        )
+
+        return author
 
     @staticmethod
     def is_lot_available(lot):
