@@ -52,6 +52,11 @@ class Question(Entity, models.Model):
     FIELD_CHECKBOX_GROUP = 'checkbox-group'
     FIELD_RADIO_GROUP = 'radio-group'
 
+    PREDEFIENED_CPF = 'input-phone-cpf'
+    PREDEFIENED_CNPJ = 'input-phone-cnpj'
+    PREDEFIENED_PHONE = 'input-phone-phone'
+    PREDEFIENED_CELLPHONE = 'input-phone-cellphone'
+
     TYPES = (
         (FIELD_INPUT_TEXT, 'Texto (255 caracteres)'),
         (FIELD_INPUT_NUMBER, 'Número'),
@@ -64,6 +69,10 @@ class Question(Entity, models.Model):
         (FIELD_SELECT, 'Lista simples'),
         (FIELD_CHECKBOX_GROUP, 'Múltipla escolha'),
         (FIELD_RADIO_GROUP, 'Escolha única'),
+        (PREDEFIENED_CPF, 'CPF'),
+        (PREDEFIENED_CNPJ, 'CNPJ'),
+        (PREDEFIENED_PHONE, 'Número de Telefone Fixo'),
+        (PREDEFIENED_CELLPHONE, 'Número de Celular'),
     )
 
     survey = models.ForeignKey(

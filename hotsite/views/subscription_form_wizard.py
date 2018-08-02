@@ -576,7 +576,8 @@ class SubscriptionWizardView(SessionWizardView):
             lot = self.get_lot()
 
             # Tratamento especial para extrair as respostas do form_data,
-            # causado pelo uso do FormWizard que adiciona prefixos nas respostas
+            # causado pelo uso do FormWizard que adiciona prefixos nas
+            # respostas
             survey_response = QueryDict('', mutable=True)
             for form_question, form_response in form_data.items():
                 if form_question == 'csrfmiddlewaretoken':
@@ -593,7 +594,7 @@ class SubscriptionWizardView(SessionWizardView):
             )
 
             if not survey_form.is_valid():
-                raise ValidationError(form.errors)
+                raise ValidationError(survey_form.errors)
 
             survey_form.save()
 

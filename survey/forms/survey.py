@@ -6,6 +6,8 @@ from survey.models import Survey, Question, Author, Answer
 from survey.services import AnswerService
 from .field import SurveyField
 
+from core.model.validator import cpf_validator, cnpj_validator
+
 
 class SurveyForm(forms.Form):
     """ Formulário Dinâmico. """
@@ -16,12 +18,14 @@ class SurveyForm(forms.Form):
 
         if not isinstance(survey, Survey):
             msg = '{} não é uma instância de Survey'.format(
-                survey.__class__.__name__)
+                survey.__class__.__name__
+            )
             raise ValueError(msg)
 
         self.survey = survey
         self.user = user
         self.author = author
+
         super(SurveyForm, self).__init__(*args, **kwargs)
 
         if self.survey.questions:
@@ -60,8 +64,26 @@ class SurveyForm(forms.Form):
 
     def clean(self):
         clean_data = super().clean()
+        self.validate_predefined_fields()
         self.answer_service_list = self._clean_answers()
         return clean_data
+
+    def validate_predefined_fields(self):
+        for f_name, answer in self.cleaned_data.items():
+            question = Question.objects.get(name=f_name,
+                                            survey=self.survey)
+
+            if question.type == Question.PREDEFIENED_CPF:
+                try:
+                    cpf_validator(answer)
+                except forms.ValidationError:
+                    raise forms.ValidationError({f_name: 'CPF Inválido.'})
+
+            if question.type == Question.PREDEFIENED_CNPJ:
+                try:
+                    cnpj_validator(answer)
+                except forms.ValidationError:
+                    raise forms.ValidationError({f_name: 'CNPJ Inválido.'})
 
     def _clean_answers(self) -> list:
         """
@@ -80,9 +102,10 @@ class SurveyForm(forms.Form):
             if answer:
 
                 if not self.author and self.user:
-                    self.author = \
-                        Author.objects.get_or_create(survey=self.survey,
-                                                     user=self.user)[0]
+                    self.author = Author.objects.get_or_create(
+                        survey=self.survey,
+                        user=self.user
+                    )[0]
 
                 if self.author is None:
                     raise Exception(
@@ -94,18 +117,22 @@ class SurveyForm(forms.Form):
                 existing_answer = None
 
                 try:
-                    existing_answer = Answer.objects.get(question=question.pk,
-                                                         author=self.author)
+                    existing_answer = Answer.objects.get(
+                        question=question.pk,
+                        author=self.author,
+                    )
                 except Answer.DoesNotExist:
                     pass
 
                 if existing_answer:
-                    answer_service = AnswerService(instance=existing_answer,
-                                                   data={
-                                                       'question': question.pk,
-                                                       'author': self.author.pk,
-                                                       'value': answer,
-                                                   })
+                    answer_service = AnswerService(
+                        instance=existing_answer,
+                        data={
+                            'question': question.pk,
+                            'author': self.author.pk,
+                            'value': answer,
+                        }
+                    )
                 else:
                     answer_service = AnswerService(data={
                         'question': question.pk,
@@ -118,7 +145,8 @@ class SurveyForm(forms.Form):
                     answer_list.append(answer_object)
                 else:
                     msg = 'Não foi possivel validar a resposta: {}'.format(
-                        answer_service.data)
+                        answer_service.data
+                    )
                     raise ValidationError(msg)
 
         return answer_list
