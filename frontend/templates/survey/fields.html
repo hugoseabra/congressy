@@ -10,34 +10,76 @@
 
                 <div class="table">
                     <table class="table noborder" >
-                        <thead>
-                        <tr>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                        </thead>
                         <tbody>
                         <tr>
-                            <td class="col-xs-1 text-center control-buttons
-                            my-handle"
-                                style="background-color:
-                                #f8f8f8;width: 5%">
+                            <td class="col-xs-1 text-center control-buttons my-handle" style="background-color: #f8f8f8;width: 5%">
                                 <i class=" fas fa-arrows-alt"></i>
                             </td>
-
+                            {% if field.field.field_type == 'input-phone-cpf' %}
+                                <td class="col-xs-1 text-center" style="width: 5%">
+                                    <i class="far fa-user" style="font-size: 28px"></i>
+                                </td>
+                            {% elif field.field.field_type == 'input-phone-cnpj' %}
+                                <td class="col-xs-1 text-center" style="width: 5%">
+                                    <i class="far fa-building" style="font-size: 28px"></i>
+                                </td>
+                            {% elif field.field.field_type == 'input-phone-phone' %}
+                                <td class="col-xs-1 text-center" style="width: 5%" data-toggle="tooltip" title="Telefone Fixo">
+                                    <i class="fas fa-phone" style="font-size: 28px"></i>
+                                </td>
+                            {% elif field.field.field_type == 'input-phone-cellphone' %}
+                                <td class="col-xs-1 text-center" style="width: 5%" data-toggle="tooltip" title="Telefone Celular">
+                                    <i class="fas fa-mobile-alt" style="font-size: 28px"></i>
+                                </td>
+                            {% elif field.field.field_type == 'input-text' %}
+                                <td class="col-xs-1 text-center" style="width: 5%" data-toggle="tooltip" title="Texto">
+                                    <i class="fas fa-i-cursor" style="font-size: 28px"></i>
+                                </td>
+                            {% elif field.field.field_type == 'input-date' %}
+                                <td class="col-xs-1 text-center" style="width: 5%" data-toggle="tooltip" title="Data">
+                                    <i class="far fa-calendar-alt" style="font-size: 28px"></i>
+                                </td>
+                            {% elif field.field.field_type == 'textarea' %}
+                                <td class="col-xs-1 text-center" style="width: 5%" data-toggle="tooltip" title="Parágrafo">
+                                    <i class="fas fa-align-left" style="font-size: 28px"></i>
+                                </td>
+                            {% elif field.field.field_type == 'select' %}
+                                <td class="col-xs-1 text-center" style="width: 5%" data-toggle="tooltip" title="Lista">
+                                    <i class="fas fa-list-ul" style="font-size: 28px"></i>
+                                </td>
+                            {% elif field.field.field_type == 'radio-group' %}
+                                <td class="col-xs-1 text-center" style="width: 5%" data-toggle="tooltip" title="Múltipla Escolha">
+                                    <i class="far fa-check-circle" style="font-size: 28px"></i>
+                                </td>
+                            {% elif field.field.field_type == 'checkbox-group' %}
+                                <td class="col-xs-1 text-center" style="width: 5%" data-toggle="tooltip" title="Várias Opções">
+                                    <i class="far fa-check-square" style="font-size: 28px"></i>
+                                </td>
+                            {% elif field.field.field_type == 'input-number' %}
+                                <td class="col-xs-1 text-center" style="width: 5%" data-toggle="tooltip" title="Somente Números">
+                                    <i class="fas fa-sort-numeric-up" style="font-size: 28px"></i>
+                                </td>
+                            {% elif field.field.field_type == 'input-email' %}
+                                <td class="col-xs-1 text-center" style="width: 5%" data-toggle="tooltip" title="E-mail">
+                                    <i class="fas fa-envelope" style="font-size: 28px"></i>
+                                </td>
+                            {% endif %}
                             <td class="col-md-8"
                                 data-question-type="{{ field.field.field_type }}"
                                 data-question-label="{{ field.field.label }}"
                                 data-question-name="{{ field.field.question_name }}"
                                 data-question-id="{{ field.field.question_id }}">
 
-                                {% render_generic_field field %}
+                                {% if field.field.field_type == 'radio-group' %}
+                                    {% render_icheck_field field %}
+                                {% elif field.field.field_type == 'checkbox-group' %}
+                                    {% render_icheck_field field %}
+                                {% else %}
+                                    {% render_generic_field field %}
+                                {% endif %}
                             </td>
 
                             <td class="col-md-3 control-buttons text-center">
-
-
                                 <div class="btn-group">
                                     <button type="button" class="btn
                                         btn-primary btn-trans
@@ -60,6 +102,19 @@
                                                 Editar
                                             </a>
                                         </li>
+                                        <li>
+                                            {% if field.field.field_type == 'checkbox-group' or field.field.field_type == 'radio-group' %}
+                                            <a href="javascript:void(0)" onclick="openEditOptionQuestionTypeModal('{{ field.field.label }}', '{{ field.field.field_type }}', '{{ field.field.question_id }}')">
+                                                <i class="fas fa-pencil-alt"></i>
+                                                Alterar tipo
+                                            </a>
+                                            {% else %}
+                                            <a href="javascript:void(0)" onclick="openEditInputQuestionTypeModal('{{ field.field.label }}', '{{ field.field.field_type }}', '{{ field.field.question_id }}')">
+                                                <i class="fas fa-pencil-alt"></i>
+                                                Alterar tipo
+                                            </a>
+                                            {% endif %}
+                                        </li>
                                         <li class="js-duplicate">
                                             <a href="javascript:void(0)" onclick="duplicateField('{{ field.field.label }}', '{{ field.field.question_id }}')">
                                                 <i class="far fa-clone"></i>
@@ -81,6 +136,7 @@
                                 <div class="checkbox" data-checkbox-name="{{ field.name }}">
                                     {{ field.field.type }}
                                     <input type="checkbox"
+                                           style="display: none"
                                            class="update_required"
                                            data-name="{{ field.name }}"
                                             {% if field.field.required %}

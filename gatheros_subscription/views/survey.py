@@ -161,6 +161,24 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
                 return HttpResponse(status=200)
 
+            elif action == 'change_type':
+
+                new_type = self.request.POST.get('new_type')
+
+                if new_type not in QUESTION_TYPE_LIST:
+                    return HttpResponse(status=500)
+
+                question = get_object_or_404(
+                    Question,
+                    pk=question_id,
+                    survey=self.survey
+                )
+
+                question.type = new_type
+                question.save()
+
+                return HttpResponse(status=200)
+
             return HttpResponse(status=500)
 
         question_type = self.request.POST.get('question_type', None)
@@ -332,7 +350,10 @@ class EventSurveyDeleteAjaxView(EventViewMixin, AccountMixin,
 
         if event_survey_id:
             event_survey = get_object_or_404(EventSurvey, pk=event_survey_id)
+            survey = event_survey.survey
             event_survey.delete()
+            survey.delete()
+
             return HttpResponse(status=204)
         else:
             return HttpResponse(status=400)

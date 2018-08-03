@@ -204,9 +204,9 @@ def _export_survey_answers(worksheet, event_survey):
     ]
 
     survey = event_survey.survey
-    subscriptions = event_survey.event.subscriptions.filter(completed=True,
-                                                            test_subscription=False)
+
     questions = survey.questions.all().order_by('order')
+    num_questions = len(questions)
 
     # Lista a ser consultada para pegar a sequência de colunas de perguntas.
     question_pks = []
@@ -218,6 +218,10 @@ def _export_survey_answers(worksheet, event_survey):
         question_pks.append(question.pk)
 
     worksheet.append(columns)
+
+    event = event_survey.event
+    subscriptions = event.subscriptions.filter(completed=True,
+                                               test_subscription=False)
 
     collector = {}
     row_idx = 1
@@ -235,12 +239,17 @@ def _export_survey_answers(worksheet, event_survey):
             author=sub.author,
         ).order_by('question__order')
 
-        if not answers:
-            continue
-
         collector[row_idx].append(get_object_value(sub, 'code'))
         collector[row_idx].append(person.name)
         collector[row_idx].append(person.email)
+
+        if not answers:
+            # Insere linha com todas as respostas das colunas como '-' = vazias
+            for i in range(0, num_questions):
+                collector[row_idx].append('-')
+
+            row_idx += 1
+            continue
 
         for answer in answers:
             question = answer.question
