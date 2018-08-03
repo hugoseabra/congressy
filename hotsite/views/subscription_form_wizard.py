@@ -13,6 +13,7 @@ from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
 from gatheros_event.models import Event, Person
+from gatheros_subscription.directors import SubscriptionSurveyDirector
 from gatheros_subscription.models import FormConfig, Lot, Subscription
 from hotsite import forms
 from mailer.services import (
@@ -25,8 +26,6 @@ from payment.helpers.payment_helpers import (
     is_boleto_allowed,
 )
 from payment.models import Transaction
-from survey.directors import SurveyDirector
-from survey.models import Author
 
 FORMS = [
     ("private_lot", forms.PrivateLotForm),
@@ -570,8 +569,8 @@ class SubscriptionWizardView(SessionWizardView):
         # Persisting survey
         if isinstance(form, forms.SurveyForm):
 
-            survey_director = SurveyDirector(event=self.event,
-                                             user=self.request.user)
+            survey_director = SubscriptionSurveyDirector(
+                self.get_subscription())
 
             lot = self.get_lot()
 
@@ -590,7 +589,6 @@ class SubscriptionWizardView(SessionWizardView):
             survey_form = survey_director.get_form(
                 survey=lot.event_survey.survey,
                 data=survey_response,
-                author=self.get_author(),
             )
 
             if not survey_form.is_valid():
