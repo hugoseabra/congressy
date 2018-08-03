@@ -1,7 +1,4 @@
-from gatheros_subscription.models import (
-    Subscription,
-    SubscriptionAuthor,
-)
+from gatheros_subscription.models import Subscription
 from survey.forms import SurveyForm
 from survey.models import Author, Answer, Survey
 
@@ -23,7 +20,7 @@ class SubscriptionSurveyDirector(object):
 
         self.subscription = subscription
 
-        if subscription is not None:    
+        if subscription is not None:
             if not isinstance(subscription, Subscription):
                 msg = '{} não é uma instância de Subscription'.format(
                     subscription.__class__.__name__)
@@ -37,21 +34,11 @@ class SubscriptionSurveyDirector(object):
             if self.subscription.person.user:
                 user = self.subscription.person.user
 
-            try:
-                self.subscription_author = SubscriptionAuthor.objects.get(
-                    subscription=self.subscription,
-                )
-            except SubscriptionAuthor.DoesNotExist:
-
-                autor = Author.objects.create(
+            if self.subscription.author is None:
+                self.subscription.author = Author.objects.create(
                     name=self.subscription.person.name,
                     survey=survey,
                     user=user,
-                )
-
-                self.subscription_author = SubscriptionAuthor.objects.create(
-                    subscription=self.subscription,
-                    author=autor,
                 )
 
         super().__init__()
@@ -74,13 +61,13 @@ class SubscriptionSurveyDirector(object):
         """
         # Caso não seja passado uma inscrição, resgatar apenas um
         # SurveyForm vazio
-        if self.subscription is None:
+        if self.subscription is None or self.subscription.author is None:
             return SurveyForm(
                 survey=survey,
             )
 
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
-        author = self.subscription_author.author
+        author = self.subscription.author
 
         try:
             """

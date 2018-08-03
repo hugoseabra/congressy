@@ -40,13 +40,12 @@ from gatheros_subscription.models import (
     FormConfig,
     Lot,
     Subscription,
-    SubscriptionAuthor,
 )
 from mailer import exception as mailer_exception, services as mailer
 from payment import forms
 from payment.helpers import payment_helpers
 from payment.models import Transaction
-from survey.models import Author, Question, Answer
+from survey.models import Question, Answer
 
 
 class EventViewMixin(TemplateNameableMixin, AccountMixin):
@@ -551,11 +550,8 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
             return survey_answers
 
         survey = self.object.lot.event_survey.survey
-        try:
-            author = SubscriptionAuthor.objects.get(
-                subscription=self.object,
-            ).author
 
+        if self.object.author:
             questions = Question.objects.filter(survey=survey)
 
             for question in questions:
@@ -564,7 +560,7 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
 
                 answers = Answer.objects.filter(
                     question=question,
-                    author=author,
+                    author=self.object.author,
                 )
 
                 if answers.count() == 1:
@@ -574,7 +570,8 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
                 elif answers.count() == 0:
                     try:
                         answer = Answer.objects.get(question=question,
-                                                    author=author).human_display
+                                                    author=self.object.author)
+                        answer = answer.human_display
                     except Answer.DoesNotExist:
                         pass
 
@@ -582,8 +579,6 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
                     'question': question.label,
                     'answer': answer
                 })
-        except SubscriptionAuthor.DoesNotExist:
-            pass
 
         return survey_answers
 
