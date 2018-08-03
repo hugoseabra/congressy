@@ -4,6 +4,7 @@ import locale
 from openpyxl import Workbook
 from six import BytesIO
 
+from gatheros_subscription.models import SubscriptionAuthor
 from payment.models import Transaction
 from survey.models import Answer
 
@@ -227,9 +228,16 @@ def _export_survey_answers(worksheet, event_survey):
         if row_idx not in collector:
             collector[row_idx] = []
 
+        try:
+            author = SubscriptionAuthor.objects.get(
+                subscription=sub,
+            ).author
+        except SubscriptionAuthor.DoesNotExist:
+            continue
+
         answers = Answer.objects.filter(
             question__survey=survey,
-            author__user=person.user,
+            author=author,
         ).order_by('question__order')
 
         if not answers:
