@@ -1220,18 +1220,14 @@ class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
-        survey_director = SurveyDirector(event=self.event)
         survey = self.subscription.lot.event_survey.survey
-        author = self.get_author()
-
         form_kwargs = self.get_form_kwargs()
-
         data = form_kwargs.get('data')
+        survey_director = SubscriptionSurveyDirector(self.subscription)
 
         return survey_director.get_form(
             survey=survey,
             data=data,
-            author=author,
         )
 
     def form_valid(self, form):
