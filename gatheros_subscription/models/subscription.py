@@ -16,7 +16,6 @@ from gatheros_event.models.constants import (
     CONGRESSY_PERCENT_10_0,
 )
 from gatheros_event.models.mixins import GatherosModelMixin
-from survey.models import Author
 from . import Lot
 from .rules import subscription as rule
 

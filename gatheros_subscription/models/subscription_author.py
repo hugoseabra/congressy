@@ -7,19 +7,18 @@ from survey.models import Author
 class SubscriptionAuthor(models.Model):
     """Modelo de formularios de evento"""
 
-    subscription = models.ForeignKey(
+    subscription = models.OneToOneField(
         Subscription,
         on_delete=models.CASCADE,
         verbose_name='inscrição',
         related_name='subscription_author'
     )
 
-    author = models.OneToOneField(
+    author = models.ForeignKey(
         Author,
         on_delete=models.CASCADE,
         verbose_name='autor',
         related_name='subscription',
-        unique=True,
     )
 
     def __str__(self):
