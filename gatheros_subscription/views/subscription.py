@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.transaction import atomic
+from django.forms import ValidationError
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -24,6 +25,7 @@ from gatheros_event.views.mixins import (
     AccountMixin,
     PermissionDenied,
 )
+from gatheros_subscription.directors import SubscriptionSurveyDirector
 from gatheros_subscription.forms import (
     SubscriptionAttendanceForm,
     SubscriptionPersonForm,
@@ -34,12 +36,15 @@ from gatheros_subscription.helpers.barcode import create_barcode
 from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.helpers.report_payment import \
     PaymentReportCalculator
-from gatheros_subscription.models import FormConfig, Lot, Subscription
+from gatheros_subscription.models import (
+    FormConfig,
+    Lot,
+    Subscription,
+)
 from mailer import exception as mailer_exception, services as mailer
 from payment import forms
 from payment.helpers import payment_helpers
 from payment.models import Transaction
-from survey.directors import SurveyDirector
 from survey.models import Author, Question, Answer
 
 
@@ -544,36 +549,42 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         if not self.object.lot.event_survey:
             return survey_answers
 
-        author = self.object.author
         survey = self.object.lot.event_survey.survey
-        questions = Question.objects.filter(survey=survey)
+        try:
+            author = SubscriptionAuthor.objects.get(
+                subscription=self.object,
+            ).author
 
-        for question in questions:
+            questions = Question.objects.filter(survey=survey)
 
-            answer = 'Sem resposta.'
+            for question in questions:
 
-            person = self.object.person
+                answer = 'Sem resposta.'
 
-            answers = Answer.objects.filter(
-                question=question,
-                author__user=person.user,
-            )
+                person = self.object.person
 
-            if answers.count() == 1:
-                answer = answers.first().human_display
-            elif answers.count() > 1:
-                raise Exception('Temos ambiguidade de respostas')
-            elif answers.count() == 0:
-                try:
-                    answer = Answer.objects.get(question=question,
-                                                author=author).human_display
-                except Answer.DoesNotExist:
-                    pass
+                answers = Answer.objects.filter(
+                    question=question,
+                    author__user=person.user,
+                )
 
-            survey_answers.append({
-                'question': question.label,
-                'answer': answer
-            })
+                if answers.count() == 1:
+                    answer = answers.first().human_display
+                elif answers.count() > 1:
+                    raise Exception('Temos ambiguidade de respostas')
+                elif answers.count() == 0:
+                    try:
+                        answer = Answer.objects.get(question=question,
+                                                    author=author).human_display
+                    except Answer.DoesNotExist:
+                        pass
+
+                survey_answers.append({
+                    'question': question.label,
+                    'answer': answer
+                })
+        except SubscriptionAuthor.DoesNotExist:
+            pass
 
         return survey_answers
 
@@ -601,6 +612,55 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
         return reverse('subscription:subscription-add', kwargs={
             'event_pk': self.event.pk
         })
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        if context['selected_lot'] != 0:
+            try:
+
+                lot_pk = context['selected_lot']
+
+                lot = Lot.objects.get(pk=lot_pk)
+                if lot.event_survey:
+                    survey = lot.event_survey.survey
+                    context['survey_form'] = self.get_survey_form(survey)
+            except Lot.DoesNotExist:
+                pass
+
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.subscription.lot.event_survey:
+
+            survey = self.subscription.lot.event_survey.survey
+
+            survey_form = self.get_survey_form(
+                survey=survey,
+                data=self.request.POST,
+                subscription=self.subscription,
+            )
+
+            if survey_form.is_valid():
+                survey_form.save()
+            else:
+                raise ValidationError(survey_form.errors)
+
+        return response
+
+    @staticmethod
+    def get_survey_form(survey, subscription=None, data=None):
+
+        survey_director = SubscriptionSurveyDirector(subscription)
+
+        survey_form = survey_director.get_form(
+            survey=survey,
+            data=data,
+        )
+
+        return survey_form
 
 
 class SubscriptionEditFormView(SubscriptionFormMixin):
