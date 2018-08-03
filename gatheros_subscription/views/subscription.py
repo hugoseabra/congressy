@@ -1219,6 +1219,11 @@ class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
                                               uuid=uuid)
         return super().dispatch(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['subscription'] = self.subscription
+        return context
+
     def get_form(self, form_class=None):
         survey = self.subscription.lot.event_survey.survey
         form_kwargs = self.get_form_kwargs()
@@ -1239,39 +1244,3 @@ class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
                 'pk': self.subscription.pk,
             })
         )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['subscription'] = self.subscription
-        return context
-
-    # --------- CUSTOM ------------
-    def get_author(self):
-        survey = self.subscription.lot.event_survey.survey
-        author = self.subscription.author
-
-        if author is None and self.subscription.person.user:
-            try:
-                author = Author.objects.get(
-                    survey=survey,
-                    user=self.subscription.person.user,
-                )
-            except Author.DoesNotExist:
-                pass
-
-        if author is None:
-            self.subscription.author = self._create_author()
-            self.subscription.save()
-
-        return author
-
-    def _create_author(self):
-        survey = self.subscription.lot.event_survey.survey
-        name = self.subscription.person.name
-
-        author, _ = Author.objects.get_or_create(
-            survey=survey,
-            name=name,
-        )
-
-        return author

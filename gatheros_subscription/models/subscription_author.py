@@ -14,7 +14,7 @@ class SubscriptionAuthor(models.Model):
         related_name='subscription_author'
     )
 
-    author = models.ForeignKey(
+    author = models.OneToOneField(
         Author,
         on_delete=models.CASCADE,
         verbose_name='autor',

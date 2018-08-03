@@ -33,6 +33,9 @@ class SubscriptionSurveyDirector(object):
                 raise Exception('Lot não possui event_survey')
 
             survey = self.subscription.lot.event_survey.survey
+            user = None
+            if self.subscription.person.user:
+                user = self.subscription.person.user
 
             try:
                 self.subscription_author = SubscriptionAuthor.objects.get(
@@ -43,6 +46,7 @@ class SubscriptionSurveyDirector(object):
                 autor = Author.objects.create(
                     name=self.subscription.person.name,
                     survey=survey,
+                    user=user,
                 )
 
                 self.subscription_author = SubscriptionAuthor.objects.create(

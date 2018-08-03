@@ -508,10 +508,10 @@ class SubscriptionWizardView(SessionWizardView):
 
         if step == 'survey':
             lot = self.get_lot()
+
             kwargs.update({
-                'user': self.request.user,
-                'event': self.event,
-                'event_survey': lot.event_survey,
+                'subscription': self.get_subscription(),
+                'survey': lot.event_survey.survey,
             })
 
         if step == 'payment':
@@ -1014,39 +1014,6 @@ class SubscriptionWizardView(SessionWizardView):
         return subscription.transactions.filter(
             status=Transaction.PAID
         ).count() > 0
-
-    def get_author(self):
-        lot = self.get_lot()
-
-        author = self.subscription.author
-        survey = lot.event_survey.survey
-
-        if author is None and self.subscription.person.user:
-            try:
-                author = Author.objects.get(
-                    survey=survey,
-                    user=self.subscription.person.user,
-                )
-            except Author.DoesNotExist:
-                pass
-
-        if author is None:
-            self.subscription.author = self._create_author()
-
-        return author
-
-    def _create_author(self):
-
-        lot = self.get_lot()
-
-        survey = lot.event_survey.survey
-
-        author, _ = Author.objects.get_or_create(
-            survey=survey,
-            user=self.request.user,
-        )
-
-        return author
 
     @staticmethod
     def is_lot_available(lot):
