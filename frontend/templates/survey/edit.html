@@ -56,236 +56,223 @@
     </div>
 
     <div class="row">
-
-        <div class="col-lg-12 col-xl-5">
-
-            <div class="panel panel-primary">
-
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        Vínculo com Lotes
-                    </h3>
-                </div>
-                <div class="panel-body">
-                    {% if survey.questions.count > 0 %}
-
-                        {% include 'subscription/includes/lot_event_survey_change_panel.html' %}
-
-
-                    {% else %}
-                        <div>
-                            <strong>Não é permitido vincular formulários sem
-                                perguntas a
-                                lotes</strong>
-                        </div>
-                    {% endif %}
-                </div>
-
-            </div>
-
-
-        </div>
-
-        <div class="col-lg-12 col-xl-7">
-
+        <div class="col-lg-12 col-xl-7 col-xl-push-5">
             <div class="panel panel-primary" id="form-preview">
-
                 <div class="panel-heading">
                     <h3 class="panel-title">
                         Previsão do Formulário
                     </h3>
                 </div>
-
                 <div class="panel-body">
-
                     <div id='fields'>
                         <strong>Nenhuma questão.</strong>
                     </div>
-
                 </div>
-
             </div>
-            <div class="panel panel-primary">
+        </div>
+        <div class="col-lg-12 col-xl-5 col-xl-pull-7">
+            <div class="row">
 
-                <div class="panel-heading">
-                    <h3 class="panel-title">Novo Campo</h3>
-                </div>
-
-                <div class="panel-body">
-
-                    <div class="row">
-
-                        <div class="col-md-6">
-
-                            <strong style="font-size: 20px">
-                                Insira um campo pré-definido:
-                            </strong>
-                            <hr/>
-
-                            <a data-field-type="CPF"
-                               data-field-icon="far fa-user"
-                               data-question_type="input-phone-cpf"
-                               title="CPF"
-                               class="open-AddSimpleQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-
-                                    <i class="far fa-user"></i>
-                                    CPF
-                                </div>
-                            </a>
-                            <a data-field-type="CNPJ"
-                               data-field-icon="far fa-building"
-                               data-question_type="input-phone-cnpj"
-                               title="CNPJ"
-                               class="open-AddSimpleQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-
-                                    <i class="far fa-building"></i>
-                                    CNPJ
-                                </div>
-                            </a>
-                            <a data-field-type="Telefone Fixo"
-                               data-field-icon="fas fa-phone"
-                               data-question_type="input-phone-phone"
-                               title="Telefone Fixo"
-                               class="open-AddSimpleQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-                                    <i class="fas fa-phone"></i>
-                                    Telefone Fixo
-                                </div>
-                            </a>
-                            <a data-field-type="Telefone Celular"
-                               data-field-icon="fas fa-mobile-alt"
-                               data-question_type="input-phone-cellphone"
-                               title="Telefone Celular"
-                               class="open-AddSimpleQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-                                    <i class="fas fa-mobile-alt"></i>
-                                    Telefone Celular
-                                </div>
-                            </a>
-
-
+                <div class="col-md-12">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Novo Campo
+                            </h3>
                         </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-6">
 
-                        <div class="col-md-6">
+                                    <strong style="font-size: 20px">
+                                        Campo pré-definido:
+                                    </strong>
+                                    <hr/>
 
-                            <strong style="font-size: 20px">
-                                Insira um campo pelo tipo:
-                            </strong>
-                            <hr/>
+                                    <a data-field-type="CPF"
+                                       data-field-icon="far fa-user"
+                                       data-question_type="input-phone-cpf"
+                                       title="CPF"
+                                       class="open-AddSimpleQuestionDialog btn
+                                       btn-primary btn-block">
+                                        <div class="text-left">
 
-                            <a data-field-type="Data"
-                               data-field-icon="far fa-calendar-alt"
-                               data-question_type="input-date"
-                               title="Data"
-                               class="open-AddSimpleQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
+                                            <i class="far fa-user"></i>
+                                            CPF
+                                        </div>
+                                    </a>
+                                    <a data-field-type="CNPJ"
+                                       data-field-icon="far fa-building"
+                                       data-question_type="input-phone-cnpj"
+                                       title="CNPJ"
+                                       class="open-AddSimpleQuestionDialog btn
+                                       btn-primary btn-block">
+                                        <div class="text-left">
 
-                                    <i class="far fa-calendar-alt"></i>
-                                    Data
+                                            <i class="far fa-building"></i>
+                                            CNPJ
+                                        </div>
+                                    </a>
+                                    <a data-field-type="Telefone Fixo"
+                                       data-field-icon="fas fa-phone"
+                                       data-question_type="input-phone-phone"
+                                       title="Telefone Fixo"
+                                       class="open-AddSimpleQuestionDialog btn
+                                       btn-primary btn-block">
+                                        <div class="text-left">
+                                            <i class="fas fa-phone"></i>
+                                            Telefone Fixo
+                                        </div>
+                                    </a>
+                                    <a data-field-type="Telefone Celular"
+                                       data-field-icon="fas fa-mobile-alt"
+                                       data-question_type="input-phone-cellphone"
+                                       title="Telefone Celular"
+                                       class="open-AddSimpleQuestionDialog btn
+                                       btn-primary btn-block">
+                                        <div class="text-left">
+                                            <i class="fas fa-mobile-alt"></i>
+                                            Telefone Celular
+                                        </div>
+                                    </a>
+
+
                                 </div>
-                            </a>
 
-                            <a data-field-type="Texto"
-                               data-field-icon="fas fa-i-cursor"
-                               data-question_type="input-text"
-                               title="Texto"
-                               class="open-AddSimpleQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
+                                <div class="col-md-6">
 
-                                    <i class="fas fa-i-cursor"></i>
-                                    Texto
+                                    <strong style="font-size: 20px">
+                                        Campo por tipo:
+                                    </strong>
+                                    <hr/>
+                                    <a data-field-type="Texto"
+                                       data-field-icon="fas fa-i-cursor"
+                                       data-question_type="input-text"
+                                       title="Texto"
+                                       class="open-AddSimpleQuestionDialog btn
+                                       btn-primary btn-block">
+                                        <div class="text-left">
+
+                                            <i class="fas fa-i-cursor"></i>
+                                            Texto
+                                        </div>
+                                    </a>
+                                    <a data-field-type="Data"
+                                       data-field-icon="far fa-calendar-alt"
+                                       data-question_type="input-date"
+                                       title="Data"
+                                       class="open-AddSimpleQuestionDialog btn
+                                       btn-primary btn-block">
+                                        <div class="text-left">
+
+                                            <i class="far fa-calendar-alt"></i>
+                                            Data
+                                        </div>
+                                    </a>
+
+                                    <a data-field-type="Parágrafo"
+                                       data-field-icon="fas fa-align-left"
+                                       data-question_type="textarea"
+                                       title="Parágrafo"
+                                       class="open-AddSimpleQuestionDialog btn
+                                       btn-primary btn-block">
+                                        <div class="text-left">
+
+                                            <i class="fas fa-align-left"></i>
+                                            Parágrafo
+                                        </div>
+                                    </a>
+
+                                    <a data-field-type="Lista"
+                                       data-field-icon="fas fa-list-ul"
+                                       data-question_type="select"
+                                       title="Lista"
+                                       class="open-AddComplexQuestionDialog btn
+                                       btn-primary btn-block">
+                                        <div class="text-left">
+
+                                            <i class="fas fa-list-ul"></i>
+                                            Lista
+                                        </div>
+                                    </a>
+
+                                    <a data-field-type="Múltipla Escolha"
+                                       data-field-icon="far fa-check-circle"
+                                       data-question_type="radio-group"
+                                       title="Múltipla Escolha"
+                                       class="open-AddComplexQuestionDialog btn
+                                       btn-primary btn-block">
+                                        <div class="text-left">
+
+                                            <i class="far fa-check-circle"></i>
+                                            Múltipla Escolha
+                                        </div>
+                                    </a>
+
+                                    <a data-field-type="Várias Opções"
+                                       data-field-icon="far fa-check-square"
+                                       data-question_type="checkbox-group"
+                                       title="Várias Opções"
+                                       class="open-AddComplexQuestionDialog btn
+                                       btn-primary btn-block">
+                                        <div class="text-left">
+
+                                            <i class="far fa-check-square"></i>
+                                            Várias Opções
+                                        </div>
+                                    </a>
+                                    <a data-field-type="Somente Números"
+                                       data-field-icon="fas fa-sort-numeric-up"
+                                       data-question_type="input-number"
+                                       title="Somente números"
+                                       class="open-AddSimpleQuestionDialog btn
+                                       btn-primary btn-block">
+                                        <div class="text-left">
+                                            <i class="fas fa-sort-numeric-up"></i>
+                                            Somente Números
+                                        </div>
+                                    </a>
+                                    <a data-field-type="E-mail"
+                                       data-field-icon="fas fa-envelope"
+                                       data-question_type="input-email"
+                                       title="E-mail"
+                                       class="open-AddSimpleQuestionDialog btn
+                                       btn-primary btn-block">
+                                        <div class="text-left">
+                                            <i class="fas fa-envelope"></i>
+                                            E-mail
+                                        </div>
+                                    </a>
+
                                 </div>
-                            </a>
-
-                            <a data-field-type="Parágrafo"
-                               data-field-icon="fas fa-align-left"
-                               data-question_type="textarea"
-                               title="Parágrafo"
-                               class="open-AddSimpleQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-
-                                    <i class="fas fa-align-left"></i>
-                                    Parágrafo
-                                </div>
-                            </a>
-
-                            <a data-field-type="Lista"
-                               data-field-icon="fas fa-list-ul"
-                               data-question_type="select"
-                               title="Lista"
-                               class="open-AddComplexQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-
-                                    <i class="fas fa-list-ul"></i>
-                                    Lista
-                                </div>
-                            </a>
-
-                            <a data-field-type="Múltipla Escolha"
-                               data-field-icon="far fa-check-circle"
-                               data-question_type="radio-group"
-                               title="Múltipla Escolha"
-                               class="open-AddComplexQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-
-                                    <i class="far fa-check-circle"></i>
-                                    Múltipla Escolha
-                                </div>
-                            </a>
-
-                            <a data-field-type="Várias Opções"
-                               data-field-icon="far fa-check-square"
-                               data-question_type="checkbox-group"
-                               title="Várias Opções"
-                               class="open-AddComplexQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-
-                                    <i class="far fa-check-square"></i>
-                                    Várias Opções
-                                </div>
-                            </a>
-                            <a data-field-type="Somente Números"
-                               data-field-icon="fas fa-sort-numeric-up"
-                               data-question_type="input-number"
-                               title="Somente números"
-                               class="open-AddSimpleQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-                                    <i class="fas fa-sort-numeric-up"></i>
-                                    Somente Números
-                                </div>
-                            </a>
-                            <a data-field-type="E-mail"
-                               data-field-icon="fas fa-envelope"
-                               data-question_type="input-email"
-                               title="E-mail"
-                               class="open-AddSimpleQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-                                    <i class="fas fa-envelope"></i>
-                                    E-mail
-                                </div>
-                            </a>
-
+                            </div>
                         </div>
                     </div>
-
                 </div>
+                <div class="col-md-12">
+                    <div class="panel panel-primary">
 
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Vínculo com Lotes
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {% if survey.questions.count > 0 %}
+                                        {% include 'subscription/includes/lot_event_survey_change_panel.html' %}
+                                    {% else %}
+                                        <div>
+                                            <strong>Não é permitido vincular formulários sem perguntas a lotes</strong>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-
         </div>
     </div>
 
@@ -339,7 +326,7 @@
                         </div>
 
 
-                        <input type="text"
+                        <input type="hidden"
                                id="id_question_type"
                                name="question_type">
                     </div>
@@ -509,6 +496,112 @@
         </div>
     </div>
 
+    <div class="modal fade" id="editQuestionTypeInputs" tabindex="-1" role="dialog">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <p style="font-size: 15px" class="modal-title">
+                        Editar Tipo de Campo
+                    </p>
+                </div>
+                <form method="post" id="editQuestionTypeInputsForm">
+                    {% csrf_token %}
+                    <div class="modal-body" style="padding: 30px">
+                        <strong style="font-size: 25px">
+                            <span class="question_name"></span>
+                        </strong>
+                        <hr/>
+                        <div class="form-group">
+                            <label for="new_type_input">Nome do campo:</label>
+                            <small style="color:#C9302C">*</small>
+                            <div>
+                                <select name="new_type_input" id="new_type_input" class="form-control">
+                                    <optgroup label="Campos genéricos">
+                                        <option value="input-text">Texto</option>
+                                        <option value="input-date">Data</option>
+                                        <option value="textarea">Parágrafo</option>
+                                        <option value="input-email">E-mail</option>
+                                        <option value="input-number">Somente Número</option>
+                                    </optgroup>
+                                    <optgroup label="Campos pré-definidos">
+                                        <option value="input-phone-cpf">CPF</option>
+                                        <option value="input-phone-cnpj">CNPJ</option>
+                                        <option value="input-phone-phone">Telefone Fixo</option>
+                                        <option value="input-phone-cellphone">Telefone Celular</option>
+                                    </optgroup>
+                                </select>
+                                <small class="text-muted">Você pode alterar o tipo e mudar a forma de exibição ao participante.</small>
+                                <input type="hidden" name="question_id" value="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-danger"
+                                data-dismiss="modal">Cancelar
+                        </button>
+                        <button type="submit"
+                                class="btn btn-success new_question_save">
+                            Salvar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editQuestionTypeOptions" tabindex="-1" role="dialog">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <p style="font-size: 15px" class="modal-title">
+                        Editar Tipo de Campo
+                    </p>
+                </div>
+                <form method="post" id="editQuestionTypeOptionsForm">
+                    {% csrf_token %}
+                    <div class="modal-body" style="padding: 30px">
+                        <strong style="font-size: 25px">
+                            <span class="question_name"></span>
+                        </strong>
+                        <hr/>
+                        <div class="form-group">
+                            <label for="new_type_input">Nome do campo:</label>
+                            <small style="color:#C9302C">*</small>
+                            <div>
+                                <select name="new_type_input" id="new_type_input" class="form-control">
+                                    <option value="radio-group">Múltipla Escolha</option>
+                                    <option value="checkbox-group">Várias Opções</option>
+                                </select>
+                                <small class="text-muted">Você pode alterar o tipo e mudar a forma de exibição ao participante.</small>
+                                <input type="hidden" name="question_id" value="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-danger"
+                                data-dismiss="modal">Cancelar
+                        </button>
+                        <button type="submit"
+                                class="btn btn-success new_question_save">
+                            Salvar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="confirmDelete"
          role="dialog">
 
@@ -554,7 +647,7 @@
     </div>
 {% endblock %}
 {% block scripts %}
-
+    <script src="{% static 'assets/survey/js/predefined-fields.js' %}"></script>
     <script type="application/javascript">
 
         var complex_question_types = [
@@ -937,6 +1030,13 @@
                     }, 300);
                 });
 
+                $('[data-mask]').each(function() {
+                    $(this).mask($(this).attr("data-mask"));
+                });
+
+                // From predefined-fields.js
+                loadPredefinedEvents();
+
             }, 200);
 
 
@@ -997,15 +1097,81 @@
             $.ajax({
                 url: location.pathname + '?template_name=survey/fields',
                 success: function (result) {
-                    document.getElementById("fields").innerHTML =
-                        result;
+                    document.getElementById("fields").innerHTML = result;
                     createFieldList();
-
                 },
                 error: function (error) {
                     Messenger().post({
                         message: 'Não foi possivel atualizar as perguntas. ',
                         type: 'danger'
+                    });
+                }
+            });
+        }
+
+        function openEditInputQuestionTypeModal(question_name, question_type, question_id) {
+            var form_el = $('#editQuestionTypeInputsForm');
+                form_el.unbind('submit');
+
+            var modal_el = $('#editQuestionTypeInputs');
+
+            form_el.find('.question_name').text(question_name);
+            form_el.find('#new_type_input').val(question_type);
+            form_el.find('input[name=question_id]').val(question_id);
+            form_el.submit(function(e) {
+                e.preventDefault();
+                editQuestionTypeModal($(this), modal_el);
+            });
+            modal_el.modal();
+        }
+
+        function openEditOptionQuestionTypeModal(question_name, question_type, question_id) {
+            var form_el = $('#editQuestionTypeOptionsForm');
+                form_el.unbind('submit');
+
+            var modal_el = $('#editQuestionTypeOptions');
+
+            form_el.find('.question_name').text(question_name);
+            form_el.find('#new_type_input').val(question_type);
+            form_el.find('input[name=question_id]').val(question_id);
+            form_el.submit(function(e) {
+                e.preventDefault();
+                editQuestionTypeModal($(this), modal_el);
+            });
+            modal_el.modal();
+        }
+
+        function editQuestionTypeModal(form_el, model_el) {
+            form_el = $(form_el);
+            model_el = $(model_el);
+
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+            var new_type = form_el.find('#new_type_input').val();
+            var question_id = form_el.find('input[name=question_id]').val();
+
+            $.ajax({
+                type: "POST",
+                url: location.pathname,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: {
+                    question_id: question_id,
+                    new_type: new_type,
+                    action: 'change_type'
+                },
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Pergunta alterada com sucesso!',
+                        type: 'success'
+                    });
+                    model_el.modal('hide');
+                    updateFields();
+                },
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel alterar tipo de pergunta.',
+                        type: 'error'
                     });
                 }
             });
