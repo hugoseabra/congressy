@@ -40,6 +40,7 @@ from gatheros_subscription.models import (
     FormConfig,
     Lot,
     Subscription,
+    SubscriptionAuthor,
 )
 from mailer import exception as mailer_exception, services as mailer
 from payment import forms
@@ -561,11 +562,9 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
 
                 answer = 'Sem resposta.'
 
-                person = self.object.person
-
                 answers = Answer.objects.filter(
                     question=question,
-                    author__user=person.user,
+                    author=author,
                 )
 
                 if answers.count() == 1:
