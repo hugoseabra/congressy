@@ -1061,10 +1061,18 @@ def notify_new_event(event):
         }
     )
 
+    org = event.organization
+    if org.email:
+        author_email = org.email
+    else:
+        member = event.organization.members.first()
+        author_email = member.person.email
+
     body = render_to_string(
         template_name='mailer/notify_new_event.html',
         context={
             'event': event,
+            'author_email': author_email,
             'link': link
         }
     )
