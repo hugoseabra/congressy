@@ -157,6 +157,7 @@
             </div>
         </div>
         {% if selected_lot %}
+
             <div class="row">
                 <div class="col-md-12">
                     <div class="panel panel-primary">
@@ -300,6 +301,33 @@
                     {% endif %}
                 </div>
             </div>
+
+            {% if survey_form %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="panel-title">
+                                    Perguntas Extras
+                                </div>
+                            </div>
+                            <div class="panel-body">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% for field in survey_form.visible_fields %}
+                                            {% render_generic_field field %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+
         {% endif %}
         <div class="row">
             <div class="col-md-12">

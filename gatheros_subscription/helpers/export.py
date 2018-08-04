@@ -231,9 +231,12 @@ def _export_survey_answers(worksheet, event_survey):
         if row_idx not in collector:
             collector[row_idx] = []
 
+        if sub.author is None:
+            continue
+
         answers = Answer.objects.filter(
             question__survey=survey,
-            author__user=person.user,
+            author=sub.author,
         ).order_by('question__order')
 
         collector[row_idx].append(get_object_value(sub, 'code'))

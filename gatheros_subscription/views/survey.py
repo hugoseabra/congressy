@@ -2,13 +2,13 @@ import json
 from ast import literal_eval
 
 from django.contrib import messages
-from django.db.transaction import atomic
 from django.db.models.functions import Lower
+from django.db.transaction import atomic
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.views import generic
 from django.utils.text import slugify
+from django.views import generic
 
 from core.util import represents_int
 from core.views.mixins import TemplateNameableMixin
@@ -18,26 +18,7 @@ from gatheros_subscription.models import EventSurvey, Lot
 from survey.api import SurveySerializer
 from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST
 from survey.forms import QuestionForm, SurveyForm
-from survey.models import Survey, Question
-
-
-class SurveyMixin(TemplateNameableMixin, generic.View):
-    survey = None
-
-    def dispatch(self, request, *args, **kwargs):
-        pk = self.kwargs.get('survey_pk')
-
-        self.survey = get_object_or_404(
-            Survey,
-            pk=pk
-        )
-
-        response = super().dispatch(request, *args, **kwargs)
-        return response
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['survey'] = self.survey
+from survey.models import Question
 
 
 class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
@@ -377,8 +358,6 @@ class EventSurveyDeleteAjaxView(EventViewMixin, AccountMixin,
         else:
             return HttpResponse(status=400)
 
-        return HttpResponse(status=500)
-
     def get_success_url(self):
         return reverse_lazy('subscription:survey-list', kwargs={
             'event_pk': self.event.pk,
@@ -452,7 +431,7 @@ class EventSurveyLotsEditAjaxView(EventViewMixin, AccountMixin):
                 lot.save()
 
             if item['status'] is False and \
-                            lot.event_survey == self.event_survey:
+                    lot.event_survey == self.event_survey:
                 lot.event_survey = None
                 lot.save()
 
