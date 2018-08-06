@@ -12,7 +12,7 @@ from importer.forms import (
 )
 from importer.helpers import (
     get_required_keys_mappings,
-    get_survey_required_questions_labels,
+    get_survey_required_questions,
 )
 from importer.line_data import (
     LineDataCollection,
@@ -27,6 +27,7 @@ from importer.persistence import (
     CSVCityCorrectionPersister,
 )
 from importer.preview_renderer import PreviewRenderer
+from importer.question_mapping import QuestionMapping
 from .mixins import CSVViewMixin, CSVProcessedViewMixin
 
 
@@ -176,7 +177,9 @@ class CSVPrepareView(CSVProcessedViewMixin):
 
         if self.object.lot.event_survey:
             survey = self.object.lot.event_survey.survey
-            survey_key_questions = get_survey_required_questions_labels(survey)
+            required_questions = get_survey_required_questions(survey)
+            for question in required_questions:
+                survey_key_questions.append(QuestionMapping(question))
 
         return survey_key_questions
 
@@ -252,9 +255,14 @@ class CSVPrepareView(CSVProcessedViewMixin):
         return preview_table
 
     def get_invalid_keys(self):
-
         line_data_collection = self.get_data_collection(size=1)
-        return line_data_collection[0].get_invalid_keys()
+
+        survey = None
+
+        if self.object.lot.event_survey:
+            survey = self.object.lot.event_survey.survey
+
+        return line_data_collection[0].get_invalid_keys(survey)
 
 
 class CSVErrorXLSView(CSVProcessedViewMixin):

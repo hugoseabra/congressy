@@ -191,6 +191,7 @@
                             <tr>
                                 <th>Nome da coluna</th>
                                 <th>Descrição</th>
+                                <th>Possiveis Valores</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -209,6 +210,35 @@
                                     </td>
                                     <td>
                                         {{ entry.description|capfirst }}
+                                    </td>
+                                    <td>
+                                        ---
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+
+                            {% for question in required_questions %}
+
+                                <tr>
+                                    <td>
+                                        <strong>
+
+                                            {{ question.name }}
+
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        {{ question.description|capfirst }}
+                                    </td>
+                                    <td>
+                                    <ul>
+                                        {% for option in question.options %}
+                                            <li>
+                                                {{ option }}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
                                     </td>
                                 </tr>
 
