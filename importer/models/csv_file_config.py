@@ -46,7 +46,7 @@ def get_err_file_path(instance, *args, **kwargs):
     hour = str(now.hour)
     minute = str(now.minute)
 
-    filename = "err_Import_Congressy_{}_{}_{}_{}h{}m.csv".format(
+    filename = "Erros_de_Importação_Congressy_{}_{}_{}_{}h{}m.csv".format(
         day,
         month,
         year,
