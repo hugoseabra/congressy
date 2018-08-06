@@ -165,7 +165,7 @@
 
     <div class="row" id="keys">
 
-    <div class="col-md-4">
+    <div class="col-md-5">
 
         <div class="panel panel-primary">
 
@@ -179,9 +179,10 @@
                 <div class="row">
 
                     <div class="col-md-12">
+
                         <div class="alert alert-warning">
                             <strong>Atenção!</strong>
-                            Todos os campos abaixo são
+                            Campos abaixo marcados com asteriscos são
                             <strong>obrigatórios</strong> para a
                             criação de uma inscrição no lote selecionado.
                         </div>
@@ -190,7 +191,6 @@
                             <thead>
                             <tr>
                                 <th>Nome da coluna</th>
-                                <th>Descrição</th>
                                 <th>Possiveis Valores</th>
                             </tr>
                             </thead>
@@ -199,6 +199,7 @@
                             {% for entry in required_keys %}
 
                                 <tr>
+
                                     <td>
                                         <strong>
 
@@ -207,39 +208,70 @@
                                             {% endwith %}
 
                                         </strong>
+
+                                        <div class="text-muted">
+
+                                            <small>
+                                                {{ entry.description|capfirst }}
+                                            </small>
+
+                                        </div>
+
                                     </td>
+
                                     <td>
-                                        {{ entry.description|capfirst }}
+                                        <div class="text-center">
+                                            ---
+                                        </div>
                                     </td>
-                                    <td>
-                                        ---
-                                    </td>
+
                                 </tr>
 
                             {% endfor %}
 
-                            {% for question in required_questions %}
+                            {% for question in questions %}
 
                                 <tr>
+
                                     <td>
+
+
                                         <strong>
 
+                                            {% if question.is_required %}
+                                                <span style="color:#C9302C">*</span>
+                                            {% endif %}
                                             {{ question.name }}
 
                                         </strong>
+
+                                        <div class="text-muted">
+
+                                            <small>
+                                                {{ question.description|capfirst }}
+                                            </small>
+
+                                        </div>
+
                                     </td>
+
                                     <td>
-                                        {{ question.description|capfirst }}
+
+                                        {% if question.options|length > 0 %}
+                                            <ul>
+                                                {% for option in question.options %}
+                                                    <li>
+                                                        {{ option }}
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <div class="text-center">
+                                                ---
+                                            </div>
+                                        {% endif %}
                                     </td>
-                                    <td>
-                                    <ul>
-                                        {% for option in question.options %}
-                                            <li>
-                                                {{ option }}
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                    </td>
+
                                 </tr>
 
                             {% endfor %}
@@ -253,12 +285,13 @@
                 </div>
 
             </div>
+
         </div>
     </div>
 
     {% if invalid_keys|length > 0 %}
 
-        <div class="col-md-4">
+        <div class="col-md-3">
 
             <div id="invalid-keys" class="panel panel-danger">
                 <div class="panel-heading">
@@ -285,7 +318,7 @@
 
     {% if  preview_table and denied_reason is None %}
 
-        <div class="col-md-3">
+        <div class="col-md-2">
 
             <div class="panel panel-success">
 

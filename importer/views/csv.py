@@ -12,7 +12,7 @@ from importer.forms import (
 )
 from importer.helpers import (
     get_required_keys_mappings,
-    get_survey_required_questions,
+    get_survey_questions,
 )
 from importer.line_data import (
     LineDataCollection,
@@ -143,7 +143,7 @@ class CSVPrepareView(CSVProcessedViewMixin):
             form = CSVFileConfigForm(instance=self.object)
 
         context['required_keys'] = self.get_required_key_mappings()
-        context['required_questions'] = self.get_required_survey_questions()
+        context['questions'] = self.get_survey_questions()
 
         preview_table = None
         denied_reason = None
@@ -171,14 +171,14 @@ class CSVPrepareView(CSVProcessedViewMixin):
         return get_required_keys_mappings(
             form_config=form_config)
 
-    def get_required_survey_questions(self) -> list:
+    def get_survey_questions(self) -> list:
 
         survey_key_questions = list()
 
         if self.object.lot.event_survey:
             survey = self.object.lot.event_survey.survey
-            required_questions = get_survey_required_questions(survey)
-            for question in required_questions:
+            all_questions = get_survey_questions(survey)
+            for question in all_questions:
                 survey_key_questions.append(QuestionMapping(question))
 
         return survey_key_questions

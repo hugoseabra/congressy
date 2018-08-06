@@ -6,7 +6,7 @@ from gatheros_subscription.directors import SubscriptionSurveyDirector
 from gatheros_subscription.models import FormConfig, Lot
 from importer.constants import KEY_MAP
 from importer.forms import CSVSubscriptionForm
-from importer.helpers import get_required_keys, get_survey_required_questions
+from importer.helpers import get_required_keys, get_survey_questions
 from survey.models import Survey
 
 
@@ -166,8 +166,8 @@ class LineData(object):
     @staticmethod
     def is_valid_survey_question(key: str, survey: Survey) -> bool:
 
-        required_questions = get_survey_required_questions(survey)
-        for question in required_questions:
+        all_questions = get_survey_questions(survey)
+        for question in all_questions:
             if key == question.label.lower():
                 return True
 

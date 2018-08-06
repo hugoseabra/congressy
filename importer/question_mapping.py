@@ -13,9 +13,9 @@ class QuestionMapping(object):
         if not isinstance(question, Question):
             raise ValueError('question não é do tipo Question')
 
-        self.question = question
-        self.name = question.label.lower()
-        self.description = question.help_text if question.help_text else '---'
+        self.question = question                    
+        self.name = question.label.lower().strip()
+        self.description = question.help_text if question.help_text else ''
         self.description = self.description.lower()
 
         self.is_required = question.required
