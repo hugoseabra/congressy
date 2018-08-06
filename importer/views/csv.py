@@ -11,7 +11,7 @@ from importer.forms import (
     CSVCityForm,
 )
 from importer.helpers import (
-    get_required_keys_mappings,
+    get_keys_mapping_dict,
     get_survey_questions,
 )
 from importer.line_data import (
@@ -142,7 +142,7 @@ class CSVPrepareView(CSVProcessedViewMixin):
         if form is None:
             form = CSVFileConfigForm(instance=self.object)
 
-        context['required_keys'] = self.get_required_key_mappings()
+        context['key_mapping'] = self.get_key_mappings()
         context['questions'] = self.get_survey_questions()
 
         preview_table = None
@@ -165,11 +165,9 @@ class CSVPrepareView(CSVProcessedViewMixin):
 
         return context
 
-    def get_required_key_mappings(self) -> list:
-
+    def get_key_mappings(self) -> list:
         form_config = self.object.lot.event.formconfig
-        return get_required_keys_mappings(
-            form_config=form_config)
+        return get_keys_mapping_dict(form_config=form_config)
 
     def get_survey_questions(self) -> list:
 

@@ -36,18 +36,25 @@ def get_required_keys(form_config) -> list:
     return found_keys
 
 
-def get_required_keys_mappings(form_config) -> list:
-    required_keys_mapping = []
+def get_keys_mapping_dict(form_config) -> list:
+    keys_mapping = list()
 
+    keys = KEY_MAP.keys()
     required_keys = get_required_keys(form_config)
 
-    for key in required_keys:
-        mapping = KEY_MAP.get(key, None)
-        if mapping is None:
-            raise MappingNotFoundError(key)
-        required_keys_mapping.append(mapping)
+    for key in keys:
 
-    return required_keys_mapping
+        if key in required_keys:
+            required = True
+        else:
+            required = False
+
+        keys_mapping.append({
+            'mapping': KEY_MAP.get(key),
+            'required': required
+        })
+
+    return keys_mapping
 
 
 def get_survey_questions(survey: Survey) -> list:
