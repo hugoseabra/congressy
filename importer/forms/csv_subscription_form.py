@@ -127,6 +127,14 @@ class CSVSubscriptionForm(forms.Form):
         if cleaned_uf:
             city_qs = city_qs.filter(uf=cleaned_uf)
 
+        if city_qs.count() > 1:
+            raise forms.ValidationError(
+                'Foram encontradas mais de uma cidade com o mesmo nome'
+            )
+
+        if city_qs.count() == 1:
+            return city_qs.first().pk
+
         if city_qs.count() == 0:
 
             # Busca por pk de city
@@ -139,18 +147,6 @@ class CSVSubscriptionForm(forms.Form):
 
             if found_city:
                 return found_city
-
-            raise forms.ValidationError(
-                'Não foram encontradas cidades com este nome'
-            )
-
-        if city_qs.count() > 1:
-            raise forms.ValidationError(
-                'Foram encontradas mais de uma cidade com o mesmo nome'
-            )
-
-        if city_qs.count() == 1:
-            return city_qs.first().pk
 
         raise forms.ValidationError(
             'Não foram encontradas cidades com este nome'
