@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.http.response import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
 
@@ -263,7 +263,9 @@ class CSVPrepareView(CSVProcessedViewMixin):
         return line_data_collection[0].get_invalid_keys(survey)
 
 
-class CSVErrorXLSView(CSVProcessedViewMixin):
+class CSVErrorXLSView(CSVViewMixin):
+
+    object = None
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -282,6 +284,13 @@ class CSVErrorXLSView(CSVProcessedViewMixin):
         error_csv = self.object.error_csv_file.path
         xls_maker = XLSErrorPersister(error_csv)
         return xls_maker.make()
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(
+            CSVFileConfig,
+            pk=self.kwargs.get('csv_pk'),
+            event=self.kwargs.get('event_pk'),
+        )
 
     @staticmethod
     def _get_mime_type() -> str:

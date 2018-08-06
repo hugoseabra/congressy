@@ -121,6 +121,7 @@
 
 
                 {% if object_list %}
+
                     <div class="panel-body csv-file">
 
                         <div class="col-md-12">
@@ -188,14 +189,14 @@
 
                                                     </li>
 
-                                                    {% if csv.processed and error_csv_file %}
+                                                    {% if csv.processed and csv.error_csv_file %}
                                                         <li role="separator" class="divider"></li>
                                                         <li class="text-center">
-                                                            <a
-                                                                    href="{% url 'importer:csv-file-error-xls' event.pk csv.pk %}"
+
+                                                            <a href="{% url 'importer:csv-file-error-xls' event.pk csv.pk %}"
                                                                     class="btn btn-danger btn-sm">
-                                                                <i class="far fa-file-excel"></i>
-                                                                Arquivo de Erros
+                                                            <i class="far fa-file-excel"></i>
+                                                            Arquivo de Erros
                                                             </a>
                                                         </li>
                                                     {% endif %}
@@ -211,7 +212,6 @@
 
                                 </tbody>
                             </table>
-
 
                         </div>
 

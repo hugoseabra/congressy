@@ -31,14 +31,7 @@ class CSVErrorPersister(CSVPersister):
             for key, value in line:
                 raw_data.update({key: value})
 
-            errors = {}
-            for fieldname, error_list in line.get_errors().items():
-
-                if fieldname == '__all__':
-                    continue
-
-                error = error_list[0]
-                errors.update({fieldname: error})
+            errors = line.get_errors()
 
             raw_data = json.dumps(raw_data, ensure_ascii=False)
             errors = json.dumps(errors, ensure_ascii=False)

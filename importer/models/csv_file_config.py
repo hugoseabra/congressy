@@ -39,27 +39,14 @@ def get_file_path(instance, *args, **kwargs):
 def get_err_file_path(instance, *args, **kwargs):
     """ Resgata localização onde os arquivos de erro do csv serão salvos. """
 
-    now = datetime.now()
-    day = str(now.day)
-    month = str(now.month)
-    year = str(now.year)
-    hour = str(now.hour)
-    minute = str(now.minute)
-
-    filename = "Erros_de_Importação_Congressy_{}_{}_{}_{}h{}m.csv".format(
-        day,
-        month,
-        year,
-        hour,
-        minute,
-    )
+    filename = "Import_Congressy.csv"
 
     return os.path.join(
         "event",
         str(instance.event.id),
         "import",
         "csv",
-        filename
+        "Err_" + filename
     )
 
 

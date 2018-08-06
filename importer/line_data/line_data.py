@@ -26,7 +26,7 @@ class LineData(object):
         self.__raw_data = raw_data
         self.__invalid_keys = list()
         self.__internal_mapping = dict()
-        self.__errors = list()
+        self.__errors = dict()
         self._parse()
 
     def _parse(self):
@@ -140,7 +140,15 @@ class LineData(object):
         return self.__internal_mapping.get(key)
 
     def add_errors(self, errors):
-        self.__errors.append(errors)
+
+        for fieldname, error_list in errors.items():
+
+            if fieldname == '__all__':
+                continue
+
+            error = error_list[0]
+            self.__errors.update({fieldname: error})
+
 
     def fetch_survey_data(self, survey):
         survey_data = {}
