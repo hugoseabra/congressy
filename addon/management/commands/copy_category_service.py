@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
             if addon.lot_category.event != lot_category.event:
                 self.stdout.write(self.style.ERROR(
-                    'Categoria e Serviço não pertencem ao mesmo evento.'
+                    'Categoria e Opcional não pertencem ao mesmo evento.'
                 ))
                 sys.exit(1)
 
@@ -38,7 +38,7 @@ class Command(BaseCommand):
 
         except Service.DoesNotExist:
             self.stdout.write(self.style.ERROR(
-                'Serviço não encontrado. ID: {}'.format(addon_pk)
+                'Opcional não encontrado. ID: {}'.format(addon_pk)
             ))
             sys.exit(1)
 
