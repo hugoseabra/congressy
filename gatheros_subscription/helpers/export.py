@@ -159,7 +159,8 @@ def _export_subscriptions(worksheet, subscriptions):
 
 def _export_payments(worksheet, event):
     worksheet.append([
-        'CÓDIGO',
+        'NÚMERO DE INSCRIÇÃO',
+        'CÓDIGO DA INSCRIÇÃO',
         'NOME',
         'TIPO',
         'STATUS',
@@ -201,7 +202,8 @@ def _export_survey_answers(worksheet, event_survey):
     """
 
     columns = [
-        'CÓDIGO',
+        'NÚMERO DE INSCRIÇÃO',
+        'CÓDIGO DA INSCRIÇÃO',
         'NOME',
         'E-MAIL',
     ]
