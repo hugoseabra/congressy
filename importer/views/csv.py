@@ -12,7 +12,7 @@ from importer.forms import (
 )
 from importer.helpers import (
     get_required_keys_mappings,
-    get_survey_required_keys_mappings,
+    get_survey_required_questions_labels,
 )
 from importer.line_data import (
     LineDataCollection,
@@ -142,6 +142,7 @@ class CSVPrepareView(CSVProcessedViewMixin):
             form = CSVFileConfigForm(instance=self.object)
 
         context['required_keys'] = self.get_required_key_mappings()
+        context['required_questions'] = self.get_required_survey_questions()
 
         preview_table = None
         denied_reason = None
@@ -166,22 +167,18 @@ class CSVPrepareView(CSVProcessedViewMixin):
     def get_required_key_mappings(self) -> list:
 
         form_config = self.object.lot.event.formconfig
-        form_config_key_mappings = get_required_keys_mappings(
+        return get_required_keys_mappings(
             form_config=form_config)
-        survey_key_mappings = list()
 
-        # Get survey keys
+    def get_required_survey_questions(self) -> list:
+
+        survey_key_questions = list()
+
         if self.object.lot.event_survey:
             survey = self.object.lot.event_survey.survey
-            survey_key_mappings = get_survey_required_keys_mappings(survey)
+            survey_key_questions = get_survey_required_questions_labels(survey)
 
-        required_key_mappings = list(form_config_key_mappings)
-
-        # Merge lists, ignoring duplicates.
-        required_key_mappings.extend(
-            x for x in survey_key_mappings if x not in required_key_mappings)
-
-        return required_key_mappings
+        return survey_key_questions
 
     def post(self, request, *args, **kwargs):
         """

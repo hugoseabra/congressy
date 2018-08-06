@@ -50,27 +50,15 @@ def get_required_keys_mappings(form_config) -> list:
     return required_keys_mapping
 
 
-def get_survey_required_questions(survey: Survey) -> list:
+def get_survey_required_questions_labels(survey: Survey) -> list:
+    questions = list()
 
-    required_questions = list()
-
-    questions = Question.objects.filter(
+    required_questions = Question.objects.filter(
         survey=survey,
-        active=True,
         required=True,
     )
 
-    for question in questions:
-        required_questions.append(question)
-
-    return required_questions
-
-
-def get_survey_required_keys_mappings(survey: Survey) -> list:
-    mappings = list()
-    required_questions = get_survey_required_questions(survey)
-
     for question in required_questions:
-        mappings.append(question.label)
+        questions.append(question.label.lower())
 
-    return mappings
+    return questions
