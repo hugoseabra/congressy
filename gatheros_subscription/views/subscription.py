@@ -552,7 +552,8 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         survey = self.object.lot.event_survey.survey
 
         if self.object.author:
-            questions = Question.objects.filter(survey=survey)
+            questions = Question.objects.filter(survey=survey).order_by(
+                'order')
 
             for question in questions:
 

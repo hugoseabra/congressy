@@ -40,6 +40,7 @@ class SubscriptionSurveyDirector(object):
                     survey=survey,
                     user=user,
                 )
+                self.subscription.save()
 
         super().__init__()
 
