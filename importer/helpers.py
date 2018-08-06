@@ -1,3 +1,4 @@
+from survey.models import Survey, Question
 from .constants import KEY_MAP, REQUIRED_KEYS
 
 
@@ -19,7 +20,7 @@ def get_mapping_from_csv_key(key):
 def get_required_keys(form_config) -> list:
     found_keys = list()
     required_keys = list()
-    
+
     required_keys.extend(REQUIRED_KEYS)
 
     form_config_keys = form_config.get_required_keys()
@@ -47,3 +48,29 @@ def get_required_keys_mappings(form_config) -> list:
         required_keys_mapping.append(mapping)
 
     return required_keys_mapping
+
+
+def get_survey_required_questions(survey: Survey) -> list:
+
+    required_questions = list()
+
+    questions = Question.objects.filter(
+        survey=survey,
+        active=True,
+        required=True,
+    )
+
+    for question in questions:
+        required_questions.append(question)
+
+    return required_questions
+
+
+def get_survey_required_keys_mappings(survey: Survey) -> list:
+    mappings = list()
+    required_questions = get_survey_required_questions(survey)
+
+    for question in required_questions:
+        mappings.append(question.label)
+
+    return mappings

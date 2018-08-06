@@ -145,6 +145,7 @@
                                 {% render_generic_field form.delimiter %}
                                 {% render_generic_field form.encoding %}
                                 {% render_generic_field form.separator %}
+                                {% render_generic_field form.lot %}
                                 <div class="form-group" style="margin-top: 25px;">
                                     <div>
                                         <button type="submit" class="btn btn-primary">
@@ -313,7 +314,7 @@
                 $('#csv-process').hide();
                 $('#csv-loader').show();
             });
-            
+
 
         });
 

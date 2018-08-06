@@ -12,6 +12,7 @@ from importer.forms import (
 )
 from importer.helpers import (
     get_required_keys_mappings,
+    get_survey_required_keys_mappings,
 )
 from importer.line_data import (
     LineDataCollection,
@@ -163,8 +164,24 @@ class CSVPrepareView(CSVProcessedViewMixin):
         return context
 
     def get_required_key_mappings(self) -> list:
+
         form_config = self.object.lot.event.formconfig
-        return get_required_keys_mappings(form_config=form_config)
+        form_config_key_mappings = get_required_keys_mappings(
+            form_config=form_config)
+        survey_key_mappings = list()
+
+        # Get survey keys
+        if self.object.lot.event_survey:
+            survey = self.object.lot.event_survey.survey
+            survey_key_mappings = get_survey_required_keys_mappings(survey)
+
+        required_key_mappings = list(form_config_key_mappings)
+
+        # Merge lists, ignoring duplicates.
+        required_key_mappings.extend(
+            x for x in survey_key_mappings if x not in required_key_mappings)
+
+        return required_key_mappings
 
     def post(self, request, *args, **kwargs):
         """
