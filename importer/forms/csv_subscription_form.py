@@ -127,13 +127,13 @@ class CSVSubscriptionForm(forms.Form):
         if cleaned_uf:
             city_qs = city_qs.filter(uf=cleaned_uf)
 
+        if city_qs.count() == 1:
+            return city_qs.first().pk
+
         if city_qs.count() > 1:
             raise forms.ValidationError(
                 'Foram encontradas mais de uma cidade com o mesmo nome'
             )
-
-        if city_qs.count() == 1:
-            return city_qs.first().pk
 
         if city_qs.count() == 0:
 
