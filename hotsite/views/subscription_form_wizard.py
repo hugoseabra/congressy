@@ -615,6 +615,28 @@ class SubscriptionWizardView(SessionWizardView):
 
         return form_data
 
+    def get_next_step(self, step=None):
+        """
+        Returns the next step after the given `step`. If no more steps are
+        available, None will be returned. If the `step` argument is None, the
+        current step will be determined automatically.
+        """
+        if step is None:
+            step = self.steps.current
+        form_list = self.get_form_list()
+        keys = list(form_list.keys())
+
+        # This is a hack, to return to the first step, when we get a ValueError
+        # See: https://intra.congressy.com/congressy/congressy/issues/2453/
+        try:
+            key = keys.index(step) + 1
+        except ValueError:
+            return keys[0]
+        
+        if len(keys) > key:
+            return keys[key]
+        return None
+
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
