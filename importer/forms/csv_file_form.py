@@ -28,7 +28,7 @@ class CSVFileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        initial = kwargs.get('initial', False)
+        initial = kwargs.get('initial')
 
         if initial:
             event_pk = initial['event']

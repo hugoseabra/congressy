@@ -119,25 +119,27 @@ class CSVSubscriptionForm(forms.Form):
 
         cleaned_uf = self.cleaned_data.get('uf')
 
-        found_city = None
-
-        try:
-            city_pk = int(cleaned_city)
-            found_city = City.objects.get(pk=city_pk).pk
-        except (ValueError, City.DoesNotExist):
-            pass
-
-        if found_city:
-            return found_city
-
-        city_qs = City.objects.filter(
+        city_qs = City. objects.filter(
             Q(name=str(cleaned_city).upper()) |
             Q(name_ascii=str(cleaned_city).upper())
         )
+        
         if cleaned_uf:
-            city_qs.filter(uf=cleaned_uf)
+            city_qs = city_qs.filter(uf=cleaned_uf)
 
         if city_qs.count() == 0:
+
+            # Busca por pk de city
+            found_city = None
+            try:
+                city_pk = int(cleaned_city)
+                found_city = City.objects.get(pk=city_pk).pk
+            except (ValueError, City.DoesNotExist):
+                pass
+
+            if found_city:
+                return found_city
+
             raise forms.ValidationError(
                 'Não foram encontradas cidades com este nome'
             )
@@ -147,7 +149,12 @@ class CSVSubscriptionForm(forms.Form):
                 'Foram encontradas mais de uma cidade com o mesmo nome'
             )
 
-        return city_qs.first().pk
+        if city_qs.count() == 1:
+            return city_qs.first().pk
+
+        raise forms.ValidationError(
+            'Não foram encontradas cidades com este nome'
+        )
 
     def clean(self):
         """
