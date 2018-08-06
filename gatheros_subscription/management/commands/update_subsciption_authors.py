@@ -12,7 +12,10 @@ class Command(BaseCommand):
 
         event_surveys = EventSurvey.objects.all()
 
-        needs_processing_count = 0
+        processing_count = 0
+        total_subs = 0
+        total_created = 0
+        total_existing = 0
 
         for event_survey in event_surveys:
 
@@ -27,25 +30,50 @@ class Command(BaseCommand):
 
                 es = sub.lot.event_survey
                 user = sub.person.user
+                total_subs += 1
+
+                self.stdout.write(self.style.SUCCESS(
+                    'Processing: {}'.format(
+                        sub.pk,
+                    )
+                ))
 
                 if es is not None and \
                         self.has_any_required_questions(es.survey):
 
                     if sub.author is None:
-                        try:
-                            sub.author = Author.objects.get(
-                                user=user,
-                                survey=es.survey,
-                            )
-                            sub.save()
-                            needs_processing_count += 1
-
-                        except Author.DoesNotExist:
-                            pass
+                        author, created = Author.objects.get_or_create(
+                            user=user,
+                            survey=es.survey,
+                        )
+                        sub.author = author
+                        # sub.save()
+                        processing_count += 1
+                        if created:
+                            total_created += 1
+                        else:
+                            total_existing += 1
 
         self.stdout.write(self.style.SUCCESS(
-            '\nProcessed: {}\n'.format(
-                needs_processing_count,
+            '\nTotal Processed: {}'.format(
+                processing_count,
+            )
+        ))
+        self.stdout.write(self.style.SUCCESS(
+            '\nCreated {} new authors!'.format(
+                total_created,
+            )
+        ))
+
+        self.stdout.write(self.style.SUCCESS(
+            '\nAssociated {} existing authors to their subscription'.format(
+                total_existing,
+            )
+        ))
+
+        self.stdout.write(self.style.SUCCESS(
+            '\nTotal subscriptions: {}'.format(
+                total_subs,
             )
         ))
 
