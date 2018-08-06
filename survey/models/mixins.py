@@ -46,6 +46,8 @@ class Entity(object):
 
     def _check_rules(self):
         """ Verifica as regras de integridade de domínio. """
+        # @TODO: verificar se rule é uma instância ou apenas referência da
+        # classe.
 
         for rule in self.rule_instances:
             try:

@@ -76,6 +76,7 @@ def _export_subscriptions(worksheet, subscriptions):
     """ Exporta dados de inscrição. """
 
     worksheet.append([
+        'NÚMERO DE INSCRIÇÃO',
         'CÓDIGO DA INSCRIÇÃO',
         'CATEGORIA DE PARTICIPANTE',
         'LOTE',
@@ -110,6 +111,7 @@ def _export_subscriptions(worksheet, subscriptions):
         person = sub.person
         city = person.city
 
+        collector[row_idx].append(get_object_value(sub, 'event_count'))
         collector[row_idx].append(get_object_value(sub, 'code'))
         try:
             collector[row_idx].append(sub.lot.category.name)
@@ -178,6 +180,7 @@ def _export_payments(worksheet, event):
 
         created = transaction.date_created.strftime('%d/%m/%Y %H:%M:%S')
 
+        collector[row_idx].append(get_object_value(sub, 'event_count'))
         collector[row_idx].append(get_object_value(sub, 'code'))
         collector[row_idx].append(sub.person.name)
         collector[row_idx].append(transaction.get_type_display())
@@ -206,13 +209,17 @@ def _export_survey_answers(worksheet, event_survey):
     survey = event_survey.survey
 
     questions = survey.questions.all().order_by('order')
-    num_questions = len(questions)
 
     # Lista a ser consultada para pegar a sequência de colunas de perguntas.
     question_pks = []
     for question in questions:
         # Adiciona coluna da pergunta
-        columns.append(str(question.label).upper())
+        column_name = str(question.label).upper()
+
+        if question.required is True:
+            column_name = '* {}'.format(column_name)
+
+        columns.append(column_name)
 
         # Marca coluna da pergunta pelo índice da lista
         question_pks.append(question.pk)
@@ -221,7 +228,8 @@ def _export_survey_answers(worksheet, event_survey):
 
     event = event_survey.event
     subscriptions = event.subscriptions.filter(completed=True,
-                                               test_subscription=False)
+                                               test_subscription=False,
+                                               author__isnull=False)
 
     collector = {}
     row_idx = 1
@@ -231,34 +239,27 @@ def _export_survey_answers(worksheet, event_survey):
         if row_idx not in collector:
             collector[row_idx] = []
 
-        if sub.author is None:
-            continue
-
         answers = Answer.objects.filter(
             question__survey=survey,
             author=sub.author,
         ).order_by('question__order')
 
+        if not answers:
+            continue
+
+        answers_values = {}
+        for answer in answers:
+            answers_values[answer.question.pk] = answer.human_display
+
+        collector[row_idx].append(get_object_value(sub, 'event_count'))
         collector[row_idx].append(get_object_value(sub, 'code'))
         collector[row_idx].append(person.name)
         collector[row_idx].append(person.email)
 
-        if not answers:
-            # Insere linha com todas as respostas das colunas como '-' = vazias
-            for i in range(0, num_questions):
-                collector[row_idx].append('-')
-
-            row_idx += 1
-            continue
-
-        for answer in answers:
-            question = answer.question
-
-            # Varrer até achar a coluna da pergunta
-            for question_pk in question_pks:
-                if question_pk == question.pk:
-                    # Se não há resposta, deixar em branco.
-                    collector[row_idx].append(answer.human_display)
+        # Varrer por pergunta para depois encontrar as respostas.
+        for question in questions:
+            # Se não há resposta, deixar em branco.
+            collector[row_idx].append(answers_values.get(question.pk, '-'))
 
         row_idx += 1
 
