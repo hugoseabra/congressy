@@ -353,7 +353,6 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
     def form_valid(self, form):
         cleaned_data = form.cleaned_data
         create_subs = cleaned_data.get('create_subscriptions')
-        create_xls = cleaned_data.get('create_error_xls')
 
         if create_subs:
             results = self.process(commit=True)
@@ -365,18 +364,6 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
                                  results['valid']))
 
             return redirect(self.get_success_url())
-
-        elif create_xls:
-
-            xls = self._create_xls()
-
-            response = HttpResponse(xls, content_type=self._get_mime_type())
-            response[
-                'Content-Disposition'] = 'attachment; filename="{}"'.format(
-                self.object.err_filename().split('.')[0] + '.xls',
-            )
-
-            return response
 
     def form_invalid(self, form):
 
@@ -448,12 +435,6 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
 
         # Saving a reference to the file
         self.object.error_csv_file.save(self.object.filename(), csvfile)
-
-    def _create_xls(self) -> bytes:
-
-        error_csv = self.object.error_csv_file.path
-        xls_maker = XLSErrorPersister(error_csv)
-        return xls_maker.make()
 
     def _check_for_invalid_cities(self):
         line_data_persistence_collection = self.get_data_collection()

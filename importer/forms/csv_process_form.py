@@ -6,7 +6,3 @@ class CSVProcessForm(forms.Form):
         widget=forms.HiddenInput,
         required=False,
     )
-    create_error_xls = forms.BooleanField(
-        widget=forms.HiddenInput,
-        required=False,
-    )

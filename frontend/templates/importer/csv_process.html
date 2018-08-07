@@ -61,7 +61,6 @@
 
                                 {% csrf_token %}
                                 {% render_generic_field form.create_subscriptions %}
-                                {% render_generic_field form.create_error_xls %}
 
                                 {% if process_results.valid > 0 and process_results.invalid == 0 %}
 
@@ -80,9 +79,10 @@
                                         <strong>Atenção!</strong> Não será possivel gerar nenhuma das {{ process_results.invalid }} linhas no seu arquivo
                                     </div>
 
-                                    <button type="button" class="btn btn-md btn-danger generate-error-xls">
+                                    <a href="{% url 'importer:csv-file-error-xls' event.pk object.pk %}" class="btn btn-md btn-danger">
                                         Gerar XLS de erros
-                                    </button>
+                                    </a>
+
 
                                 {% elif process_results.invalid > 0 and process_results.valid > 0 %}
 
@@ -111,9 +111,11 @@
                                         <tr>
                                             <td>{{ process_results.invalid }}</td>
                                             <td>
-                                                <button type="button" class="btn btn-md btn-danger generate-error-xls">
+
+                                                <a href="{% url 'importer:csv-file-error-xls' event.pk object.pk %}" class="btn btn-md btn-danger">
                                                     Gerar XLS de erros
-                                                </button>
+                                                </a>
+
                                             </td>
                                         </tr>
                                         </tbody>
@@ -150,16 +152,6 @@
     <script type="application/javascript">
 
         $(document).ready(function () {
-
-            $('.generate-error-xls').on('click', function () {
-                $('#id_create_error_xls').val(true);
-                $('#id_create_subscriptions').val(false);
-
-                //$('#csv-form-panel').hide();
-                //$('#csv-loader').show();
-                $('#csv-form').submit();
-
-            });
 
 
             $('.generate-success-subscriptions').on('click', function () {
