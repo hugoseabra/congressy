@@ -16,8 +16,7 @@ class SameSurveyRule(RuleChecker):
 
         if self.question.survey != self.author.survey:
             raise RuleIntegrityError(
-                'A pergunta e o autor não pertencem ao mesmo '
-                'questionário.'
+                'A pergunta e o autor não pertencem ao mesmo questionário.'
             )
 
 
