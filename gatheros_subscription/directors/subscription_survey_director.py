@@ -68,6 +68,13 @@ class SubscriptionSurveyDirector(object):
             )
 
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
+        if self.subscription.author.survey != survey:
+            self.subscription.author = Author.objects.create(
+                name=self.subscription.person.name,
+                survey=survey,
+                user=self.subscription.person.user,
+            )
+            self.subscription.save()
         author = self.subscription.author
 
         try:
@@ -80,8 +87,11 @@ class SubscriptionSurveyDirector(object):
                     Tenta iterar sobre todas as respostas deste autor.
                 """
                 try:
-                    answer = Answer.objects.get(question=question,
-                                                author=author)
+                    answer = Answer.objects.get(
+                        question=question,
+                        author=author,
+                        question__survey=survey,
+                    )
                     answers.update({question.name: answer.value})
                 except Answer.DoesNotExist:
                     pass
