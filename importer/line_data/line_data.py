@@ -127,11 +127,17 @@ class LineData(object):
 
         for entry in self.__invalid_keys:
 
-            key = entry['key']
+            key = entry['key'].lower().strip()
 
-            if survey and not self.is_valid_survey_question(key, survey):
-                invalid_keys.append(key)
+            if survey:
+
+                if self.is_valid_survey_question(key, survey):
+                    continue
+                else:
+                    invalid_keys.append(key)
+
             else:
+
                 invalid_keys.append(key)
 
         return invalid_keys
@@ -148,7 +154,6 @@ class LineData(object):
 
             error = error_list[0]
             self.__errors.update({fieldname: error})
-
 
     def fetch_survey_data(self, survey):
         survey_data = {}
@@ -175,8 +180,12 @@ class LineData(object):
     def is_valid_survey_question(key: str, survey: Survey) -> bool:
 
         all_questions = get_survey_questions(survey)
+        
         for question in all_questions:
-            if key == question.label.lower():
+
+            question = question.label.lower().strip()
+
+            if key == question:
                 return True
 
         return False

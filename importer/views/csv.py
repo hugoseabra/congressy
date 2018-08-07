@@ -394,9 +394,15 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
         valid_lines_list = LineDataCollection()
         invalid_lines_list = LineDataCollection()
 
+        if self.object.lot.event_survey:
+            survey = self.object.lot.event_survey.survey
+        else:
+            survey = None
+
         for line in line_data_persistence_collection:
             line.save(commit=commit,
                       form_config=self.object.lot.event.formconfig,
+                      survey=survey,
                       lot=self.object.lot, user=self.request.user)
 
             if line.get_errors():
@@ -445,10 +451,16 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
     def _check_for_invalid_cities(self):
         line_data_persistence_collection = self.get_data_collection()
 
+        if self.object.lot.event_survey:
+            survey = self.object.lot.event_survey.survey
+        else:
+            survey = None
+
         for line in line_data_persistence_collection:
 
             line.save(commit=False,
                       form_config=self.object.lot.event.formconfig,
+                      survey=survey,
                       lot=self.object.lot, user=self.request.user)
 
             errors = line.get_errors()
