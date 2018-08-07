@@ -47,8 +47,8 @@ class LineData(object):
                 setattr(self, parsed_key, raw_value)
             else:
                 self.__invalid_keys.append({
-                    'key': raw_key,
-                    'value': raw_value,
+                    'key': self.normalize(raw_key),
+                    'value': self.normalize(raw_value),
                 })
 
     def get_errors(self):
@@ -193,3 +193,7 @@ class LineData(object):
                 return question.name
 
         return False
+
+    @staticmethod
+    def normalize(string):
+        return string.lower().strip().replace('?', '').replace(':', '')
