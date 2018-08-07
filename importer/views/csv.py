@@ -439,7 +439,11 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
         ).get_collection()
 
     def _create_error_csv(self, line_data_collection: LineDataCollection):
+
+        # Creating file in filesystem
         csvfile = CSVErrorPersister(line_data_collection).write()
+
+        # Saving a reference to the file
         self.object.error_csv_file.save(self.object.filename(), csvfile)
 
     def _create_xls(self) -> bytes:
