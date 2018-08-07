@@ -282,8 +282,11 @@ class CSVErrorXLSView(CSVViewMixin):
 
     def _create_xls(self) -> bytes:
         error_csv = self.object.error_csv_file.path
+        survey = None
+        if self.object.lot.event_survey:
+            survey = self.object.lot.event_survey.survey
         xls_maker = XLSErrorPersister(error_csv)
-        return xls_maker.make()
+        return xls_maker.make(survey)
 
     def get_object(self, queryset=None):
         return get_object_or_404(

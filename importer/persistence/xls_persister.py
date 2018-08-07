@@ -10,7 +10,8 @@ from openpyxl.styles import colors
 from six import BytesIO
 
 from importer.constants import KEY_MAP
-from importer.helpers import get_mapping_from_csv_key
+from importer.helpers import get_mapping_from_csv_key, MappingNotFoundError
+from survey.models import Question
 
 
 class XLSPersister(abc.ABC):
@@ -44,10 +45,21 @@ class XLSErrorPersister(XLSPersister):
             end_color=colors.RED,
         )
 
-    def _get_header(self) -> list:
+    def _get_header(self, survey=None) -> list:
 
         form_keys = []
         headers = []
+
+        survey_headers = {}
+        if survey:
+            questions = Question.objects.filter(
+                survey=survey,
+            )
+
+            for question in questions:
+                cleaned_label = question.label.lower().strip().replace('?', '')
+                survey_headers.update({question.name: cleaned_label})
+
         for line in self._get_reader():
 
             raw_data = json.loads(line['raw_data'])
@@ -64,13 +76,29 @@ class XLSErrorPersister(XLSPersister):
                     form_keys.append(key)
 
         for key in form_keys:
-            headers.append(KEY_MAP[key]['csv_keys'][0])
+
+            if survey:
+                try:
+                    headers.append(KEY_MAP[key]['csv_keys'][0])
+                except KeyError:
+                    headers.append(survey_headers[key])
+            else:
+                headers.append(KEY_MAP[key]['csv_keys'][0])
 
         return headers
 
-    def make(self) -> bytes:
+    def make(self, survey=None) -> bytes:
 
-        headers = self._get_header()
+        headers = self._get_header(survey)
+        survey_headers = {}
+        if survey:
+            questions = Question.objects.filter(
+                survey=survey,
+            )
+
+            for question in questions:
+                cleaned_label = question.label.lower().strip().replace('?', '')
+                survey_headers.update({cleaned_label: question.name})
 
         cell_mapping = OrderedDict()
         i = 0
@@ -99,8 +127,13 @@ class XLSErrorPersister(XLSPersister):
 
             for key in headers:
                 cell = cell_mapping[key] + str(line_counter)
-
-                form_key, _ = get_mapping_from_csv_key(key)
+                if survey:
+                    try:
+                        form_key, _ = get_mapping_from_csv_key(key)
+                    except MappingNotFoundError:
+                        form_key = survey_headers[key]
+                else:
+                    form_key, _ = get_mapping_from_csv_key(key)
 
                 if form_key in raw_data:
 

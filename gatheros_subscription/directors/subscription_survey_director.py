@@ -65,6 +65,7 @@ class SubscriptionSurveyDirector(object):
         if self.subscription is None or self.subscription.author is None:
             return SurveyForm(
                 survey=survey,
+                data=data,
             )
 
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.

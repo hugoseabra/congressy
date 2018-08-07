@@ -7,7 +7,7 @@ from gatheros_subscription.models import FormConfig, Lot
 from importer.constants import KEY_MAP
 from importer.forms import CSVSubscriptionForm
 from importer.helpers import get_required_keys, get_survey_questions
-from survey.models import Survey
+from survey.models import Survey, Question
 
 
 class LineData(object):
@@ -75,22 +75,10 @@ class LineData(object):
 
         required_keys = get_required_keys(form_config=form_config)
 
-        survey_form_is_valid = False
-
         data = {'lot_id': lot.pk}
 
         for key, value in self:
             data.update({key: value})
-
-        if survey:
-            survey_data = self.fetch_survey_data(survey)
-            survey_form = self.get_survey_form(survey=survey, data=survey_data)
-            if survey_form.is_valid():
-                survey_form_is_valid = True
-            else:
-                self.add_errors(survey_form.errors)
-        else:
-            survey_form_is_valid = True
 
         form = CSVSubscriptionForm(
             event=lot.event,
@@ -99,21 +87,29 @@ class LineData(object):
             data=data,
         )
 
-        if form.is_valid() and survey_form_is_valid:
-            if commit:
-                subscription = form.save()
+        if survey:
+            survey_data = self.fetch_survey_data(survey)
+            survey_form = self.get_survey_form(survey=survey, data=survey_data)
 
-                if survey:
-                    survey_data = self.fetch_survey_data(survey)
-                    survey_form = self.get_survey_form(
-                        survey=survey,
-                        data=survey_data,
-                        subscription=subscription
-                    )
-                    if not survey_form.is_valid():
-                        raise Exception('Previously valid form is now invalid.')
+            if not survey_form.is_valid():
+                self.add_errors(survey_form.errors)
+
+            if not form.is_valid():
+                self.add_errors(form.errors)
+
+            if survey_form.is_valid() and form.is_valid() and commit:   
+                subscription = form.save()
+                survey_form = self.get_survey_form(survey=survey,
+                                                   data=survey_data,
+                                                   subscription=subscription)
+                survey_form.save()
+
         else:
-            self.add_errors(form.errors)
+            if form.is_valid():
+                if commit:
+                    form.save()
+            else:
+                self.add_errors(form.errors)
 
     def __iter__(self):
         for i in self.__dict__.items():
@@ -157,13 +153,20 @@ class LineData(object):
 
     def fetch_survey_data(self, survey):
         survey_data = {}
+
+        questions = Question.objects.filter(survey=survey)
+        for question in questions:
+            survey_data.update({question.name: ''})
+
         for entry in self.__invalid_keys:
 
             key = entry['key']
             value = entry['value']
 
-            if self.is_valid_survey_question(key, survey):
-                survey_data.update({key: value})
+            valid_question = self.is_valid_survey_question(key, survey)
+
+            if valid_question:
+                survey_data.update({valid_question: value})
 
         return survey_data
 
@@ -177,15 +180,16 @@ class LineData(object):
         )
 
     @staticmethod
-    def is_valid_survey_question(key: str, survey: Survey) -> bool:
+    def is_valid_survey_question(key: str, survey: Survey):
 
         all_questions = get_survey_questions(survey)
-        
+        key = key.lower().strip().replace('?', '')
+
         for question in all_questions:
 
-            question = question.label.lower().strip()
+            question_label = question.label.lower().strip().replace('?', '')
 
-            if key == question:
-                return True
+            if key == question_label:
+                return question.name
 
         return False
