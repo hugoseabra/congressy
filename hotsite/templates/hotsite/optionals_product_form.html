@@ -36,7 +36,6 @@
 <script>
     document.addEventListener("DOMContentLoaded", function (event) {
         window.setTimeout(function () {
-            render_available_optional_products_list();
             render_currently_selected_products_list();
         }, 300);
     });
@@ -51,6 +50,7 @@
             null,
             function (response) {
                 $('#available_optional_products').html(response);
+                loadImageViewerEvents();
             },
             null
         );
@@ -66,6 +66,7 @@
             },
             function (response) {
                 $('#currently_selected_products').html(response);
+                loadImageViewerEvents();
                 render_available_optional_products_list();
             },
             null
@@ -73,6 +74,9 @@
     }
 
     function addOptionalProduct(product_id) {
+
+        $('#products_table').find('button').attr('disable', '');
+        $('#selected_products_table').find('button').attr('disable', '');
 
         var url = '{% url 'public:hotsite_products' subscription.pk %}';
 
@@ -85,7 +89,6 @@
             },
             function (res) {
                 console.log(res);
-                render_available_optional_products_list();
                 render_currently_selected_products_list();
             },
             function (err) {
@@ -95,6 +98,9 @@
         );
     }
     function removeOptionalProduct(product_id) {
+
+        $('#products_table').find('button').attr('disable', '');
+        $('#selected_products_table').find('button').attr('disable', '');
 
         var url = '{% url 'public:hotsite_products' subscription.pk %}';
 
@@ -108,13 +114,43 @@
             function (res) {
                 console.log(res);
                 render_currently_selected_products_list();
-                render_available_optional_products_list();
             },
             function (err) {
                 console.log('err');
                 console.error(err);
             }
         );
+    }
+
+    function loadImageViewerEvents() {
+        $('.image-link-parent').magnificPopup({
+            delegate: 'a',
+            type: 'image',
+            closeOnContentClick: true,
+            closeBtnInside: false,
+            fixedContentPos: false,
+            mainClass: 'mfp-with-zoom mfp-img-mobile',
+            image: {
+                verticalFit: true,
+                titleSrc: function (item) {
+                    return item.el.data('optional-name');
+                }
+            },
+            zoom: {
+                enabled: true,
+                duration: 300, // don't foget to change the duration also in CSS
+                opener: function (element) {
+                    return element.find('img');
+                }
+            }
+        });
+        reloadTooltipEvents();
+    }
+
+    function reloadTooltipEvents()
+    {
+        $('.tooltip').remove();
+        app.tooltips();
     }
 
     function send(url, method, data, success_callback, error_callback) {

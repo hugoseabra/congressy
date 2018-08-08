@@ -1,0 +1,65 @@
+{% load static humanize %}
+
+<tr>
+    <td width="130px" class="image-link-parent">
+        <a href="{% static 'assets/img/addon/opcional-sample.jpg' %}" class="image-link" title="Abrir detalhes" data-optional-name="{{ optional.name }}">
+            <img src="{% static 'assets/img/addon/thumbnail-opcional-sample.jpg' %}" width="100%"/>
+        </a>
+    </td>
+    <td>
+        <div class="text-bold" style="font-size: 18px">
+            {{ optional.name }}
+        </div>
+        <div class="text-muted hidden-xs {% if optional.name|length > 45 %}hidden-sm{% endif %}">
+            Lorem Ipsum é simplesmente uma simulação de texto da indústria tipográfica e de impressos, e vem sendo utilizado desde o século XVI, quando um impress.
+        </div>
+    </td>
+</tr>
+<tr class="{% if optional.name|length <= 45 %}hidden-sm{% endif %} hidden-md hidden-lg">
+    <td colspan="2">
+        <div class="text-muted">
+            Lorem Ipsum é simplesmente uma simulação de texto da indústria tipográfica e de impressos, e vem sendo utilizado desde o século XVI, quando um impress.
+        </div>
+    </td>
+</tr>
+<tr>
+    <td colspan="2">
+        <hr style="margin-top:0;margin-bottom:5px;"  />
+        <div class="row">
+            <div class="col-xs-7">
+                <div style="font-size: 16px;margin-top: 8px;">
+                    Até:
+                    <strong>{{ optional.schedule_end|date:"d/m/Y H\hi" }}</strong>
+                </div>
+            </div>
+            <div class="col-xs-5 text-right">
+                <div style="float:right;">
+                    {% if available %}
+                        {% if action == 'add' %}
+                            <button style="padding:5px 10px" onclick="addOptionalService({{ optional.pk }})" class="btn btn-info" data-toggle="tooltip" title="Adicionar">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        {% elif action == 'remove' %}
+                            <button style="width: 100%;padding:5px 10px" onclick="removeOptionalService({{ service.optional.pk }})" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Remover">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        {% endif %}
+                    {% else %}
+                        <button style="padding:5px 10px" disabled="disabled" class="btn btn-sm btn-warning btn-block" data-toggle="tooltip" title="Indisponivel">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </button>
+                    {% endif %}
+                </div>
+                <div style="float:right;margin-top: 6px;margin-right: 8px;font-size: 18px;font-weight: bold;color:darkblue">
+                    {% if not optional.price %}
+                        Grátis
+                    {% else %}
+                        R$ {{ optional.price|intcomma }}
+                    {% endif %}
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        <hr style="margin-top:5px;height:2px;border:none;color:#DDD;background-color:#DDD;"  />
+    </td>
+</tr>

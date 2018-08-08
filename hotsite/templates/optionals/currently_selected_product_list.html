@@ -4,7 +4,7 @@
     {% if  object_list %}
         <label for="selected_products_table">Produtos</label>
 
-        <div class="table-responsive" id="selected_products_table">
+        <div id="selected_products_table">
             <table class="table">
                 <thead>
                     <tr>
@@ -16,24 +16,7 @@
                 </thead>
                 <tbody>
                 {% for product in object_list %}
-                    <tr>
-
-                        <td>{{ product.optional.name }}</td>
-                        <td>{{ product.optional.optional_type.name }}</td>
-                        <td style="font-weight: bold; vertical-align: middle">
-                            {% if product.optional.price == 0.00 %}
-                                Grátis
-                            {% else %}
-                                R$ {{ product.optional.price|intcomma }}
-                            {% endif %}
-                        </td>
-                        <td style="vertical-align: middle">
-                            <button style="width: 100%" onclick="removeOptionalProduct({{ product.optional.pk }})" class="btn btn-sm btn-danger">
-                                Remover
-                            </button>
-                        </td>
-
-                    </tr>
+                    {% include 'optionals/optional-item-snippet.html' with action='remove' optional=product.optional available=True %}
                 {% endfor %}
                 </tbody>
             </table>

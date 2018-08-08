@@ -1,9 +1,9 @@
-{% load humanize %}
+{% load static humanize %}
 
 {% if  object_list %}
     <label for="services_table">Serviços</label>
 
-    <div class="table-responsive" id="services_table">
+    <div id="services_table">
         {% for t_pk, themes in object_list.items %}
             <h3 style="border-bottom:1px solid gray">
                 {{ themes.name|upper }}
@@ -14,50 +14,10 @@
                     {{ t.name|upper }}
                 </h4>
 
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th width="72%">Nome</th>
-                        <th width="18%" class="text-right">Preço</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-
-                    <tr>
-                        {% for service in t.optionals %}
-                            <tr>
-                                <td>
-                                    <div class="text-bold">
-                                        {{ service.optional.name }}
-                                    </div>
-                                    <div class="text-muted">
-                                        {{ service.optional.schedule_start|date:"d/m/Y H\hi" }}
-                                        a
-                                        {{ service.optional.schedule_end|date:"d/m/Y H\hi" }}
-                                    </div>
-                                </td>
-                                <td class="text-right" style="font-weight: bold;vertical-align: middle">
-                                    {% if service.optional.price == 0.00 %}
-                                        Grátis
-                                    {% else %}
-                                        R$ {{ service.optional.price|intcomma }}
-                                    {% endif %}
-                                </td>
-                                <td style="vertical-align: middle">
-                                    {% if service.available %}
-                                        <button style="width: 100%" onclick="addOptionalService({{ service.optional.pk }})" class="btn btn-sm btn-success">
-                                            Selecionar
-                                        </button>
-                                    {% else %}
-                                        <button style="width: 100%" disabled="disabled" class="btn btn-sm btn-warning">
-                                            Indisponível
-                                            <i class="fas fa-exclamation-triangle"></i>
-                                        </button>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tr>
+                <table class="table table-border-none thumbnail-popups">
+                    {% for service in t.optionals %}
+                        {% include 'optionals/optional-item-snippet.html' with action='add' optional=service.optional available=service.available %}
+                    {% endfor %}
                 </table>
             {% endfor %}
 

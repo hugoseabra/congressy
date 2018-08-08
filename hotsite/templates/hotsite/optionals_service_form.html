@@ -41,7 +41,6 @@
 <script>
     document.addEventListener("DOMContentLoaded", function (event) {
         window.setTimeout(function () {
-            render_available_optional_services_list();
             render_currently_selected_service_list();
         }, 300);
     });
@@ -57,6 +56,7 @@
             function (response) {
                 //console.log(response);
                 $('#available_optional_services').html(response);
+                loadImageViewerEvents();
             },
             function (err) {
                 console.error(err);
@@ -75,6 +75,7 @@
             },
             function (response) {
                 $('#currently_selected_services').html(response);
+                loadImageViewerEvents();
                 render_available_optional_services_list();
             },
             function (err) {
@@ -85,6 +86,8 @@
 
 
     function addOptionalService(service_id) {
+
+        $('#services_table').find('button').attr('disable', '');
 
         var url = '{% url 'public:hotsite_services' subscription.pk %}';
 
@@ -97,7 +100,6 @@
             },
             function (res) {
                 //console.log(res);
-                render_available_optional_services_list();
                 render_currently_selected_service_list();
             },
             function (err) {
@@ -107,6 +109,8 @@
     }
 
     function removeOptionalService(service_id) {
+
+        $('#services_table').find('button').attr('disable', '');
 
         var url = '{% url 'public:hotsite_services' subscription.pk %}';
 
@@ -119,7 +123,6 @@
             },
             function (res) {
                 console.log(res);
-                render_available_optional_services_list();
                 render_currently_selected_service_list();
             },
             function (err) {
@@ -127,6 +130,37 @@
                 console.error(err);
             }
         );
+    }
+
+    function loadImageViewerEvents() {
+        $('.image-link-parent').magnificPopup({
+            delegate: 'a',
+            type: 'image',
+            closeOnContentClick: true,
+            closeBtnInside: false,
+            fixedContentPos: false,
+            mainClass: 'mfp-with-zoom mfp-img-mobile',
+            image: {
+                verticalFit: true,
+                titleSrc: function (item) {
+                    return item.el.data('optional-name');
+                }
+            },
+            zoom: {
+                enabled: true,
+                duration: 300, // don't foget to change the duration also in CSS
+                opener: function (element) {
+                    return element.find('img');
+                }
+            }
+        });
+        reloadTooltipEvents();
+    }
+
+    function reloadTooltipEvents()
+    {
+        $('.tooltip').remove();
+        app.tooltips();
     }
 
     function send(url, method, data, success_callback, error_callback) {

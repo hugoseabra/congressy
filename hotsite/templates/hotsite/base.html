@@ -96,6 +96,7 @@
 <script src="{% static 'hotsite/js/responsiveslides.min.js' %}"></script>
 <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
 <script src="{% static 'assets/plugins/icheck/js/icheck.min.js' %}"></script>
+<script src="{% static 'hotsite/js/src/app.js' %}"></script>
 
 
 <!-- MAIN SCRIPT
@@ -114,25 +115,6 @@
         window.setTimeout(function () {
             $('.cgsy-date-input').mask("99/99/9999");
             $('.cgsy-time-input').mask("99:99");
-
-            var radios = $('input[type=radio]');
-            var checkboxes = $('input[type=checkbox]');
-
-            radios.iCheck({
-                checkboxClass: 'icheckbox_flat-grey',
-                radioClass: 'iradio_flat-grey'
-            });
-
-            checkboxes.iCheck({
-                checkboxClass: 'icheckbox_flat-grey',
-                radioClass: 'iradio_flat-grey'
-            });
-
-            $('.tooltip-wrapper').tooltip({
-                selector: "[data-toggle=tooltip]",
-                container: "body",
-                html: true
-            });
         });
     });
 </script>

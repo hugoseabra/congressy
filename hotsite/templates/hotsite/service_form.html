@@ -1,6 +1,12 @@
 {% extends 'hotsite/base.html' %}
 {% load l10n humanize static form_config_tags user_agents user_agent_tag %}
 
+{% block styles %}
+    <!-- Magnific Popup core CSS file -->
+    <link rel="stylesheet" href="{% static 'hotsite/css/magnific-popup.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/magnific-popup-custom.css' %}">
+{% endblock %}
+
 {% block content %}
 
     {% include 'hotsite/includes/2_cover_no_form.html' %}
@@ -15,7 +21,7 @@
 
             <div class="about-row row">
 
-                <div class="col-md-9 col-md-offset-2">
+                <div class="col-md-12">
 
                     {% include "hotsite/includes/greetings.html" %}
                     {% include "hotsite/includes/selected-lot.html" %}
@@ -120,12 +126,12 @@
 
             </div>
         </div>
-
     </section>
-
 {% endblock %}
 
 {% block scripts %}
+    <!-- Magnific Popup core JS file -->
+    <script src="{% static 'hotsite/js/jquery.magnific-popup.min.js' %}"></script>
     <script>
         var num_selected_optionals = 0;
     </script>
