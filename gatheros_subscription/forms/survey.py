@@ -63,6 +63,6 @@ class SurveyForm(forms.Form):
     #     if survey_form.is_valid():
     #         survey_form.save_answers()
     #     else:
-    #         raise Exception('SurveyForm was invalid: {}'.format(
+    #         raise Exception('SurveyAnswerForm was invalid: {}'.format(
     #             survey_form.errors
     #         ))

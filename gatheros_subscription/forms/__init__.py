@@ -8,4 +8,4 @@ from .subscription import (
     SubscriptionPersonForm,
 )
 from .export import SubscriptionFilterForm
-from .survey import EventSurveyForm, SurveyForm
+from .survey import EventSurveyForm, SurveyAnswerForm

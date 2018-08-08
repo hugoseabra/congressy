@@ -1,5 +1,5 @@
 from gatheros_subscription.models import Subscription
-from survey.forms import SurveyForm
+from survey.forms import SurveyAnswerForm
 from survey.models import Author, Answer, Survey
 
 
@@ -44,11 +44,11 @@ class SubscriptionSurveyDirector(object):
 
         super().__init__()
 
-    def get_form(self, survey: Survey, data=None) -> SurveyForm:
+    def get_form(self, survey: Survey, data=None) -> SurveyAnswerForm:
         """
 
         Este método é responsável por retornar um objeto do tipo
-        'SurveyForm' este objeto que em si é uma instância de 'forms.Form'.
+        'SurveyAnswerForm' este objeto que em si é uma instância de 'forms.Form'.
 
         Esse objeto já deve vir 'populado' quando o usuário
         passado via parâmetro possua algum autoria de qualquer resposta(
@@ -58,12 +58,12 @@ class SubscriptionSurveyDirector(object):
         :param data: um dict contendo as novas respostas que serão
                 vinculadas ao form
 
-        :return SurveyForm: um objeto de SurveyForm
+        :return SurveyAnswerForm: um objeto de SurveyAnswerForm
         """
         # Caso não seja passado uma inscrição, resgatar apenas um
-        # SurveyForm vazio
+        # SurveyAnswerForm vazio
         if self.subscription is None or self.subscription.author is None:
-            return SurveyForm(
+            return SurveyAnswerForm(
                 survey=survey,
                 data=data,
             )
@@ -94,14 +94,14 @@ class SubscriptionSurveyDirector(object):
             pass
 
         if any(answers):
-            return SurveyForm(
+            return SurveyAnswerForm(
                 survey=survey,
                 initial=answers,
                 data=data,
                 author=author,
             )
 
-        return SurveyForm(
+        return SurveyAnswerForm(
             survey=survey,
             data=data,
             author=author,
