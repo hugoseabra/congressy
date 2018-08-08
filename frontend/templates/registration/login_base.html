@@ -140,6 +140,12 @@
 
 {% include 'sentry-javascript-sdk.html' %}
 
+{% block support %}
+    {% include 'facebook-pixel.html' %}
+    {% include 'google-analytics.html' %}
+    {% include 'google-remarketing.html' %}
+{% endblock %}
+
 {% block global_js %}
     <!--Global JS-->
     <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>

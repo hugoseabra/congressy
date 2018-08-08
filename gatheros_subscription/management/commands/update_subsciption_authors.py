@@ -22,14 +22,26 @@ class Command(BaseCommand):
             event = event_survey.event
 
             all_subs_in_event = event.subscriptions.all().filter(
-                completed=True,
-                test_subscription=False,
+                author__isnull=True,
+                lot__event_survey__isnull=False,
             )
+            num_subs = len(all_subs_in_event)
+
+            if not num_subs:
+                continue
+
+            self.stdout.write(self.style.SUCCESS(
+                '# ================ Subs: {}'.format(len(all_subs_in_event))
+            ))
 
             for sub in all_subs_in_event:
 
-                es = sub.lot.event_survey
                 user = sub.person.user
+
+                if not user:
+                    continue
+
+                es = sub.lot.event_survey
                 total_subs += 1
 
                 self.stdout.write(self.style.SUCCESS(
@@ -38,21 +50,29 @@ class Command(BaseCommand):
                     )
                 ))
 
-                if es is not None and \
-                        self.has_any_required_questions(es.survey):
+                created = False
+                try:
+                    author = Author.objects.get(
+                        user=user,
+                        survey=es.survey,
+                    )
 
-                    if sub.author is None:
-                        author, created = Author.objects.get_or_create(
-                            user=user,
-                            survey=es.survey,
-                        )
-                        sub.author = author
-                        # sub.save()
-                        processing_count += 1
-                        if created:
-                            total_created += 1
-                        else:
-                            total_existing += 1
+                except Author.DoesNotExist:
+                    author = Author.objects.create(
+                        user=user,
+                        survey=es.survey
+                    )
+                    created = True
+
+                sub.author = author
+                sub.save()
+
+                processing_count += 1
+
+                if created:
+                    total_created += 1
+                else:
+                    total_existing += 1
 
         self.stdout.write(self.style.SUCCESS(
             '\nTotal Processed: {}'.format(

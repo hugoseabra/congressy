@@ -111,14 +111,17 @@ class SurveyForm(forms.Form):
                     raise Exception(
                         'Não foi possivel resgatar ou criar um autor')
 
-                question = Question.objects.get(name=question,
-                                                survey=self.survey)
+                question = Question.objects.get(
+                    name=question,
+                    survey=self.survey,
+                )
 
                 existing_answer = None
 
                 try:
                     existing_answer = Answer.objects.get(
                         question=question.pk,
+                        question__survey=self.survey,
                         author=self.author,
                     )
                 except Answer.DoesNotExist:
@@ -144,10 +147,7 @@ class SurveyForm(forms.Form):
                     answer_object = answer_service.save()
                     answer_list.append(answer_object)
                 else:
-                    msg = 'Não foi possivel validar a resposta: {}'.format(
-                        answer_service.data
-                    )
-                    raise ValidationError(msg)
+                    raise ValidationError(answer_service.errors)
 
         return answer_list
 

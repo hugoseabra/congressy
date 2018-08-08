@@ -81,8 +81,11 @@ class SubscriptionSurveyDirector(object):
                     Tenta iterar sobre todas as respostas deste autor.
                 """
                 try:
-                    answer = Answer.objects.get(question=question,
-                                                author=author)
+                    answer = Answer.objects.get(
+                        question=question,
+                        author=author,
+                        question__survey=survey,
+                    )
                     answers.update({question.name: answer.value})
                 except Answer.DoesNotExist:
                     pass
