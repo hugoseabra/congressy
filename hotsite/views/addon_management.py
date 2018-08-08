@@ -55,8 +55,7 @@ class ProductOptionalManagementView(generic.TemplateView):
         # @TODO add user validation here, only if request.user == sub.user
 
         all_products_selected_by_the_user = \
-            SubscriptionProduct.objects.filter(
-                subscription=subscription,
+            subscription.subscription_products.filter(
                 optional__lot_category=subscription.lot.category
             ).order_by(
                 "optional__optional_type__name",
@@ -71,6 +70,8 @@ class ProductOptionalManagementView(generic.TemplateView):
             event_optionals_products = Product.objects.filter(
                 lot_category=category,
                 published=True
+            ).exclude(
+                subscription_services__subscription=subscription
             ).order_by(
                 "optional_type__name",
                 "name",
@@ -164,12 +165,13 @@ class ServiceOptionalManagementView(generic.TemplateView):
             self.available_options = []
 
             self.fetch_in_storage = self.request.GET.get('fetch_in_storage')
-            all_selected_services = SubscriptionService.objects.filter(
-                subscription=subscription,
+            all_selected_services = subscription.subscription_services.filter(
                 optional__lot_category=subscription.lot.category
-            ).order_by("optional__theme__name",
-                       "optional__optional_type__name",
-                       "optional__name", )
+            ).order_by(
+                "optional__theme__name",
+                "optional__optional_type__name",
+                "optional__name",
+            )
             # @TODO add user validation here, only if request.user == sub.user
 
             if self.fetch_in_storage:
@@ -197,21 +199,24 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
                 self.available_options = themes
             else:
-
                 # All service optionals
                 all_services = Service.objects.filter(
                     lot_category=category,
-                    published=True
+                    published=True,
+                ).exclude(
+                    subscription_services__subscription=subscription
                 ).order_by(
                     'theme__name',
                     "optional_type__name",
                     "name"
                 )
-                pre_selected_services = subscription.subscription_services.all()
 
-                available = get_all_options(all_services,
-                                            pre_selected_services,
-                                            available_only=False)
+                available = get_all_options(
+                    all_services,
+                    all_selected_services,
+                    available_only=False
+                )
+
                 themes = {}
                 for service in available:
                     optional = service['optional']
@@ -238,8 +243,7 @@ class ServiceOptionalManagementView(generic.TemplateView):
         except Subscription.DoesNotExist:
             pass
 
-        context = self.get_context_data()
-        return self.render_to_response(context)
+        return self.render_to_response(self.get_context_data())
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)

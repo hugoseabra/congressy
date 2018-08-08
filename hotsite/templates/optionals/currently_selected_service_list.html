@@ -18,8 +18,8 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th>Nome</th>
-                            <th>Preço</th>
+                            <th width="72%">Nome</th>
+                            <th width="18%" class="text-right">Preço</th>
                             <th></th>
                         </tr>
                         </thead>
@@ -37,23 +37,18 @@
                                             {{ service.optional.schedule_end|date:"d/m/Y H\hi" }}
                                         </div>
                                     </td>
-                                    <td>
+                                    <td class="text-right" style="font-weight: bold;vertical-align: middle">
                                         {% if service.optional.price == 0.00 %}
                                             Grátis
                                         {% else %}
                                             R$ {{ service.optional.price|intcomma }}
                                         {% endif %}
                                     </td>
-
-
-                                    <td>
-                                        <button style="width: 100%"
-                                                onclick="removeOptionalService({{ service.optional.pk }})"
-                                                class="btn btn-sm btn-danger">
+                                    <td style="vertical-align: middle">
+                                        <button style="width: 100%" onclick="removeOptionalService({{ service.optional.pk }})" class="btn btn-sm btn-danger">
                                             Remover
                                         </button>
                                     </td>
-
                                 </tr>
                             {% endfor %}
                         </tr>

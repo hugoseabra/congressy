@@ -17,8 +17,8 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>Nome</th>
-                        <th>Preço</th>
+                        <th width="72%">Nome</th>
+                        <th width="18%" class="text-right">Preço</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -36,32 +36,25 @@
                                         {{ service.optional.schedule_end|date:"d/m/Y H\hi" }}
                                     </div>
                                 </td>
-                                <td>
+                                <td class="text-right" style="font-weight: bold;vertical-align: middle">
                                     {% if service.optional.price == 0.00 %}
                                         Grátis
                                     {% else %}
                                         R$ {{ service.optional.price|intcomma }}
                                     {% endif %}
                                 </td>
-                                {% if service.available %}
-                                    <td>
-                                        <button style="width: 100%"
-                                                onclick="addOptionalService({{ service.optional.pk }})"
-                                                class="btn btn-sm btn-success">
+                                <td style="vertical-align: middle">
+                                    {% if service.available %}
+                                        <button style="width: 100%" onclick="addOptionalService({{ service.optional.pk }})" class="btn btn-sm btn-success">
                                             Selecionar
                                         </button>
-                                    </td>
-                                {% else %}
-                                    <td>
-                                        <button style="width: 100%"
-                                                disabled="disabled"
-                                                class="btn btn-sm btn-warning">
+                                    {% else %}
+                                        <button style="width: 100%" disabled="disabled" class="btn btn-sm btn-warning">
                                             Indisponível
                                             <i class="fas fa-exclamation-triangle"></i>
                                         </button>
-                                    </td>
-                                {% endif %}
-
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tr>

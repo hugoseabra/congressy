@@ -7,11 +7,12 @@
         <div class="table-responsive" id="selected_products_table">
             <table class="table">
                 <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Tipo</th>
-                    <th>Preço</th>
-                </tr>
+                    <tr>
+                        <th width="52%">Nome</th>
+                        <th width="10%">Tipo</th>
+                        <th width="18%" class="text-right">Preço</th>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tbody>
                 {% for product in object_list %}
@@ -19,17 +20,15 @@
 
                         <td>{{ product.optional.name }}</td>
                         <td>{{ product.optional.optional_type.name }}</td>
-                        <td>
+                        <td style="font-weight: bold; vertical-align: middle">
                             {% if product.optional.price == 0.00 %}
                                 Grátis
                             {% else %}
                                 R$ {{ product.optional.price|intcomma }}
                             {% endif %}
                         </td>
-                        <td>
-                            <button style="width: 100%"
-                                    onclick="removeOptionalProduct({{ product.optional.pk }})"
-                                    class="btn btn-sm btn-danger">
+                        <td style="vertical-align: middle">
+                            <button style="width: 100%" onclick="removeOptionalProduct({{ product.optional.pk }})" class="btn btn-sm btn-danger">
                                 Remover
                             </button>
                         </td>
