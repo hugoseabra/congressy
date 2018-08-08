@@ -63,9 +63,15 @@ class XLSErrorPersister(XLSPersister):
         for line in self._get_reader():
 
             raw_data = json.loads(line['raw_data'])
+            errors = json.loads(line['errors'])
 
             raw_data_keys = raw_data.keys()
             for key in raw_data_keys:
+                if key not in form_keys:
+                    form_keys.append(key)
+
+            error_keys = errors.keys()
+            for key in error_keys:
                 if key not in form_keys:
                     form_keys.append(key)
 

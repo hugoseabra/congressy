@@ -2,6 +2,7 @@ from collections import OrderedDict
 
 from django.contrib.auth.models import User
 from django.forms.utils import ErrorDict
+from django.utils.text import slugify
 
 from gatheros_subscription.directors import SubscriptionSurveyDirector
 from gatheros_subscription.models import FormConfig, Lot
@@ -54,6 +55,9 @@ class LineData(object):
 
     def get_errors(self):
         return self.__errors
+
+    def has_errors(self):
+        return len(self.__errors) > 0
 
     def get_survey_keys(self, survey: Survey = None):
         survey_keys = list()
@@ -178,6 +182,13 @@ class LineData(object):
             self.__errors.update({fieldname: error})
 
     def fetch_survey_data(self, survey):
+
+        needs_cleaning = [
+            Question.FIELD_RADIO_GROUP,
+            Question.FIELD_SELECT,
+            Question.FIELD_CHECKBOX_GROUP,
+        ]
+
         survey_data = {}
 
         questions = Question.objects.filter(survey=survey)
@@ -192,7 +203,9 @@ class LineData(object):
             valid_question = self.is_valid_survey_question(key, survey)
 
             if valid_question:
-                survey_data.update({valid_question: value})
+                if valid_question.type in needs_cleaning:
+                    value = slugify(value)
+                survey_data.update({valid_question.name: value})
 
         return survey_data
 
@@ -222,9 +235,9 @@ class LineData(object):
             question_label = question.label.lower().strip().replace('?', '')
 
             if key == question_label:
-                return question.name
+                return question
 
-        return False
+        return None
 
     @staticmethod
     def normalize(string):

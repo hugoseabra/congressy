@@ -395,7 +395,7 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
                       survey=survey,
                       lot=self.object.lot, user=self.request.user)
 
-            if line.get_errors():
+            if line.has_errors():
                 invalid_lines_list.append(line)
             else:
                 valid_lines_list.append(line)
