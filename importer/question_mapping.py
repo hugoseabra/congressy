@@ -28,6 +28,6 @@ class QuestionMapping(object):
         )
 
         for option in all_options:
-            options.append(option.name.lower())
+            options.append(option.value)
 
         return options
