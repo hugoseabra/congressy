@@ -1,0 +1,118 @@
+{% extends "base/base.html" %}
+{% load  form_config_tags static %}
+{% block title %}Importar | Congressy{% endblock %}
+
+{% block page_title %}Importar via CSV{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_description %}
+    Importação de dados via CSV
+{% endblock %}
+
+{% block styles %}
+
+    <!-- Select2 lib -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
+
+{% endblock %}
+
+{% block scripts %}
+
+    <!-- Select2 lib -->
+    <script src="{% static 'assets/plugins/select2/js/select2.min.js' %}"></script>
+
+
+    <script type="application/javascript">
+
+        $(document).ready(function () {
+
+            var lot_select_el = $('#id_lot');
+            var form_el = $('#form');
+            var loader_el = $('#loader');
+
+            // Starting select2
+            lot_select_el.select2({
+                theme: "classic",
+                width: 'resolve'
+            });
+
+            lot_select_el.on('select2:select', function (e) {
+                form_el.hide();
+                loader_el.show();
+                var data = e.params.data;
+                console.log('changed!!!');
+                console.log(data);
+            });
+
+
+        });
+
+    </script>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-left">
+                    <a href="{% url 'subscription:subscription-list' event.pk %}"
+                       class="btn btn-primary">
+                        <i class="fas fa-arrow-circle-left"></i>
+                        Voltar
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Upload
+                    </h3>
+                </div>
+
+
+                <div class="panel-body">
+
+                    <div class="row text-center" style="margin-top:20px;display: none;" id="loader">
+                        <h3>Preparando arquivo template, aguarde...</h3>
+                        <i class="fas info-color fa-circle-notch fa-spin
+                        fa-6x" style="margin-top: 20px"></i>
+                    </div>
+
+
+                    <div class="row" id="form">
+                        <form method="POST" enctype=multipart/form-data>
+
+                            {% csrf_token %}
+
+                            {{ form.event }}
+
+                            {% render_generic_field form.lot %}
+
+                            <div style="display: none;" id="file-input">
+                                {% render_generic_field form.csv_file %}
+                            </div>
+
+
+                        </form>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

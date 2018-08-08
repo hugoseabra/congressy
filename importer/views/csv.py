@@ -47,70 +47,30 @@ class CSVListView(CSVViewMixin, generic.ListView):
         return context
 
 
-class CSVFileImportView(CSVViewMixin, generic.View):
+class CSVFileImportView(CSVViewMixin, generic.FormView):
     """
-        View usada para fazer apenas upload de arquivos via POST, qualquer outra
-        solicitação irá gerar um HTTP 403.
+        View usada para fazer apenas upload de arquivos
     """
-    form_class = CSVFileForm
-    initial = {}
-    prefix = None
-    object = None
-    http_method_names = ['post']
+    template_name = "importer/csv_upload.html"
+
+    def get_form(self, form_class=None):
+        return CSVFileForm(
+            initial={'event': self.event.pk}
+        )
 
     def get_success_url(self):
-        return reverse_lazy('importer:csv-file-prepare',
-                            kwargs={
-                                'csv_pk': self.object.pk,
-                                'event_pk': self.event.pk
-                            })
+        return reverse_lazy(
+            'importer:csv-file-prepare',
+            kwargs={
+                'csv_pk': self.object.pk,
+                'event_pk': self.event.pk,
+            }
+        )
 
     def form_valid(self, form):
         self.object = form.save()
         messages.success(self.request, "Arquivo submetido com sucesso!")
         return redirect(self.get_success_url())
-
-    def post(self, *args, **kwargs):
-        """
-        Handle POST requests: instantiate a form instance with the passed
-        POST variables and then check if it's valid.
-        """
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    def get_form(self, form_class=None):
-        """Return an instance of the form to be used in this view."""
-        if form_class is None:
-            form_class = self.get_form_class()
-        return form_class(**self.get_form_kwargs())
-
-    def get_form_class(self):
-        """Return the form class to use."""
-        return self.form_class
-
-    def get_form_kwargs(self):
-        """Return the keyword arguments for instantiating the form."""
-        kwargs = {
-            'initial': self.get_initial(),
-            'prefix': self.get_prefix(),
-        }
-        if self.request.method in ('POST', 'PUT'):
-            kwargs.update({
-                'data': self.request.POST,
-                'files': self.request.FILES,
-            })
-        return kwargs
-
-    def get_initial(self):
-        """Return the initial data to use for forms on this view."""
-        return self.initial.copy()
-
-    def get_prefix(self):
-        """Return the prefix to use for forms."""
-        return self.prefix
 
     def form_invalid(self, form):
         """If the form is invalid, render the invalid form."""

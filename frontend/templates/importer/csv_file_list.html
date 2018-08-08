@@ -77,10 +77,10 @@
 
                     {% if object_list %}
 
-                        <button class="btn btn-success" id="trigger-import">
+                        <a class="btn btn-success" href="{% url 'importer:csv-file-import' event.pk %}">
                             <i class="fa fa-plus"></i>
                             Adicionar
-                        </button>
+                        </a>
 
                     {% endif %}
 
@@ -194,11 +194,11 @@
                                                         <li class="text-center">
 
                                                             <a href="{% url 'importer:csv-file-error-xls' event.pk csv.pk %}"
-                                                                    class="btn btn-danger btn-sm">
-                                                            <i class="far fa-file-excel"></i>
-                                                            Arquivo de Erros
+                                                               class="btn btn-danger btn-sm">
+                                                                <i class="far fa-file-excel"></i>
+                                                                Arquivo de Erros
                                                             </a>
-                                                        
+
                                                         </li>
                                                     {% endif %}
 
