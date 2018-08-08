@@ -2,11 +2,10 @@ from django import forms
 from django.forms import ValidationError
 from django.forms.fields import Field as DjangoField
 
+from core.model.validator import cpf_validator, cnpj_validator
 from survey.models import Survey, Question, Author, Answer
 from survey.services import AnswerService
 from .field import SurveyField
-
-from core.model.validator import cpf_validator, cnpj_validator
 
 
 class SurveyBaseForm(forms.Form):
