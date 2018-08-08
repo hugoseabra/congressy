@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from gatheros_subscription.directors import SubscriptionSurveyDirector
 from gatheros_subscription.models import FormConfig, Lot
 from importer.constants import KEY_MAP
-from django.db import transaction
 from importer.forms import CSVSubscriptionForm
 from importer.helpers import get_required_keys, get_survey_questions
 from survey.models import Survey, Question
@@ -55,6 +54,15 @@ class LineData(object):
     def get_errors(self):
         return self.__errors
 
+    def get_survey_keys(self, survey: Survey=None):
+        survey_keys = list()
+        if survey:
+            for item in self.__invalid_keys:
+                if self.is_valid_survey_question(item['key'], survey):
+                    survey_keys.append(item)
+
+        return survey_keys
+
     def save(self,
              form_config: FormConfig,
              lot: Lot,
@@ -88,39 +96,30 @@ class LineData(object):
             data=data,
         )
 
-        if form.is_valid() and survey:
+        if survey:
 
             survey_data = self.fetch_survey_data(survey)
+            survey_form = self.get_survey_form(
+                survey=survey,
+                data=survey_data,
+            )
 
-            if commit:
-
-                # If survey fails to validate, we rollback
-                with transaction.atomic():
+            if form.is_valid() and survey_form.is_valid():
+                if commit:
                     subscription = form.save()
                     survey_form = self.get_survey_form(
-                        survey=survey,
-                        data=survey_data,
-                        subscription=subscription
-                    )
-                    if survey_form.is_valid():
-                        survey_form.save()
-                    else:
-                        self.add_errors(survey_form.errors)
-                        transaction.set_rollback(True)
-            else:
-
-                # Dry run with forced roll back.
-                with transaction.atomic():
-                    subscription = form.save()
-                    survey_form = self.get_survey_form(
-                        survey=survey,
-                        data=survey_data,
-                        subscription=subscription
+                        survey,
+                        survey_data,
+                        subscription,
                     )
                     if not survey_form.is_valid():
-                        self.add_errors(survey_form.errors)
-
-                    transaction.set_rollback(True)
+                        raise Exception('Form que antes era valido agora não é')
+                    survey_form.save()
+                    subscription.author = survey_form.author
+                    subscription.save()
+            else:
+                self.add_errors(form.errors)
+                self.add_errors(survey_form.errors)
 
         elif form.is_valid():
             if commit:
@@ -191,7 +190,13 @@ class LineData(object):
     def get_survey_form(survey, data, subscription=None):
         survey_director = SubscriptionSurveyDirector(subscription)
 
-        return survey_director.get_form(
+        if subscription:
+            return survey_director.get_form(
+                survey=survey,
+                data=data,
+            )
+
+        return survey_director.get_base_form(
             survey=survey,
             data=data,
         )

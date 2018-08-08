@@ -9,6 +9,7 @@ from openpyxl.comments import Comment
 from openpyxl.styles import colors
 from six import BytesIO
 
+from core.util import merge_lists_ignore_duplicates
 from importer.constants import KEY_MAP
 from importer.helpers import get_mapping_from_csv_key, MappingNotFoundError
 from survey.models import Question
@@ -49,16 +50,15 @@ class XLSErrorPersister(XLSPersister):
 
         form_keys = []
         headers = []
-
-        survey_headers = {}
+        survey_headers = []
         if survey:
             questions = Question.objects.filter(
                 survey=survey,
-            )
+            ).order_by('order')
 
             for question in questions:
                 cleaned_label = question.label.lower().strip().replace('?', '')
-                survey_headers.update({question.name: cleaned_label})
+                survey_headers.append(cleaned_label)
 
         for line in self._get_reader():
 
@@ -69,23 +69,11 @@ class XLSErrorPersister(XLSPersister):
                 if key not in form_keys:
                     form_keys.append(key)
 
-            errors = json.loads(line['errors'])
-            error_keys = errors.keys()
-            for key in error_keys:
-                if key not in form_keys:
-                    form_keys.append(key)
-
         for key in form_keys:
-
-            if survey:
-                try:
-                    headers.append(KEY_MAP[key]['csv_keys'][0])
-                except KeyError:
-                    headers.append(survey_headers[key])
-            else:
+            if key not in survey_headers:
                 headers.append(KEY_MAP[key]['csv_keys'][0])
 
-        return headers
+        return merge_lists_ignore_duplicates(headers, survey_headers)
 
     def make(self, survey=None) -> bytes:
 

@@ -431,7 +431,10 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
     def _create_error_csv(self, line_data_collection: LineDataCollection):
 
         # Creating file in filesystem
-        csvfile = CSVErrorPersister(line_data_collection).write()
+        survey = None
+        if self.object.lot.event_survey:
+            survey = self.object.lot.event_survey.survey
+        csvfile = CSVErrorPersister(line_data_collection).write(survey)
 
         # Saving a reference to the file
         self.object.error_csv_file.save(self.object.filename(), csvfile)

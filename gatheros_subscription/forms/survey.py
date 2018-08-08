@@ -37,32 +37,3 @@ class EventSurveyForm(forms.Form):
         )
         return survey
 
-
-class SurveyForm(forms.Form):
-
-    def __init__(self, event, event_survey, **kwargs):
-
-        survey_director = SurveyDirector(event=event)
-
-        super().__init__(**kwargs)
-
-        instance = survey_director.get_form(survey=event_survey.survey)
-        self.fields = instance.fields
-
-    # def save(self):
-    #
-    #     survey_director = SurveyDirector(event=self.event)
-    #
-    #     lot = self.get_lot()
-    #
-    #     survey_form = survey_director.get_form(
-    #         survey=lot.event_survey.survey,
-    #         data=form_data.items()
-    #     )
-    #
-    #     if survey_form.is_valid():
-    #         survey_form.save_answers()
-    #     else:
-    #         raise Exception('SurveyAnswerForm was invalid: {}'.format(
-    #             survey_form.errors
-    #         ))

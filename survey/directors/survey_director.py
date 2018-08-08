@@ -4,7 +4,7 @@
 """
 from gatheros_event.models import Event
 from gatheros_subscription.models import EventSurvey
-from survey.forms import SurveyForm
+from survey.forms import SurveyAnswerForm
 from survey.models import Author, Answer
 
 
@@ -91,15 +91,15 @@ class SurveyDirector(object):
                         pass
 
                 if any(answers):
-                    survey_forms_list.append(SurveyForm(
+                    survey_forms_list.append(SurveyAnswerForm(
                         survey=event_survey.survey, initial=answers))
             except Author.DoesNotExist:
-                survey_forms_list.append(SurveyForm(
+                survey_forms_list.append(SurveyAnswerForm(
                     survey=event_survey.survey))
 
         return survey_forms_list
 
-    def get_form(self, survey, author=None, data=None) -> SurveyForm:
+    def get_form(self, survey, author=None, data=None) -> SurveyAnswerForm:
         """
 
         Este método é responsável por retornar um objeto do tipo
@@ -147,7 +147,7 @@ class SurveyDirector(object):
                 pass
 
         if any(answers):
-            return SurveyForm(
+            return SurveyAnswerForm(
                 survey=survey,
                 initial=answers,
                 data=data,
@@ -155,7 +155,7 @@ class SurveyDirector(object):
                 author=author,
             )
 
-        return SurveyForm(
+        return SurveyAnswerForm(
             survey=survey,
             data=data,
             user=self.user,
