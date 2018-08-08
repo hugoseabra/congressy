@@ -78,19 +78,9 @@ class XLSErrorPersister(XLSPersister):
     def make(self, survey=None) -> bytes:
 
         headers = self._get_header(survey)
-        survey_headers = {}
-        if survey:
-            questions = Question.objects.filter(
-                survey=survey,
-            )
-
-            for question in questions:
-                cleaned_label = question.label.lower().strip().replace('?', '')
-                survey_headers.update({cleaned_label: question.name})
 
         cell_mapping = OrderedDict()
         i = 0
-        # TODO add support for survey headers
         for key in headers:
             letter = chr(ord('a') + i)
             cell_mapping.update({key: letter.upper()})
@@ -119,7 +109,7 @@ class XLSErrorPersister(XLSPersister):
                     try:
                         form_key, _ = get_mapping_from_csv_key(key)
                     except MappingNotFoundError:
-                        form_key = survey_headers[key]
+                        form_key = key
                 else:
                     form_key, _ = get_mapping_from_csv_key(key)
 

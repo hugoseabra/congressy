@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from django.contrib.auth.models import User
+from django.forms.utils import ErrorDict
 
 from gatheros_subscription.directors import SubscriptionSurveyDirector
 from gatheros_subscription.models import FormConfig, Lot
@@ -54,7 +55,7 @@ class LineData(object):
     def get_errors(self):
         return self.__errors
 
-    def get_survey_keys(self, survey: Survey=None):
+    def get_survey_keys(self, survey: Survey = None):
         survey_keys = list()
         if survey:
             for item in self.__invalid_keys:
@@ -119,7 +120,16 @@ class LineData(object):
                     subscription.save()
             else:
                 self.add_errors(form.errors)
-                self.add_errors(survey_form.errors)
+                new_errs = ErrorDict()
+                for err, value in survey_form.errors.items():
+                    q = Question.objects.get(
+                        name=err,
+                        survey=survey,
+                    )
+                    name = self.normalize(q.label)
+                    new_errs.update({name: value})
+
+                self.add_errors(new_errs)
 
         elif form.is_valid():
             if commit:
