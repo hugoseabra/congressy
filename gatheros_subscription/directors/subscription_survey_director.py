@@ -68,14 +68,6 @@ class SubscriptionSurveyDirector(object):
             )
 
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
-        if self.subscription.author.survey != survey:
-            self.subscription.author = Author.objects.create(
-                name=self.subscription.person.name,
-                survey=survey,
-                user=self.subscription.person.user,
-            )
-            self.subscription.save()
-        author = self.subscription.author
 
         try:
             """
