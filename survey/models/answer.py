@@ -58,8 +58,7 @@ class Answer(Entity, models.Model):
         verbose_name='valor'
     )
 
-    human_display = models.CharField(
-        max_length=255,
+    human_display = models.TextField(
         verbose_name='nome exibido a humanos',
         blank=True,
         null=True,
