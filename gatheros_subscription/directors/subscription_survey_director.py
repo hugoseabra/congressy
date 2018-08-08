@@ -68,6 +68,7 @@ class SubscriptionSurveyDirector(object):
             )
 
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
+        author = self.subscription.author
 
         try:
             """
