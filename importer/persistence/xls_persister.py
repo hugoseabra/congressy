@@ -45,8 +45,8 @@ class CSVMixin(object):
 
 class XLSErrorPersister(XLSPersister, CSVMixin):
 
-    def __init__(self, csv_file_path) -> None:
-        super().__init__(csv_file_path)
+    def __init__(self) -> None:
+        super().__init__()
         self.redFill = styles.PatternFill(
             patternType='solid',
             fill_type='solid',
