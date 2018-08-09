@@ -91,7 +91,10 @@ class XLSErrorPersister(CSVMixin, XLSPersister):
 
     def make(self, survey=None) -> bytes:
 
-        headers = self._get_header(survey)
+        raw_headers = self._get_header(survey)
+        headers = list()
+        for header in raw_headers:
+            headers.append(header.upper())
 
         cell_mapping = OrderedDict()
         i = 0
@@ -117,7 +120,7 @@ class XLSErrorPersister(CSVMixin, XLSPersister):
             raw_data = json.loads(line['raw_data'])
             errors = json.loads(line['errors'])
 
-            for key in headers:
+            for key in raw_headers:
                 cell = cell_mapping[key] + str(line_counter)
                 if survey:
                     try:
@@ -205,7 +208,7 @@ class XLSLotExamplePersister(XLSPersister):
             letter = chr(ord('a') + i)
             cell = letter.upper() + str(1)
 
-            header = item[0]
+            header = item[0].upper()
             required = item[1]
             ws1[cell] = header
             if required:
