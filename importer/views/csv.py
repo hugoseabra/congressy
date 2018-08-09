@@ -54,11 +54,14 @@ class CSVFileImportView(CSVViewMixin, generic.FormView):
         View usada para fazer apenas upload de arquivos
     """
     template_name = "importer/csv_upload.html"
+    object = None
 
     def get_form(self, form_class=None):
-        return CSVFileForm(
-            initial={'event': self.event.pk}
-        )
+
+        kwargs = self.get_form_kwargs()
+        kwargs['initial'] = {'event': self.event.pk}
+
+        return CSVFileForm(**kwargs)
 
     def get_success_url(self):
         return reverse_lazy(
@@ -85,10 +88,7 @@ class CSVFileImportView(CSVViewMixin, generic.FormView):
             messages.error(self.request,
                            "{}: {}".format(error, value[0]))
 
-        return redirect(
-            reverse_lazy('importer:csv-list', kwargs={
-                'event_pk': self.event.pk,
-            }))
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 class CSVExampleFileView(CSVViewMixin, generic.View):

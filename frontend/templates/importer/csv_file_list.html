@@ -34,34 +34,6 @@
 
         }
 
-        $(document).ready(function () {
-
-            var file_loader_el = $('#csv-file-loader');
-            var csv_file_els = $('.csv-file');
-            var lot_select_el = $('#id_lot');
-
-            $('#trigger-import').on('click', function () {
-                $('#import_modal').modal('show');
-                // Starting select2
-                lot_select_el.select2({
-                    theme: "classic",
-                    width: 'resolve'
-                });
-            });
-
-
-            $("#save-submission").on('click', function () {
-                //TODO Implement filetype check, verify that the file is a csv before submitting this form.
-                $('#import_modal').modal('hide');
-                csv_file_els.hide();
-                file_loader_el.show();
-
-                $('#file-form').submit();
-            });
-
-
-        });
-
     </script>
 
 {% endblock %}

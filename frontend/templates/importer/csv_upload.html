@@ -26,8 +26,8 @@
         $(document).ready(function () {
 
             var lot_select_el = $('#id_lot');
-            var form_el = $('#form');
-            var loader_el = $('#loader');
+            var file_input_el = $('#file-input');
+            var download_link = $('#download_link');
 
             // Starting select2
             lot_select_el.select2({
@@ -36,11 +36,19 @@
             });
 
             lot_select_el.on('select2:select', function (e) {
-                form_el.hide();
-                loader_el.show();
+                file_input_el.show();
+
                 var data = e.params.data;
-                console.log('changed!!!');
-                console.log(data);
+                var event_pk = '{{ event.pk }}';
+
+                var lot_pk = data.id;
+
+                var url = '/manage/events/' + event_pk +
+                    '/subscriptions/import/csv/lot/' + lot_pk + '/example/';
+
+                download_link.attr("href", url)
+
+
             });
 
 
@@ -82,26 +90,49 @@
 
                 <div class="panel-body">
 
-                    <div class="row text-center" style="margin-top:20px;display: none;" id="loader">
-                        <h3>Preparando arquivo template, aguarde...</h3>
-                        <i class="fas info-color fa-circle-notch fa-spin
-                        fa-6x" style="margin-top: 20px"></i>
-                    </div>
-
-
-                    <div class="row" id="form">
-                        <form method="POST" enctype=multipart/form-data>
+                    <div class="row">
+                        <form method="POST" enctype="multipart/form-data">
 
                             {% csrf_token %}
 
                             {{ form.event }}
 
-                            {% render_generic_field form.lot %}
-
-                            <div style="display: none;" id="file-input">
-                                {% render_generic_field form.csv_file %}
+                            <div id="lot-input">
+                                {% render_generic_field form.lot %}
                             </div>
 
+
+                            <div id="file-input" style="display: none;">
+
+                                <div class="col-md-6">
+                                    {% render_generic_field form.csv_file %}
+
+                                    <button type="submit" class="btn btn-success" id="save-submission" style="margin-left: 10px">
+                                        Enviar
+                                    </button>
+
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+
+                                        <label for="example_file" style="margin-bottom:0">
+                                            Planilha de Exemplo:
+                                        </label>
+
+                                        <div style="margin-top: 5px">
+                                            <a href="#" class="btn btn-primary" id="download_link">
+                                                <i class="fas fa-download"></i>
+                                                Download
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted">
+                                                Planilha de exemplo para o lote escolhido
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                         </form>
                     </div>
