@@ -52,7 +52,10 @@
                 $('#available_optional_products').html(response);
                 loadImageViewerEvents();
             },
-            null
+            function (err) {
+                console.log(err);
+                cgsy.messenger.triggerError('Não foi possível carregar itens disponíveis.');
+            }
         );
     }
     function render_currently_selected_products_list() {
@@ -69,7 +72,10 @@
                 loadImageViewerEvents();
                 render_available_optional_products_list();
             },
-            null
+            function (err) {
+                console.log(err);
+                cgsy.messenger.triggerError('Não foi possível carregar itens selecionados.');
+            }
         );
     }
 
@@ -90,10 +96,14 @@
             function (res) {
                 console.log(res);
                 render_currently_selected_products_list();
+                window.setTimeout(function() {
+                    cgsy.messenger.triggerSuccess('Item inserido com sucesso.')
+                }, 350);
             },
             function (err) {
                 console.log('err');
                 console.error(err);
+                cgsy.messenger.triggerError('Não foi possível adicionar item.');
             }
         );
     }
@@ -114,10 +124,14 @@
             function (res) {
                 console.log(res);
                 render_currently_selected_products_list();
+                window.setTimeout(function() {
+                    cgsy.messenger.triggerSuccess('Item removido com sucesso.')
+                }, 350);
             },
             function (err) {
                 console.log('err');
                 console.error(err);
+                cgsy.messenger.triggerError('Não foi possível remover item.');
             }
         );
     }

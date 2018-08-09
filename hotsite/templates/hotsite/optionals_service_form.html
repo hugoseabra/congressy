@@ -46,7 +46,7 @@
     });
 
 
-    function render_available_optional_services_list() {
+    function render_available_optional_services_list(alert_add) {
         var url = '{% url 'public:hotsite_services' subscription.pk  %}';
 
         send(
@@ -60,6 +60,7 @@
             },
             function (err) {
                 console.error(err);
+                cgsy.messenger.triggerError('Não foi possível carregar itens disponíveis.');
             }
         );
     }
@@ -80,6 +81,7 @@
             },
             function (err) {
                 console.log(err);
+                cgsy.messenger.triggerError('Não foi possível carregar itens selecionados.');
             }
         );
     }
@@ -101,9 +103,13 @@
             function (res) {
                 //console.log(res);
                 render_currently_selected_service_list();
+                window.setTimeout(function() {
+                    cgsy.messenger.triggerSuccess('Item inserido com sucesso.')
+                }, 350);
             },
             function (err) {
                 console.log(err);
+                cgsy.messenger.triggerError('Não foi possível adicionar item.');
             }
         );
     }
@@ -125,10 +131,14 @@
             function (res) {
                 console.log(res);
                 render_currently_selected_service_list();
+                window.setTimeout(function() {
+                    cgsy.messenger.triggerSuccess('Item removido com sucesso.')
+                }, 350);
             },
             function (err) {
                 console.log('err');
                 console.error(err);
+                cgsy.messenger.triggerError('Não foi possível remover item.');
             }
         );
     }
