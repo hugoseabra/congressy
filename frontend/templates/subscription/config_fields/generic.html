@@ -49,6 +49,11 @@
                 {% else %}
                     {% render_field field class="form-control" %}
                 {% endif %}
+                {% if help_text and 'textarea' in field.field.widget.template_name %}
+                    <small class="text-muted">
+                        {{ help_text|safe }}
+                    </small>
+                {% endif %}
             {% endif %}
             {% if errors %}
                 <div class="col-md-12">

@@ -6,7 +6,6 @@ apresentar informações ligadas a ela a pessoa que possam se interessar em
 participar do evento.
 """
 import os
-from collections import Counter
 from datetime import datetime
 
 from django.db import models
@@ -16,13 +15,13 @@ from stdimage.validators import MaxSizeValidator, MinSizeValidator
 
 from core.model import track_data
 from core.util import model_field_slugify
+from gatheros_event.helpers import reports
 from gatheros_event.models.constants import (
     CONGRESSY_PERCENTS,
     CONGRESSY_PERCENT_10_0,
 )
 from . import Category, Organization
 from .mixins import GatherosModelMixin
-from gatheros_event.helpers import reports
 
 
 def get_image_path(instance, filename):

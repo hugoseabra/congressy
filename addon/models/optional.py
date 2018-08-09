@@ -3,11 +3,13 @@
 """
     Representação do serviços de opcional(add ons)
 """
+import os
 from datetime import datetime
 from decimal import Decimal
 
-from django.conf import settings
 from django.db import models
+from stdimage import StdImageField
+from stdimage.validators import MaxSizeValidator, MinSizeValidator
 
 from addon import constants, rules
 from base.models import EntityMixin
@@ -16,6 +18,16 @@ from gatheros_event.models.mixins import GatherosModelMixin
 from gatheros_subscription.models import LotCategory, Subscription
 from .optional_type import OptionalServiceType, OptionalProductType
 from .theme import Theme
+
+
+def get_image_path(instance, filename):
+    """ Resgata localização onde as imagens serão inseridas. """
+    return os.path.join(
+        'event',
+        str(instance.id),
+        'addon',
+        os.path.basename(filename)
+    )
 
 
 @track_data('date_end_sub', 'liquid_price')
@@ -107,6 +119,17 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
         blank=True,
         help_text='Número de dias em que serão liberadas as vagas de opcionais'
                   ' caso a inscrição esteja como pendente.'
+    )
+
+    banner = StdImageField(
+        upload_to=get_image_path,
+        blank=True,
+        null=True,
+        verbose_name='imagem',
+        variations={'default': (900, 580), 'thumbnail': (135, 87, True)},
+        validators=[MaxSizeValidator(2700, 1740)],
+        help_text="Imagem de apresentação (tamanho"
+                  " mínimo: 900px x 580px)."
     )
 
     def __str__(self):
@@ -212,7 +235,8 @@ class Product(AbstractOptional):
         :type: bool
         """
         return self.subscription_products \
-            .filter(subscription__completed=True, subscription__test_subscription=False) \
+            .filter(subscription__completed=True,
+                    subscription__test_subscription=False) \
             .exclude(subscription__status=Subscription.CANCELED_STATUS) \
             .count()
 
@@ -290,6 +314,7 @@ class Service(AbstractOptional):
         :type: bool
         """
         return self.subscription_services \
-            .filter(subscription__completed=True, subscription__test_subscription=False) \
+            .filter(subscription__completed=True,
+                    subscription__test_subscription=False) \
             .exclude(subscription__status=Subscription.CANCELED_STATUS) \
             .count()
