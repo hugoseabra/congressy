@@ -10,21 +10,17 @@ from openpyxl.styles import colors
 from six import BytesIO
 
 from core.util import merge_lists_ignore_duplicates
+from gatheros_subscription.models import Lot
 from importer.constants import KEY_MAP
-from importer.helpers import get_mapping_from_csv_key, MappingNotFoundError
+from importer.helpers import (
+    get_mapping_from_csv_key,
+    MappingNotFoundError,
+    get_keys_mapping_dict,
+)
 from survey.models import Question
 
 
 class XLSPersister(abc.ABC):
-
-    def __init__(self, csv_file_path) -> None:
-        self.file_path = csv_file_path
-        self._reader = None
-
-    def _get_reader(self) -> DictReader:
-        self._reader = DictReader(open(self.file_path, 'r'))
-
-        return self._reader
 
     @abc.abstractmethod
     def _get_header(self) -> list:
@@ -35,7 +31,19 @@ class XLSPersister(abc.ABC):
         pass
 
 
-class XLSErrorPersister(XLSPersister):
+class CSVPersister(object):
+
+    def __init__(self, csv_file_path) -> None:
+        self.file_path = csv_file_path
+        self._reader = None
+
+    def _get_reader(self) -> DictReader:
+        self._reader = DictReader(open(self.file_path, 'r'))
+
+        return self._reader
+
+
+class XLSErrorPersister(XLSPersister, CSVPersister):
 
     def __init__(self, csv_file_path) -> None:
         super().__init__(csv_file_path)
@@ -136,6 +144,76 @@ class XLSErrorPersister(XLSPersister):
 
             line_counter += 1
 
+        wb.save(stream)
+
+        return stream.getvalue()
+
+
+class XLSLotExamplePersister(XLSPersister):
+
+    def __init__(self, lot: Lot) -> None:
+        if not isinstance(lot, Lot):
+            raise TypeError('lot não é um objeto do tipo Lot')
+
+        self.lot = lot
+        self.bold = styles.Font(bold=True)
+        super().__init__()
+
+    def _get_header(self) -> dict:
+
+        headers_map = dict()
+        
+        form_config = self.lot.event.formconfig
+        keys_mapping_list = get_keys_mapping_dict(form_config=form_config)
+        for item in keys_mapping_list:
+            header = item['mapping']['csv_keys'][0]
+            required = item['required']
+            headers_map.update({header: required})
+
+        survey = None
+        if self.lot.event_survey:
+            survey = self.lot.event_survey.survey
+
+        if survey:
+            questions = Question.objects.filter(
+                survey=survey,
+            ).order_by('order')
+
+            for question in questions:
+                cleaned_label = question.label.lower().strip().replace('?', '')
+                required = question.required
+                headers_map.update({cleaned_label: required})
+
+        return headers_map
+
+    def make(self) -> bytes:
+
+        headers = self._get_header()
+
+        stream = BytesIO()
+
+        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+
+        wb = Workbook()
+
+        ws1 = wb.active
+
+        ws1.title = 'Planilha de exemplo -  {}'.format(self.lot.name)
+
+        i = 0
+        for item in headers.items():
+            letter = chr(ord('a') + i)
+            cell = letter.upper() + str(1)
+
+            header = item[0]
+            required = item[1]
+            ws1[cell] = header
+            if required:
+                ws1[cell].font = self.bold
+                ws1[cell].comment = Comment("Obrigatório", 'Congressy')
+
+            i += 1
+            
         wb.save(stream)
 
         return stream.getvalue()

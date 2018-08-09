@@ -4,6 +4,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
 
+from gatheros_subscription.models import Lot
 from importer.forms import (
     CSVFileForm,
     CSVFileConfigForm,
@@ -23,6 +24,7 @@ from importer.models import CSVFileConfig
 from importer.persistence import (
     CSVErrorPersister,
     XLSErrorPersister,
+    XLSLotExamplePersister,
     CSVCorrectionPersister,
     CSVCityCorrectionPersister,
 )
@@ -87,6 +89,40 @@ class CSVFileImportView(CSVViewMixin, generic.FormView):
             reverse_lazy('importer:csv-list', kwargs={
                 'event_pk': self.event.pk,
             }))
+
+
+class CSVExampleFileView(CSVViewMixin, generic.View):
+    lot = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.lot = get_object_or_404(
+            Lot,
+            pk=self.kwargs.get('lot_pk'),
+            event=self.kwargs.get('event_pk'),
+        )
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        xls = self._create_xls()
+
+        response = HttpResponse(xls, content_type=self._get_mime_type())
+        response[
+            'Content-Disposition'] = 'attachment; filename="{}"'.format(
+            'Exemplo_' + self.lot.name + '.xls',
+        )
+
+        return response
+
+    def _create_xls(self) -> bytes:
+        xls_maker = XLSLotExamplePersister(lot=self.lot)
+        return xls_maker.make()
+
+    @staticmethod
+    def _get_mime_type() -> str:
+        mime = 'application'
+        content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        return '{}/{}'.format(mime, content_type)
 
 
 class CSVPrepareView(CSVProcessedViewMixin):
@@ -224,7 +260,6 @@ class CSVPrepareView(CSVProcessedViewMixin):
 
 
 class CSVErrorXLSView(CSVViewMixin):
-
     object = None
 
     def get(self, request, *args, **kwargs):
