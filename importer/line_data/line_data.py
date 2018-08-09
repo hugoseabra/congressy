@@ -186,7 +186,10 @@ class LineData(object):
         needs_cleaning = [
             Question.FIELD_RADIO_GROUP,
             Question.FIELD_SELECT,
-            Question.FIELD_CHECKBOX_GROUP,
+        ]
+
+        needs_grouping = [
+            Question.FIELD_CHECKBOX_GROUP
         ]
 
         survey_data = {}
@@ -203,8 +206,19 @@ class LineData(object):
             valid_question = self.is_valid_survey_question(key, survey)
 
             if valid_question:
-                if valid_question.type in needs_cleaning:
+
+                if valid_question.type in needs_grouping:
+
+                    raw_list = value.split(',')
+                    parsed_list = list()
+                    for item in raw_list:
+                        parsed_list.append(slugify(item))
+
+                    value = parsed_list
+
+                elif valid_question.type in needs_cleaning:
                     value = slugify(value)
+
                 survey_data.update({valid_question.name: value})
 
         return survey_data
