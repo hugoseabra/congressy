@@ -34,6 +34,17 @@
 
         }
 
+
+        $(document).ready(function () {
+            $('#delete_csv').on('click', function () {
+                $('#delete_modal').modal('hide');
+                $('.csv-file').hide();
+                $('#csv-file-loader').show();
+            })
+        });
+
+
+
     </script>
 
 {% endblock %}
