@@ -85,9 +85,9 @@
     }
 
 
-    function addOptionalService(service_id) {
-
-        $('#services_table').find('button').attr('disable', '');
+    function addOptionalService(button_el, service_id) {
+        $('.optional-action-buttons').find('button').attr('disabled', '');
+        insertLoaderIntoButton(button_el);
 
         var url = '{% url 'public:hotsite_services' subscription.pk %}';
 
@@ -108,9 +108,10 @@
         );
     }
 
-    function removeOptionalService(service_id) {
+    function removeOptionalService(button_el, service_id) {
 
-        $('#services_table').find('button').attr('disable', '');
+        $('.optional-action-buttons').find('button').attr('disabled', '');
+        insertLoaderIntoButton(button_el);
 
         var url = '{% url 'public:hotsite_services' subscription.pk %}';
 
@@ -157,8 +158,15 @@
         reloadTooltipEvents();
     }
 
-    function reloadTooltipEvents()
-    {
+    function insertLoaderIntoButton(button_el) {
+        button_el = $(button_el);
+        var current_icon = button_el.find('i');
+            current_icon.addClass('hide');
+        var loader_icon = $('<i>').addClass('fas fa-circle-notch fa-spin');
+        loader_icon.appendTo(button_el);
+    }
+
+    function reloadTooltipEvents() {
         $('.tooltip').remove();
         app.tooltips();
     }

@@ -23,7 +23,7 @@
     </td>
 </tr>
 <tr>
-    <td colspan="2">
+    <td colspan="2" class="optional-action-buttons">
         <hr style="margin-top:0;margin-bottom:5px;"  />
         <div class="row">
             <div class="col-xs-7">
@@ -36,11 +36,11 @@
                 <div style="float:right;">
                     {% if available %}
                         {% if action == 'add' %}
-                            <button style="padding:5px 10px" onclick="addOptionalService({{ optional.pk }})" class="btn btn-info" data-toggle="tooltip" title="Adicionar">
+                            <button style="padding:5px 10px" onclick="addOptionalService(this, {{ optional.pk }})" class="btn btn-danger" data-toggle="tooltip" title="Adicionar">
                                 <i class="fa fa-plus"></i>
                             </button>
                         {% elif action == 'remove' %}
-                            <button style="width: 100%;padding:5px 10px" onclick="removeOptionalService({{ service.optional.pk }})" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Remover">
+                            <button style="width: 100%;padding:5px 10px" onclick="removeOptionalService(this, {{ service.optional.pk }})" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Remover">
                                 <i class="fa fa-trash"></i>
                             </button>
                         {% endif %}
