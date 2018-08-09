@@ -36,6 +36,9 @@ class LineData(object):
         for raw_key, raw_value in self.__raw_data.items():
 
             parsed_key = raw_key.lower().strip()
+            if parsed_key.startswith('*'):
+                parsed_key = parsed_key[1:].strip()
+
             is_valid = False
 
             for key, value in KEY_MAP.items():
@@ -49,7 +52,7 @@ class LineData(object):
                 setattr(self, parsed_key, raw_value)
             else:
                 self.__invalid_keys.append({
-                    'key': self.normalize(raw_key),
+                    'key': parsed_key,
                     'value': self.normalize(raw_value),
                 })
 
@@ -153,7 +156,7 @@ class LineData(object):
 
         for entry in self.__invalid_keys:
 
-            key = entry['key'].lower().strip()
+            key = entry['key']
 
             if survey:
 
@@ -242,11 +245,10 @@ class LineData(object):
     def is_valid_survey_question(key: str, survey: Survey):
 
         all_questions = get_survey_questions(survey)
-        key = key.lower().strip().replace('?', '')
 
         for question in all_questions:
 
-            question_label = question.label.lower().strip().replace('?', '')
+            question_label = question.label.lower().strip()
 
             if key == question_label:
                 return question
@@ -255,4 +257,4 @@ class LineData(object):
 
     @staticmethod
     def normalize(string):
-        return string.lower().strip().replace('?', '').replace(':', '')
+        return string.lower().strip()

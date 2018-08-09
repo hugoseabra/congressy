@@ -52,8 +52,8 @@ class CSVSubscriptionForm(forms.Form):
     birth_date = forms.DateField(
         input_formats=[
             '%Y-%m-%d',
-            '%m/%d/%Y',
-            '%m/%d/%y',
+            '%d/%m/%Y',
+            '%d/%m/%y',
         ]
     )
     street = forms.CharField(max_length=255)

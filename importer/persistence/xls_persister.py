@@ -73,7 +73,7 @@ class XLSErrorPersister(CSVMixin, XLSPersister):
             ).order_by('order')
 
             for question in questions:
-                cleaned_label = question.label.lower().strip().replace('?', '')
+                cleaned_label = question.label.lower().strip()
                 survey_headers.append(cleaned_label)
 
         for line in self._get_reader():
@@ -129,7 +129,7 @@ class XLSErrorPersister(CSVMixin, XLSPersister):
             errors = json.loads(line['errors'])
 
             for key in raw_headers:
-                cell = cell_mapping[key] + str(line_counter)
+                cell = cell_mapping[key.upper()] + str(line_counter)
                 if survey:
                     try:
                         form_key, _ = get_mapping_from_csv_key(key)
