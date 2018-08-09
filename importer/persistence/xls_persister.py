@@ -30,6 +30,14 @@ class XLSPersister(abc.ABC):
     def make(self) -> bytes:
         pass
 
+    @staticmethod
+    def colnum_string(n):
+        string = ""
+        while n > 0:
+            n, remainder = divmod(n - 1, 26)
+            string = chr(65 + remainder) + string
+        return string
+
 
 class CSVMixin(object):
 
@@ -97,9 +105,9 @@ class XLSErrorPersister(CSVMixin, XLSPersister):
             headers.append(header.upper())
 
         cell_mapping = OrderedDict()
-        i = 0
+        i = 1
         for key in headers:
-            letter = chr(ord('a') + i)
+            letter = self.colnum_string(i)
             cell_mapping.update({key: letter.upper()})
             i += 1
 
@@ -203,9 +211,9 @@ class XLSLotExamplePersister(XLSPersister):
 
         ws1.title = 'Planilha de exemplo -  {}'.format(self.lot.name)
 
-        i = 0
+        i = 1
         for item in headers.items():
-            letter = chr(ord('a') + i)
+            letter = self.colnum_string(i)
             cell = letter.upper() + str(1)
 
             header = item[0].upper()
