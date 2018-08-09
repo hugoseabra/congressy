@@ -31,7 +31,7 @@ class XLSPersister(abc.ABC):
         pass
 
 
-class CSVPersister(object):
+class CSVMixin(object):
 
     def __init__(self, csv_file_path) -> None:
         self.file_path = csv_file_path
@@ -43,7 +43,7 @@ class CSVPersister(object):
         return self._reader
 
 
-class XLSErrorPersister(XLSPersister, CSVPersister):
+class XLSErrorPersister(XLSPersister, CSVMixin):
 
     def __init__(self, csv_file_path) -> None:
         super().__init__(csv_file_path)
