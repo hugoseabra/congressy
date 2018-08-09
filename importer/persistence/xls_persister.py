@@ -43,10 +43,10 @@ class CSVMixin(object):
         return self._reader
 
 
-class XLSErrorPersister(XLSPersister, CSVMixin):
+class XLSErrorPersister(CSVMixin, XLSPersister):
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, csv_file_path) -> None:
+        super().__init__(csv_file_path)
         self.redFill = styles.PatternFill(
             patternType='solid',
             fill_type='solid',
@@ -162,7 +162,7 @@ class XLSLotExamplePersister(XLSPersister):
     def _get_header(self) -> dict:
 
         headers_map = dict()
-        
+
         form_config = self.lot.event.formconfig
         keys_mapping_list = get_keys_mapping_dict(form_config=form_config)
         for item in keys_mapping_list:
@@ -213,7 +213,7 @@ class XLSLotExamplePersister(XLSPersister):
                 ws1[cell].comment = Comment("Obrigatório", 'Congressy')
 
             i += 1
-            
+
         wb.save(stream)
 
         return stream.getvalue()
