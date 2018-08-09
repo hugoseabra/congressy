@@ -185,3 +185,37 @@ def render_international_phone(
         'autofocus': autofocus,
         'hide': hide,
     }
+
+
+@register.inclusion_tag('subscription/config_fields/generic_survey.html')
+def render_generic_survey_field(
+        field,
+        required=False,
+        use_required_field=True,
+        autofocus=False,
+        label=None,
+        help_text=None,
+        hide=False):
+    if required is False and use_required_field is True:
+        required = field.field.required
+
+    if label is not None:
+        field.label_tag = "<label for='id_{name}'>{label}:</label>".format(
+            name=field.name,
+            label=label
+        )
+
+    if not help_text and hasattr(field, 'help_text'):
+        help_text = field.help_text
+
+    return {
+        'field': field,
+        'label_tag': field.label_tag,
+        'name': field.name,
+        'help_text': help_text,
+        'errors': field.errors,
+        'required': required,
+        'autofocus': autofocus,
+        'hide': hide,
+    }
+
