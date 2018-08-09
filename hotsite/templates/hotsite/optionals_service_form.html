@@ -57,6 +57,7 @@
                 //console.log(response);
                 $('#available_optional_services').html(response);
                 loadImageViewerEvents();
+                reloadStickyDiv();
             },
             function (err) {
                 console.error(err);
@@ -78,6 +79,7 @@
                 $('#currently_selected_services').html(response);
                 loadImageViewerEvents();
                 render_available_optional_services_list();
+                reloadStickyDiv();
             },
             function (err) {
                 console.log(err);
@@ -179,6 +181,10 @@
     function reloadTooltipEvents() {
         $('.tooltip').remove();
         app.tooltips();
+    }
+
+    function reloadStickyDiv() {
+        var sticky = new Sticky('.sticky');
     }
 
     function send(url, method, data, success_callback, error_callback) {

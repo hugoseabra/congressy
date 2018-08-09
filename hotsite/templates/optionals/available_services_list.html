@@ -1,13 +1,14 @@
 {% load static humanize %}
 
 {% if  object_list %}
-    <label for="services_table">Serviços</label>
-
-    <div id="services_table">
+    <div id="services_table" data-sticky-container>
         {% for t_pk, themes in object_list.items %}
-            <h3 style="border-bottom:1px solid gray">
-                {{ themes.name|upper }}
-            </h3>
+            <div style="border-bottom:1px solid gray" class="sticky" data-sticky-class="is-sticky" data-sticky>
+                <div class="subtitle hide">Disponíveis</div>
+                <h3>
+                    {{ themes.name|upper }}
+                </h3>
+            </div>
 
             {% for pk, t in themes.types.items %}
                 <h4 class="text-muted text-bold">

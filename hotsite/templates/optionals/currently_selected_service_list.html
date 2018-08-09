@@ -1,22 +1,16 @@
 {% load static humanize %}
 
 <div id="currently_selected">
-    <!-- This div will be displayed as fixed bar at the top of the page, when user scrolls -->
-    <div class="scroller">This is the scrollable bar</div>
-
-    <div class="test_content">
-        Quisque sollicitudin elit vitae diam consequat accumsan. Suspendisse potenti. Donec dapibus tortor at justo eleifend at pellentesque leo lobortis. Etiam ultrices leo et nulla iaculis eu facilisis augue fermentum. Pellentesque eu leo purus. Vestibulum bibendum, metus at bibendum blandit, lacus neque porttitor diam, id facilisis lectus mauris et leo. Donec adipiscing interdum lacus sed condimentum. In auctor sollicitudin orci, ac interdum risus aliquet ullamcorper. Curabitur mollis accumsan vulputate. Etiam adipiscing diam nec dui posuere ut tincidunt felis tristique. Vestibulum neque enim, placerat sed placerat commodo, consectetur ac mauris. Sed ultrices pretium nibh, a blandit libero imperdiet pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;
-    </div>
-
-
     {% if  object_list %}
-        <label for="selected_products_table">Serviços</label>
+        <div id="selected_products_table" data-sticky-container>
 
-        <div id="selected_products_table">
             {% for t_pk, themes in object_list.items %}
-                <h3 style="border-bottom:1px solid gray">
-                    {{ themes.name|upper }}
-                </h3>
+                <div style="border-bottom:1px solid gray" class="sticky" data-sticky-class="is-sticky" data-sticky>
+                    <div class="subtitle hide">Selecionados</div>
+                    <h3>
+                        {{ themes.name|upper }}
+                    </h3>
+                </div>
 
                 {% for pk, t in themes.types.items %}
                     <h4 class="text-muted text-bold">

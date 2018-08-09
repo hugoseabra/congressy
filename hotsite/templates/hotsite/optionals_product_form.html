@@ -51,6 +51,7 @@
             function (response) {
                 $('#available_optional_products').html(response);
                 loadImageViewerEvents();
+                reloadStickyDiv();
             },
             function (err) {
                 console.log(err);
@@ -71,6 +72,7 @@
                 $('#currently_selected_products').html(response);
                 loadImageViewerEvents();
                 render_available_optional_products_list();
+                reloadStickyDiv();
             },
             function (err) {
                 console.log(err);
@@ -173,6 +175,10 @@
     {
         $('.tooltip').remove();
         app.tooltips();
+    }
+
+    function reloadStickyDiv() {
+        var sticky = new Sticky('.sticky');
     }
 
     function send(url, method, data, success_callback, error_callback) {
