@@ -202,11 +202,11 @@
                             </strong>
 
                         </h1>
-
-                        <button class="btn btn-primary" style="margin-top: 15px" id="trigger-import">
+                        
+                        <a class="btn btn-success" href="{% url 'importer:csv-file-import' event.pk %}">
                             <i class="fas fa-upload"></i>
                             Importar
-                        </button>
+                        </a>
 
                     </div>
 
@@ -220,47 +220,6 @@
 {% endblock %}
 
 {% block modals %}
-
-    <div class="modal" id="import_modal" role="dialog"
-         aria-labelledby="import_modal_label">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"
-                            aria-hidden="true">×
-                    </button>
-                    <h4 class="modal-title"
-                        id="import_modal_label">
-                        Importação de arquivo CSV
-                    </h4>
-                </div>
-                <div class="modal-body">
-
-                    <form method="POST" action="{% url 'importer:csv-file-import' event.pk %}" id="file-form" enctype=multipart/form-data>
-
-                        {% csrf_token %}
-
-                        {{ form.event }}
-
-                        {% render_generic_field form.lot %}
-                        {% render_generic_field form.csv_file %}
-                        <input name="csv_file" id="id_csv_file" type="file" accept=".csv">
-
-                    </form>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger"
-                            data-dismiss="modal">Fechar
-                    </button>
-                    <button type="button" class="btn btn-success" id="save-submission">
-                        Enviar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
     <div class="modal" id="delete_modal" role="dialog"
          aria-labelledby="delete_modal_label">
