@@ -6,17 +6,9 @@
 
         <div id="selected_products_table">
             <table class="table">
-                <thead>
-                    <tr>
-                        <th width="52%">Nome</th>
-                        <th width="10%">Tipo</th>
-                        <th width="18%" class="text-right">Preço</th>
-                        <th></th>
-                    </tr>
-                </thead>
                 <tbody>
                 {% for product in object_list %}
-                    {% include 'optionals/optional-item-snippet.html' with action='remove' optional=product.optional available=True %}
+                    {% include 'optionals/optional-item-snippet.html' with optional_type='product' action='remove' optional=product.optional available=True %}
                 {% endfor %}
                 </tbody>
             </table>
@@ -26,5 +18,5 @@
     {% endif %}
 </div>
 <script>
-    num_selected_optionals = parseInt('{{ object_list|length }}');
+    var num_selected_optionals = parseInt('{{ object_list|length }}');
 </script>

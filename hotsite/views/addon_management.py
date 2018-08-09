@@ -71,7 +71,7 @@ class ProductOptionalManagementView(generic.TemplateView):
                 lot_category=category,
                 published=True
             ).exclude(
-                subscription_services__subscription=subscription
+                subscription_products__subscription=subscription
             ).order_by(
                 "optional_type__name",
                 "name",

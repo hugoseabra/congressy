@@ -16,7 +16,7 @@
 
                 <table class="table table-border-none thumbnail-popups">
                     {% for service in t.optionals %}
-                        {% include 'optionals/optional-item-snippet.html' with action='add' optional=service.optional available=service.available %}
+                        {% include 'optionals/optional-item-snippet.html' with optional_type='service' action='add' optional=service.optional available=service.available %}
                     {% endfor %}
                 </table>
             {% endfor %}

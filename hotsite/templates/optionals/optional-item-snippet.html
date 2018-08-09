@@ -26,21 +26,30 @@
     <td colspan="2" class="optional-action-buttons">
         <hr style="margin-top:0;margin-bottom:5px;"  />
         <div class="row">
-            <div class="col-xs-7">
-                <div style="font-size: 16px;margin-top: 8px;">
-                    Até:
-                    <strong>{{ optional.schedule_end|date:"d/m/Y H\hi" }}</strong>
+            {% if optional.schedule_start and optional.schedule_end %}
+            <div class="col-sm-7">
+                <div style="margin-top: 8px;">
+                    <div class="row">
+                        <div class="col-sm-2">
+                            Horário:
+                        </div>
+                        <div class="col-sm-10">
+                            <strong>{{ optional.schedule_start|date:"d/m H\hi" }}</strong> a <strong>{{ optional.schedule_end|date:"d/m H\hi" }}</strong>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-xs-5 text-right">
+            {% endif %}
+            <div class="{% if optional.schedule_start and optional.schedule_end %}col-sm-5{% else %}col-sm-12{% endif %} text-right">
+                {{ optional.get_cname }}
                 <div style="float:right;">
                     {% if available %}
                         {% if action == 'add' %}
-                            <button style="padding:5px 10px" onclick="addOptionalService(this, {{ optional.pk }})" class="btn btn-danger" data-toggle="tooltip" title="Adicionar">
+                            <button style="padding:5px 10px" onclick="{% if optional_type == 'service' %}addOptionalService(this, {{ optional.pk }}){% elif optional_type == 'product' %}addOptionalProduct(this, {{ optional.pk }}){% endif %}" class="btn btn-success" data-toggle="tooltip" title="Adicionar">
                                 <i class="fa fa-plus"></i>
                             </button>
                         {% elif action == 'remove' %}
-                            <button style="width: 100%;padding:5px 10px" onclick="removeOptionalService(this, {{ service.optional.pk }})" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Remover">
+                            <button style="width: 100%;padding:5px 10px" onclick="{% if optional_type == 'service' %}removeOptionalService(this, {{ service.optional.pk }}){% elif optional_type == 'product' %}removeOptionalProduct(this, {{ optional.pk }}){% endif %}" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Remover">
                                 <i class="fa fa-trash"></i>
                             </button>
                         {% endif %}

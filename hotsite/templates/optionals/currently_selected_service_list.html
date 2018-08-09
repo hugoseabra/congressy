@@ -1,6 +1,14 @@
 {% load static humanize %}
 
 <div id="currently_selected">
+    <!-- This div will be displayed as fixed bar at the top of the page, when user scrolls -->
+    <div class="scroller">This is the scrollable bar</div>
+
+    <div class="test_content">
+        Quisque sollicitudin elit vitae diam consequat accumsan. Suspendisse potenti. Donec dapibus tortor at justo eleifend at pellentesque leo lobortis. Etiam ultrices leo et nulla iaculis eu facilisis augue fermentum. Pellentesque eu leo purus. Vestibulum bibendum, metus at bibendum blandit, lacus neque porttitor diam, id facilisis lectus mauris et leo. Donec adipiscing interdum lacus sed condimentum. In auctor sollicitudin orci, ac interdum risus aliquet ullamcorper. Curabitur mollis accumsan vulputate. Etiam adipiscing diam nec dui posuere ut tincidunt felis tristique. Vestibulum neque enim, placerat sed placerat commodo, consectetur ac mauris. Sed ultrices pretium nibh, a blandit libero imperdiet pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;
+    </div>
+
+
     {% if  object_list %}
         <label for="selected_products_table">Serviços</label>
 
@@ -17,7 +25,7 @@
 
                     <table class="table">
                         {% for service in t.optionals %}
-                            {% include 'optionals/optional-item-snippet.html' with action='remove' optional=service.optional available=True %}
+                            {% include 'optionals/optional-item-snippet.html' with optional_type='service' action='remove' optional=service.optional available=True %}
                         {% endfor %}
                     </table>
                 {% endfor %}
@@ -29,5 +37,5 @@
     {% endif %}
 </div>
 <script>
-    num_selected_optionals = parseInt('{{ object_list|length }}');
+    var num_selected_optionals = parseInt('{{ object_list|length }}');
 </script>
