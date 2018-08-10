@@ -17,7 +17,7 @@ from gatheros_subscription.forms import EventSurveyForm
 from gatheros_subscription.models import EventSurvey, Lot
 from survey.api import SurveySerializer
 from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST
-from survey.forms import QuestionForm, SurveyForm
+from survey.forms import QuestionForm, SurveyAnswerForm
 from survey.models import Question
 
 
@@ -45,7 +45,7 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
         context['active'] = 'form-personalizado'
         context['form'] = QuestionForm(survey=self.survey)
         context['lots'] = self._get_selected_lots()
-        context['full_survey_form'] = SurveyForm(
+        context['full_survey_form'] = SurveyAnswerForm(
             survey=self.survey)
 
         return context

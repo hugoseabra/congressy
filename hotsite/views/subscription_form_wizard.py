@@ -13,7 +13,6 @@ from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
 from gatheros_event.models import Event, Person
-from gatheros_subscription.directors import SubscriptionSurveyDirector
 from gatheros_subscription.models import FormConfig, Lot, Subscription
 from hotsite import forms
 from mailer.services import (
@@ -26,6 +25,8 @@ from payment.helpers.payment_helpers import (
     is_boleto_allowed,
 )
 from payment.models import Transaction
+from survey.directors import SurveyDirector
+from survey.models import Author
 
 FORMS = [
     ("private_lot", forms.PrivateLotForm),
@@ -509,8 +510,8 @@ class SubscriptionWizardView(SessionWizardView):
             lot = self.get_lot()
 
             kwargs.update({
-                'subscription': self.get_subscription(),
-                'survey': lot.event_survey.survey,
+                'user': self.request.user,
+                'event_survey': lot.event_survey,
             })
 
         if step == 'payment':
@@ -569,14 +570,13 @@ class SubscriptionWizardView(SessionWizardView):
         # Persisting survey
         if isinstance(form, forms.SurveyForm):
 
-            survey_director = SubscriptionSurveyDirector(
-                self.get_subscription())
+            survey_director = SurveyDirector(event=self.event,
+                                             user=self.request.user)
 
             lot = self.get_lot()
 
             # Tratamento especial para extrair as respostas do form_data,
-            # causado pelo uso do FormWizard que adiciona prefixos nas
-            # respostas
+            # causado pelo uso do FormWizard que adiciona prefixos nas respostas
             survey_response = QueryDict('', mutable=True)
             for form_question, form_response in form_data.items():
                 if form_question == 'csrfmiddlewaretoken':
@@ -592,9 +592,12 @@ class SubscriptionWizardView(SessionWizardView):
             )
 
             if not survey_form.is_valid():
-                raise ValidationError(survey_form.errors)
+                raise ValidationError(form.errors)
 
             survey_form.save()
+            subscription = self.get_subscription()
+            subscription.author = survey_form.author
+            subscription.save()
 
         # Persisting payments:
         if isinstance(form, forms.PaymentForm):

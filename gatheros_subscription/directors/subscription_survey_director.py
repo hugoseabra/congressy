@@ -1,5 +1,5 @@
 from gatheros_subscription.models import Subscription
-from survey.forms import SurveyForm
+from survey.forms import SurveyAnswerForm, SurveyBaseForm
 from survey.models import Author, Answer, Survey
 
 
@@ -44,11 +44,11 @@ class SubscriptionSurveyDirector(object):
 
         super().__init__()
 
-    def get_form(self, survey: Survey, data=None) -> SurveyForm:
+    def get_form(self, survey: Survey, data=None) -> SurveyAnswerForm:
         """
 
         Este método é responsável por retornar um objeto do tipo
-        'SurveyForm' este objeto que em si é uma instância de 'forms.Form'.
+        'SurveyAnswerForm' este objeto que em si é uma instância de 'forms.Form'.
 
         Esse objeto já deve vir 'populado' quando o usuário
         passado via parâmetro possua algum autoria de qualquer resposta(
@@ -58,23 +58,17 @@ class SubscriptionSurveyDirector(object):
         :param data: um dict contendo as novas respostas que serão
                 vinculadas ao form
 
-        :return SurveyForm: um objeto de SurveyForm
+        :return SurveyAnswerForm: um objeto de SurveyAnswerForm
         """
         # Caso não seja passado uma inscrição, resgatar apenas um
-        # SurveyForm vazio
+        # SurveyAnswerForm vazio
         if self.subscription is None or self.subscription.author is None:
-            return SurveyForm(
+            return SurveyAnswerForm(
                 survey=survey,
+                data=data,
             )
 
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
-        if self.subscription.author.survey != survey:
-            self.subscription.author = Author.objects.create(
-                name=self.subscription.person.name,
-                survey=survey,
-                user=self.subscription.person.user,
-            )
-            self.subscription.save()
         author = self.subscription.author
 
         try:
@@ -100,14 +94,77 @@ class SubscriptionSurveyDirector(object):
             pass
 
         if any(answers):
-            return SurveyForm(
+            return SurveyAnswerForm(
                 survey=survey,
                 initial=answers,
                 data=data,
                 author=author,
             )
 
-        return SurveyForm(
+        return SurveyAnswerForm(
+            survey=survey,
+            data=data,
+            author=author,
+        )
+
+    def get_base_form(self, survey: Survey, data=None) -> SurveyBaseForm:
+        """
+
+        Este método é responsável por retornar um objeto do tipo
+        'SurveyAnswerForm' este objeto que em si é uma instância de 'forms.Form'.
+
+        Esse objeto já deve vir 'populado' quando o usuário
+        passado via parâmetro possua algum autoria de qualquer resposta(
+        'answer') de um formulário('survey').
+
+        :param survey: uma instância de um objeto de formulário
+        :param data: um dict contendo as novas respostas que serão
+                vinculadas ao form
+
+        :return SurveyAnswerForm: um objeto de SurveyAnswerForm
+        """
+        # Caso não seja passado uma inscrição, resgatar apenas um
+        # SurveyAnswerForm vazio
+        if self.subscription is None or self.subscription.author is None:
+            return SurveyBaseForm(
+                survey=survey,
+                data=data,
+            )
+
+        answers = {}  # lista que guarda as respostas dessa autoria caso haja.
+        author = self.subscription.author
+
+        try:
+            """
+                Resgatar a autoria para poder popular as respostas dos
+                objetos de 'survey'
+            """
+            for question in survey.questions.all():
+                """
+                    Tenta iterar sobre todas as respostas deste autor.
+                """
+                try:
+                    answer = Answer.objects.get(
+                        question=question,
+                        author=author,
+                        question__survey=survey,
+                    )
+                    answers.update({question.name: answer.value})
+                except Answer.DoesNotExist:
+                    pass
+
+        except Author.DoesNotExist:
+            pass
+
+        if any(answers):
+            return SurveyBaseForm(
+                survey=survey,
+                initial=answers,
+                data=data,
+                author=author,
+            )
+
+        return SurveyBaseForm(
             survey=survey,
             data=data,
             author=author,

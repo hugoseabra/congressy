@@ -29,6 +29,11 @@ urls = [
         name='csv-file-error-xls'
     ),
     url(
+        r'^csv/lot/(?P<lot_pk>[\d]+)/example/',
+        views.CSVExampleFileView.as_view(),
+        name='csv-example-file'
+    ),
+    url(
         r'^csv/upload$',
         views.CSVFileImportView.as_view(),
         name='csv-file-import'

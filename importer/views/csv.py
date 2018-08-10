@@ -1,9 +1,10 @@
 from django.contrib import messages
 from django.http.response import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
 
+from gatheros_subscription.models import Lot
 from importer.forms import (
     CSVFileForm,
     CSVFileConfigForm,
@@ -11,8 +12,8 @@ from importer.forms import (
     CSVCityForm,
 )
 from importer.helpers import (
-    get_required_keys_mappings,
-    get_survey_required_questions_labels,
+    get_keys_mapping_dict,
+    get_survey_questions,
 )
 from importer.line_data import (
     LineDataCollection,
@@ -23,10 +24,12 @@ from importer.models import CSVFileConfig
 from importer.persistence import (
     CSVErrorPersister,
     XLSErrorPersister,
+    XLSLotExamplePersister,
     CSVCorrectionPersister,
     CSVCityCorrectionPersister,
 )
 from importer.preview_renderer import PreviewRenderer
+from importer.question_mapping import QuestionMapping
 from .mixins import CSVViewMixin, CSVProcessedViewMixin
 
 
@@ -46,70 +49,33 @@ class CSVListView(CSVViewMixin, generic.ListView):
         return context
 
 
-class CSVFileImportView(CSVViewMixin, generic.View):
+class CSVFileImportView(CSVViewMixin, generic.FormView):
     """
-        View usada para fazer apenas upload de arquivos via POST, qualquer outra
-        solicitação irá gerar um HTTP 403.
+        View usada para fazer apenas upload de arquivos
     """
-    form_class = CSVFileForm
-    initial = {}
-    prefix = None
+    template_name = "importer/csv_upload.html"
     object = None
-    http_method_names = ['post']
+
+    def get_form(self, form_class=None):
+
+        kwargs = self.get_form_kwargs()
+        kwargs['initial'] = {'event': self.event.pk}
+
+        return CSVFileForm(**kwargs)
 
     def get_success_url(self):
-        return reverse_lazy('importer:csv-file-prepare',
-                            kwargs={
-                                'csv_pk': self.object.pk,
-                                'event_pk': self.event.pk
-                            })
+        return reverse_lazy(
+            'importer:csv-file-prepare',
+            kwargs={
+                'csv_pk': self.object.pk,
+                'event_pk': self.event.pk,
+            }
+        )
 
     def form_valid(self, form):
         self.object = form.save()
         messages.success(self.request, "Arquivo submetido com sucesso!")
         return redirect(self.get_success_url())
-
-    def post(self, *args, **kwargs):
-        """
-        Handle POST requests: instantiate a form instance with the passed
-        POST variables and then check if it's valid.
-        """
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    def get_form(self, form_class=None):
-        """Return an instance of the form to be used in this view."""
-        if form_class is None:
-            form_class = self.get_form_class()
-        return form_class(**self.get_form_kwargs())
-
-    def get_form_class(self):
-        """Return the form class to use."""
-        return self.form_class
-
-    def get_form_kwargs(self):
-        """Return the keyword arguments for instantiating the form."""
-        kwargs = {
-            'initial': self.get_initial(),
-            'prefix': self.get_prefix(),
-        }
-        if self.request.method in ('POST', 'PUT'):
-            kwargs.update({
-                'data': self.request.POST,
-                'files': self.request.FILES,
-            })
-        return kwargs
-
-    def get_initial(self):
-        """Return the initial data to use for forms on this view."""
-        return self.initial.copy()
-
-    def get_prefix(self):
-        """Return the prefix to use for forms."""
-        return self.prefix
 
     def form_invalid(self, form):
         """If the form is invalid, render the invalid form."""
@@ -122,10 +88,41 @@ class CSVFileImportView(CSVViewMixin, generic.View):
             messages.error(self.request,
                            "{}: {}".format(error, value[0]))
 
-        return redirect(
-            reverse_lazy('importer:csv-list', kwargs={
-                'event_pk': self.event.pk,
-            }))
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+class CSVExampleFileView(CSVViewMixin, generic.View):
+    lot = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.lot = get_object_or_404(
+            Lot,
+            pk=self.kwargs.get('lot_pk'),
+            event=self.kwargs.get('event_pk'),
+        )
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        xls = self._create_xls()
+
+        response = HttpResponse(xls, content_type=self._get_mime_type())
+        response[
+            'Content-Disposition'] = 'attachment; filename="{}"'.format(
+            'Exemplo_' + self.lot.name + '.xls',
+        )
+
+        return response
+
+    def _create_xls(self) -> bytes:
+        xls_maker = XLSLotExamplePersister(lot=self.lot)
+        return xls_maker.make()
+
+    @staticmethod
+    def _get_mime_type() -> str:
+        mime = 'application'
+        content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        return '{}/{}'.format(mime, content_type)
 
 
 class CSVPrepareView(CSVProcessedViewMixin):
@@ -141,8 +138,8 @@ class CSVPrepareView(CSVProcessedViewMixin):
         if form is None:
             form = CSVFileConfigForm(instance=self.object)
 
-        context['required_keys'] = self.get_required_key_mappings()
-        context['required_questions'] = self.get_required_survey_questions()
+        context['key_mapping'] = self.get_key_mappings()
+        context['questions'] = self.get_survey_questions()
 
         preview_table = None
         denied_reason = None
@@ -164,19 +161,19 @@ class CSVPrepareView(CSVProcessedViewMixin):
 
         return context
 
-    def get_required_key_mappings(self) -> list:
-
+    def get_key_mappings(self) -> list:
         form_config = self.object.lot.event.formconfig
-        return get_required_keys_mappings(
-            form_config=form_config)
+        return get_keys_mapping_dict(form_config=form_config)
 
-    def get_required_survey_questions(self) -> list:
+    def get_survey_questions(self) -> list:
 
         survey_key_questions = list()
 
         if self.object.lot.event_survey:
             survey = self.object.lot.event_survey.survey
-            survey_key_questions = get_survey_required_questions_labels(survey)
+            all_questions = get_survey_questions(survey)
+            for question in all_questions:
+                survey_key_questions.append(QuestionMapping(question))
 
         return survey_key_questions
 
@@ -252,12 +249,18 @@ class CSVPrepareView(CSVProcessedViewMixin):
         return preview_table
 
     def get_invalid_keys(self):
-
         line_data_collection = self.get_data_collection(size=1)
-        return line_data_collection[0].get_invalid_keys()
+
+        survey = None
+
+        if self.object.lot.event_survey:
+            survey = self.object.lot.event_survey.survey
+
+        return line_data_collection[0].get_invalid_keys(survey)
 
 
-class CSVErrorXLSView(CSVProcessedViewMixin):
+class CSVErrorXLSView(CSVViewMixin):
+    object = None
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -274,8 +277,18 @@ class CSVErrorXLSView(CSVProcessedViewMixin):
 
     def _create_xls(self) -> bytes:
         error_csv = self.object.error_csv_file.path
+        survey = None
+        if self.object.lot.event_survey:
+            survey = self.object.lot.event_survey.survey
         xls_maker = XLSErrorPersister(error_csv)
-        return xls_maker.make()
+        return xls_maker.make(survey)
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(
+            CSVFileConfig,
+            pk=self.kwargs.get('csv_pk'),
+            event=self.kwargs.get('event_pk'),
+        )
 
     @staticmethod
     def _get_mime_type() -> str:
@@ -335,7 +348,6 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
     def form_valid(self, form):
         cleaned_data = form.cleaned_data
         create_subs = cleaned_data.get('create_subscriptions')
-        create_xls = cleaned_data.get('create_error_xls')
 
         if create_subs:
             results = self.process(commit=True)
@@ -347,18 +359,6 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
                                  results['valid']))
 
             return redirect(self.get_success_url())
-
-        elif create_xls:
-
-            xls = self._create_xls()
-
-            response = HttpResponse(xls, content_type=self._get_mime_type())
-            response[
-                'Content-Disposition'] = 'attachment; filename="{}"'.format(
-                self.object.err_filename().split('.')[0] + '.xls',
-            )
-
-            return response
 
     def form_invalid(self, form):
 
@@ -379,12 +379,18 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
         valid_lines_list = LineDataCollection()
         invalid_lines_list = LineDataCollection()
 
+        if self.object.lot.event_survey:
+            survey = self.object.lot.event_survey.survey
+        else:
+            survey = None
+
         for line in line_data_persistence_collection:
             line.save(commit=commit,
                       form_config=self.object.lot.event.formconfig,
+                      survey=survey,
                       lot=self.object.lot, user=self.request.user)
 
-            if line.get_errors():
+            if line.has_errors():
                 invalid_lines_list.append(line)
             else:
                 valid_lines_list.append(line)
@@ -418,22 +424,29 @@ class CSVProcessView(CSVProcessedViewMixin, generic.FormView):
         ).get_collection()
 
     def _create_error_csv(self, line_data_collection: LineDataCollection):
-        csvfile = CSVErrorPersister(line_data_collection).write()
+
+        # Creating file in filesystem
+        survey = None
+        if self.object.lot.event_survey:
+            survey = self.object.lot.event_survey.survey
+        csvfile = CSVErrorPersister(line_data_collection).write(survey)
+
+        # Saving a reference to the file
         self.object.error_csv_file.save(self.object.filename(), csvfile)
-
-    def _create_xls(self) -> bytes:
-
-        error_csv = self.object.error_csv_file.path
-        xls_maker = XLSErrorPersister(error_csv)
-        return xls_maker.make()
 
     def _check_for_invalid_cities(self):
         line_data_persistence_collection = self.get_data_collection()
+
+        if self.object.lot.event_survey:
+            survey = self.object.lot.event_survey.survey
+        else:
+            survey = None
 
         for line in line_data_persistence_collection:
 
             line.save(commit=False,
                       form_config=self.object.lot.event.formconfig,
+                      survey=survey,
                       lot=self.object.lot, user=self.request.user)
 
             errors = line.get_errors()

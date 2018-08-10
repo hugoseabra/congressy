@@ -5,6 +5,7 @@ import json
 from django.core.files.base import ContentFile
 
 from importer.line_data import LineDataCollection
+from survey.models import Survey
 
 
 class CSVPersister(abc.ABC):
@@ -20,7 +21,7 @@ class CSVPersister(abc.ABC):
 
 class CSVErrorPersister(CSVPersister):
 
-    def write(self) -> ContentFile:
+    def write(self, survey: Survey = None) -> ContentFile:
 
         writer = csv.DictWriter(self._file, fieldnames=['raw_data', 'errors'])
         writer.writeheader()
@@ -31,14 +32,10 @@ class CSVErrorPersister(CSVPersister):
             for key, value in line:
                 raw_data.update({key: value})
 
-            errors = {}
-            for fieldname, error_list in line.get_errors().items():
+            for dict_item in line.get_survey_keys(survey):
+                raw_data.update({dict_item['key']: dict_item['value']})
 
-                if fieldname == '__all__':
-                    continue
-
-                error = error_list[0]
-                errors.update({fieldname: error})
+            errors = line.get_errors()
 
             raw_data = json.dumps(raw_data, ensure_ascii=False)
             errors = json.dumps(errors, ensure_ascii=False)
