@@ -1,0 +1,149 @@
+{% extends "base/base.html" %}
+{% load  form_config_tags static %}
+{% block title %}Importar | Congressy{% endblock %}
+
+{% block page_title %}Importar via CSV{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_description %}
+    Importação de dados via CSV
+{% endblock %}
+
+{% block styles %}
+
+    <!-- Select2 lib -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
+
+{% endblock %}
+
+{% block scripts %}
+
+    <!-- Select2 lib -->
+    <script src="{% static 'assets/plugins/select2/js/select2.min.js' %}"></script>
+
+
+    <script type="application/javascript">
+
+        $(document).ready(function () {
+
+            var lot_select_el = $('#id_lot');
+            var file_input_el = $('#file-input');
+            var download_link = $('#download_link');
+
+            // Starting select2
+            lot_select_el.select2({
+                theme: "classic",
+                width: 'resolve'
+            });
+
+            lot_select_el.on('select2:select', function (e) {
+                file_input_el.show();
+
+                var data = e.params.data;
+                var event_pk = '{{ event.pk }}';
+
+                var lot_pk = data.id;
+
+                var url = '/manage/events/' + event_pk +
+                    '/subscriptions/import/csv/lot/' + lot_pk + '/example/';
+
+                download_link.attr("href", url)
+
+
+            });
+
+
+        });
+
+    </script>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-left">
+                    <a href="{% url 'subscription:subscription-list' event.pk %}"
+                       class="btn btn-primary">
+                        <i class="fas fa-arrow-circle-left"></i>
+                        Voltar
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Upload
+                    </h3>
+                </div>
+
+
+                <div class="panel-body">
+
+                    <div class="row">
+                        <form method="POST" enctype="multipart/form-data">
+
+                            {% csrf_token %}
+
+                            {{ form.event }}
+
+                            <div id="lot-input">
+                                {% render_generic_field form.lot %}
+                            </div>
+
+
+                            <div id="file-input" style="display: none;">
+
+                                <div class="col-md-6">
+                                    {% render_generic_field form.csv_file %}
+
+                                    <button type="submit" class="btn btn-success" id="save-submission" style="margin-left: 10px">
+                                        Enviar
+                                    </button>
+
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+
+                                        <label for="example_file" style="margin-bottom:0">
+                                            Planilha de Exemplo:
+                                        </label>
+
+                                        <div style="margin-top: 5px">
+                                            <a href="#" class="btn btn-primary" id="download_link">
+                                                <i class="fas fa-download"></i>
+                                                Download
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted">
+                                                Planilha de exemplo para o lote escolhido
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

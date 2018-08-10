@@ -34,33 +34,15 @@
 
         }
 
+
         $(document).ready(function () {
-
-            var file_loader_el = $('#csv-file-loader');
-            var csv_file_els = $('.csv-file');
-            var lot_select_el = $('#id_lot');
-
-            $('#trigger-import').on('click', function () {
-                $('#import_modal').modal('show');
-                // Starting select2
-                lot_select_el.select2({
-                    theme: "classic",
-                    width: 'resolve'
-                });
-            });
-
-
-            $("#save-submission").on('click', function () {
-                //TODO Implement filetype check, verify that the file is a csv before submitting this form.
-                $('#import_modal').modal('hide');
-                csv_file_els.hide();
-                file_loader_el.show();
-
-                $('#file-form').submit();
-            });
-
-
+            $('#delete_csv').on('click', function () {
+                $('#delete_modal').modal('hide');
+                $('.csv-file').hide();
+                $('#csv-file-loader').show();
+            })
         });
+
 
     </script>
 
@@ -77,10 +59,10 @@
 
                     {% if object_list %}
 
-                        <button class="btn btn-success" id="trigger-import">
+                        <a class="btn btn-success" href="{% url 'importer:csv-file-import' event.pk %}">
                             <i class="fa fa-plus"></i>
                             Adicionar
-                        </button>
+                        </a>
 
                     {% endif %}
 
@@ -121,6 +103,7 @@
 
 
                 {% if object_list %}
+
                     <div class="panel-body csv-file">
 
                         <div class="col-md-12">
@@ -153,51 +136,47 @@
                                         </td>
                                         <td class="text-center">
 
+
                                             <div class="btn-group">
-                                                <button type="button" class="btn btn-md btn-primary dropdown-toggle btn-trans" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <button type="button" class="btn
+                                                        btn-primary btn-trans
+                                                        btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
                                                     <span class="fas fa-cog"></span>
                                                 </button>
-                                                <ul class="dropdown-menu dropdown-menu-right">
-                                                    <li class="text-center">
-                                                        <button onclick="
-                                                                {% if csv.processed %}
-                                                                    void(0);
-                                                                {% else %}
-                                                                    window.location='{% url 'importer:csv-file-prepare' event.pk csv.pk %}'
-                                                                {% endif %}"
-                                                                class="btn btn-primary btn-sm" {% if csv.processed %}disabled {% endif %}>
+                                                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+
+
+                                                    <li role="presentation">
+                                                        <a href="{% if csv.processed %}#{% else %}{% url 'importer:csv-file-prepare' event.pk csv.pk %}{% endif %}"
+                                                           role="menuitem" tabindex="-1">
                                                             <i class="fas fa-exchange-alt"></i>
                                                             Processar
-                                                        </button>
+                                                        </a>
                                                     </li>
-                                                    <li class="text-center">
 
+                                                    <li role="presentation">
 
-                                                        <button
-                                                                onclick='
-                                                                        {% if csv.processed %}
-                                                                            void(0);
-                                                                        {% else %}
-                                                                            openDeleteModal("{{ csv.pk }}", "{{ csv.filename }}");
-                                                                        {% endif %}'
-                                                                type="button" class="btn btn-danger btn-sm" {% if csv.processed %}disabled {% endif %}>
+                                                        <a onclick='{% if csv.processed %}void(0);{% else %}openDeleteModal("{{ csv.pk }}", "{{ csv.filename }}");{% endif %}'
+                                                           role="menuitem" tabindex="-1">
                                                             <i class="far fa-trash-alt"></i>
                                                             Apagar
-                                                        </button>
-
-
+                                                        </a>
                                                     </li>
 
-                                                    {% if csv.processed and error_csv_file %}
+
+                                                    {% if csv.error_csv_file %}
                                                         <li role="separator" class="divider"></li>
-                                                        <li class="text-center">
-                                                            <a
-                                                                    href="{% url 'importer:csv-file-error-xls' event.pk csv.pk %}"
-                                                                    class="btn btn-danger btn-sm">
+
+                                                        <li role="presentation">
+
+                                                            <a href="{% url 'importer:csv-file-error-xls' event.pk csv.pk %}"
+                                                               role="menuitem" tabindex="-1">
                                                                 <i class="far fa-file-excel"></i>
                                                                 Arquivo de Erros
                                                             </a>
+
                                                         </li>
+
                                                     {% endif %}
 
 
@@ -211,7 +190,6 @@
 
                                 </tbody>
                             </table>
-
 
                         </div>
 
@@ -230,10 +208,10 @@
 
                         </h1>
 
-                        <button class="btn btn-primary" style="margin-top: 15px" id="trigger-import">
+                        <a class="btn btn-success" href="{% url 'importer:csv-file-import' event.pk %}" style="margin-top: 15px">
                             <i class="fas fa-upload"></i>
                             Importar
-                        </button>
+                        </a>
 
                     </div>
 
@@ -247,47 +225,6 @@
 {% endblock %}
 
 {% block modals %}
-
-    <div class="modal" id="import_modal" role="dialog"
-         aria-labelledby="import_modal_label">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"
-                            aria-hidden="true">×
-                    </button>
-                    <h4 class="modal-title"
-                        id="import_modal_label">
-                        Importação de arquivo CSV
-                    </h4>
-                </div>
-                <div class="modal-body">
-
-                    <form method="POST" action="{% url 'importer:csv-file-import' event.pk %}" id="file-form" enctype=multipart/form-data>
-
-                        {% csrf_token %}
-
-                        {{ form.event }}
-
-                        {% render_generic_field form.lot %}
-                        {% render_generic_field form.csv_file %}
-                        <input name="csv_file" id="id_csv_file" type="file" accept=".csv">
-
-                    </form>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger"
-                            data-dismiss="modal">Fechar
-                    </button>
-                    <button type="button" class="btn btn-success" id="save-submission">
-                        Enviar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
     <div class="modal" id="delete_modal" role="dialog"
          aria-labelledby="delete_modal_label">

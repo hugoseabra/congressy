@@ -81,6 +81,7 @@ def _export_subscriptions(worksheet, subscriptions):
         'CATEGORIA DE PARTICIPANTE',
         'LOTE',
         'STATUS',
+        'SEXO',
         'CREDENCIADO (CHECK-IN)',
         'CREDENCIADO EM',
         'NOME',
@@ -121,6 +122,7 @@ def _export_subscriptions(worksheet, subscriptions):
         collector[row_idx].append(get_object_value(sub.lot, 'name'))
 
         collector[row_idx].append(sub.get_status_display())
+        collector[row_idx].append(person.get_gender_display())
 
         collector[row_idx].append('Sim' if sub.attended else 'Não')
         collector[row_idx].append(
