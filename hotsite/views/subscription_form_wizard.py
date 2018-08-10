@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 
 from django.conf import settings
@@ -26,7 +27,6 @@ from payment.helpers.payment_helpers import (
 )
 from payment.models import Transaction
 from survey.directors import SurveyDirector
-from survey.models import Author
 
 FORMS = [
     ("private_lot", forms.PrivateLotForm),
@@ -90,23 +90,28 @@ def has_pending_payment(wizard):
     ##########################################################################
     # Verifica se já existe pagamentos aguardando serem processados.
     ##########################################################################
-    has_boleto_waiting = False
-    has_card_waiting = False
     for transaction in subscription.transactions.all():
         is_cc = transaction.type == Transaction.CREDIT_CARD
         is_boleto = transaction.type == Transaction.BOLETO
+        boleto_expiration_date = transaction.boleto_expiration_date
+        today = datetime.date(datetime.now())
         if transaction.status == Transaction.WAITING_PAYMENT:
+
             if is_boleto:
-                has_boleto_waiting = True
+                if boleto_expiration_date \
+                        and boleto_expiration_date < today:
+                    return False
+                else:
+                    return True
 
             if is_cc:
-                has_card_waiting = True
+                return True
 
         # NO caso de cartão de crédito, pode haver um delay no processamento
         if transaction.status == Transaction.PROCESSING and is_cc:
-            has_card_waiting = True
+            return True
 
-    return has_card_waiting is True or has_boleto_waiting is True
+    return False
 
 
 def can_process_payment(wizard):
@@ -635,7 +640,7 @@ class SubscriptionWizardView(SessionWizardView):
             key = keys.index(step) + 1
         except ValueError:
             return keys[0]
-        
+
         if len(keys) > key:
             return keys[key]
         return None
