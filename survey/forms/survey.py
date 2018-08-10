@@ -2,17 +2,14 @@ from django import forms
 from django.forms import ValidationError
 from django.forms.fields import Field as DjangoField
 
+from core.model.validator import cpf_validator, cnpj_validator
 from survey.models import Survey, Question, Author, Answer
 from survey.services import AnswerService
 from .field import SurveyField
 
-from core.model.validator import cpf_validator, cnpj_validator
 
-
-class SurveyForm(forms.Form):
+class SurveyBaseForm(forms.Form):
     """ Formulário Dinâmico. """
-
-    answer_service_list = None
 
     def __init__(self, survey, user=None, author=None, *args, **kwargs):
 
@@ -26,7 +23,7 @@ class SurveyForm(forms.Form):
         self.user = user
         self.author = author
 
-        super(SurveyForm, self).__init__(*args, **kwargs)
+        super(SurveyBaseForm, self).__init__(*args, **kwargs)
 
         if self.survey.questions:
 
@@ -65,7 +62,6 @@ class SurveyForm(forms.Form):
     def clean(self):
         clean_data = super().clean()
         self.validate_predefined_fields()
-        self.answer_service_list = self._clean_answers()
         return clean_data
 
     def validate_predefined_fields(self):
@@ -84,6 +80,17 @@ class SurveyForm(forms.Form):
                     cnpj_validator(answer)
                 except forms.ValidationError:
                     raise forms.ValidationError({f_name: 'CNPJ Inválido.'})
+
+
+class SurveyAnswerForm(SurveyBaseForm):
+    """ Formulário Dinâmico. """
+
+    answer_service_list = None
+
+    def clean(self):
+        clean_data = super().clean()
+        self.answer_service_list = self._clean_answers()
+        return clean_data
 
     def _clean_answers(self) -> list:
         """

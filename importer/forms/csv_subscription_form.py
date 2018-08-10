@@ -52,8 +52,8 @@ class CSVSubscriptionForm(forms.Form):
     birth_date = forms.DateField(
         input_formats=[
             '%Y-%m-%d',
-            '%m/%d/%Y',
-            '%m/%d/%y',
+            '%d/%m/%Y',
+            '%d/%m/%y',
         ]
     )
     street = forms.CharField(max_length=255)
@@ -238,7 +238,8 @@ class CSVSubscriptionForm(forms.Form):
         subscription.completed = True
         subscription.status = Subscription.CONFIRMED_STATUS
         subscription.origin = Subscription.DEVICE_ORIGIN_CSV_IMPORT
-        return subscription.save()
+        subscription.save()
+        return subscription
 
     def set_as_required(self, field_name):
 

@@ -145,7 +145,7 @@
                                 {% render_generic_field form.delimiter %}
                                 {% render_generic_field form.encoding %}
                                 {% render_generic_field form.separator %}
-                                {% render_generic_field form.lot %}
+                            
                                 <div class="form-group" style="margin-top: 25px;">
                                     <div>
                                         <button type="submit" class="btn btn-primary">
@@ -154,6 +154,28 @@
                                         </button>
                                     </div>
                                 </div>
+
+
+                                {% if  preview_table and denied_reason is None %}
+
+
+                                    <div class="form-group pull-right" style="margin-top: 25px;">
+                                        <div>
+
+                                            <a href="{% url 'importer:csv-file-process' event.pk object.pk %}"
+                                               class="btn btn-success"
+                                               {% if object.processed %}disabled {% endif %} id="csv-process-btn">
+                                                <i class="fas fa-cogs"></i>
+                                                Salvar e processar
+                                            </a>
+                                        
+                                        </div>
+                                    </div>
+
+
+
+                                {% endif %}
+
                             </div>
                         </div>
                     </form>
@@ -163,9 +185,9 @@
 
     </div>
 
-    <div class="row" id="keys">
 
-    <div class="col-md-4">
+
+    <div class="col-md-5">
 
         <div class="panel panel-primary">
 
@@ -179,9 +201,10 @@
                 <div class="row">
 
                     <div class="col-md-12">
+
                         <div class="alert alert-warning">
                             <strong>Atenção!</strong>
-                            Todos os campos abaixo são
+                            Campos abaixo marcados com asteriscos(<span style="color:#C9302C">*</span>) são
                             <strong>obrigatórios</strong> para a
                             criação de uma inscrição no lote selecionado.
                         </div>
@@ -190,26 +213,90 @@
                             <thead>
                             <tr>
                                 <th>Nome da coluna</th>
-                                <th>Descrição</th>
+                                <th>Possiveis Valores</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            {% for entry in required_keys %}
+                            {% for entry in key_mapping %}
 
                                 <tr>
+
                                     <td>
                                         <strong>
 
-                                            {% with entry.csv_keys|first as first_key %}
+                                            {% if entry.required %}
+                                                <span style="color:#C9302C">*</span>
+                                            {% endif %}
+                                            {% with entry.mapping.csv_keys|first as first_key %}
                                                 {{ first_key }}
                                             {% endwith %}
 
                                         </strong>
+
+                                        <div class="text-muted">
+
+                                            <small>
+                                                {{ entry.mapping.description|capfirst }}
+                                            </small>
+
+                                        </div>
+
                                     </td>
+
                                     <td>
-                                        {{ entry.description|capfirst }}
+                                        <div class="text-center">
+                                            ---
+                                        </div>
                                     </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                            {% for question in questions %}
+
+                                <tr>
+
+                                    <td>
+
+
+                                        <strong>
+
+                                            {% if question.is_required %}
+                                                <span style="color:#C9302C">*</span>
+                                            {% endif %}
+                                            {{ question.name }}
+
+                                        </strong>
+
+                                        <div class="text-muted">
+
+                                            <small>
+                                                {{ question.description|capfirst }}
+                                            </small>
+
+                                        </div>
+
+                                    </td>
+
+                                    <td>
+
+                                        {% if question.options|length > 0 %}
+                                            <ul>
+                                                {% for option in question.options %}
+                                                    <li>
+                                                        {{ option }}
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <div class="text-center">
+                                                ---
+                                            </div>
+                                        {% endif %}
+                                    </td>
+
                                 </tr>
 
                             {% endfor %}
@@ -223,12 +310,13 @@
                 </div>
 
             </div>
+
         </div>
     </div>
 
     {% if invalid_keys|length > 0 %}
 
-        <div class="col-md-4">
+        <div class="col-md-3">
 
             <div id="invalid-keys" class="panel panel-danger">
                 <div class="panel-heading">
@@ -247,54 +335,6 @@
                         </h3>
                     </div>
                 </div>
-            </div>
-
-        </div>
-
-    {% endif %}
-
-    {% if  preview_table and denied_reason is None %}
-
-        <div class="col-md-3">
-
-            <div class="panel panel-success">
-
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        Processar arquivo
-                    </h3>
-                </div>
-
-
-                <div class="panel-body text-center" id="csv-loader" style="display: none">
-
-                    <div class="row text-center"
-                         style="margin-top:20px;">
-                        <h3>Processando arquivo, aguarde...</h3>
-                        <i class="fas info-color fa-circle-notch fa-spin
-                        fa-6x" style="margin-top: 20px"></i>
-                    </div>
-
-                </div>
-                <div class="panel-body" id="csv-process">
-
-                    <div class="row">
-
-                        <div class="col-md-12">
-                            <a class="btn btn-lg btn-success"
-                               href="{% url 'importer:csv-file-process' event.pk object.pk %}"
-                               class="btn btn-primary"
-                               {% if object.processed %}disabled {% endif %} id="csv-process-btn">
-                                <i class="fas fa-cogs"></i>
-                                Processar o arquivo
-                            </a>
-                        </div>
-
-
-                    </div>
-
-                </div>
-
             </div>
 
         </div>

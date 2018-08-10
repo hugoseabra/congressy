@@ -439,7 +439,7 @@ class LotSurveyView(generic.DetailView):
         if not self.object.event_survey:
             return None
 
-        return forms.SurveyForm(
+        return forms.SurveyAnswerForm(
             event_survey=self.object.event_survey,
             user=self.request.user
         )

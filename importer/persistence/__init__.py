@@ -4,4 +4,4 @@ from .csv_persister import (
     CSVCorrectionPersister,
     CSVCityCorrectionPersister,
 )
-from .xls_persister import XLSPersister, XLSErrorPersister
+from .xls_persister import XLSErrorPersister, XLSLotExamplePersister

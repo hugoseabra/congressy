@@ -54,7 +54,8 @@ class OptionManager(Manager):
         slug = original_slug
 
         existing_options = Option.objects.filter(
-            question=question
+            question=question,
+            name=slug,
         )
 
         if existing_options.count() >= 1:

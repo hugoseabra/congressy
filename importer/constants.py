@@ -42,6 +42,7 @@ KEY_MAP = {
         'csv_keys': [
             'data de nasc',
             'data de nasc.',
+            'data nasc',
             'nascimento',
             'data de nascimento',
             'nasc.',
@@ -52,7 +53,11 @@ KEY_MAP = {
     'street': {
         'verbose_name': 'Rua',
         'description': 'Local de residencia do participante',
-        'csv_keys': ['rua'],
+        'csv_keys': [
+            'rua',
+            'rua/logradouro',
+            'logradouro',
+        ],
         'possible_values': [],
     },
     'complement': {
@@ -94,7 +99,12 @@ KEY_MAP = {
     'institution': {
         'verbose_name': 'Instituição',
         'description': 'Local onde o participante trabalha',
-        'csv_keys': ['instituicao', 'instituição'],
+        'csv_keys': [
+            'instituicao',
+            'instituição',
+            'instituicao/empresa',
+            'empresa',
+        ],
         'possible_values': [],
     },
     'institution_cnpj': {
@@ -106,7 +116,15 @@ KEY_MAP = {
     'function': {
         'verbose_name': 'Ocupação',
         'description': 'cargo exercido do participante',
-        'csv_keys': ['cargo', 'ocupação', 'ocupacao'],
+        'csv_keys': [
+            'cargo',
+            'ocupação',
+            'ocupacao',
+            'função/cargo',
+            'funcao',
+            'cargo',
+            'emprego',
+        ],
         'possible_values': [],
     },
 

@@ -6,6 +6,12 @@
 {% load event_tags %}
 {% load form_config_tags %}
 
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'assets/plugins/icheck/css/all.css' %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
+{% endblock %}
+
 {{% block title %}
     {% if object %}Editar{% else %}Nova{% endif %} Inscrição | Congressy
 {% endblock %}
@@ -22,6 +28,7 @@
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script src="{% static 'assets/js/user_notification.js' %}"></script>
     <script src="{% static "assets/plugins/moment/moment.js" %}"></script>
+    <script src="{% static 'assets/plugins/icheck/js/icheck.min.js' %}"></script>
 
     <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
 
@@ -41,8 +48,16 @@
                     birthDate.data("DateTimePicker").date(datePerson);
                 }
             }
-        });
-        $(document).ready(function () {
+
+
+            var checkboxes = $('input[type=checkbox]');
+
+            checkboxes.iCheck({
+                checkboxClass: 'icheckbox_flat-grey',
+                radioClass: 'iradio_flat-grey'
+            });
+
+
             $('#id_person-phone').mask("(99) 99999-9999");
             $('#id_person-zip_code').mask("99999-999");
 
@@ -76,6 +91,7 @@
             $('#id_zip_code').on('keyup', function () {
                 searchByCep();
             });
+
         });
     </script>
 
@@ -351,8 +367,3 @@
     </form>
 {% endblock %}
 
-{% block styles %}
-
-    <link rel="stylesheet"
-          href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
-{% endblock %}
