@@ -1,10 +1,12 @@
 from django.test import TestCase
 
-from gatheros_event.tests.mocks import MockFactory as EventMockFactory
 from addon.tests import MockFactory as AddonMockFactory
+from gatheros_event.tests.mocks import MockFactory as EventMockFactory
 from gatheros_subscription.helpers.feature_identifier import (
     is_free_event,
     is_paid_event,
+    event_has_products,
+    event_has_services,
 )
 from gatheros_subscription.tests.mocks import MockFactory
 
@@ -59,7 +61,6 @@ class FeatureConfigurationTest(TestCase):
         self.assertFalse(is_free_event(paid_opt_product_event))
 
     def test_is_paid(self):
-
         # Testing with a truly free event
         clean_event = self.event_mock_factory.fake_event()
         self.assertFalse(is_paid_event(clean_event))
@@ -100,3 +101,29 @@ class FeatureConfigurationTest(TestCase):
             price=10,
         )
         self.assertTrue(is_paid_event(paid_opt_product_event))
+
+    def test_event_has_products(self):
+        event = self.event_mock_factory.fake_event()
+        self.assertFalse(event_has_products(event))
+
+        lot = self.mock_factory.fake_lot(event)
+        lot_cat = self.mock_factory.fake_lot_category(event)
+        self.mock_factory.add_category_to_lot(lot, lot_cat)
+
+        self.addon_mock_factory.fake_product(
+            lot_category=lot_cat,
+        )
+        self.assertTrue(event_has_products(event))
+
+    def test_event_has_services(self):
+        event = self.event_mock_factory.fake_event()
+        self.assertFalse(event_has_services(event))
+
+        lot = self.mock_factory.fake_lot(event)
+        lot_cat = self.mock_factory.fake_lot_category(event)
+        self.mock_factory.add_category_to_lot(lot, lot_cat)
+
+        self.addon_mock_factory.fake_service(
+            lot_category=lot_cat,
+        )
+        self.assertTrue(event_has_services(event))
