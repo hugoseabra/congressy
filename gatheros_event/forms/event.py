@@ -28,11 +28,6 @@ class EventForm(forms.ModelForm):
             'name',
             'date_start',
             'date_end',
-            'has_optionals',
-            'has_extra_activities',
-            'has_checkin',
-            'has_certificate',
-            'has_survey',
             'event_type',
             'rsvp_type',
             'expected_subscriptions',
@@ -47,22 +42,16 @@ class EventForm(forms.ModelForm):
 
         }
 
-
     def __init__(self, user, lang='pt-br', *args, **kwargs):
         self.user = user
 
         instance = kwargs.get('instance')
 
         super(EventForm, self).__init__(*args, **kwargs)
-        # self.fields['is_scientific'].help_text = 'Trata-se de um evento com ' \
-        #                                          'submissão de artigos ' \
-        #                                          'cientificos?'
 
         self.fields['expected_subscriptions'].required = True
         if instance is None:
             self._configure_organization_field()
-
-        self._hide_todo_config_fields()
 
     def _configure_organization_field(self):
         orgs = []
@@ -138,17 +127,6 @@ class EventForm(forms.ModelForm):
                 first_lot.save()
 
         return instance
-
-    def _hide_todo_config_fields(self):
-        todo_config_fields = (
-            'has_optionals',
-            'has_extra_activities',
-            'has_checkin',
-            'has_certificate',
-        )
-        if self.instance.pk is not None:
-            for f_name in todo_config_fields:
-                self[f_name].field.widget = forms.HiddenInput()
 
 
 class EventEditDatesForm(forms.ModelForm):

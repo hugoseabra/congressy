@@ -102,39 +102,6 @@ class Event(models.Model, GatherosModelMixin):
         help_text="Como será seu evento?"
     )
 
-    has_optionals = models.BooleanField(
-        default=False,
-        verbose_name='Opcionais',
-        help_text="Você irá vender, opcionais como: hospedagem, alimentação,"
-                  " camisetas?"
-    )
-
-    has_extra_activities = models.BooleanField(
-        default=False,
-        verbose_name='Atividades extras',
-        help_text="Seu evento terá: workshops, minicursos?"
-    )
-
-    has_checkin = models.BooleanField(
-        default=False,
-        verbose_name='Checkin',
-        help_text="Deseja realizar o checkin com nosso App gratuito?"
-    )
-
-    has_certificate = models.BooleanField(
-        default=False,
-        verbose_name='Certificado',
-        help_text="Seu evento terá entrega de Certificados ?"
-
-    )
-
-    has_survey = models.BooleanField(
-        default=False,
-        verbose_name='Formulário Personalizado',
-        help_text="Seu evento terá formulário com perguntas personalizadas ?"
-
-    )
-
     subscription_type = models.CharField(
         max_length=15,
         choices=SUBSCRIPTION_CHOICES,
