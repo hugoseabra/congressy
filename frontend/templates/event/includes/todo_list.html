@@ -6,6 +6,7 @@
 </div>
 <table id="todo-list" class="table table-striped">
     <tbody>
+
     <tr class="todo_list_element" role="presentation">
         <td>
             <a>Criar evento</a>
@@ -19,6 +20,7 @@
 
         </td>
     </tr>
+
     <tr class="todo_list_element" role="presentation">
         <td>
             <a>Criar HotSite </a>
@@ -47,6 +49,7 @@
             {% endif %}
         </td>
     </tr>
+
     {% if event.event_type == event.EVENT_TYPE_PAID or event.event_type == event.EVENT_TYPE_SCIENTIFIC or has_paid_lots %}
         <tr class="todo_list_element" role="presentation">
 
@@ -180,6 +183,7 @@
             </td>
         </tr>
     {% endif %}
+
     {% if has_addons.extra_activities == True %}
         <tr id="del-extra_activities" class="todo_list_element"
             role="presentation">
@@ -222,6 +226,7 @@
             </td>
         </tr>
     {% endif %}
+
     {% if has_addons.optionals == True %}
         <tr id="del-optionals" class="todo_list_element" role="presentation">
             <td>
@@ -266,6 +271,7 @@
             </td>
         </tr>
     {% endif %}
+
     {% if has_addons.survey == True %}
         <tr id="del-survey" class="todo_list_element" role="presentation">
             <td>
@@ -310,43 +316,48 @@
             </td>
         </tr>
     {% endif %}
-        {% if has_addons.certificate == True %}
-            <tr id="del-certificate" class="todo_list_element" role="presentation">
-                <td>
 
-                    <button type="button"
-                            class="add_todo_element btn btn-warning btn-trans
+    {% if has_addons.certificate == True %}
+        <tr id="del-certificate" class="todo_list_element" role="presentation">
+
+            <td>
+
+                <button type="button"
+                        class="add_todo_element btn btn-warning btn-trans
                             btn-sm dropdown-toggle"
-                            data-toggle="dropdown"
-                            aria-expanded="false"
-                            aria-haspopup="true">
+                        data-toggle="dropdown"
+                        aria-expanded="false"
+                        aria-haspopup="true">
                         <span class="fas
                 fa-minus"></span>
-                    </button>
-                    <a>Gerar Certificados</a>
-                </td>
-                <td>
-                    <button type="button"
-                            class="btn btn-success btn-trans btn-sm dropdown-toggle"
-                            data-toggle="dropdown"
-                            onclick="location.href='{% url 'certificate:event-certificate-config' event.pk %}'"
-                            aria-expanded="false"
-                            aria-haspopup="true">
-                        <span>Acessar</span>
-                    </button>
-                </td>
+                </button>
+                <a>Gerar Certificados</a>
+            </td>
 
-                <td>
-                    {% if ready_certificate %}
-                        <i class="fas fa-check-circle success-color
+            <td>
+                <button type="button"
+                        class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                        data-toggle="dropdown"
+                        onclick="location.href='{% url 'certificate:event-certificate-config' event.pk %}'"
+                        aria-expanded="false"
+                        aria-haspopup="true">
+                    <span>Acessar</span>
+                </button>
+            </td>
+
+            <td>
+                {% if ready_certificate %}
+                    <i class="fas fa-check-circle success-color
                                             pull-right fa-2x"></i>
-                    {% else %}
-                        <i class="fas fa-exclamation-circle warning-color
+                {% else %}
+                    <i class="fas fa-exclamation-circle warning-color
                                             pull-right fa-2x"></i>
-                    {% endif %}
-                </td>
-            </tr>
-        {% endif %}
+                {% endif %}
+            </td>
+
+        </tr>
+    {% endif %}
+
     </tbody>
 </table>
 <br>
@@ -430,24 +441,24 @@
                         </td>
                     </tr>
                 {% endif %}
-                                {% if has_addons.certificate == False %}
-                                    <tr id="add-certificate" class="todo_list_element"
-                                        role="presentation">
-                                        <td>
+                {% if has_addons.certificate == False %}
+                    <tr id="add-certificate" class="todo_list_element"
+                        role="presentation">
+                        <td>
 
-                                            <button type="button"
-                                                    class="add_todo_element btn btn-success btn-trans
+                            <button type="button"
+                                    class="add_todo_element btn btn-success btn-trans
                                         btn-sm dropdown-toggle"
-                                                    data-toggle="dropdown"
-                                                    aria-expanded="false"
-                                                    aria-haspopup="true">
+                                    data-toggle="dropdown"
+                                    aria-expanded="false"
+                                    aria-haspopup="true">
                                     <span class="fas
                             fa-plus"></span>
-                                            </button>
-                                            <a>Gerar Certificados</a>
-                                        </td>
-                                    </tr>
-                                {% endif %}
+                            </button>
+                            <a>Gerar Certificados</a>
+                        </td>
+                    </tr>
+                {% endif %}
             {% endif %}
             </tbody>
         </table>

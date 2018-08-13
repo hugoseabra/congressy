@@ -1,10 +1,5 @@
 {% extends "base/base.html" %}
-{% load static %}
-{% load static i18n queryset_filter %}
-{% load base_tags %}
-{% load widget_tweaks %}
-{% load event_tags %}
-{% load form_config_tags %}
+{% load static i18n queryset_filter base_tags  widget_tweaks form_config_tags  event_tags %}
 
 {% block sidebar %}{% endblock %}
 
@@ -39,7 +34,8 @@
 
 
 {% block content %}
-    {% if not step %}
+
+    {% if step is None %}
         <div class="row">
             <div class="col-md-4">
                 <div class="type_event panel panel-primary"
@@ -106,7 +102,7 @@
                     </div>
                     <div class="panel-body" style="text-align: center">
                         <img style="width: 150px; height:
-                    150px;" class="type-image" src="{% static "assets/img/scientific-event.png" %}" />
+                    150px;" class="type-image" src="{% static "assets/img/scientific-event.png" %}"/>
                     </div>
                     <div id="scientific-footer" class="panel-footer">
                         <h3> Seu evento é científico com inscrição paga.<br/>
@@ -125,13 +121,14 @@
             </div>
 
         </div>
+        
         <form action="" method="GET" id="choose-type-form"
               style="display:none">
             <input type="hidden" name="event_type" id="event_type" value=""/>
             <input type="hidden" name="step" value="step2"/>
         </form>
-    {% endif %}
-    {% if step == 'step2' %}
+
+    {% elif step == 'step2' %}
 
         <form action="" method="post" class="form-horizontal form-border"
               role="form" name="event_form">
@@ -300,6 +297,7 @@
                 </div>
 
         </form>
+
     {% endif %}
 
 {% endblock %}
@@ -314,11 +312,11 @@
     <script>
         $(document).ready(function () {
             var slug_checker = null;
-            $('#id_name').on('keyup', function() {
+            $('#id_name').on('keyup', function () {
                 window.clearTimeout(slug_checker);
-                slug_checker = window.setTimeout(function() {
-                    var eventName =  $('#id_name').val();
-                    $.get("{% url 'event:event-slug' %}", {name: eventName })
+                slug_checker = window.setTimeout(function () {
+                    var eventName = $('#id_name').val();
+                    $.get("{% url 'event:event-slug' %}", {name: eventName})
                         .done(function (data) {
                             document.getElementById('print-url').innerHTML = data;
                         });

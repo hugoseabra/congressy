@@ -20,6 +20,36 @@ class DateTimeInput(forms.DateTimeInput):
 class EventForm(forms.ModelForm):
     """Formulário principal de evento"""
 
+    has_optionals = forms.BooleanField(
+        label='Opcionais',
+        help_text='Você irá vender, opcionais como: hospedagem, alimentação, '
+                  'camisetas?',
+        required=False,
+    )
+    has_extra_activities = forms.BooleanField(
+        label='Atividades extras',
+        help_text='Seu evento terá: workshops, minicursos?',
+        required=False,
+    )
+
+    has_checkin = forms.BooleanField(
+        label='Checkin',
+        help_text='Deseja realizar o checkin com nosso App gratuito?',
+        required=False,
+    )
+
+    has_certificate = forms.BooleanField(
+        label='Certificado',
+        help_text='Seu evento terá entrega de Certificados ?',
+        required=False,
+    )
+
+    has_survey = forms.BooleanField(
+        label='Formulário Personalizado',
+        help_text='Seu evento terá formulário com perguntas personalizadas ?',
+        required=False,
+    )
+
     class Meta:
         model = Event
         fields = [
@@ -126,7 +156,21 @@ class EventForm(forms.ModelForm):
                 first_lot.category = general_category
                 first_lot.save()
 
+        self.set_feature_release(instance)
+
         return instance
+
+    def set_feature_release(self, instance: Event):
+        data = self.cleaned_data
+        features = instance.feature_release
+
+        features.feature_products = data['has_optionals']
+        features.feature_services = data['has_extra_activities']
+        features.feature_checkin = data['has_checkin']
+        features.feature_certificate = data['has_certificate']
+        features.feature_survey = data['has_survey']
+
+        features.save()
 
 
 class EventEditDatesForm(forms.ModelForm):

@@ -145,14 +145,11 @@ class EventAddFormView(BaseEventView, generic.CreateView):
         return form_class(user=self.request.user, **kwargs)
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
 
-        step = self.request.GET.get('step')
-        event_type = self.request.GET.get('event_type')
-        slug = self.request.GET.get('slug')
-        if step and event_type:
-            context['step'] = step
-            context['event_type'] = event_type
+        context['step'] = self.request.GET.get('step')
+        context['event_type'] = self.request.GET.get('event_type')
 
         return context
 
