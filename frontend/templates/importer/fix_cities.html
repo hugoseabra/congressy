@@ -1,0 +1,123 @@
+{% extends "base/base.html" %}
+{% load i18n static url_tags  form_config_tags %}
+
+{% block title %}Processar importação | Congressy{% endblock %}
+
+{% block page_title %}Processar importação via CSV{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_description %}
+    Processar importação de dados via CSV | {{ object.filename }}
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-left">
+
+                    <a href="{% url 'importer:csv-list' event.pk %}"
+                       class="btn btn-primary" style="margin-left: 5px">
+                        <i class="fas fa-arrow-circle-left"></i>
+                        Voltar Lista de arquivos
+                    </a>
+
+                    <a href="{% url 'importer:csv-file-prepare' event.pk object.pk %}"
+                       class="btn btn-success">
+                        <i class="fas fa-pencil-alt"></i>
+                        Voltar as configurações
+                    </a>
+
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            {% include 'importer/includes/form_city.html' %}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script type="application/javascript">
+
+        $(document).ready(function () {
+
+            window.setTimeout(function () {
+
+                var city_el = $('#id_city_name');
+
+                $('#id_state').change(function () {
+                    city_el.html($('<option>').text('Carregando...'));
+
+                    var that = $(this);
+                    window.setTimeout(function () {
+                        fetch_cities($(that), $('#id_city_name'), $('#id_city'));
+                    }, 500);
+                });
+
+                city_el.change(function () {
+                    $("#id_city").val($(this).val());
+                });
+
+            }, 350);
+
+            $('#submit_btn').on('click', function () {
+
+                $('#form-body').hide();
+                $('#csv-loader').show();
+            });
+
+
+        });
+
+        function fetch_cities(uf_el, city_list_el, city_hidden_el, selected_value, callback) {
+            uf_el = $(uf_el);
+            city_list_el = $(city_list_el);
+            city_hidden_el = $(city_hidden_el);
+            selected_value = selected_value || '';
+            callback = callback || null;
+
+            $.ajax({
+                url: "/api/cities/?uf=" + $(uf_el).val() + '&length=1000',
+                success: function (result) {
+
+                    var listitems = [];
+                    var ids = [];
+
+                    $.each(result.results, function (key, value) {
+                        listitems.push('<option value=' + value.id + '>' + value.name + '</option>');
+                        ids.push(value.id)
+                    });
+
+                    city_list_el.html(listitems.join(''));
+                    city_list_el.prop('disabled', false);
+
+                    if (selected_value) {
+                        window.setTimeout(function () {
+                            city_list_el.val(selected_value);
+                            city_hidden_el.val(selected_value);
+                        }, 500);
+                    } else {
+                        city_list_el.val(ids[0]);
+                        city_hidden_el.val(ids[0]);
+                    }
+
+                    if (callback) {
+                        callback(result.results)
+                    }
+                },
+                error: function (err) {
+                    throw err;
+                }
+            });
+        }
+
+    </script>
+
+{% endblock %}

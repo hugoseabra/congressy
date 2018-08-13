@@ -39,15 +39,26 @@ urls = [
         name='subscription-payments'
     ),
     url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/switch-test/$',
+        views.SwitchSubscriptionTestView.as_view(),
+        name='subscription-switch-test'
+    ),
+    url(
         r'^(?P<pk>[0-9A-Fa-f-]+)/voucher/$',
         views.VoucherSubscriptionPDFView.as_view(),
         name='subscription-voucher'
+    ),
+    url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/survey/$',
+        views.SubscriptionInternalSurveyFormView.as_view(),
+        name='subscription-internal-survey'
     ),
     url(
         r'^(?P<pk>[0-9A-Fa-f-]+)/',
         views.SubscriptionViewFormView.as_view(),
         name='subscription-view'
     ),
+
     url(
         r'^attendance/dashboard/$',
         views.SubscriptionAttendanceDashboardView.as_view(),

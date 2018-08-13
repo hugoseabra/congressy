@@ -6,6 +6,10 @@ from .area_category import AreaCategory
 
 class Work(models.Model):
 
+    class Meta:
+        verbose_name = 'Trabalho'
+        verbose_name_plural = 'Trabalhos'
+
     ARTICLE = 'artigo'
     BANNER = 'banner'
     SUMMARY = 'resumo'

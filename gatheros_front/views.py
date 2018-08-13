@@ -1,4 +1,8 @@
+import json
+import urllib
+
 import absoluteuri
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
@@ -15,10 +19,9 @@ from django.views.generic import TemplateView, View
 from gatheros_front.forms import AuthenticationForm
 from gatheros_subscription.views.subscription import MySubscriptionsListView
 from mailer.services import notify_set_password
-import urllib
-import json
-from django.conf import settings
 
+LOGIN_SUPERUSER_ONLY = getattr(settings, 'LOGIN_SUPERUSER_ONLY', False)
+ALLOW_ACCOUNT_REGISTRATION = getattr(settings, 'ACCOUNT_REGISTRATION', False)
 
 @login_required
 def start(request):
@@ -46,6 +49,10 @@ class Login(auth_views.LoginView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+
+        ctx['allow_account_registration'] = \
+            LOGIN_SUPERUSER_ONLY or ALLOW_ACCOUNT_REGISTRATION
+
         ctx['is_embeded'] = self.request.GET.get('embeded') == '1'
         if 'show_captcha' in self.request.session \
                 and self.request.session['show_captcha'] is True:
@@ -60,7 +67,7 @@ class Login(auth_views.LoginView):
 
             recaptcha_response = self.request.POST.get('g-recaptcha-response')
             url = 'https://www.google.com/recaptcha/api/siteverify'
-            print(settings.GOOGLE_MAPS_API_KEY)
+
             values = {
                 'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
                 'response': recaptcha_response

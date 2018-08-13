@@ -1,4 +1,4 @@
-version: "3"
+version: "3.5"
 services:
   redis:
     image: redis:4-alpine
@@ -8,35 +8,54 @@ services:
     volumes:
       - "redis:/data"
 
+  wkhtmltopdf:
+    image: openlabs/docker-wkhtmltopdf-aas
+    networks:
+      - wkhtmltopdf
+
+  migration:
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    entrypoint:
+      - /services/migration/container-entry.sh
+    env_file: ./env-file
+
   # Preparação de volumes.
   volume:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    depends_on:
+      - migration
     entrypoint:
       - /services/volume/container-entry.sh
     volumes:
       - "/etc/localtime:/etc/localtime"
       - "./media:/var/www/cgsy/media"
-    env_file:
-      - ./env-file
+    env_file: ./env-file
 
   cron:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     depends_on:
+      - migration
       - volume
+      - wkhtmltopdf
     entrypoint:
       - /services/cron/container-entry.sh
     volumes:
       - "/etc/localtime:/etc/localtime"
       - "./media:/var/www/cgsy/media"
-    env_file:
-      - ./env-file
+    env_file: ./env-file
+    networks:
+      - wkhtmltopdf
 
   manage:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     depends_on:
+      - migration
       - volume
+      - redis
+      - wkhtmltopdf
     networks:
       - redis
+      - wkhtmltopdf
     ports:
       - "8000:80"
     entrypoint:
@@ -50,6 +69,9 @@ services:
 
   partner:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    depends_on:
+      - migration
+      - redis
     networks:
       - redis
     ports:
@@ -62,8 +84,30 @@ services:
       - ./env-file
       - ./env-partner-file
 
+  admin_intranet:
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    depends_on:
+      - migration
+      - volume
+      - redis
+      - wkhtmltopdf
+    networks:
+      - redis
+      - wkhtmltopdf
+    ports:
+      - "8002:80"
+    entrypoint:
+      - /services/web/admin_intranet/container-entry.sh
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "./media:/var/www/cgsy/media"
+    env_file:
+      - ./env-file
+      - ./env-admin_intranet-file
+
 networks:
   redis:
+  wkhtmltopdf:
 
 volumes:
   redis:

@@ -3,9 +3,11 @@ from ast import literal_eval
 
 from django.contrib import messages
 from django.db.models.functions import Lower
+from django.db.transaction import atomic
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
+from django.utils.text import slugify
 from django.views import generic
 
 from core.util import represents_int
@@ -15,30 +17,8 @@ from gatheros_subscription.forms import EventSurveyForm
 from gatheros_subscription.models import EventSurvey, Lot
 from survey.api import SurveySerializer
 from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST
-from survey.forms import QuestionForm, SurveyForm
-from survey.models import Survey, Question
-
-
-class SurveyMixin(TemplateNameableMixin, generic.View):
-    survey = None
-
-    def dispatch(self, request, *args, **kwargs):
-        pk = self.kwargs.get('survey_pk')
-
-        if not pk:
-            return redirect('https://congressy.com')
-
-        self.survey = get_object_or_404(
-            Survey,
-            pk=pk
-        )
-
-        response = super().dispatch(request, *args, **kwargs)
-        return response
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['survey'] = self.survey
+from survey.forms import QuestionForm, SurveyAnswerForm
+from survey.models import Question
 
 
 class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
@@ -49,8 +29,12 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
     def dispatch(self, request, *args, **kwargs):
         self.event = self.get_event()
-        self.survey = self.get_survey()
-        self.event_survey = EventSurvey.objects.get(survey=self.survey)
+        self.event_survey = EventSurvey.objects.get(
+            pk=self.kwargs.get('survey_pk'),
+            event=self.event,
+        )
+        self.survey = self.event_survey.survey
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -61,7 +45,7 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
         context['active'] = 'form-personalizado'
         context['form'] = QuestionForm(survey=self.survey)
         context['lots'] = self._get_selected_lots()
-        context['full_survey_form'] = SurveyForm(
+        context['full_survey_form'] = SurveyAnswerForm(
             survey=self.survey)
 
         return context
@@ -72,6 +56,11 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
             action = self.request.POST.get('action')
             question_id = self.request.POST.get('question_id')
+
+            if not action or not question_id:
+                HttpResponse(
+                    "Sem id({}) ou sem ação({})".format(question_id, action),
+                    status=500, )
 
             if action == 'delete':
 
@@ -152,6 +141,49 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
                 return HttpResponse(status=500)
 
+            elif action == 'duplicate':
+
+                question = get_object_or_404(
+                    Question,
+                    pk=question_id,
+                    survey=self.survey
+                )
+
+                with atomic():
+                    options = question.options.all().order_by('pk') \
+                        if question.has_options \
+                        else []
+
+                    question.pk = None
+                    question.label = 'Cópia - {}'.format(question.label)
+                    question.name = slugify(question.label)
+                    question.save()
+
+                    for option in options:
+                        option.pk = None
+                        option.question = question
+                        option.save()
+
+                return HttpResponse(status=200)
+
+            elif action == 'change_type':
+
+                new_type = self.request.POST.get('new_type')
+
+                if new_type not in QUESTION_TYPE_LIST:
+                    return HttpResponse(status=500)
+
+                question = get_object_or_404(
+                    Question,
+                    pk=question_id,
+                    survey=self.survey
+                )
+
+                question.type = new_type
+                question.save()
+
+                return HttpResponse(status=200)
+
             return HttpResponse(status=500)
 
         question_type = self.request.POST.get('question_type', None)
@@ -197,20 +229,8 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
         return redirect(reverse_lazy('subscription:survey-edit', kwargs={
             'event_pk': self.event.pk,
-            'survey_pk': self.survey.pk,
+            'survey_pk': self.event_survey.pk,
         }))
-
-    def get_survey(self):
-        """ Resgata questionário do contexto da view. """
-
-        if self.survey:
-            return self.survey
-
-        self.survey = get_object_or_404(
-            Survey,
-            pk=self.kwargs.get('survey_pk')
-        )
-        return self.survey
 
     def _get_selected_lots(self):
         lots_list = []
@@ -254,7 +274,6 @@ class SurveyListView(EventViewMixin, AccountMixin, generic.ListView):
 
 
 class EventSurveyCreateView(EventViewMixin, AccountMixin, generic.View):
-
     def post(self, request, *args, **kwargs):
         data = request.POST.copy()
 
@@ -278,6 +297,51 @@ class EventSurveyCreateView(EventViewMixin, AccountMixin, generic.View):
         return HttpResponse(status=400)
 
 
+class EventSurveyDuplicateView(EventViewMixin, AccountMixin, generic.View):
+    def post(self, request, *args, **kwargs):
+
+        event_survey = get_object_or_404(
+            EventSurvey,
+            pk=self.kwargs.get('survey_pk')
+        )
+
+        with atomic():
+            survey = event_survey.survey
+            questions = survey.questions.all().order_by('pk')
+
+            new_survey = survey
+
+            # Duplicando survey
+            new_survey.pk = None
+            new_survey.name = 'Cópia - {}'.format(new_survey.name)
+            new_survey.save()
+
+            new_event_survey = event_survey
+            new_event_survey.pk = None
+            new_event_survey.survey = new_survey
+            new_event_survey.save()
+
+            # Duplicando perguntas
+            for question in questions:
+                options = question.options.all().order_by('pk') \
+                    if question.has_options \
+                    else []
+
+                new_question = question
+                new_question.pk = None
+                new_question.survey = new_survey
+                new_question.save()
+
+                # Duplicando opções
+                for option in options:
+                    new_option = option
+                    new_option.pk = None
+                    new_option.question = new_question
+                    new_option.save()
+
+        return HttpResponse(status=200)
+
+
 class EventSurveyDeleteAjaxView(EventViewMixin, AccountMixin,
                                 generic.TemplateView):
     """
@@ -291,12 +355,13 @@ class EventSurveyDeleteAjaxView(EventViewMixin, AccountMixin,
 
         if event_survey_id:
             event_survey = get_object_or_404(EventSurvey, pk=event_survey_id)
+            survey = event_survey.survey
             event_survey.delete()
+            survey.delete()
+
             return HttpResponse(status=204)
         else:
             return HttpResponse(status=400)
-
-        return HttpResponse(status=500)
 
     def get_success_url(self):
         return reverse_lazy('subscription:survey-list', kwargs={
@@ -360,13 +425,19 @@ class EventSurveyLotsEditAjaxView(EventViewMixin, AccountMixin):
             if 'lots' in key:
                 lot_pk = key.replace('lots[', '').replace(']', '')
                 status = item[0].replace('[', '').replace(']', '')
-                status = True if status == 'true' else False
+                status = status == 'true'
                 lots.append({'lot': lot_pk, 'status': status})
 
         for item in lots:
-            if item['status']:
-                lot = Lot.objects.get(pk=item['lot'], event=self.event.pk)
+            lot = Lot.objects.get(pk=item['lot'], event=self.event.pk)
+
+            if item['status'] is True:
                 lot.event_survey = self.event_survey
+                lot.save()
+
+            if item['status'] is False and \
+                    lot.event_survey == self.event_survey:
+                lot.event_survey = None
                 lot.save()
 
         return HttpResponse(status=200)

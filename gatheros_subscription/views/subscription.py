@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.transaction import atomic
+from django.forms import ValidationError
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -24,20 +25,27 @@ from gatheros_event.views.mixins import (
     AccountMixin,
     PermissionDenied,
 )
+from gatheros_subscription.directors import SubscriptionSurveyDirector
 from gatheros_subscription.forms import (
     SubscriptionAttendanceForm,
     SubscriptionPersonForm,
     SubscriptionFilterForm,
     SubscriptionForm,
 )
+from gatheros_subscription.helpers.barcode import create_barcode
 from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.helpers.report_payment import \
     PaymentReportCalculator
-from gatheros_subscription.models import FormConfig, Lot, Subscription
+from gatheros_subscription.models import (
+    FormConfig,
+    Lot,
+    Subscription,
+)
 from mailer import exception as mailer_exception, services as mailer
 from payment import forms
 from payment.helpers import payment_helpers
 from payment.models import Transaction
+from survey.models import Question, Answer
 
 
 class EventViewMixin(TemplateNameableMixin, AccountMixin):
@@ -426,6 +434,7 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         ctx['full_prices'] = calculator.full_prices
         ctx['installments'] = calculator.installments
         ctx['has_manual'] = calculator.has_manual
+        ctx['survey_answers'] = self.get_survey_answers()
         ctx['total_paid'] = calculator.total_paid
         ctx['dividend_amount'] = calculator.dividend_amount
         ctx['financial'] = self.financial
@@ -534,6 +543,46 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
     def get_services(self):
         return self.object.subscription_services.all()
 
+    def get_survey_answers(self):
+        survey_answers = list()
+
+        if not self.object.lot.event_survey:
+            return survey_answers
+
+        survey = self.object.lot.event_survey.survey
+
+        if self.object.author:
+            questions = Question.objects.filter(survey=survey).order_by(
+                'order')
+
+            for question in questions:
+
+                answer = 'Sem resposta.'
+
+                answers = Answer.objects.filter(
+                    question=question,
+                    author=self.object.author,
+                )
+
+                if answers.count() == 1:
+                    answer = answers.first().human_display
+                elif answers.count() > 1:
+                    raise Exception('Temos ambiguidade de respostas')
+                elif answers.count() == 0:
+                    try:
+                        answer = Answer.objects.get(question=question,
+                                                    author=self.object.author)
+                        answer = answer.human_display
+                    except Answer.DoesNotExist:
+                        pass
+
+                survey_answers.append({
+                    'question': question.label,
+                    'answer': answer
+                })
+
+        return survey_answers
+
 
 class SubscriptionAddFormView(SubscriptionFormMixin):
     """ Formulário de inscrição """
@@ -558,6 +607,55 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
         return reverse('subscription:subscription-add', kwargs={
             'event_pk': self.event.pk
         })
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        if context['selected_lot'] != 0:
+            try:
+
+                lot_pk = context['selected_lot']
+
+                lot = Lot.objects.get(pk=lot_pk)
+                if lot.event_survey:
+                    survey = lot.event_survey.survey
+                    context['survey_form'] = self.get_survey_form(survey)
+            except Lot.DoesNotExist:
+                pass
+
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.subscription.lot.event_survey:
+
+            survey = self.subscription.lot.event_survey.survey
+
+            survey_form = self.get_survey_form(
+                survey=survey,
+                data=self.request.POST,
+                subscription=self.subscription,
+            )
+
+            if survey_form.is_valid():
+                survey_form.save()
+            else:
+                raise ValidationError(survey_form.errors)
+
+        return response
+
+    @staticmethod
+    def get_survey_form(survey, subscription=None, data=None):
+
+        survey_director = SubscriptionSurveyDirector(subscription)
+
+        survey_form = survey_director.get_form(
+            survey=survey,
+            data=data,
+        )
+
+        return survey_form
 
 
 class SubscriptionEditFormView(SubscriptionFormMixin):
@@ -693,8 +791,7 @@ class SubscriptionCancelView(EventViewMixin, generic.DetailView):
         })
 
 
-class SubscriptionAttendanceDashboardView(EventViewMixin,
-                                          generic.TemplateView):
+class SubscriptionAttendanceDashboardView(EventViewMixin, generic.TemplateView):
     template_name = 'subscription/attendance-dashboard.html'
     search_by = 'name'
 
@@ -720,6 +817,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
             list = Subscription.objects.filter(
                 attended=True,
                 completed=True,
+                test_subscription=False,
                 event=self.get_event(),
             ).order_by('-attended_on')
             return list[0:5]
@@ -732,7 +830,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
         try:
             return Subscription.objects.filter(
                 attended=True,
-                completed=True,
+                completed=True, test_subscription=False,
                 event=self.get_event(),
             ).count()
 
@@ -744,7 +842,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
         total = \
             Subscription.objects.filter(
                 event=self.get_event(),
-                completed=True,
+                completed=True, test_subscription=False
             ).exclude(status=Subscription.CANCELED_STATUS).count()
 
         return total
@@ -754,7 +852,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
         confirmed = \
             Subscription.objects.filter(
                 status=Subscription.CONFIRMED_STATUS,
-                completed=True,
+                completed=True, test_subscription=False,
                 event=self.get_event()
             ).count()
 
@@ -794,7 +892,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
         return query_set.filter(
             person=person,
-            completed=True,
+            completed=True, test_subscription=False
             # event__published=True,
         )
 
@@ -851,7 +949,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
                 for transaction in subscription.transactions.all():
                     if transaction.status == transaction.WAITING_PAYMENT and \
-                                    transaction.type == 'boleto':
+                            transaction.type == 'boleto':
                         return True
 
         return False
@@ -930,6 +1028,7 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
         context = super(VoucherSubscriptionPDFView, self).get_context_data(
             **kwargs)
         context['qrcode'] = self.generate_qr_code()
+        context['barcode'] = create_barcode(self.subscription)
         context['logo'] = self.get_logo()
         context['event'] = self.event
         context['person'] = self.person
@@ -1086,3 +1185,58 @@ class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
             completed=True,
             event=self.get_event(),
         ).exclude(status=Subscription.CANCELED_STATUS).order_by('-attended_on')
+
+
+class SwitchSubscriptionTestView(EventViewMixin, generic.View):
+    """
+    Gerenciamento de inscrições que podem ou não serem setados como Teste.
+    """
+    success_message = ""
+
+    def get_object(self):
+        return get_object_or_404(Subscription, pk=self.kwargs.get('pk'))
+
+    def post(self, request, *args, **kwargs):
+        state = request.POST.get('state')
+
+        subscription = self.get_object()
+        subscription.test_subscription = state == "True"
+        subscription.save()
+        return HttpResponse(status=200)
+
+
+class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
+    subscription = None
+    template_name = "subscription/survey.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        uuid = self.kwargs.get('pk')
+        self.subscription = get_object_or_404(Subscription,
+                                              uuid=uuid)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['subscription'] = self.subscription
+        return context
+
+    def get_form(self, form_class=None):
+        survey = self.subscription.lot.event_survey.survey
+        form_kwargs = self.get_form_kwargs()
+        data = form_kwargs.get('data')
+        survey_director = SubscriptionSurveyDirector(self.subscription)
+
+        return survey_director.get_form(
+            survey=survey,
+            data=data,
+        )
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, "Respostas salvas com sucesso!")
+        return redirect(
+            reverse_lazy('subscription:subscription-view', kwargs={
+                'event_pk': self.event.pk,
+                'pk': self.subscription.pk,
+            })
+        )

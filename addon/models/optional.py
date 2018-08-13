@@ -212,7 +212,7 @@ class Product(AbstractOptional):
         :type: bool
         """
         return self.subscription_products \
-            .filter(subscription__completed=True) \
+            .filter(subscription__completed=True, subscription__test_subscription=False) \
             .exclude(subscription__status=Subscription.CANCELED_STATUS) \
             .count()
 
@@ -290,6 +290,6 @@ class Service(AbstractOptional):
         :type: bool
         """
         return self.subscription_services \
-            .filter(subscription__completed=True) \
+            .filter(subscription__completed=True, subscription__test_subscription=False) \
             .exclude(subscription__status=Subscription.CANCELED_STATUS) \
             .count()

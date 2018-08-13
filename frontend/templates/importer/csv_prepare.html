@@ -1,0 +1,363 @@
+{% extends "base/base.html" %}
+{% load i18n static url_tags  form_config_tags %}
+
+{% block title %}Processar importação | Congressy{% endblock %}
+
+{% block page_title %}Processar importação via CSV{% endblock %}
+{% block page_sub_title %}{{ event.name }} | {{ object.filename }}{% endblock %}
+{% block page_description %}
+    Processar importação de dados via CSV
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-left">
+                    <a href="{% url 'importer:csv-list' event.pk %}"
+                       class="btn btn-primary">
+                        <i class="fas fa-arrow-circle-left"></i>
+                        Voltar
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+    {% if preview_table and denied_reason is None %}
+
+        <div class="row" id="preview">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            Preview - Uma pequena amostra dos seus dados.
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-md-12" id="preview-content" style="margin-top: 15px">
+
+                                {{ preview_table|safe }}
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% elif denied_reason %}
+
+        <div class="row" id="preview_error">
+            <div class="col-md-12">
+                <div class="panel panel-warning">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Preview</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-md-12 text-center" id="preview-content" style="margin-top: 15px">
+
+                                <h1>
+                                    <strong>
+                                        <i class="fas fa-exclamation-triangle warning-color"></i>
+                                        Atenção!
+                                        <i class="fas fa-exclamation-triangle warning-color"></i>
+                                    </strong>
+                                </h1>
+
+                                <h2 style="margin-top: 5px">
+                                    {{ denied_reason }}
+                                </h2>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+
+        <div class="row" id="unknown_preview_error">
+            <div class="col-md-12">
+                <div class="panel panel-warning">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Preview</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-md-12 text-center" id="preview-content" style="margin-top: 15px">
+
+                                <h1>
+                                    <strong>
+                                        <i class="fas fa-exclamation-triangle warning-color"></i>
+                                        Atenção!
+                                        <i class="fas fa-exclamation-triangle warning-color"></i>
+                                    </strong>
+                                </h1>
+
+                                <h2 style="margin-top: 5px">
+                                    Ocorreu algum erro desconhecido. Por favor entre em contato com a equipe Congressy para maiores informações.
+                                </h2>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% endif %}
+
+    <div class="row">
+
+        <div class="col-md-12">
+
+            <div class="panel panel-primary">
+
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Configuração do arquivo
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <form class="form-inline" method="post" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                {% csrf_token %}
+                                {% for hidden_field in form.hidden_fields %}
+                                    {% if hidden_field.errors %}
+                                        {% render_errors hidden_field.errors %}
+                                    {% endif %}
+                                    {{ hidden_field }}
+                                {% endfor %}
+                                {% render_generic_field form.delimiter %}
+                                {% render_generic_field form.encoding %}
+                                {% render_generic_field form.separator %}
+                            
+                                <div class="form-group" style="margin-top: 25px;">
+                                    <div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-retweet"></i>
+                                            Recarregar
+                                        </button>
+                                    </div>
+                                </div>
+
+
+                                {% if  preview_table and denied_reason is None %}
+
+
+                                    <div class="form-group pull-right" style="margin-top: 25px;">
+                                        <div>
+
+                                            <a href="{% url 'importer:csv-file-process' event.pk object.pk %}"
+                                               class="btn btn-success"
+                                               {% if object.processed %}disabled {% endif %} id="csv-process-btn">
+                                                <i class="fas fa-cogs"></i>
+                                                Salvar e processar
+                                            </a>
+                                        
+                                        </div>
+                                    </div>
+
+
+
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <div class="col-md-5">
+
+        <div class="panel panel-primary">
+
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    Campos Obrigatórios
+                </h3>
+            </div>
+            <div class="panel-body">
+
+                <div class="row">
+
+                    <div class="col-md-12">
+
+                        <div class="alert alert-warning">
+                            <strong>Atenção!</strong>
+                            Campos abaixo marcados com asteriscos(<span style="color:#C9302C">*</span>) são
+                            <strong>obrigatórios</strong> para a
+                            criação de uma inscrição no lote selecionado.
+                        </div>
+
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Nome da coluna</th>
+                                <th>Possiveis Valores</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            {% for entry in key_mapping %}
+
+                                <tr>
+
+                                    <td>
+                                        <strong>
+
+                                            {% if entry.required %}
+                                                <span style="color:#C9302C">*</span>
+                                            {% endif %}
+                                            {% with entry.mapping.csv_keys|first as first_key %}
+                                                {{ first_key }}
+                                            {% endwith %}
+
+                                        </strong>
+
+                                        <div class="text-muted">
+
+                                            <small>
+                                                {{ entry.mapping.description|capfirst }}
+                                            </small>
+
+                                        </div>
+
+                                    </td>
+
+                                    <td>
+                                        <div class="text-center">
+                                            ---
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                            {% for question in questions %}
+
+                                <tr>
+
+                                    <td>
+
+
+                                        <strong>
+
+                                            {% if question.is_required %}
+                                                <span style="color:#C9302C">*</span>
+                                            {% endif %}
+                                            {{ question.name }}
+
+                                        </strong>
+
+                                        <div class="text-muted">
+
+                                            <small>
+                                                {{ question.description|capfirst }}
+                                            </small>
+
+                                        </div>
+
+                                    </td>
+
+                                    <td>
+
+                                        {% if question.options|length > 0 %}
+                                            <ul>
+                                                {% for option in question.options %}
+                                                    <li>
+                                                        {{ option }}
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <div class="text-center">
+                                                ---
+                                            </div>
+                                        {% endif %}
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    {% if invalid_keys|length > 0 %}
+
+        <div class="col-md-3">
+
+            <div id="invalid-keys" class="panel panel-danger">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Campos que serão ignorados
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <h3>
+                            <ul>
+                                {% for key in invalid_keys %}
+                                    <li>{{ key|truncatechars:40 }}</li>
+                                {% endfor %}
+                            </ul>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    {% endif %}
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script type="application/javascript">
+
+        $(document).ready(function () {
+
+            $('#csv-process-btn').on('click', function () {
+                $('#csv-process').hide();
+                $('#csv-loader').show();
+            });
+
+
+        });
+
+    </script>
+
+{% endblock %}

@@ -77,13 +77,14 @@ if [ "$RECREATE" == "1" ]; then
 
     # o docker-compose do staging pode depender de um env-file que pode não
     # existir
-    touch ./bin/env/staging/env-manage-staging
+    mkdir -p /tmp/staging-files
+    touch /tmp/staging-files/env-manage-staging
 
     # manage-staging depende da rede criada pelo stack do banco. Devemos ter
     # certeza que o container não está rodando para destruir o banco, caso
     # contrário, o Docker não irá destruir informando que há um container
     # utilizando a rede.
-    docker-compose -f ./bin/env/staging/docker-compose.yml down --remove-orphans
+    docker-compose -f ./conf/staging/docker-compose.yml down --remove-orphans
 
     # Mata image e destroi rede, volumes e container
     docker-compose -f ./bin/env/docker-compose.yml down --remove-orphans

@@ -268,6 +268,16 @@ class Event(models.Model, GatherosModelMixin):
         blank=True,
     )
 
+    allow_importing = models.BooleanField(
+        default=False,
+        verbose_name='permitir importação via csv',
+    )
+
+    allow_boleto_expiration_on_lot_expiration = models.BooleanField(
+        default=False,
+        verbose_name='vencimento dos boletos na da data de vencimento dos lotes',
+    )
+
     class Meta:
         verbose_name = 'evento'
         verbose_name_plural = 'eventos'
@@ -309,7 +319,7 @@ class Event(models.Model, GatherosModelMixin):
         attended = 0.0
         if hasattr(self, 'subscriptions'):
             queryset = self.subscriptions
-            num = queryset.filter(completed=True).exclude(
+            num = queryset.filter(completed=True, test_subscription=False).exclude(
                 status='canceled'
             ).count()
 
@@ -407,7 +417,7 @@ class Event(models.Model, GatherosModelMixin):
             return '{0:.2f}%'.format((num * 100) / num_total)
 
         queryset = self.subscriptions \
-            .filter(completed=True) \
+            .filter(completed=True, test_subscription=False) \
             .exclude(status='canceled')
 
         if only_attended is True:

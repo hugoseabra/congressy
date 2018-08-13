@@ -6,6 +6,12 @@
 {% load event_tags %}
 {% load form_config_tags %}
 
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'assets/plugins/icheck/css/all.css' %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
+{% endblock %}
+
 {{% block title %}
     {% if object %}Editar{% else %}Nova{% endif %} Inscrição | Congressy
 {% endblock %}
@@ -22,6 +28,7 @@
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script src="{% static 'assets/js/user_notification.js' %}"></script>
     <script src="{% static "assets/plugins/moment/moment.js" %}"></script>
+    <script src="{% static 'assets/plugins/icheck/js/icheck.min.js' %}"></script>
 
     <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
 
@@ -41,8 +48,16 @@
                     birthDate.data("DateTimePicker").date(datePerson);
                 }
             }
-        });
-        $(document).ready(function () {
+
+
+            var checkboxes = $('input[type=checkbox]');
+
+            checkboxes.iCheck({
+                checkboxClass: 'icheckbox_flat-grey',
+                radioClass: 'iradio_flat-grey'
+            });
+
+
             $('#id_person-phone').mask("(99) 99999-9999");
             $('#id_person-zip_code').mask("99999-999");
 
@@ -76,13 +91,14 @@
             $('#id_zip_code').on('keyup', function () {
                 searchByCep();
             });
+
         });
     </script>
 
 {% endblock %}
 
 {% block content %}
-    <form action="" method="post" class="" name="subscription_form">
+    <form action="" method="post" class="skip-submition-check" name="subscription_form">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -157,6 +173,7 @@
             </div>
         </div>
         {% if selected_lot %}
+
             <div class="row">
                 <div class="col-md-12">
                     <div class="panel panel-primary">
@@ -300,6 +317,33 @@
                     {% endif %}
                 </div>
             </div>
+
+            {% if survey_form %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="panel-title">
+                                    Perguntas Extras
+                                </div>
+                            </div>
+                            <div class="panel-body">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% for field in survey_form.visible_fields %}
+                                            {% render_generic_field field %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+
         {% endif %}
         <div class="row">
             <div class="col-md-12">
@@ -323,8 +367,3 @@
     </form>
 {% endblock %}
 
-{% block styles %}
-
-    <link rel="stylesheet"
-          href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
-{% endblock %}

@@ -22,32 +22,18 @@
     {% endif %}
 
     <div>
-
-        {% if autofocus %}
-
-            {% if  required  or required == 'True' %}
-                {{ field|add_class:"form-control"|attr:"required:required"|append_attr:"autofocus" }}
-            {% else %}
-                {{ field|add_class:"form-control"|append_attr:"autofocus" }}
-            {% endif %}
-
-        {% elif field.field.widget.input_type == "checkbox" %}
-
-
+        {% if field.field.widget.input_type == "checkbox" %}
             {% if  required  or required == 'True' %}
                 {{ field|add_class:"js-switch"|attr:"style:display:none"|attr:"required:required" }}
             {% else %}
                 {{ field|add_class:"js-switch"|attr:"style:display:none" }}
             {% endif %}
-
         {% else %}
-
             {% if  required  or required == 'True' %}
-                {{ field|add_class:"form-control"|attr:"required:required" }}
+                {{ field|add_class:"form-control"|attr:"style:display:none"|attr:"required:required" }}
             {% else %}
                 {{ field|add_class:"form-control" }}
             {% endif %}
-
         {% endif %}
 
 

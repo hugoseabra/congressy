@@ -4,6 +4,7 @@ Formulários de Informação de evento
 import base64
 import binascii
 
+import lorem
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.core.files.base import ContentFile
@@ -40,7 +41,6 @@ class BaseModelFileForm(forms.ModelForm):
 
 
 class InfoForm(BaseModelFileForm):
-
     remove_image = forms.CharField(
         max_length=10,
         widget=forms.HiddenInput,
@@ -87,6 +87,7 @@ class InfoForm(BaseModelFileForm):
         self.event = event
 
         data = kwargs.get('data')
+        instance = kwargs.get('instance')
 
         if data:
             # TODO: this isn't DRY. Separate this logic into a helper.
@@ -99,7 +100,11 @@ class InfoForm(BaseModelFileForm):
                 data._mutable = True
                 del data['image_main']
                 data._mutable = False
-                event.info.image_main.delete(save=True)
+
+                try:
+                    event.info.image_main.delete(save=True)
+                except AttributeError:
+                    pass
 
             else:
 
@@ -117,6 +122,12 @@ class InfoForm(BaseModelFileForm):
                         data._mutable = False
                     except (binascii.Error, ValueError):
                         pass
+
+        if instance is None:
+            initial = kwargs.get('initial')
+            if initial is None:
+                initial = {}
+            initial.update({'description_html': lorem.paragraph()})
 
         super().__init__(**kwargs)
 

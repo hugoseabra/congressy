@@ -1,7 +1,7 @@
 import os
 import sys
 
-from django.core.management.utils import get_random_secret_key
+# from django.core.management.utils import get_random_secret_key
 
 sys.path.append("..")
 
@@ -70,4 +70,11 @@ setup(
     env_dict,
     '/var/www/cgsy/project/partner/settings/prod.py',
     '/var/www/cgsy/project/partner/settings/prod.py'
+)
+
+# Admin
+setup(
+    env_dict,
+    '/var/www/cgsy/project/admin_intranet/settings/prod.py',
+    '/var/www/cgsy/project/admin_intranet/settings/prod.py'
 )

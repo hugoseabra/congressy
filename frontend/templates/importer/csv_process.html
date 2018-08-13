@@ -1,0 +1,174 @@
+{% extends "base/base.html" %}
+{% load i18n static url_tags  form_config_tags %}
+
+{% block title %}Processar importação | Congressy{% endblock %}
+
+{% block page_title %}Processar importação via CSV{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_description %}
+    Processar importação de dados via CSV | {{ object.filename }}
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-left">
+
+                    <a href="{% url 'importer:csv-list' event.pk %}"
+                       class="btn btn-primary" style="margin-left: 5px">
+                        <i class="fas fa-arrow-circle-left"></i>
+                        Voltar Lista de arquivos
+                    </a>
+
+                    <a href="{% url 'importer:csv-file-prepare' event.pk object.pk %}"
+                       class="btn btn-success">
+                        <i class="fas fa-pencil-alt"></i>
+                        Voltar as configurações
+                    </a>
+
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12   ">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Inscrições
+                    </h3>
+                </div>
+
+                <div class="panel-body text-center" id="csv-loader" style="height: 200px; display: none;">
+
+                    <div class="row text-center"
+                         style="margin-top:20px;">
+                        <h3>Processando arquivo, aguarde...</h3>
+                        <i class="fas info-color fa-circle-notch fa-spin
+                        fa-6x" style="margin-top: 20px"></i>
+                    </div>
+
+                </div>
+                <div class="panel-body" id="csv-form-panel">
+
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <form method="post" id="csv-form">
+
+                                {% csrf_token %}
+                                {% render_generic_field form.create_subscriptions %}
+
+                                {% if process_results.valid > 0 and process_results.invalid == 0 %}
+
+                                    <h1>
+                                        <strong>Sucesso!</strong> Será possivel gerar <strong>{{ process_results.valid }}</strong> inscrições.
+                                    </h1>
+
+                                    <button type="button" class="btn btn-md btn-success generate-success-subscriptions" style="margin-top: 15px">
+                                        Gerar inscrições
+                                    </button>
+
+
+                                {% elif process_results.invalid > 0 and process_results.valid == 0 %}
+
+                                    <div class="alert alert-danger">
+                                        <strong>Atenção!</strong> Não será possivel gerar nenhuma das {{ process_results.invalid }} linhas no seu arquivo
+                                    </div>
+
+                                    <a href="{% url 'importer:csv-file-error-xls' event.pk object.pk %}" class="btn btn-md btn-danger">
+                                        Gerar XLS de erros
+                                    </a>
+
+
+                                {% elif process_results.invalid > 0 and process_results.valid > 0 %}
+
+
+                                    <table class="table" style="width: 30%; margin: 0 auto">
+
+                                        <thead>
+                                        <tr>
+                                            <th>Quantidade</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>{{ process_results.valid }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-md btn-success generate-success-subscriptions">
+                                                    Gerar inscrições
+                                                </button>
+                                                <br>
+                                                <small class="text-muted warning-color">
+                                                    Atenção: Ao girar as inscrições você será redirecionado.
+                                                </small>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{ process_results.invalid }}</td>
+                                            <td>
+
+                                                <a href="{% url 'importer:csv-file-error-xls' event.pk object.pk %}" class="btn btn-md btn-danger">
+                                                    Gerar XLS de erros
+                                                </a>
+
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+
+
+                                {% elif process_results.invalid == 0 and process_results.valid == 0 %}
+
+                                    <div class="alert alert-danger">
+                                        <strong>Atenção!</strong>
+                                        Não foi possivel gerar nenhuma inscrição do seu arquivo e também não encontramos nenhum erro.
+                                        Por gentiliza verifique seu arquivo.
+                                    </div>
+
+                                {% endif %}
+
+
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script type="application/javascript">
+
+        $(document).ready(function () {
+
+
+            $('.generate-success-subscriptions').on('click', function () {
+
+                $('#csv-form-panel').hide();
+                $('#csv-loader').show();
+
+                $('#id_create_subscriptions').val(true);
+                $('#id_create_error_xls').val(false);
+
+                $('#csv-form').submit();
+
+            });
+
+
+        });
+
+    </script>
+
+{% endblock %}

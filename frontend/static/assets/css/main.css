@@ -3501,7 +3501,7 @@ label.valid {
   width: 200px;
   padding-right: 10px;
   background-color: #F0F3F3;
-  z-index: 100;
+  z-index: 150;
 }
 .theme-cgsy-full .sidebar-itens {
   color: #4c4c4c;
@@ -3514,11 +3514,6 @@ label.valid {
   color: #F0F3F3;
   background-color: #1f7bb6;
   outline: 0;
-}
-@media only screen and (min-width: 1600px) {
-  .theme-cgsy-full .col-xl-2 {
-    width: auto;
-  }
 }
 .theme-cgsy-full #header .brand {
   background: #F0F3F3;
@@ -3616,7 +3611,7 @@ label.valid {
   }
   .theme-cgsy-full .manage_sidebar {
     margin-top: 0;
-    position: fixed;
+    position: relative;
   }
   .theme-cgsy-full .main-content-wrapper {
     padding-top: 0;

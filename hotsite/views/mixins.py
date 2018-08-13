@@ -208,7 +208,7 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
                 sub = Subscription.objects.get(
                     person=person,
                     event=self.event,
-                    completed=True,
+                    completed=True, test_subscription=False
                 )
 
                 context['subscription'] = sub
@@ -255,6 +255,7 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
                 Subscription.objects.get(
                     person=person,
                     completed=True,
+                    test_subscription=False,
                     event=self.event
                 )
                 return True
@@ -275,6 +276,7 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
                 person=person,
                 event=self.event,
                 completed=True,
+                test_subscription=False
             )
 
             has_products = sub.subscription_products.filter(

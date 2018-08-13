@@ -20,7 +20,26 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="{% static "assets/js/messenger.js" %}"></script>
     <script>
+        $(document).ready(function () {
+            $('#test-sub').on('change', function () {
+                var switchState = $('#test-sub').is(":checked");
+                var messageState = switchState ? "True" : "False";
+
+                var sender = new cgsy.AjaxSender("{% url 'subscription:subscription-switch-test' event.pk object.pk %}");
+
+                sender.setSuccessCallback(function () {
+                    var switchState = $('#test-sub').is(":checked");
+                    var messengerMessage = switchState ?
+                        "A inscrição agora é uma inscrição de teste" :
+                        "A inscrição não é mais uma inscrição de teste";
+                    window.cgsy.messenger.triggerSuccess(messengerMessage);
+                });
+                sender.send('POST', {'state': messageState});
+            });
+        });
+
         function show_block(el_to_show, el_to_hide) {
             el_to_show = $(el_to_show);
             el_to_hide = $(el_to_hide);
@@ -37,7 +56,7 @@
         }
 
         function delete_payment(transaction_id, amount) {
-            var message = "Tem certeza que deseja deletar o lançamento de R$ " +amount+ " ?";
+            var message = "Tem certeza que deseja deletar o lançamento de R$ " + amount + " ?";
 
             document.getElementById('delete-message').innerHTML = message;
             $('#manual-delete-payment-form-modal').modal();
@@ -99,7 +118,7 @@
         $(document).ready(function () {
             Messenger.options = {
                 extraClasses: 'messenger-fixed messenger-on-bottom ' +
-                'messenger-on-right',
+                    'messenger-on-right',
                 theme: 'flat'
             };
 
@@ -167,6 +186,56 @@
         {% else %}
             {% include 'subscription/includes/profile-subscriber.html' %}
         {% endif %}
+
+        {% if survey_answers|length > 0 %}
+            <div class="row">
+                <div class="col-xl-11 col-lg-11 col-md-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel" id="survey-block-hidden">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Respostas
+                                        <a href="#"
+                                           onclick="show_block('#survey-block-visible', '#survey-block-hidden');return false;"
+                                           class="btn btn-link"
+                                           style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="panel panel-primary" style="display:none"
+                                 id="survey-block-visible">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        Respostas <a href="#"
+                                                     onclick="show_block('#survey-block-hidden', '#survey-block-visible');return false;"
+                                                     class="btn btn-link"
+                                                     style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(ocultar)</a>
+                                    </h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-md-12">
+
+                                            {% for item in survey_answers %}
+                                                <div class="form-group">
+                                                    <label>{{ item.question }}</label>
+                                                    <div>
+                                                        {{ item.answer }}
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    
     </div>
 
     <div id="checkout_form_block" style="display:none">
@@ -188,4 +257,5 @@
 {% block modals %}
     {% include 'subscription/includes/modal-manual-payment-form.html' with form=manual_payment_form %}
     {% include 'subscription/includes/modal-delete-manual-payment-form.html' with form=manual_payment_form %}
+
 {% endblock %}

@@ -24,13 +24,21 @@ from .rules import subscription as rule
 class SubscriptionManager(models.Manager):
     """ Gerenciador de inscrição - Manager"""
 
+    def next_event_count(self, event):
+        """ Resgata próximo número de inscrição. """
+        count_max = self.filter(event=event).aggregate(Max('event_count'))
+        if count_max['event_count__max']:
+            return count_max['event_count__max'] + 1
+
+        return 1
+
     def next_count(self, lot):
         """ Resgata próximo número de inscrição. """
         count_max = self.filter(lot=lot).aggregate(Max('count'))
         if count_max['count__max']:
             return count_max['count__max'] + 1
-        else:
-            return 1
+
+        return 1
 
     def generate_code(self, event):
         """ Gera código de inscrição. """
@@ -48,10 +56,12 @@ class Subscription(models.Model, GatherosModelMixin):
 
     DEVICE_ORIGIN_HOTSITE = 'hotsite'
     DEVICE_ORIGIN_MANAGE = 'manage'
+    DEVICE_ORIGIN_CSV_IMPORT = 'csv_import'
 
     DEVICE_ORIGINS = (
         (DEVICE_ORIGIN_HOTSITE, 'Hotsite do evento'),
         (DEVICE_ORIGIN_MANAGE, 'Manage'),
+        (DEVICE_ORIGIN_CSV_IMPORT, 'Import via CSV'),
     )
 
     CONFIRMED_STATUS = 'confirmed'
@@ -114,6 +124,11 @@ class Subscription(models.Model, GatherosModelMixin):
         blank=True,
         verbose_name='código'
     )
+    event_count = models.IntegerField(
+        default=1,
+        blank=True,
+        verbose_name='num. inscrição geral'
+    )
     count = models.IntegerField(
         default=None,
         blank=True,
@@ -165,6 +180,8 @@ class Subscription(models.Model, GatherosModelMixin):
         editable=False
     )
 
+    test_subscription = models.BooleanField(default=False)
+
     objects = SubscriptionManager()
 
     class Meta:
@@ -175,6 +192,7 @@ class Subscription(models.Model, GatherosModelMixin):
             ("person", "event"),
             ("lot", "count"),
             ("event", "code"),
+            # ("event", "event_count"),
         )
 
     def __str__(self):
@@ -209,6 +227,11 @@ class Subscription(models.Model, GatherosModelMixin):
             self.code = Subscription.objects.generate_code(self.event)
 
         # RULE 3 - rule.test_rule_3_numero_inscricao_gerado
+        if self._state.adding is True:
+            self.event_count = Subscription.objects.next_event_count(
+                self.event
+            )
+
         if not self.count or self.has_changed('lot_id'):
             self.count = Subscription.objects.next_count(self.lot)
 
@@ -220,6 +243,13 @@ class Subscription(models.Model, GatherosModelMixin):
 
         rule.rule_5_inscricao_apos_data_final_lote(self, self._state.adding)
         rule.rule_6_inscricao_apos_data_final_evento(self, self._state.adding)
+
+    def get_event_count_display(self):
+        """ Recupera display de formatação de número de inscrição. """
+
+        if not self.event_count:
+            return '--'
+        return '{0:03d}'.format(self.event_count)
 
     def get_count_display(self):
         """ Recupera display de formatação de número de inscrição. """

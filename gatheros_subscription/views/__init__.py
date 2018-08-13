@@ -29,6 +29,8 @@ from .subscription import (
     SubscriptionViewFormView,
     VoucherSubscriptionPDFView,
     SubscriptionAttendanceListView,
+    SwitchSubscriptionTestView,
+    SubscriptionInternalSurveyFormView,
 )
 from .subscription_api import (
     SubscriptionSearchViewSet,
@@ -37,6 +39,7 @@ from .subscription_api import (
 from .survey import (
     EventSurveyCreateView,
     EventSurveyDeleteAjaxView,
+    EventSurveyDuplicateView,
     EventSurveyEditAjaxView,
     EventSurveyLotsEditAjaxView,
     SurveyEditView,

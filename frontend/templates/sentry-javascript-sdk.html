@@ -1,27 +1,29 @@
 {% load static %}
 
-<!-- Sentry JS SDK 2.1.+ required -->
-{% if SENTRY_PUBLIC_DSN %}
-<script src="https://cdn.ravenjs.com/3.22.1/raven.min.js" crossorigin="anonymous"></script>
-<script src="{% static "assets/js/sentry-functions.js"%}"></script>
-<script>
-setConfig('{{ SENTRY_PUBLIC_DSN  }}', '{{ ENVIRONMENT_VERSION }}');
-{% if request.user.is_authenticated %}
-setUserContext(
-    '{{ request.user.pk }}',
-    '{{ request.user.get_full_name }}',
-    '{{ request.user.email }}'
-);
-{% endif %}
-var TRACKER_CAPTURE = true;
-{% if request.sentry and request.sentry.id %}
-function send_user_feedback() {
-    user_feedback_report('{{ request.sentry.id }}', '{{ SENTRY_PUBLIC_DSN }}')
-}
-{% endif %}
-</script>
-{% else %}
-<script>
-var TRACKER_CAPTURE = false;
-</script>
+{% if not debug %}
+    <!-- Sentry JS SDK 2.1.+ required -->
+    {% if SENTRY_PUBLIC_DSN %}
+        <script src="https://cdn.ravenjs.com/3.22.1/raven.min.js" crossorigin="anonymous"></script>
+        <script src="{% static "assets/js/sentry-functions.js" %}"></script>
+        <script>
+            setConfig('{{ SENTRY_PUBLIC_DSN  }}', '{{ ENVIRONMENT_VERSION }}');
+            {% if request.user.is_authenticated %}
+                setUserContext(
+                    '{{ request.user.pk }}',
+                    '{{ request.user.get_full_name }}',
+                    '{{ request.user.email }}'
+                );
+            {% endif %}
+            var TRACKER_CAPTURE = true;
+            {% if request.sentry and request.sentry.id %}
+                function send_user_feedback() {
+                    user_feedback_report('{{ request.sentry.id }}', '{{ SENTRY_PUBLIC_DSN }}');
+                }
+            {% endif %}
+        </script>
+    {% else %}
+        <script>
+            var TRACKER_CAPTURE = false;
+        </script>
+    {% endif %}
 {% endif %}

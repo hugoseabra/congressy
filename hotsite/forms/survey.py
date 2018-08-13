@@ -10,9 +10,9 @@ from survey.directors import SurveyDirector
 
 class SurveyForm(forms.Form):
 
-    def __init__(self, event, user, event_survey, **kwargs):
+    def __init__(self,  user, event_survey, **kwargs):
         self.event_survey = event_survey
-        self.event = event
+        self.event = event_survey.event
         self.user = user
 
         survey_director = SurveyDirector(event=self.event, user=self.user)

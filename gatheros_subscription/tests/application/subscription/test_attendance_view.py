@@ -64,7 +64,7 @@ class SubscriptionAttendanceSearchViewTest(TestCase):
             subs = self.event.subscriptions.filter(
                 person__name__icontains=search_value.strip(),
             ).filter(
-                completed=True
+                completed=True, test_subscription=False
             ).exclude(status=Subscription.CANCELED_STATUS)
 
             data = {

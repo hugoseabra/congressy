@@ -15,6 +15,11 @@ urls = [
         name='survey-edit'
     ),
     url(
+        r'^(?P<survey_pk>[\d]+)/duplicate',
+        views.EventSurveyDuplicateView.as_view(),
+        name='survey-duplicate'
+    ),
+    url(
         r'^delete$',
         views.EventSurveyDeleteAjaxView.as_view(),
         name='survey-ajax-delete'

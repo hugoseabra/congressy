@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 
 from django.conf import settings
@@ -40,10 +41,10 @@ FORMS = [
 TEMPLATES = {
     "private_lot": "hotsite/private_lot_form.html",
     "lot": "hotsite/lot_form.html",
-    "person": "hotsite/person_form.html",
-    "survey": "hotsite/survey_form.html",
     "service": "hotsite/service_form.html",
     "product": "hotsite/product_form.html",
+    "person": "hotsite/person_form.html",
+    "survey": "hotsite/survey_form.html",
     "payment": "hotsite/payment_form.html"
 }
 
@@ -89,23 +90,28 @@ def has_pending_payment(wizard):
     ##########################################################################
     # Verifica se já existe pagamentos aguardando serem processados.
     ##########################################################################
-    has_boleto_waiting = False
-    has_card_waiting = False
     for transaction in subscription.transactions.all():
         is_cc = transaction.type == Transaction.CREDIT_CARD
         is_boleto = transaction.type == Transaction.BOLETO
+        boleto_expiration_date = transaction.boleto_expiration_date
+        today = datetime.date(datetime.now())
         if transaction.status == Transaction.WAITING_PAYMENT:
+
             if is_boleto:
-                has_boleto_waiting = True
+                if boleto_expiration_date \
+                        and boleto_expiration_date < today:
+                    return False
+                else:
+                    return True
 
             if is_cc:
-                has_card_waiting = True
+                return True
 
         # NO caso de cartão de crédito, pode haver um delay no processamento
         if transaction.status == Transaction.PROCESSING and is_cc:
-            has_card_waiting = True
+            return True
 
-    return has_card_waiting is True or has_boleto_waiting is True
+    return False
 
 
 def can_process_payment(wizard):
@@ -212,7 +218,7 @@ def has_products(wizard):
 
     try:
         optionals = lot.category.product_optionals
-        return optionals.count() > 0
+        return optionals.filter(published=True).count() > 0
 
     except AttributeError:
         return False
@@ -241,7 +247,7 @@ def has_services(wizard):
 
     try:
         optionals = lot.category.service_optionals
-        return optionals.count() > 0
+        return optionals.filter(published=True).count() > 0
 
     except AttributeError:
         return False
@@ -388,7 +394,7 @@ class SubscriptionWizardView(SessionWizardView):
 
             if self.event.is_scientific:
                 if not self.event.work_config or not \
-                        self.event.work_config.is_submittable:
+                        self.event.work_config.is_configured:
                     return redirect('public:hotsite', slug=self.event.slug)
 
             return super().dispatch(request, *args, **kwargs)
@@ -432,7 +438,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and
-                    self.storage.current_step is not None):
+                self.storage.current_step is not None):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
 
@@ -507,9 +513,9 @@ class SubscriptionWizardView(SessionWizardView):
 
         if step == 'survey':
             lot = self.get_lot()
+
             kwargs.update({
                 'user': self.request.user,
-                'event': self.event,
                 'event_survey': lot.event_survey,
             })
 
@@ -574,6 +580,8 @@ class SubscriptionWizardView(SessionWizardView):
 
             lot = self.get_lot()
 
+            # Tratamento especial para extrair as respostas do form_data,
+            # causado pelo uso do FormWizard que adiciona prefixos nas respostas
             survey_response = QueryDict('', mutable=True)
             for form_question, form_response in form_data.items():
                 if form_question == 'csrfmiddlewaretoken':
@@ -585,15 +593,16 @@ class SubscriptionWizardView(SessionWizardView):
 
             survey_form = survey_director.get_form(
                 survey=lot.event_survey.survey,
-                data=survey_response
+                data=survey_response,
             )
 
-            if survey_form.is_valid():
-                survey_form.save_answers()
-            else:
-                raise Exception('SurveyForm was invalid: {}'.format(
-                    survey_form.errors
-                ))
+            if not survey_form.is_valid():
+                raise ValidationError(form.errors)
+
+            survey_form.save()
+            subscription = self.get_subscription()
+            subscription.author = survey_form.author
+            subscription.save()
 
         # Persisting payments:
         if isinstance(form, forms.PaymentForm):
@@ -613,6 +622,28 @@ class SubscriptionWizardView(SessionWizardView):
                 raise ValidationError(str(e))
 
         return form_data
+
+    def get_next_step(self, step=None):
+        """
+        Returns the next step after the given `step`. If no more steps are
+        available, None will be returned. If the `step` argument is None, the
+        current step will be determined automatically.
+        """
+        if step is None:
+            step = self.steps.current
+        form_list = self.get_form_list()
+        keys = list(form_list.keys())
+
+        # This is a hack, to return to the first step, when we get a ValueError
+        # See: https://intra.congressy.com/congressy/congressy/issues/2453/
+        try:
+            key = keys.index(step) + 1
+        except ValueError:
+            return keys[0]
+
+        if len(keys) > key:
+            return keys[key]
+        return None
 
     def get_context_data(self, **kwargs):
 

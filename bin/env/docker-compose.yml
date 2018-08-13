@@ -20,7 +20,7 @@
 #   muito legal para o servidor do ambiente staging. DEVE-SE TER CUIDADO ao
 #   gerenciar o servidor para não expor esta porta publicamente.
 ###############################################################################
-version: '3'
+version: '3.5'
 services:
   postgres:
     image: postgres:9.6-alpine
@@ -37,14 +37,27 @@ services:
       - POSTGRES_PASSWORD=congressy
 
   mailhog:
-    image: mailhog/mailhog
     image: blueimp/mailhog
+    container_name: mailhog
     networks:
       - mailhog
     ports:
       - "1025:1025"
       - "8025:8025"
 
+  wkhtmltopdf:
+    image: openlabs/docker-wkhtmltopdf-aas
+    container_name: wkhtmltopdf
+    networks:
+      - wkhtmltopdf
+    ports:
+      - "5010:80"
+
 networks:
   postgres:
+    name: local_postgres
   mailhog:
+    name: local_mailhog
+  wkhtmltopdf:
+    name: local_wkhtmltopdf
+

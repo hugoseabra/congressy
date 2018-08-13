@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'captcha',
     'wkhtmltopdf',
     'formtools',
+    'django_cron',
 
     # KANU_APPS
     'kanu_locations',
@@ -142,6 +143,7 @@ TEMPLATES = [
             os.path.join(BASE_DIR, 'hotsite', 'templates'),
             os.path.join(BASE_DIR, 'mailer', 'templates'),
             os.path.join(BASE_DIR, 'bitly', 'templates'),
+            os.path.join(BASE_DIR, 'admin_intranet', 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {

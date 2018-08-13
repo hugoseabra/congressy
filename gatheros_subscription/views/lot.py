@@ -149,7 +149,7 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
             total_subscriptions_event = 0
             for lot in self.event.lots.all():
                 total_subscriptions_event += lot.subscriptions.filter(
-                    completed=True
+                    completed=True, test_subscription=False
                 ).exclude(
                     status='canceled'
                 ).count()
@@ -168,7 +168,7 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
         for cat in queryset.all():
             for lot in cat.lots.all():
                 sub_queryset = lot.subscriptions.filter(
-                    completed=True,
+                    completed=True, test_subscription=False,
                     status__in=['confirmed', 'awaiting']
                 )
                 num = sub_queryset.count()
@@ -296,7 +296,7 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         context['has_surveys'] = self._event_has_surveys()
         context['has_optionals'] = self._lot_has_optionals()
         context['lot_has_subscriptions'] = self.object.subscriptions.filter(
-            completed=True,
+            completed=True, test_subscription=False,
         ).count() > 0
 
         return context
@@ -439,7 +439,7 @@ class LotSurveyView(generic.DetailView):
         if not self.object.event_survey:
             return None
 
-        return forms.SurveyForm(
+        return forms.SurveyAnswerForm(
             event_survey=self.object.event_survey,
             user=self.request.user
         )

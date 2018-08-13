@@ -41,13 +41,27 @@ Variáveis:
             </a>
         </li>
     {% endif %}
+    {% if event.has_certificate %}
 
-    <li {% if active == 'certificate' %}class=  "active"{% endif %}>
-        <a class="sidebar-itens" href="{% url 'certificate:event-certificate-config' event.pk %}"
-           title="Editor de Certificados">
-            <i class="fas fa-graduation-cap"></i>Certificado
-        </a>
-    </li>
+        <li {% if active == 'certificate' %}class=  "active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'certificate:event-certificate-config' event.pk %}"
+               title="Editor de Certificados">
+                <i class="fas fa-graduation-cap"></i>Certificado
+            </a>
+        </li>
+
+        <li {% if active == 'certificate-manual' %}class=  "active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'certificate:event-certificate-manual' event.pk %}"
+               title="Lançador de Certificados Manual"
+               style="padding-right: 0;font-size: 15px">
+                <i class="fas fa-graduation-cap"></i>
+                Certificado Manual
+            </a>
+        </li>
+    {% endif %}
+
 </ul>
 
 <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
@@ -174,15 +188,15 @@ Variáveis:
                 </a>
             </li>
         {% endif %}
-    {% if event.has_optionals %}
-        <li {% if active == 'addon-opcionais' %}class="active"{% endif %}>
-            <a class="sidebar-itens"
-               href="{% url 'addon:optional-product-list' event.pk %}"
-               title="Opcionais">
-                <i class="fas fa-shopping-basket"></i>
-                Opcionais
-            </a>
-        </li>
+        {% if event.has_optionals %}
+            <li {% if active == 'addon-opcionais' %}class="active"{% endif %}>
+                <a class="sidebar-itens"
+                   href="{% url 'addon:optional-product-list' event.pk %}"
+                   title="Opcionais">
+                    <i class="fas fa-shopping-basket"></i>
+                    Opcionais
+                </a>
+            </li>
         {% endif %}
     </ul>
 {% endif %}

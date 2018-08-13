@@ -23,7 +23,7 @@
     <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
     <script src="{% static 'assets/js/date-time.js' %}"></script>
     <script src="{% static 'assets/js/user_notification.js' %}"></script>
-    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
     <script>
         $(document).ready(function () {
@@ -330,16 +330,16 @@
                     }
                 });
 
-                var has_optionals = false;
+{#                var has_optionals = false;#}
+{##}
+{#                {% if has_optionals %}#}
+{#                    has_optionals = true;#}
+{#                {% endif %}#}
 
-                {% if has_optionals %}
-                    has_optionals = true;
-                {% endif %}
-
-                if (has_optionals && parseFloat(price_el.val()) === 0.00) {
-                    $('#has_optionals_warning').show();
-                    $('.btn-success').prop('disabled', true);
-                }
+{#                if (has_optionals && parseFloat(price_el.val()) === 0.00) {#}
+{#                    $('#has_optionals_warning').show();#}
+{#                    $('.btn-success').prop('disabled', true);#}
+{#                }#}
 
                 price_el.mask('#.##0,00', {reverse: true});
 

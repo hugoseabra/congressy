@@ -104,6 +104,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         context['has_survey_create'] = self.has_survey_create()
         context['number_attendances'] = self.get_number_attendances()
         context['status_addons'] = self.get_status_addons()
+        context['event_is_full'] = self.event_is_full()
         try:
             context['is_configured'] = self.event.work_config.is_configured
         except AttributeError:
@@ -132,7 +133,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
                 'name': lot.name,
                 'limit': lot.limit,
                 'number_subscription': lot.subscriptions.filter(
-                    completed=True
+                    completed=True, test_subscription=False
                 ).exclude(
                     status='canceled'
                 ).count(),
@@ -229,7 +230,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
 
     def _get_total_subscriptions(self):
         return self.event.subscriptions.filter(
-            completed=True,
+            completed=True, test_subscription=False
         ).exclude(
             status=Subscription.CANCELED_STATUS
         ).count()
@@ -347,6 +348,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
             Transaction.objects.filter(
                 Q(subscription__event=self.event) &
                 Q(subscription__completed=True) &
+                Q(subscription__test_subscription=False) &
                 (
                         Q(status=Transaction.PAID) |
                         Q(status=Transaction.WAITING_PAYMENT)
@@ -370,6 +372,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
             Subscription.objects.filter(
                 status=Subscription.AWAITING_STATUS,
                 completed=True,
+                test_subscription=False,
                 event=self.event,
             ).exclude(
                 status=Subscription.CANCELED_STATUS
@@ -388,3 +391,19 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
                 return True
 
         return False
+
+    def event_is_full(self):
+        if self.event.expected_subscriptions and \
+                self.event.expected_subscriptions > 0:
+
+            total_subscriptions_event = 0
+            for lot in self.event.lots.all():
+                total_subscriptions_event += lot.subscriptions.filter(
+                    completed=True, test_subscription=False
+                ).exclude(
+                    status='canceled'
+                ).count()
+            return total_subscriptions_event >= self.event.expected_subscriptions
+
+        else:
+            return False

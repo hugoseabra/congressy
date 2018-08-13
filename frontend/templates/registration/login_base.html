@@ -20,8 +20,13 @@
     <meta name="description" content="">
         <meta name="viewport"
               content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <!-- Bootstrap core CSS -->
 
+    <!-- FAVICONS -->
+    <link rel="icon" href="{% static 'assets/img/favicons/favicon.ico' %}">
+    <link rel="apple-touch-icon"
+          href="{% static 'assets/img/favicons/apple-touch-icon.png' %}">
+
+    <!-- Bootstrap core CSS -->
     <link rel="stylesheet"
           href="{% static "assets/plugins/bootstrap/css/bootstrap.min.css" %}">
     <!-- Fonts  -->
@@ -134,6 +139,12 @@
 </section>
 
 {% include 'sentry-javascript-sdk.html' %}
+
+{% block support %}
+    {% include 'facebook-pixel.html' %}
+    {% include 'google-analytics.html' %}
+    {% include 'google-remarketing.html' %}
+{% endblock %}
 
 {% block global_js %}
     <!--Global JS-->

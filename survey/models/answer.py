@@ -16,8 +16,7 @@ class SameSurveyRule(RuleChecker):
 
         if self.question.survey != self.author.survey:
             raise RuleIntegrityError(
-                'A pergunta e o autor não pertencem ao mesmo '
-                'questionário.'
+                'A pergunta e o autor não pertencem ao mesmo questionário.'
             )
 
 
@@ -59,8 +58,7 @@ class Answer(Entity, models.Model):
         verbose_name='valor'
     )
 
-    human_display = models.CharField(
-        max_length=255,
+    human_display = models.TextField(
         verbose_name='nome exibido a humanos',
         blank=True,
         null=True,

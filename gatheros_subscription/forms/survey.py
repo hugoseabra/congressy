@@ -2,7 +2,7 @@
 from django import forms
 
 from gatheros_subscription.models import EventSurvey
-from gatheros_subscription.survey_director import SurveyDirector
+from survey.directors import SurveyDirector
 from survey.services import SurveyService
 
 
@@ -37,15 +37,3 @@ class EventSurveyForm(forms.Form):
         )
         return survey
 
-
-class SurveyForm(forms.Form):
-
-    def __init__(self, event_survey, user, **kwargs):
-        self.user = user
-
-        survey_director = SurveyDirector(user=self.user)
-
-        super().__init__(**kwargs)
-
-        instance = survey_director.get_form(survey=event_survey.survey)
-        self.fields = instance.fields

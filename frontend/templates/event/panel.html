@@ -272,9 +272,24 @@
             </div>
         </div>
     </div>
+    {% if event_is_full %}
+
+        <div class="alert alert-warning" role="alert">
+            <h3>
+                Todos os lotes foram finalizados porque
+                o evento está lotado
+                <i class="fas fa-question-circle"
+                   data-toggle="tooltip"
+                   title='O número de participantes esperados foi excedido, caso queira aumentar o número de vagas, altere em "Dados do evento"'
+                ></i>
+            </h3>
+        </div>
+
+    {% endif %}
 
     <div id="todo-data"
-         class="panel panel-primary col-xs-12 col-xl-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0">
+         class="panel panel-primary col-xs-12 col-xl-12 col-sm-12 col-md-12 col-lg-12"
+         style="padding: 0">
         <div class="panel-heading">
             <div class="panel-title">Etapas de configuração do seu evento</div>
         </div>
