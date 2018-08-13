@@ -37,7 +37,10 @@ class MockFactory:
         return person
 
     def fake_organization(self):
-        organization = Organization(name=self.fake_factory.company())
+        organization = Organization(
+            name=self.fake_factory.company(),
+            email=self.fake_factory.ascii_email(),
+        )
         organization.save()
 
         assert organization is not None
@@ -47,20 +50,16 @@ class MockFactory:
     def fake_event(self, organization=None):
 
         if not organization:
-            raise Exception('No organization provided to event factory')
+            organization = self.fake_organization()
 
-        event = Event(
-            organization=organization,
+        return Event.objects.create(
             name='Event: ' + ' '.join(self.fake_factory.words(nb=3)),
+            organization=organization,
             date_start=datetime.now() + timedelta(days=3),
             date_end=datetime.now() + timedelta(days=4),
             category=Category.objects.first(),
         )
-        event.save()
 
-        assert event is not None
-
-        return event
 
     def join_organization(self, organization, person):
 
