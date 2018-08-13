@@ -9,7 +9,6 @@ from gatheros_event.models import Event
 
 
 def is_free_event(event: Event):
-
     lots = event.lots.all()
 
     for lot in lots:
@@ -34,3 +33,7 @@ def is_free_event(event: Event):
                         return False
 
     return True
+
+
+def is_paid_event(event: Event):
+    return not is_free_event(event)
