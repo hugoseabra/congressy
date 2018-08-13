@@ -60,8 +60,8 @@ class MockFactory:
             category=Category.objects.first(),
         )
 
-
-    def join_organization(self, organization, person):
+    @staticmethod
+    def join_organization(organization, person):
 
         membership = Member(person=person, organization=organization,
                             group=Member.ADMIN)
