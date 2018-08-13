@@ -3,7 +3,7 @@
 
         - Grátis
         - Pago
-        - Cientifico
+        
 """
 from gatheros_event.models import Event
 
