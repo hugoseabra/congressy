@@ -591,7 +591,7 @@ class SubscriptionWizardView(SessionWizardView):
                     survey_response.update(
                         {form_question.replace('survey-', ''): form_response})
 
-            survey_form = survey_director.get_form(
+            survey_form = survey_director.get_active_form(
                 survey=lot.event_survey.survey,
                 data=survey_response,
             )
