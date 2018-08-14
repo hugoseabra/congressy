@@ -21,9 +21,9 @@ class Debt(models.Model):
     class Meta:
         verbose_name = 'pendência'
         verbose_name_plural = 'pendências'
-        unique_together = (
-            ('type', 'subscription'),
-        )
+        indexes = [
+            models.Index(fields=['type', 'item_id']),
+        ]
 
     DEBT_TYPE_SUBSCRIPTION = 'subscription'
     DEBT_TYPE_SERVICE = 'service'
@@ -46,8 +46,7 @@ class Debt(models.Model):
     )
 
     name = models.CharField(max_length=255, verbose_name='nome',)
-    item_id = models.CharField(
-        max_length=255, verbose_name='id do item',)
+    item_id = models.CharField(max_length=255, verbose_name='id do item',)
 
     subscription = models.ForeignKey(
         Subscription,
