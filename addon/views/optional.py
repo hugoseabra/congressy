@@ -1,67 +1,20 @@
 from django.contrib import messages
-from django.shortcuts import redirect
 from django.urls import reverse
 from django.views import generic
 
 from addon import services
 from addon.models import Product, Service
 from core.views.mixins import TemplateNameableMixin
-from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription.models import LotCategory
+from .mixins import (
+    ProductFeatureFlagMixin,
+    ServiceFeatureFlagMixin,
+    EventOptionalMixin,
+)
 
 
-class EventOptionalMixin(AccountMixin, generic.View):
-    event = None
-
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            self.event = Event.objects.get(pk=self.kwargs.get('event_pk'))
-        except Event.DoesNotExist:
-            messages.warning(
-                request,
-                "Evento não informado."
-            )
-            return redirect('event:event-list')
-
-        paid_lots = False
-
-        for lot in self.event.lots.all():
-            if lot.price is not None and lot.price > 0:
-                paid_lots = True
-                break
-
-        if paid_lots is False:
-            if self.event.event_type == self.event.EVENT_TYPE_FREE:
-                messages.error(
-                    request,
-                    "Evento grátis não possui opcionais."
-                )
-                return redirect('event:event-panel', self.event.pk)
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        # noinspection PyUnresolvedReferences
-        context = super().get_context_data(**kwargs)
-        context['event'] = self.event
-        context['has_paid_lots'] = self.has_paid_lots()
-        context['themes'] = self.event.themes.all()
-        return context
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-
-            price = lot.price
-
-            if price and price > 0:
-                return True
-
-        return False
-
-
-class OptionalServiceListView(TemplateNameableMixin,
+class OptionalServiceListView(ServiceFeatureFlagMixin,
+                              TemplateNameableMixin,
                               EventOptionalMixin,
                               generic.ListView):
     queryset = LotCategory.objects.all()
@@ -105,7 +58,8 @@ class OptionalServiceListView(TemplateNameableMixin,
         return stats
 
 
-class OptionalProductListView(TemplateNameableMixin,
+class OptionalProductListView(ProductFeatureFlagMixin,
+                              TemplateNameableMixin,
                               EventOptionalMixin,
                               generic.ListView):
     queryset = LotCategory.objects.all()
@@ -150,7 +104,9 @@ class OptionalProductListView(TemplateNameableMixin,
         return stats
 
 
-class OptionalAddProductView(EventOptionalMixin, generic.CreateView):
+class OptionalAddProductView(ProductFeatureFlagMixin,
+                             EventOptionalMixin,
+                             generic.CreateView):
     form_class = services.ProductService
     template_name = 'addon/optional/form-product.html'
 
@@ -207,7 +163,9 @@ class OptionalAddProductView(EventOptionalMixin, generic.CreateView):
     #     return initial
 
 
-class OptionalAddServiceView(EventOptionalMixin, generic.CreateView):
+class OptionalAddServiceView(ServiceFeatureFlagMixin,
+                             EventOptionalMixin,
+                             generic.CreateView):
     form_class = services.ServiceService
     template_name = 'addon/optional/form-service.html'
 
@@ -269,7 +227,9 @@ class OptionalAddServiceView(EventOptionalMixin, generic.CreateView):
         #     return initial
 
 
-class OptionalProductEditView(EventOptionalMixin, generic.UpdateView):
+class OptionalProductEditView(ProductFeatureFlagMixin,
+                              EventOptionalMixin,
+                              generic.UpdateView):
     form_class = services.ProductService
     model = Product
     template_name = 'addon/optional/form-product.html'
@@ -310,7 +270,8 @@ class OptionalProductEditView(EventOptionalMixin, generic.UpdateView):
         context['optional_active'] = 'product'
         context['optonal_has_subscriptions'] = \
             self.object.subscription_products.filter(
-                subscription__completed=True, subscription__test_subscription=False
+                subscription__completed=True,
+                subscription__test_subscription=False
             ).count()
         return context
 
@@ -318,7 +279,9 @@ class OptionalProductEditView(EventOptionalMixin, generic.UpdateView):
         return super().form_invalid(form)
 
 
-class OptionalServiceEditView(EventOptionalMixin, generic.UpdateView):
+class OptionalServiceEditView(ServiceFeatureFlagMixin,
+                              EventOptionalMixin,
+                              generic.UpdateView):
     form_class = services.ServiceService
     model = Service
     template_name = 'addon/optional/form-service.html'
