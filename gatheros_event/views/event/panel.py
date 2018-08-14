@@ -172,7 +172,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         features = self.object.feature_release
 
         has_addons = {
-            'extra_activities': features.feature_products,
+            'extra_activities': features.feature_services,
             'optionals': features.feature_products,
             'checkin': features.feature_checkin,
             'certificate': features.feature_certificate,
