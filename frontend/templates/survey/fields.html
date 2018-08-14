@@ -2,7 +2,7 @@
 {% if full_survey_form.fields|length > 0 %}
     <ul id="simpleList" class="list-group">
         {% for field in full_survey_form %}
-            <li class="list-group-item"
+            <li class="list-group-item {% if field.field.is_active %}question-disabled{% endif %}"
                 data-id="{{ field.name }}"
                 data-name="{{ field.name }}"
                 data-label="{{ field.label }}">
@@ -76,6 +76,10 @@
                                     {% render_icheck_field field %}
                                 {% else %}
                                     {% render_generic_field field %}
+                                {% endif %}
+
+                                {% if field.field.is_active %}
+                                    <div class="text-danger">Desativado</div>
                                 {% endif %}
                             </td>
 
@@ -170,7 +174,6 @@
 
 
                                 </div>
-
 
                                 <div class="row text-center"
                                      data-loader="{{ field.name }}"
