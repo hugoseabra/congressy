@@ -115,7 +115,7 @@ Variáveis:
 
 </ul>
 
-{% if event.has_checkin %}
+{% if event.feature_release.feature_checkin %}
     <h5 class="sidebar-header" style="color:#4c4c4c;">Credenciamento</h5>
     <ul class="nav nav-pills nav-stacked">
         <li {% if active == 'checkin-dashboard' %}class="active"{% endif %}>
@@ -167,10 +167,10 @@ Variáveis:
 
 {% has_paid_lots event as has_paid_lots %}
 
-{% if event.has_extra_activities or event.has_optionals %}
+{% if event.feature_release.feature_products or event.feature_release.feature_services %}
     <h5 class="sidebar-header" style="color:#4c4c4c;">Recursos Extras</h5>
     <ul class="nav nav-pills nav-stacked">
-        {% if event.has_extra_activities %}
+        {% if event.feature_release.feature_services %}
             <li {% if active == 'addon-themes' %}class="active"{% endif %}>
                 <a class="sidebar-itens"
                    href="{% url 'addon:theme-list' event.pk %}"
@@ -188,7 +188,7 @@ Variáveis:
                 </a>
             </li>
         {% endif %}
-        {% if event.has_optionals %}
+        {% if event.feature_release.feature_products %}
             <li {% if active == 'addon-opcionais' %}class="active"{% endif %}>
                 <a class="sidebar-itens"
                    href="{% url 'addon:optional-product-list' event.pk %}"

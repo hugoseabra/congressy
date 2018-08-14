@@ -46,6 +46,7 @@ from payment import forms
 from payment.helpers import payment_helpers
 from payment.models import Transaction
 from survey.models import Question, Answer
+from .mixins import CheckinFeatureFlagMixin
 
 
 class EventViewMixin(TemplateNameableMixin, AccountMixin):
@@ -791,7 +792,8 @@ class SubscriptionCancelView(EventViewMixin, generic.DetailView):
         })
 
 
-class SubscriptionAttendanceDashboardView(EventViewMixin, generic.TemplateView):
+class SubscriptionAttendanceDashboardView(CheckinFeatureFlagMixin,
+                                          generic.TemplateView):
     template_name = 'subscription/attendance-dashboard.html'
     search_by = 'name'
 
@@ -813,25 +815,29 @@ class SubscriptionAttendanceDashboardView(EventViewMixin, generic.TemplateView):
         return cxt
 
     def get_attendances(self):
+
+        sub_list = list()
+
         try:
-            list = Subscription.objects.filter(
+            sub_list = Subscription.objects.filter(
                 attended=True,
                 completed=True,
                 test_subscription=False,
-                event=self.get_event(),
+                event=self.event,
             ).order_by('-attended_on')
-            return list[0:5]
 
-
+            return sub_list[0:5]
         except Subscription.DoesNotExist:
-            return []
+            pass
+
+        return sub_list
 
     def get_number_attendances(self):
         try:
             return Subscription.objects.filter(
                 attended=True,
                 completed=True, test_subscription=False,
-                event=self.get_event(),
+                event=self.event,
             ).count()
 
         except Subscription.DoesNotExist:
@@ -841,7 +847,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin, generic.TemplateView):
 
         total = \
             Subscription.objects.filter(
-                event=self.get_event(),
+                event=self.event,
                 completed=True, test_subscription=False
             ).exclude(status=Subscription.CANCELED_STATUS).count()
 
@@ -853,14 +859,14 @@ class SubscriptionAttendanceDashboardView(EventViewMixin, generic.TemplateView):
             Subscription.objects.filter(
                 status=Subscription.CONFIRMED_STATUS,
                 completed=True, test_subscription=False,
-                event=self.get_event()
+                event=self.event,
             ).count()
 
         return confirmed
 
     def get_report(self):
         """ Resgata informações gerais do evento. """
-        return self.get_event().get_report(only_attended=True)
+        return self.event.get_report(only_attended=True)
 
 
 class MySubscriptionsListView(AccountMixin, generic.ListView):
@@ -1075,7 +1081,8 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
         return self.subscription.confirmed is True
 
 
-class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
+class SubscriptionAttendanceSearchView(CheckinFeatureFlagMixin,
+                                       generic.TemplateView):
     template_name = 'subscription/attendance.html'
 
     def get_context_data(self, **kwargs):
@@ -1169,7 +1176,8 @@ class SubscriptionAttendanceView(EventViewMixin, generic.FormView):
         return sub.event.pk == event.pk
 
 
-class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
+class SubscriptionAttendanceListView(CheckinFeatureFlagMixin,
+                                     generic.TemplateView):
     template_name = 'subscription/attendance-list.html'
 
     def get_context_data(self, **kwargs):
@@ -1183,7 +1191,7 @@ class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
         return Subscription.objects.filter(
             attended=True,
             completed=True,
-            event=self.get_event(),
+            event=self.event,
         ).exclude(status=Subscription.CANCELED_STATUS).order_by('-attended_on')
 
 
