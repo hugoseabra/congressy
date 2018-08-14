@@ -11,6 +11,8 @@ from django.core.files.base import ContentFile
 from django.db import IntegrityError
 
 from core.forms import TelephoneInput, clean_phone as phone_cleaner
+from core.model.validator import cpf_validator, cnpj_validator
+from core.util.string import clear_string
 from gatheros_event.models import Member, Organization
 
 
@@ -52,7 +54,7 @@ class OrganizationForm(forms.ModelForm):
             'phone': TelephoneInput(attrs={'placeholder': '(99) 99999-9999'}),
             'email': forms.TextInput(
                 attrs={'type': 'email',
-                       'placeholder': 'me@you.com'}),
+                    'placeholder': 'me@you.com'}),
         }
 
     def __init__(self, user, internal=False, data=None, *args, **kwargs):
@@ -216,7 +218,7 @@ class OrganizationFinancialForm(forms.ModelForm):
             'phone': TelephoneInput(attrs={'placeholder': '(99) 99999-9999'}),
             'email': forms.TextInput(
                 attrs={'type': 'email',
-                       'placeholder': 'me@you.com'}),
+                    'placeholder': 'me@you.com'}),
         }
 
     def __init__(self, user, internal=False, data=None, *args, **kwargs):
@@ -280,6 +282,27 @@ class OrganizationFinancialForm(forms.ModelForm):
             )
 
         return result
+
+    def clean_cnpj_ou_cpf(self):
+        cleaned_cnpj_ou_cpf = phone_cleaner(
+            self.cleaned_data.get('cnpj_ou_cpf'))
+
+        cleaned_cnpj_ou_cpf = clear_string(cleaned_cnpj_ou_cpf)
+
+        if len(cleaned_cnpj_ou_cpf) == 11:
+            try:
+                cpf_validator(cleaned_cnpj_ou_cpf)
+            except ValidationError:
+                raise ValidationError('CPF Invalido')
+        elif len(cleaned_cnpj_ou_cpf) == 14:
+            try:
+                cnpj_validator(cleaned_cnpj_ou_cpf)
+            except ValidationError:
+                raise ValidationError('CPF Invalido')
+        else:
+            raise ValidationError('Numero de documento invalido')
+
+        return cleaned_cnpj_ou_cpf
 
     def clean_phone(self):
 
