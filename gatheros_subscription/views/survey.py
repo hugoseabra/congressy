@@ -229,6 +229,7 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
             question_data = {
                 'survey': self.survey.pk,
                 'type': request.POST.get('question_type'),
+                'active': True,
                 'name': request.POST.get('name'),
                 'label': request.POST.get('name'),
                 'help_text': request.POST.get('help_text'),
