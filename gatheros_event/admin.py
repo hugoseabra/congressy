@@ -342,5 +342,4 @@ class FeatureConfigurationAdmin(admin.ModelAdmin):
     Admin para Configurações de Eventos
     """
     search_fields = ('event__name',)
-    exclude = ('event'
-               '',)
+    exclude = ('event',)
