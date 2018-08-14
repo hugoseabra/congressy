@@ -59,6 +59,13 @@ class FeatureConfiguration(models.Model):
         default=False,
         verbose_name='funcionalidade - inscrições internas',
         help_text='Liberar funcionalidade de organizadores poderão inserir '
-                  'inscrição interna manualmente'
+                  'inscrição interna manualmente.'
+    )
+
+    feature_manual_payments = models.BooleanField(
+        default=False,
+        verbose_name='funcionalidade - pagamentos manuais',
+        help_text='Liberar funcionalidade de organizadores poderão inserir '
+                  'pagamentos manuais.'
     )
 
