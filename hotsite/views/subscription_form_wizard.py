@@ -184,7 +184,9 @@ def has_survey(wizard):
         except Lot.DoesNotExist:
             return False
 
-    return lot.event_survey and lot.event_survey.survey.questions.count()
+    return lot.event_survey and \
+           lot.event_survey.survey.questions.count() and \
+           lot.event.feature_release.feature_survey
 
 
 def is_private_event(wizard):
@@ -218,7 +220,8 @@ def has_products(wizard):
 
     try:
         optionals = lot.category.product_optionals
-        return optionals.filter(published=True).count() > 0
+        return optionals.filter(published=True).count() > 0 and \
+               lot.event.feature_release.feature_products
 
     except AttributeError:
         return False
@@ -247,7 +250,8 @@ def has_services(wizard):
 
     try:
         optionals = lot.category.service_optionals
-        return optionals.filter(published=True).count() > 0
+        return optionals.filter(published=True).count() > 0 and \
+               lot.event.feature_release.feature_services
 
     except AttributeError:
         return False
@@ -277,7 +281,8 @@ def has_paid_products(wizard):
     try:
         optionals = lot.category.product_optionals
         for optional in optionals.all():
-            if optional.price and optional.price > 0:
+            if optional.price and optional.price > 0 and \
+                    lot.event.feature_release.feature_products:
                 return True
 
     except AttributeError:
@@ -310,7 +315,8 @@ def has_paid_services(wizard):
     try:
         optionals = lot.category.service_optionals
         for optional in optionals.all():
-            if optional.price and optional.price > 0:
+            if optional.price and optional.price > 0 and \
+                    lot.event.feature_release.feature_services:
                 return True
 
     except AttributeError:
