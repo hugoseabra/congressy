@@ -10,14 +10,14 @@ from survey.directors import SurveyDirector
 
 class SurveyForm(forms.Form):
 
-    def __init__(self,  user, event_survey, **kwargs):
+    def __init__(self, user, event_survey, **kwargs):
         self.event_survey = event_survey
         self.event = event_survey.event
         self.user = user
 
         survey_director = SurveyDirector(event=self.event, user=self.user)
 
-        instance = survey_director.get_form(survey=self.event_survey.survey)
+        instance = survey_director.get_active_form(survey=self.event_survey.survey)
         super().__init__(**kwargs)
         self.initial = instance.initial
         self.fields = instance.fields

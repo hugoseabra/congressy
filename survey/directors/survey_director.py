@@ -4,7 +4,7 @@
 """
 from gatheros_event.models import Event
 from gatheros_subscription.models import EventSurvey
-from survey.forms import SurveyAnswerForm
+from survey.forms import SurveyAnswerForm, ActiveSurveyAnswerForm
 from survey.models import Author, Answer
 
 
@@ -148,6 +148,69 @@ class SurveyDirector(object):
             )
 
         return SurveyAnswerForm(
+            survey=survey,
+            data=data,
+            user=self.user,
+            author=author,
+        )
+
+    def get_active_form(self, survey, author=None, data=None) -> ActiveSurveyAnswerForm:
+        """
+
+        Este método é responsável por retornar um objeto do tipo
+        'SurveyForm' este objeto que em si é uma instância de 'forms.Form'.
+
+        Esse objeto já deve vir 'populado' quando o usuário
+        passado via parâmetro possua algum autoria de qualquer resposta(
+        'answer') de um formulário('survey').
+
+
+        :param survey: uma instância de um objeto de formulário
+        :param author: uma instância de um objeto de Author já existente
+        :param data: um dict contendo as novas respostas que serão
+                vinculadas ao form
+
+        :return SurveyForm: um objeto de SurveyForm
+        """
+
+        if author is None:
+            try:
+                author = Author.objects.get(survey=survey, user=self.user)
+            except Author.DoesNotExist:
+                pass
+
+        answers = {}  # lista que guarda as respostas dessa autoria caso haja.
+
+        if author:
+            try:
+                """
+                    Resgatar a autoria para poder popular as respostas dos
+                    objetos de 'survey'
+                """
+                for question in survey.questions.all():
+                    """
+                        Tenta iterar sobre todas as respostas deste autor.
+                    """
+                    try:
+                        answer = Answer.objects.get(question=question,
+                                                    author=author)
+                        answers.update({question.name: answer.value})
+                    except Answer.DoesNotExist:
+                        pass
+
+            except Author.DoesNotExist:
+                pass
+
+        if any(answers):
+            return ActiveSurveyAnswerForm(
+                survey=survey,
+                initial=answers,
+                data=data,
+                user=self.user,
+                author=author,
+            )
+
+        return ActiveSurveyAnswerForm(
             survey=survey,
             data=data,
             user=self.user,
