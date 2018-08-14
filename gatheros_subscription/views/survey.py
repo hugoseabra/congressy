@@ -184,6 +184,31 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
                 return HttpResponse(status=200)
 
+            elif action == 'deactivate':
+                question = get_object_or_404(
+                    Question,
+                    pk=question_id,
+                    survey=self.survey
+                )
+
+                if question.active is True:
+                    question.active = False
+                    question.save()
+
+                    return HttpResponse(status=200)
+
+            elif action == 'activate':
+                question = get_object_or_404(
+                    Question,
+                    pk=question_id,
+                    survey=self.survey
+                )
+
+                if question.active is False:
+                    question.active = True
+                    question.save()
+                    return HttpResponse(status=200)
+
             return HttpResponse(status=500)
 
         question_type = self.request.POST.get('question_type', None)

@@ -104,15 +104,15 @@
                                         </li>
                                         <li>
                                             {% if field.field.field_type == 'checkbox-group' or field.field.field_type == 'radio-group' %}
-                                            <a href="javascript:void(0)" onclick="openEditOptionQuestionTypeModal('{{ field.field.label }}', '{{ field.field.field_type }}', '{{ field.field.question_id }}')">
-                                                <i class="fas fa-pencil-alt"></i>
-                                                Alterar tipo
-                                            </a>
+                                                <a href="javascript:void(0)" onclick="openEditOptionQuestionTypeModal('{{ field.field.label }}', '{{ field.field.field_type }}', '{{ field.field.question_id }}')">
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                    Alterar tipo
+                                                </a>
                                             {% else %}
-                                            <a href="javascript:void(0)" onclick="openEditInputQuestionTypeModal('{{ field.field.label }}', '{{ field.field.field_type }}', '{{ field.field.question_id }}')">
-                                                <i class="fas fa-pencil-alt"></i>
-                                                Alterar tipo
-                                            </a>
+                                                <a href="javascript:void(0)" onclick="openEditInputQuestionTypeModal('{{ field.field.label }}', '{{ field.field.field_type }}', '{{ field.field.question_id }}')">
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                    Alterar tipo
+                                                </a>
                                             {% endif %}
                                         </li>
                                         <li class="js-duplicate">
@@ -129,6 +129,27 @@
                                                 Excluir
                                             </a>
                                         </li>
+
+                                        {% if field.field.is_active %}
+                                            <li class="js-deactivate">
+
+                                                <a href="javascript:void(0)" onclick="deactivateField('{{ field.field.label }}', '{{ field.field.question_id }}')">
+                                                    <i class="fas fa-times-circle"></i>
+                                                    Desativar
+                                                </a>
+
+                                            </li>
+                                        {% elif not field.field.is_active  %}
+                                            <li class="js-activate">
+
+                                                <a href="javascript:void(0)" onclick="activateField('{{ field.field.label }}', '{{ field.field.question_id }}')">
+                                                    <i class="fas fa-times-circle"></i>
+                                                    Ativar
+                                                </a>
+
+                                            </li>
+                                        {% endif %}
+
 
                                     </ul>
                                 </div>
@@ -176,6 +197,10 @@
     <style>
         .noborder td, .noborder th {
             border: none !important;
+        }
+
+        .deactivated {
+            background-color: lightgrey;
         }
     </style>
 {% endblock %}

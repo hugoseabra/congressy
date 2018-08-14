@@ -1214,6 +1214,72 @@
             });
         }
 
+        function deactivateField(question_name, questionId) {
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+            if (!confirm('Deseja realmente desativar a pergunta "'+question_name+'"?')) {
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: location.pathname,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: {
+                    question_id: questionId,
+                    action: 'deactivate'
+                },
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Pergunta desativada com sucesso!',
+                        type: 'success'
+                    });
+                    updateFields();
+                },
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel desativar pergunta.',
+                        type: 'error'
+                    });
+                }
+            });
+        }
+
+        function activateField(question_name, questionId) {
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+            if (!confirm('Deseja realmente ativar a pergunta "'+question_name+'"?')) {
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: location.pathname,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: {
+                    question_id: questionId,
+                    action: 'activate'
+                },
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Pergunta ativada com sucesso!',
+                        type: 'success'
+                    });
+                    updateFields();
+                },
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel ativar pergunta.',
+                        type: 'error'
+                    });
+                }
+            });
+        }
+
     </script>
 
 {% endblock %}
