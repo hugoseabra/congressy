@@ -69,6 +69,9 @@ class SurveyBaseForm(forms.Form):
             question = Question.objects.get(name=f_name,
                                             survey=self.survey)
 
+            if question.required is False and not answer:
+                continue
+
             if question.type == Question.PREDEFIENED_CPF:
                 try:
                     cpf_validator(answer)
@@ -85,7 +88,9 @@ class SurveyBaseForm(forms.Form):
 class SurveyAnswerForm(SurveyBaseForm):
     """ Formulário Dinâmico. """
 
-    answer_service_list = None
+    def __init__(self, *args, **kwargs):
+        self.answer_service_list = None
+        super().__init__(*args, **kwargs)
 
     def clean(self):
         clean_data = super().clean()

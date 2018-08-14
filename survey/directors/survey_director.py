@@ -127,24 +127,16 @@ class SurveyDirector(object):
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
 
         if author:
-            try:
+            for question in survey.questions.all():
                 """
-                    Resgatar a autoria para poder popular as respostas dos
-                    objetos de 'survey'
+                    Tenta iterar sobre todas as respostas deste autor.
                 """
-                for question in survey.questions.all():
-                    """
-                        Tenta iterar sobre todas as respostas deste autor.
-                    """
-                    try:
-                        answer = Answer.objects.get(question=question,
-                                                    author=author)
-                        answers.update({question.name: answer.value})
-                    except Answer.DoesNotExist:
-                        pass
-
-            except Author.DoesNotExist:
-                pass
+                try:
+                    answer = Answer.objects.get(question=question,
+                                                author=author)
+                    answers.update({question.name: answer.value})
+                except Answer.DoesNotExist:
+                    pass
 
         if any(answers):
             return SurveyAnswerForm(

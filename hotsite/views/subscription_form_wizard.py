@@ -597,7 +597,7 @@ class SubscriptionWizardView(SessionWizardView):
             )
 
             if not survey_form.is_valid():
-                raise ValidationError(form.errors)
+                raise ValidationError(survey_form.errors)
 
             survey_form.save()
             subscription = self.get_subscription()
