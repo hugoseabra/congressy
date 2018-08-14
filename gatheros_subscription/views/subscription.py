@@ -650,7 +650,7 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
         survey_director = SubscriptionSurveyDirector(subscription)
 
-        survey_form = survey_director.get_form(
+        survey_form = survey_director.get_active_form(
             survey=survey,
             data=data,
         )
@@ -1226,7 +1226,7 @@ class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
         data = form_kwargs.get('data')
         survey_director = SubscriptionSurveyDirector(self.subscription)
 
-        return survey_director.get_form(
+        return survey_director.get_active_form(
             survey=survey,
             data=data,
         )

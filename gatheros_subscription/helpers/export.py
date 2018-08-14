@@ -223,6 +223,9 @@ def _export_survey_answers(worksheet, event_survey):
         if question.required is True:
             column_name = '* {}'.format(column_name)
 
+        if question.active is False:
+            column_name += ' (desativado)'
+
         columns.append(column_name)
 
         # Marca coluna da pergunta pelo índice da lista
