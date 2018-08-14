@@ -38,7 +38,7 @@ class ServiceFeatureFlagMixin(OptionalBaseMixin):
 
     def pre_dispatch(self, request):
         response = super().pre_dispatch(request)
-        features = self.event.feature_release
+        features = self.event.feature_configuration
 
         if features.feature_services is False:
             raise PermissionDenied(self.get_permission_denied_message())
@@ -49,7 +49,7 @@ class ProductFeatureFlagMixin(OptionalBaseMixin):
 
     def pre_dispatch(self, request):
         response = super().pre_dispatch(request)
-        features = self.event.feature_release
+        features = self.event.feature_configuration
 
         if features.feature_products is False:
             raise PermissionDenied(self.get_permission_denied_message())

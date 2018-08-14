@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.db.models import Sum
 
 from .models import Category, Event, Info, Invitation, Member, Occupation, \
-    Organization, Person, Place, Segment, Subject
+    Organization, Person, Place, Segment, Subject, FeatureConfiguration
 
 
 @admin.register(Segment)
@@ -192,11 +192,6 @@ class OrganizationAdmin(admin.ModelAdmin):
                 'internal',
             ),
         }),
-        ('Inscrições', {
-            'fields': (
-                'allow_internal_subscription',
-            ),
-        }),
         ('Site e Redes Sociais', {
             'classes': ('collapse', 'closed'),
             'fields': (
@@ -339,3 +334,13 @@ class InvitationAdmin(admin.ModelAdmin):
 
     get_organization.__name__ = 'organização'
     get_user.__name__ = 'convidado'
+
+
+@admin.register(FeatureConfiguration)
+class FeatureConfigurationAdmin(admin.ModelAdmin):
+    """
+    Admin para Configurações de Eventos
+    """
+    search_fields = ('event__name',)
+    exclude = ('event'
+               '',)

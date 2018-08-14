@@ -2,12 +2,12 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from gatheros_event.models import Event, ConfFeatureRelease
+from gatheros_event.models import Event, FeatureConfiguration
 from mailer.services import notify_new_event
 
 
 @receiver(post_save, sender=Event)
-def create_conf_feature_release(instance, raw, created, **_):
+def create_conf_feature_configuration(instance, raw, created, **_):
     if raw is True:
         return
 
@@ -15,7 +15,7 @@ def create_conf_feature_release(instance, raw, created, **_):
         try:
             instance.feature_relase
         except AttributeError:
-            ConfFeatureRelease.objects.create(event=instance)
+            FeatureConfiguration.objects.create(event=instance)
 
 
 @receiver(post_save, sender=Event)

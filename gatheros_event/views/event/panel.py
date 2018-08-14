@@ -22,7 +22,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
     def post(self, request, *args, **kwargs):
 
         self.object = self.get_object()
-        features = self.object.feature_release
+        features = self.object.feature_configuration
 
         id_row = request.POST.get('id_row')
         row_name = id_row[4:]
@@ -169,7 +169,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
 
     def has_addons(self):
 
-        features = self.object.feature_release
+        features = self.object.feature_configuration
 
         has_addons = {
             'extra_activities': features.feature_services,

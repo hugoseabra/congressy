@@ -156,13 +156,13 @@ class EventForm(forms.ModelForm):
                 first_lot.category = general_category
                 first_lot.save()
 
-        self.set_feature_release(instance)
+        self.set_feature_configuration(instance)
 
         return instance
 
-    def set_feature_release(self, instance: Event):
+    def set_feature_configuration(self, instance: Event):
         data = self.cleaned_data
-        features = instance.feature_release
+        features = instance.feature_configuration
 
         features.feature_products = data['has_optionals']
         features.feature_services = data['has_extra_activities']

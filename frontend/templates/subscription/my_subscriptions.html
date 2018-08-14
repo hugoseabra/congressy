@@ -264,7 +264,7 @@
 
                                     </td>
                                     <td>
-                                        {% if item.event.has_certificate_config and item.status == item.CONFIRMED_STATUS and item.completed and item.event.feature_release.feature_certificate %}
+                                        {% if item.event.has_certificate_config and item.status == item.CONFIRMED_STATUS and item.completed and item.event.feature_configuration.feature_certificate %}
 
                                             {% if item.event.certificate.only_attending_participantes %}
                                                 {% if item.attended is True %}

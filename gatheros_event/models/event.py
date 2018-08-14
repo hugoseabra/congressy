@@ -319,10 +319,7 @@ class Event(models.Model, GatherosModelMixin):
 
     @property
     def allow_internal_subscription(self):
-        if self.running is True:
-            return True
-
-        return self.organization.allow_internal_subscription
+        return self.feature_configuration.feature_internal_subscription
 
     def get_status_display(self):
         """ Recupera o status do evento de acordo com a propriedade 'status'"""

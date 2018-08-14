@@ -6,15 +6,22 @@ from django.db import models
 from . import Event
 
 
-class ConfFeatureRelease(models.Model):
+class FeatureConfiguration(models.Model):
     """ Configuração de Recursos liberados de um evento """
+
+    class Meta:
+        verbose_name = 'Configuração de Features'
+        verbose_name_plural = 'Configurações de Features'
+
+    def __str__(self):
+        return self.event.name
 
     event = models.OneToOneField(
         Event,
         on_delete=models.CASCADE,
         primary_key=True,
         verbose_name='evento',
-        related_name='feature_release',
+        related_name='feature_configuration',
     )
 
     feature_survey = models.BooleanField(
@@ -47,3 +54,11 @@ class ConfFeatureRelease(models.Model):
         verbose_name='funcionalidade - atividades extras',
         help_text='Liberar funcionalidade de atividades extras no evento.'
     )
+
+    feature_internal_subscription = models.BooleanField(
+        default=False,
+        verbose_name='funcionalidade - inscrições internas',
+        help_text='Liberar funcionalidade de organizadores poderão inserir '
+                  'inscrição interna manualmente'
+    )
+

@@ -224,13 +224,6 @@ class Organization(models.Model, GatherosModelMixin):
         blank=True,
     )
 
-    allow_internal_subscription = models.BooleanField(
-        default=False,
-        verbose_name='permitir inscrição interna',
-        help_text='Se ativado, organizadores poderão inserir inscrição interna'
-                  ' manualmente.'
-    )
-
     last_access = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     class Meta:
