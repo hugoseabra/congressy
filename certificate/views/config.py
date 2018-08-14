@@ -6,10 +6,10 @@ from django.conf import settings
 from django.views import generic
 
 from certificate import models, forms
-from gatheros_event.views.mixins import EventViewMixin
+from .mixins import CertificateFeatureFlagMixin
 
 
-class CertificateConfigView(EventViewMixin, generic.TemplateView):
+class CertificateConfigView(CertificateFeatureFlagMixin, generic.TemplateView):
     template_name = 'certificate/certificado_.html'
     object = None
     long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
