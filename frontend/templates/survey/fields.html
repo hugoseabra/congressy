@@ -3,10 +3,9 @@
     <ul id="simpleList" class="list-group">
         {% for field in full_survey_form %}
             <li class="list-group-item {% if field.field.is_active %}question-disabled{% endif %}"
-                data-id="{{ field.name }}"
+                data-id="{{ field.field.question_id }}"
                 data-name="{{ field.name }}"
                 data-label="{{ field.label }}">
-
 
                 <div class="table">
                     <table class="table noborder" >

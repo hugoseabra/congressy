@@ -380,6 +380,7 @@ class EventSurveyDeleteAjaxView(EventViewMixin, AccountMixin,
 
         if event_survey_id:
             event_survey = get_object_or_404(EventSurvey, pk=event_survey_id)
+
             survey = event_survey.survey
             event_survey.delete()
             survey.delete()
