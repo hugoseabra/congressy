@@ -312,8 +312,7 @@ class PaymentForm(forms.Form):
             try:
                 debt = self.subscription.debts.get(
                     type=Debt.DEBT_TYPE_SERVICE,
-                    subscription=self.subscription,
-                    status=Debt.DEBT_STATUS_DEBT,
+                    item_id=str(service.optional.pk),
                 )
 
                 debt_kwargs['instance'] = debt
@@ -354,8 +353,7 @@ class PaymentForm(forms.Form):
             try:
                 debt = self.subscription.debts.get(
                     type=Debt.DEBT_TYPE_PRODUCT,
-                    subscription=self.subscription,
-                    status=Debt.DEBT_STATUS_DEBT,
+                    item_id=str(product.optional.pk),
                 )
 
                 debt_kwargs['instance'] = debt

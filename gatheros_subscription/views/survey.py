@@ -57,6 +57,11 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
             action = self.request.POST.get('action')
             question_id = self.request.POST.get('question_id')
 
+            if not action or not question_id:
+                HttpResponse(
+                    "Sem id({}) ou sem ação({})".format(question_id, action),
+                    status=500, )
+
             if action == 'delete':
 
                 question = get_object_or_404(Question,
