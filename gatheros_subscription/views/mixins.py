@@ -1,4 +1,5 @@
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
@@ -7,7 +8,7 @@ from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
 
 
-class SubscriptionBaseMixin(AccountMixin, generic.View):
+class FeatureFlagMixinBaseMixin(AccountMixin, generic.View):
     event = None
     permission_denied_message = 'Você não pode realizar esta ação.'
 
@@ -34,7 +35,7 @@ class SubscriptionBaseMixin(AccountMixin, generic.View):
         return context
 
 
-class CheckinFeatureFlagMixin(SubscriptionBaseMixin):
+class CheckinFeatureFlagMixin(FeatureFlagMixinBaseMixin):
 
     def pre_dispatch(self, request):
         response = super().pre_dispatch(request)
@@ -44,3 +45,15 @@ class CheckinFeatureFlagMixin(SubscriptionBaseMixin):
             raise PermissionDenied(self.get_permission_denied_message())
         return response
 
+
+class SurveyFeatureFlagMixin(FeatureFlagMixinBaseMixin):
+
+    def pre_dispatch(self, request):
+        response = super().pre_dispatch(request)
+        features = self.event.feature_release
+
+        if features.feature_survey is False:
+            if self.request.is_ajax():
+                return HttpResponse(status=403)
+            raise PermissionDenied(self.get_permission_denied_message())
+        return response

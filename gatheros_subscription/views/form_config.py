@@ -11,6 +11,7 @@ from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
 from gatheros_subscription.forms import EventSurveyForm, FormConfigForm
 from gatheros_subscription.models import EventSurvey
+from .mixins import SurveyFeatureFlagMixin
 
 
 class EventViewMixin(AccountMixin, generic.View):
@@ -70,7 +71,10 @@ class EventViewMixin(AccountMixin, generic.View):
         return reverse('event:event-list')
 
 
-class FormConfigView(TemplateNameableMixin, EventViewMixin, generic.FormView):
+class FormConfigView(SurveyFeatureFlagMixin,
+                     TemplateNameableMixin,
+                     EventViewMixin,
+                     generic.FormView):
     """ Formulário de configuração de inscrição."""
 
     form_class = FormConfigForm
