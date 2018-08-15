@@ -69,3 +69,15 @@ class FeatureConfiguration(models.Model):
                   'pagamentos manuais.'
     )
 
+    feature_boleto_expiration_on_lot_expiration = models.BooleanField(
+        default=False,
+        verbose_name='funcionalidade - vencimento dos boletos',
+        help_text='Liberar funcionalidade vencimento dos boletos na da data '
+                  'de vencimento dos lotes'
+    )
+
+    feature_import_via_csv = models.BooleanField(
+        default=False,
+        verbose_name='funcionalidade - importação via CSV',
+        help_text='Liberar funcionalidade de permitir importação via csv'
+    )

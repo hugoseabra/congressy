@@ -16,7 +16,7 @@ class CSVViewMixin(EventViewMixin):
     def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
 
-        if not self.event.allow_importing:
+        if not self.event.feature_configuration.feature_import_via_csv:
 
             if request.is_ajax():
                 message = 'Evento não permite importação via CSV'
