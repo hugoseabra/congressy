@@ -187,6 +187,31 @@ class SurveyEditView(SurveyFeatureFlagMixin,
 
                 return HttpResponse(status=200)
 
+            elif action == 'deactivate':
+                question = get_object_or_404(
+                    Question,
+                    pk=question_id,
+                    survey=self.survey
+                )
+
+                if question.active is True:
+                    question.active = False
+                    question.save()
+
+                    return HttpResponse(status=200)
+
+            elif action == 'activate':
+                question = get_object_or_404(
+                    Question,
+                    pk=question_id,
+                    survey=self.survey
+                )
+
+                if question.active is False:
+                    question.active = True
+                    question.save()
+                    return HttpResponse(status=200)
+
             return HttpResponse(status=500)
 
         question_type = self.request.POST.get('question_type', None)
@@ -207,6 +232,7 @@ class SurveyEditView(SurveyFeatureFlagMixin,
             question_data = {
                 'survey': self.survey.pk,
                 'type': request.POST.get('question_type'),
+                'active': True,
                 'name': request.POST.get('name'),
                 'label': request.POST.get('name'),
                 'help_text': request.POST.get('help_text'),
@@ -363,6 +389,7 @@ class EventSurveyDeleteAjaxView(SurveyFeatureFlagMixin,
 
         if event_survey_id:
             event_survey = get_object_or_404(EventSurvey, pk=event_survey_id)
+
             survey = event_survey.survey
             event_survey.delete()
             survey.delete()

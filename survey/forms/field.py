@@ -75,6 +75,7 @@ class SurveyField(object):
         self.initial = initial
         self.required = required
         self.can_edit = True
+        self.is_active = question.active
         self.label = label or ''
         self.placeholder = kwargs.get('placeholder', '')
         self.help_text = kwargs.get('help_text', '')
@@ -234,9 +235,11 @@ class SurveyField(object):
             self.django_field.choices = self.options
 
         self.django_field.can_edit = not self.question.has_answers
+        self.django_field.is_active = self.is_active
         self.django_field.field_type = self.type
         self.django_field.question_id = self.question.pk
         self.django_field.question_name = self.question.name
+
 
         return self.django_field
 
