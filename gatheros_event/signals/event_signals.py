@@ -7,7 +7,7 @@ from mailer.services import notify_new_event
 
 
 @receiver(post_save, sender=Event)
-def create_conf_feature_configuration(instance, raw, created, **_):
+def create_feature_configuration(instance, raw, created, **_):
     if raw is True:
         return
 
@@ -19,7 +19,7 @@ def create_conf_feature_configuration(instance, raw, created, **_):
 
 
 @receiver(post_save, sender=Event)
-def create_conf_feature_management(instance, raw, created, **_):
+def create_feature_management(instance, raw, created, **_):
     if raw is True:
         return
 
