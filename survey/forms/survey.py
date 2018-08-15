@@ -85,7 +85,7 @@ class SurveyBaseForm(forms.Form):
                     raise forms.ValidationError({f_name: 'CNPJ Inválido.'})
 
 
-class ActiveSurveyBaseForm(forms.Form):
+class ActiveSurveyBaseForm(SurveyBaseForm):
     """ Formulário Dinâmico. """
 
     def __init__(self, survey, user=None, author=None, *args, **kwargs):
