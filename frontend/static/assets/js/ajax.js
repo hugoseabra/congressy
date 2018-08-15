@@ -5,12 +5,13 @@ window.cgsy = window.cgsy || {};
     cgsy.AjaxSender = function (url) {
 
         url = url || window.location.href;
+        var sender_method = null;
 
         var success_callback = function () {
         };
         var default_fail_callback = function (response) {
             var msg = 'Failure on request to "' + url + '" with method';
-            msg += ' "' + this.method + '".';
+            msg += ' "' + sender_method + '".';
 
             if (response.hasOwnProperty('detail')) {
                 msg += ' Detalhes: ' + response.detail;
@@ -60,6 +61,7 @@ window.cgsy = window.cgsy || {};
         this.send = function (method, data) {
 
             data = data || {};
+            sender_method = method;
 
             $.ajax({
                 url: url,

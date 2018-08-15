@@ -22,7 +22,8 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
     def post(self, request, *args, **kwargs):
 
         self.object = self.get_object()
-        features = self.object.feature_configuration
+        feature_config = self.object.feature_configuration
+        feature_management = self.object.feature_management
 
         id_row = request.POST.get('id_row')
         row_name = id_row[4:]
@@ -37,29 +38,49 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
                 val = False
 
             if row_name == 'checkin':
-                features.feature_checkin = val
-                features.save()
-                return HttpResponse(status=201)
+                if feature_config.feature_checkin:
+                    feature_management.checkin = val
+                    feature_management.save()
+                    return HttpResponse(status=201)
+                else:
+                    return HttpResponse("Evento não possui essa funcionalidade",
+                                        status=403)
 
             elif row_name == 'extra_activities':
-                features.feature_services = val
-                features.save()
-                return HttpResponse(status=201)
+                if feature_config.feature_services:
+                    feature_management.services = val
+                    feature_management.save()
+                    return HttpResponse(status=201)
+                else:
+                    return HttpResponse("Evento não possui essa funcionalidade",
+                                        status=403)
 
             elif row_name == 'certificate':
-                features.feature_certificate = val
-                features.save()
-                return HttpResponse(status=201)
+                if feature_config.feature_certificate:
+                    feature_management.certificate = val
+                    feature_management.save()
+                    return HttpResponse(status=201)
+                else:
+                    return HttpResponse("Evento não possui essa funcionalidade",
+                                        status=403)
 
             elif row_name == 'optionals':
-                features.feature_products = val
-                features.save()
-                return HttpResponse(status=201)
+                if feature_config.feature_products:
+                    feature_management.products = val
+                    feature_management.save()
+                    return HttpResponse(status=201)
+                else:
+                    return HttpResponse("Evento não possui essa funcionalidade",
+                                        status=403)
 
             elif row_name == 'survey':
-                features.feature_survey = val
-                features.save()
-                return HttpResponse(status=201)
+                if feature_config.feature_survey:
+                    feature_management.survey = val
+                    feature_management.save()
+                    return HttpResponse(status=201)
+                else:
+                    return HttpResponse("Evento não possui essa funcionalidade",
+                                        status=403)
 
         return HttpResponse(status=200)
 
@@ -68,6 +89,8 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         context = super(EventPanelView, self).get_context_data(**kwargs)
 
         context['event'] = self.object
+        context['feature_config'] = self.object.feature_configuration
+        context['feature_management'] = self.object.feature_management
         context['status'] = self._get_status()
         context['totals'] = self._get_payables()
         context['limit'] = self._get_limit()
@@ -83,7 +106,6 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         context['can_delete'] = self._can_delete
         context['can_view_lots'] = self._can_view_lots
         context['can_manage_subscriptions'] = self.can_manage_subscriptions
-        context['has_addons'] = self.has_addons()
         context['percent_attended'] = {
             'label': round(self.object.percent_attended),
             'number': str(self.object.percent_attended).replace(',', '.'),
@@ -166,20 +188,6 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
 
         except Subscription.DoesNotExist:
             return 0
-
-    def has_addons(self):
-
-        features = self.object.feature_configuration
-
-        has_addons = {
-            'extra_activities': features.feature_services,
-            'optionals': features.feature_products,
-            'checkin': features.feature_checkin,
-            'certificate': features.feature_certificate,
-            'survey': features.feature_survey,
-        }
-
-        return has_addons
 
     def has_paid_lots(self):
         """ Retorna se evento possui algum lote pago. """

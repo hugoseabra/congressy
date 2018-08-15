@@ -6,7 +6,8 @@ from django.contrib import admin
 from django.db.models import Sum
 
 from .models import Category, Event, Info, Invitation, Member, Occupation, \
-    Organization, Person, Place, Segment, Subject, FeatureConfiguration
+    Organization, Person, Place, Segment, Subject, FeatureConfiguration, \
+    FeatureManagement
 
 
 @admin.register(Segment)
@@ -343,3 +344,13 @@ class FeatureConfigurationAdmin(admin.ModelAdmin):
     """
     search_fields = ('event__name',)
     exclude = ('event',)
+
+
+@admin.register(FeatureManagement)
+class FeatureManagementAdmin(admin.ModelAdmin):
+    """
+    Admin para Configurações de Eventos selecionadas pelos organizadores
+    """
+    search_fields = ('event__name',)
+    exclude = ('event',)
+

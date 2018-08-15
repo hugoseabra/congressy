@@ -1,13 +1,49 @@
 {% extends "base/base.html" %}
 {# @TODO Change the icons in nav_aside_itens  #}
 
-{% load static event_tags  base_tags  widget_tweaks form_config_tags humanize l10n %}
-{% load queryset_filter %}
+{% load static event_tags  base_tags  widget_tweaks form_config_tags humanize l10n queryset_filter %}
+{% block styles %}
+    <style>
+        .add_todo_element {
+            padding-right: 10px;
+            cursor: pointer;
+        }
+
+        .todo_list_element {
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .new_nav_items {
+            width: 40px;
+        }
+
+        .divider {
+            height: 1px;
+            margin: 9px 0;
+            overflow: hidden;
+            background-color: #e5e5e5;
+        }
+
+        .sidebar-left .nav > li.active > a {
+            color: #6FAFC0;
+        }
+    </style>
+{% endblock %}
+{% block pageheader %}
+    <div class="pageheader">
+        <h2>Painel do Evento</h2>
+    </div>
+{% endblock %}
 {% block scripts %}
     <script src="{% static "/assets/plugins/gauge/gauge.min.js" %}"></script>
+    <script src="{% static "assets/js/messenger.js" %}"></script>
     <script src="{% static "/assets/plugins/chartjs/Chart.min.js" %}"></script>
     <link href="https://fonts.googleapis.com/css?family=Roboto"
           rel="stylesheet">
+
     <script>
         //=================Gauge Inscritos=================================
 
@@ -52,6 +88,13 @@
         ];
 
         $(document).ready(function () {
+
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom ' +
+                'messenger-on-right',
+                theme: 'flat'
+            };
+
             var ctx3 = document.getElementById("doughnut");
             if (ctx3 != null) {
                 ctx3 = ctx3.getContext('2d');
@@ -67,7 +110,6 @@
 
         (function ($, cgsy) {
             "use strict";
-
 
             cgsy.panel.TodoList = function () {
                 var that = this;
@@ -88,7 +130,6 @@
                     sender.send('GET');
                 };
 
-
                 this.update = function (main_el, id_row, callback) {
                     main_el = $(main_el);
 
@@ -97,36 +138,22 @@
                         that.render(main_el, callback);
 
                     });
+
+                    sender.setFailCallback(function (res) {
+
+                        if (res.status === 403) {
+                            window.cgsy.messenger.triggerError(
+                                'Você não tem permissão para executar essa ação.'
+                            );
+                        }
+
+
+                    });
+
                     sender.send('POST', {'id_row': id_row});
+
                 };
             };
-
-            {#cgsy.panel.InsideBar = function () {#}
-            {#    var that = this;#}
-            {##}
-            {#    this.render = function (main_el, callback) {#}
-            {#        main_el = $(main_el);#}
-            {##}
-            {#        var sender = new cgsy.AjaxSender("{% url 'event:event-panel' event.pk %}?template_name=event/event-menu");#}
-            {#        sender.setSuccessCallback(function (response) {#}
-            {#            main_el.html(response);#}
-            {#            if (callback) {#}
-            {#                callback();#}
-            {#            }#}
-            {#        });#}
-            {##}
-            {#        sender.send('GET');#}
-            {#    };#}
-            {##}
-            {##}
-            {#    this.update = function (main_el, callback) {#}
-            {#        main_el = $(main_el);#}
-            {##}
-            {#        var sender = new cgsy.AjaxSender("{% url 'event:event-panel' event.pk %}");#}
-            {#        sender.setSuccessCallback(function () {#}
-            {#            that.render(main_el, callback);#}
-            {#        });#}
-            {#    };#}
 
         })(jQuery, window.cgsy);
 
@@ -181,18 +208,6 @@
             });
         }
 
-        {##}
-        {#function updateInsideBar() {#}
-        {#    var inside = new window.cgsy.panel.InsideBar();#}
-        {#    $('.update_inside_bar').on('click', function () {#}
-        {#        inside.update(#}
-        {#            $('#event-menu'),#}
-        {#            function () {#}
-        {#                updateInsideBar();#}
-        {#            }#}
-        {#        );#}
-        {#    });#}
-
         $(document).ready(function () {
             setProgressBar();
             create_todo_events();
@@ -203,41 +218,7 @@
     </script>
 
 {% endblock %}
-{% block styles %}
-    <style>
-        .add_todo_element {
-            padding-right: 10px;
-            cursor: pointer;
-        }
 
-        .todo_list_element {
-            padding-left: 10px;
-            padding-right: 10px;
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
-
-        .new_nav_items {
-            width: 40px;
-        }
-
-        .divider {
-            height: 1px;
-            margin: 9px 0;
-            overflow: hidden;
-            background-color: #e5e5e5;
-        }
-
-        .sidebar-left .nav > li.active > a {
-            color: #6FAFC0;
-        }
-    </style>
-{% endblock %}
-{% block pageheader %}
-    <div class="pageheader">
-        <h2>Painel do Evento</h2>
-    </div>
-{% endblock %}
 
 {% block title %} Painel do evento | Congressy{% endblock %}
 
@@ -301,7 +282,6 @@
         </div>
     </div>
 
-
     {% if has_paid_lots %}
         <div class="col-md-12 col-lg-12">
             <div class="col-md-6 col-sm-12 col-xs-12">
@@ -351,6 +331,7 @@
             </div>
         </div>
     {% endif %}
+
     <div id="graph-data" class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
         <div class=" col-lg-6 col-md-6 col-sm-12 col-xs-12"
              style="margin-bottom: 15px ">
@@ -420,4 +401,6 @@
             </div>
         {% endif %}
     </div>
+
+
 {% endblock %}
