@@ -19,7 +19,8 @@ from clint.textui import colored, puts
 def shell_do(cmd, **kwargs):
     process = subprocess.Popen(cmd.format(**kwargs), shell=True,
                                stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE, universal_newlines=True)
+                               stderr=subprocess.PIPE,
+                               universal_newlines=True)
     out, err = process.communicate()
 
     if err:
