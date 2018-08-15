@@ -486,7 +486,7 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
 
             return redirect(url)
 
-        if self.event.allow_internal_subscription is False:
+        if not self.event.feature_configuration.feature_manual_payments:
             self.permission_denied_url = reverse(
                 'subscription:subscription-list', kwargs={
                     'event_pk': self.event.pk,
