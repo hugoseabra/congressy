@@ -42,12 +42,6 @@ class Command(BaseCommand):
                 management.products = True
                 config.feature_products = True
 
-            if event.allow_boleto_expiration_on_lot_expiration:
-                config.feature_boleto_expiration_on_lot_expiration = True
-
-            if event.allow_importing:
-                config.feature_import_via_csv = True
-
             management.save()
             config.save()
 
