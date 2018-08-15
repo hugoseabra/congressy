@@ -41,7 +41,7 @@ Variáveis:
             </a>
         </li>
     {% endif %}
-    {% if event.has_certificate %}
+    {% if event.feature_configuration.feature_certificate and  event.feature_management.certificate %}
 
         <li {% if active == 'certificate' %}class=  "active"{% endif %}>
             <a class="sidebar-itens"
@@ -115,7 +115,7 @@ Variáveis:
 
 </ul>
 
-{% if event.feature_configuration.feature_checkin %}
+{% if event.feature_configuration.feature_checkin and event.feature_management.checkin %}
     <h5 class="sidebar-header" style="color:#4c4c4c;">Credenciamento</h5>
     <ul class="nav nav-pills nav-stacked">
         <li {% if active == 'checkin-dashboard' %}class="active"{% endif %}>
@@ -167,10 +167,10 @@ Variáveis:
 
 {% has_paid_lots event as has_paid_lots %}
 
-{% if event.feature_configuration.feature_products or event.feature_configuration.feature_services %}
+{% if event.feature_management.products and  event.feature_configuration.feature_products or event.feature_configuration.feature_services and event.feature_management.services %}
     <h5 class="sidebar-header" style="color:#4c4c4c;">Recursos Extras</h5>
     <ul class="nav nav-pills nav-stacked">
-        {% if event.feature_configuration.feature_services %}
+        {% if event.feature_configuration.feature_services and event.feature_management.services%}
             <li {% if active == 'addon-themes' %}class="active"{% endif %}>
                 <a class="sidebar-itens"
                    href="{% url 'addon:theme-list' event.pk %}"
@@ -188,7 +188,7 @@ Variáveis:
                 </a>
             </li>
         {% endif %}
-        {% if event.feature_configuration.feature_products %}
+        {% if event.feature_configuration.feature_products and event.feature_management.products%}
             <li {% if active == 'addon-opcionais' %}class="active"{% endif %}>
                 <a class="sidebar-itens"
                    href="{% url 'addon:optional-product-list' event.pk %}"
