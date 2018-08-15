@@ -24,17 +24,20 @@ class SurveyBaseForm(forms.Form):
         self.author = author
 
         super(SurveyBaseForm, self).__init__(*args, **kwargs)
+        self.create_questions()
 
-        if self.survey.questions:
+    def get_questions(self):
+        return self.survey.questions.all()
 
-            for question in self.survey.questions.all().order_by('order'):
-                self.create_field(name=question.name,
-                                  field_type=question.type,
-                                  label=question.label,
-                                  required=question.required,
-                                  help_text=question.help_text,
-                                  intro=question.intro,
-                                  question=question)
+    def create_questions(self):
+        for question in self.get_questions().order_by('order'):
+            self.create_field(name=question.name,
+                              field_type=question.type,
+                              label=question.label,
+                              required=question.required,
+                              help_text=question.help_text,
+                              intro=question.intro,
+                              question=question)
 
     def create_field(self, question, name, field_type, initial=None,
                      required=False, help_text=None, intro=False,
@@ -83,39 +86,6 @@ class SurveyBaseForm(forms.Form):
                     cnpj_validator(answer)
                 except forms.ValidationError:
                     raise forms.ValidationError({f_name: 'CNPJ Inválido.'})
-
-
-class ActiveSurveyBaseForm(SurveyBaseForm):
-    """ Formulário Dinâmico. """
-
-    def __init__(self, survey, user=None, author=None, *args, **kwargs):
-
-        if not isinstance(survey, Survey):
-            msg = '{} não é uma instância de Survey'.format(
-                survey.__class__.__name__
-            )
-            raise ValueError(msg)
-
-        self.survey = survey
-        self.user = user
-        self.author = author
-
-        super(ActiveSurveyBaseForm, self).__init__(*args, **kwargs)
-
-        if self.survey.questions:
-
-            questions = self.survey.questions.filter(
-                active=True,
-            ).order_by('order')
-
-            for question in questions:
-                self.create_field(name=question.name,
-                                  field_type=question.type,
-                                  label=question.label,
-                                  required=question.required,
-                                  help_text=question.help_text,
-                                  intro=question.intro,
-                                  question=question)
 
 
 class SurveyAnswerForm(SurveyBaseForm):
@@ -201,6 +171,11 @@ class SurveyAnswerForm(SurveyBaseForm):
             answer.save()
 
 
-class ActiveSurveyAnswerForm(ActiveSurveyBaseForm):
+class ActiveSurveyAnswerForm(SurveyAnswerForm):
     """ Formulário Dinâmico. """
-    pass
+
+    def get_questions(self):
+        questions_qs = super().get_questions()
+        questions_qs.filter(active=True)
+
+        return questions_qs
