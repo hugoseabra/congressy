@@ -91,6 +91,8 @@ class OptionalServiceListView(TemplateNameableMixin,
         for cat in queryset.all():
             for optional in cat.service_optionals.all():
                 sub_queryset = optional.subscription_services.filter(
+                    subscription__test_subscription=False,
+                    subscription__completed=True,
                     subscription__status__in=['confirmed', 'awaiting']
                 )
                 num = sub_queryset.count()
@@ -136,6 +138,8 @@ class OptionalProductListView(TemplateNameableMixin,
         for cat in queryset.all():
             for optional in cat.product_optionals.all():
                 sub_queryset = optional.subscription_products.filter(
+                    subscription__test_subscription=False,
+                    subscription__completed=True,
                     subscription__status__in=['confirmed', 'awaiting']
                 )
                 num = sub_queryset.count()
@@ -310,7 +314,8 @@ class OptionalProductEditView(EventOptionalMixin, generic.UpdateView):
         context['optional_active'] = 'product'
         context['optonal_has_subscriptions'] = \
             self.object.subscription_products.filter(
-                subscription__completed=True, subscription__test_subscription=False
+                subscription__completed=True,
+                subscription__test_subscription=False
             ).count()
         return context
 
