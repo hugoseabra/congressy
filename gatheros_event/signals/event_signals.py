@@ -15,7 +15,10 @@ def create_conf_feature_configuration(instance, raw, created, **_):
         try:
             instance.feature_relase
         except AttributeError:
-            FeatureConfiguration.objects.create(event=instance)
+            FeatureConfiguration.objects.create(
+                event=instance,
+                feature_certificate=True,
+            )
 
 
 @receiver(post_save, sender=Event)
