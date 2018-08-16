@@ -2,6 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import PermissionDenied, NotFound
 from rest_framework.permissions import BasePermission
 
+from gatheros_subscription.helpers.event_types import is_free_event
 from .models import Service, Product
 
 
@@ -26,13 +27,9 @@ class IsNotFreeEvent(BasePermission):
         if optional is None:
             raise NotFound()
 
-        for lot in optional.lot_category.event.lots.all():
-            if lot.price and lot.price > 0:
-                return True
+        event = optional.lot_category.event
 
-        if optional.lot_category.event.event_type == \
-                optional.lot_category.event.EVENT_TYPE_FREE:
+        if is_free_event(event):
             raise PermissionDenied()
 
         return True
-
