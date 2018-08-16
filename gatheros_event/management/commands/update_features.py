@@ -7,7 +7,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         i = 0
-        processed_orgs = list()
 
         for event in Event.objects.all():
             self.stdout.write(self.style.SUCCESS(
@@ -15,16 +14,14 @@ class Command(BaseCommand):
             ))
 
             config = FeatureConfiguration.objects.create(
-                event=event
+                event=event,
+                feature_certificate=True,
+                feature_internal_subscription=True,
             )
 
             management = FeatureManagement.objects.create(
                 event=event
             )
-
-            if event.has_certificate:
-                management.certificate = True
-                config.feature_certificate = True
 
             if event.has_survey:
                 management.survey = True
@@ -41,6 +38,9 @@ class Command(BaseCommand):
             if event.has_optionals:
                 management.products = True
                 config.feature_products = True
+
+            if event.event_type == event.EVENT_TYPE_PAID:
+                event.feature_configuration.feature_checkin = True
 
             management.save()
             config.save()
