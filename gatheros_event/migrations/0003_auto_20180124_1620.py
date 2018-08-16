@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='organization',
             name='cnpj_ou_cpf',
-            field=models.CharField(blank=True, max_length=14, null=True, verbose_name='CPF ou CNPJ da conta com ou sem pontuações'),
+            field=models.CharField(blank=True, max_length=14, null=True, unique=True, verbose_name='CPF ou CNPJ da conta com ou sem pontuações'),
         ),
         migrations.AlterField(
             model_name='organization',
