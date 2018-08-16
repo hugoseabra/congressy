@@ -13,12 +13,19 @@ def create_conf_feature_configuration(instance, raw, created, **_):
 
     if created is True:
         try:
-            instance.feature_relase
+            instance.feature_configuration
         except AttributeError:
             FeatureConfiguration.objects.create(
                 event=instance,
                 feature_certificate=True,
+                feature_internal_subscription=True,
+                
             )
+
+        if instance.event_type == instance.EVENT_TYPE_PAID:
+            instance.feature_configuration.feature_checkin = True
+
+        instance.feature_configuration.save()
 
 
 @receiver(post_save, sender=Event)
