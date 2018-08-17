@@ -99,7 +99,8 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
                   ' deste item opcional?'
     )
 
-    description = models.TextField(
+    description = models.CharField(
+        max_length=150,
         verbose_name="descrição",
         null=True,
         blank=True,
@@ -193,7 +194,6 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
         congressy_amount = self.liquid_price * congressy_plan_percent
         # if congressy_amount < minimum:
         #     congressy_amount = minimum
-
 
         return round(self.liquid_price + congressy_amount, 2)
 
