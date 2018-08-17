@@ -334,7 +334,6 @@ class Lot(models.Model, GatherosModelMixin):
                 if total_subscriptions_event >= self.event.expected_subscriptions:
                     return Lot.LOT_STATUS_FINISHED
 
-
         now = datetime.now()
         if now >= self.date_end:
             return Lot.LOT_STATUS_FINISHED
