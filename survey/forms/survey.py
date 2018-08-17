@@ -24,17 +24,20 @@ class SurveyBaseForm(forms.Form):
         self.author = author
 
         super(SurveyBaseForm, self).__init__(*args, **kwargs)
+        self.create_questions()
 
-        if self.survey.questions:
+    def get_questions(self):
+        return self.survey.questions.all()
 
-            for question in self.survey.questions.all().order_by('order'):
-                self.create_field(name=question.name,
-                                  field_type=question.type,
-                                  label=question.label,
-                                  required=question.required,
-                                  help_text=question.help_text,
-                                  intro=question.intro,
-                                  question=question)
+    def create_questions(self):
+        for question in self.get_questions().order_by('order'):
+            self.create_field(name=question.name,
+                              field_type=question.type,
+                              label=question.label,
+                              required=question.required,
+                              help_text=question.help_text,
+                              intro=question.intro,
+                              question=question)
 
     def create_field(self, question, name, field_type, initial=None,
                      required=False, help_text=None, intro=False,
@@ -69,6 +72,9 @@ class SurveyBaseForm(forms.Form):
             question = Question.objects.get(name=f_name,
                                             survey=self.survey)
 
+            if question.required is False and not answer:
+                continue
+
             if question.type == Question.PREDEFIENED_CPF:
                 try:
                     cpf_validator(answer)
@@ -85,7 +91,9 @@ class SurveyBaseForm(forms.Form):
 class SurveyAnswerForm(SurveyBaseForm):
     """ Formulário Dinâmico. """
 
-    answer_service_list = None
+    def __init__(self, *args, **kwargs):
+        self.answer_service_list = None
+        super().__init__(*args, **kwargs)
 
     def clean(self):
         clean_data = super().clean()
@@ -161,3 +169,13 @@ class SurveyAnswerForm(SurveyBaseForm):
     def save(self):
         for answer in self.answer_service_list:
             answer.save()
+
+
+class ActiveSurveyAnswerForm(SurveyAnswerForm):
+    """ Formulário Dinâmico. """
+
+    def get_questions(self):
+        questions_qs = super().get_questions()
+        questions_qs.filter(active=True)
+
+        return questions_qs

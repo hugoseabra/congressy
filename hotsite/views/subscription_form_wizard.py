@@ -591,13 +591,13 @@ class SubscriptionWizardView(SessionWizardView):
                     survey_response.update(
                         {form_question.replace('survey-', ''): form_response})
 
-            survey_form = survey_director.get_form(
+            survey_form = survey_director.get_active_form(
                 survey=lot.event_survey.survey,
                 data=survey_response,
             )
 
             if not survey_form.is_valid():
-                raise ValidationError(form.errors)
+                raise ValidationError(survey_form.errors)
 
             survey_form.save()
             subscription = self.get_subscription()

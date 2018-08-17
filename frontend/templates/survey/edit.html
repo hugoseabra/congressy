@@ -619,6 +619,9 @@
                         <strong>
                             Certeza que deseja deletar essa pergunta?
                         </strong>
+                        <hr />
+                        Isso irá excluir as respoatas desta pergunta.
+                        Talvez apenas desativar a pergunta possa ser suficiente para manter as respostas existentes.
                     </p>
                     <hr/>
                     <i id="removingQuestion"></i>
@@ -636,7 +639,7 @@
                             class="btn btn-success"
                             id="deleteQuestion"
                             data-dismiss="modal">
-                        Sim
+                        Sim, excluir pergunta e respostas
                     </button>
                 </div>
 
@@ -1049,12 +1052,13 @@
                     var questionIdEl = $('#removingQuestionId');
                     var questionNameEl = $('#removingQuestionName');
 
-                    var trElement = $(evt.item).closest('tr');
-                    var question = $(trElement).find('td:eq(1)').data();
+                    var liElement = $(evt.item).closest('li.list-group-item');
+                    var question = liElement.data();
+                    console.log(question);
 
-                    questionEl.text(question.questionLabel);
-                    questionIdEl.val(question.questionId);
-                    questionNameEl.val(question.questionLabel);
+                    questionEl.text(question.label);
+                    questionIdEl.val(question.id);
+                    questionNameEl.val(question.label);
                     $('#confirmDelete').modal('show');
                 },
                 onEnd: function (evt) {
@@ -1214,6 +1218,72 @@
             });
         }
 
+        function deactivateField(question_name, questionId) {
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+            if (!confirm('Deseja realmente desativar a pergunta "'+question_name+'"?')) {
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: location.pathname,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: {
+                    question_id: questionId,
+                    action: 'deactivate'
+                },
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Pergunta desativada com sucesso!',
+                        type: 'success'
+                    });
+                    updateFields();
+                },
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel desativar pergunta.',
+                        type: 'error'
+                    });
+                }
+            });
+        }
+
+        function activateField(question_name, questionId) {
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+            if (!confirm('Deseja realmente ativar a pergunta "'+question_name+'"?')) {
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: location.pathname,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: {
+                    question_id: questionId,
+                    action: 'activate'
+                },
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Pergunta ativada com sucesso!',
+                        type: 'success'
+                    });
+                    updateFields();
+                },
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel ativar pergunta.',
+                        type: 'error'
+                    });
+                }
+            });
+        }
+
     </script>
 
 {% endblock %}
@@ -1227,6 +1297,11 @@
 
         .list-group-item:hover .control-buttons {
             visibility: visible;
+        }
+
+        li.question-disabled table td {
+            font-style: italic;
+            color: #CCC;
         }
 
     </style>

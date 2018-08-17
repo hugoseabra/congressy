@@ -234,11 +234,10 @@ class Product(AbstractOptional):
         :return: número de opcionais vendidos
         :type: bool
         """
-        return self.subscription_products \
-            .filter(subscription__completed=True,
-                    subscription__test_subscription=False) \
-            .exclude(subscription__status=Subscription.CANCELED_STATUS) \
-            .count()
+        return self.subscription_products.filter(
+            subscription__completed=True,
+            subscription__test_subscription=False
+        ).exclude(subscription__status=Subscription.CANCELED_STATUS).count()
 
 
 @track_data('schedule_start', 'schedule_end')
@@ -313,8 +312,7 @@ class Service(AbstractOptional):
         :return: número de opcionais vendidos
         :type: bool
         """
-        return self.subscription_services \
-            .filter(subscription__completed=True,
-                    subscription__test_subscription=False) \
-            .exclude(subscription__status=Subscription.CANCELED_STATUS) \
-            .count()
+        return self.subscription_services.filter(
+            subscription__completed=True,
+            subscription__test_subscription=False
+        ).exclude(subscription__status=Subscription.CANCELED_STATUS).count()

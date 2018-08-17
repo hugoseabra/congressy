@@ -157,7 +157,6 @@ class Organization(models.Model, GatherosModelMixin):
 
     # Obrigatório - CPF ou CNPJ da conta com ou sem pontuações
     cnpj_ou_cpf = models.CharField(
-        unique=True,
         max_length=14,
         blank=True,
         null=True,
