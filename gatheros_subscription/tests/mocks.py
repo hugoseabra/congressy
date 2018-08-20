@@ -25,7 +25,8 @@ class MockFactory:
         return Lot.objects.create(
             event=event,
             name=self.fake_factory.name(),
-            date_start=datetime.now() + timedelta(days=2)
+            date_start=datetime.now() + timedelta(days=2),
+            date_end=event.date_start,
         )
 
     def fake_paid_lot(self, event: Event, amount: int = 10):
@@ -36,7 +37,33 @@ class MockFactory:
             event=event,
             price=amount,
             name=self.fake_factory.name(),
-            date_start=datetime.now() + timedelta(days=2)
+            date_start=datetime.now() + timedelta(days=2),
+            date_end=event.date_start,
+        )
+
+    def fake_private_lot(self, event: Event):
+        if not isinstance(event, Event):
+            raise Exception("'{}' is not instance of Event".format(event))
+
+        return Lot.objects.create(
+            event=event,
+            name=self.fake_factory.name(),
+            date_start=datetime.now() + timedelta(days=2),
+            date_end=event.date_start,
+            private=True,
+        )
+
+    def fake_private_paid_lot(self, event: Event, amount: int = 10):
+        if not isinstance(event, Event):
+            raise Exception("'{}' is not instance of Event".format(event))
+
+        return Lot.objects.create(
+            event=event,
+            price=amount,
+            private=True,
+            name=self.fake_factory.name(),
+            date_start=datetime.now() + timedelta(days=2),
+            date_end=event.date_start,
         )
 
     def fake_lot_category(self, event: Event):
