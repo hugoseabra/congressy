@@ -6,8 +6,8 @@ window.cgsy = window.cgsy || {};
 
         url = url || window.location.href;
 
-        var success_callback = function () {
-        };
+        var success_callback = function (response) {};
+
         var default_fail_callback = function (response) {
             var msg = 'Failure on request to "' + url + '" with method';
             msg += ' "' + this.method + '".';

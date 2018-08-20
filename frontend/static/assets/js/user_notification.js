@@ -4,8 +4,10 @@ $(document).ready(function () {
 
     $("form").on("submit", function (e) {
         $(window).off("beforeunload");
-        var submitButton = $('form').find(':submit');
-        submitButton.prop('disabled', true);
+        if (!$(this).hasClass('skip-submition-check')) {
+            var submitButton = $(this).find(':submit');
+            submitButton.prop('disabled', true);
+        }
     });
 
     $("button").on("click", function (e) {
@@ -16,7 +18,10 @@ $(document).ready(function () {
     });
 
     function disableButton(el) {
-        el.prop('disabled', true);
+        el = $(el);
+        if (!el.closest('form').hasClass('skip-submition-check')) {
+            el.prop('disabled', true);
+        }
     }
 
     $("input").on('keyup', function (event) {
