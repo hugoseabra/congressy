@@ -9,7 +9,7 @@ from decimal import Decimal
 
 from django.db import models
 from stdimage import StdImageField
-from stdimage.validators import MaxSizeValidator, MinSizeValidator
+from stdimage.validators import MaxSizeValidator
 
 from addon import constants, rules
 from base.models import EntityMixin
@@ -22,10 +22,14 @@ from .theme import Theme
 
 def get_image_path(instance, filename):
     """ Resgata localização onde as imagens serão inseridas. """
+
+    addon_type = str(instance.__class__.__name__).lower()
+
     return os.path.join(
         'event',
+        str(instance.lot_category.event_id),
+        'addon_{}'.format(addon_type),
         str(instance.id),
-        'addon',
         os.path.basename(filename)
     )
 
