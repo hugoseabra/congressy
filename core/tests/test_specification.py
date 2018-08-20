@@ -1,6 +1,6 @@
 from test_plus.test import TestCase
 
-from gatheros_event.specification import CompositeSpecification
+from core.specification import CompositeSpecification
 
 
 class User(object):
