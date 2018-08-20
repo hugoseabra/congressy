@@ -27,8 +27,29 @@
  */
 window.cgsy = window.cgsy || {};
 
-(function($, cgsy, Croppie) {
+(function($, cgsy) {
     "use strict";
+    /**
+     * USAGE:
+     *
+     * // Cria crop de 900x580 quadrada.
+     * var cropper = new window.cgsy.Cropper(900, 580, 'square');
+     *
+     * Configura tamanho proporcional da janela de crop.
+     * cropper.setWindowProportionalPercent(40);
+     *
+     * Configura tamanho da margem de crop da janela de crop.
+     * cropper.setBoundaryMargin(20);
+     *
+     * // Se quiser recorte arredondado:
+     * var cropper = new window.cgsy.Cropper(900, 580, 'circle');
+     *
+     * // Para recortar:
+     * cropper.prepare($('input_file_onde_esta_o_blob_inicial'), $('element_image_de_recorte'));
+     *
+     * // Resgata o base64 da imagem recortada
+     * base64_image = cropper.crop()
+     */
 
     /**
      * Manipulação de recorte de uma imagem.
@@ -69,10 +90,11 @@ window.cgsy = window.cgsy || {};
         var croppieObject = null;
 
         if (!crop_width || !crop_height) {
-            console.error(
+            alert(
                 'You must provide WIDTH and HEIGHT when creating' +
                 ' window.cgsy.Cropper instance.'
             );
+            return;
         }
 
         if (shape in ['square', 'circle']) {
@@ -189,29 +211,77 @@ window.cgsy = window.cgsy || {};
                     reject(error)
                 };
             });
-        }
+        };
 
         var getProportion = function(value, percent) {
             return ((parseFloat(value) * parseFloat(percent))/100);
         };
     };
-})(jQuery, window.cgsy, window.Croppie);
+})(jQuery, window.cgsy);
 
 (function($, cgsy, URL, AjaxSender) {
     "use strict";
 
     /**
+     * USAGE:
+     *
+     * // Cropper a ser usado pelo modal.
+     * var cropper = new window.cgsy.Cropper(900, 580, 'square');
+     * cropper.setWindowProportionalPercent(40);
+     * cropper.setBoundaryMargin(20);
+     *
+     * // Imagem que geralmente é resultado de um crop anterior.
+     * var banner_img = "caminho_da_imagem_original.jpg";
+     *
+     * // Objeto de modal preparado para crop.
+     * modal_block = new window.cgsy.ModalBlock(cropper, banner_img, 'banner');
+     *
+     * // Caso não tenha uma imagem, pode-se definir uma imagem padrão.
+     * modal_obj.setDefaultImgSrc("assets/img/addon/opcional-sample-900x580.png");
+     *
+     * // Callbacks diversos após o crop.
+     * modal_obj.addPostCropCallback(function(base64_image) {
+     *      $('#image-cropped-to-show-to-user').attr('src', base64_image);
+     * });
+     *
+     * // Caso se queira realizar um crop e enviar de forma assíncrona, basta
+     * // passar a URI do Endpoint de API onde será feita uma requisição PATCH.
+     * // O campo a ser atualizado na API será o campo passado na instância de
+     * // ModalBlock, // ou seja, 'banner'.
+     * modal_obj.setAsyncMode('https://my-api.com/my-imgae/1/');
+     *
+     *
+     * // Caso se queira realizar um crop e enviar de forma síncrona, basta
+     * // passar o elemento do formulário cliente. ModelBlock não irá processar
+     * // o submit do Form, mas criará um campo 'hidden' com o nome do campo
+     * // informado, ou seja, 'banner' no formulário e irá injetar o base64
+     * // da imagem no campo para ser submitido pelo usuário quando ele desejar.
+     * modal_obj.setSyncMode($('#my-owesome-form'));
+     *
+     * // Abrir modal
+     * modal_obj.open()
+     */
+
+    /**
      * Modal Criado dinamicamente para cada crop a ser realizado.
      * @param {cgsy.Cropper} cropper - Cropper de manipulação da imagem
      * @param {string} img_src - Imagem inicial
+     * @param {object} client_image_field_name - Objeto jQuery do campo de imagem do formulário cliente.
      * @constructor
      */
-    cgsy.ModalBlock = function(cropper, img_src) {
+    cgsy.ModalBlock = function(cropper, img_src, client_image_field_name) {
 
         const SUBMIT_MODE_SYNC = 'sync_mode';
         const SUBMIT_MODE_ASYNC = 'async_mode';
 
         this.img_src = img_src;
+
+        /**
+         * Elemento jQuery do campo no qual será inserido o Base64 da imagem
+         * recorada para envio síncrono o formulário cliente.
+         * @type {object}
+         */
+        this.client_image_field_name = client_image_field_name;
 
         /**
          * Elemento jQuery da janela pai do modal.
@@ -263,18 +333,18 @@ window.cgsy = window.cgsy || {};
         var async_mode_uri = null;
 
         /**
-         * Se assíncrono: Nome do campo no qual o modal deve atrelar o conteúdo
-         * base64 da imagem recortada para enviar no PATCH.
-         * @type {string}
+         * Element jQuery do formulário cliente para configuração de preparação
+         * para submissão assíncrona.
+         * @type {object}
          */
-        var async_mode_field_name = null;
+        var sync_client_form_el = null;
 
         /**
-         * Se síncrono: Elemento jQuery da tag "input[type=FILE]" do formulário
-         * principal da aplicação cliente.
-         * @type {string}
+         * Element jQuery do campo que receberá o conteúdo Base64 da imagem
+         * recortada e que será enviado sincronamente.
+         * @type {object}
          */
-        var sync_mode_input_file_el = null;
+        var sync_client_image_field_el = null;
 
         /**
          *
@@ -284,7 +354,12 @@ window.cgsy = window.cgsy || {};
 
         var self  = this;
 
-        this.setAsyncMode = function(uri, field_name) {
+        this.setAsyncMode = function(uri) {
+            if (!this.client_image_field_name) {
+                console.error("Client image field's name not provided");
+                return;
+            }
+
             if (submit_mode) {
                 console.error('Submission mode already set as: ' + submit_mode);
                 return;
@@ -292,17 +367,37 @@ window.cgsy = window.cgsy || {};
 
             submit_mode = SUBMIT_MODE_ASYNC;
             async_mode_uri = uri;
-            async_mode_field_name = field_name;
         };
 
-        this.setSyncMode = function(input_file_el) {
+        this.setSyncMode = function(client_form_el) {
+            if (!this.client_image_field_name) {
+                console.error("Client image field's name not provided");
+                return;
+            }
+
             if (submit_mode) {
                 console.error('Submission mode already set as: ' + submit_mode);
                 return;
             }
 
+            sync_client_form_el = $(client_form_el);
+
+            if (sync_client_form_el.find('input[name='+self.client_image_field_name+']').length > 0) {
+                alert(
+                    'Client already has a field with name' +
+                    ' "'+self.client_image_field_name+'". Remove it and let' +
+                    ' the window.cgsy.ModalBlock handle the field.'
+                );
+                return;
+            }
+
             submit_mode = SUBMIT_MODE_SYNC;
-            sync_mode_input_file_el = $(input_file_el);
+            sync_client_image_field_el = $('<input>').attr({
+                'type': 'hidden',
+                'name': self.client_image_field_name
+            });
+
+            sync_client_form_el.append(sync_client_image_field_el);
         };
 
         /**
@@ -332,12 +427,17 @@ window.cgsy = window.cgsy || {};
                     });
                     window.setTimeout(function() {
                         self.main.modal('hide');
-                    }, 200);
+                    }, 500);
                 });
             });
         };
 
         this.send = function(base64_image) {
+            if (!this.client_image_field_name) {
+                console.error("Client image field's name not provided");
+                return;
+            }
+
             if (submit_mode === SUBMIT_MODE_ASYNC) {
                 return new Promise(function(resolve, reject) {
                     var sender = new AjaxSender(async_mode_uri);
@@ -348,15 +448,14 @@ window.cgsy = window.cgsy || {};
                         reject(response)
                     });
                     var data = {};
-                    data[async_mode_field_name] = base64_image;
-
+                    data[self.client_image_field_name] = base64_image;
                     sender.send('PATCH', data);
                 });
             }
 
             if (submit_mode === SUBMIT_MODE_SYNC) {
                 return new Promise(function(resolve) {
-                    sync_mode_input_file_el.val(base64_image);
+                    sync_client_image_field_el.val(base64_image);
                     resolve(base64_image);
                 });
             }
@@ -420,12 +519,7 @@ window.cgsy = window.cgsy || {};
                 'class': 'btn btn-default',
                 'data-dismiss': 'modal'
             }).text('Fechar');
-            var footer_button2 = $('<button>').attr({
-                'type': 'button',
-                'class': 'btn btn-success'
-            }).text('Enviar');
             column_footer_buttons.append(footer_button1);
-            column_footer_buttons.append(footer_button2);
 
             // MAIN CONTENT -> to Modal Body
             // -- ROW: INPUT[TYPE=FILE] e BUTTON
@@ -486,15 +580,15 @@ window.cgsy = window.cgsy || {};
             var column_delete_buttons = $('<div>').addClass('col-sm-4 text-right');
             row_manage_buttons.append(column_delete_buttons);
 
-            self.button_delete_el = $('<button>').attr({
-                'class': 'btn btn-sm btn-trans btn-danger',
-                'type': 'button',
-                'style': 'margin-top: 4px;margin-left: 4px;'
-            });
-            column_delete_buttons.append(self.button_delete_el);
+            // self.button_delete_el = $('<button>').attr({
+            //     'class': 'btn btn-sm btn-trans btn-danger',
+            //     'type': 'button',
+            //     'style': 'margin-top: 4px;margin-left: 4px;'
+            // });
+            // column_delete_buttons.append(self.button_delete_el);
 
-            var delete_icon = $('<i>').addClass('fas fa-trash');
-            self.button_delete_el.append(delete_icon);
+            // var delete_icon = $('<i>').addClass('fas fa-trash');
+            // self.button_delete_el.append(delete_icon);
 
             // Spinner -> Body
             self.spinner_el = $('<div>').css({
