@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='event',
             name='congressy_percent',
-            field=models.CharField(choices=[('4.99', '4,99%'), ('7.00', '7%'), ('8.50', '8,5%'), ('9.00', '9%'), ('10.00', '10%')], default='10.00', help_text='Valor percentual da congressy caso o evento seja pago.', max_length=5, verbose_name='percentual congressy'),
+            field=models.CharField(choices=[('4.99', '4,99%'), ('4.99', '4,99%'), ('7.00', '7%'), ('8.50', '8,5%'), ('9.00', '9%'), ('10.00', '10%')], default='10.00', help_text='Valor percentual da congressy caso o evento seja pago.', max_length=5, verbose_name='percentual congressy'),
         ),
     ]
