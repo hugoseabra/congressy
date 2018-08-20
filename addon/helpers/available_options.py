@@ -38,19 +38,31 @@ def get_all_options(
     results = []
     for optional in all_optionals:
 
-        available = not optional.has_quantity_conflict and \
-                    not optional.has_sub_end_date_conflict
+        reasons = []
+
+        if optional.has_quantity_conflict:
+            reasons.append('Esgotado')
+
+        if optional.has_sub_end_date_conflict:
+            reasons.append('Expirado')
+
+        available = len(reasons) == 0
 
         if available:
             for service in pre_existing_optionals:
                 # Checks for bi-lateral time restrictions.
                 if not is_in_time_frame(service.optional, optional):
+                    reasons.append('Conflito de horário')
                     available = False
 
         if available_only:
             results.append(optional)
             continue
 
-        results.append({"optional": optional, "available": available})
+        results.append({
+            "optional": optional,
+            "available": available,
+            'reasons': ','.join(reasons)
+        })
 
     return results

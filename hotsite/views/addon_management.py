@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
@@ -56,7 +58,8 @@ class ProductOptionalManagementView(generic.TemplateView):
 
         all_products_selected_by_the_user = \
             subscription.subscription_products.filter(
-                optional__lot_category=subscription.lot.category
+                optional__lot_category=subscription.lot.category,
+                optional__date_end_sub__gt=datetime.now()
             ).order_by(
                 "optional__optional_type__name",
                 "optional__name",
@@ -69,7 +72,8 @@ class ProductOptionalManagementView(generic.TemplateView):
         else:
             event_optionals_products = Product.objects.filter(
                 lot_category=category,
-                published=True
+                published=True,
+                date_end_sub__gt=datetime.now()
             ).exclude(
                 subscription_products__subscription=subscription
             ).order_by(
@@ -166,7 +170,8 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
             self.fetch_in_storage = self.request.GET.get('fetch_in_storage')
             all_selected_services = subscription.subscription_services.filter(
-                optional__lot_category=subscription.lot.category
+                optional__lot_category=subscription.lot.category,
+                optional__date_end_sub__gt=datetime.now()
             ).order_by(
                 "optional__theme__name",
                 "optional__optional_type__name",
@@ -203,6 +208,7 @@ class ServiceOptionalManagementView(generic.TemplateView):
                 all_services = Service.objects.filter(
                     lot_category=category,
                     published=True,
+                    date_end_sub__gt=datetime.now(),
                 ).exclude(
                     subscription_services__subscription=subscription
                 ).order_by(

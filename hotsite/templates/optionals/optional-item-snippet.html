@@ -1,27 +1,33 @@
 {% load static humanize %}
 
 <tr>
+    {% if optional.banner %}
     <td width="130px" class="image-link-parent">
-        <a href="{% static 'assets/img/addon/opcional-sample.jpg' %}" class="image-link" title="Abrir detalhes" data-optional-name="{{ optional.name }}">
-            <img src="{% static 'assets/img/addon/thumbnail-opcional-sample.jpg' %}" width="100%"/>
+        <a href="{{ optional.banner.default.url }}" class="image-link" title="Abrir detalhes" data-optional-name="{{ optional.name }}">
+            <img src="{{ optional.banner.thumbnail.url }}" width="100%"/>
         </a>
     </td>
-    <td>
+    {% endif %}
+    <td colspan="2">
         <div class="text-bold" style="font-size: 18px">
             {{ optional.name }}
         </div>
+        {% if optional.description %}
         <div class="text-muted hidden-xs {% if optional.name|length > 45 %}hidden-sm{% endif %}">
-            Lorem Ipsum é simplesmente uma simulação de texto da indústria tipográfica e de impressos, e vem sendo utilizado desde o século XVI, quando um impress.
+            {{ optional.description |safe }}
         </div>
+        {% endif %}
     </td>
 </tr>
+{% if optional.description %}
 <tr class="{% if optional.name|length <= 45 %}hidden-sm{% endif %} hidden-md hidden-lg">
     <td colspan="2">
         <div class="text-muted">
-            Lorem Ipsum é simplesmente uma simulação de texto da indústria tipográfica e de impressos, e vem sendo utilizado desde o século XVI, quando um impress.
+            {{ optional.description |safe }}
         </div>
     </td>
 </tr>
+{% endif %}
 <tr>
     <td colspan="2" class="optional-action-buttons">
         <hr style="margin-top:0;margin-bottom:5px;"  />
@@ -54,9 +60,11 @@
                             </button>
                         {% endif %}
                     {% else %}
-                        <button style="padding:5px 10px" disabled="disabled" class="btn btn-sm btn-warning btn-block" data-toggle="tooltip" title="Indisponivel">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </button>
+                        <div data-toggle="tooltip" title="Conflito de Horário">
+                            <button style="padding:5px 10px" disabled="disabled" class="btn btn-sm btn-warning btn-block">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </button>
+                        </div>
                     {% endif %}
                 </div>
                 <div style="float:right;margin-top: 6px;margin-right: 8px;font-size: 18px;font-weight: bold;color:darkblue">

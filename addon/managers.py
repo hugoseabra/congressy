@@ -91,7 +91,7 @@ class ProductManager(managers.Manager):
         banner = self.cleaned_data.get('banner')
 
         if not banner:
-            return banner
+            return None
 
         # Decoding from base64 avatar into a file obj.
         try:
@@ -160,7 +160,7 @@ class ServiceManager(managers.Manager):
         banner = self.cleaned_data.get('banner')
 
         if not banner:
-            return banner
+            return None
 
         # Decoding from base64 avatar into a file obj.
         try:
