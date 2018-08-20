@@ -27,7 +27,11 @@
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
     <script src="{% static "assets/js/addon.js" %}"></script>
-        <script src="{% static 'assets/js/user_notification.js' %}"></script>
+    <script src="{% static 'assets/js/user_notification.js' %}"></script>
+
+    <!-- Script used for cropping -->
+    <script src="{% static "assets/plugins/croppie/croppie.js" %}"></script>
+    <script src="{% static "assets/js/image-crop.js" %}"></script>
 
     <script type="application/javascript">
         $(document).ready(function () {
@@ -40,37 +44,67 @@
                 dateRestrict.data("DateTimePicker").minDate(false);
             {% endif %}
         });
-            (function ($) {
-                "use strict";
 
-                $(document).ready(function () {
-                    {% if LANGUAGE_CODE == 'pt-br' or LANGUAGE_CODE == 'en' or LANGUAGE_CODE == 'en-us' %}
-                        $('#id_date_end_sub_0').mask("99/99/9999");
-                        $('#id_schedule_start_0').mask("99/99/9999");
-                        $('#id_schedule_end_0').mask("99/99/9999");
-                    {% else %}
-                        $('#id_date_end_sub_0').mask("9999-99-99");
-                        $('#id_schedule_start_0').mask("9999-99-99");
-                        $('#id_schedule_end_0').mask("9999-99-99");
-                    {% endif %}
+        (function ($) {
+            "use strict";
 
-                    $('#id_date_end_sub_1').mask("99:99");
-                    $('#id_schedule_start_1').mask("99:99");
-                    $('#id_schedule_end_1').mask("99:99");
-                    $('#id_liquid_price').mask('#.##0,00', {reverse: true});
+            $(document).ready(function () {
+                {% if LANGUAGE_CODE == 'pt-br' or LANGUAGE_CODE == 'en' or LANGUAGE_CODE == 'en-us' %}
+                    $('#id_date_end_sub_0').mask("99/99/9999");
+                    $('#id_schedule_start_0').mask("99/99/9999");
+                    $('#id_schedule_end_0').mask("99/99/9999");
+                {% else %}
+                    $('#id_date_end_sub_0').mask("9999-99-99");
+                    $('#id_schedule_start_0').mask("9999-99-99");
+                    $('#id_schedule_end_0').mask("9999-99-99");
+                {% endif %}
 
-                    window.setTimeout(function () {
-                        window.cgsy.addon.create_events();
+                $('#id_date_end_sub_1').mask("99:99");
+                $('#id_schedule_start_1').mask("99:99");
+                $('#id_schedule_end_1').mask("99:99");
+                $('#id_liquid_price').mask('#.##0,00', {reverse: true});
 
-                        {% for theme in themes %}
-                            window.cgsy.addon.add_theme_limit({{ theme.pk }}, '{{ theme.name }}', {{ theme.limit|default_if_none:0 }});
-                        {% endfor %}
-                        window.cgsy.addon.show_theme_limit();
-                        window.cgsy.addon.check_uncheck_has_price();
-                    }, 300);
-                });
+                window.setTimeout(function () {
+                    window.cgsy.addon.create_events();
 
-            })(jQuery);
+                    {% for theme in themes %}
+                        window.cgsy.addon.add_theme_limit({{ theme.pk }}, '{{ theme.name }}', {{ theme.limit|default_if_none:0 }});
+                    {% endfor %}
+                    window.cgsy.addon.show_theme_limit();
+                    window.cgsy.addon.check_uncheck_has_price();
+                }, 300);
+            });
+
+        })(jQuery);
+
+        var modal_obj;
+        $(document).ready(function() {
+            "use strict";
+
+            var cropper = new window.cgsy.Cropper(900, 580, 'square');
+                cropper.setWindowProportionalPercent(40);
+                cropper.setBoundaryMargin(20);
+
+            var banner_img;
+            {% if object.banner %}
+                banner_img = "{{ object.banner.default.url }}";
+            {% endif %}
+
+            modal_obj = new window.cgsy.ModalBlock(cropper, banner_img, 'banner');
+            modal_obj.setDefaultImgSrc("{% static 'assets/img/addon/opcional-sample-900x580.png' %}");
+            modal_obj.addPostCropCallback(function(base64_image) {
+                $('#banner-thumbnail').attr('src', base64_image);
+                window.cgsy.messenger.triggerSuccess('Imagem recortada com sucesso.');
+            });
+
+            {% if object.pk %}
+                // Assincrono
+                modal_obj.setAsyncMode('{% url 'api:addon:service-detail' object.pk %}');
+            {% else %}
+                // Sincrono
+                modal_obj.setSyncMode($('#optional_form'));
+            {% endif %}
+        });
     </script>
 {% endblock %}
 
@@ -79,11 +113,10 @@
 {% endblock %}
 
 {% block content %}
-
     <div id="output"></div>
 
     <form action="" id="optional_form" method="post"
-          class="form-horizontal form-border"
+          class="form-horizontal form-border skip-submition-check"
           role="form" name="optional_form">
         {% csrf_token %}
 
@@ -102,9 +135,7 @@
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="buttonbar">
                     <div class="float-right">
-                        <a href="
-
-                                {% url 'addon:optional-service-list' event.pk %}{% if object.lot_category %}#cat={{ object.lot_category.pk }}{% endif %}"
+                        <a href="{% url 'addon:optional-service-list' event.pk %}{% if object.lot_category %}#cat={{ object.lot_category.pk }}{% endif %}"
                            class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>
                             Cancelar
@@ -130,24 +161,46 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-xl-10 col-xl-push-1 col-md-12">
-                                {% render_generic_field form.name autofocus=True %}
+                            <div class="col-xl-3 col-xl-push-1 col-md-4">
+                                <div class="row banner">
+                                    <div class="col-md-12 text-center image-link-parent">
+                                        <img class="img-responsive" width="270px" style="margin: 0 auto" src="{% if object.banner %}{{ object.banner.thumbnail.url }}{% else %}{% static 'assets/img/addon/thumbnail-opcional-sample-135x87.png' %}{% endif %}" id="banner-thumbnail" />
+                                    </div>
+                                </div>
+                                <div class="row banner" style="margin-top: 10px">
+                                    <div class="col-md-12 text-center">
+                                        <button type="button" class="btn btn-primary" id="open_banner_modal" onclick="modal_obj.open()">
+                                            <i class="fas fa-image"></i>
+                                            Configurar imagem
+                                        </button>
+                                        <small class="row text-muted">
+                                            {{ object.banner.field.help_text }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-7 col-xl-push-1 col-md-8">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.name autofocus=True %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.optional_type %}
+
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.lot_category %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-xl-5 col-xl-push-1 col-md-6">
-                                {% render_generic_field form.optional_type %}
-
-                            </div>
-                            <div class="col-xl-5 col-xl-push-1 col-md-6">
-                                {% render_generic_field form.lot_category %}
+                            <div class="col-xl-10 col-xl-push-1 col-md-12">
+                                {% render_generic_field form.description help_text="Deixe claro ao participante do que se trata esta Atividade Extra." %}
                             </div>
                         </div>
-                        {#                        <div class="row">#}
-                        {#                            <div class="col-xl-10 col-xl-push-1 col-md-12">#}
-                        {#                                {% render_generic_field form.description %}#}
-                        {#                            </div>#}
-                        {#                        </div>#}
                     </div>
                 </div>
 
@@ -300,6 +353,6 @@
 {% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet"
-          href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
+    <link rel="stylesheet" href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
+    <link href="{% static "assets/plugins/croppie/croppie.css" %}" rel="stylesheet">
 {% endblock %}

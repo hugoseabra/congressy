@@ -47,13 +47,19 @@
           href="{% static 'assets/plugins/icheck/css/all.css' %}">
     <link rel="stylesheet" href="{% static 'hotsite/css/animate.min.css' %}">
 
-
     <!-- SPECIFIC CSS -->
     <link rel="stylesheet" href="{% static 'hotsite/css/style.css' %}">
 
     <!-- COLOR -->
     <link id="color-css" rel="stylesheet"
           href="{% static 'hotsite/css/colors/blue.css' %}">
+
+    <!-- Messenger -->
+    <link rel="stylesheet" href="{% static "assets/plugins/messenger/css/messenger.css" %}">
+    <link rel="stylesheet" href="{% static "assets/plugins/messenger/css/messenger-theme-flat.css" %}">
+    <link rel="stylesheet" href="{% static "assets/css/messenger-custom.css" %}">
+    <link rel="stylesheet" href="{% static "assets/plugins/messenger/css/location-sel.css" %}">
+
     <style>
         img.blurred {
             -webkit-filter: blur(18px);
@@ -96,7 +102,11 @@
 <script src="{% static 'hotsite/js/responsiveslides.min.js' %}"></script>
 <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
 <script src="{% static 'assets/plugins/icheck/js/icheck.min.js' %}"></script>
-
+<script src="{% static "assets/plugins/messenger/js/messenger.min.js" %}"></script>
+<script src="{% static "assets/plugins/messenger/js/messenger-theme-flat.js" %}"></script>
+<script src="{% static "assets/plugins/messenger/js/messenger-theme-future.js" %}"></script>
+<script src="{% static "assets/js/messenger.js" %}"></script>
+<script src="{% static 'hotsite/js/src/app.js' %}"></script>
 
 <!-- MAIN SCRIPT
 ================================= -->
@@ -114,25 +124,6 @@
         window.setTimeout(function () {
             $('.cgsy-date-input').mask("99/99/9999");
             $('.cgsy-time-input').mask("99:99");
-
-            var radios = $('input[type=radio]');
-            var checkboxes = $('input[type=checkbox]');
-
-            radios.iCheck({
-                checkboxClass: 'icheckbox_flat-grey',
-                radioClass: 'iradio_flat-grey'
-            });
-
-            checkboxes.iCheck({
-                checkboxClass: 'icheckbox_flat-grey',
-                radioClass: 'iradio_flat-grey'
-            });
-
-            $('.tooltip-wrapper').tooltip({
-                selector: "[data-toggle=tooltip]",
-                container: "body",
-                html: true
-            });
         });
     });
 </script>

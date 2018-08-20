@@ -1,14 +1,16 @@
-{% load humanize %}
+{% load static humanize %}
 
 <div id="currently_selected">
     {% if  object_list %}
-        <label for="selected_products_table">Serviços</label>
+        <div id="selected_products_table" data-sticky-container>
 
-        <div class="table-responsive" id="selected_products_table">
             {% for t_pk, themes in object_list.items %}
-                <h3 style="border-bottom:1px solid gray">
-                    {{ themes.name|upper }}
-                </h3>
+                <div style="border-bottom:1px solid gray" class="sticky" data-sticky-class="is-sticky" data-sticky>
+                    <div class="subtitle hide">Selecionados</div>
+                    <h3>
+                        {{ themes.name|upper }}
+                    </h3>
+                </div>
 
                 {% for pk, t in themes.types.items %}
                     <h4 class="text-muted text-bold">
@@ -16,47 +18,9 @@
                     </h4>
 
                     <table class="table">
-                        <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Preço</th>
-                            <th></th>
-                        </tr>
-                        </thead>
-
-                        <tr>
-                            {% for service in t.optionals %}
-                                <tr>
-                                    <td>
-                                        <div class="text-bold">
-                                            {{ service.optional.name }}
-                                        </div>
-                                        <div class="text-muted">
-                                            {{ service.optional.schedule_start|date:"d/m/Y H\hi" }}
-                                            a
-                                            {{ service.optional.schedule_end|date:"d/m/Y H\hi" }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {% if service.optional.price == 0.00 %}
-                                            Grátis
-                                        {% else %}
-                                            R$ {{ service.optional.price|intcomma }}
-                                        {% endif %}
-                                    </td>
-
-
-                                    <td>
-                                        <button style="width: 100%"
-                                                onclick="removeOptionalService({{ service.optional.pk }})"
-                                                class="btn btn-sm btn-danger">
-                                            Remover
-                                        </button>
-                                    </td>
-
-                                </tr>
-                            {% endfor %}
-                        </tr>
+                        {% for service in t.optionals %}
+                            {% include 'optionals/optional-item-snippet.html' with optional_type='service' action='remove' optional=service.optional available=True %}
+                        {% endfor %}
                     </table>
                 {% endfor %}
 
@@ -67,5 +31,5 @@
     {% endif %}
 </div>
 <script>
-    num_selected_optionals = parseInt('{{ object_list|length }}');
+    var num_selected_optionals = parseInt('{{ object_list|length }}');
 </script>

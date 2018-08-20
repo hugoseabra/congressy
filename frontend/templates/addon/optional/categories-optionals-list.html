@@ -7,9 +7,18 @@
         <div class="row tooltip-wrapper">
             <div class="col-md-8 col-lg-7 col-xl-8" style="word-wrap: break-word">
                 <div class="panel-title">
-                    <small class="text-muted">{{ optional.optional_type.name }}</small>
-                    <br />
-                    {{ optional.name }}
+                    <div class="row">
+                        {% if optional.banner %}
+                        <div class="col-md-4 col-lg-4 col-xl-2">
+                            <img src="{{ optional.banner.thumbnail.url }}" class="img-responsive" />
+                        </div>
+                        {% endif %}
+                        <div class="{% if optional.banner %}col-md-8 col-lg-8  col-xl-10{% else %}col-md-12{% endif %}">
+                            <small class="text-muted">{{ optional.optional_type.name }}</small>
+                            <br />
+                            {{ optional.name }}
+                        </div>
+                    </div>
                 </div>
                 <hr />
                 <div style="margin-bottom:3px;">

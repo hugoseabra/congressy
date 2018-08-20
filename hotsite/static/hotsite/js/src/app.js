@@ -5,6 +5,7 @@ window.app = function () {
     $(function () {
         switcheryToggle();
         icheckStart();
+        tooltips();
     });
 
     var switcheryElements = {};
@@ -28,9 +29,17 @@ window.app = function () {
     };
 
     var icheckStart = function() {
-        $('input[type=radio]').iCheck({
+        var radios = $('input[type=radio]');
+        var checkboxes = $('input[type=checkbox]');
+
+        radios.iCheck({
             checkboxClass: 'icheckbox_flat-grey',
-            radioClass: 'iradio_flat-blue'
+            radioClass: 'iradio_flat-grey'
+        });
+
+        checkboxes.iCheck({
+            checkboxClass: 'icheckbox_flat-grey',
+            radioClass: 'iradio_flat-grey'
         });
     };
 
@@ -43,6 +52,15 @@ window.app = function () {
         if (isChecked === false && checkbox.prop('checked') === true) {
             checkbox.trigger('click').removeAttr("checked");
         }
+    };
+
+    //tooltips
+    var tooltips = function() {
+        $('.tooltip-wrapper').tooltip({
+            selector: "[data-toggle=tooltip]",
+            container: "body",
+            html:true
+        })
     };
 
     var enableDisableSwitchery = function(elem, disable) {
@@ -61,7 +79,9 @@ window.app = function () {
         'setSwitchery': setSwitchery,
         'disableSwitchery': enableDisableSwitchery,
         'switcheryToggle': switcheryToggle,
-        'switcheryElements': switcheryElements
+        'switcheryElements': switcheryElements,
+        'iCheckStart': icheckStart,
+        'tooltips': tooltips
     };
 }();
 
