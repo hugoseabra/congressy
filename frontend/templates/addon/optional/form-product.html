@@ -28,6 +28,11 @@
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
     <script src="{% static "assets/js/addon.js" %}"></script>
+
+    <!-- Script used for cropping -->
+    <script src="{% static "assets/plugins/croppie/croppie.js" %}"></script>
+    <script src="{% static "assets/js/image-crop.js" %}"></script>
+
     <script type="application/javascript">
         $(document).ready(function () {
             var date = createDatePicker();
@@ -67,6 +72,35 @@
             });
 
         })(jQuery);
+
+        var modal_obj;
+        $(document).ready(function() {
+            "use strict";
+
+            var cropper = new window.cgsy.Cropper(900, 580, 'square');
+                cropper.setWindowProportionalPercent(40);
+                cropper.setBoundaryMargin(20);
+
+            var banner_img;
+            {% if object.banner %}
+                banner_img = "{{ object.banner.default.url }}";
+            {% endif %}
+
+            modal_obj = new window.cgsy.ModalBlock(cropper, banner_img, 'banner');
+            modal_obj.setDefaultImgSrc("{% static 'assets/img/addon/opcional-sample-900x580.png' %}");
+            modal_obj.addPostCropCallback(function(base64_image) {
+                $('#banner-thumbnail').attr('src', base64_image);
+                window.cgsy.messenger.triggerSuccess('Imagem recortada com sucesso.');
+            });
+
+            {% if object.pk %}
+                // Assincrono
+                modal_obj.setAsyncMode('{% url 'api:addon:product-detail' object.pk %}');
+            {% else %}
+                // Sincrono
+                modal_obj.setSyncMode($('#optional_form'));
+            {% endif %}
+        });
     </script>
 {% endblock %}
 
@@ -126,22 +160,44 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-xl-10 col-xl-push-1 col-md-12">
-                                {% render_generic_field form.name autofocus=True %}
+                            <div class="col-xl-3 col-xl-push-1 col-md-4">
+                                <div class="row banner">
+                                    <div class="col-md-12 text-center image-link-parent">
+                                        <img class="img-responsive" width="270px" style="margin: 0 auto" src="{% if object.banner %}{{ object.banner.thumbnail.url }}{% else %}{% static 'assets/img/addon/thumbnail-opcional-sample-135x87.png' %}{% endif %}" id="banner-thumbnail" />
+                                    </div>
+                                </div>
+                                <div class="row banner" style="margin-top: 10px">
+                                    <div class="col-md-12 text-center">
+                                        <button type="button" class="btn btn-primary" id="open_banner_modal" onclick="modal_obj.open()">
+                                            <i class="fas fa-image"></i>
+                                            Configurar imagem
+                                        </button>
+                                        <small class="row text-muted">
+                                            {{ object.banner.field.help_text }}
+                                        </small>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xl-5 col-xl-push-1 col-md-6">
-                                {% render_generic_field form.optional_type %}
+                            <div class="col-xl-7 col-xl-push-1 col-md-8">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.name autofocus=True %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.optional_type %}
 
-                            </div>
-                            <div class="col-xl-5 col-xl-push-1 col-md-6">
-                                {% render_generic_field form.lot_category %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.lot_category %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-xl-10 col-xl-push-1 col-md-12">
-                                {% render_generic_field form.description help_text="Deixa claro ao participante do que se trata este Opcional." %}
+                                {% render_generic_field form.description help_text="Deixe claro ao participante do que se trata esta Atividade Extra." %}
                             </div>
                         </div>
                     </div>
@@ -241,6 +297,6 @@
 
 {% endblock %}
 {% block styles %}
-    <link rel="stylesheet"
-          href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
+    <link rel="stylesheet" href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
+    <link href="{% static "assets/plugins/croppie/croppie.css" %}" rel="stylesheet">
 {% endblock %}

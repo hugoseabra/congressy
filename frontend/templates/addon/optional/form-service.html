@@ -90,23 +90,20 @@
                 banner_img = "{{ object.banner.default.url }}";
             {% endif %}
 
-            modal_obj = new window.cgsy.ModalBlock(cropper, banner_img);
+            modal_obj = new window.cgsy.ModalBlock(cropper, banner_img, 'banner');
             modal_obj.setDefaultImgSrc("{% static 'assets/img/addon/opcional-sample-900x580.png' %}");
             modal_obj.addPostCropCallback(function(base64_image) {
                 $('#banner-thumbnail').attr('src', base64_image);
+                window.cgsy.messenger.triggerSuccess('Imagem recortada com sucesso.');
             });
 
             {% if object.pk %}
                 // Assincrono
-                modal_obj.setAsyncMode(
-                    '{% url 'api:addon:service-detail' object.pk %}',
-                    'banner'
-                );
+                modal_obj.setAsyncMode('{% url 'api:addon:service-detail' object.pk %}');
             {% else %}
                 // Sincrono
-                modal_obj.setSyncMode($('#cropped_banner'));
+                modal_obj.setSyncMode($('#optional_form'));
             {% endif %}
-
         });
     </script>
 {% endblock %}
@@ -119,7 +116,7 @@
     <div id="output"></div>
 
     <form action="" id="optional_form" method="post"
-          class="form-horizontal form-border"
+          class="form-horizontal form-border skip-submition-check"
           role="form" name="optional_form">
         {% csrf_token %}
 
@@ -166,9 +163,8 @@
                         <div class="row">
                             <div class="col-xl-3 col-xl-push-1 col-md-4">
                                 <div class="row banner">
-                                    <div class="col-md-12 text-center">
+                                    <div class="col-md-12 text-center image-link-parent">
                                         <img class="img-responsive" width="270px" style="margin: 0 auto" src="{% if object.banner %}{{ object.banner.thumbnail.url }}{% else %}{% static 'assets/img/addon/thumbnail-opcional-sample-135x87.png' %}{% endif %}" id="banner-thumbnail" />
-                                        <input type="text" name="banner" id="cropped_banner" value="" />
                                     </div>
                                 </div>
                                 <div class="row banner" style="margin-top: 10px">
@@ -355,64 +351,6 @@
     </form>
 
 {% endblock %}
-
-{#{% block modals %}#}
-{#    <div class="modal fade" id="edit_banner_modal" tabindex="-1" role="dialog" aria-hidden="true">#}
-{#        <div class="modal-dialog" role="document">#}
-{#            <div class="modal-content">#}
-{#                <div class="modal-header">#}
-{#                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>#}
-{#                    <h3 class="modal-title">Editar imagem de apresentação: </h3>#}
-{#                </div>#}
-{#                <div class="modal-body">#}
-{#                    <div class="row text-center">#}
-{#                        <div class="col-md-12">#}
-{#                            <input type="file" style="display: none" id="id_banner_file" accept="image/*">#}
-{#                            <img class="img-responsive" src="{% if object.banner %}{{ object.banner.default.url }}{% else %}{% static 'assets/img/addon/opcional-sample-900x580.png' %}{% endif %}" id="banner-cropped" />#}
-{#                        </div>#}
-{#                    </div>#}
-{##}
-{#                    <div class="row text-center" style="margin-top: 5px">#}
-{#                        <div class="row text-center" style="margin-top: 5px">#}
-{#                            <div class="row text-center" style="margin-top: 3px;#}
-{#                    margin-bottom: 5px">#}
-{##}
-{#                                <button class="btn btn-md btn-info" onclick="askForFile();" id="edit_btn" ype="button">#}
-{#                                    <i class="fas fa-exchange-alt"></i>#}
-{#                                    Trocar#}
-{#                                </button>#}
-{#                                <button class="btn btn-md btn-info" id="start_crop" type="button">#}
-{#                                    <i class="fas fa-crop"></i>#}
-{#                                    Recortar#}
-{#                                </button>#}
-{#                                <button type="button" class="btn btn-md  btn-danger banner-remove" data-dismiss="modal">#}
-{#                                    <i class="fas fa-trash"></i>#}
-{#                                    Deletar#}
-{#                                </button>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="modal-footer">#}
-{#                    <div class="pull-right">#}
-{#                        <button type="button" class="btn btn-md  btn-default"#}
-{#                                data-dismiss="modal">#}
-{#                            Cancelar#}
-{#                        </button>#}
-{#                        <button type="button"#}
-{#                                class="btn btn-md btn-success banner-save"#}
-{#                                data-dismiss="modal"#}
-{#                                onclick="submitImage()"#}
-{#                                id="edit_banner_modal_btn">#}
-{#                            <i class="fas fa-save"></i>#}
-{#                            Salvar#}
-{#                        </button>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
-{#{% endblock %}#}
 
 {% block styles %}
     <link rel="stylesheet" href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
