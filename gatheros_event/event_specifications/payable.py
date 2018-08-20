@@ -27,7 +27,7 @@ class Payable(EventSpecificationMixin):
             # Verificação de limite de lote
             total_subs_in_lot = self._get_valid_subs_in_lot(lot)
 
-            if total_subs_in_lot >= lot.limit:
+            if total_subs_in_lot and total_subs_in_lot >= lot.limit:
                 continue
 
             if lot.price and lot.price > 0:

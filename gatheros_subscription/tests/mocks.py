@@ -25,7 +25,8 @@ class MockFactory:
         return Lot.objects.create(
             event=event,
             name=self.fake_factory.name(),
-            date_start=datetime.now() + timedelta(days=2),
+            active=True,
+            date_start=datetime.now(),
             date_end=event.date_start,
         )
 
@@ -36,8 +37,9 @@ class MockFactory:
         return Lot.objects.create(
             event=event,
             price=amount,
+            active=True,
             name=self.fake_factory.name(),
-            date_start=datetime.now() + timedelta(days=2),
+            date_start=datetime.now(),
             date_end=event.date_start,
         )
 
@@ -48,7 +50,8 @@ class MockFactory:
         return Lot.objects.create(
             event=event,
             name=self.fake_factory.name(),
-            date_start=datetime.now() + timedelta(days=2),
+            active=True,
+            date_start=datetime.now(),
             date_end=event.date_start,
             private=True,
         )
@@ -61,8 +64,9 @@ class MockFactory:
             event=event,
             price=amount,
             private=True,
+            active=True,
             name=self.fake_factory.name(),
-            date_start=datetime.now() + timedelta(days=2),
+            date_start=datetime.now(),
             date_end=event.date_start,
         )
 

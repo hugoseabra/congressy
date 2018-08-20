@@ -22,8 +22,6 @@ class EventSpecificationMixin(CompositeSpecification):
             lot=lot,
             completed=True,
             test_subscription=False,
-        ).exclude(
-            subscription__status=Subscription.CANCELED_STATUS
         )
 
     @staticmethod

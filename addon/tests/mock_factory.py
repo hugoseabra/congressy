@@ -31,7 +31,10 @@ class MockFactory:
         self.fake_factory = Faker()
 
     def fake_organization(self):
-        return Organization.objects.create(name=self.fake_factory.company())
+        return Organization.objects.create(
+            name=self.fake_factory.company(),
+            email=self.fake_factory.email(),
+        )
 
     def fake_event(self, organization=None):
 
@@ -124,7 +127,7 @@ class MockFactory:
         if price is None:
             price = Decimal(0.00)
 
-        date_end = datetime.now() + timedelta(days=3)
+        date_end = lot_category.event.date_start
 
         return Product.objects.create(
             name='optional product',
@@ -132,7 +135,7 @@ class MockFactory:
             lot_category=lot_category,
             date_end_sub=date_end,
             liquid_price=price,
-
+            published=True,
         )
 
     def fake_service(self, optional_type=None, theme=None, lot_category=None,
