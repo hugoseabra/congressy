@@ -27,9 +27,11 @@ class Person(models.Model, GatherosModelMixin):
 
     GENDER_MALE = 'M'
     GENDER_FEMALE = 'F'
+    GENDER_UNDEFINED = 'U'
     GENDER_CHOICES = (
         (GENDER_MALE, 'Masculino'),
         (GENDER_FEMALE, 'Feminino'),
+        (GENDER_UNDEFINED, 'Prefiro não definir'),
     )
 
     uuid = models.UUIDField(
