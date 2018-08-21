@@ -9,6 +9,8 @@ from . import Event
 class FeatureConfiguration(models.Model):
     """ Configuração de Recursos liberados de um evento """
 
+    SYSTEM_USER_NAME = 'system'
+
     class Meta:
         verbose_name = 'Configuração de Features'
         verbose_name_plural = 'Configurações de Features'
@@ -22,6 +24,12 @@ class FeatureConfiguration(models.Model):
         primary_key=True,
         verbose_name='evento',
         related_name='feature_configuration',
+    )
+
+    last_updated_by = models.CharField(
+        max_length=255,
+        verbose_name="atualizado por",
+        default=SYSTEM_USER_NAME,
     )
 
     feature_survey = models.BooleanField(
