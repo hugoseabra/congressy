@@ -101,29 +101,3 @@ class FeatureConfigurationTest(TestCase):
             price=10,
         )
         self.assertTrue(is_paid_event(paid_opt_product_event))
-
-    def test_event_has_products(self):
-        event = self.event_mock_factory.fake_event()
-        self.assertFalse(event_has_products(event))
-
-        lot = self.mock_factory.fake_lot(event)
-        lot_cat = self.mock_factory.fake_lot_category(event)
-        self.mock_factory.add_category_to_lot(lot, lot_cat)
-
-        self.addon_mock_factory.fake_product(
-            lot_category=lot_cat,
-        )
-        self.assertTrue(event_has_products(event))
-
-    def test_event_has_services(self):
-        event = self.event_mock_factory.fake_event()
-        self.assertFalse(event_has_services(event))
-
-        lot = self.mock_factory.fake_lot(event)
-        lot_cat = self.mock_factory.fake_lot_category(event)
-        self.mock_factory.add_category_to_lot(lot, lot_cat)
-
-        self.addon_mock_factory.fake_service(
-            lot_category=lot_cat,
-        )
-        self.assertTrue(event_has_services(event))
