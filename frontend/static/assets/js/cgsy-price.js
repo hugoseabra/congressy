@@ -23,6 +23,10 @@ window.cgsy = window.cgsy || {};
          * @returns {object} - float
          */
         this.getPrice = function(liquid_price) {
+            if (!liquid_price) {
+                return null;
+            }
+
             liquid_price = parseFloat(liquid_price);
 
             var result;
@@ -42,6 +46,10 @@ window.cgsy = window.cgsy || {};
          * @returns {object} - float
          */
         this.getLiquidPrice = function(full_price) {
+            if (!full_price) {
+                return null;
+            }
+
             full_price = parseFloat(full_price);
 
             var result;
