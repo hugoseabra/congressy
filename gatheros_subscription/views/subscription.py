@@ -50,6 +50,7 @@ from survey.models import Question, Answer
 
 class EventViewMixin(TemplateNameableMixin, AccountMixin):
     """ Mixin de view para vincular com informações de event. """
+
     event = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -73,8 +74,8 @@ class EventViewMixin(TemplateNameableMixin, AccountMixin):
         context['has_paid_lots'] = self.has_paid_lots()
 
         try:
-            config = event.formconfig
-        except AttributeError:
+            config = FormConfig.objects.get(event=event)
+        except FormConfig.DoesNotExist:
             config = FormConfig()
             config.event = event
 
