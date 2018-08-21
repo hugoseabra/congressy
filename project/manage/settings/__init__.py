@@ -21,6 +21,7 @@ INSTALLED_APPS += [
     'certificate',
     'raffle',
     'importer',
+    'attendance'
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'

@@ -1,5 +1,5 @@
 from django.db import models
-from . import attendance_service
+from . import AttendanceService
 from addon.models.optional_type import OptionalServiceType
 
 
@@ -13,7 +13,7 @@ class AttendanceServiceFilter(models.Model):
     )
 
     attendance_service = models.ForeignKey(
-        attendance_service,
+        AttendanceService,
         verbose_name='Lista de Check-in/out',
         related_name='service_filters',
         on_delete=models.CASCADE

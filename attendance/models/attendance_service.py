@@ -3,6 +3,7 @@ from gatheros_event.models import Event
 
 
 class AttendanceService(models.Model):
+
     name = models.CharField(max_length=255, verbose_name='nome')
 
     event = models.ForeignKey(
@@ -18,4 +19,4 @@ class AttendanceService(models.Model):
     class Meta:
         verbose_name = 'Lista de Check-in/out'
         verbose_name_plural = 'Lista de Check-ins/outs'
-        ordering = ['name']
+        ordering = ['name',]

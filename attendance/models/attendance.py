@@ -1,5 +1,5 @@
 from django.db import models
-from . import attendance_service
+from . import AttendanceService
 from gatheros_subscription.models import Subscription
 
 
@@ -32,7 +32,7 @@ class Attendance(models.Model):
     attended_by = models.PositiveIntegerField(verbose_name='criado por')
 
     attendance_service = models.ForeignKey(
-        attendance_service,
+        AttendanceService,
         verbose_name='Lista de Check-in/out',
         related_name='attendances',
         on_delete=models.PROTECT
@@ -54,4 +54,4 @@ class Attendance(models.Model):
         verbose_name_plural = 'Check-ins/outs'
         ordering = ['created_on']
 
-        indexes = [models.Index(fields=['name', ])]
+        indexes = [models.Index(fields=['attended_by', ])]

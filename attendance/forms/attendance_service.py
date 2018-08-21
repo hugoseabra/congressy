@@ -4,19 +4,20 @@ from attendance.models import AttendanceService, AttendanceCategoryFilter, \
 
 
 class AttendanceServiceForm(forms.ModelForm):
+
     lot_category_filter = forms.CharField(
         widget=forms.CheckboxSelectMultiple,
         label='Categorias de Lotes',
         required=False,
     )
 
-    product_category_filter = forms.CharField(
+    product_filter = forms.CharField(
         widget=forms.CheckboxSelectMultiple,
         label='Categorias de Opcionais',
         required=False,
     )
 
-    service_category_filter = forms.CharField(
+    service_filter = forms.CharField(
         widget=forms.CheckboxSelectMultiple,
         label='Categorias de Atividades Extras',
         required=False,
@@ -132,7 +133,7 @@ class AttendanceServiceForm(forms.ModelForm):
         service = super().save(commit)
 
         self.__create_lot_category_filters(service=service)
-        self.__create_product_filters(service=service)
-        self.__create_service_filters(service=service)
+        # self.__create_product_filters(service=service)
+        # self.__create_service_filters(service=service)
 
         return service

@@ -1,5 +1,5 @@
 from django.db import models
-from . import attendance_service
+from . import AttendanceService
 from gatheros_subscription.models import LotCategory
 
 
@@ -13,7 +13,7 @@ class AttendanceCategoryFilter(models.Model):
     )
 
     attendance_service = models.ForeignKey(
-        attendance_service,
+        AttendanceService,
         verbose_name='Lista de Check-in/out',
         related_name='lot_category_filters',
         on_delete=models.CASCADE
