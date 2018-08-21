@@ -8,7 +8,7 @@ from gatheros_event.tests.mocks import MockFactory as EventFactory
 from gatheros_subscription.tests.mocks import MockFactory as SubFactory
 
 
-class SpecificationTest(TestCase):
+class PayableSpecificationTest(TestCase):
 
     def setUp(self):
         self.event_factory = EventFactory()

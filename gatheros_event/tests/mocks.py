@@ -19,7 +19,8 @@ class MockFactory:
         self.fake_factory = Faker('pt_BR')
 
     def fake_person(self):
-        person = Person(name=self.fake_factory.name(), email=self.fake_factory.free_email())
+        person = Person(name=self.fake_factory.name(),
+                        email=self.fake_factory.free_email())
 
         first_name = person.name.split(' ')[0]
         email = person.email
@@ -47,7 +48,13 @@ class MockFactory:
 
         return organization
 
-    def fake_event(self, organization=None):
+    def fake_event(self, organization=None, date_start=None, date_end=None):
+
+        if date_start is None:
+            date_start = datetime.now() + timedelta(days=3)
+
+        if date_end is None:
+            date_end = datetime.now() + timedelta(days=4)
 
         if not organization:
             organization = self.fake_organization()
@@ -55,8 +62,8 @@ class MockFactory:
         return Event.objects.create(
             name='Event: ' + ' '.join(self.fake_factory.words(nb=3)),
             organization=organization,
-            date_start=datetime.now() + timedelta(days=3),
-            date_end=datetime.now() + timedelta(days=4),
+            date_start=date_start,
+            date_end=date_end,
             category=Category.objects.first(),
         )
 
@@ -68,4 +75,3 @@ class MockFactory:
         membership.save()
 
         return membership
-
