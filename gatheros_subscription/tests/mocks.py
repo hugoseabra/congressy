@@ -6,8 +6,8 @@ from datetime import datetime
 
 from faker import Faker
 
-from gatheros_event.models import Event
-from gatheros_subscription.models import Lot, LotCategory
+from gatheros_event.models import Event, Person
+from gatheros_subscription.models import Lot, LotCategory, Subscription
 
 
 class MockFactory:
@@ -84,6 +84,63 @@ class MockFactory:
             event=event,
             name=self.fake_factory.name(),
             active=True,
+        )
+
+    @staticmethod
+    def fake_subscription(lot: Lot, person: Person):
+        if not isinstance(lot, Lot):
+            raise Exception("'{}' is not instance of Lot".format(lot))
+
+        if not isinstance(person, Person):
+            raise Exception("'{}' is not instance of Person".format(person))
+
+        return Subscription.objects.create(
+            status=Subscription.CONFIRMED_STATUS,
+            lot=lot,
+            event=lot.event,
+            person=person,
+            origin=Subscription.DEVICE_ORIGIN_HOTSITE,
+            created_by=0,
+            completed=True,
+            test_subscription=False,
+        )
+
+    @staticmethod
+    def fake_test_subscription(lot: Lot, person: Person):
+        if not isinstance(lot, Lot):
+            raise Exception("'{}' is not instance of Lot".format(lot))
+
+        if not isinstance(person, Person):
+            raise Exception("'{}' is not instance of Person".format(person))
+
+        return Subscription.objects.create(
+            status=Subscription.CONFIRMED_STATUS,
+            lot=lot,
+            event=lot.event,
+            person=person,
+            origin=Subscription.DEVICE_ORIGIN_HOTSITE,
+            created_by=0,
+            completed=True,
+            test_subscription=True,
+        )
+
+    @staticmethod
+    def fake_unconfirmed_subscription(lot: Lot, person: Person):
+        if not isinstance(lot, Lot):
+            raise Exception("'{}' is not instance of Lot".format(lot))
+
+        if not isinstance(person, Person):
+            raise Exception("'{}' is not instance of Person".format(person))
+
+        return Subscription.objects.create(
+            status=Subscription.CONFIRMED_STATUS,
+            lot=lot,
+            event=lot.event,
+            person=person,
+            origin=Subscription.DEVICE_ORIGIN_HOTSITE,
+            created_by=0,
+            completed=False,
+            test_subscription=False,
         )
 
     @staticmethod
