@@ -44,6 +44,8 @@ class OptionalServiceListView(ServiceFeatureFlagMixin,
         for cat in queryset.all():
             for optional in cat.service_optionals.all():
                 sub_queryset = optional.subscription_services.filter(
+                    subscription__test_subscription=False,
+                    subscription__completed=True,
                     subscription__status__in=['confirmed', 'awaiting']
                 )
                 num = sub_queryset.count()
@@ -90,6 +92,8 @@ class OptionalProductListView(ProductFeatureFlagMixin,
         for cat in queryset.all():
             for optional in cat.product_optionals.all():
                 sub_queryset = optional.subscription_products.filter(
+                    subscription__test_subscription=False,
+                    subscription__completed=True,
                     subscription__status__in=['confirmed', 'awaiting']
                 )
                 num = sub_queryset.count()

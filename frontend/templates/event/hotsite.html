@@ -12,8 +12,7 @@
 
 {% block styles %}
 
-    <link href="{% static "assets/plugins/croppie/croppie.css" %}"
-          rel="stylesheet">
+    <link href="{% static "assets/plugins/croppie/croppie.css" %}" rel="stylesheet">
 
     <style>
         .event-info-status-item {
@@ -59,8 +58,8 @@
 {% block scripts %}
     {{ block.super }}
 
-    <script src="{% static "assets/plugins/croppie/croppie.js" %}"></script>
     <!-- Script used for cropping -->
+    <script src="{% static "assets/plugins/croppie/croppie.js" %}"></script>
 
     <script src="{% static "assets/js/messenger.js" %}"></script>
     <!-- Messenger lib -->
@@ -92,6 +91,7 @@
                 $('#place-form-block').toggleClass('col-md-12');
             })
         });
+
         window.cgsy = window.cgsy || {};
         cgsy.maps = cgsy.maps || {};
         var croppie_obj = undefined;
@@ -281,7 +281,7 @@
             $('.banner-loader').show();
 
             if (typeof(croppie_obj) === "undefined") {
-                croppie_obj = createCroppieObj()
+                croppie_obj = createCroppieObj();
             }
             croppie_obj.croppie('result', 'base64', 'original', 'png', '1', false).then(function (base64_image) {
                 $('#banner-cropped')[0].src = base64_image;
@@ -512,8 +512,7 @@
                                 <div class="row text-center banner-loader"
                                      style="margin-top:20px; display: none">
                                     <h3>Processando, aguarde...</h3>
-                                    <i class="fas info-color fa-circle-notch fa-spin
-                        fa-6x" style="margin-top: 20px"></i>
+                                    <i class="fas info-color fa-circle-notch fa-spin fa-6x" style="margin-top: 20px"></i>
                                 </div>
 
                                 <div class="row text-center banner">
@@ -839,18 +838,14 @@
 
 
 {% block modals %}
-    <div class="modal fade" id="edit_banner_modal" tabindex="-1"
-         role="dialog"
-         aria-hidden="true">
+    <div class="modal fade" id="edit_banner_modal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close"
-                            data-dismiss="modal" aria-hidden="true">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                         ×
                     </button>
                     <h3 class="modal-title">Editar banner: </h3>
-
                 </div>
                 <div class="modal-body">
 

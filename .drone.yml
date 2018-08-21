@@ -11,7 +11,7 @@ branches:
 clone:
   git:
     image: plugins/git
-    depth: 50
+#    depth: 50
     tags: true
 
 # Steps of deploy, according to configurations and conditionals

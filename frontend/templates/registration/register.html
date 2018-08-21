@@ -97,3 +97,8 @@
         </div>
     </form>
 {% endblock %}
+
+{% block support %}
+    {{ block.super }}
+    {% include 'hotjar.html' %}
+{% endblock %}

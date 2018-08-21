@@ -284,10 +284,8 @@ class OrganizationFinancialForm(forms.ModelForm):
         return result
 
     def clean_cnpj_ou_cpf(self):
-        cleaned_cnpj_ou_cpf = phone_cleaner(
-            self.cleaned_data.get('cnpj_ou_cpf'))
-
-        cleaned_cnpj_ou_cpf = clear_string(cleaned_cnpj_ou_cpf)
+        cleaned_cnpj_ou_cpf = \
+            clear_string(self.cleaned_data.get('cnpj_ou_cpf'))
 
         if len(cleaned_cnpj_ou_cpf) == 11:
             try:
@@ -305,10 +303,7 @@ class OrganizationFinancialForm(forms.ModelForm):
         return cleaned_cnpj_ou_cpf
 
     def clean_phone(self):
-
-        cleaned_phone = phone_cleaner(self.cleaned_data.get('phone'))
-
-        return cleaned_phone
+        return phone_cleaner(self.cleaned_data.get('phone'))
 
     def clean_email(self):
         return self.data.get('email').lower()

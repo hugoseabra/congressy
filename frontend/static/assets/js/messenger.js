@@ -1,4 +1,5 @@
-window.cert = window.cgsy.messenger || {};
+window.cgsy = window.cgsy || {};
+window.cgsy.messenger = window.cgsy.messenger || {};
 
 (function (Messenger, cgsy) {
     "use strict";
