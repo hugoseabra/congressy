@@ -203,15 +203,20 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
         data = {
             'person': person.pk,
             'lot': lot_pk,
-            'origin': Subscription.DEVICE_ORIGIN_MANAGE,
             'created_by': self.request.user.pk,
-            # 'completed': True,
         }
 
-        kwargs = {'data': data}
+        kwargs = {}
 
         if self.subscription:
             kwargs['instance'] = self.subscription
+
+            if self.subscription.origin:
+                data['origin'] = self.subscription.origin
+            else:
+                data['origin'] = Subscription.DEVICE_ORIGIN_MANAGE
+
+        kwargs.update({'data': data})
 
         return SubscriptionForm(self.event, **kwargs)
 
