@@ -2,12 +2,12 @@ from datetime import datetime, timedelta
 
 from test_plus.test import TestCase
 
-from gatheros_event.event_specifications import Subscribable
+from gatheros_event.event_specifications import EventSubscribable
 from gatheros_event.tests.mocks import MockFactory as EventFactory
 from gatheros_subscription.tests.mocks import MockFactory as SubFactory
 
 
-class SubscribableSpecificationTest(TestCase):
+class EventSubscribableSpecificationTest(TestCase):
 
     @staticmethod
     def _clean_event(event):
@@ -55,27 +55,27 @@ class SubscribableSpecificationTest(TestCase):
     # ======= is_specification =======
 
     def test_is_future_spec(self):
-        root_specification = Subscribable()
+        root_specification = EventSubscribable()
         self.assertTrue(root_specification.is_satisfied_by(self.future_event))
 
     def test_is_past_spec(self):
-        root_specification = Subscribable()
+        root_specification = EventSubscribable()
         self.assertFalse(root_specification.is_satisfied_by(self.past_event))
 
     def test_is_present_spec(self):
-        root_specification = Subscribable()
+        root_specification = EventSubscribable()
         self.assertTrue(root_specification.is_satisfied_by(self.present_event))
 
     # ======= not_specification =======
 
     def test_not_future_spec(self):
-        root_specification = Subscribable().not_specification()
+        root_specification = EventSubscribable().not_specification()
         self.assertFalse(root_specification.is_satisfied_by(self.future_event))
 
     def test_not_past_spec(self):
-        root_specification = Subscribable().not_specification()
+        root_specification = EventSubscribable().not_specification()
         self.assertTrue(root_specification.is_satisfied_by(self.past_event))
 
     def test_not_present_spec(self):
-        root_specification = Subscribable().not_specification()
+        root_specification = EventSubscribable().not_specification()
         self.assertFalse(root_specification.is_satisfied_by(self.present_event))

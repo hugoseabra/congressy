@@ -1,77 +1,131 @@
-import abc
-
-from django.db.models import QuerySet
+from core.specification import AndSpecification
+from gatheros_event.event_specifications import (
+    LotVisible,
+    LotSubscribable,
+    LotHasSubscriptions,
+    EventVisible,
+    EventPayable,
+    ClosedWithNoAudience,
+    ClosedWithAudience,
+    OpenWithNoAudience,
+    OpenWithAudience,
+)
 
 from gatheros_event.models import Event
 
 
-class EventState(abc.ABC):
+class EventState(object):
     """
-        Interface usada para descrever estados de eventos.
-        Veja `EventPrivacy`, `EventBusiness`
+        Objetivo: Obter um evento e receber informações sobre o estado do mesmo.
     """
 
     def __init__(self, event: Event) -> None:
         self.event = event
 
-    @abc.abstractmethod
-    def get_state(self) -> str:
-        pass
+    def is_public(self) -> bool:
 
+        if ClosedWithNoAudience().is_satisfied_by(self.event):
+            for lot in self.event.lots.all():
+                if LotVisible().is_satisfied_by(lot):
+                    return True
 
-class EventPrivacyState(EventState):
-    """
-    Objetivo: Obter um evento e receber informações sobre o estado de
-    privacidade do mesmo.
+        elif ClosedWithAudience().is_satisfied_by(self.event):
+            for lot in self.event.lots.all():
 
-    Caso o evento ainda tem algum lote disponivel, sua privacidade é definida
-    através destes lotes disponiveis conforme:
+                one = LotVisible()
+                other = LotHasSubscriptions()
 
-        Privado:
-            * Todos os lotes disponíveis devem ser configurado como 'privado';
+                spec = AndSpecification(one, other)
+                if spec.is_satisfied_by(lot):
+                    return True
 
-        Público:
-            * Deve ter pelo menos um Lote disponível e configurado como
-              'não-privado';
+        elif OpenWithNoAudience().is_satisfied_by(self.event):
+            for lot in self.event.lots.all():
 
-    Caso não tenha nenhum lote disponivel, a privacidade é definida analisando
-    todos os lotes antigos observando as regas acima mas também levando em
-    consideração se algum lote teve inscrição.
-    """
+                one = LotVisible()
+                other = LotVisible()
 
-    PRIVATE = 'private'
-    PUBLIC = 'public'
+                spec = AndSpecification(one, other)
+                if spec.is_satisfied_by(lot):
+                    return True
 
-    def get_state(self) -> str:
+        elif OpenWithAudience().is_satisfied_by(self.event):
+            for lot in self.event.lots.all():
 
-        available_lots = self._get_available_lots()
+                one = LotVisible()
+                other = LotVisible()
 
-        if len(available_lots) > 0:
+                spec = AndSpecification(one, other)
+                if spec.is_satisfied_by(lot):
+                    return True
 
-            # Has at least one available lot
-            for lot in available_lots:
+        return False
 
-                if not lot.private:
-                    return self.PUBLIC
+    def is_private(self) -> bool:
 
-            return self.PRIVATE
+        if ClosedWithNoAudience().is_satisfied_by(self.event):
 
-        # Has no available lot
-        all_lots = self._get_all_lots()
+            if EventVisible().not_specification().is_satisfied_by(self.event):
+                return True
 
-        for lot in all_lots:
-            if not lot.private and lot.subscriptions.filter(
-                    completed=True,
-                    test_subscription=False,
-            ).count() > 0:
-                return self.PUBLIC
+        elif ClosedWithAudience().is_satisfied_by(self.event):
 
-        return self.PRIVATE
+            if EventVisible().not_specification().is_satisfied_by(self.event):
+                return True
 
-    def _get_available_lots(self) -> list:
-        all_lots = self._get_all_lots()
+            public_lot_with_no_subs = False
+            private_lot_with_subs = False
 
-        return [lot for lot in all_lots if lot.status == lot.LOT_STATUS_RUNNING]
+            for lot in self.event.lots.all():
 
-    def _get_all_lots(self) -> QuerySet:
-        return self.event.lots.all()
+                one = LotVisible()
+                other = LotHasSubscriptions().not_specification()
+
+                public_lot_spec = AndSpecification(one, other)
+                if public_lot_spec.is_satisfied_by(lot):
+                    public_lot_with_no_subs = True
+
+                one = LotVisible().not_specification()
+                other = LotHasSubscriptions()
+
+                private_lot_spec = AndSpecification(one, other)
+                if private_lot_spec.is_satisfied_by(lot):
+                    private_lot_with_subs = True
+
+            if public_lot_with_no_subs and private_lot_with_subs:
+                return True
+
+        elif OpenWithNoAudience().is_satisfied_by(self.event):
+            if EventVisible().not_specification().is_satisfied_by(self.event):
+                return True
+
+            for lot in self.event.lots.all():
+
+                one = LotVisible().not_specification()
+                other = LotSubscribable()
+
+                spec = AndSpecification(one, other)
+                if spec.is_satisfied_by(lot):
+                    return True
+
+        elif OpenWithAudience().is_satisfied_by(self.event):
+            if EventVisible().not_specification().is_satisfied_by(self.event):
+                return True
+
+        return False
+
+    def is_payable(self) -> bool:
+
+        if EventPayable().is_satisfied_by(self.event):
+            return True
+
+        return False
+
+    def is_free(self) -> bool:
+
+        spec = EventPayable().not_specification()
+
+        if spec.is_satisfied_by(self.event):
+            return True
+
+        return False

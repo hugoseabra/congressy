@@ -3,12 +3,12 @@ from decimal import Decimal
 from test_plus.test import TestCase
 
 from addon.tests.mock_factory import MockFactory as AddonFactory
-from gatheros_event.event_specifications import Payable
+from gatheros_event.event_specifications import EventPayable
 from gatheros_event.tests.mocks import MockFactory as EventFactory
 from gatheros_subscription.tests.mocks import MockFactory as SubFactory
 
 
-class PayableSpecificationTest(TestCase):
+class EventPayableSpecificationTest(TestCase):
 
     def setUp(self):
         self.event_factory = EventFactory()
@@ -62,60 +62,60 @@ class PayableSpecificationTest(TestCase):
     # ======= is_specification =======
 
     def test_is_free_lots_spec(self):
-        root_specification = Payable()
+        root_specification = EventPayable()
         self.assertFalse(root_specification.is_satisfied_by(self.free_event))
 
     def test_is_paid_lots_spec(self):
-        root_specification = Payable()
+        root_specification = EventPayable()
         self.assertTrue(root_specification.is_satisfied_by(self.paid_lot_event))
 
     def test_is_free_products_spec(self):
-        root_specification = Payable()
+        root_specification = EventPayable()
         self.assertFalse(
             root_specification.is_satisfied_by(self.free_product_event))
 
     def test_is_paid_products_spec(self):
-        root_specification = Payable()
+        root_specification = EventPayable()
         self.assertTrue(
             root_specification.is_satisfied_by(self.paid_product_event))
 
     def test_is_free_services_spec(self):
-        root_specification = Payable()
+        root_specification = EventPayable()
         self.assertFalse(
             root_specification.is_satisfied_by(self.free_service_event))
 
     def test_is_paid_services_spec(self):
-        root_specification = Payable()
+        root_specification = EventPayable()
         self.assertTrue(
             root_specification.is_satisfied_by(self.paid_service_event))
 
     # ======= not_specification =======
 
     def test_is_not_free_lot_spec(self):
-        root_specification = Payable().not_specification()
+        root_specification = EventPayable().not_specification()
         self.assertTrue(root_specification.is_satisfied_by(self.free_event))
 
     def test_is_not_paid_lot_spec(self):
-        root_specification = Payable().not_specification()
+        root_specification = EventPayable().not_specification()
         self.assertFalse(
             root_specification.is_satisfied_by(self.paid_lot_event))
 
     def test_is_not_free_products_spec(self):
-        root_specification = Payable().not_specification()
+        root_specification = EventPayable().not_specification()
         self.assertTrue(
             root_specification.is_satisfied_by(self.free_product_event))
 
     def test_is_not_paid_products_spec(self):
-        root_specification = Payable().not_specification()
+        root_specification = EventPayable().not_specification()
         self.assertFalse(
             root_specification.is_satisfied_by(self.paid_product_event))
 
     def test_is_not_free_services_spec(self):
-        root_specification = Payable().not_specification()
+        root_specification = EventPayable().not_specification()
         self.assertTrue(
             root_specification.is_satisfied_by(self.free_service_event))
 
     def test_is_not_paid_services_spec(self):
-        root_specification = Payable().not_specification()
+        root_specification = EventPayable().not_specification()
         self.assertFalse(
             root_specification.is_satisfied_by(self.paid_service_event))

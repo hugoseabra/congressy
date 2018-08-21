@@ -1,11 +1,11 @@
 from test_plus.test import TestCase
 
-from gatheros_event.event_specifications import HasSubscriptions
+from gatheros_event.event_specifications import EventHasSubscriptions
 from gatheros_event.tests.mocks import MockFactory as EventFactory
 from gatheros_subscription.tests.mocks import MockFactory as SubFactory
 
 
-class HasSubscriptionsSpecificationTest(TestCase):
+class EventHasSubscriptionsSpecificationTest(TestCase):
 
     @staticmethod
     def _clean_event(event):
@@ -40,33 +40,33 @@ class HasSubscriptionsSpecificationTest(TestCase):
     # ======= is_specification =======
 
     def test_is_empty_event_spec(self):
-        root_specification = HasSubscriptions()
+        root_specification = EventHasSubscriptions()
         self.assertFalse(
             root_specification.is_satisfied_by(self.empty_event))
 
     def test_is_valid_subs_event_spec(self):
-        root_specification = HasSubscriptions()
+        root_specification = EventHasSubscriptions()
         self.assertTrue(
             root_specification.is_satisfied_by(self.valid_subs_event))
 
     def test_is_invalid_subs_event_spec(self):
-        root_specification = HasSubscriptions()
+        root_specification = EventHasSubscriptions()
         self.assertFalse(
             root_specification.is_satisfied_by(self.invalid_subs_event))
 
     # ======= not_specification =======
 
     def test_not_empty_event_spec(self):
-        root_specification = HasSubscriptions().not_specification()
+        root_specification = EventHasSubscriptions().not_specification()
         self.assertTrue(
             root_specification.is_satisfied_by(self.empty_event))
 
     def test_not_valid_subs_event_spec(self):
-        root_specification = HasSubscriptions().not_specification()
+        root_specification = EventHasSubscriptions().not_specification()
         self.assertFalse(
             root_specification.is_satisfied_by(self.valid_subs_event))
 
     def test_not_invalid_subs_event_spec(self):
-        root_specification = HasSubscriptions().not_specification()
+        root_specification = EventHasSubscriptions().not_specification()
         self.assertTrue(
             root_specification.is_satisfied_by(self.invalid_subs_event))

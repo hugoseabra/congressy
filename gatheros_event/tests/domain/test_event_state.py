@@ -1,6 +1,6 @@
 from test_plus.test import TestCase
 
-from gatheros_event.event_state import EventPrivacyState
+from gatheros_event.event_state import EventState
 from gatheros_event.tests.mocks import MockFactory as EventMockFactory
 from gatheros_subscription.tests.mocks import MockFactory as SubMockFactory
 
@@ -17,8 +17,9 @@ class EventPrivacyStateTest(TestCase):
         for i in range(5):
             self.subscription_factory.fake_lot(event=event)
 
-        state = EventPrivacyState(event=event)
-        self.assertEqual(state.get_state(), state.PUBLIC)
+        state = EventState(event=event)
+        self.assertTrue(state.is_public())
+        self.assertFalse(state.is_private())
 
     def test_no_subs_public_hybrid_valid_lots(self):
         event = self.event_factory.fake_event()
@@ -29,8 +30,9 @@ class EventPrivacyStateTest(TestCase):
         for i in range(5):
             self.subscription_factory.fake_paid_lot(event=event)
 
-        state = EventPrivacyState(event=event)
-        self.assertEqual(state.get_state(), state.PUBLIC)
+        state = EventState(event=event)
+        self.assertTrue(state.is_public())
+        self.assertFalse(state.is_private())
 
     def test_no_subs_private_only_valid_lots(self):
         event = self.event_factory.fake_event()
@@ -40,8 +42,9 @@ class EventPrivacyStateTest(TestCase):
         for i in range(5):
             self.subscription_factory.fake_private_lot(event=event)
 
-        state = EventPrivacyState(event=event)
-        self.assertEqual(state.get_state(), state.PRIVATE)
+        state = EventState(event=event)
+        self.assertFalse(state.is_public())
+        self.assertTrue(state.is_private())
 
     @staticmethod
     def _make_event_private(event):
