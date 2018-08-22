@@ -103,8 +103,16 @@ class CSVSubscriptionForm(forms.Form):
 
     def clean_uf(self):
         cleaned_uf = self.cleaned_data.get("uf")
-        if not cleaned_uf:
+        cleaned_city = self.cleaned_data.get('city')
+
+        if not cleaned_uf and not cleaned_city:
             return cleaned_uf
+
+        if not cleaned_uf and cleaned_city:
+            city = self.fetch_city(cleaned_city)
+
+            if city:
+                return city.uf
 
         if len(str(cleaned_uf)) > 2:
             raise forms.ValidationError(
@@ -151,6 +159,13 @@ class CSVSubscriptionForm(forms.Form):
         raise forms.ValidationError(
             'Não foram encontradas cidades com este nome'
         )
+
+    def clean_email(self):
+        cleaned_email = self.cleaned_data.get('email')
+        if cleaned_email:
+            cleaned_email = cleaned_email.lower()
+
+        return cleaned_email
 
     def clean(self):
         """
@@ -252,3 +267,28 @@ class CSVSubscriptionForm(forms.Form):
         if field_name not in self.fields:
             raise ValueError('Unknown field name: {}'.format(field_name))
         self.fields[field_name].required = False
+
+    @staticmethod
+    def fetch_city(city_name):
+
+        city_qs = City.objects.filter(
+            Q(name=str(city_name).upper()) |
+            Q(name_ascii=str(city_name).upper())
+        )
+
+        if city_qs.count() == 0:
+
+            # Busca por pk de city
+            found_city = None
+            try:
+                city_pk = int(city_name)
+                found_city = City.objects.get(pk=city_pk).pk
+            except (ValueError, City.DoesNotExist):
+                pass
+
+            if found_city:
+                return found_city
+        elif city_qs.count() == 1:
+            return city_qs.first()
+
+        return None
