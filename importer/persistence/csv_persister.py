@@ -32,8 +32,10 @@ class CSVErrorPersister(CSVPersister):
             for key, value in line:
                 raw_data.update({key: value})
 
-            for dict_item in line.get_survey_keys(survey):
-                raw_data.update({dict_item['key']: dict_item['value']})
+            if survey:
+
+                for dict_item in line.get_survey_keys(survey):
+                    raw_data.update({dict_item['key']: dict_item['value']})
 
             errors = line.get_errors()
 
@@ -52,14 +54,21 @@ class CSVErrorPersister(CSVPersister):
 
 class CSVCorrectionPersister(CSVPersister):
 
-    def write(self) -> ContentFile:
-
+    def write(self, survey: Survey = None) -> ContentFile:
+                                                                        
         headers = list()
 
         for line in self.line_data_collection:
             for key, _ in line:
                 if key not in headers:
                     headers.append(key)
+
+            if survey:
+
+                for dict_item in line.get_survey_keys(survey):
+                    key = dict_item['key']
+                    if key not in headers:
+                        headers.append(key)
 
         writer = csv.DictWriter(self._file, fieldnames=headers)
         writer.writeheader()
@@ -69,6 +78,11 @@ class CSVCorrectionPersister(CSVPersister):
             data = {}
             for key, value in line:
                 data.update({key: value})
+
+            if survey:
+
+                for dict_item in line.get_survey_keys(survey):
+                    data.update({dict_item['key']: dict_item['value']})
 
             writer.writerow(data)
 
@@ -91,7 +105,7 @@ class CSVCityCorrectionPersister(CSVPersister):
 
         super().__init__(line_data_collection)
 
-    def write(self) -> ContentFile:
+    def write(self, survey: Survey = None) -> ContentFile:
 
         headers = list()
 
@@ -99,6 +113,11 @@ class CSVCityCorrectionPersister(CSVPersister):
             for key, _ in line:
                 if key not in headers:
                     headers.append(key)
+            if survey:
+                for dict_item in line.get_survey_keys(survey):
+                    key = dict_item['key']
+                    if key not in headers:
+                        headers.append(key)
 
         writer = csv.DictWriter(self._file, fieldnames=headers)
         writer.writeheader()
@@ -112,6 +131,10 @@ class CSVCityCorrectionPersister(CSVPersister):
                     value = self.new
 
                 data.update({key: value})
+            if survey:
+
+                for dict_item in line.get_survey_keys(survey):
+                    data.update({dict_item['key']: dict_item['value']})
 
             writer.writerow(data)
 
