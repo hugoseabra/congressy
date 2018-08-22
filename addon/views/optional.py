@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.contrib import messages
 from django.urls import reverse
 from django.views import generic
@@ -5,12 +6,64 @@ from django.views import generic
 from addon import services
 from addon.models import Product, Service
 from core.views.mixins import TemplateNameableMixin
+from gatheros_event.models import Event
+from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription.models import LotCategory
 from .mixins import (
     ProductFeatureFlagMixin,
     ServiceFeatureFlagMixin,
     EventOptionalMixin,
 )
+
+class EventOptionalMixin(AccountMixin, generic.View):
+    event = None
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.event = Event.objects.get(pk=self.kwargs.get('event_pk'))
+        except Event.DoesNotExist:
+            messages.warning(
+                request,
+                "Evento não informado."
+            )
+            return redirect('event:event-list')
+
+        paid_lots = False
+
+        for lot in self.event.lots.all():
+            if lot.price is not None and lot.price > 0:
+                paid_lots = True
+                break
+
+        if paid_lots is False:
+            if self.event.event_type == self.event.EVENT_TYPE_FREE:
+                messages.error(
+                    request,
+                    "Evento grátis não possui opcionais."
+                )
+                return redirect('event:event-panel', self.event.pk)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # noinspection PyUnresolvedReferences
+        context = super().get_context_data(**kwargs)
+        context['event'] = self.event
+        context['has_paid_lots'] = self.has_paid_lots()
+        context['themes'] = self.event.themes.all()
+        context['cgsy_percent'] = Decimal(self.event.congressy_percent) / 100
+        return context
+
+    def has_paid_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+
+            price = lot.price
+
+            if price and price > 0:
+                return True
+
+        return False
 
 
 class OptionalServiceListView(ServiceFeatureFlagMixin,

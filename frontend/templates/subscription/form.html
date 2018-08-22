@@ -154,7 +154,7 @@
                                         {% if not allow_edit_lot %}disabled=""{% endif %}
                                         onchange="window.location.href=window.location.pathname+'?lot='+$(this).val()">
                                     {% if not selected_lot %}
-                                        <option value=""></option>
+                                        <option value="">- Selecione -</option>
                                     {% endif %}
                                     {% for lot in lots %}
                                         <option value="{{ lot.pk }}"

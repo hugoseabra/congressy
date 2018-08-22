@@ -51,6 +51,7 @@ from .mixins import CheckinFeatureFlagMixin
 
 class EventViewMixin(TemplateNameableMixin, AccountMixin):
     """ Mixin de view para vincular com informações de event. """
+
     event = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -74,8 +75,8 @@ class EventViewMixin(TemplateNameableMixin, AccountMixin):
         context['has_paid_lots'] = self.has_paid_lots()
 
         try:
-            config = event.formconfig
-        except AttributeError:
+            config = FormConfig.objects.get(event=event)
+        except FormConfig.DoesNotExist:
             config = FormConfig()
             config.event = event
 
@@ -204,15 +205,20 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
         data = {
             'person': person.pk,
             'lot': lot_pk,
-            'origin': Subscription.DEVICE_ORIGIN_MANAGE,
             'created_by': self.request.user.pk,
-            # 'completed': True,
         }
 
-        kwargs = {'data': data}
+        kwargs = {}
 
         if self.subscription:
             kwargs['instance'] = self.subscription
+
+            if self.subscription.origin:
+                data['origin'] = self.subscription.origin
+            else:
+                data['origin'] = Subscription.DEVICE_ORIGIN_MANAGE
+
+        kwargs.update({'data': data})
 
         return SubscriptionForm(self.event, **kwargs)
 
