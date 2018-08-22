@@ -1,0 +1,96 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load static i18n %}
+
+{% block title %}
+    Listas de Checkin | Congressy
+{% endblock %}
+
+{% block page_title %}
+    Listas de Checkin
+{% endblock %}
+
+{% block nav_aside_itens %}
+    {% if object %}
+        {% include 'event/event-menu.html' with active='dados-do-evento' %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-right">
+                    <a href="{% url 'attendance:attendance-list-add' event.pk %}"
+                       class="btn
+                    btn-success">
+                        <i class="fa fa-plus"></i>
+                        Nova Lista de Checkin
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row tooltip-wrapper">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        Listas de Checkin
+                    </div>
+                </div>
+                <div class="panel-body ">
+                    <table class="table table-striped table-bordered dataTable no-footer nowrap"
+                           cellspacing="0"
+                           width="100%">
+                        <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th width="5%"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in attendance_lists %}
+                            <tr>
+                                <td>
+                                    <a>{{ item.name }}</a>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button"
+                                                class="btn btn-primary btn-trans btn-sm dropdown-toggle"
+                                                data-toggle="dropdown"
+                                                aria-expanded="false">
+                                            <span class="fas fa-cog"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right"
+                                            role="menu">
+                                            <li>
+                                                <a class="open-editSurvey"
+                                                href="{% url 'attendance:attendance-list-edit' event.pk item.pk %}"
+                                                >
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                    Editar
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a class="open-DeleteQuestionDialog">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                    Excluir
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

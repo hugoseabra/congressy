@@ -1,12 +1,8 @@
-
 from django.contrib import messages
-from django.conf import settings
-from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect
-from attendance.forms import attendance_service
+from attendance.forms import AttendanceServiceForm
+from attendance.models import AttendanceCategoryFilter
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
 from gatheros_event.helpers.account import update_account
@@ -44,7 +40,7 @@ class BaseAttendanceServiceView(AccountMixin, View):
             response = super(BaseAttendanceServiceView, self).form_valid(form)
             update_account(
                 request=self.request,
-                organization=form.instance.organization,
+                organization=self.event.organization,
                 force=True
             )
 
@@ -77,12 +73,14 @@ class BaseAttendanceServiceView(AccountMixin, View):
             **kwargs)
         context['next_path'] = self._get_referer_url()
         context['form_title'] = self.get_form_title()
+        context['event'] = self.event
+
 
         return context
 
 
 class AddAttendanceServiceView(BaseAttendanceServiceView, generic.CreateView):
-    form_class = attendance_service.AttendanceServiceForm
+    form_class = AttendanceServiceForm
     success_message = 'Lista de checkin criada com sucesso.'
     form_title = 'Nova lista de checkin'
     object = None
@@ -93,6 +91,7 @@ class AddAttendanceServiceView(BaseAttendanceServiceView, generic.CreateView):
 
         data.update({"event": self.kwargs.get("event_pk")})
         kwargs.update({"data": data})
+
         return kwargs
 
     def get_form(self, form_class=None):
@@ -104,8 +103,6 @@ class AddAttendanceServiceView(BaseAttendanceServiceView, generic.CreateView):
         return form_class(**kwargs)
 
     def post(self, request, *args, **kwargs):
-
-        lot_categories = request.POST.getlist('lot_categories', [])
         self.object = None
         form = self.get_form()
         if not form.is_valid():
@@ -117,18 +114,79 @@ class AddAttendanceServiceView(BaseAttendanceServiceView, generic.CreateView):
         return self.form_valid(form)
 
     def get_success_url(self):
-        form = self.get_form()
-        event = form.instance
         return reverse(
             'event:event-panel',
-            kwargs={'pk': event.pk}
+            kwargs={'pk': self.event.pk}
         )
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
 
-        context['category_list'] = \
-            self.event.lot_categories.all().order_by('name')
+        context['category_list'] = self.event.lot_categories.all()
+        return context
 
+
+class EditAttendanceServiceView(BaseAttendanceServiceView, generic.UpdateView):
+    template_name = 'attendance/edit-form.html'
+    form_class = AttendanceServiceForm
+    model = AttendanceServiceForm.Meta.model
+    success_url = reverse_lazy('attendance:manage-list-attendance')
+    success_message = 'Lista de checkin alterada com sucesso.'
+
+    object = None
+
+    def get_object(self, queryset=None):
+        """ Resgata objeto principal da view. """
+        if self.object:
+            return self.object
+
+        self.object = super(EditAttendanceServiceView, self).get_object(queryset)
+        return self.object
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        data = kwargs.get("data", {}).copy()
+
+        data.update({"event": self.kwargs.get("event_pk")})
+        kwargs.update({"data": data})
+
+        return kwargs
+
+    def get_success_url(self):
+        return reverse(
+            'attendance:manage-list-attendance',
+            kwargs={'event_pk': self.event.pk}
+        )
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            self.object = form.save()
+            return self.form_valid(form)
+
+        else:
+            return self.render_to_response(self.get_context_data(
+                form=form,
+            ))
+
+    def get_lot_categories(self):
+        items = []
+        lc_filter_pks = []
+        for item in AttendanceCategoryFilter.objects.filter(pk=self.object.id):
+            lc_filter_pks.append(item.pk)
+
+        for lc in self.event.lot_categories.all().order_by('name'):
+            items.append({
+                'name': lc.name,
+                'value': lc.pk,
+                'checked': lc.pk in lc_filter_pks
+            })
+
+        return items
+
+    def get_context_data(self, **kwargs):
+        # noinspection PyUnresolvedReferences
+        context = super().get_context_data(**kwargs)
+        context['lot_categories'] = self.get_lot_categories()
         return context
