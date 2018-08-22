@@ -107,7 +107,7 @@ class SubscriptionSurveyDirector(object):
             author=author,
         )
 
-    def get_active_form(self, survey: Survey, data=None) -> ActiveSurveyAnswerForm:
+    def get_active_form(self, survey: Survey, data=None):
         """
 
         Este método é responsável por retornar um objeto do tipo
