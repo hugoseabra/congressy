@@ -1,5 +1,7 @@
 from decimal import Decimal
+
 from django.contrib import messages
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views import generic
 
@@ -7,13 +9,13 @@ from addon import services
 from addon.models import Product, Service
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
+from gatheros_event.views.mixins import AccountMixin
 from gatheros_subscription.models import LotCategory
 from .mixins import (
     ProductFeatureFlagMixin,
     ServiceFeatureFlagMixin,
-    EventOptionalMixin,
 )
+
 
 class EventOptionalMixin(AccountMixin, generic.View):
     event = None
@@ -27,21 +29,6 @@ class EventOptionalMixin(AccountMixin, generic.View):
                 "Evento não informado."
             )
             return redirect('event:event-list')
-
-        paid_lots = False
-
-        for lot in self.event.lots.all():
-            if lot.price is not None and lot.price > 0:
-                paid_lots = True
-                break
-
-        if paid_lots is False:
-            if self.event.event_type == self.event.EVENT_TYPE_FREE:
-                messages.error(
-                    request,
-                    "Evento grátis não possui opcionais."
-                )
-                return redirect('event:event-panel', self.event.pk)
 
         return super().dispatch(request, *args, **kwargs)
 
