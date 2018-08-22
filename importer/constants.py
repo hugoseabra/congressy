@@ -127,11 +127,8 @@ KEY_MAP = {
         ],
         'possible_values': [],
     },
-
 }
 
 REQUIRED_KEYS = [
     'name',
-    'email',
-    'gender',
 ]
