@@ -42,6 +42,8 @@ KEY_MAP = {
         'csv_keys': [
             'data de nasc',
             'data de nasc.',
+            'data nasc.',
+            'data nascimento',
             'data nasc',
             'nascimento',
             'data de nascimento',
