@@ -6,6 +6,7 @@ function loadPredefinedEvents() {
             this.value = this.value.replace(/[^0-9+-\/.]/g, '').replace(/(\..*)\./g, '$1');
         });
     }, 300);
+    app.createFileUploadEvents();
 }
 
 $(document).ready(function () {

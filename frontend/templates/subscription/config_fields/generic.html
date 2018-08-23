@@ -29,15 +29,18 @@
                 {% render_field field %}
                 <br>
             {% elif field.field.widget.input_type == "file" %}
-                <label for="{{ field.id_for_label }}"
-                       class="custom-file-upload">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    Enviar arquivo
-                </label>
-                {{ field }}
-
+                <div class="input-group btn-file-group">
+                    <label for="{{ field.id_for_label }}" class="input-group-btn">
+                        <span class="btn btn-primary btn-file">
+{#                            Browse&hellip; {{ file|attr:"style:display:none" }}#}
+                            Arquivo:
+                        </span>
+                    </label>
+                    <input type="text" class="form-control" readonly />
+                    {{ field|attr:"style:display:none" }}
+{#                    {{ field }}#}
+                </div>
                 {% if help_text %}
-                    <br/>
                     <small class="text-muted">
                         {{ help_text|safe }}
                     </small>
