@@ -236,10 +236,9 @@ class FormConfig(models.Model):
     def __str__(self):
         return self.event.name
 
-    def get_required_keys(self) -> list:
+    @staticmethod
+    def get_required_keys(config) -> list:
         required_keys = []
-
-        config = self
 
         if config.phone:
             if 'phone' not in required_keys:

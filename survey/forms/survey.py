@@ -13,16 +13,11 @@ from survey.services import AnswerService
 from .field import SurveyField
 
 
-def handle_uploaded_file(f):
-    with open('some/file/name.txt', 'wb+') as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
-
-
 class SurveyBaseForm(forms.Form):
     """ Formulário Dinâmico. """
 
     def __init__(self, survey, user=None, author=None, *args, **kwargs):
+
         if not isinstance(survey, Survey):
             msg = '{} não é uma instância de Survey'.format(
                 survey.__class__.__name__
@@ -106,8 +101,9 @@ class SurveyBaseForm(forms.Form):
 class SurveyAnswerForm(SurveyBaseForm):
     """ Formulário Dinâmico. """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, name=None, *args, **kwargs):
         self.answer_service_list = []
+        self.name = name
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -136,6 +132,12 @@ class SurveyAnswerForm(SurveyBaseForm):
                 self.author = Author.objects.get_or_create(
                     survey=self.survey,
                     user=self.user
+                )[0]
+
+            if self.author is None and self.name:
+                self.author = Author.objects.get_or_create(
+                    survey=self.survey,
+                    name=self.name,
                 )[0]
 
             if self.author is None:

@@ -146,6 +146,7 @@ class SubscriptionSurveyDirector(object):
             return ActiveSurveyAnswerForm(
                 survey=survey,
                 data=data,
+                files=files,
             )
 
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
