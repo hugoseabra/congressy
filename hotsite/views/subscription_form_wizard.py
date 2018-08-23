@@ -1,9 +1,11 @@
+import os
 from datetime import datetime
 from decimal import Decimal
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
+# from django.core.files.storage import FileSystemStorage
 from django.db.transaction import atomic
 from django.forms import ValidationError
 from django.http import QueryDict
@@ -326,6 +328,9 @@ def has_paid_services(wizard):
 
 
 class SubscriptionWizardView(SessionWizardView):
+    # file_storage = FileSystemStorage(
+    #     location=os.path.join(settings.MEDIA_ROOT, 'survey', 'pdfs')
+    # )
     condition_dict = {
         'private_lot': is_private_event,
         'lot': is_not_private_event,
@@ -444,7 +449,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and
-                self.storage.current_step is not None):
+                    self.storage.current_step is not None):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
 
@@ -468,8 +473,8 @@ class SubscriptionWizardView(SessionWizardView):
             try:
                 self.storage.set_step_data(self.steps.current,
                                            self.process_step(form))
-                self.storage.set_step_files(self.steps.current,
-                                            self.process_step_files(form))
+                # self.storage.set_step_files(self.steps.current,
+                #                             self.process_step_files(form))
             except ValidationError as e:
 
                 if hasattr(e, 'message'):
@@ -539,6 +544,7 @@ class SubscriptionWizardView(SessionWizardView):
             raise ValidationError(form.errors)
 
         form_data = self.get_form_step_data(form)
+        form_files = self.get_form_step_files(form)
 
         # Creating a subscription.
         if isinstance(form, forms.LotsForm) or \
@@ -587,19 +593,33 @@ class SubscriptionWizardView(SessionWizardView):
             lot = self.get_lot()
 
             # Tratamento especial para extrair as respostas do form_data,
-            # causado pelo uso do FormWizard que adiciona prefixos nas respostas
+            # causado pelo uso do FormWizard que adiciona prefixos nas
+            # respostas
             survey_response = QueryDict('', mutable=True)
             for form_question, form_response in form_data.items():
                 if form_question == 'csrfmiddlewaretoken':
                     survey_response.update({form_question: form_response})
 
                 if 'survey-' in form_question:
-                    survey_response.update(
-                        {form_question.replace('survey-', ''): form_response})
+                    survey_response.update({
+                        form_question.replace('survey-', ''): form_response
+                    })
+
+            survey_files = QueryDict('', mutable=True)
+            for form_question, uploaded_file in form_files.items():
+                if form_question == 'csrfmiddlewaretoken':
+                    survey_files.update({form_question: uploaded_file})
+
+                if 'survey-' in form_question:
+                    survey_files.update({
+                        form_question.replace('survey-', ''): uploaded_file
+                    })
 
             survey_form = survey_director.get_active_form(
                 survey=lot.event_survey.survey,
                 data=survey_response,
+                files=survey_files,
+                update=self.request.method in ['POST', 'PUT']
             )
 
             if not survey_form.is_valid():

@@ -135,8 +135,16 @@
                                             Telefone Celular
                                         </div>
                                     </a>
-
-
+                                    <a data-field-type="Envio de PDF"
+                                       data-field-icon="fas fa-file-pdf"
+                                       data-question_type="input-file-pdf"
+                                       title="Envio de PDF"
+                                       class="open-AddSimpleQuestionDialog btn btn-primary btn-block">
+                                        <div class="text-left">
+                                            <i class="fas fa-file-pdf"></i>
+                                            Envio de PDF
+                                        </div>
+                                    </a>
                                 </div>
 
                                 <div class="col-md-6">
@@ -854,7 +862,6 @@
 
         $('#addQuestionForm').submit(function () {
             $(this).find(':submit').attr('disabled', 'disabled');
-            $(this).submit();
         });
 
         $('.change-lot').on('change', function () {
