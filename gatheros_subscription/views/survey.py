@@ -92,7 +92,7 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
                 set_to = self.request.POST.get('setTo')
                 try:
-                    question = Question.objects.get(name=question_id,
+                    question = Question.objects.get(pk=question_id,
                                                     survey=self.survey)
                 except Question.DoesNotExist:
                     return HttpResponse(status=404)

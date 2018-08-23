@@ -145,6 +145,16 @@
                                             Envio de PDF
                                         </div>
                                     </a>
+                                    <a data-field-type="Envio de Imagem"
+                                       data-field-icon="fas fa-image"
+                                       data-question_type="input-file-image"
+                                       title="Envio de Imagem"
+                                       class="open-AddSimpleQuestionDialog btn btn-primary btn-block">
+                                        <div class="text-left">
+                                            <i class="fas fa-image"></i>
+                                            Envio de Imagem
+                                        </div>
+                                    </a>
                                 </div>
 
                                 <div class="col-md-6">
@@ -996,7 +1006,6 @@
                 required_checkboxes.on('ifUnchecked', function (event) {
                     $(this).closest("input").attr('checked', false);
                 });
-
 
                 var checkbox_requirment_watcher = null;
                 required_checkboxes.on('ifChanged', function (e) {
