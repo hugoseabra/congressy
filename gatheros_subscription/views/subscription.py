@@ -216,6 +216,8 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
                 data['origin'] = self.subscription.origin
             else:
                 data['origin'] = Subscription.DEVICE_ORIGIN_MANAGE
+        else:
+            data['origin'] = Subscription.DEVICE_ORIGIN_MANAGE
 
         kwargs.update({'data': data})
 
