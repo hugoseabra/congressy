@@ -152,51 +152,47 @@ class SubscriptionSurveyDirector(object):
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
         author = self.subscription.author
 
-        try:
+        """
+            Resgatar a autoria para poder popular as respostas dos
+            objetos de 'survey'
+        """
+        file_types = [
+            Question.FIELD_INPUT_FILE_PDF,
+            Question.FIELD_INPUT_FILE_IMAGE,
+        ]
+
+        for question in survey.questions.all():
             """
-                Resgatar a autoria para poder popular as respostas dos
-                objetos de 'survey'
+                Tenta iterar sobre todas as respostas deste autor.
             """
-            file_types = [
-                Question.FIELD_INPUT_FILE_PDF,
-                Question.FIELD_INPUT_FILE_IMAGE,
-            ]
+            try:
+                answer = Answer.objects.get(
+                    question=question,
+                    author=author,
+                    question__survey=survey,
+                )
 
-            for question in survey.questions.all():
-                """
-                    Tenta iterar sobre todas as respostas deste autor.
-                """
-                try:
-                    answer = Answer.objects.get(
-                        question=question,
-                        author=author,
-                        question__survey=survey,
-                    )
-
-                    if question.type in file_types:
-                        if update is True or data or files:
-                            continue
-
-                        storage = FileSystemStorage(
-                            base_url=os.path.join(settings.MEDIA_URL),
-                        )
-                        storage.open(answer.value)
-
-                        initial_storage = InitialStorage(
-                            storage,
-                            answer.human_display,
-                            answer.value
-                        )
-                        answers.update({question.name: initial_storage})
+                if question.type in file_types:
+                    if update is True or data or files:
                         continue
 
-                    answers.update({question.name: answer.value})
+                    storage = FileSystemStorage(
+                        base_url=os.path.join(settings.MEDIA_URL),
+                    )
+                    storage.open(answer.value)
 
-                except Answer.DoesNotExist:
-                    pass
+                    initial_storage = InitialStorage(
+                        storage,
+                        answer.human_display,
+                        answer.value
+                    )
+                    answers.update({question.name: initial_storage})
+                    continue
 
-        except Author.DoesNotExist:
-            pass
+                answers.update({question.name: answer.value})
+
+            except Answer.DoesNotExist:
+                pass
 
         if any(answers):
             return ActiveSurveyAnswerForm(
