@@ -2,6 +2,7 @@ import os
 
 from django import forms
 from django.conf import settings
+from django.db.transaction import atomic
 from django.core.files.storage import FileSystemStorage
 from django.forms import ValidationError
 from django.forms.fields import Field as DjangoField
@@ -183,21 +184,27 @@ class SurveyAnswerForm(SurveyBaseForm):
         return answer_list
 
     def save(self):
-        for answer in self.answer_service_list:
+        with atomic():
 
-            question = answer.question
-            if question.type == Question.FIELD_INPUT_FILE_PDF:
-                if question.name not in self.files:
-                    continue
+            for answer in self.answer_service_list:
 
-                uploaded_file = self.files.get(question.name)
-                filename = self.storage.save(
-                    uploaded_file.name,
-                    uploaded_file
-                )
-                answer.value = os.path.join('survey', 'pdfs', filename)
+                question = answer.question
+                if question.type == Question.FIELD_INPUT_FILE_PDF:
+                    if question.name not in self.files:
+                        continue
 
-            answer.save()
+                    uploaded_file = self.files.get(question.name)
+                    filename = self.storage.save(
+                        os.path.join(str(question.pk), uploaded_file.name),
+                        uploaded_file
+                    )
+                    answer.value = os.path.join(
+                        'survey',
+                        'pdfs',
+                        filename
+                    )
+
+                answer.save()
 
 
 class ActiveSurveyAnswerForm(SurveyAnswerForm):

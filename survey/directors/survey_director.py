@@ -169,8 +169,7 @@ class SurveyDirector(object):
             author=author,
         )
 
-    def get_active_form(self, survey, author=None, data=None,
-                        files=None) -> ActiveSurveyAnswerForm:
+    def get_active_form(self, survey, author=None, data=None, files=None, update=False) -> ActiveSurveyAnswerForm:
         """
 
         Este método é responsável por retornar um objeto do tipo
@@ -186,6 +185,8 @@ class SurveyDirector(object):
         :param data: um dict contendo as novas respostas que serão
                 vinculadas ao form
         :param files: um dict contendo os arquivos enviados na request
+        :param update: boolean informando se o resgate do formulário é para
+               atualização ou não.
 
         :return SurveyForm: um objeto de SurveyForm
         """
@@ -212,7 +213,7 @@ class SurveyDirector(object):
                                                     author=author)
 
                         if question.type == question.FIELD_INPUT_FILE_PDF:
-                            if files:
+                            if update is True or data or files:
                                 continue
 
                             storage = FileSystemStorage(
@@ -226,9 +227,9 @@ class SurveyDirector(object):
                                 answer.value
                             )
                             answers.update({question.name: initial_storage})
+                            continue
 
-                        else:
-                            answers.update({question.name: answer.value})
+                        answers.update({question.name: answer.value})
 
                     except Answer.DoesNotExist:
                         pass

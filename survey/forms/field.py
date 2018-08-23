@@ -149,7 +149,7 @@ class SurveyField(object):
             self.django_field = fields.FileField(
                 max_length=500,
                 label=self.label.title(),
-                required=False,
+                required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
                 validators=[

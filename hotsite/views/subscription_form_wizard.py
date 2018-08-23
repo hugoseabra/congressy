@@ -613,6 +613,7 @@ class SubscriptionWizardView(SessionWizardView):
                 survey=lot.event_survey.survey,
                 data=survey_response,
                 files=survey_files,
+                update=self.request.method in ['POST', 'PUT']
             )
 
             if not survey_form.is_valid():
