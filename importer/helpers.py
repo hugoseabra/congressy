@@ -23,7 +23,7 @@ def get_required_keys(form_config) -> list:
 
     required_keys.extend(REQUIRED_KEYS)
 
-    form_config_keys = form_config.get_required_keys()
+    form_config_keys = form_config.get_required_keys(form_config)
     required_keys.extend(
         x for x in form_config_keys if x not in required_keys)
 

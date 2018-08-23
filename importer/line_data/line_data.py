@@ -231,7 +231,7 @@ class LineData(object):
         survey_director = SubscriptionSurveyDirector(subscription)
 
         if subscription:
-            return survey_director.get_form(
+            return survey_director.get_active_form(
                 survey=survey,
                 data=data,
             )

@@ -91,8 +91,9 @@ class SurveyBaseForm(forms.Form):
 class SurveyAnswerForm(SurveyBaseForm):
     """ Formulário Dinâmico. """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, name=None, *args, **kwargs):
         self.answer_service_list = None
+        self.name = name
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -122,6 +123,12 @@ class SurveyAnswerForm(SurveyBaseForm):
                         user=self.user
                     )[0]
 
+                if self.author is None and self.name:
+                    self.author = Author.objects.get_or_create(
+                        survey=self.survey,
+                        name=self.name,
+                    )[0]
+                    
                 if self.author is None:
                     raise Exception(
                         'Não foi possivel resgatar ou criar um autor')
