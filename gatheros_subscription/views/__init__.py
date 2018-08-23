@@ -30,7 +30,6 @@ from .subscription import (
     VoucherSubscriptionPDFView,
     SubscriptionAttendanceListView,
     SwitchSubscriptionTestView,
-    SubscriptionInternalSurveyFormView,
 )
 from .subscription_api import (
     SubscriptionSearchViewSet,
