@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='question',
             name='type',
-            field=models.CharField(choices=[('input-text', 'Texto (255 caracteres)'), ('input-number', 'Número'), ('input-date', 'Data'), ('input-datetime-local', 'Data e hora'), ('input-email', 'E-mail'), ('input-phone', 'Telefone'), ('input-file-pdf', 'Envio de PDF'), ('textarea', 'Texto longo'), ('boolean', 'SIM/NÃO'), ('select', 'Lista simples'), ('checkbox-group', 'Múltipla escolha'), ('radio-group', 'Escolha única'), ('input-phone-cpf', 'CPF'), ('input-phone-cnpj', 'CNPJ'), ('input-phone-phone', 'Número de Telefone Fixo'), ('input-phone-cellphone', 'Número de Celular')], max_length=50, verbose_name='tipo'),
+            field=models.CharField(choices=[('input-text', 'Texto (255 caracteres)'), ('input-number', 'Número'), ('input-date', 'Data'), ('input-datetime-local', 'Data e hora'), ('input-email', 'E-mail'), ('input-file-pdf', 'Envio de PDF'), ('input-file-image', 'Envio de Imagem'), ('input-phone', 'Telefone'), ('textarea', 'Texto longo'), ('boolean', 'SIM/NÃO'), ('select', 'Lista simples'), ('checkbox-group', 'Múltipla escolha'), ('radio-group', 'Escolha única'), ('input-phone-cpf', 'CPF'), ('input-phone-cnpj', 'CNPJ'), ('input-phone-phone', 'Número de Telefone Fixo'), ('input-phone-cellphone', 'Número de Celular')], max_length=50, verbose_name='tipo'),
         ),
     ]

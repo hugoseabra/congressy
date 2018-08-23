@@ -34,7 +34,7 @@ def get_image_path(instance, filename):
     )
 
 
-@track_data('date_end_sub', 'liquid_price')
+@track_data('banner', 'date_end_sub', 'liquid_price')
 class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
     """
         Opcional é um item adicional (add-on) à inscrição de um evento que

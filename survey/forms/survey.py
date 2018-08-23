@@ -1,9 +1,10 @@
 import os
+import shutil
 
 from django import forms
 from django.conf import settings
-from django.db.transaction import atomic
 from django.core.files.storage import FileSystemStorage
+from django.db.transaction import atomic
 from django.forms import ValidationError
 from django.forms.fields import Field as DjangoField
 
@@ -29,8 +30,8 @@ class SurveyBaseForm(forms.Form):
         self.author = author
 
         self.storage = FileSystemStorage(
-            location=os.path.join(settings.MEDIA_ROOT, 'survey', 'pdfs'),
-            base_url=os.path.join(settings.MEDIA_URL, 'survey', 'pdfs'),
+            location=os.path.join(settings.MEDIA_ROOT, 'survey'),
+            base_url=os.path.join(settings.MEDIA_URL, 'survey'),
         )
 
         super(SurveyBaseForm, self).__init__(*args, **kwargs)
@@ -47,7 +48,7 @@ class SurveyBaseForm(forms.Form):
                               required=question.required,
                               help_text=question.help_text,
                               intro=question.intro,
-                              question=question,)
+                              question=question, )
 
     def create_field(self, question, name, field_type, initial=None,
                      required=False, help_text=None, intro=False,
@@ -186,27 +187,65 @@ class SurveyAnswerForm(SurveyBaseForm):
         return answer_list
 
     def save(self):
+
+        file_types = [
+            Question.FIELD_INPUT_FILE_PDF,
+            Question.FIELD_INPUT_FILE_IMAGE,
+        ]
+
+        file_directories = {
+            Question.FIELD_INPUT_FILE_PDF: 'pdfs',
+            Question.FIELD_INPUT_FILE_IMAGE: 'images',
+        }
+
         with atomic():
 
             for answer in self.answer_service_list:
 
                 question = answer.question
-                if question.type == Question.FIELD_INPUT_FILE_PDF:
+                if question.type in file_types:
                     if question.name not in self.files:
                         continue
 
                     uploaded_file = self.files.get(question.name)
-                    filename = self.storage.save(
-                        os.path.join(str(question.pk), uploaded_file.name),
-                        uploaded_file
-                    )
-                    answer.value = os.path.join(
-                        'survey',
-                        'pdfs',
-                        filename
-                    )
+                    file_dir = file_directories.get(question.type)
+
+                    if file_dir is None:
+                        path = os.path.join(
+                            str(question.pk),
+                            uploaded_file.name
+                        )
+
+                    else:
+                        path = os.path.join(
+                            file_dir,
+                            str(question.pk),
+                            uploaded_file.name
+                        )
+
+                    self._clear_previous_file(path)
+                    filename = self.storage.save(path, uploaded_file)
+                    answer.value = os.path.join('survey', filename)
 
                 answer.save()
+
+    def _clear_previous_file(self, file_path):
+
+        previous_file_path = os.path.join(
+            settings.MEDIA_ROOT,
+            'survey',
+            file_path
+        )
+
+        base_dir = os.path.dirname(previous_file_path)
+        if os.path.isdir(base_dir):
+            for file in os.listdir(base_dir):
+                file_path = os.path.join(base_dir, file)
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
 
 
 class ActiveSurveyAnswerForm(SurveyAnswerForm):
