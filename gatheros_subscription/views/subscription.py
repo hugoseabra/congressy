@@ -722,6 +722,110 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
             'pk': self.subscription.pk,
         })
 
+    def get_context_data(self, **kwargs):
+
+        survey_form = kwargs.pop('survey_form', None)
+
+        context = super().get_context_data(**kwargs)
+
+        if self.subscription.lot.event_survey:
+            if survey_form:
+                context['survey_form'] = survey_form
+            else:
+                survey = self.subscription.lot.event_survey.survey
+                form = self.get_survey_form(survey,
+                                            subscription=self.subscription)
+                context['survey_form'] = form
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        """
+            Handles POST requests, instantiating a form instance with the passed
+            POST variables and then checked for validity.
+        """
+        if self.allow_edit_lot and 'subscription-lot' not in request.POST:
+            messages.warning(request, 'Você deve informar um lote.')
+            return redirect(self.get_error_url())
+
+        request.POST = request.POST.copy()
+
+        to_be_pre_cleaned = [
+            'person-cpf',
+            'person-phone',
+            'person-zip_code',
+            'person-institution_cnpj'
+        ]
+
+        for field in to_be_pre_cleaned:
+            if field in request.POST:
+                request.POST[field] = clear_string(request.POST[field])
+
+        form = self.get_form()
+        if form.is_valid():
+
+            if self.allow_edit_lot:
+                lot_pk = self.request.POST.get('subscription-lot')
+
+            elif self.subscription:
+                lot_pk = self.subscription.lot.pk
+
+            else:
+                raise Exception('Edição de lote somente para nova inscrição.')
+
+            with atomic():
+                self.object = form.save()
+                subscription_form = self.get_subscription_form(
+                    person=self.object,
+                    lot_pk=lot_pk,
+                )
+                if not subscription_form.is_valid():
+                    for error in subscription_form.errors:
+                        messages.error(self.request, str(error))
+
+                    return redirect(self.get_error_url())
+
+                self.subscription = subscription_form.save()
+                if self.subscription.lot.event_survey:
+
+                    survey = self.subscription.lot.event_survey.survey
+
+                    survey_form = self.get_survey_form(
+                        survey=survey,
+                        data=self.request.POST,
+                        files=self.request.FILES,
+                        subscription=self.subscription,
+                    )
+
+                    if survey_form.is_valid():
+                        survey_form.save()
+                        return self.form_valid(form)
+                    else:
+                        return self.form_invalid(form, survey_form=survey_form)
+        else:
+            return self.form_invalid(form)
+
+    def form_invalid(self, form, survey_form=None):
+        """
+        If the form is invalid, re-render the context data with the
+        data-filled form and errors.
+        """
+        return self.render_to_response(
+            self.get_context_data(form=form, survey_form=survey_form))
+
+    def get_survey_form(self, survey, subscription=None, data=None, files=None):
+
+        survey_director = SubscriptionSurveyDirector(subscription)
+
+        survey_form = survey_director.get_active_form(
+            survey=survey,
+            data=data,
+            files=files,
+            update=self.request.method in ['POST', 'PUT'],
+        )
+
+        return survey_form
+
 
 class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
     """ Inscrição de pessoa que já possui perfil. """
