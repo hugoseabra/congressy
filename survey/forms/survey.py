@@ -1,4 +1,8 @@
+import os
+
 from django import forms
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.forms import ValidationError
 from django.forms.fields import Field as DjangoField
 
@@ -8,11 +12,16 @@ from survey.services import AnswerService
 from .field import SurveyField
 
 
+def handle_uploaded_file(f):
+    with open('some/file/name.txt', 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+
+
 class SurveyBaseForm(forms.Form):
     """ Formulário Dinâmico. """
 
     def __init__(self, survey, user=None, author=None, *args, **kwargs):
-
         if not isinstance(survey, Survey):
             msg = '{} não é uma instância de Survey'.format(
                 survey.__class__.__name__
@@ -22,6 +31,11 @@ class SurveyBaseForm(forms.Form):
         self.survey = survey
         self.user = user
         self.author = author
+
+        self.storage = FileSystemStorage(
+            location=os.path.join(settings.MEDIA_ROOT, 'survey', 'pdfs'),
+            base_url=os.path.join(settings.MEDIA_URL, 'survey', 'pdfs'),
+        )
 
         super(SurveyBaseForm, self).__init__(*args, **kwargs)
         self.create_questions()
@@ -37,7 +51,7 @@ class SurveyBaseForm(forms.Form):
                               required=question.required,
                               help_text=question.help_text,
                               intro=question.intro,
-                              question=question)
+                              question=question,)
 
     def create_field(self, question, name, field_type, initial=None,
                      required=False, help_text=None, intro=False,
@@ -92,7 +106,7 @@ class SurveyAnswerForm(SurveyBaseForm):
     """ Formulário Dinâmico. """
 
     def __init__(self, *args, **kwargs):
-        self.answer_service_list = None
+        self.answer_service_list = []
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -114,60 +128,75 @@ class SurveyAnswerForm(SurveyBaseForm):
 
         for question, answer in self.cleaned_data.items():
 
-            if answer:
+            if not answer:
+                continue
 
-                if not self.author and self.user:
-                    self.author = Author.objects.get_or_create(
-                        survey=self.survey,
-                        user=self.user
-                    )[0]
-
-                if self.author is None:
-                    raise Exception(
-                        'Não foi possivel resgatar ou criar um autor')
-
-                question = Question.objects.get(
-                    name=question,
+            if not self.author and self.user:
+                self.author = Author.objects.get_or_create(
                     survey=self.survey,
+                    user=self.user
+                )[0]
+
+            if self.author is None:
+                raise Exception(
+                    'Não foi possivel resgatar ou criar um autor'
                 )
 
-                existing_answer = None
+            question = Question.objects.get(
+                name=question,
+                survey=self.survey,
+            )
 
-                try:
-                    existing_answer = Answer.objects.get(
-                        question=question.pk,
-                        question__survey=self.survey,
-                        author=self.author,
-                    )
-                except Answer.DoesNotExist:
-                    pass
+            existing_answer = None
 
-                if existing_answer:
-                    answer_service = AnswerService(
-                        instance=existing_answer,
-                        data={
-                            'question': question.pk,
-                            'author': self.author.pk,
-                            'value': answer,
-                        }
-                    )
-                else:
-                    answer_service = AnswerService(data={
+            try:
+                existing_answer = Answer.objects.get(
+                    question=question.pk,
+                    question__survey=self.survey,
+                    author=self.author,
+                )
+            except Answer.DoesNotExist:
+                pass
+
+            if existing_answer:
+                answer_service = AnswerService(
+                    instance=existing_answer,
+                    data={
                         'question': question.pk,
                         'author': self.author.pk,
                         'value': answer,
-                    })
+                    }
+                )
+            else:
+                answer_service = AnswerService(data={
+                    'question': question.pk,
+                    'author': self.author.pk,
+                    'value': answer,
+                })
 
-                if answer_service.is_valid():
-                    answer_object = answer_service.save()
-                    answer_list.append(answer_object)
-                else:
-                    raise ValidationError(answer_service.errors)
+            if answer_service.is_valid():
+                answer_object = answer_service.save()
+                answer_list.append(answer_object)
+            else:
+                raise ValidationError(answer_service.errors)
 
         return answer_list
 
     def save(self):
         for answer in self.answer_service_list:
+
+            question = answer.question
+            if question.type == Question.FIELD_INPUT_FILE_PDF:
+                if question.name not in self.files:
+                    continue
+
+                uploaded_file = self.files.get(question.name)
+                filename = self.storage.save(
+                    uploaded_file.name,
+                    uploaded_file
+                )
+                answer.value = os.path.join('survey', 'pdfs', filename)
+
             answer.save()
 
 
@@ -176,6 +205,6 @@ class ActiveSurveyAnswerForm(SurveyAnswerForm):
 
     def get_questions(self):
         questions_qs = super().get_questions()
-        questions_qs.filter(active=True)
+        questions_qs = questions_qs.filter(active=True)
 
         return questions_qs

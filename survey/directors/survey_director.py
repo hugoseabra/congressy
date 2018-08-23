@@ -2,10 +2,25 @@
     Intenção: Este diretor tem a intenção de integrar o módulo neste módulo
     'survey' neste módulo de hotsite.
 """
+import os
+import absoluteuri
+
 from gatheros_event.models import Event
 from gatheros_subscription.models import EventSurvey
 from survey.forms import SurveyAnswerForm, ActiveSurveyAnswerForm
 from survey.models import Author, Answer
+
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+
+
+class InitialStorage(object):
+    def __init__(self, storage, file_name, file_path):
+        self.file_name = file_name
+        self.url = absoluteuri.build_absolute_uri(storage.url(file_path))
+
+    def __str__(self):
+        return self.file_name
 
 
 class SurveyDirector(object):
@@ -154,7 +169,8 @@ class SurveyDirector(object):
             author=author,
         )
 
-    def get_active_form(self, survey, author=None, data=None) -> ActiveSurveyAnswerForm:
+    def get_active_form(self, survey, author=None, data=None,
+                        files=None) -> ActiveSurveyAnswerForm:
         """
 
         Este método é responsável por retornar um objeto do tipo
@@ -169,6 +185,7 @@ class SurveyDirector(object):
         :param author: uma instância de um objeto de Author já existente
         :param data: um dict contendo as novas respostas que serão
                 vinculadas ao form
+        :param files: um dict contendo os arquivos enviados na request
 
         :return SurveyForm: um objeto de SurveyForm
         """
@@ -180,7 +197,6 @@ class SurveyDirector(object):
                 pass
 
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
-
         if author:
             try:
                 """
@@ -194,7 +210,26 @@ class SurveyDirector(object):
                     try:
                         answer = Answer.objects.get(question=question,
                                                     author=author)
-                        answers.update({question.name: answer.value})
+
+                        if question.type == question.FIELD_INPUT_FILE_PDF:
+                            if files:
+                                continue
+
+                            storage = FileSystemStorage(
+                                base_url=os.path.join(settings.MEDIA_URL),
+                            )
+                            storage.open(answer.value)
+
+                            initial_storage = InitialStorage(
+                                storage,
+                                answer.human_display,
+                                answer.value
+                            )
+                            answers.update({question.name: initial_storage})
+
+                        else:
+                            answers.update({question.name: answer.value})
+
                     except Answer.DoesNotExist:
                         pass
 
@@ -208,6 +243,7 @@ class SurveyDirector(object):
                 data=data,
                 user=self.user,
                 author=author,
+                files=files,
             )
 
         return ActiveSurveyAnswerForm(
@@ -215,4 +251,5 @@ class SurveyDirector(object):
             data=data,
             user=self.user,
             author=author,
+            files=files,
         )
