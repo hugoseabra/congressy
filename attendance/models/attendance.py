@@ -35,7 +35,7 @@ class Attendance(models.Model):
         AttendanceService,
         verbose_name='Lista de Check-in/out',
         related_name='attendances',
-        on_delete=models.PROTECT
+        on_delete=models.CASCADE
     )
 
     printed_on = models.DateTimeField(

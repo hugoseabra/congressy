@@ -27,6 +27,7 @@ class AttendanceServiceForm(forms.ModelForm):
 
     def __create_lot_category_filters(self, service):
         lc_pks = self.data.getlist('lot_categories', [])
+        lc_pks = list(map(int, lc_pks))
         existing_cat_filters = []
         for cat_filter in service.lot_category_filters.all():
             if cat_filter.lot_category.pk in lc_pks:

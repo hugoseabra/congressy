@@ -19,8 +19,6 @@ from .payment import PaymentDeleteView
 from .subscription import (
     MySubscriptionsListView,
     SubscriptionAddFormView,
-    SubscriptionAttendanceView,
-    SubscriptionAttendanceSearchView,
     SubscriptionAttendanceDashboardView,
     SubscriptionCancelView,
     SubscriptionEditFormView,
@@ -28,7 +26,6 @@ from .subscription import (
     SubscriptionListView,
     SubscriptionViewFormView,
     VoucherSubscriptionPDFView,
-    SubscriptionAttendanceListView,
     SwitchSubscriptionTestView,
     SubscriptionInternalSurveyFormView,
 )

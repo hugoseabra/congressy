@@ -67,17 +67,17 @@
                                         <ul class="dropdown-menu dropdown-menu-right"
                                             role="menu">
                                             <li>
-                                                <a class="open-editSurvey"
-                                                href="{% url 'attendance:attendance-list-edit' event.pk item.pk %}"
+                                                <a href="{% url 'attendance:attendance-list-edit' event.pk item.pk %}"
                                                 >
                                                     <i class="fas fa-pencil-alt"></i>
                                                     Editar
                                                 </a>
                                             </li>
 
-                                            <li>
-                                                <a class="open-DeleteQuestionDialog">
-                                                    <i class="fas fa-trash-alt"></i>
+                                            <li onclick="$('#lot-delete-form').attr('action','{% url 'attendance:attendance-list-delete' event.pk item.pk%}');
+                                                $('#attendace-list-delete-modal').modal();">
+                                                <a>
+                                                    <i class="fas fa-trash-alt"> </i>
                                                     Excluir
                                                 </a>
                                             </li>
@@ -89,6 +89,46 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block modals %}
+    <div class="modal" id="attendace-list-delete-modal" role="dialog"
+         data-backdrop="true">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content">
+                <form action="" method="post" class="form-horizontal"
+                      role="form" id="lot-delete-form">
+                    <div class="modal-header">
+                        <button type="button" class="close"
+                                data-dismiss="modal"
+                                aria-label="Close"><span
+                                aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title text-bold">
+                            Excluir lista de checkin
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+
+                        <p>Deseja realmente excluir a lista de checkin ?</p>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-success" type="submit">
+                            Confirmar
+                        </button>
+
+                        <button class="btn btn-danger"
+                                data-dismiss="modal">Voltar
+                        </button>
+
+                    </div>
+                </form>
             </div>
         </div>
     </div>

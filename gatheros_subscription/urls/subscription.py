@@ -18,11 +18,7 @@ urls = [
         views.SubscriptionUpdateAttendedAPIView.as_view(),
         name='subscription-api-update-check-in'
     ),
-    url(
-        r'^(?P<pk>[0-9A-Fa-f-]+)/attendance/$',
-        views.SubscriptionAttendanceView.as_view(),
-        name='subscription-attendance'
-    ),
+
     url(
         r'^(?P<pk>[0-9A-Fa-f-]+)/edit/$',
         views.SubscriptionEditFormView.as_view(),
@@ -59,26 +55,16 @@ urls = [
         name='subscription-view'
     ),
 
-    url(
-        r'^attendance/dashboard/$',
-        views.SubscriptionAttendanceDashboardView.as_view(),
-        name='subscription-attendance-dashboard'
-    ),
-    url(
-        r'^attendance/search/$',
-        views.SubscriptionAttendanceSearchView.as_view(),
-        name='subscription-attendance-search'
-    ),
-    url(
-        r'^attendance/list/$',
-        views.SubscriptionAttendanceListView.as_view(),
-        name='subscription-attendance-list'
-    ),
-    url(
-        r'^api/attendance/search/$',
-        views.SubscriptionSearchViewSet.as_view(),
-        name='subscription-api-attendance-search'
-    ),
+    # url(
+    #     r'^attendance/list/$',
+    #     views.SubscriptionAttendanceListView.as_view(),
+    #     name='subscription-attendance-list'
+    # ),
+    # url(
+    #     r'^api/attendance/search/$',
+    #     views.SubscriptionSearchViewSet.as_view(),
+    #     name='subscription-api-attendance-search'
+    # ),
     url(
         r'^export/$',
         views.SubscriptionExportView.as_view(),
