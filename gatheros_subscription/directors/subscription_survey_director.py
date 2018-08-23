@@ -7,7 +7,7 @@ from django.core.files.storage import FileSystemStorage
 from gatheros_subscription.models import Subscription
 from survey.forms import SurveyAnswerForm, SurveyBaseForm, \
     ActiveSurveyAnswerForm
-from survey.models import Author, Answer, Survey
+from survey.models import Author, Answer, Survey, Question
 
 
 class InitialStorage(object):
@@ -157,6 +157,11 @@ class SubscriptionSurveyDirector(object):
                 Resgatar a autoria para poder popular as respostas dos
                 objetos de 'survey'
             """
+            file_types = [
+                Question.FIELD_INPUT_FILE_PDF,
+                Question.FIELD_INPUT_FILE_IMAGE,
+            ]
+
             for question in survey.questions.all():
                 """
                     Tenta iterar sobre todas as respostas deste autor.
@@ -168,7 +173,7 @@ class SubscriptionSurveyDirector(object):
                         question__survey=survey,
                     )
 
-                    if question.type == question.FIELD_INPUT_FILE_PDF:
+                    if question.type in file_types:
                         if update is True or data or files:
                             continue
 
