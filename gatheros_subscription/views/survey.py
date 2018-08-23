@@ -72,14 +72,13 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
             elif action == 'update_order':
 
-                new_order = json.loads(self.request.POST.get(
-                    'new_order'))
+                new_order = json.loads(self.request.POST.get('new_order'))
 
                 counter = 1
                 try:
-                    for question_name in new_order:
+                    for question_id in new_order:
                         question = Question.objects.get(survey=self.survey,
-                                                        name=question_name)
+                                                        pk=question_id)
                         question.order = counter
                         question.save()
                         counter += 1

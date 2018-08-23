@@ -1001,7 +1001,7 @@
                 var checkbox_requirment_watcher = null;
                 required_checkboxes.on('ifChanged', function (e) {
 
-                    var question_id = this.dataset.name;
+                    var question_id = this.dataset.id;
 
                     var setTo = null;
 
@@ -1049,7 +1049,6 @@
 
             }, 200);
 
-
             return Sortable.create(byId('simpleList'), {
                 animation: 150,
                 filter: '.js-remove',
@@ -1085,7 +1084,7 @@
                         data: {
                             action: 'update_order',
                             new_order: JSON.stringify(this.toArray()),
-                            question_id: evt.item.dataset.name
+                            question_id: evt.item.dataset.id
                         },
                         success: function (res) {
                             //updateFields();
@@ -1144,7 +1143,7 @@
 
             form_el.find('.question_name').text(question_name);
             form_el.find('#new_type_input').val(question_type);
-            form_el.find('input[name=question_id]').val(question_id);
+            form_el.find('input[name=question_id]').val(questiosimpleListn_id);
             form_el.submit(function(e) {
                 e.preventDefault();
                 editQuestionTypeModal($(this), modal_el);
