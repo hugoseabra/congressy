@@ -1,6 +1,22 @@
+import os
+
+import absoluteuri
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+
 from gatheros_subscription.models import Subscription
-from survey.forms import SurveyAnswerForm, SurveyBaseForm, ActiveSurveyAnswerForm
+from survey.forms import SurveyAnswerForm, SurveyBaseForm, \
+    ActiveSurveyAnswerForm
 from survey.models import Author, Answer, Survey
+
+
+class InitialStorage(object):
+    def __init__(self, storage, file_name, file_path):
+        self.file_name = file_name
+        self.url = absoluteuri.build_absolute_uri(storage.url(file_path))
+
+    def __str__(self):
+        return self.file_name
 
 
 class SubscriptionSurveyDirector(object):
@@ -107,7 +123,8 @@ class SubscriptionSurveyDirector(object):
             author=author,
         )
 
-    def get_active_form(self, survey: Survey, data=None):
+    def get_active_form(self, survey: Survey, data=None, files=None,
+                        update=False) -> ActiveSurveyAnswerForm:
         """
 
         Este método é responsável por retornar um objeto do tipo
@@ -126,9 +143,10 @@ class SubscriptionSurveyDirector(object):
         # Caso não seja passado uma inscrição, resgatar apenas um
         # SurveyAnswerForm vazio
         if self.subscription is None or self.subscription.author is None:
-            return SurveyAnswerForm(
+            return ActiveSurveyAnswerForm(
                 survey=survey,
                 data=data,
+                files=files,
             )
 
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
@@ -149,7 +167,26 @@ class SubscriptionSurveyDirector(object):
                         author=author,
                         question__survey=survey,
                     )
+
+                    if question.type == question.FIELD_INPUT_FILE_PDF:
+                        if update is True or data or files:
+                            continue
+
+                        storage = FileSystemStorage(
+                            base_url=os.path.join(settings.MEDIA_URL),
+                        )
+                        storage.open(answer.value)
+
+                        initial_storage = InitialStorage(
+                            storage,
+                            answer.human_display,
+                            answer.value
+                        )
+                        answers.update({question.name: initial_storage})
+                        continue
+
                     answers.update({question.name: answer.value})
+
                 except Answer.DoesNotExist:
                     pass
 
@@ -162,15 +199,18 @@ class SubscriptionSurveyDirector(object):
                 initial=answers,
                 data=data,
                 author=author,
+                files=files,
             )
 
         return ActiveSurveyAnswerForm(
             survey=survey,
             data=data,
             author=author,
+            files=files,
         )
 
-    def get_base_form(self, survey: Survey, data=None) -> SurveyBaseForm:
+    def get_base_form(self, survey: Survey, data=None, files=None,
+                      update=False) -> SurveyBaseForm:
         """
 
         Este método é responsável por retornar um objeto do tipo
@@ -192,6 +232,7 @@ class SubscriptionSurveyDirector(object):
             return SurveyBaseForm(
                 survey=survey,
                 data=data,
+                files=files,
             )
 
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
@@ -212,6 +253,24 @@ class SubscriptionSurveyDirector(object):
                         author=author,
                         question__survey=survey,
                     )
+
+                    if question.type == question.FIELD_INPUT_FILE_PDF:
+                        if update is True or data or files:
+                            continue
+
+                        storage = FileSystemStorage(
+                            base_url=os.path.join(settings.MEDIA_URL),
+                        )
+                        storage.open(answer.value)
+
+                        initial_storage = InitialStorage(
+                            storage,
+                            answer.human_display,
+                            answer.value
+                        )
+                        answers.update({question.name: initial_storage})
+                        continue
+
                     answers.update({question.name: answer.value})
                 except Answer.DoesNotExist:
                     pass
@@ -225,10 +284,12 @@ class SubscriptionSurveyDirector(object):
                 initial=answers,
                 data=data,
                 author=author,
+                files=files,
             )
 
         return SurveyBaseForm(
             survey=survey,
             data=data,
             author=author,
+            files=files,
         )

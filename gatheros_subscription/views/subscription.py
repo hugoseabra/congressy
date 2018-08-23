@@ -565,7 +565,7 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
 
             for question in questions:
 
-                answer = 'Sem resposta.'
+                answer = '-'
 
                 answers = Answer.objects.filter(
                     question=question,
@@ -573,20 +573,21 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
                 )
 
                 if answers.count() == 1:
-                    answer = answers.first().human_display
+                    answer = answers.first()
                 elif answers.count() > 1:
                     raise Exception('Temos ambiguidade de respostas')
                 elif answers.count() == 0:
                     try:
                         answer = Answer.objects.get(question=question,
                                                     author=self.object.author)
-                        answer = answer.human_display
                     except Answer.DoesNotExist:
-                        pass
+                        continue
 
                 survey_answers.append({
                     'question': question.label,
-                    'answer': answer
+                    'human_display': answer.human_display,
+                    'value': answer.value,
+                    'is_file': answer.question.type == answer.question.FIELD_INPUT_FILE_PDF,
                 })
 
         return survey_answers
@@ -643,6 +644,7 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
             survey_form = self.get_survey_form(
                 survey=survey,
                 data=self.request.POST,
+                files=self.request.FILES,
                 subscription=self.subscription,
             )
 
@@ -653,14 +655,15 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
         return response
 
-    @staticmethod
-    def get_survey_form(survey, subscription=None, data=None):
+    def get_survey_form(self, survey, subscription=None, data=None, files=None):
 
         survey_director = SubscriptionSurveyDirector(subscription)
 
         survey_form = survey_director.get_active_form(
             survey=survey,
             data=data,
+            files=files,
+            update=self.request.method in ['POST', 'PUT'],
         )
 
         return survey_form
@@ -1232,11 +1235,14 @@ class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
         survey = self.subscription.lot.event_survey.survey
         form_kwargs = self.get_form_kwargs()
         data = form_kwargs.get('data')
+        files = form_kwargs.get('files')
         survey_director = SubscriptionSurveyDirector(self.subscription)
 
         return survey_director.get_active_form(
             survey=survey,
             data=data,
+            files=files,
+            update=self.request.method in ['POST', 'PUT'],
         )
 
     def form_valid(self, form):
