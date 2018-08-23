@@ -121,12 +121,15 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
                 question_data = {
                     'name': data.get('name_edit', question.name),
                     'label': data.get('name_edit', question.label),
-                    'help_text': data.get('help_text_edit',
-                                          question.help_text),
+                    'help_text': data.get(
+                        'help_text_edit',
+                        question.help_text
+                    ),
                     'intro': bool(data.get('intro_edit', False)),
                     'options': data.get('options_edit', question.options),
                     'survey': self.survey.pk,
                     'type': question.type,
+                    'active': question.active,
                 }
 
                 question_form = QuestionForm(

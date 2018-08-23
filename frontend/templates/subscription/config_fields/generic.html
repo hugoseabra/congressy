@@ -29,15 +29,9 @@
                 {% render_field field %}
                 <br>
             {% elif field.field.widget.input_type == "file" %}
-                <label for="{{ field.id_for_label }}"
-                       class="custom-file-upload">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    Enviar arquivo
-                </label>
-                {{ field }}
+                {% render_field field %}
 
                 {% if help_text %}
-                    <br/>
                     <small class="text-muted">
                         {{ help_text|safe }}
                     </small>

@@ -113,9 +113,10 @@ class QuestionForm(forms.Form):
                     if not option_service.is_valid():
                         # self.question.delete()
                         for key, err in option_service.errors.items():
-                            raise forms.ValidationError("Problema ao "
-                                                        "salvar uma opção: "
-                                                        + _(err[0]))
+                            raise forms.ValidationError(
+                                "Problema ao salvar uma opção:"
+                                " {}".format(_(err[0]))
+                            )
                     else:
                         self.options_list.append(option_service)
 
