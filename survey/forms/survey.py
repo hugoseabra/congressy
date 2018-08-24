@@ -1,5 +1,4 @@
 import os
-import shutil
 
 from django import forms
 from django.conf import settings
@@ -104,15 +103,16 @@ class SurveyAnswerForm(SurveyBaseForm):
 
     def __init__(self, name=None, *args, **kwargs):
         self.answer_service_list = []
+        self.previous_file_paths = {}
         self.name = name
         super().__init__(*args, **kwargs)
 
     def clean(self):
         clean_data = super().clean()
-        self.answer_service_list = self._clean_answers()
+        self.answer_service_list = self._create_answer_services()
         return clean_data
 
-    def _clean_answers(self) -> list:
+    def _create_answer_services(self) -> list:
         """
 
         :return: list: uma lista de objetos do tipo Answer que corresponde a
@@ -121,8 +121,12 @@ class SurveyAnswerForm(SurveyBaseForm):
         :raises ValidationError: exception sobe caso o serviço de resposta
         não consiga validar corretamente.
         """
+        file_types = [
+            Question.FIELD_INPUT_FILE_PDF,
+            Question.FIELD_INPUT_FILE_IMAGE,
+        ]
 
-        answer_list = []
+        answer_service_list = []
 
         for question, answer in self.cleaned_data.items():
 
@@ -151,40 +155,41 @@ class SurveyAnswerForm(SurveyBaseForm):
                 survey=self.survey,
             )
 
-            existing_answer = None
+            answer_service_kwargs = {
+                'data': {
+                    'question': question.pk,
+                    'author': self.author.pk,
+                    'value': answer,
+                }
+            }
 
             try:
-                existing_answer = Answer.objects.get(
+                answer_instance = Answer.objects.get(
                     question=question.pk,
                     question__survey=self.survey,
                     author=self.author,
                 )
+
+                if question.type in file_types:
+                    # Coleta caminho de arquivos anteriores para serem
+                    # ao salvar respostas.
+                    self.previous_file_paths.update({
+                        answer_instance.pk: answer_instance.value,
+                    })
+
+                answer_service_kwargs['instance'] = answer_instance
             except Answer.DoesNotExist:
                 pass
 
-            if existing_answer:
-                answer_service = AnswerService(
-                    instance=existing_answer,
-                    data={
-                        'question': question.pk,
-                        'author': self.author.pk,
-                        'value': answer,
-                    }
-                )
-            else:
-                answer_service = AnswerService(data={
-                    'question': question.pk,
-                    'author': self.author.pk,
-                    'value': answer,
-                })
+            answer_service = AnswerService(**answer_service_kwargs)
 
             if answer_service.is_valid():
-                answer_object = answer_service.save()
-                answer_list.append(answer_object)
+                answer_service_list.append(answer_service)
+
             else:
                 raise ValidationError(answer_service.errors)
 
-        return answer_list
+        return answer_service_list
 
     def save(self):
 
@@ -200,52 +205,56 @@ class SurveyAnswerForm(SurveyBaseForm):
 
         with atomic():
 
-            for answer in self.answer_service_list:
+            for answer_service in self.answer_service_list:
 
-                question = answer.question
-                if question.type in file_types:
-                    if question.name not in self.files:
-                        continue
+                question = answer_service.cleaned_data.get('question')
 
-                    uploaded_file = self.files.get(question.name)
-                    file_dir = file_directories.get(question.type)
+                # Se não possui instância, é um serviço de uma nova resposta
+                if question.type not in file_types:
+                    answer_service.save()
+                    continue
 
-                    if file_dir is None:
-                        path = os.path.join(
-                            str(question.pk),
-                            uploaded_file.name
-                        )
+                # Se nenhum arquivo foi enviado, não há porque guardar
+                # resposta.
+                if question.name not in self.files:
+                    continue
 
-                    else:
-                        path = os.path.join(
-                            file_dir,
-                            str(question.pk),
-                            uploaded_file.name
-                        )
+                uploaded_file = self.files.get(question.name)
+                file_dir = file_directories.get(question.type)
 
-                    self._clear_previous_file(path)
-                    filename = self.storage.save(path, uploaded_file)
-                    answer.value = os.path.join('survey', filename)
+                if file_dir is None:
+                    path = os.path.join(
+                        str(question.pk),
+                        uploaded_file.name
+                    )
 
+                else:
+                    path = os.path.join(
+                        file_dir,
+                        str(question.pk),
+                        uploaded_file.name
+                    )
+
+                answer = answer_service.save()
+
+                previous_file_path = self.previous_file_paths.get(answer.pk)
+                if previous_file_path:
+                    self._clear_previous_file(previous_file_path)
+
+                filename = self.storage.save(path, uploaded_file)
+
+                # Service já validou todos os campos. Podemos inserir  valor
+                # direto na instância.
+                answer.value = os.path.join('survey', filename)
+                answer.human_display = uploaded_file.name
                 answer.save()
 
     def _clear_previous_file(self, file_path):
 
-        previous_file_path = os.path.join(
-            settings.MEDIA_ROOT,
-            'survey',
-            file_path
-        )
+        previous_file_path = os.path.join(settings.MEDIA_ROOT, file_path)
 
-        base_dir = os.path.dirname(previous_file_path)
-        if os.path.isdir(base_dir):
-            for file in os.listdir(base_dir):
-                file_path = os.path.join(base_dir, file)
-                if os.path.isfile(file_path):
-                    os.unlink(file_path)
-
-                elif os.path.isdir(file_path):
-                    shutil.rmtree(file_path)
+        if os.path.isfile(previous_file_path):
+            os.unlink(previous_file_path)
 
 
 class ActiveSurveyAnswerForm(SurveyAnswerForm):
