@@ -26,7 +26,7 @@ urls = [
     ),
     url(
         r'^(?P<pk>[\d]+)/attendance/(?P<subscription_pk>[0-9A-Fa-f-]+)$',
-        views.AttendanceView.as_view(),
+        views.AttendanceSearchView.as_view(),
         name='attendance'
     ),
     url(

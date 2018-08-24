@@ -11,7 +11,7 @@ from gatheros_event.helpers.account import update_account
 from gatheros_subscription.models import Subscription
 
 
-class AttendanceView(generic.FormView):
+class AttendanceSearchView(generic.FormView):
     form_class = AttendanceServiceForm
     http_method_names = ['post']
     search_by = 'name'
@@ -54,7 +54,7 @@ class AttendanceView(generic.FormView):
         return self.get_success_url()
 
     def get_form_kwargs(self):
-        kwargs = super(AttendanceView, self).get_form_kwargs()
+        kwargs = super(AttendanceSearchView, self).get_form_kwargs()
         kwargs.update({'subscription': self.get_subscription(),
                        'attendance_service': self.get_attendance_list(),
                        'attended_by' : self.user})
@@ -62,7 +62,7 @@ class AttendanceView(generic.FormView):
 
     def form_invalid(self, form):
         messages.error(self.request, form.errors)
-        return super(AttendanceView, self).form_invalid(form)
+        return super(AttendanceSearchView, self).form_invalid(form)
 
     def form_valid(self, form):
         sub = self.get_subscription()
@@ -88,17 +88,18 @@ class AttendanceView(generic.FormView):
                 )
             )
             form.attended(self.register_type == 'register')
-            return super(AttendanceView, self).form_valid(form)
+            return super(AttendanceSearchView, self).form_valid(form)
 
     def post(self, request, *args, **kwargs):
         self.search_by = request.POST.get('search_by')
         self.register_type = request.POST.get('action')
 
-        return super(AttendanceView, self).post(
+        return super(AttendanceSearchView, self).post(
             request,
             *args,
             **kwargs
         )
+
 
 class SubscriptionAttendanceSearchView(generic.TemplateView):
     template_name = 'subscription/attendance.html'

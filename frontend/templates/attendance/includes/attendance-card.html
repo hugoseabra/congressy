@@ -1,0 +1,91 @@
+<div class="col-md-4 col-md-offset-3"
+     >
+    <div class="panel" style="border-radius: 5px;
+ box-shadow: 0 10px 15px 0 rgba(223, 223, 223, 0.5);
+">
+        <div class="container-fluid"
+             style="background-color:{% if checkin %}#d0021b {% else %} #27ae60 {% endif %};height: 70px;
+                     border-top-left-radius: 5px;
+                     border-top-right-radius: 5px;
+                     ">
+
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-xs-offset-3" style="margin-top:-50px;">
+                <img src="http://cdn.staticneo.com/w/evangelion/6/6a/Shinji.jpg"
+                     class="img-responsive img-circle" alt="Responsive image">
+            </div>
+        </div>
+        <div class="panel-body">
+            <h2 class="text-center"> Gabriel Rubens Miranda</h2>
+            <div class="text-center" style="padding-top: 8px">
+                <div class="row">
+                    <div class="col-md-7">
+                        <h3 style="padding-bottom: 5px">
+                            <i class="fas fa-barcode"
+
+                               data-toggle="tooltip"
+                               data-placement="left"
+                               title=""
+                               data-original-title="código da inscrição"></i>
+                            7F566747</h3>
+                    </div>
+                    <div class="col-md-5">
+                        <h3 style=" padding-bottom: 5px">
+                            <i class="fas fa-list-ol"
+
+                               data-toggle="tooltip"
+                               data-placement="left"
+                               title=""
+                               data-original-title="Número da Inscrição"></i>
+                            1234
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center"
+                 style="overflow: hidden">
+                <div style="height: 0.5px;width: 100%; background-color: #e6e6e6;
+                            margin-top: 10px; margin-bottom: 10px">
+
+                </div>
+                <h3 style="padding-bottom: 5px">
+                    <i class="far fa-envelope"
+                       data-toggle="tooltip"
+                       data-placement="left"
+                       title=""
+                       data-original-title="Email"></i>
+                    gabrielanda@gmail.com</h3>
+
+                <h3 style="padding-bottom: 5px">
+                    <i class="fas fa-th-list""
+                       data-toggle="tooltip"
+                       data-placement="left"
+                       title=""
+                       data-original-title="Categoria"></i>
+                    Estudantes</h3>
+                <h3 style="padding-bottom: 5px">
+                    <i class="fas fa-th-large"
+                       data-toggle="tooltip"
+                       data-placement="left"
+                       title=""
+                       data-original-title="Lote"></i>
+                    Lote Promocional</h3>
+
+                <div style=" text-align: center">
+                    <button style="margin-top:5px;border-radius: 25px"
+                            class="btn {% if checkin %} btn-success {% else %} btn-danger {% endif %}btn-trans">
+                        {% if checkin %}
+                            Realizar
+                            Check-in
+                        {% else %}
+                            Realizar Check-out
+                        {% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

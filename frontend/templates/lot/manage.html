@@ -134,25 +134,27 @@
             {% if categories.count %}
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="panel panel-primary">
-                            <div class="panel-heading">
-                                <div class="panel-title">
-                                    Gerenciamento de Lotes por Categoria
-                                </div>
-                            </div>
-
-                            <div class="panel-body" id="lot-list-main-block">
-                                {% if event_is_full %}
-                                    <h3>
-                                        <i class="fas fa-exclamation-circle warning-color"></i>
-                                        Todos os lotes foram finalizados porque
-                                        o evento está lotado
-                                    </h3>
-                                    <br>
-                                {% endif %}
-                                {% include 'lot/categories-lots-list.html' %}
-                            </div>
-                        </div>
+                    {% include 'attendance/includes/attendance-card.html' with checkin=True %}
+                    {% include 'attendance/includes/attendance-card.html' with checkin=false %}
+{#                        <div class="panel panel-primary">#}
+{#                            <div class="panel-heading">#}
+{#                                <div class="panel-title">#}
+{#                                    Gerenciamento de Lotes por Categoria#}
+{#                                </div>#}
+{#                            </div>#}
+{##}
+{#                            <div class="panel-body" id="lot-list-main-block">#}
+{#                                {% if event_is_full %}#}
+{#                                    <h3>#}
+{#                                        <i class="fas fa-exclamation-circle warning-color"></i>#}
+{#                                        Todos os lotes foram finalizados porque#}
+{#                                        o evento está lotado#}
+{#                                    </h3>#}
+{#                                    <br>#}
+{#                                {% endif %}#}
+{#                                {% include 'lot/categories-lots-list.html' %}#}
+{#                            </div>#}
+{#                        </div>#}
                     </div>
                 </div>
             {% endif %}
