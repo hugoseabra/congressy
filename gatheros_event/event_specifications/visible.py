@@ -37,6 +37,9 @@ class LotVisible(LotCompositeSpecificationMixin):
         if lot.private:
             return False
 
+        if not lot.active:
+            return False
+
         now = datetime.now()
         # Verificação se o lote está dentro do prazo ativo
         lot_range = DateTimeRange(start=lot.date_start, stop=lot.date_end)
