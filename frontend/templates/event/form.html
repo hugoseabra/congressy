@@ -121,7 +121,7 @@
             </div>
 
         </div>
-        
+
         <form action="" method="GET" id="choose-type-form"
               style="display:none">
             <input type="hidden" name="event_type" id="event_type" value=""/>
@@ -230,42 +230,30 @@
                                 </div>
                             {% endif %}
                             {% if not object %}
-                                {% if event_type != 'free' %}
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            {% render_generic_field form.expected_subscriptions %}
-                                        </div>
-                                        <div class="col-md-6">
-                                            {% render_switchery_field form.has_checkin %}
-                                        </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.expected_subscriptions %}
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            {% render_switchery_field form.has_optionals %}
-                                        </div>
-                                        <div class="col-md-6">
-                                            {% render_switchery_field form.has_extra_activities %}
-                                        </div>
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.has_checkin %}
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            {% render_switchery_field form.has_certificate %}
-                                        </div>
-                                        <div class="col-md-6">
-                                            {% render_switchery_field form.has_survey %}
-                                        </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.has_optionals %}
                                     </div>
-                                {% else %}
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            {% render_generic_field form.expected_subscriptions %}
-                                        </div>
-                                        <div class="col-md-6">
-                                            {% render_switchery_field form.has_survey %}
-                                        </div>
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.has_extra_activities %}
                                     </div>
-                                {% endif %}
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.has_certificate %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.has_survey %}
+                                    </div>
+                                </div>
                             {% endif %}
                         </div>
                     </div>
