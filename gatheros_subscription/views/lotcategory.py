@@ -42,6 +42,8 @@ class LotCategoryListView(generic.ListView):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
+        context['has_inside_bar'] = True
+        context['active'] = 'categorias'
         return context
 
     def get_queryset(self):

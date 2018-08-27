@@ -137,13 +137,13 @@
     <div class="row">
         <div class="col-md-12">
             <div class="buttonbar">
-                <div class="float-left">
-                    <a href="{% url 'subscription:lot-list' event.pk %}"
-                       class="btn btn-primary">
-                        <i class="fas fa-angle-left"></i>
-                        Lotes
-                    </a>
-                </div>
+{#                <div class="float-left">#}
+{#                    <a href="{% url 'subscription:lot-list' event.pk %}"#}
+{#                       class="btn btn-primary">#}
+{#                        <i class="fas fa-angle-left"></i>#}
+{#                        Lotes#}
+{#                    </a>#}
+{#                </div>#}
                 {% if event.feature_configuration.feature_multi_lots %}
                     <div class="float-right">
                         <a href="{% url 'subscription:category-add' event.pk %}"

@@ -114,11 +114,11 @@
                 <div class="col-md-12">
                     <div class="buttonbar">
                         <div class="float-left">
-                            <a href="{% url 'subscription:category-list' event.pk %}"
-                               class="btn btn-primary">
-                                <i class="fab fa-stack-exchange"></i>
-                                Gerenciar Categorias
-                            </a>
+{#                            <a href="{% url 'subscription:category-list' event.pk %}"#}
+{#                               class="btn btn-primary">#}
+{#                                <i class="fab fa-stack-exchange"></i>#}
+{#                                Gerenciar Categorias#}
+{#                            </a>#}
 
                             {% if event.feature_configuration.feature_multi_lots %}
                                 <a href="{% url 'subscription:lot-add' event.pk %}"

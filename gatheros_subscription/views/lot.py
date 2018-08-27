@@ -142,7 +142,7 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
         context['event'] = self.event
         context['can_add'] = self._can_add
         context['has_inside_bar'] = True
-        context['active'] = 'lotes-categorias'
+        context['active'] = 'lotes'
         context['subscription_stats'] = self.get_subscription_stats()
         context['full_banking'] = self._get_full_banking()
         context['exhibition_code'] = Lot.objects.generate_exhibition_code()
