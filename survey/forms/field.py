@@ -33,6 +33,7 @@ class SurveyField(object):
     FIELD_INPUT_DATETIME = 'input-datetime-local'
     FIELD_INPUT_EMAIL = 'input-email'
     FIELD_INPUT_FILE_PDF = 'input-file-pdf'
+    FIELD_INPUT_FILE_IMAGE = 'input-file-image'
     FIELD_INPUT_PHONE = 'input-phone'
     FIELD_INPUT_PHONE_PHONE = 'input-phone-phone'
     FIELD_INPUT_PHONE_CELLPHONE = 'input-phone-cellphone'
@@ -49,6 +50,7 @@ class SurveyField(object):
         FIELD_INPUT_PHONE_CPF,
         FIELD_INPUT_PHONE_CNPJ,
         FIELD_INPUT_FILE_PDF,
+        FIELD_INPUT_FILE_IMAGE,
         FIELD_INPUT_PHONE_PHONE,
         FIELD_INPUT_PHONE_CELLPHONE,
         FIELD_INPUT_NUMBER,
@@ -147,7 +149,6 @@ class SurveyField(object):
 
         if self.type == self.FIELD_INPUT_FILE_PDF:
             self.django_field = fields.FileField(
-                max_length=500,
                 label=self.label.title(),
                 required=self.required,
                 initial=self.initial,
@@ -155,6 +156,14 @@ class SurveyField(object):
                 validators=[
                     FileExtensionValidator(allowed_extensions=['pdf']),
                 ]
+            )
+
+        if self.type == self.FIELD_INPUT_FILE_IMAGE:
+            self.django_field = fields.ImageField(
+                label=self.label.title(),
+                required=self.required,
+                initial=self.initial,
+                help_text=self.help_text,
             )
 
         if self.type == self.FIELD_INPUT_PHONE:
