@@ -6,7 +6,7 @@ from gatheros_event.helpers.event_business import is_paid_event, is_free_event
 from gatheros_event.models import Event
 
 
-def has_only_first_lot_active(event: Event):
+def _has_only_first_lot_active(event: Event):
     found_active_lot = False
 
     for lot in event.lots.all():
@@ -18,7 +18,7 @@ def has_only_first_lot_active(event: Event):
     return True
 
 
-def deactivate_all_but_first_lot(event: Event):
+def _deactivate_all_but_first_lot(event: Event):
     for lot in event.lots.all():
         lot.active = False
         lot.save()
@@ -53,8 +53,8 @@ def update_event_config_flags(event: Event):
         for feature, value in FREE_EVENT_FEATURES.items():
             setattr(feature_config, feature, value)
 
-        if not has_only_first_lot_active(event):
-            deactivate_all_but_first_lot(event)
+        if not _has_only_first_lot_active(event):
+            _deactivate_all_but_first_lot(event)
 
     event.save()
     feature_config.save()
