@@ -144,13 +144,15 @@
                         Lotes
                     </a>
                 </div>
-                <div class="float-right">
-                    <a href="{% url 'subscription:category-add' event.pk %}"
-                       class="btn btn-success">
-                        <i class="fa fa-plus"></i>
-                        Adicionar
-                    </a>
-                </div>
+                {% if event.feature_configuration.feature_multi_lots %}
+                    <div class="float-right">
+                        <a href="{% url 'subscription:category-add' event.pk %}"
+                           class="btn btn-success">
+                            <i class="fa fa-plus"></i>
+                            Adicionar
+                        </a>
+                    </div>
+                {% endif %}
                 <div class="clearfix"></div>
             </div>
         </div>
@@ -174,37 +176,37 @@
 
                             <tbody>
                             {% for cat in object_list %}
-                            <tr>
-                            <td>
-                                <a href="{% url 'subscription:category-edit' event.pk cat.pk %}">{{ cat.name }}</a>
-                            </td>
-                            <td>
-                                <div class="btn-group">
-                                    <button
-                                        type="button"
-                                        class="btn btn-primary btn-trans btn-sm dropdown-toggle"
-                                        data-toggle="dropdown"
-                                        aria-expanded="false">
-                                        <span class="fas fa-cog"></span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-right"
-                                        role="menu">
-                                        <li>
-                                            <a href=" {% url 'subscription:category-edit' event.pk cat.pk %}">
-                                                <i class="fas fa-pencil-alt"></i>
-                                                Editar
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="{% url 'subscription:category-delete' event.pk cat.pk %}">
-                                                <i class="fas fa-trash-alt"></i>
-                                                Excluir
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                            </tr>
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'subscription:category-edit' event.pk cat.pk %}">{{ cat.name }}</a>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button
+                                                    type="button"
+                                                    class="btn btn-primary btn-trans btn-sm dropdown-toggle"
+                                                    data-toggle="dropdown"
+                                                    aria-expanded="false">
+                                                <span class="fas fa-cog"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right"
+                                                role="menu">
+                                                <li>
+                                                    <a href=" {% url 'subscription:category-edit' event.pk cat.pk %}">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                        Editar
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'subscription:category-delete' event.pk cat.pk %}">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                        Excluir
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
                             {% endfor %}
                             </tbody>
                         </table>
