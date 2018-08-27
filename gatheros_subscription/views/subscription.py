@@ -770,48 +770,50 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
                 request.POST[field] = clear_string(request.POST[field])
 
         form = self.get_form()
-        if form.is_valid():
-
-            if self.allow_edit_lot:
-                lot_pk = self.request.POST.get('subscription-lot')
-
-            elif self.subscription:
-                lot_pk = self.subscription.lot.pk
-
-            else:
-                raise Exception('Edição de lote somente para nova inscrição.')
-
-            with atomic():
-                self.object = form.save()
-                subscription_form = self.get_subscription_form(
-                    person=self.object,
-                    lot_pk=lot_pk,
-                )
-                if not subscription_form.is_valid():
-                    for error in subscription_form.errors:
-                        messages.error(self.request, str(error))
-
-                    return redirect(self.get_error_url())
-
-                self.subscription = subscription_form.save()
-                if self.subscription.lot.event_survey:
-
-                    survey = self.subscription.lot.event_survey.survey
-
-                    survey_form = self.get_survey_form(
-                        survey=survey,
-                        data=self.request.POST,
-                        files=self.request.FILES,
-                        subscription=self.subscription,
-                    )
-
-                    if survey_form.is_valid():
-                        survey_form.save()
-                        return self.form_valid(form)
-                    else:
-                        return self.form_invalid(form, survey_form=survey_form)
-        else:
+        if not form.is_valid():
             return self.form_invalid(form)
+
+        if self.allow_edit_lot:
+            lot_pk = self.request.POST.get('subscription-lot')
+
+        elif self.subscription:
+            lot_pk = self.subscription.lot.pk
+
+        else:
+            raise Exception('Edição de lote somente para nova inscrição.')
+
+        with atomic():
+            self.object = form.save()
+            subscription_form = self.get_subscription_form(
+                person=self.object,
+                lot_pk=lot_pk,
+            )
+            if not subscription_form.is_valid():
+                for error in subscription_form.errors:
+                    messages.error(self.request, str(error))
+
+                return redirect(self.get_error_url())
+
+            self.subscription = subscription_form.save()
+
+            if not self.subscription.lot.event_survey:
+                return self.form_valid(form)
+
+            survey = self.subscription.lot.event_survey.survey
+
+            survey_form = self.get_survey_form(
+                survey=survey,
+                data=self.request.POST,
+                files=self.request.FILES,
+                subscription=self.subscription,
+            )
+
+            if not survey_form.is_valid():
+                return self.form_invalid(form, survey_form=survey_form)
+
+            survey_form.save()
+
+        return self.form_valid(form)
 
     def form_invalid(self, form, survey_form=None):
         """
