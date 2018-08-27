@@ -5,16 +5,15 @@ from rest_framework.authentication import (
 )
 from rest_framework.permissions import IsAuthenticated
 
+from gatheros_subscription.lot_api_permissions import MultiLotsAllowed
 from gatheros_subscription.serializers import (
     Lot,
     LotSerializer,
 )
-from gatheros_subscription.lot_api_permissions import MultiLotsAllowed
 
 
 class RestrictionViewMixin(object):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated, MultiLotsAllowed)
 
 
 class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
@@ -34,3 +33,20 @@ class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
         queryset = super().get_queryset()
         return queryset.filter(event__organization__in=org_pks)
+
+    def check_permissions(self, request):
+        """
+        Check if the request should be permitted.
+        Raises an appropriate exception if the request is not permitted.
+        """
+
+        if request.method == "POST":
+            self.permission_classes = (IsAuthenticated, MultiLotsAllowed)
+        else:
+            self.permission_classes = (IsAuthenticated,)
+
+        for permission in self.get_permissions():
+            if not permission.has_permission(request, self):
+                self.permission_denied(
+                    request, message=getattr(permission, 'message', None)
+                )
