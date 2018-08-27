@@ -38,6 +38,9 @@ class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         """
         Check if the request should be permitted.
         Raises an appropriate exception if the request is not permitted.
+
+        Special case: Viewset does not allow object creation without
+        the multi-lot flag enabled.
         """
 
         if request.method == "POST":
