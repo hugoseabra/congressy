@@ -58,6 +58,10 @@ class ApplicationServiceMixin(forms.Form):
         self.fields.update(self.manager.fields)
         self.initial.update(self.manager.initial)
 
+    @property
+    def instance(self):
+        return getattr(self.manager, 'instance')
+
     def _get_manager(self, **kwargs):
         manager_class = self._get_manager_class()
 

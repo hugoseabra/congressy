@@ -33,8 +33,28 @@
     <script src="{% static "assets/plugins/croppie/croppie.js" %}"></script>
     <script src="{% static "assets/js/image-crop.js" %}"></script>
 
+    <!-- Script price calculator -->
+    <script src="{% static "assets/js/price-format.min.js" %}"></script>
+    <script src="{% static "assets/js/cgsy-price.js" %}"></script>
+
     <script type="application/javascript">
+        var price_calculator;
+        function getLiquidPrice(value, to_el) {
+            if (!value) {
+                to_el.val('');
+                return;
+            }
+
+            value = value.replace('.', '').replace(',', '.');
+            value = price_calculator.getLiquidPrice(parseFloat(value));
+
+            to_el = $(to_el);
+            to_el.val(as_currency(parseFloat(value)));
+        }
+
         $(document).ready(function () {
+            price_calculator = new window.cgsy.PriceCalculator(parseFloat('{{ cgsy_percent|unlocalize }}'), true);
+
             var date = createDatePicker();
             {% if object %}
                 date.data("DateTimePicker").minDate(false);
@@ -58,7 +78,7 @@
                 $('#id_date_end_sub_1').mask("99:99");
                 $('#id_schedule_start_1').mask("99:99");
                 $('#id_schedule_end_1').mask("99:99");
-                $('#id_liquid_price').mask('#.##0,00', {reverse: true});
+                $('#id_price').mask('#.##0,00', {reverse: true});
 
                 window.setTimeout(function () {
                     window.cgsy.addon.create_events();
@@ -235,20 +255,44 @@
                             {% if optonal_has_subscriptions and not object.liquid_price %}
                             {% else %}
                                 <div class="col-xl-3 col-xl-push-1 col-md-4">
-                                    {% render_generic_field form.liquid_price %}
+                                    <div class="form-group" style="margin-top: 20px">
+                                        <label for="id_liquid_price" style="margin-bottom:0">Preço de venda</label>
+                                        <small>
+                                            <i class="fas fa-question-circle" data-toggle="tooltip" data-placement="right" title="Qual o preço que você irá pedir pela venda deste item opcional?"></i>
+                                        </small>
+                                        <div>
+                                            <div class="input-group">
+                                                <div class="input-group-addon">R$</div>
+                                                <input class="form-control" type="tel" name="price" value="{{ object.price|default_if_none:'' }}" id="id_price" required="required" onkeyup="getLiquidPrice(this.value, $('#id_liquid_price'))">
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="form-group" style="margin-top: 20px">
+                                        <label for="id_liquid_price" style="margin-bottom:0">Valor a receber</label>
+                                        <small>
+                                            <i class="fas fa-question-circle" data-toggle="tooltip" data-placement="right" title="Valor líquido a receber por cada venda deste item opcional?"></i>
+                                        </small>
+                                        <div>
+                                            <div class="input-group">
+                                                <div class="input-group-addon">R$</div>
+                                                <input class="form-control" style="background-color: white;color:blue" type="text" readonly name="liquid_price" value="{{ object.liquid_price|default_if_none:'' }}" id="id_liquid_price">
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <input type="hidden"  name="" id="id_liquid_price" >
                                 </div>
                                 <div class="col-xl-7 col-xl-push-1 col-md-8">
                                     <div class="well well-sm"
                                          style="text-align: justify">
                                         <div><strong>Importante:</strong></div>
                                         <small class="help-text text-muted">
-                                            As
-                                            <strongs>Taxas de Transação
-                                            </strongs>
-                                            serão transferidas para o
-                                            participante.
-                                            Verifique se o <strong>valor
-                                            final</strong>.
+                                            Este item irá transferir as <strongs>Taxas</strongs> para o participante.
+                                            Então é importante verificar o <span style="text-decoration: underline;">valor a receber</span>
+                                            para saber quanto você receberá por este opcional.
                                         </small>
                                     </div>
                                 </div>

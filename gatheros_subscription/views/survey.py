@@ -75,14 +75,13 @@ class SurveyEditView(SurveyFeatureFlagMixin,
 
             elif action == 'update_order':
 
-                new_order = json.loads(self.request.POST.get(
-                    'new_order'))
+                new_order = json.loads(self.request.POST.get('new_order'))
 
                 counter = 1
                 try:
-                    for question_name in new_order:
+                    for question_id in new_order:
                         question = Question.objects.get(survey=self.survey,
-                                                        name=question_name)
+                                                        pk=question_id)
                         question.order = counter
                         question.save()
                         counter += 1
@@ -96,7 +95,7 @@ class SurveyEditView(SurveyFeatureFlagMixin,
 
                 set_to = self.request.POST.get('setTo')
                 try:
-                    question = Question.objects.get(name=question_id,
+                    question = Question.objects.get(pk=question_id,
                                                     survey=self.survey)
                 except Question.DoesNotExist:
                     return HttpResponse(status=404)

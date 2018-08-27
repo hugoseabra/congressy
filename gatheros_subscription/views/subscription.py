@@ -538,6 +538,11 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
             questions = Question.objects.filter(survey=survey).order_by(
                 'order')
 
+            file_types = [
+                Question.FIELD_INPUT_FILE_PDF,
+                Question.FIELD_INPUT_FILE_IMAGE,
+            ]
+
             for question in questions:
 
                 answer = '-'
@@ -562,7 +567,7 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
                     'question': question.label,
                     'human_display': answer.human_display,
                     'value': answer.value,
-                    'is_file': answer.question.type == answer.question.FIELD_INPUT_FILE_PDF,
+                    'is_file': question.type in file_types,
                 })
 
         return survey_answers
