@@ -47,7 +47,13 @@ class LotCategoryListView(generic.ListView):
     def get_queryset(self):
         """Lotes a exibir são de acordo com o evento e não-interno"""
         query_set = super().get_queryset()
-        return query_set.filter(event=self.event).order_by('pk')
+        query_set = query_set.filter(event=self.event)
+
+        if not self.event.feature_configuration.feature_multi_lots:
+            first = query_set.first()
+            query_set = query_set.filter(pk=first.pk)
+
+        return query_set.order_by('pk')
 
 
 class LotCategoryAddView(MultiLotsFeatureFlagMixin, generic.CreateView):

@@ -130,6 +130,13 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
             'date_start', 'date_end'
         )
 
+    def get_categories(self):
+        query_set = self.event.lot_categories.all()
+        if not self.event.feature_configuration.feature_multi_lots:
+            first = query_set.first()
+            query_set = query_set.filter(pk=first.pk)
+        return query_set.order_by('pk')
+
     def get_context_data(self, **kwargs):
         context = super(LotListView, self).get_context_data(**kwargs)
         context['event'] = self.event
@@ -139,7 +146,7 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
         context['subscription_stats'] = self.get_subscription_stats()
         context['full_banking'] = self._get_full_banking()
         context['exhibition_code'] = Lot.objects.generate_exhibition_code()
-        context['categories'] = self.event.lot_categories.all().order_by('pk')
+        context['categories'] = self.get_categories()
         context['event_is_full'] = self.event_is_full()
         return context
 
