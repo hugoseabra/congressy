@@ -559,21 +559,6 @@
                                     </li>
                                 {% endif %}
 
-                                {% if survey_answers|length > 0 %}
-
-                                    <li>
-                                        <button type="button"
-                                                class="btn btn-info btn-trans"
-                                                data-toggle="tooltip"
-                                                title="Abrir formulário de perguntas do participante"
-                                                onclick="window.location.href='{% url 'subscription:subscription-internal-survey' event.pk object.pk %}'">
-                                            <span class="fas fa-clipboard-list"></span>
-                                            Editar respostas do participante
-                                        </button>
-                                    </li>
-
-                                {% endif %}
-
                                 <li>
                                     <button type="button" style="display:none"
                                             class="btn btn-primary btn-trans"

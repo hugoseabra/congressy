@@ -1,7 +1,6 @@
 """ Helper para inscrições. """
 import locale
 
-from django.db.models import Count
 from openpyxl import Workbook
 from six import BytesIO
 
@@ -29,6 +28,8 @@ def clean_sheet_title(title):
         '/',
         '&',
         '*',
+        ':',
+        '?',
     )
     for char in invalid_chars:
         title = title.replace(char, '_')

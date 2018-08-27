@@ -7,7 +7,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.transaction import atomic
-from django.forms import ValidationError
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -272,33 +271,8 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        if self.allow_edit_lot:
-            lot_pk = self.request.POST.get('subscription-lot')
-
-        elif self.subscription:
-            lot_pk = self.subscription.lot.pk
-
-        else:
-            raise Exception('Edição de lote somente para nova inscrição.')
-
-        with atomic():
-            self.object = form.save()
-            subscription_form = self.get_subscription_form(
-                person=self.object,
-                lot_pk=lot_pk,
-            )
-            if not subscription_form.is_valid():
-                for error in subscription_form.errors:
-                    messages.error(self.request, str(error))
-
-                return redirect(self.get_error_url())
-
-            self.subscription = subscription_form.save()
 
         return super().form_valid(form)
-
-    def form_invalid(self, form):
-        return super().form_invalid(form)
 
 
 class SubscriptionListView(EventViewMixin, generic.ListView):
@@ -620,6 +594,8 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
     def get_context_data(self, **kwargs):
 
+        survey_form = kwargs.pop('survey_form', None)
+
         context = super().get_context_data(**kwargs)
 
         if context['selected_lot'] != 0:
@@ -629,32 +605,89 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
                 lot = Lot.objects.get(pk=lot_pk)
                 if lot.event_survey:
-                    survey = lot.event_survey.survey
-                    context['survey_form'] = self.get_survey_form(survey)
+                    if survey_form:
+                        context['survey_form'] = survey_form
+                    else:
+                        survey = lot.event_survey.survey
+                        context['survey_form'] = self.get_survey_form(survey)
             except Lot.DoesNotExist:
                 pass
 
         return context
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if self.subscription.lot.event_survey:
+    def post(self, request, *args, **kwargs):
+        """
+            Handles POST requests, instantiating a form instance with the passed
+            POST variables and then checked for validity.
+        """
+        if self.allow_edit_lot and 'subscription-lot' not in request.POST:
+            messages.warning(request, 'Você deve informar um lote.')
+            return redirect(self.get_error_url())
 
-            survey = self.subscription.lot.event_survey.survey
+        request.POST = request.POST.copy()
 
-            survey_form = self.get_survey_form(
-                survey=survey,
-                data=self.request.POST,
-                files=self.request.FILES,
-                subscription=self.subscription,
-            )
+        to_be_pre_cleaned = [
+            'person-cpf',
+            'person-phone',
+            'person-zip_code',
+            'person-institution_cnpj'
+        ]
 
-            if survey_form.is_valid():
-                survey_form.save()
+        for field in to_be_pre_cleaned:
+            if field in request.POST:
+                request.POST[field] = clear_string(request.POST[field])
+
+        form = self.get_form()
+        if form.is_valid():
+
+            if self.allow_edit_lot:
+                lot_pk = self.request.POST.get('subscription-lot')
+
+            elif self.subscription:
+                lot_pk = self.subscription.lot.pk
+
             else:
-                raise ValidationError(survey_form.errors)
+                raise Exception('Edição de lote somente para nova inscrição.')
 
-        return response
+            with atomic():
+                self.object = form.save()
+                subscription_form = self.get_subscription_form(
+                    person=self.object,
+                    lot_pk=lot_pk,
+                )
+                if not subscription_form.is_valid():
+                    for error in subscription_form.errors:
+                        messages.error(self.request, str(error))
+
+                    return redirect(self.get_error_url())
+
+                self.subscription = subscription_form.save()
+                if self.subscription.lot.event_survey:
+
+                    survey = self.subscription.lot.event_survey.survey
+
+                    survey_form = self.get_survey_form(
+                        survey=survey,
+                        data=self.request.POST,
+                        files=self.request.FILES,
+                        subscription=self.subscription,
+                    )
+
+                    if survey_form.is_valid():
+                        survey_form.save()
+                        return self.form_valid(form)
+                    else:
+                        return self.form_invalid(form, survey_form=survey_form)
+        else:
+            return self.form_invalid(form)
+
+    def form_invalid(self, form, survey_form=None):
+        """
+        If the form is invalid, re-render the context data with the
+        data-filled form and errors.
+        """
+        return self.render_to_response(
+            self.get_context_data(form=form, survey_form=survey_form))
 
     def get_survey_form(self, survey, subscription=None, data=None, files=None):
 
@@ -689,6 +722,110 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
             'event_pk': self.event.pk,
             'pk': self.subscription.pk,
         })
+
+    def get_context_data(self, **kwargs):
+
+        survey_form = kwargs.pop('survey_form', None)
+
+        context = super().get_context_data(**kwargs)
+
+        if self.subscription.lot.event_survey:
+            if survey_form:
+                context['survey_form'] = survey_form
+            else:
+                survey = self.subscription.lot.event_survey.survey
+                form = self.get_survey_form(survey,
+                                            subscription=self.subscription)
+                context['survey_form'] = form
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        """
+            Handles POST requests, instantiating a form instance with the passed
+            POST variables and then checked for validity.
+        """
+        if self.allow_edit_lot and 'subscription-lot' not in request.POST:
+            messages.warning(request, 'Você deve informar um lote.')
+            return redirect(self.get_error_url())
+
+        request.POST = request.POST.copy()
+
+        to_be_pre_cleaned = [
+            'person-cpf',
+            'person-phone',
+            'person-zip_code',
+            'person-institution_cnpj'
+        ]
+
+        for field in to_be_pre_cleaned:
+            if field in request.POST:
+                request.POST[field] = clear_string(request.POST[field])
+
+        form = self.get_form()
+        if form.is_valid():
+
+            if self.allow_edit_lot:
+                lot_pk = self.request.POST.get('subscription-lot')
+
+            elif self.subscription:
+                lot_pk = self.subscription.lot.pk
+
+            else:
+                raise Exception('Edição de lote somente para nova inscrição.')
+
+            with atomic():
+                self.object = form.save()
+                subscription_form = self.get_subscription_form(
+                    person=self.object,
+                    lot_pk=lot_pk,
+                )
+                if not subscription_form.is_valid():
+                    for error in subscription_form.errors:
+                        messages.error(self.request, str(error))
+
+                    return redirect(self.get_error_url())
+
+                self.subscription = subscription_form.save()
+                if self.subscription.lot.event_survey:
+
+                    survey = self.subscription.lot.event_survey.survey
+
+                    survey_form = self.get_survey_form(
+                        survey=survey,
+                        data=self.request.POST,
+                        files=self.request.FILES,
+                        subscription=self.subscription,
+                    )
+
+                    if survey_form.is_valid():
+                        survey_form.save()
+                        return self.form_valid(form)
+                    else:
+                        return self.form_invalid(form, survey_form=survey_form)
+        else:
+            return self.form_invalid(form)
+
+    def form_invalid(self, form, survey_form=None):
+        """
+        If the form is invalid, re-render the context data with the
+        data-filled form and errors.
+        """
+        return self.render_to_response(
+            self.get_context_data(form=form, survey_form=survey_form))
+
+    def get_survey_form(self, survey, subscription=None, data=None, files=None):
+
+        survey_director = SubscriptionSurveyDirector(subscription)
+
+        survey_form = survey_director.get_active_form(
+            survey=survey,
+            data=data,
+            files=files,
+            update=self.request.method in ['POST', 'PUT'],
+        )
+
+        return survey_form
 
 
 class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
@@ -1222,43 +1359,3 @@ class SwitchSubscriptionTestView(EventViewMixin, generic.View):
         subscription.test_subscription = state == "True"
         subscription.save()
         return HttpResponse(status=200)
-
-
-class SubscriptionInternalSurveyFormView(EventViewMixin, generic.FormView):
-    subscription = None
-    template_name = "subscription/survey.html"
-
-    def dispatch(self, request, *args, **kwargs):
-        uuid = self.kwargs.get('pk')
-        self.subscription = get_object_or_404(Subscription,
-                                              uuid=uuid)
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['subscription'] = self.subscription
-        return context
-
-    def get_form(self, form_class=None):
-        survey = self.subscription.lot.event_survey.survey
-        form_kwargs = self.get_form_kwargs()
-        data = form_kwargs.get('data')
-        files = form_kwargs.get('files')
-        survey_director = SubscriptionSurveyDirector(self.subscription)
-
-        return survey_director.get_active_form(
-            survey=survey,
-            data=data,
-            files=files,
-            update=self.request.method in ['POST', 'PUT'],
-        )
-
-    def form_valid(self, form):
-        form.save()
-        messages.success(self.request, "Respostas salvas com sucesso!")
-        return redirect(
-            reverse_lazy('subscription:subscription-view', kwargs={
-                'event_pk': self.event.pk,
-                'pk': self.subscription.pk,
-            })
-        )
