@@ -89,3 +89,9 @@ class FeatureConfiguration(models.Model):
         verbose_name='funcionalidade - importação via CSV',
         help_text='Liberar funcionalidade de permitir importação via csv'
     )
+
+    feature_multi_lots = models.BooleanField(
+        default=False,
+        verbose_name='funcionalidade - multi lotes',
+        help_text='Liberar funcionalidade de multi lotes'
+    )

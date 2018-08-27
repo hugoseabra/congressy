@@ -18,6 +18,7 @@ class Command(BaseCommand):
                 feature_certificate=True,
                 feature_internal_subscription=True,
                 feature_checkin=True,
+                feature_multi_lots=True,
             )
 
             management = FeatureManagement.objects.create(
