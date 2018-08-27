@@ -2,7 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import PermissionDenied, NotFound
 from rest_framework.permissions import BasePermission
 
-from gatheros_subscription.helpers.event_types import is_free_event
+from gatheros_event.helpers.event_business import is_free_event
 from .models import Service, Product
 
 

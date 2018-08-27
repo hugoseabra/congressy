@@ -17,10 +17,13 @@ class Command(BaseCommand):
                 event=event,
                 feature_certificate=True,
                 feature_internal_subscription=True,
+                feature_checkin=True,
             )
 
             management = FeatureManagement.objects.create(
-                event=event
+                event=event,
+                certificate=True,
+                checkin=True,
             )
 
             if event.has_survey:
@@ -38,9 +41,6 @@ class Command(BaseCommand):
             if event.has_optionals:
                 management.products = True
                 config.feature_products = True
-
-            if event.event_type == event.EVENT_TYPE_PAID:
-                event.feature_configuration.feature_checkin = True
 
             management.save()
             config.save()
