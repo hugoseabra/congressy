@@ -9,7 +9,8 @@ from django.views import View, generic
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Organization
-from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
+from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin, \
+    MultiLotsFeatureFlagMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import Lot, EventSurvey
 
@@ -187,7 +188,7 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
             return False
 
         banking_required_fields = ['bank_code', 'agency', 'account',
-                                   'cnpj_ou_cpf', 'account_type']
+            'cnpj_ou_cpf', 'account_type']
 
         for field in Organization._meta.get_fields():
             for required_field in banking_required_fields:
@@ -204,7 +205,8 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
         )
 
 
-class LotAddFormView(BaseFormLotView, generic.CreateView):
+class LotAddFormView(MultiLotsFeatureFlagMixin, BaseFormLotView,
+                     generic.CreateView):
     form_class = forms.LotForm
     # template_name = 'gatheros_subscription/lot/form.html'
     template_name = 'lot/form.html'
@@ -263,7 +265,7 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
             return False
 
         banking_required_fields = ['bank_code', 'agency', 'account',
-                                   'cnpj_ou_cpf', 'account_type']
+            'cnpj_ou_cpf', 'account_type']
 
         for field in Organization._meta.get_fields():
 

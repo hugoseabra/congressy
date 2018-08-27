@@ -5,12 +5,13 @@ from django.views import generic
 
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
+from gatheros_event.views.mixins import DeleteViewMixin, \
+    MultiLotsFeatureFlagMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import LotCategory
 
 
-class LotCategoryListView(AccountMixin, generic.ListView):
+class LotCategoryListView(generic.ListView):
     """Lista de lotes de acordo com o evento do contexto"""
     model = LotCategory
     template_name = 'lotcategory/list.html'
@@ -49,7 +50,7 @@ class LotCategoryListView(AccountMixin, generic.ListView):
         return query_set.filter(event=self.event).order_by('pk')
 
 
-class LotCategoryAddView(generic.CreateView):
+class LotCategoryAddView(MultiLotsFeatureFlagMixin, generic.CreateView):
     form_class = forms.LotCategoryForm
     template_name = 'lotcategory/form.html'
     event = None
@@ -102,7 +103,7 @@ class LotCategoryAddView(generic.CreateView):
         return response
 
 
-class LotCategoryEditView(AccountMixin, generic.UpdateView):
+class LotCategoryEditView(generic.UpdateView):
     form_class = forms.LotCategoryForm
     model = forms.LotCategoryForm.Meta.model
     template_name = 'lotcategory/form.html'

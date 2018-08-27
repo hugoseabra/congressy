@@ -119,11 +119,14 @@
                                 <i class="fab fa-stack-exchange"></i>
                                 Gerenciar Categorias
                             </a>
-                            <a href="{% url 'subscription:lot-add' event.pk %}"
-                               class="btn btn-success">
-                                <i class="fa fa-plus"></i>
-                                Novo Lote
-                            </a>
+
+                            {% if event.feature_configuration.feature_multi_lots %}
+                                <a href="{% url 'subscription:lot-add' event.pk %}"
+                                   class="btn btn-success">
+                                    <i class="fa fa-plus"></i>
+                                    Novo Lote
+                                </a>
+                            {% endif %}
                         </div>
 
                         <div class="clearfix"></div>

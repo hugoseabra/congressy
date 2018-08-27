@@ -336,3 +336,29 @@ class EventViewMixin(AccountMixin, generic.View):
 
     def get_permission_denied_url(self):
         return reverse('event:event-list')
+
+
+class MultiLotsFeatureFlagMixin(AccountMixin, generic.View):
+    event = None
+    permission_denied_message = 'Você não pode realizar esta ação.'
+
+    def get_permission_denied_url(self):
+        return reverse(
+            'event:event-panel',
+            kwargs={
+                'pk': self.event.pk,
+            }
+        )
+
+    def pre_dispatch(self, request):
+        self.event = get_object_or_404(
+            Event,
+            pk=self.kwargs.get('event_pk'),
+        )
+
+        response = super().pre_dispatch(request)
+        features = self.event.feature_configuration
+
+        if features.feature_multi_lots is False:
+            raise PermissionDenied(self.get_permission_denied_message())
+        return response
