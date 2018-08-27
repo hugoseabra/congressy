@@ -25,14 +25,14 @@ urls = [
         name='manage-list-attendance'
     ),
     url(
-        r'^(?P<pk>[\d]+)/attendance/(?P<subscription_pk>[0-9A-Fa-f-]+)$',
-        views.AttendanceSearchView.as_view(),
+        r'^(?P<pk>[\d]+)/attendance/',
+        views.AttendancePageSearchView.as_view(),
         name='attendance'
     ),
     url(
-        r'^(?P<pk>[\d]+)/search/',
-        views.SubscriptionAttendanceSearchView.as_view(),
-        name='attendance-list-edit'
+        r'^(?P<pk>[\d]+)/api/attendance/search/$',
+        views.SubscriptionSearchViewSet.as_view(),
+        name='subscription-api-attendance-search'
     ),
 ]
 

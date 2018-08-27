@@ -4,21 +4,6 @@ from gatheros_subscription.models import Subscription
 
 
 class Attendance(models.Model):
-    CHECK_IN = 'check-in'
-    CHECK_OUT = 'check-out'
-
-    OPERATION_OPTIONS = (
-        (CHECK_IN, 'check-in'),
-        (CHECK_OUT, 'check-out')
-    )
-
-    operation = models.CharField(
-        choices=OPERATION_OPTIONS,
-        max_length=35,
-        verbose_name='Tipo de Operação',
-        help_text='Tipo de operação (check-in, check-out'
-    )
-
     subscription = models.ForeignKey(
         Subscription,
         on_delete=models.CASCADE,
@@ -26,8 +11,13 @@ class Attendance(models.Model):
         related_name='attendances'
     )
 
-    created_on = models.DateTimeField(auto_now_add=True,
-                                      verbose_name='criado em')
+    checkin_on = models.DateTimeField(null=True,
+                                      blank=True,
+                                      verbose_name='check-in realizado em')
+
+    checkout_on = models.DateTimeField(null=True,
+                                       blank=True,
+                                       verbose_name='check-out realizado em')
 
     attended_by = models.PositiveIntegerField(verbose_name='criado por')
 
@@ -52,6 +42,6 @@ class Attendance(models.Model):
     class Meta:
         verbose_name = 'Check-in/out'
         verbose_name_plural = 'Check-ins/outs'
-        ordering = ['created_on']
+        ordering = ['checkin_on']
 
         indexes = [models.Index(fields=['attended_by', ])]

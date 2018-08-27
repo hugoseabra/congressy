@@ -6,7 +6,6 @@ class AttendanceForm(forms.ModelForm):
     class Meta:
         model = Attendance
         fields = (
-            'operation',
             'attended_by',
             'subscription',
             'attendance_service',
