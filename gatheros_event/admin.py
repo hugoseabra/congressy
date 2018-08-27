@@ -8,6 +8,7 @@ from django.db.models import Sum
 from .models import Category, Event, Info, Invitation, Member, Occupation, \
     Organization, Person, Place, Segment, Subject, FeatureConfiguration, \
     FeatureManagement
+from gatheros_event.forms import FeatureConfigurationForm
 
 
 @admin.register(Segment)
@@ -341,7 +342,22 @@ class FeatureConfigurationAdmin(admin.ModelAdmin):
     Admin para Configurações de Eventos
     """
     search_fields = ('event__name',)
-    exclude = ('event',)
+    exclude = ('event', 'last_updated_by')
+    form = FeatureConfigurationForm
+
+    def get_form(self, request, obj=None, **kwargs):
+        AdminForm = super(FeatureConfigurationAdmin, self).get_form(
+            request,
+            obj,
+            **kwargs
+        )
+
+        class AdminFormWithRequest(AdminForm):
+            def __new__(cls, *args, **kwargs):
+                kwargs['request'] = request
+                return AdminForm(*args, **kwargs)
+
+        return AdminFormWithRequest
 
 
 @admin.register(FeatureManagement)
@@ -351,4 +367,3 @@ class FeatureManagementAdmin(admin.ModelAdmin):
     """
     search_fields = ('event__name',)
     exclude = ('event',)
-
