@@ -111,7 +111,7 @@
 {% block content %}
     {% include 'attendance/includes/attendance-menu.html' %}
     <div class="row">
-        <div class="col-md-12" style="margin-left: 250px">
+        <div class="col-md-8 col-md-offset-2">
 
             <div id="searchBar">
                 <form onsubmit="search();return false;">
@@ -119,15 +119,13 @@
                         <span style="font-size: 30px"></span>
                         <input id="searchBarInput" type="text"
                                list="recent_searches"
-                               style="height: 50px;
-                    width:
-                    500px;
+                               style="width: 100%;
                     font-size:30px ">
                         <datalist id="recent_searches">
                         </datalist>
 
                         <button type="button" onclick="search()" class="btn
-                        btn-lg btn-success"
+                        btn-lg btn-primary btn-3d"
                                 id="searchBtn" style="margin-left: 5px">
                             <i class="fas fa-search"></i>
                         </button>
@@ -136,13 +134,22 @@
 
 
             </div>
-
+        </div>
+        <div class="col-md-12">
             <div id="results" style="display: none; margin-top: 25px">
 
-                <div id="result_list"></div>
+                <div id="result_list">
+                    {% include 'attendance/includes/attendance-card.html' with checkin=True %}
+                    {% include 'attendance/includes/attendance-card.html' with checkin=True %}
+                    {% include 'attendance/includes/attendance-card.html' with checkin=True %}
+                    {% include 'attendance/includes/attendance-card.html' with checkin=True %}
+                    {% include 'attendance/includes/attendance-card.html' with checkin=True %}
+                    {% include 'attendance/includes/attendance-card.html' with checkin=True %}
+                    {% include 'attendance/includes/attendance-card.html' with checkin=True %}
+                    {% include 'attendance/includes/attendance-card.html' with checkin=false %}
+                </div>
 
             </div>
-
         </div>
     </div>
 
@@ -219,7 +226,7 @@
                 panel_body.className = 'panel-body';
                 panel.className = 'panel panel-primary';
                 document_id.className = 'cpf_field';
-                
+
                 cols.appendChild(panel);
                 row.appendChild(cols);
                 panel.appendChild(panel_body);
