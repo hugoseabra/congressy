@@ -5,7 +5,7 @@ from gatheros_event.tests.mocks import MockFactory as EventMockFactory
 from gatheros_subscription.tests.mocks import MockFactory as SubMockFactory
 
 
-class EventPrivacyStateTest(TestCase):
+class EventStatePrivacyTest(TestCase):
 
     def setUp(self):
         self.event_factory = EventMockFactory()
