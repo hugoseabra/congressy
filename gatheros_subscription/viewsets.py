@@ -9,11 +9,12 @@ from gatheros_subscription.serializers import (
     Lot,
     LotSerializer,
 )
+from gatheros_subscription.lot_api_permissions import MultiLotsAllowed
 
 
 class RestrictionViewMixin(object):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, MultiLotsAllowed)
 
 
 class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
