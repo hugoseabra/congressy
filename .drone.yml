@@ -425,7 +425,7 @@ pipeline:
      - MAINTAINER_NAME=congressy
      - REPO_NAME=cgsy
      - SENTRY_BASE_URL=https://bugs.congressy.com
-     - VERSION=1.5.30-test
+     - VERSION=1.5.31
 
     secrets:
       - source: SENTRY_RELEASE_API_TOKEN
