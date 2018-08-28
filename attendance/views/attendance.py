@@ -112,7 +112,6 @@ class AttendancePageSearchView(generic.TemplateView):
         return context
 
 
-
 class SubscriptionAttendanceListView(generic.TemplateView):
     template_name = 'attendance/attendance-list.html'
     object = None
