@@ -19,4 +19,4 @@ class AttendanceService(models.Model):
     class Meta:
         verbose_name = 'Lista de Check-in/out'
         verbose_name_plural = 'Lista de Check-ins/outs'
-        ordering = ['name',]
+        ordering = ['name']
