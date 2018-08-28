@@ -65,81 +65,47 @@
     </div>
 {% endblock %}
 
-{% block nav_aside_itens %}
-    <h5 class="sidebar-header">Configurações</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento">
-                <i class="fa  fa-fw fa-rocket"></i> Página do evento
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário">
-                <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
-    </ul>
-
-    <h5 class="sidebar-header">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'subscription:lot-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Ingressos
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Inscrições
-            </a>
-        </li>
-        {#        <li class="active">#}
-        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
-        {#               title="Check-in">#}
-        {#                <i class="fa  fa-fw fa-rocket"></i>#}
-        {#                Check-in#}
-        {#            </a>#}
-        {#        </li>#}
-    </ul>
-{% endblock %}
 
 {% block content %}
+
     <div class="row">
-
-        {% include 'attendance/includes/attendance-menu.html' %}
+        {% include 'attendance/includes/attendance-menu.html' with active='checkin' %}
         <div class="col-md-10">
-
-            <div id="searchBar">
-                <form onsubmit="search();return false;">
-                    <div class="vertical-align">
-                        <span style="font-size: 30px"></span>
-                        <input id="searchBarInput" type="text"
-                               list="recent_searches"
-                               style="width: 100%;
-                    font-size:30px ">
-                        <datalist id="recent_searches">
-                        </datalist>
-
-                        <button type="button" onclick="search()" class="btn
-                        btn-lg btn-primary btn-3d"
-                                id="searchBtn" style="margin-left: 5px">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>
-
-
-            </div>
-            <div id="results" style="display: none; margin-top: 25px">
-
-                <div id="result_list">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">Realizar Checkin</div>
                 </div>
+                <div class="panel-body">
+                    <div id="searchBar">
+                        <form onsubmit="search();return false;">
+                            <div class="vertical-align">
+                                <span style="font-size: 30px"></span>
+                                <input id="searchBarInput" type="text"
+                                       list="recent_searches"
+                                       style="width: 100%;
+                    font-size:30px ">
+                                <datalist id="recent_searches">
+                                </datalist>
 
+                                <button type="button" onclick="search()"
+                                        class="btn
+                        btn-lg btn-primary btn-3d"
+                                        id="searchBtn"
+                                        style="margin-left: 5px">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+
+
+                    </div>
+                    <div id="results" style="display: none; margin-top: 25px">
+
+                        <div id="result_list">
+                        </div>
+
+                    </div>
+                </div>
             </div>
         </div>
     </div>

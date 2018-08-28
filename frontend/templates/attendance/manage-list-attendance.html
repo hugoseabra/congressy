@@ -54,7 +54,7 @@
                         {% for item in attendance_lists %}
                             <tr>
                                 <td>
-                                    <a>{{ item.name }}</a>
+                                    <a href="{% url 'attendance:dashboard' event.pk item.pk %}">{{ item.name }}</a>
                                 </td>
                                 <td>
                                     <div class="btn-group">
