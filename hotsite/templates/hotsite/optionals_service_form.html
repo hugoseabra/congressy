@@ -39,15 +39,15 @@
 </div>
 
 <script>
+
     document.addEventListener("DOMContentLoaded", function (event) {
         window.setTimeout(function () {
             render_currently_selected_service_list();
         }, 300);
     });
 
-
     function render_available_optional_services_list(alert_add) {
-        var url = '{% url 'public:hotsite_services' subscription.pk  %}';
+        var url = '{% url 'public:hotsite_services' selected_lot.category.pk subscription.pk  %}';
 
         send(
             url,
@@ -67,7 +67,7 @@
     }
 
     function render_currently_selected_service_list() {
-        var url = '{% url 'public:hotsite_services' subscription.pk  %}';
+        var url = '{% url 'public:hotsite_services' selected_lot.category.pk subscription.pk  %}';
 
         send(
             url,
@@ -88,12 +88,11 @@
         );
     }
 
-
     function addOptionalService(button_el, service_id) {
         $('.optional-action-buttons').find('button').attr('disabled', '');
         insertLoaderIntoButton(button_el);
 
-        var url = '{% url 'public:hotsite_services' subscription.pk %}';
+        var url = '{% url 'public:hotsite_services' selected_lot.category.pk subscription.pk %}';
 
         send(
             url,
@@ -105,7 +104,7 @@
             function (res) {
                 //console.log(res);
                 render_currently_selected_service_list();
-                window.setTimeout(function() {
+                window.setTimeout(function () {
                     cgsy.messenger.triggerSuccess('Item adicionado com sucesso.')
                 }, 350);
             },
@@ -121,7 +120,7 @@
         $('.optional-action-buttons').find('button').attr('disabled', '');
         insertLoaderIntoButton(button_el);
 
-        var url = '{% url 'public:hotsite_services' subscription.pk %}';
+        var url = '{% url 'public:hotsite_services' selected_lot.category.pk subscription.pk %}';
 
         send(
             url,
@@ -133,7 +132,7 @@
             function (res) {
                 console.log(res);
                 render_currently_selected_service_list();
-                window.setTimeout(function() {
+                window.setTimeout(function () {
                     cgsy.messenger.triggerSuccess('Item removido com sucesso.')
                 }, 350);
             },
@@ -173,7 +172,7 @@
     function insertLoaderIntoButton(button_el) {
         button_el = $(button_el);
         var current_icon = button_el.find('i');
-            current_icon.addClass('hide');
+        current_icon.addClass('hide');
         var loader_icon = $('<i>').addClass('fas fa-circle-notch fa-spin');
         loader_icon.appendTo(button_el);
     }
