@@ -19,21 +19,15 @@ class Command(BaseCommand):
                 feature_internal_subscription=True,
                 feature_checkin=True,
                 feature_multi_lots=True,
+                feature_survey=True,
             )
 
             management = FeatureManagement.objects.create(
                 event=event,
                 certificate=True,
                 checkin=True,
+                survey=True,
             )
-
-            if event.has_survey:
-                management.survey = True
-                config.feature_survey = True
-
-            if event.has_checkin:
-                management.checkin = True
-                config.feature_checkin = True
 
             if event.has_extra_activities:
                 management.services = True
