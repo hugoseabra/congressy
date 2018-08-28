@@ -51,6 +51,6 @@ class Checkout(Attendance):
         Checkin,
         on_delete=models.CASCADE,
         verbose_name='Check-in',
-        related_name='checkouts'
+        related_name='checkout'
     )
 

@@ -5,7 +5,7 @@ from gatheros_event.helpers import reports
 from django.views import View, generic
 from attendance.forms import AttendanceServiceForm
 from attendance.models import AttendanceCategoryFilter, \
-    AttendanceService
+    AttendanceService, Checkin, Checkout
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
 from gatheros_event.helpers.account import update_account
@@ -108,7 +108,8 @@ class AttendancePageSearchView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['event'] = Event.objects.get(pk=self.kwargs.get('event_pk'))
-        context['attendance_list'] = AttendanceService.objects.get(pk=self.kwargs.get('pk'))
+        context['attendance_list'] = AttendanceService.objects.get(
+            pk=self.kwargs.get('pk'))
         return context
 
 
@@ -132,14 +133,11 @@ class SubscriptionAttendanceListView(generic.TemplateView):
         return context
 
     def get_attendances(self):
-        return Attendance.objects.filter(
+        return Checkin.objects.filter(
             attendence_service=self.object,
             subscription__attended=True,
-            checkout_on=None
-        ).exclude(Attendance.objects.filter(
-            subscription__status=Subscription.CANCELED_STATUS,
-            checkin_on=None
-        )).order_by('-checkin_on')
+            checkout__isnull=True
+        ).order_by('-attended_on')
 
     class AttendanceDashboardView(generic.TemplateView):
         template_name = 'attendance/attendance-dashboard.html'
@@ -173,14 +171,11 @@ class SubscriptionAttendanceListView(generic.TemplateView):
 
         def get_attendances(self):
             try:
-                list = Attendance.objects.filter(
+                list = Checkin.objects.filter(
                     attendence_service=self.object,
                     subscription__attended=True,
-                    checkout_on=None
-                ).exclude(Attendance.objects.filter(
-                    subscription__status=Subscription.CANCELED_STATUS,
-                    checkin_on=None
-                )).order_by('-checkin_on')
+                    checkout__isnull=True
+                ).order_by('-attended_on')
                 return list[0:5]
 
             except Subscription.DoesNotExist:
@@ -188,14 +183,11 @@ class SubscriptionAttendanceListView(generic.TemplateView):
 
         def get_number_attendances(self):
             try:
-                return Attendance.objects.filter(
+                return Checkin.objects.filter(
                     attendence_service=self.object,
                     subscription__attended=True,
-                    checkout_on=None
-                ).exclude(Attendance.objects.filter(
-                    subscription__status=Subscription.CANCELED_STATUS,
-                    checkin_on=None
-                )).count()
+                    checkout__isnull=True
+                ).order_by('-attended_on').count()
 
             except Subscription.DoesNotExist:
                 return 0
