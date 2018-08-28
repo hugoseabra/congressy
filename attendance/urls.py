@@ -47,4 +47,5 @@ urls = [
 ]
 
 urlpatterns = [
-    url(r'^events/(?P<event_pk>[\d]+)/attendance-list/', include(urls))]
+    url(r'^events/(?P<event_pk>[\d]+)/attendance-list/', include(urls))
+]
