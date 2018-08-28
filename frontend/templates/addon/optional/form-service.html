@@ -58,7 +58,7 @@
 
             var dateStart = createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
             createTimePicker();
-            var dateRestrict = createDatePicker();
+            var dateRestrict = createDatePicker($('#id_date_end_sub_0'));
             {% if object %}
                 dateStart.data("DateTimePicker").minDate(false);
                 dateRestrict.data("DateTimePicker").minDate(false);
@@ -125,6 +125,10 @@
                 modal_obj.setSyncMode($('#optional_form'));
             {% endif %}
         });
+
+
+
+
     </script>
 {% endblock %}
 
@@ -135,7 +139,7 @@
 {% block content %}
     <div id="output"></div>
 
-    <form action="" id="optional_form" method="post"
+    <form novalidate action="" id="optional_form" method="post"
           class="form-horizontal form-border skip-submition-check"
           role="form" name="optional_form">
         {% csrf_token %}

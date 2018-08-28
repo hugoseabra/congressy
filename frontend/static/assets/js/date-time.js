@@ -5,7 +5,7 @@
 // #datepicker-end  .datapicker
 
 var minDate = new Date();
-    minDate.setHours(0, 0, 0, 0);
+minDate.setHours(0, 0, 0, 0);
 
 var tooltips = {
     today: 'Ir para hoje',
@@ -61,20 +61,22 @@ function createTimePicker(el) {
 }
 
 function createDatePicker(el) {
-    if (!el) {
-        el = '.datapicker';
-    }
+
     el = $(el);
-    el.datetimepicker({
-        locale: 'pt-br',
-        format: 'DD/MM/YYYY',
-        allowInputToggle: true,
-        minDate: minDate,
-        tooltips: tooltips,
-        showTodayButton: true
 
-    });
+    if (el.length) {
 
+        el.datetimepicker({
+            locale: 'pt-br',
+            format: 'DD/MM/YYYY',
+            allowInputToggle: true,
+            minDate: minDate,
+            tooltips: tooltips,
+            showTodayButton: true
+
+        });
+
+    }
     return el;
 }
 

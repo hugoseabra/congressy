@@ -143,11 +143,17 @@
 
     <script>
         $(document).ready(function () {
-            var date = createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
+            var date = createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end .datapicker');
             createTimePicker();
+            
             {% if object %}
                 date.data("DateTimePicker").minDate(false);
+                window.setTimeout(function () {
+                    $('#datepicker-begin .datapicker input').val('{{ object.date_start|date:'d/m/Y' }}');
+                    $('#datepicker-end .datapicker input').val('{{ object.date_end|date:'d/m/Y' }}');
+                }, 200);
             {% endif %}
+
         });
         (function ($) {
             $(document).ready(function () {
