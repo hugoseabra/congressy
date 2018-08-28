@@ -1,24 +1,33 @@
 from django.db import models
-from . import AttendanceService
+
 from gatheros_subscription.models import Subscription
+from . import AttendanceService
 
 
 class Attendance(models.Model):
-    subscription = models.ForeignKey(
-        Subscription,
-        on_delete=models.CASCADE,
-        verbose_name='Inscrito',
-        related_name='%(class)ss'
-    )
+    class Meta:
+        abstract = True
+        ordering = ['created_on']
 
-    attended_on = models.DateTimeField(
+        indexes = [models.Index(fields=['attended_by', ])]
+
+    created_on = models.DateTimeField(
         verbose_name='imprimiu a etiqueta em',
         null=True,
         blank=True,
         auto_now_add=True,
     )
 
-    attended_by = models.PositiveIntegerField(verbose_name='criado por')
+    attended_by = models.CharField(
+        max_length=255,
+        verbose_name='criado por'
+    )
+
+
+class Checkin(Attendance):
+    class Meta (Attendance.Meta):
+        verbose_name = 'entrada'
+        verbose_name_plural = 'entradas'
 
     attendance_service = models.ForeignKey(
         AttendanceService,
@@ -27,16 +36,12 @@ class Attendance(models.Model):
         on_delete=models.CASCADE
     )
 
-    class Meta:
-        abstract = True
-        verbose_name = 'Attendance'
-        verbose_name_plural = 'Attendances'
-        ordering = ['attended_on']
-
-        indexes = [models.Index(fields=['attended_by', ])]
-
-
-class Checkin(Attendance):
+    subscription = models.ForeignKey(
+        Subscription,
+        on_delete=models.CASCADE,
+        verbose_name='Inscrito',
+        related_name='checkins'
+    )
 
     printed_on = models.DateTimeField(
         verbose_name='imprimiu a etiqueta em',
@@ -46,11 +51,13 @@ class Checkin(Attendance):
 
 
 class Checkout(Attendance):
+    class Meta (Attendance.Meta):
+        verbose_name = 'saída'
+        verbose_name_plural = 'saídas'
 
     checkin = models.OneToOneField(
         Checkin,
         on_delete=models.CASCADE,
         verbose_name='Check-in',
-        related_name='checkouts'
+        related_name='checkout'
     )
-

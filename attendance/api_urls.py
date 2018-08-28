@@ -10,6 +10,10 @@ router.register(
     r'attendance/services',
     viewsets.AttendanceServiceViewSet
 )
+router.register(
+    r'attendance/services/(?P<optional_pk>[\d]+)/subscriptions',
+    viewsets.SubscriptionAttendanceViewSet
+)
 
 router.register(r'attendance/checkins', viewsets.CheckinViewSet)
 router.register(r'attendance/checkouts', viewsets.CheckoutViewSet)
