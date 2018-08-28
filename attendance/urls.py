@@ -24,16 +24,16 @@ urls = [
         views.ManageListAttendanceView.as_view(),
         name='manage-list-attendance'
     ),
-    url(
-        r'^(?P<pk>[\d]+)/attendance/',
-        views.AttendancePageSearchView.as_view(),
-        name='attendance'
-    ),
-    url(
-        r'^(?P<pk>[\d]+)/api/attendance/search/$',
-        views.SubscriptionSearchViewSet.as_view(),
-        name='subscription-api-attendance-search'
-    ),
+    # url(
+    #     r'^(?P<pk>[\d]+)/attendance/',
+    #     views.AttendancePageSearchView.as_view(),
+    #     name='attendance'
+    # ),
+    # url(
+    #     r'^(?P<pk>[\d]+)/api/attendance/search/$',
+    #     views.SubscriptionSearchViewSet.as_view(),
+    #     name='subscription-api-attendance-search'
+    # ),
 ]
 
 urlpatterns = [

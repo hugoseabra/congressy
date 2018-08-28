@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from gatheros_event.helpers import reports
 from django.views import View, generic
 from attendance.forms import AttendanceServiceForm
-from attendance.models import AttendanceCategoryFilter, Attendance, \
+from attendance.models import AttendanceCategoryFilter, \
     AttendanceService
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin

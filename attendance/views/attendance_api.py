@@ -3,7 +3,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 
 from gatheros_subscription.models import Subscription
-from attendance.models import AttendanceService, Attendance,AttendanceCategoryFilter
+from attendance.models import AttendanceService, AttendanceCategoryFilter
 from gatheros_subscription.serializers import CheckInSubscriptionSerializer
 
 

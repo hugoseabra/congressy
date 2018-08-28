@@ -8,25 +8,35 @@ class Attendance(models.Model):
         Subscription,
         on_delete=models.CASCADE,
         verbose_name='Inscrito',
-        related_name='attendances'
+        related_name='%(class)ss'
     )
 
-    checkin_on = models.DateTimeField(null=True,
-                                      blank=True,
-                                      verbose_name='check-in realizado em')
-
-    checkout_on = models.DateTimeField(null=True,
-                                       blank=True,
-                                       verbose_name='check-out realizado em')
+    attended_on = models.DateTimeField(
+        verbose_name='imprimiu a etiqueta em',
+        null=True,
+        blank=True,
+        auto_now_add=True,
+    )
 
     attended_by = models.PositiveIntegerField(verbose_name='criado por')
 
     attendance_service = models.ForeignKey(
         AttendanceService,
         verbose_name='Lista de Check-in/out',
-        related_name='attendances',
+        related_name='%(class)ss',
         on_delete=models.CASCADE
     )
+
+    class Meta:
+        abstract = True
+        verbose_name = 'Attendance'
+        verbose_name_plural = 'Attendances'
+        ordering = ['attended_on']
+
+        indexes = [models.Index(fields=['attended_by', ])]
+
+
+class Checkin(Attendance):
 
     printed_on = models.DateTimeField(
         verbose_name='imprimiu a etiqueta em',
@@ -34,14 +44,13 @@ class Attendance(models.Model):
         blank=True
     )
 
-    printed = models.BooleanField(
-        default=False,
-        verbose_name='imprimiu etiqueta'
+
+class Checkout(Attendance):
+
+    checkin = models.OneToOneField(
+        Checkin,
+        on_delete=models.CASCADE,
+        verbose_name='Check-in',
+        related_name='checkouts'
     )
 
-    class Meta:
-        verbose_name = 'Check-in/out'
-        verbose_name_plural = 'Check-ins/outs'
-        ordering = ['checkin_on']
-
-        indexes = [models.Index(fields=['attended_by', ])]
