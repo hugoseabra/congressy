@@ -129,13 +129,13 @@
                 </div>
 
                 <div class="float-right">
-                    {% if event.allow_importing %}
+                    {% if event.feature_configuration.feature_import_via_csv %}
                         <a href="{% url 'importer:csv-list' event.pk %}" class="btn btn-primary">
                             <i class="fas fa-file-excel"></i>
                             Importar via CSV
                         </a>
                     {% endif %}
-                    {% if event.allow_internal_subscription %}
+                    {% if event.feature_configuration.feature_internal_subscription %}
                         <a role="button" class="btn btn-success"
                            href="{% url 'subscription:subscription-add' event.pk %}">
                             <i class="fa fa-plus"></i>
