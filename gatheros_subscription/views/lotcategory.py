@@ -10,6 +10,14 @@ from gatheros_event.views.mixins import DeleteViewMixin, \
 from gatheros_subscription import forms
 from gatheros_subscription.models import LotCategory
 
+try:
+    from raven.contrib.django.raven_compat.models import client
+
+    SENTRY_RAVEN = True
+
+except ImportError:
+    SENTRY_RAVEN = False
+
 
 class LotCategoryListView(generic.ListView):
     """Lista de lotes de acordo com o evento do contexto"""
@@ -52,7 +60,22 @@ class LotCategoryListView(generic.ListView):
         query_set = query_set.filter(event=self.event)
 
         if not self.event.feature_configuration.feature_multi_lots:
-            first = query_set.first()
+            cats_with_active_lots = query_set.filter(
+                lots__active=True
+            )
+            if cats_with_active_lots.count() == 0:
+                cats_with_active_lots = query_set
+                if SENTRY_RAVEN:
+                    message = 'Nenhuma categoria com lote ativo'
+                    extra_data = {
+                        'event_pk': self.event.pk,
+                        'event': self.event.name,
+                    }
+                    client.captureMessage(message, **extra_data)
+                else:
+                    raise Exception('Nenhuma categoria com lote ativo')
+
+            first = cats_with_active_lots.first()
             query_set = query_set.filter(pk=first.pk)
 
         return query_set.order_by('pk')
