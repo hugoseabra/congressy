@@ -102,14 +102,16 @@ Variáveis:
             <i class="fas fa-cog"></i> Dados do evento
         </a>
     </li>
-    <li {% if active == 'form-personalizado' %}class="active"{% endif %}>
-        <a class="sidebar-itens" href=
-                "{% url 'subscription:form-config' event.pk %}"
-           title="Form. Personalizado"
-           style="padding-right: 0;font-size: 15px">
-            <i class="fab fa-wpforms"></i> Form. Personalizado
-        </a>
-    </li>
+    {% if event.feature_configuration.feature_survey and event.feature_management.survey %}
+        <li {% if active == 'form-personalizado' %}class="active"{% endif %}>
+            <a class="sidebar-itens" href=
+                    "{% url 'subscription:form-config' event.pk %}"
+               title="Form. Personalizado"
+               style="padding-right: 0;font-size: 15px">
+                <i class="fab fa-wpforms"></i> Form. Personalizado
+            </a>
+        </li>
+    {% endif %}
     {#        <h5 class="sidebar-header" style="color:#4c4c4c;">Adicionais</h5>#}
     {#        <ul class="nav nav-pills nav-stacked">#}
     {#            <li>#}
