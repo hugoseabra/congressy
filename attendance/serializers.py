@@ -9,6 +9,27 @@ REST_FRAMEWORK = {
 }
 
 
+class DynamicFieldsModelSerializer(serializers.ModelSerializer):
+    """
+    A ModelSerializer that takes an additional `fields` argument that
+    controls which fields should be displayed.
+    """
+
+    def __init__(self, *args, **kwargs):
+        # Instantiate the superclass normally
+        super(DynamicFieldsModelSerializer, self).__init__(*args, **kwargs)
+
+        fields = kwargs['context']['request'].query_params.get('fields')
+        if fields:
+            fields = fields.split(',')
+            # Drop any fields that are not specified in the `fields` argument.
+            allowed = set(fields)
+            existing = set(self.fields.keys())
+            # @TODO - dar suporte a filtro de campos de objetos relacionados.
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+
+
 class AttendanceServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.AttendanceService
@@ -64,6 +85,9 @@ class CheckinsField(serializers.Field):
 
 
 class AttendedStatusField(serializers.Field):
+    def to_internal_value(self, data):
+        pass
+
     def to_representation(self, obj):
         checkin = obj.checkins.last()
 
@@ -78,7 +102,7 @@ class AttendedStatusField(serializers.Field):
             return True
 
 
-class SubscriptionAttendanceSerializer(serializers.ModelSerializer):
+class SubscriptionAttendanceSerializer(DynamicFieldsModelSerializer):
     event = EventSerializer()
     lot = LotSerializer()
     person = PersonSerializer()

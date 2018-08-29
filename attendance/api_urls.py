@@ -11,7 +11,7 @@ router.register(
     viewsets.AttendanceServiceViewSet
 )
 router.register(
-    r'attendance/services/(?P<optional_pk>[\d]+)/subscriptions',
+    r'attendance/services/(?P<service_pk>[\d]+)/subscriptions',
     viewsets.SubscriptionAttendanceViewSet
 )
 
