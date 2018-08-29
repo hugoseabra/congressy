@@ -44,5 +44,7 @@ class ManageListAttendanceView(AccountMixin, ListView):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
+        context['has_inside_bar'] = True
+        context['active'] = 'attendance'
         context['attendance_lists'] = AttendanceService.objects.filter(event = self.event)
         return context

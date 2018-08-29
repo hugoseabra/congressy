@@ -21,9 +21,16 @@
 {% block content %}
 
     <div class="row">
-        <div class="col-md-12">
+        {% include 'attendance/includes/attendance-menu.html' with active='credenciados' %}
+
+        <div class="col-md-10">
 
             <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        Lista de participantes que realizaram Checkin
+                    </div>
+                </div>
                 <div class="panel-body">
                     <table id="attendance_table"
                            class="table table-striped table-bordered dataTable no-footer nowrap"
@@ -54,16 +61,16 @@
 
                                 </td>
                                 <td>
-                                    {{  att.subscription.code }}
+                                    {{ att.subscription.code }}
                                 </td>
                                 <td>
                                     {% if  att.subscription.cpf %}
                                         <div class="cpf">
-                                            {{  att.subscription.cpf }}
+                                            {{ att.subscription.cpf }}
                                         </div>
                                     {% elif  att.subscription.institution_cnpj %}
                                         <div class="cnpj">
-                                            {{  att.subscription.institution_cnpj }}
+                                            {{ att.subscription.institution_cnpj }}
                                         </div>
                                     {% else %}
                                         ...

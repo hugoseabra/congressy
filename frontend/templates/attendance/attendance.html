@@ -65,82 +65,146 @@
     </div>
 {% endblock %}
 
-{% block nav_aside_itens %}
-    <h5 class="sidebar-header">Configurações</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento">
-                <i class="fa  fa-fw fa-rocket"></i> Página do evento
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário">
-                <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
-    </ul>
-
-    <h5 class="sidebar-header">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'subscription:lot-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Ingressos
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Inscrições
-            </a>
-        </li>
-        {#        <li class="active">#}
-        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
-        {#               title="Check-in">#}
-        {#                <i class="fa  fa-fw fa-rocket"></i>#}
-        {#                Check-in#}
-        {#            </a>#}
-        {#        </li>#}
-    </ul>
-{% endblock %}
 
 {% block content %}
+
     <div class="row">
-
-        {% include 'attendance/includes/attendance-menu.html' %}
+        {% include 'attendance/includes/attendance-menu.html' with active='checkin' %}
         <div class="col-md-10">
-
-            <div id="searchBar">
-                <form onsubmit="search();return false;">
-                    <div class="vertical-align">
-                        <span style="font-size: 30px"></span>
-                        <input id="searchBarInput" type="text"
-                               list="recent_searches"
-                               style="width: 100%;
-                    font-size:30px ">
-                        <datalist id="recent_searches">
-                        </datalist>
-
-                        <button type="button" onclick="search()" class="btn
-                        btn-lg btn-primary btn-3d"
-                                id="searchBtn" style="margin-left: 5px">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>
-
-
-            </div>
-            <div id="results" style="display: none; margin-top: 25px">
-
-                <div id="result_list">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">Realizar Checkin</div>
                 </div>
+                <div class="panel-body">
+                    <div id="searchBar">
+                        <form onsubmit="search();return false;">
+                            <div class="vertical-align">
+                                <span style="font-size: 30px"></span>
+                                <input id="searchBarInput" type="text"
+                                       list="recent_searches"
+                                       style="width: 100%;
+                    font-size:30px ">
+                                <datalist id="recent_searches">
+                                </datalist>
 
+                                <button type="button" onclick="search()"
+                                        class="btn
+                        btn-lg btn-primary btn-3d"
+                                        id="searchBtn"
+                                        style="margin-left: 5px">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+
+
+                    </div>
+                    <div id="results" style="display: none; margin-top: 25px">
+
+                        <div id="result_list">
+                        </div>
+
+                    </div>
+                </div>
             </div>
+        </div>
+
+        <div class="sub-card" style="display: none">
+            <div class="col-md-4">
+                <div class="panel" style="border-radius: 5px;
+ box-shadow: 0 10px 15px 0 rgba(223, 223, 223, 0.5);
+">
+                    <div class="container-fluid"
+                         style="background-color:{% if checkin %}#d0021b {% else %} #27ae60 {% endif %};height: 70px;
+                                 border-top-left-radius: 5px;
+                                 border-top-right-radius: 5px;
+                                 ">
+
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 col-xs-offset-3"
+                             style="margin-top:-50px;">
+                            <img src="http://cdn.staticneo.com/w/evangelion/6/6a/Shinji.jpg"
+                                 class="img-responsive img-circle"
+                                 alt="Responsive image">
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <h2 class="text-center"> {{ name }}</h2>
+                        <div class="text-center" style="padding-top: 8px">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <h3 style="padding-bottom: 5px"
+                                        class="card-name">
+                                        <i class="fas fa-barcode"
+
+                                           data-toggle="tooltip"
+                                           data-placement="left"
+                                           title=""
+                                           data-original-title="código da inscrição"></i>
+                                    </h3>
+                                </div>
+                                <div class="col-md-5">
+                                    <h3 style=" padding-bottom: 5px"
+                                        class="card_subscription_number">
+                                        <i class="fas fa-list-ol"
+
+                                           data-toggle="tooltip"
+                                           data-placement="left"
+                                           title=""
+                                           data-original-title="Número da Inscrição"></i>
+
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center"
+                             style="overflow: hidden">
+                            <div style="height: 0.5px;width: 100%; background-color: #e6e6e6;
+                            margin-top: 10px; margin-bottom: 10px">
+
+                            </div>
+                            <h3 style="padding-bottom: 5px" class="card_email">
+                                <i class="far fa-envelope"
+                                   data-toggle="tooltip"
+                                   data-placement="left"
+                                   title=""
+                                   data-original-title="Email"></i>
+                            </h3>
+
+                            <h3 style="padding-bottom: 5px"
+                                class="card_category">
+                                <i class="fas fa-th-list"
+                                   data-toggle="tooltip"
+                                   data-placement="left"
+                                   title=""
+                                   data-original-title="Categoria"></i>
+                            </h3>
+                            <h3 style="padding-bottom: 5px" class="card_lot">
+                                <i class="fas fa-th-large"
+                                   data-toggle="tooltip"
+                                   data-placement="left"
+                                   title=""
+                                   data-original-title="Lote"></i>
+                            </h3>
+
+                            <div style=" text-align: center">
+                                <button style="margin-top:5px;border-radius: 25px"
+                                        class="btn card_button {% if checkin %} btn-success {% else %} btn-danger {% endif %}btn-trans">
+                                    {% if checkin %}
+                                        Realizar
+                                        Check-in
+                                    {% else %}
+                                        Realizar Check-out
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
     </div>
 
@@ -199,7 +263,13 @@
 
             var i;
             for (i = 0; i < res.length; i++) {
+                debugger;
                 var s = res[i];
+                var card = $('.sub-card').clone();
+                card.children('.card-name').html(s['person']['name']);
+                card.children('.card_subscription_number').html(s['code']);
+                card.children('.card-email').html(s['person']['email']);
+
 
                 var row = document.createElement('div');
                 var cols = document.createElement('div');
