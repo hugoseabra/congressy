@@ -1,4 +1,5 @@
 import re
+
 from django.db.models import Q
 from rest_framework import viewsets
 from rest_framework.authentication import (
@@ -6,6 +7,7 @@ from rest_framework.authentication import (
     SessionAuthentication,
 )
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from attendance import models, serializers
 from gatheros_subscription.models import Subscription
@@ -82,7 +84,6 @@ class AttendanceServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
 class SubscriptionAttendanceViewSet(RestrictionViewMixin,
                                     viewsets.ModelViewSet):
-
     queryset = Subscription.objects.all().order_by('person__name')
     serializer_class = serializers.SubscriptionAttendanceSerializer
 
@@ -160,6 +161,12 @@ class CheckinViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
             attendance_service__event__organization_id__in=org_pks
         )
 
+    def list(self, request, *args, **kwargs):
+        content = {
+            'status': 'request is not allowed.'
+        }
+        return Response(content, status=405)
+
 
 class CheckoutViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
     queryset = models.Checkout.objects.all()
@@ -175,5 +182,11 @@ class CheckoutViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
         queryset = super().get_queryset()
         return queryset.filter(
-            attendance_service__event__organization_id__in=org_pks
+            checkin__attendance_service__event__organization_id__in=org_pks
         )
+
+    def list(self, request, *args, **kwargs):
+        content = {
+            'status': 'request is not allowed.'
+        }
+        return Response(content, status=405)
