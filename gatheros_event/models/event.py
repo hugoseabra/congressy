@@ -51,6 +51,14 @@ class Event(models.Model, GatherosModelMixin):
     EVENT_STATUS_RUNNING = 'running'
     EVENT_STATUS_FINISHED = 'finished'
 
+    EVENT_BUSINESS_STATUS_PAID = 'paid'
+    EVENT_BUSINESS_STATUS_FREE = 'free'
+
+    BUSINESS_STATUSES = (
+        (EVENT_BUSINESS_STATUS_PAID, 'paid'),
+        (EVENT_BUSINESS_STATUS_FREE, 'free'),
+    )
+
     STATUSES = (
         (None, 'não-iniciado'),
         (EVENT_STATUS_NOT_STARTED, 'não-iniciado'),
@@ -266,14 +274,12 @@ class Event(models.Model, GatherosModelMixin):
         blank=True,
     )
 
-    allow_importing = models.BooleanField(
-        default=False,
-        verbose_name='permitir importação via csv',
-    )
-
-    allow_boleto_expiration_on_lot_expiration = models.BooleanField(
-        default=False,
-        verbose_name='vencimento dos boletos na da data de vencimento dos lotes',
+    business_status = models.CharField(
+        max_length=50,
+        choices=BUSINESS_STATUSES,
+        verbose_name='Ultimo status de negocios conhecido',
+        blank=True,
+        null=True,
     )
 
     class Meta:
@@ -317,7 +323,8 @@ class Event(models.Model, GatherosModelMixin):
         attended = 0.0
         if hasattr(self, 'subscriptions'):
             queryset = self.subscriptions
-            num = queryset.filter(completed=True, test_subscription=False).exclude(
+            num = queryset.filter(completed=True,
+                                  test_subscription=False).exclude(
                 status='canceled'
             ).count()
 

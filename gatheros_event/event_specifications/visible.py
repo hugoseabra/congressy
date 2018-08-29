@@ -47,8 +47,10 @@ class LotVisible(LotCompositeSpecificationMixin):
             return False
 
         # Verificação de limite de lote
-        total_subs_in_lot = self._get_valid_subs_in_lot(lot)
-        if total_subs_in_lot and total_subs_in_lot >= lot.limit:
-            return False
+        if lot.limit:
+            total_subs_in_lot = self._get_valid_subs_in_lot(lot)
+            if total_subs_in_lot:
+                if total_subs_in_lot.count() >= lot.limit:
+                    return False
 
         return True

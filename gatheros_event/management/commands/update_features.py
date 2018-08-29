@@ -1,4 +1,6 @@
 from django.core.management.base import BaseCommand
+
+from gatheros_event.helpers.event_business import is_paid_event, is_free_event
 from gatheros_event.models import Event, FeatureManagement, FeatureConfiguration
 
 
@@ -39,6 +41,16 @@ class Command(BaseCommand):
 
             management.save()
             config.save()
+
+            if is_paid_event(event):
+                event.business_status = \
+                    event.EVENT_BUSINESS_STATUS_PAID
+            elif is_free_event(event):
+                event.business_status = \
+                    event.EVENT_BUSINESS_STATUS_FREE
+            else:
+                raise Exception('Unknown event state')
+            event.save()
 
             i += 1
 

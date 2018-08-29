@@ -6,8 +6,8 @@ from gatheros_event.signals.helpers import update_event_config_flags
 from gatheros_subscription.models import Lot
 
 
-@receiver(post_save, sender=Lot)
 @receiver(pre_delete, sender=Lot)
+@receiver(post_save, sender=Lot)
 def set_feature_flags_on_event_type_change(instance, **_):
     """ Altera as flags de fatures quando um evento muda de tipo """
 

@@ -19,7 +19,7 @@ def create_feature_configuration(instance, raw, created, **_):
                 event=instance,
                 feature_certificate=True,
                 feature_internal_subscription=True,
-                
+
             )
 
         if instance.event_type == instance.EVENT_TYPE_PAID:
@@ -35,9 +35,17 @@ def create_feature_management(instance, raw, created, **_):
 
     if created is True:
         try:
-            instance.feature_management
+            config = instance.feature_management
         except AttributeError:
-            FeatureManagement.objects.create(event=instance)
+            config = FeatureManagement.objects.create(event=instance)
+
+        config.feature_products = instance.has_optionals
+        config.feature_services = instance.has_extra_activities
+        config.feature_checkin = instance.has_checkin
+        config.feature_certificate = instance.has_certificate
+        config.feature_survey = instance.has_survey
+
+        config.save()
 
 
 @receiver(post_save, sender=Event)

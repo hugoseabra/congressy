@@ -136,14 +136,6 @@ class LotForm(forms.ModelForm):
                 ' alterado.'
             )
 
-        # Se vinculado à opcionais e/ou atividades extras,
-        # não permitir alterar valor para "0" (setar como gratuito).
-        if self._lot_has_optionals() and price == 0:
-            raise forms.ValidationError(
-                'Esse lote está em uma categoria que já possui opcionais e não'
-                ' pode mais ter preço grátis.'
-            )
-
         return price
 
     def clean_exhibition_code(self):

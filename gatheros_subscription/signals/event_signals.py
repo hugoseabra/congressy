@@ -41,46 +41,46 @@ def clean_related_lots_when_subscription_disabled(instance, raw, **_):
         return
 
 
-@receiver(post_save, sender=Event)
-def manage_related_lot_when_subscription_enabled(instance, created, raw, **_):
-    """ Gerencia lotes relacionados quando inscrições são ativadas. """
-    # Disable when loaded by fixtures
-    if raw is True:
-        return
-
-    # # Process only if, in edition, subscription_type is changed
-    if created is False and instance.has_changed('subscription_type') is False:
-        if instance.subscription_type == Event.SUBSCRIPTION_SIMPLE:
-
-            lot = Lot.objects.get(event=instance)
-
-            if lot:
-                lot.adjust_unique_lot_date(force=True)
-                lot.save()
-
-        return
-
-    num_lots = Lot.objects.filter(event=instance).count()
-
-    # Em inscrições simple
-    if instance.subscription_type == Event.SUBSCRIPTION_SIMPLE:
-        # Se lotes, uni-los.
-        if num_lots > 0:
-            _merge_lots_and_subscriptions(event=instance)
-            return
-
-        # Cria lote interno.
-        _create_internal_lot(event=instance)
-
-    # Inscrições gerenciados por lote
-    elif instance.subscription_type == Event.SUBSCRIPTION_BY_LOTS:
-        # Se lotes, convertê-los para externos
-        if num_lots > 0:
-            _convert_internal_lot_to_external(event=instance)
-            return
-
-        # Cria lote externo
-        _create_external_lot(event=instance)
+# @receiver(post_save, sender=Event)
+# def manage_related_lot_when_subscription_enabled(instance, created, raw, **_):
+#     """ Gerencia lotes relacionados quando inscrições são ativadas. """
+#     # Disable when loaded by fixtures
+#     if raw is True:
+#         return
+#
+#     # # Process only if, in edition, subscription_type is changed
+#     if created is False and instance.has_changed('subscription_type') is False:
+#         if instance.subscription_type == Event.SUBSCRIPTION_SIMPLE:
+#
+#             lot = Lot.objects.get(event=instance)
+#
+#             if lot:
+#                 lot.adjust_unique_lot_date(force=True)
+#                 lot.save()
+#
+#         return
+#
+#     # num_lots = Lot.objects.filter(event=instance).count()
+#
+#     # Em inscrições simple
+#     # if instance.subscription_type == Event.SUBSCRIPTION_SIMPLE:
+#     #     # Se lotes, uni-los.
+#     #     if num_lots > 0:
+#     #         _merge_lots_and_subscriptions(event=instance)
+#     #         return
+#     #
+#     #     # Cria lote interno.
+#     #     _create_internal_lot(event=instance)
+#     #
+#     # # Inscrições gerenciados por lote
+#     # elif instance.subscription_type == Event.SUBSCRIPTION_BY_LOTS:
+#     #     # Se lotes, convertê-los para externos
+#     #     if num_lots > 0:
+#     #         _convert_internal_lot_to_external(event=instance)
+#     #         return
+#     #
+#     #     # Cria lote externo
+#     #     _create_external_lot(event=instance)
 
 
 def _remove_lots(event):
