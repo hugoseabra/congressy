@@ -683,6 +683,8 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
                         return self.form_valid(form)
                     else:
                         return self.form_invalid(form, survey_form=survey_form)
+                else:
+                    return self.form_valid(form)
         else:
             return self.form_invalid(form)
 

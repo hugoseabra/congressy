@@ -11,6 +11,7 @@ from gatheros_event.models import Event, Info, Organization
 from gatheros_event.views.mixins import AccountMixin
 from gatheros_subscription.models import Subscription, EventSurvey, Lot
 from payment.models import Transaction
+from gatheros_event.event_specifications.subscribable import EventSubscribable
 
 
 class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
@@ -95,6 +96,8 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         context['totals'] = self._get_payables()
         context['limit'] = self._get_limit()
         context['has_paid_lots'] = self.has_paid_lots()
+        context['event_is_subscribable'] = EventSubscribable()\
+            .is_satisfied_by(self.object)
         context['all_lots'] = self.all_lots_status()
         context['gender'] = self._get_gender()
         context['pending'] = self._get_number_pending()

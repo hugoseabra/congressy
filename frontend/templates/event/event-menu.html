@@ -73,28 +73,25 @@ Variáveis:
             <i class="fas fa-file-alt"></i> Página do evento
         </a>
     </li>
-    {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
-
-        <li {% if active == 'categorias' %}class="active"{% endif %}>
-            <a class="sidebar-itens" href="{% url 'subscription:category-list' event.pk %}"
-               title="Categorias">
-                <i class="fas fa-th-list"></i>
-                Categoria(s)
-            </a>
-        </li>
-
-        <li {% if active == 'lotes' %}class="active"{% endif %}>
-            <a class="sidebar-itens" href=
-                    "{% url 'subscription:lot-list' event.pk %}"
-               title="Lotes/Categorias">
-                <i class="fas fa-th-large"></i>
-                Lote(s)
-            </a>
-        </li>
 
 
+    <li {% if active == 'categorias' %}class="active"{% endif %}>
+        <a class="sidebar-itens" href="{% url 'subscription:category-list' event.pk %}"
+           title="Categorias">
+            <i class="fas fa-th-list"></i>
+            Categoria(s)
+        </a>
+    </li>
 
-    {% endif %}
+    <li {% if active == 'lotes' %}class="active"{% endif %}>
+        <a class="sidebar-itens" href=
+                "{% url 'subscription:lot-list' event.pk %}"
+           title="Lotes/Categorias">
+            <i class="fas fa-th-large"></i>
+            Lote(s)
+        </a>
+    </li>
+
     <li {% if active == 'dados-do-evento' %}class="active"{% endif %}>
         <a class="sidebar-itens" href=
                 "{% url 'event:event-edit' event.pk %}"

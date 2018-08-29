@@ -41,7 +41,7 @@
 
             var dateInput = $('#id_person-birth_date');
             if (dateInput.length) {
-                var birthDate = createDatePicker();
+                var birthDate = createDatePicker(dateInput);
                 birthDate.data("DateTimePicker").minDate(false);
                 birthDate.data("DateTimePicker").useCurrent(false);
                 var datePerson = dateInput.attr('value');
