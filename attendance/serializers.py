@@ -136,5 +136,5 @@ class CheckinSerializer(serializers.ModelSerializer):
 
 class CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Checkin
+        model = models.Checkout
         fields = '__all__'
