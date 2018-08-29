@@ -1,9 +1,9 @@
-<div class="col-md-4">
+<div class="col-md-4" id="sub-card" style="display: none">
     <div class="panel" style="border-radius: 5px;
  box-shadow: 0 10px 15px 0 rgba(223, 223, 223, 0.5);
 ">
-        <div class="container-fluid"
-             style="background-color:{% if checkin %}#d0021b {% else %} #27ae60 {% endif %};height: 70px;
+        <div class="container-fluid card-header"
+             style="height: 70px;
                      border-top-left-radius: 5px;
                      border-top-right-radius: 5px;
                      ">
@@ -11,33 +11,36 @@
         </div>
         <div class="row">
             <div class="col-xs-6 col-xs-offset-3" style="margin-top:-50px;">
-                <img src="http://cdn.staticneo.com/w/evangelion/6/6a/Shinji.jpg"
-                     class="img-responsive img-circle" alt="Responsive image">
+{#                <img src="http://cdn.staticneo.com/w/evangelion/6/6a/Shinji.jpg"#}
+{#                     class="img-responsive img-circle" alt="Responsive image">#}
             </div>
         </div>
         <div class="panel-body">
-            <h2 class="text-center"> {{ name }}</h2>
+            <h2 class="text-center card-name" style="font-size: 20px;padding-top: 10px"></h2>
             <div class="text-center" style="padding-top: 8px">
                 <div class="row">
                     <div class="col-md-7">
-                        <h3 style="padding-bottom: 5px" class="card-name">
+                        <h3 style="padding-bottom: 5px">
                             <i class="fas fa-barcode"
 
                                data-toggle="tooltip"
                                data-placement="left"
                                title=""
-                               data-original-title="código da inscrição"></i>
+                               data-original-title="código da inscrição">
+
+                            </i>
+                            <span class="card_code"></span>
                             </h3>
                     </div>
                     <div class="col-md-5">
-                        <h3 style=" padding-bottom: 5px" class="card_subscription_number">
+                        <h3 style=" padding-bottom: 5px">
                             <i class="fas fa-list-ol"
 
                                data-toggle="tooltip"
                                data-placement="left"
                                title=""
                                data-original-title="Número da Inscrição"></i>
-
+                            <span class="card_subscription_number"></span>
                         </h3>
                     </div>
                 </div>
@@ -48,38 +51,43 @@
                             margin-top: 10px; margin-bottom: 10px">
 
                 </div>
-                <h3 style="padding-bottom: 5px" class="card_email">
+                <h3 style="padding-bottom: 5px" >
                     <i class="far fa-envelope"
                        data-toggle="tooltip"
                        data-placement="left"
                        title=""
                        data-original-title="Email"></i>
+                    <span class="card_email"></span>
                 </h3>
 
-                <h3 style="padding-bottom: 5px" class="card_category">
+                <h3 style="padding-bottom: 5px" >
                     <i class="fas fa-th-list"
                        data-toggle="tooltip"
                        data-placement="left"
                        title=""
                        data-original-title="Categoria"></i>
+                    <span class="card_category" ></span>
                 </h3>
-                <h3 style="padding-bottom: 5px" class="card_lot">
+                <h3 style="padding-bottom: 5px" >
                     <i class="fas fa-th-large"
                        data-toggle="tooltip"
                        data-placement="left"
                        title=""
                        data-original-title="Lote"></i>
+                    <span class="card_lot"></span>
+                </h3>
+                <h3 style="padding-bottom: 5px" >
+                    <i class="far fa-id-badge"
+                       data-toggle="tooltip"
+                       data-placement="left"
+                       title=""
+                       data-original-title="Status"></i>
+                    <span class="card_status"></span>
                 </h3>
 
                 <div style=" text-align: center">
                     <button style="margin-top:5px;border-radius: 25px"
-                            class="btn card_button {% if checkin %} btn-success {% else %} btn-danger {% endif %}btn-trans">
-                        {% if checkin %}
-                            Realizar
-                            Check-in
-                        {% else %}
-                            Realizar Check-out
-                        {% endif %}
+                            class="btn card-button btn-trans">
                     </button>
                 </div>
             </div>

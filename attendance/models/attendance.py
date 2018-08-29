@@ -32,7 +32,7 @@ class Checkin(Attendance):
     attendance_service = models.ForeignKey(
         AttendanceService,
         verbose_name='Lista de Check-in/out',
-        related_name='%(class)ss',
+        related_name='checkins',
         on_delete=models.CASCADE
     )
 

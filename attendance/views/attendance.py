@@ -125,15 +125,15 @@ class CheckinListView(generic.TemplateView):
         context = super().get_context_data(**kwargs)
         context['attendance_list'] = self.get_attendance_list()
         context['event'] = Event.objects.get(pk=self.kwargs.get('event_pk'))
-        # context['attendances'] = self.get_attendances()
+        context['attendances'] = self.get_attendances()
 
         return context
 
     def get_attendances(self):
         return Checkin.objects.filter(
-            attendence_service=self.object,
+            attendance_service=self.object,
             checkout__isnull=True
-        ).order_by('-attended_on')
+        ).order_by('-created_on')
 
 
 class AttendanceDashboardView(generic.TemplateView):
@@ -156,100 +156,97 @@ class AttendanceDashboardView(generic.TemplateView):
         context = super().get_context_data(**kwargs)
         context['attendance_list'] = self.get_attendance_list()
         context['event'] = Event.objects.get(pk=self.kwargs.get('event_pk'))
-        # context.update({
-        #     'attendances': self.get_attendances(),
-        #     'search_by': self.search_by,
-        #     'confirmed': self.get_number_confirmed(),
-        #     'number_attendances': self.get_number_attendances(),
-        #     'total_subscriptions': self.get_number_subscription(),
-        #     'reports': self.get_report()
-        # })
+        context.update({
+            'attendances': self.get_attendances(),
+            'search_by': self.search_by,
+            'confirmed': self.get_number_confirmed(),
+            'number_attendances': self.get_number_attendances(),
+            'total_subscriptions': self.get_number_subscription(),
+            'reports': self.get_report()
+        })
         return context
 
-    # def get_attendances(self):
-    #     try:
-    #         list = Checkin.objects.filter(
-    #             attendence_service=self.object,
-    #             checkout__isnull=True
-    #         ).order_by('-attended_on')
-    #         return list[0:5]
-    #
-    #     except Subscription.DoesNotExist:
-    #         return []
-    #
-    # def get_number_attendances(self):
-    #     try:
-    #         return Checkin.objects.filter(
-    #             attendence_service=self.object,
-    #             subscription__attended=True,
-    #             checkout__isnull=True
-    #         ).order_by('-attended_on').count()
-    #
-    #     except Subscription.DoesNotExist:
-    #         return 0
-    #
-    # def get_number_subscription(self):
-    #
-    #     total = \
-    #         Subscription.objects.filter(
-    #             event=self.get_event(),
-    #             completed=True, test_subscription=False
-    #         ).exclude(status=Subscription.CANCELED_STATUS).count()
-    #
-    #     return total
-    #
-    # def get_number_confirmed(self):
-    #
-    #     confirmed = \
-    #         Subscription.objects.filter(
-    #             status=Subscription.CONFIRMED_STATUS,
-    #             completed=True, test_subscription=False,
-    #             event=self.get_event()
-    #         ).count()
-    #
-    #     return confirmed
-    #
-    # def get_report(self):
-    #     """
-    #     Recupera um dicinário com informaçõse que podem ser utilizadas como
-    #     relatório.
-    #     """
-    #     if not hasattr(self, 'subscriptions'):
-    #         return {}
-    #
-    #     def perc(num, num_total):
-    #         if num_total == 0:
-    #             return 0
-    #         return '{0:.2f}%'.format((num * 100) / num_total)
-    #
-    #     queryset = Subscription.objects.filter(
-    #         attendances__attendance_service__pk=self.get_attendance_list())
-    #
-    #     total = queryset.count()
-    #
-    #     reports_dict = {}
-    #
-    #     gender_report = reports.get_report_gender(queryset)
-    #
-    #     reports_dict.update(gender_report)
-    #     reports_dict.update({
-    #         'num_men': '{} ({})'.format(
-    #             gender_report['men'],
-    #             perc(gender_report['men'], total)
-    #         ),
-    #         'num_women': '{} ({})'.format(
-    #             gender_report['women'],
-    #             perc(gender_report['women'], total)
-    #         ),
-    #     })
-    #
-    #     reports_dict.update(
-    #         {'num_pnes': reports.get_report_gender(queryset)})
-    #     reports_dict.update({
-    #         'cities': reports.get_report_cities(queryset)
-    #     })
-    #     reports_dict.update({
-    #         'ages': reports.get_report_age(queryset)
-    #     })
-    #
-    #     return reports_dict
+    def get_attendances(self):
+        try:
+            list = Checkin.objects.filter(
+                attendance_service=self.object,
+                checkout__isnull=True
+            ).order_by('-created_on')
+            return list[0:5]
+
+        except Subscription.DoesNotExist:
+            return []
+
+    def get_number_attendances(self):
+        try:
+            return Checkin.objects.filter(
+                attendance_service=self.object,
+                checkout__isnull=True
+            ).order_by('-created_on').count()
+
+        except Subscription.DoesNotExist:
+            return 0
+
+    def get_number_subscription(self):
+
+        total = \
+            Subscription.objects.filter(
+                event=self.get_event(),
+                completed=True, test_subscription=False
+            ).exclude(status=Subscription.CANCELED_STATUS).count()
+
+        return total
+
+    def get_number_confirmed(self):
+
+        confirmed = \
+            Subscription.objects.filter(
+                status=Subscription.CONFIRMED_STATUS,
+                completed=True, test_subscription=False,
+                event=self.get_event()
+            ).count()
+
+        return confirmed
+
+    def get_report(self):
+        """
+        Recupera um dicinário com informaçõse que podem ser utilizadas como
+        relatório.
+        """
+
+        def perc(num, num_total):
+            if num_total == 0:
+                return 0
+            return '{0:.2f}%'.format((num * 100) / num_total)
+
+        queryset = Subscription.objects.filter(
+            checkins__attendance_service__pk=self.get_attendance_list().pk)
+
+        total = queryset.count()
+
+        reports_dict = {}
+
+        gender_report = reports.get_report_gender(queryset)
+
+        reports_dict.update(gender_report)
+        reports_dict.update({
+            'num_men': '{} ({})'.format(
+                gender_report['men'],
+                perc(gender_report['men'], total)
+            ),
+            'num_women': '{} ({})'.format(
+                gender_report['women'],
+                perc(gender_report['women'], total)
+            ),
+        })
+
+        reports_dict.update(
+            {'num_pnes': reports.get_report_gender(queryset)})
+        reports_dict.update({
+            'cities': reports.get_report_cities(queryset)
+        })
+        reports_dict.update({
+            'ages': reports.get_report_age(queryset)
+        })
+
+        return reports_dict

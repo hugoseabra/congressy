@@ -50,10 +50,10 @@
                         {% for att in attendances %}
                             <tr>
                                 <td>
-                                    {{ att.subscription.name }}
+                                    {{ att.subscription.person.name }}
                                     <br>
                                     <small class="text-muted">
-                                        {{ att.person.email }}
+                                        {{ att.person.person.email }}
                                     </small>
                                 </td>
                                 <td class="col-md-1">
@@ -64,21 +64,21 @@
                                     {{ att.subscription.code }}
                                 </td>
                                 <td>
-                                    {% if  att.subscription.cpf %}
+                                    {% if  att.subscription.person.cpf %}
                                         <div class="cpf">
-                                            {{ att.subscription.cpf }}
+                                            {{ att.subscription.person.cpf }}
                                         </div>
-                                    {% elif  att.subscription.institution_cnpj %}
+                                    {% elif  att.subscription.person.institution_cnpj %}
                                         <div class="cnpj">
-                                            {{ att.subscription.institution_cnpj }}
+                                            {{ att.subscription.person.institution_cnpj }}
                                         </div>
                                     {% else %}
                                         ...
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if att.checkin_on %}
-                                        {{ att.checkin_on|date:"d/m/Y H\hi" }}
+                                    {% if att.created_on %}
+                                        {{ att.created_on|date:"d/m/Y H\hi" }}
                                     {% else %}
                                         Não disponivel.
                                     {% endif %}

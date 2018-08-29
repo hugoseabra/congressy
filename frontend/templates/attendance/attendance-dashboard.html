@@ -242,9 +242,9 @@
                                                    cellpadding="0">
                                                 <tr>
                                                     <td style="padding: 5px;font-size:12px">
-                                                        <div style="font-weight: bold;text-transform: uppercase">{{ attendance.person.name }}</div>
+                                                        <div style="font-weight: bold;text-transform: uppercase">{{ attendance.subscription.person.name }}</div>
                                                         <div>
-                                                            <strong>Data:</strong> {{ attendance.attended_on|date:"d/m/Y H\hi" }}
+                                                            <strong>Data:</strong> {{ attendance.created_on|date:"d/m/Y H\hi" }}
                                                         </div>
                                                     </td>
                                                 </tr>
