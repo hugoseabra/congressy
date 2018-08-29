@@ -71,6 +71,7 @@
     <div class="row">
         {% include 'attendance/includes/attendance-menu.html' with active='checkin' %}
         <div class="col-md-10">
+
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <div class="panel-title">Realizar Checkin</div>
@@ -117,51 +118,58 @@
 
 {% block scripts %}
 
-    <script src="{% static 'assets/js/vendor/moment.js' %}"></script>
-
+    <script src="{% static 'assets/js/vendor/moment.js' %}"></script>,
+    <script src="{% static 'assets/js/ajax.js' %}"></script>,
     <script>
 
-        // CSRF code
-        function getCookie(name) {
-            var cookieValue = null;
-            var i = 0;
-            if (document.cookie && document.cookie !== '') {
-                var cookies = document.cookie.split(';');
-                for (i; i < cookies.length; i++) {
-                    var cookie = jQuery.trim(cookies[i]);
-                    // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
+        function checkin (subscription_pk) {
+            var sender = new window.cgsy.AjaxSender('{% url 'api:attendance:checkin-list' %}');
+            sender.setSuccessCallback(function () {
+                Messenger().post({
+                    message: 'Check-in realizado com sucesso!',
+                    type: 'success'
+                });
+            });
+            sender.setFailCallback(function (err) {
+                    console.error(err);
+                    Messenger().post({
+                        message: 'Não foi possivel realizar o check-in.',
+                        type: 'danger'
+                    });
+                });
+            sender.send('POST',{
+                        subscription : subscription_pk,
+                        attendance_service: '{{ attendance_list.pk  }}',
+                        attended_by: '{{ request.user.get_full_name }}'
+                    } );
         }
-
-        var csrftoken = getCookie('csrftoken');
 
         function create_result_list(res) {
             var i;
             for (i = 0; i < res.length; i++) {
                 var s = res[i];
                 var status = '';
-                var checkin = true;
                 var card = $('#sub-card').clone();
+                card.removeClass('sub-card');
                 card.find('.card-name').text(s['person']['name']);
                 card.find('.card_code').text(s['code']);
-                card.find('.card_lot').text(s['lot']);
+                card.find('.card_lot').text(s['lot']['name']);
+                card.find('.card_category').text(s['lot']['category']);
                 card.find('.card_subscription_number').text(s['event_count']);
                 card.find('.card_email').text(s['person']['email']);
                 card.find('.card_status').text(s['status']);
+
                 if (s['status'] === 'confirmed') {
                     status = 'Confirmado <i class="fa fa-circle" ' +
                         'style="color:#5cb85c"></i>';
 
-                    if (checkin === false) {
+                    if (s['attendance_status'] === false) {
                         card.find('.card-header').css('background-color', '#d0021b');
                         card.find('.card-button').text('Realizar Check-in');
                         card.find('.card-button').addClass('btn-success');
+                        card.find('.card-button').removeClass('btn-danger');
+                        card.find('.card-button').attr('onclick', 'checkin("'+s["uuid"]+'")');
+
                     }
                     else {
                         card.find('.card-header').css('background-color', '#27ae60')
@@ -200,17 +208,17 @@
             $('#results').hide();
 
             var raw_query = $('#searchBarInput').val();
-            var query = '?query=' + raw_query;
+            var query = '?search=' + raw_query;
 
             var option = document.createElement('option');
             option.setAttribute('value', raw_query);
             $('#recent_searches').append(option);
 
             $.ajax({
-                url: '{% url 'attendance:subscription-api-attendance-search' event.pk attendance_list.pk %}' + query,
+                url: '{% url 'api:attendance:subscription-list' attendance_list.pk %}' + query,
                 type: 'GET',
                 success: function (res) {
-                     $('#result_list').empty();
+                    $('#result_list').empty();
                     create_result_list(res);
                     //$('#searchBar').hide('slow');
                     $('#results').show();
