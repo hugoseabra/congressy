@@ -417,6 +417,30 @@ pipeline:
     when:
       branch: [ master ]
 
+#  notify-sentry-release:
+#    image: hugoseabra19/drone-sentry-release
+#    environment:
+#     - PROJECT_NAME=Congressy v1
+#     - PROJECT_ALIAS=congressy-v1
+#     - MAINTAINER_NAME=congressy
+#     - REPO_NAME=cgsy
+#     - SENTRY_BASE_URL=https://bugs.congressy.com
+#     - VERSION=1.5.31
+#
+#    secrets:
+#      - source: SENTRY_RELEASE_API_TOKEN
+#        target: SENTRY_API_RELEASE_TOKEN
+#      - source: ${DRONE_COMMIT_SHA}
+#        target: COMMIT_SHA
+#
+#    envs: [
+#      sentry_release_api_token
+#    ]
+#
+#    when:
+#      status: [ success ]
+#      branch: [ master ]
+
   notify-production-on-telegram:
     image: appleboy/drone-telegram
     pull: true

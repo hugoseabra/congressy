@@ -42,7 +42,7 @@
 
 
     function render_available_optional_products_list() {
-        var url = '{% url 'public:hotsite_products' subscription.pk %}';
+        var url = '{% url 'public:hotsite_products' selected_lot.category.pk subscription.pk %}';
 
         send(
             url,
@@ -60,7 +60,7 @@
         );
     }
     function render_currently_selected_products_list() {
-        var url = '{% url 'public:hotsite_products' subscription.pk %}';
+        var url = '{% url 'public:hotsite_products' selected_lot.category.pk subscription.pk %}';
 
         send(
             url,
@@ -86,7 +86,7 @@
         $('.optional-action-buttons').find('button').attr('disabled', '');
         insertLoaderIntoButton(button_el);
 
-        var url = '{% url 'public:hotsite_products' subscription.pk %}';
+        var url = '{% url 'public:hotsite_products' selected_lot.category.pk subscription.pk %}';
 
         send(
             url,
@@ -114,7 +114,7 @@
         $('.optional-action-buttons').find('button').attr('disabled', '');
         insertLoaderIntoButton(button_el);
 
-        var url = '{% url 'public:hotsite_products' subscription.pk %}';
+        var url = '{% url 'public:hotsite_products' selected_lot.category.pk subscription.pk %}';
 
         send(
             url,

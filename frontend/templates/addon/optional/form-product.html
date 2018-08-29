@@ -55,7 +55,7 @@
         $(document).ready(function () {
             price_calculator = new window.cgsy.PriceCalculator(parseFloat('{{ cgsy_percent|unlocalize }}'), true);
 
-            var date = createDatePicker();
+            var date = createDatePicker($('#id_date_end_sub_0'));
             {% if object %}
                 date.data("DateTimePicker").minDate(false);
             {% endif %}
@@ -132,7 +132,7 @@
 
     <div id="output"></div>
 
-    <form action="" id="optional_form" method="post"
+    <form  novalidate action="" id="optional_form" method="post"
           class="form-horizontal form-border"
           role="form" name="optional_form">
         {% csrf_token %}

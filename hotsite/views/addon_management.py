@@ -11,7 +11,7 @@ from addon.models import (
     SubscriptionProduct,
     SubscriptionService,
 )
-from gatheros_subscription.models import Subscription
+from gatheros_subscription.models import Subscription, LotCategory
 
 """
 DEV NOTES: 
@@ -48,8 +48,8 @@ class ProductOptionalManagementView(generic.TemplateView):
 
         subscription_pk = kwargs.get('subscription_pk')
         subscription = get_object_or_404(Subscription, pk=subscription_pk)
-
-        category = subscription.lot.category
+        category_pk = kwargs.get('lot_category_pk')
+        category = get_object_or_404(LotCategory, pk=category_pk)
 
         self.available_options = []
 
@@ -58,7 +58,7 @@ class ProductOptionalManagementView(generic.TemplateView):
 
         all_products_selected_by_the_user = \
             subscription.subscription_products.filter(
-                optional__lot_category=subscription.lot.category,
+                optional__lot_category=category,
                 optional__date_end_sub__gt=datetime.now()
             ).order_by(
                 "optional__optional_type__name",
@@ -161,93 +161,90 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
     def get(self, request, *args, **kwargs):
 
-        try:
-            subscription_pk = kwargs.get('subscription_pk')
-            subscription = Subscription.objects.get(pk=subscription_pk)
+        subscription_pk = kwargs.get('subscription_pk')
+        subscription = get_object_or_404(Subscription, pk=subscription_pk)
+        category_pk = kwargs.get('lot_category_pk')
+        category = get_object_or_404(LotCategory, pk=category_pk)
 
-            category = subscription.lot.category
-            self.available_options = []
+        self.available_options = []
 
-            self.fetch_in_storage = self.request.GET.get('fetch_in_storage')
-            all_selected_services = subscription.subscription_services.filter(
-                optional__lot_category=subscription.lot.category,
-                optional__date_end_sub__gt=datetime.now()
+        self.fetch_in_storage = self.request.GET.get('fetch_in_storage')
+        all_selected_services = subscription.subscription_services.filter(
+            optional__lot_category=category,
+            optional__date_end_sub__gt=datetime.now()
+        ).order_by(
+            "optional__theme__name",
+            "optional__optional_type__name",
+            "optional__name",
+        )
+        # @TODO add user validation here, only if request.user == sub.user
+
+        if self.fetch_in_storage:
+
+            themes = {}
+            for service in all_selected_services:
+                optional = service.optional
+                theme = optional.theme
+                o_type = optional.optional_type
+                if theme.pk not in themes:
+                    themes[theme.pk] = {
+                        'name': theme.name,
+                        'types': {},
+                    }
+
+                if o_type.pk not in themes[theme.pk]['types']:
+                    themes[theme.pk]['types'][o_type.pk] = {
+                        'name': o_type.name,
+                        'optionals': [],
+                    }
+
+                themes[theme.pk]['types'][o_type.pk]['optionals'].append(
+                    service
+                )
+
+            self.available_options = themes
+        else:
+            # All service optionals
+            all_services = Service.objects.filter(
+                lot_category=category,
+                published=True,
+                date_end_sub__gt=datetime.now(),
+            ).exclude(
+                subscription_services__subscription=subscription
             ).order_by(
-                "optional__theme__name",
-                "optional__optional_type__name",
-                "optional__name",
+                'theme__name',
+                "optional_type__name",
+                "name"
             )
-            # @TODO add user validation here, only if request.user == sub.user
 
-            if self.fetch_in_storage:
+            available = get_all_options(
+                all_services,
+                all_selected_services,
+                available_only=False
+            )
 
-                themes = {}
-                for service in all_selected_services:
-                    optional = service.optional
-                    theme = optional.theme
-                    o_type = optional.optional_type
-                    if theme.pk not in themes:
-                        themes[theme.pk] = {
-                            'name': theme.name,
-                            'types': {},
-                        }
+            themes = {}
+            for service in available:
+                optional = service['optional']
+                theme = optional.theme
+                o_type = optional.optional_type
+                if theme.pk not in themes:
+                    themes[theme.pk] = {
+                        'name': theme.name,
+                        'types': {},
+                    }
 
-                    if o_type.pk not in themes[theme.pk]['types']:
-                        themes[theme.pk]['types'][o_type.pk] = {
-                            'name': o_type.name,
-                            'optionals': [],
-                        }
+                if o_type.pk not in themes[theme.pk]['types']:
+                    themes[theme.pk]['types'][o_type.pk] = {
+                        'name': o_type.name,
+                        'optionals': [],
+                    }
 
-                    themes[theme.pk]['types'][o_type.pk]['optionals'].append(
-                        service
-                    )
-
-                self.available_options = themes
-            else:
-                # All service optionals
-                all_services = Service.objects.filter(
-                    lot_category=category,
-                    published=True,
-                    date_end_sub__gt=datetime.now(),
-                ).exclude(
-                    subscription_services__subscription=subscription
-                ).order_by(
-                    'theme__name',
-                    "optional_type__name",
-                    "name"
+                themes[theme.pk]['types'][o_type.pk]['optionals'].append(
+                    service
                 )
 
-                available = get_all_options(
-                    all_services,
-                    all_selected_services,
-                    available_only=False
-                )
-
-                themes = {}
-                for service in available:
-                    optional = service['optional']
-                    theme = optional.theme
-                    o_type = optional.optional_type
-                    if theme.pk not in themes:
-                        themes[theme.pk] = {
-                            'name': theme.name,
-                            'types': {},
-                        }
-
-                    if o_type.pk not in themes[theme.pk]['types']:
-                        themes[theme.pk]['types'][o_type.pk] = {
-                            'name': o_type.name,
-                            'optionals': [],
-                        }
-
-                    themes[theme.pk]['types'][o_type.pk]['optionals'].append(
-                        service
-                    )
-
-                self.available_options = themes
-
-        except Subscription.DoesNotExist:
-            pass
+            self.available_options = themes
 
         return self.render_to_response(self.get_context_data())
 
