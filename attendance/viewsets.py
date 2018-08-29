@@ -20,26 +20,11 @@ def search_subscriptions(service, queryset, search_criteria):
     if not search_criteria:
         return queryset
 
-    lot_category_pks = [
-        lot_cat_filter.lot_category.pk
-        for lot_cat_filter in service.lot_category_filters.all()
-    ]
-
-    # filter lot category
-    if lot_category_pks:
-        queryset = queryset.filter(lot__category_id__in=lot_category_pks)
-        if queryset.count() == 0:
-            return queryset
-
-    # Fetch by event code
+    # Fetch by event count
     if search_criteria.isdigit():
         queryset = queryset.filter(event_count=int(search_criteria))
-        return queryset
-
-    # Filter by name
-    name_queryset = queryset.filter(person__name__icontains=search_criteria)
-    if name_queryset.count() > 0:
-        return name_queryset
+        if queryset.count() > 0:
+            return queryset
 
     # Filter by email
     email_queryset = queryset.filter(
@@ -67,6 +52,9 @@ def search_subscriptions(service, queryset, search_criteria):
     )
     if cnpf_query.count() > 0:
         return cnpf_query
+
+    # Filter by name
+    queryset = queryset.filter(person__name__icontains=search_criteria)
 
     return queryset
 
@@ -119,6 +107,15 @@ class SubscriptionAttendanceViewSet(RestrictionViewMixin,
             pk=self.kwargs.get('service_pk')
         )
         queryset = queryset.filter(event=service.event)
+
+        # filter lot category
+        lot_category_pks = [
+            lot_cat_filter.lot_category.pk
+            for lot_cat_filter in service.lot_category_filters.all()
+        ]
+
+        if lot_category_pks:
+            queryset = queryset.filter(lot__category_id__in=lot_category_pks)
 
         checkin_param = self.request.query_params.get('checkedin')
         if checkin_param is not None:
