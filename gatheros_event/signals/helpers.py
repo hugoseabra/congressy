@@ -28,19 +28,19 @@ def update_event_config_flags(event: Event):
         for feature, value in PAID_EVENT_FEATURES.items():
             setattr(feature_config, feature, value)
 
-    elif is_free_event(event):
+    elif is_free_event(event) and  \
+            feature_config.last_updated_by == feature_config.SYSTEM_USER_NAME:
 
+        event.business_status = event.EVENT_BUSINESS_STATUS_FREE
+
+        if event.event_type is not event.EVENT_TYPE_SCIENTIFIC:
+            event.event_type = event.EVENT_TYPE_FREE
+
+        for feature, value in FREE_EVENT_FEATURES.items():
+            setattr(feature_config, feature, value)
+
+    if not feature_config.feature_multi_lots:
         _deactivate_all_lotes(event)
-
-        if feature_config.last_updated_by == feature_config.SYSTEM_USER_NAME:
-
-            event.business_status = event.EVENT_BUSINESS_STATUS_FREE
-
-            if event.event_type is not event.EVENT_TYPE_SCIENTIFIC:
-                event.event_type = event.EVENT_TYPE_FREE
-
-            for feature, value in FREE_EVENT_FEATURES.items():
-                setattr(feature_config, feature, value)
 
     event.save()
     feature_config.save()
