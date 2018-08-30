@@ -122,7 +122,7 @@
     <script src="{% static 'assets/js/ajax.js' %}"></script>,
     <script>
 
-        function checkin (subscription_pk) {
+        function checkin(subscription_pk) {
             var sender = new window.cgsy.AjaxSender('{% url 'api:attendance:checkin-list' %}');
             sender.setSuccessCallback(function () {
                 Messenger().post({
@@ -131,72 +131,75 @@
                 });
             });
             sender.setFailCallback(function (err) {
-                    console.error(err);
-                    Messenger().post({
-                        message: 'Não foi possivel realizar o check-in.',
-                        type: 'danger'
-                    });
+                console.error(err);
+                Messenger().post({
+                    message: 'Não foi possivel realizar o check-in.',
+                    type: 'danger'
                 });
-            sender.send('POST',{
-                        subscription : subscription_pk,
-                        attendance_service: '{{ attendance_list.pk  }}',
-                        attended_by: '{{ request.user.get_full_name }}'
-                    } );
+            });
+            sender.send('POST', {
+                subscription: subscription_pk,
+                attendance_service: '{{ attendance_list.pk  }}',
+                attended_by: '{{ request.user.get_full_name }}'
+            });
+        }
+
+        function createCard(subscription) {
+            var status = '';
+            var card = $('#sub-card').clone();
+            card.removeAttr('id');;
+            card.find('.card-name').text(subscription['person']['name']);
+            card.find('.card_code').text(subscription['code']);
+            card.find('.card_lot').text(subscription['lot']['name']);
+            card.find('.card_category').text(subscription['lot']['category']);
+            card.find('.card_subscription_number').text(subscription['event_count']);
+            card.find('.card_email').text(subscription['person']['email']);
+            card.find('.card_status').text(subscription['status']);
+
+            if (s['status'] === 'confirmed') {
+                status = 'Confirmado <i class="fa fa-circle" ' +
+                    'style="color:#5cb85c"></i>';
+
+                if (s['attendance_status'] === false) {
+                    card.find('.card-header').css('background-color', '#d0021b');
+                    card.find('.card-button').text('Realizar Check-in');
+                    card.find('.card-button').addClass('btn-success');
+                    card.find('.card-button').removeClass('btn-danger');
+                    card.find('.card-button').attr('onclick', 'checkin("' + subscription["uuid"] + '")');
+
+                }
+                else {
+                    card.find('.card-header').css('background-color', '#27ae60')
+                    card.find('.card-button').text('Realizar Check-out');
+                    card.find('.card-button').addClass('btn-danger');
+
+
+                }
+            }
+            else {
+                card.find('.card-header').css('background-color', '#1f7bb6');
+                card.find('.card-button').hide();
+
+                if (s['status'] === 'awaiting') {
+                    status = 'Pendente <i class="fa fa-circle" ' +
+                        'style="color:#f0ad4e"></i>';
+                }
+                else if (s['status'] === 'canceled') {
+                    status = 'Cancelado <i class="fa fa-circle" ' +
+                        'style="color:#d9534f"></i>';
+                }
+            }
+            card.find('.card_status').html(status);
+
+            $('#result_list').append(card);
+            card.show();
         }
 
         function create_result_list(res) {
             var i;
             for (i = 0; i < res.length; i++) {
                 var s = res[i];
-                var status = '';
-                var card = $('#sub-card').clone();
-                card.removeClass('sub-card');
-                card.find('.card-name').text(s['person']['name']);
-                card.find('.card_code').text(s['code']);
-                card.find('.card_lot').text(s['lot']['name']);
-                card.find('.card_category').text(s['lot']['category']);
-                card.find('.card_subscription_number').text(s['event_count']);
-                card.find('.card_email').text(s['person']['email']);
-                card.find('.card_status').text(s['status']);
-
-                if (s['status'] === 'confirmed') {
-                    status = 'Confirmado <i class="fa fa-circle" ' +
-                        'style="color:#5cb85c"></i>';
-
-                    if (s['attendance_status'] === false) {
-                        card.find('.card-header').css('background-color', '#d0021b');
-                        card.find('.card-button').text('Realizar Check-in');
-                        card.find('.card-button').addClass('btn-success');
-                        card.find('.card-button').removeClass('btn-danger');
-                        card.find('.card-button').attr('onclick', 'checkin("'+s["uuid"]+'")');
-
-                    }
-                    else {
-                        card.find('.card-header').css('background-color', '#27ae60')
-                        card.find('.card-button').text('Realizar Check-out');
-                        card.find('.card-button').addClass('btn-danger');
-
-
-                    }
-                }
-                else {
-                    card.find('.card-header').css('background-color', '#1f7bb6');
-                    card.find('.card-button').hide();
-
-                    if (s['status'] === 'awaiting') {
-                        status = 'Pendente <i class="fa fa-circle" ' +
-                            'style="color:#f0ad4e"></i>';
-                    }
-                    else if (s['status'] === 'canceled') {
-                        status = 'Cancelado <i class="fa fa-circle" ' +
-                            'style="color:#d9534f"></i>';
-                    }
-                }
-                card.find('.card_status').html(status);
-
-                $('#result_list').append(card);
-                card.show();
-
+                createCard(s);
 
             }
 
@@ -220,7 +223,6 @@
                 success: function (res) {
                     $('#result_list').empty();
                     create_result_list(res);
-                    //$('#searchBar').hide('slow');
                     $('#results').show();
                 }
             }).fail(function (err) {
