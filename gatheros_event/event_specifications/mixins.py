@@ -79,3 +79,37 @@ class LotCompositeSpecificationMixin(CompositeSpecification):
     def is_satisfied_by(self, lot: Lot):
         self._is_lot_instance(lot)
         return super().is_satisfied_by(lot)
+
+
+class ProductCompositeSpecificationMixin(CompositeSpecification):
+    """
+        Esse mixin que garante que o candidato repassado via o metodo
+        'is_satisfied_by' seja uma instancia de Product, além de oferecer uns
+        metodos privados que são compartilhados por seus filhos
+    """
+
+    @staticmethod
+    def _is_product_instance(product):
+        if not isinstance(product, Product):
+            raise ValueError('product não é uma instancia de Product')
+
+    def is_satisfied_by(self, product: Product):
+        self._is_product_instance(product)
+        return super().is_satisfied_by(product)
+
+
+class ServiceCompositeSpecificationMixin(CompositeSpecification):
+    """
+        Esse mixin que garante que o candidato repassado via o metodo
+        'is_satisfied_by' seja uma instancia de Service, além de oferecer uns
+        metodos privados que são compartilhados por seus filhos
+    """
+
+    @staticmethod
+    def _is_service_instance(service):
+        if not isinstance(service, Service):
+            raise ValueError('service não é uma instancia de Service')
+
+    def is_satisfied_by(self, service: Service):
+        self._is_service_instance(service)
+        return super().is_satisfied_by(service)

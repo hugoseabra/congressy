@@ -1,10 +1,15 @@
 from decimal import Decimal
 
+from addon.models import Product, Service
 from core.specification import AndSpecification
 from gatheros_event.models import Event
 from gatheros_subscription.models import Lot
-from .mixins import EventCompositeSpecificationMixin, \
-    LotCompositeSpecificationMixin
+from .mixins import (
+    EventCompositeSpecificationMixin,
+    LotCompositeSpecificationMixin,
+    ProductCompositeSpecificationMixin,
+    ServiceCompositeSpecificationMixin,
+)
 from .visible import LotVisible
 
 
@@ -40,34 +45,65 @@ class LotPayable(LotCompositeSpecificationMixin):
     def is_satisfied_by(self, lot: Lot):
         super().is_satisfied_by(lot)
 
-        if lot.price and lot.price > 0:
-            return True
+        paid_service_or_product_flag = False
 
         # Products
         all_products = self._get_active_products_in_lot(lot)
         for product in all_products:
 
-            if not product.running:
-                continue
-
-            if product.has_quantity_conflict or \
-                    product.has_sub_end_date_conflict:
-                continue
-            if product.price > Decimal(0.00):
-                return True
+            if ProductPayable().is_satisfied_by(product):
+                paid_service_or_product_flag = True
 
         # Services
         all_services = self._get_active_services_in_lot(lot)
         for service in all_services:
 
-            if not service.running:
-                continue
+            if ServicePayable().is_satisfied_by(service):
+                paid_service_or_product_flag = True
 
-            if service.has_quantity_conflict or \
-                    service.has_sub_end_date_conflict:
-                continue
+        if not paid_service_or_product_flag and not lot.price or lot.price == 0:
+            return False
 
-            if service.price > Decimal(0.00):
-                return True
+        return True
 
-        return False
+
+class ProductPayable(ProductCompositeSpecificationMixin):
+    """
+        Essa especificação informa se o  produto é possivel ser pago
+    """
+
+    def is_satisfied_by(self, product: Product):
+        super().is_satisfied_by(product)
+
+        if not product.running:
+            return False
+
+        if product.has_quantity_conflict or \
+                product.has_sub_end_date_conflict:
+            return False
+
+        if product.price == Decimal(0.00):
+            return False
+
+        return True
+
+
+class ServicePayable(ServiceCompositeSpecificationMixin):
+    """
+        Essa especificação informa se o serviço é possivel ser pago
+    """
+
+    def is_satisfied_by(self, service: Service):
+        super().is_satisfied_by(service)
+
+        if not service.running:
+            return False
+
+        if service.has_quantity_conflict or \
+                service.has_sub_end_date_conflict:
+            return False
+
+        if service.price == Decimal(0.00):
+            return False
+
+        return True
