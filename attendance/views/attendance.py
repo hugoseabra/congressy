@@ -99,12 +99,34 @@ from gatheros_subscription.models import Subscription
 
 class AttendancePageSearchView(generic.TemplateView):
     template_name = 'attendance/attendance.html'
+    object = None
+    event = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = AttendanceService.objects.get(pk=self.kwargs.get('pk'))
+        self.event = Event.objects.get(pk=self.kwargs.get('event_pk'))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_lot_categories(self):
+        items = []
+        lc_filter_pks = []
+        for item in AttendanceCategoryFilter.objects.filter(
+                attendance_service_id=self.object.pk):
+            lc_filter_pks.append(item.lot_category_id)
+
+        for lc in self.event.lot_categories.all().order_by('name'):
+            items.append({
+                'name': lc.name
+            })
+
+        return items
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['event'] = Event.objects.get(pk=self.kwargs.get('event_pk'))
+        context['event'] = self.event
         context['attendance_list'] = AttendanceService.objects.get(
             pk=self.kwargs.get('pk'))
+        context['lot_categories'] = self.get_lot_categories()
 
         return context
 

@@ -30,8 +30,60 @@
                     <div class="panel-title">Realizar Checkin</div>
                 </div>
                 <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-10 col-sm-10 col-xs-9 col-lg-11 col-xl-11">
+                            <div class="input-group input-group-lg">
+                                <div class="input-group-btn">
+                                    <button type="button"
+                                            class="btn btn-default dropdown-toggle"
+                                            data-toggle="dropdown"
+                                            aria-haspopup="true"
+                                            aria-expanded="false"><i
+                                            class="far fa-keyboard"></i>
+                                            Teclado
+                                        <span
+                                                class="caret"></span></button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#"><i
+                                                class="far fa-keyboard"></i>
+                                                Teclado
+                                        </a></li>
+                                        <li><a href="#"><i
+                                                class="fas fa-qrcode"></i>
+                                                QrCode
+                                        </a></li>
+                                        <li><a href="#"><i
+                                                class="fas fa-barcode"></i>
+                                                Cód. Barra
+                                        </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <input id="search" type="text" class="form-control"
+                                       aria-label="...">
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-2 col-xs-3 col-lg-1 col-xl-1"
+                             style="padding-left: 0">
+                            <button id="submit" type="button"
+                                    class="btn
+                        btn-lg btn-primary btn-3d"
+                                    id="searchBtn"
+                                    style="margin-left: 5px">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div><!-- /input-group -->
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h3>Categorias:
+                            {% for cat in lot_categories %}
+                                 <span class="badge badge-primary">{{ cat.name }}</span>
+                            {% endfor %}
+                            </h3>
+                        </div>
+                    </div>
                     <div id="cards-list"></div>
-
                 </div>
             </div>
         </div>
@@ -44,44 +96,16 @@
     <script src="{% static 'assets/js/ajax.js' %}"></script>,
     <script src="{% static 'assets/js/attendance/attendance.js' %}"></script>,
     <script>
-        var collection, attendance, subscription, subscription2, card, card2, attendance_list;
-        $(document).ready(function() {
-            collection = new window.cgsy.attendance.SubscriptionCollection(
-                '{% url 'api:attendance:subscription-list' attendance_list.pk %}'
+        $(document).ready(function () {
+            var typingSearch = new window.cgsy.attendance.TypingSearch(
+                '{{ attendance_list.pk }}',
+                '{{ request.user.get_full_name }}',
+                '{% url 'api:attendance:subscription-list' attendance_list.pk %}',
+                $('#search'),
+                $('#submit'),
+                $('#cards-list')
             );
-            collection.fetch('LU').then(function() {
-                console.log(collection);
-            });
-
-
-{#            subscription = new window.cgsy.attendance.Subscription(#}
-{#                '97a7c7fb-84b2-4b9f-9a98-dcadad012981'#}
-{#            );#}
-{#            subscription2 = new window.cgsy.attendance.Subscription(#}
-{#                '15c01d8b-487b-4a2a-9f9f-9d86d314a6a2'#}
-{#            );#}
-{#            subscription.setUri('{% url 'api:attendance:subscription-list' attendance_list.pk %}:pk/');#}
-{#            subscription2.setUri('{% url 'api:attendance:subscription-list' attendance_list.pk %}:pk/');#}
-{##}
-{#            attendance = new window.cgsy.attendance.Attendance(#}
-{#                '{% url 'api:attendance:checkin-list' %}',#}
-{#                '{% url 'api:attendance:checkout-list' %}'#}
-{#            );#}
-{##}
-{#            subscription.fetch({{ attendance_list.pk }}, 'Hugo').then(function() {#}
-{##}
-{#                subscription2.fetch({{ attendance_list.pk }}, 'Hugo').then(function() {#}
-{##}
-{#                    card = new window.cgsy.attendance.Card(subscription, attendance);#}
-{#                    card2 = new window.cgsy.attendance.Card(subscription2, attendance);#}
-{##}
-{#                    attendance_list = new window.cgsy.attendance.List(1, 'Hugo');#}
-{#                    attendance_list.addCard(card);#}
-{#                    attendance_list.addCard(card2);#}
-{#                    attendance_list.render($('#cards-list'));#}
-{#                });#}
-{#            });#}
-
+            typingSearch.bindSubmitEvent()
         });
     </script>
 

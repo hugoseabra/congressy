@@ -442,6 +442,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             var button = $('<button>').addClass('btn btn-trans').css({
                 'margin-top': '5px',
                 'border-radius': '25px'
+
             });
 
             console.log('4. Status de inscrição do card: ' + subscription.attendance_status);
@@ -503,13 +504,13 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                 card_html +=               "<div class=\"col-md-7 text-center\">";
                 card_html +=                   "<h3 style=\"padding-bottom: 5px\">";
                 card_html +=                       "<i class=\"fas fa-barcode\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"código da inscrição\"></i>";
-                card_html +=                       "<span>"+subscription.code+"</span>";
+                card_html +=                       "<span> "+subscription.code+"</span>";
                 card_html +=                   "</h3>";
                 card_html +=               "</div>";
                 card_html +=               "<div class=\"col-md-5 text-center\">";
                 card_html +=                   "<h3 style=\" padding-bottom: 5px\">";
                 card_html +=                       "<i class=\"fas fa-list-ol\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Número da Inscrição\"></i>";
-                card_html +=                       "<span>"+subscription.event_count+"</span>";
+                card_html +=                       "<span> "+subscription.event_count+"</span>";
                 card_html +=                   "</h3>";
                 card_html +=               "</div>";
                 card_html +=           "</div>";
@@ -518,19 +519,19 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                 card_html +=                   "<div style=\"height: 0.5px;width: 100%; background-color: #e6e6e6; margin-top: 10px; margin-bottom: 10px\"></div>";
                 card_html +=                   "<h3 style=\"padding-bottom: 5px\" >";
                 card_html +=                       "<i class=\"far fa-envelope\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Email\"></i>";
-                card_html +=                       "<span>"+subscription.email+"</span>";
+                card_html +=                       "<span> "+subscription.email+"</span>";
                 card_html +=                   "</h3>";
                 card_html +=                   "<h3 style=\"padding-bottom: 5px\" >";
                 card_html +=                       "<i class=\"fas fa-th-list\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Categoria\"></i>";
-                card_html +=                       "<span>"+subscription.category_name+"</span>";
+                card_html +=                       "<span> "+subscription.category_name+"</span>";
                 card_html +=                   "</h3>";
                 card_html +=                   "<h3 style=\"padding-bottom: 5px\" >";
                 card_html +=                       "<i class=\"fas fa-th-large\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Lote\"></i>";
-                card_html +=                       "<span>"+subscription.lot_name+"</span>";
+                card_html +=                       "<span> "+subscription.lot_name+"</span>";
                 card_html +=                   "</h3>";
                 card_html +=                   "<h3 style=\"padding-bottom: 5px\" >";
                 card_html +=                       "<i class=\"far fa-id-badge\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Status\"></i>";
-                card_html +=                       "<span>"+status_text+" <i class=\"fa fa-circle\" style=\"color:"+status_pointer_color+"\"></i></span>";
+                card_html +=                       "<span> "+status_text+" <i class=\"fa fa-circle\" style=\"color:"+status_pointer_color+"\"></i></span>";
                 card_html +=                   "</h3>";
                 card_html +=                   "<div style=\" text-align: center\">"+button.prop('outerHTML')+"<div>";
                 card_html +=               "</div>";
@@ -553,6 +554,9 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                         button.on('click', function() {
                             console.log('0. trigger checkout.');
 
+                            var button_text = button.text();
+                            button.attr('disabled', '');
+                            button.text('Aguarde...');
                             attendance.checkout(
                                 service_pk,
                                 subscription,
@@ -560,6 +564,9 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                             ).then(function() {
                                 console.log('3. recriando card.');
                                 self.create_card_el(service_pk, created_by);
+
+                                button.removeAttr('disabled');
+                                button.text(button_text);
                             });
                         });
                         break;
@@ -567,7 +574,9 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     case STATUS_NOT_CHECKED:
                         button.on('click', function() {
                             console.log('0. trigger checkin.');
-
+                            var button_text = button.text();
+                            button.attr('disabled', '');
+                            button.text('Aguarde...');
                             attendance.checkin(
                                 service_pk,
                                 subscription,
@@ -575,6 +584,8 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                             ).then(function() {
                                 console.log('3. recriando card.');
                                 self.create_card_el(service_pk, created_by);
+                                button.removeAttr('disabled');
+                                button.text(button_text);
                             });
                         });
                         break;
@@ -617,12 +628,48 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 })(jQuery, window.cgsy.attendance);
 
 // ==========================================================================//
-// KEYBOARD SEARCH
+// TYPING SEARCH
 // ==========================================================================//
-(function (AjaxSender, attendance) {
+(function ($, attendance, AjaxSender, List, subscriptionCollection ) {
 
-    attendance.KeyboardSearch = function(attendance, attendance_list, subscription_uri) {
+    attendance.TypingSearch = function(service_pk, created_by, subscription_uri, input_el, submit_el, output_el) {
+        var typingInput;
+        var subscriptions;
+        var self = this;
+        input_el = $(input_el);
+        submit_el = $(submit_el);
 
+        var getTypingInput = function () {
+            self.typingInput = input_el.val();
+        };
+
+        var getSubscriptionCollection = function () {
+            console.log(self.typingInput);
+            var SubscriptionCollection = new subscriptionCollection(subscription_uri);
+            SubscriptionCollection.fetch(self.typingInput).then(function () {
+                self.subscriptions = SubscriptionCollection;
+            });
+        };
+
+        var renderCards = function () {
+            var cardList = new List(service_pk, created_by);
+            cardList.render(output_el);
+        };
+
+        var search = function () {
+            getTypingInput();
+            getSubscriptionCollection();
+            renderCards();
+        };
+
+        this.bindSubmitEvent = function () {
+            submit_el.click(function () {
+                search();
+            })
+        }
+
+        
+         
     };
 
-})(window.cgsy.AjaxSender, window.cgsy.attendance);
+})(jQuery,window.cgsy.attendance,  window.cgsy.AjaxSender, window.cgsy.attendance.List, window.cgsy.attendance.SubscriptionCollection);
