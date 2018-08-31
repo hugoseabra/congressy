@@ -9,7 +9,7 @@ class Attendance(models.Model):
         abstract = True
         ordering = ['created_on']
 
-        indexes = [models.Index(fields=['attended_by', ])]
+        indexes = [models.Index(fields=['created_by', ])]
 
     created_on = models.DateTimeField(
         verbose_name='imprimiu a etiqueta em',
@@ -18,7 +18,7 @@ class Attendance(models.Model):
         auto_now_add=True,
     )
 
-    attended_by = models.CharField(
+    created_by = models.CharField(
         max_length=255,
         verbose_name='criado por'
     )

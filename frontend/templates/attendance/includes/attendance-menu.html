@@ -1,33 +1,29 @@
-<div class="col-md-2 col-sm-12" id="compose-wrapper">
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <div class="panel-title">Atendimento</div>
-        </div>
-        <div class="panel-body">
-
-            <ul class="nav nav-stacked compose-nav">
-
-                <li {% if active == 'dashboard' %}class="active" {% endif %}>
-                    <a href="{% url 'attendance:dashboard' event.pk attendance_list.pk %}">
-                        Painel de Check-in
-                    </a>
-                </li>
-                <li {% if active == 'checkin' %}class="active" {% endif %}>
-                    <a href="{% url 'attendance:attendance' event.pk attendance_list.pk %}">
-                        Check-in
-                    </a>
-                </li>
-                <li {% if active == 'credenciados' %}class="active" {% endif %}>
-                    <a href="{% url 'attendance:checkin-list' event.pk attendance_list.pk %}">Credenciados</a>
-                </li>
-            </ul>
-            <a href="{% url 'attendance:manage-list-attendance' event.pk %}"
-               class="btn btn-primary btn-block">
-                <i class="fas fa-arrow-circle-left"></i>
-                Voltar
-            </a>
-        </div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <div class="panel-title">Atendimento</div>
     </div>
+    <div class="panel-body">
 
+        <ul class="nav nav-stacked compose-nav">
 
+            <li {% if active == 'dashboard' %}class="active" {% endif %}>
+                <a href="{% url 'attendance:dashboard' event.pk attendance_list.pk %}">
+                    Painel de Check-in
+                </a>
+            </li>
+            <li {% if active == 'checkin' %}class="active" {% endif %}>
+                <a href="{% url 'attendance:attendance' event.pk attendance_list.pk %}">
+                    Check-in
+                </a>
+            </li>
+            <li {% if active == 'credenciados' %}class="active" {% endif %}>
+                <a href="{% url 'attendance:checkin-list' event.pk attendance_list.pk %}">Credenciados</a>
+            </li>
+        </ul>
+        <a href="{% url 'attendance:manage-list-attendance' event.pk %}"
+           class="btn btn-primary btn-block">
+            <i class="fas fa-arrow-circle-left"></i>
+            Voltar
+        </a>
+    </div>
 </div>

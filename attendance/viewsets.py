@@ -56,7 +56,9 @@ def search_subscriptions(service, queryset, search_criteria):
         return cnpf_query
 
     # Filter by name
-    queryset = queryset.filter(person__name__icontains=search_criteria)
+    queryset = queryset.filter(
+        person__name__icontains=str(search_criteria).lower()
+    )
 
     return queryset
 

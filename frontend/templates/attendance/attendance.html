@@ -10,313 +10,79 @@
     Realize o credenciamento de inscritos confirmando sua presença no evento.
 {% endblock %}
 
-{% block extrascript %}
-    <script type="text/javascript">
-        function configure_input(field_name) {
-            var input = document.getElementById('search_input');
-            var size;
-            switch (field_name) {
-                case 'code':
-                    size = 10;
-                    input.setAttribute('type', 'search');
-                    break;
-                case 'email':
-                    input.setAttribute('type', 'email');
-                    size = 40;
-                    break;
-                default:
-                    input.setAttribute('type', 'search');
-                    size = 60;
-            }
-
-            input.setAttribute('size', size);
-            input.focus();
-            {% if search_by == 'code' and result %}
-                document.getElementById('registration_button').focus();
-            {% else %}
-                input.focus();
-            {% endif %}
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            configure_input('{{ search_by }}');
-
-            {% if search_by == 'code' and result %}
-                window.setTimeout(function () {
-                    document.getElementById('registration_button').focus()
-                }, 500);
-            {% endif %}
-        }, false);
-    </script>
-{% endblock %}
-{% block styles %}
-    <style>
-
-        .vertical-align {
-            display: flex;
-            align-items: center;
-        }
-    </style>
-{% endblock %}
+{% block styles %}{% endblock %}
 
 {% block pageheader %}
     <div class="pageheader">
-        <h1>Credenciamento</h1>
+        <h1>Mudar título</h1>
     </div>
 {% endblock %}
 
 
 {% block content %}
-
     <div class="row">
-        {% include 'attendance/includes/attendance-menu.html' with active='checkin' %}
+        <div class="col-md-2 col-sm-12" id="compose-wrapper">
+            {% include 'attendance/includes/attendance-menu.html' with active='checkin' %}
+        </div>
         <div class="col-md-10">
-
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <div class="panel-title">Realizar Checkin</div>
                 </div>
                 <div class="panel-body">
-                    <div id="searchBar">
-                        <form onsubmit="search();return false;">
-                            <div class="vertical-align">
-                                <span style="font-size: 30px"></span>
-                                <input id="searchBarInput" type="text"
-                                       list="recent_searches"
-                                       style="width: 100%;
-                    font-size:30px ">
-                                <datalist id="recent_searches">
-                                </datalist>
-
-                                <button type="button" onclick="search()"
-                                        class="btn
-                        btn-lg btn-primary btn-3d"
-                                        id="searchBtn"
-                                        style="margin-left: 5px">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </form>
-
-
-                    </div>
-                    <div id="results" style="display: none; margin-top: 25px">
-                        <div id="result_list">
-                        </div>
-
-                    </div>
-                    {% include 'attendance/includes/attendance-card.html' %}
+                    <div id="cards-list"></div>
 
                 </div>
             </div>
         </div>
-
     </div>
 
 
 {% endblock %}
 
 {% block scripts %}
-
-    <script src="{% static 'assets/js/vendor/moment.js' %}"></script>,
     <script src="{% static 'assets/js/ajax.js' %}"></script>,
+    <script src="{% static 'assets/js/attendance/attendance.js' %}"></script>,
     <script>
-
-        function checkin(subscription_pk) {
-            var sender = new window.cgsy.AjaxSender('{% url 'api:attendance:checkin-list' %}');
-            sender.setSuccessCallback(function () {
-                Messenger().post({
-                    message: 'Check-in realizado com sucesso!',
-                    type: 'success'
-                });
-            });
-            sender.setFailCallback(function (err) {
-                console.error(err);
-                Messenger().post({
-                    message: 'Não foi possivel realizar o check-in.',
-                    type: 'danger'
-                });
-            });
-            sender.send('POST', {
-                subscription: subscription_pk,
-                attendance_service: '{{ attendance_list.pk  }}',
-                attended_by: '{{ request.user.get_full_name }}'
-            });
-        }
-
-        function createCard(subscription) {
-            var status = '';
-            var card = $('#sub-card').clone();
-            card.removeAttr('id');;
-            card.find('.card-name').text(subscription['person']['name']);
-            card.find('.card_code').text(subscription['code']);
-            card.find('.card_lot').text(subscription['lot']['name']);
-            card.find('.card_category').text(subscription['lot']['category']);
-            card.find('.card_subscription_number').text(subscription['event_count']);
-            card.find('.card_email').text(subscription['person']['email']);
-            card.find('.card_status').text(subscription['status']);
-
-            if (s['status'] === 'confirmed') {
-                status = 'Confirmado <i class="fa fa-circle" ' +
-                    'style="color:#5cb85c"></i>';
-
-                if (s['attendance_status'] === false) {
-                    card.find('.card-header').css('background-color', '#d0021b');
-                    card.find('.card-button').text('Realizar Check-in');
-                    card.find('.card-button').addClass('btn-success');
-                    card.find('.card-button').removeClass('btn-danger');
-                    card.find('.card-button').attr('onclick', 'checkin("' + subscription["uuid"] + '")');
-
-                }
-                else {
-                    card.find('.card-header').css('background-color', '#27ae60')
-                    card.find('.card-button').text('Realizar Check-out');
-                    card.find('.card-button').addClass('btn-danger');
-
-
-                }
-            }
-            else {
-                card.find('.card-header').css('background-color', '#1f7bb6');
-                card.find('.card-button').hide();
-
-                if (s['status'] === 'awaiting') {
-                    status = 'Pendente <i class="fa fa-circle" ' +
-                        'style="color:#f0ad4e"></i>';
-                }
-                else if (s['status'] === 'canceled') {
-                    status = 'Cancelado <i class="fa fa-circle" ' +
-                        'style="color:#d9534f"></i>';
-                }
-            }
-            card.find('.card_status').html(status);
-
-            $('#result_list').append(card);
-            card.show();
-        }
-
-        function create_result_list(res) {
-            var i;
-            for (i = 0; i < res.length; i++) {
-                var s = res[i];
-                createCard(s);
-
-            }
-
-        }
-
-        function search() {
-
-            $('.res').remove();
-            $('#results').hide();
-
-            var raw_query = $('#searchBarInput').val();
-            var query = '?search=' + raw_query;
-
-            var option = document.createElement('option');
-            option.setAttribute('value', raw_query);
-            $('#recent_searches').append(option);
-
-            $.ajax({
-                url: '{% url 'api:attendance:subscription-list' attendance_list.pk %}' + query,
-                type: 'GET',
-                success: function (res) {
-                    $('#result_list').empty();
-                    create_result_list(res);
-                    $('#results').show();
-                }
-            }).fail(function (err) {
-                console.error(err);
+        var collection, attendance, subscription, subscription2, card, card2, attendance_list;
+        $(document).ready(function() {
+            collection = new window.cgsy.attendance.SubscriptionCollection(
+                '{% url 'api:attendance:subscription-list' attendance_list.pk %}'
+            );
+            collection.fetch('LU').then(function() {
+                console.log(collection);
             });
 
-        }
 
+{#            subscription = new window.cgsy.attendance.Subscription(#}
+{#                '97a7c7fb-84b2-4b9f-9a98-dcadad012981'#}
+{#            );#}
+{#            subscription2 = new window.cgsy.attendance.Subscription(#}
+{#                '15c01d8b-487b-4a2a-9f9f-9d86d314a6a2'#}
+{#            );#}
+{#            subscription.setUri('{% url 'api:attendance:subscription-list' attendance_list.pk %}:pk/');#}
+{#            subscription2.setUri('{% url 'api:attendance:subscription-list' attendance_list.pk %}:pk/');#}
+{##}
+{#            attendance = new window.cgsy.attendance.Attendance(#}
+{#                '{% url 'api:attendance:checkin-list' %}',#}
+{#                '{% url 'api:attendance:checkout-list' %}'#}
+{#            );#}
+{##}
+{#            subscription.fetch({{ attendance_list.pk }}, 'Hugo').then(function() {#}
+{##}
+{#                subscription2.fetch({{ attendance_list.pk }}, 'Hugo').then(function() {#}
+{##}
+{#                    card = new window.cgsy.attendance.Card(subscription, attendance);#}
+{#                    card2 = new window.cgsy.attendance.Card(subscription2, attendance);#}
+{##}
+{#                    attendance_list = new window.cgsy.attendance.List(1, 'Hugo');#}
+{#                    attendance_list.addCard(card);#}
+{#                    attendance_list.addCard(card2);#}
+{#                    attendance_list.render($('#cards-list'));#}
+{#                });#}
+{#            });#}
+
+        });
     </script>
-
-{% endblock %}
-
-{% block modals %}
-    <div class="modal" id="check_in_modal" tabindex="-1" role="dialog"
-         aria-labelledby="confirmModalLabel">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"
-                            aria-hidden="true">×
-                    </button>
-                    <h4 class="modal-title"
-                        id="confirmModalLabel">Confirmação de check-in</h4>
-                </div>
-                <div class="modal-body">
-
-
-                    <h3 style="font-weight: bold" id="confirmName"></h3>
-                    <h3 style="font-weight: bold" id="confirmEmail"></h3>
-                    <h3 style="font-weight: bold" id="confirmCpf"></h3>
-                    <h3 style="font-weight: bold" id="confirmCnpj"></h3>
-                    <h3 style="font-weight: bold" id="confirmCode"></h3>
-                    <input type="hidden" id="confirmPk"/>
-
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger"
-                            data-dismiss="modal">Fechar
-                    </button>
-                    <button type="button" class="btn btn-success"
-                            id="check_in_btn">
-                        Confirmar!
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal" id="check_out_modal" tabindex="-1" role="dialog"
-         aria-labelledby="unconfirmModalLabel">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"
-                            aria-hidden="true">×
-                    </button>
-                    <h4 class="modal-title"
-                        id="confirmModalLabel">Confirmação de check-out</h4>
-                </div>
-                <div class="modal-body">
-
-                    <h2 class="danger-color">
-                        <i class="fas fa-exclamation-triangle
-                        fa-1x"></i> Atenção! <i class="fas
-                        fa-exclamation-triangle
-                        fa-1x"></i>
-                    </h2>
-                    <h2 style="margin-top: 5px" class="danger-color">
-                        Você está prestes a realizar o check-out do
-                        seguinte participante:
-                    </h2>
-
-
-                    <h3 style="font-weight: bold; margin-top: 25px"
-                        id="unconfirmName"></h3>
-                    <h3 style="font-weight: bold" id="unconfirmEmail"></h3>
-                    <h3 style="font-weight: bold" id="unconfirmCpf"></h3>
-                    <h3 style="font-weight: bold" id="unconfirmCnpj"></h3>
-                    <h3 style="font-weight: bold" id="unconfirmCode"></h3>
-                    <input type="hidden" id="unconfirmPk"/>
-
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success"
-                            id="check_out_btn">
-                        Confirmar!
-                    </button>
-                    <button type="button" class="btn btn-danger"
-                            data-dismiss="modal">Fechar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
 {% endblock %}
