@@ -4,11 +4,11 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import generic
 
-from gatheros_subscription.views.subscription import EventViewMixin
+from gatheros_subscription.views.subscription import SubscriptionViewMixin
 from importer.models import CSVFileConfig
 
 
-class CSVViewMixin(EventViewMixin):
+class CSVViewMixin(SubscriptionViewMixin):
     """
         Mixin utilizado para não permitir acesso sem determinada flag ativada.
     """
