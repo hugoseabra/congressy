@@ -6,6 +6,8 @@ window.cgsy = window.cgsy || {};
 
         url = url || window.location.href;
 
+        var beforeSendCallback = function() {};
+
         var success_callback = function () {
         };
         var default_fail_callback = function (response) {
@@ -47,14 +49,31 @@ window.cgsy = window.cgsy || {};
         }
 
         this.setSuccessCallback = function (callback) {
+            if (typeof callback !== 'function') {
+                console.error('Callback is not a function: ' + callback);
+                return;
+            }
             success_callback = callback
         };
 
         this.setFailCallback = function (callback) {
+            if (typeof callback !== 'function') {
+                console.error('Callback is not a function: ' + callback);
+                return;
+            }
+
             fail_callback = function (response) {
                 callback(response);
                 default_fail_callback(response);
             }
+        };
+
+        this.setBeforeSendCallback = function(callback) {
+            if (typeof callback !== 'function') {
+                console.error('Callback is not a function: ' + callback);
+                return;
+            }
+            beforeSendCallback = callback;
         };
 
         this.send = function (method, data) {
@@ -71,6 +90,8 @@ window.cgsy = window.cgsy || {};
                     if (!csrfSafeMethod(settings.type)) {
                         xhr.setRequestHeader("X-CSRFToken", csrftoken);
                     }
+
+                    beforeSendCallback();
                 },
                 success: success_callback,
                 error: fail_callback
