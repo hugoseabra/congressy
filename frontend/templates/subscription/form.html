@@ -41,7 +41,7 @@
 
             var dateInput = $('#id_person-birth_date');
             if (dateInput.length) {
-                var birthDate = createDatePicker();
+                var birthDate = createDatePicker(dateInput);
                 birthDate.data("DateTimePicker").minDate(false);
                 birthDate.data("DateTimePicker").useCurrent(false);
                 var datePerson = dateInput.attr('value');
@@ -58,9 +58,6 @@
                 radioClass: 'iradio_flat-grey'
             });
 
-
-            $('#id_person-phone').mask("(99) 99999-9999");
-            $('#id_person-zip_code').mask("99999-999");
 
             hotsiteShowHideCepLoader();
 
@@ -80,6 +77,9 @@
                     city_el.prop('disabled', true);
                 {% endif %}
             }, 300);
+
+            $('#id_person-phone').mask("(99) 99999-9999");
+            zip_code_el.mask("99999-999");
 
             $('#id_state').change(function () {
                 city_el.html($('<option>').text('Carregando...'));
