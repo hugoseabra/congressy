@@ -8,6 +8,12 @@
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'assets/plugins/icheck/css/all.css' %}">
+
+    <!-- Select2 lib -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
+    <!-- Select2 theme -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2-bootstrap4.min.css' %}">
+
     <link rel="stylesheet"
           href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
 {% endblock %}
@@ -33,6 +39,8 @@
     <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
 
     <script src="{% static 'assets/js/date-time.js' %}"></script>
+    <!-- Select2 lib -->
+    <script src="{% static 'assets/plugins/select2/js/select2.min.js' %}"></script>
 
 
     <script type="application/javascript">
@@ -59,9 +67,6 @@
             });
 
 
-            $('#id_person-phone').mask("(99) 99999-9999");
-            $('#id_person-zip_code').mask("99999-999");
-
             hotsiteShowHideCepLoader();
 
             var uf_el = $('#id_person-state');
@@ -81,6 +86,9 @@
                 {% endif %}
             }, 300);
 
+            $('#id_person-phone').mask("(99) 99999-9999");
+            zip_code_el.mask("99999-999");
+
             $('#id_state').change(function () {
                 city_el.html($('<option>').text('Carregando...'));
                 var that = $(this);
@@ -95,6 +103,12 @@
 
             $('#id_zip_code').on('keyup', function () {
                 searchByCep();
+            });
+        
+            // Starting select2
+            $('#id_subscription-lot').select2({
+                theme: "bootstrap4",
+                width: 'resolve'
             });
 
         });
@@ -160,17 +174,49 @@
                                         {% if not allow_edit_lot %}disabled=""{% endif %}
                                         onchange="window.location.href=window.location.pathname+'?lot='+$(this).val()">
                                     {% if not selected_lot %}
-                                        <option value="">- Selecione -</option>
+                                        <option value="" disabled="disabled" selected="selected">- Selecione -</option>
                                     {% endif %}
-                                    {% for lot in lots %}
+                                    {% for lot in running_lots %}
                                         <option value="{{ lot.pk }}"
-                                                {% if selected_lot and selected_lot == lot.pk %}selected="selected"{% endif %}>{{ lot.display_publicly }}
-                                            -
-                                            até: {{ lot.date_end|date:'d/m/Y H\hi' }}
-                                            {% if lot.private %}
-                                                <small>(privado)
-                                                </small>{% endif %}</option>
+                                                {% if selected_lot and selected_lot == lot.pk %}selected="selected"{% endif %}>
+                                            {{ lot.display_publicly }} - até: {{ lot.date_end|date:'d/m/Y H\hi' }}
+                                            <small>
+                                                {% if lot.private %}
+                                                    (Em andamento e privado)
+                                                {% else %}
+                                                    (Em andamento)
+                                                {% endif %}
+                                            </small>
+                                        </option>
                                     {% endfor %}
+                                    {% for lot in stopped_lots %}
+                                        <option value="{{ lot.pk }}"
+                                                {% if selected_lot and selected_lot == lot.pk %}selected="selected"{% endif %}>
+                                            {{ lot.display_publicly }} - até: {{ lot.date_end|date:'d/m/Y H\hi' }}
+                                            <small>
+                                                {% if lot.private %}
+                                                    (Encerrado e privado)
+                                                {% else %}
+                                                    (Encerrado)
+                                                {% endif %}
+                                            </small>
+                                        </option>
+                                    {% endfor %}
+                                    {% for lot in future_lots %}
+                                        <option value="{{ lot.pk }}"
+                                                {% if selected_lot and selected_lot == lot.pk %}selected="selected"{% endif %}>
+                                            {{ lot.display_publicly }} - até: {{ lot.date_end|date:'d/m/Y H\hi' }}
+                                            <small>
+                                                {% if lot.private %}
+                                                    (Não-iniciado e privado)
+                                                {% else %}
+                                                    (Não-iniciado)
+                                                {% endif %}
+                                            </small>
+                                        </option>
+                                    {% endfor %}
+
+
                                 </select>
                             </div>
                         </div>
