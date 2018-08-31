@@ -601,6 +601,24 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
         survey_form = kwargs.pop('survey_form', None)
 
         context = super().get_context_data(**kwargs)
+        context['running_lots'] = [
+            lot
+            for lot in self.get_lots()
+            if lot.status == lot.LOT_STATUS_RUNNING
+               or (self.subscription and self.subscription.lot == lot)
+        ]
+        context['stopped_lots'] = [
+            lot
+            for lot in self.get_lots()
+            if lot.status == lot.LOT_STATUS_FINISHED
+               or (self.subscription and self.subscription.lot == lot)
+        ]
+        context['future_lots'] = [
+            lot
+            for lot in self.get_lots()
+            if lot.status == lot.LOT_STATUS_NOT_STARTED
+               or (self.subscription and self.subscription.lot == lot)
+        ]
 
         if context['selected_lot'] != 0:
             try:
@@ -1109,7 +1127,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
                 for transaction in subscription.transactions.all():
                     if transaction.status == transaction.WAITING_PAYMENT and \
-                                    transaction.type == 'boleto':
+                            transaction.type == 'boleto':
                         return True
 
         return False
