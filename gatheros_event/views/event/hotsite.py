@@ -5,7 +5,7 @@ from django.views.generic import FormView
 
 from gatheros_event import forms
 from gatheros_event.helpers.account import update_account
-from gatheros_event.helpers.event_business import event_has_had_payment
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event, Info
 from gatheros_event.views.mixins import AccountMixin
 
@@ -78,7 +78,7 @@ class EventHotsiteView(AccountMixin, FormView):
         context['active'] = 'pagina-do-evento'
         context['event'] = event
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
-        context['event_has_had_payments'] = event_has_had_payment(event)
+        context['is_paid_event'] = is_paid_event(event)
 
         try:
             context['info'] = event.info

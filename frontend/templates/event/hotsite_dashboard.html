@@ -394,7 +394,7 @@
                 <i class="fab fa-wpforms"></i> Formulário
             </a>
         </li>
-        {% if has_paid_lots %}
+        {% ifis_paid_event %}
             <li>
                 <a href="{% url 'payment:event-payments' event.pk %}"
                    title="Pagamentos">

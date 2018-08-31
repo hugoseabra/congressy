@@ -19,7 +19,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from gatheros_event.helpers.account import update_account
-from gatheros_event.helpers.event_business import event_has_had_payment
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
 from mailer import exception as mailer_notification
@@ -155,7 +155,7 @@ class EventPaymentView(AccountMixin, ListView):
         context['totals'] = self._get_payables()
         context['has_inside_bar'] = True
         context['active'] = 'pagamentos'
-        context['event_has_had_payments'] = event_has_had_payment(self.event)
+        context['is_paid_event'] = is_paid_event(self.event)
 
         return context
 

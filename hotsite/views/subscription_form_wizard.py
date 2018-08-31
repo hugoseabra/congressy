@@ -1,12 +1,9 @@
-import os
 from datetime import datetime
 from decimal import Decimal
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
-# from django.core.files.storage import FileSystemStorage
-from gatheros_event.event_specifications import EventPayable
 from django.db.transaction import atomic
 from django.forms import ValidationError
 from django.http import QueryDict
@@ -16,6 +13,7 @@ from django.utils.translation import ugettext as _
 from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event, Person
 from gatheros_subscription.models import FormConfig, Lot, Subscription
 from hotsite import forms
@@ -450,7 +448,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and
-                    self.storage.current_step is not None):
+                self.storage.current_step is not None):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
 
@@ -717,7 +715,7 @@ class SubscriptionWizardView(SessionWizardView):
             except AttributeError:
                 config = FormConfig()
 
-            if EventPayable().is_satisfied_by(self.event):
+            if is_paid_event(self.event):
                 config.email = True
                 config.phone = True
                 config.city = True

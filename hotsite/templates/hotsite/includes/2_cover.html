@@ -93,7 +93,7 @@
                         <div class="hero-features-right col-md-5"
                              data-animation="fadeIn">
                             {% if subscription_enabled and not subscription_finished %}
-                                {% if has_paid_lots and not has_active_bank_account %}
+                                {% if is_paid_event and not has_active_bank_account %}
                                     <p style="position: relative;font-size: 20px;font-style: italic;padding: 10px 0 25px;">
                                         Evento está sendo configurado, volte em
                                         breve para realizar sua inscrição!</p>
@@ -155,7 +155,7 @@
                             <div class="hero-features-right col-md-5"
                                  data-animation="fadeIn">
                                 {% if subscription_enabled and not subscription_finished %}
-                                    {% if has_paid_lots and not has_active_bank_account %}
+                                    {% if is_paid_event and not has_active_bank_account %}
                                         <p style="position: relative;font-size: 20px;font-style: italic;padding: 10px 0 25px;">
                                             Evento está sendo configurado, volte
                                             em

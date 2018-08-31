@@ -121,7 +121,7 @@
                 <i class="fa  fa-fw fa-rocket"></i> Produtos / Serviços
             </a>
         </li>
-        {% if has_paid_lots %}
+        {% if is_paid_event %}
             <li>
                 <a href="{% url 'payment:event-payments' event.pk %}"
                    title="Pagamentos">

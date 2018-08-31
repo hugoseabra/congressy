@@ -8,7 +8,7 @@ from django.views import generic
 from addon import services
 from addon.models import Product, Service
 from core.views.mixins import TemplateNameableMixin
-from gatheros_event.helpers.event_business import event_has_had_payment
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
 from gatheros_subscription.models import LotCategory
@@ -37,7 +37,7 @@ class EventOptionalMixin(AccountMixin, generic.View):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
-        context['event_has_had_payments'] = event_has_had_payment(self.event)
+        context['is_paid_event'] = is_paid_event(self.event)
         context['themes'] = self.event.themes.all()
         context['cgsy_percent'] = Decimal(self.event.congressy_percent) / 100
         return context

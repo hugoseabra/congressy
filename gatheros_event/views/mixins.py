@@ -16,10 +16,9 @@ from django.views.generic.edit import FormMixin
 from django.views.generic.list import ListView
 
 from core.model.deletable import DeletableModelMixin
-from gatheros_event.event_specifications import EventPayable
 from gatheros_event.helpers.account import get_member, get_organization, \
     get_organizations, is_manager, update_account
-from gatheros_event.helpers.event_business import event_has_had_payment
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event, Member
 
 
@@ -301,9 +300,9 @@ class EventViewMixin(AccountMixin):
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super(EventViewMixin, self).get_context_data(**kwargs)
-        is_payable = EventPayable().is_satisfied_by(self.event)
+        is_payable = is_paid_event(self.event)
         context['event'] = self.get_event()
-        context['event_has_had_payments'] = event_has_had_payment(self.event)
+        context['is_paid_event'] = is_paid_event(self.event)
         context['event_is_payable'] = is_payable
 
         return context

@@ -4,9 +4,10 @@
 """
 
 from gatheros_event.forms import PersonForm
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Person
 from gatheros_subscription.models import FormConfig
-from gatheros_event.event_specifications import EventPayable
+
 
 class SubscriptionPersonForm(PersonForm):
 
@@ -70,7 +71,7 @@ class SubscriptionPersonForm(PersonForm):
         country = self.data.get('person-country', 'BR')
         required_fields = ['gender', 'country']
 
-        event_is_payable = EventPayable().is_satisfied_by(self.event)
+        event_is_payable = is_paid_event(self.event)
 
         if event_is_payable or config.phone:
             required_fields.append('phone')

@@ -50,7 +50,7 @@
         </td>
     </tr>
 
-    {% if event.event_type == event.EVENT_TYPE_PAID or event.event_type == event.EVENT_TYPE_SCIENTIFIC or has_paid_lots %}
+    {% if event.event_type == event.EVENT_TYPE_PAID or event.event_type == event.EVENT_TYPE_SCIENTIFIC or event_is_payable %}
         <tr class="todo_list_element" role="presentation">
 
             <td>

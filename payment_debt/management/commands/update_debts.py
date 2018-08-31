@@ -17,7 +17,7 @@ class Command(BaseCommand):
         events = Event.objects.all()
 
         for event in events:
-            if EventPayable().is_satisfied_by(event) is False:
+            if is_paid_event(event) is False:
                 continue
 
             debts_created = 0

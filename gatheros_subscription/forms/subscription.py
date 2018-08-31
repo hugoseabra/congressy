@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django import forms
 
-from gatheros_event.event_specifications import EventPayable
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.forms import PersonForm
 from gatheros_subscription.models import Subscription, Lot, FormConfig
 
@@ -13,7 +13,7 @@ class SubscriptionPersonForm(PersonForm):
 
         event_is_payable = False
         if lot:
-            event_is_payable = EventPayable().is_satisfied_by(lot.event)
+            event_is_payable = is_paid_event(lot.event)
 
         if event_is_payable:
             try:

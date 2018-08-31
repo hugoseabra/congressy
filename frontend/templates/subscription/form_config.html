@@ -16,12 +16,9 @@
 
 {% block content %}
 
-    {% if has_paid_lots %}
+    {% if event_is_payable %}
         <div class="well well-info">
-            Este evento possui um de seus lotes pagos, portanto os
-            seguintes
-            campos
-            serão sempre obrigatórios:
+            Este evento possui alguma coisa paga, portanto os seguintes campos serão sempre obrigatórios:
 
             <ul style="margin-top: 8px;">
                 <li>E-mail;</li>
@@ -313,7 +310,7 @@
                 enableDisableCityButton(false);
             {% endif %}
 
-            {% if has_paid_lots %}
+            {% if event_is_payable %}
                 setLotPaiedStatus();
             {% endif %}
 
@@ -614,6 +611,7 @@
     </script>
 
 {% endblock %}
+
 {% block modals %}
 
     <div class="modals">

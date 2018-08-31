@@ -6,11 +6,11 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404, redirect
-from gatheros_event.event_specifications import EventPayable
 from django.views import generic
 
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.forms import PersonForm
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event, Info
 from gatheros_subscription.models import FormConfig, Lot, \
     Subscription
@@ -36,7 +36,7 @@ class EventMixin(TemplateNameableMixin, generic.View):
         except AttributeError:
             config = FormConfig()
 
-        if EventPayable().is_satisfied_by(self.event):
+        if is_paid_event(self.event):
             config.email = True
             config.phone = True
             config.city = True

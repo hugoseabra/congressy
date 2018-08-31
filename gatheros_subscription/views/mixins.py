@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
 
-from gatheros_event.helpers.event_business import event_has_had_payment
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
 
@@ -33,7 +33,7 @@ class FeatureFlagMixinBaseMixin(AccountMixin, generic.View):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
-        context['event_has_had_payments'] = event_has_had_payment(self.event)
+        context['is_paid_event'] = is_paid_event(self.event)
         return context
 
 

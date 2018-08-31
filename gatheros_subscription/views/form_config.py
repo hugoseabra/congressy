@@ -6,7 +6,7 @@ from django.views import generic
 
 from core.util import represents_int
 from core.views.mixins import TemplateNameableMixin
-from gatheros_event.event_specifications import EventPayable
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.views.mixins import EventViewMixin
 from gatheros_subscription.forms import EventSurveyForm, FormConfigForm
 from gatheros_subscription.models import EventSurvey
@@ -50,7 +50,7 @@ class FormConfigView(SurveyFeatureFlagMixin,
     def get_initial(self):
         initial = super().get_initial()
 
-        is_payable = EventPayable().is_satisfied_by(self.event)
+        is_payable = is_paid_event(self.event)
 
         if is_payable:
             initial.update({
@@ -84,13 +84,14 @@ class FormConfigView(SurveyFeatureFlagMixin,
         cxt['active'] = 'form-personalizado'
         cxt['object'] = self.object
         cxt['event'] = self.event
+        cxt['event_is_payable'] = is_paid_event(self.event)
         cxt['event_survey_list'] = self._get_event_surveys()
         cxt['survey_list_form'] = EventSurveyForm(event=self.event)
 
         if self.survey is not None:
             cxt['survey'] = self.survey.survey
-            cxt['event_survey'] = self.survey
-            cxt['lots'] = self._get_selected_lots()
+        cxt['event_survey'] = self.survey
+        cxt['lots'] = self._get_selected_lots()
 
         return cxt
 

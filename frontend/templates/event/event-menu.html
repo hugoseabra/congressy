@@ -4,7 +4,7 @@
 Variáveis:
 - active
 - event
-- event_has_had_payments
+- is_paid_event
 
 {% endcomment %}
 <h5 class="sidebar-header" style="color:#4c4c4c;">Início</h5>
@@ -32,7 +32,7 @@ Variáveis:
             </span>
         </a>
     </li>
-    {% if event_has_had_payments %}
+    {% if is_paid_event %}
         <li {% if active == 'pagamentos' %}class="active"{% endif %}>
             <a class="sidebar-itens" href=
                     "{% url 'payment:event-payments' event.pk %}"

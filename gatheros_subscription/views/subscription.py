@@ -4,7 +4,7 @@ from datetime import datetime
 import qrcode
 import qrcode.image.svg
 from django.conf import settings
-from gatheros_event.helpers.event_business import event_has_had_payment
+from gatheros_event.helpers.event_business import is_paid_event
 from django.contrib import messages
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.transaction import atomic
@@ -48,6 +48,7 @@ from payment.helpers import payment_helpers
 from payment.models import Transaction
 from survey.models import Question, Answer
 from .mixins import CheckinFeatureFlagMixin
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.event_specifications.payable import EventPayable
 
 
@@ -77,7 +78,7 @@ class SubscriptionViewMixin(TemplateNameableMixin, AccountMixin):
 
         event = self.get_event()
         context['event'] = event
-        context['event_has_had_payments'] = event_has_had_payment(event)
+        context['is_paid_event'] = is_paid_event(event)
 
         try:
             config = FormConfig.objects.get(event=event)
@@ -85,7 +86,7 @@ class SubscriptionViewMixin(TemplateNameableMixin, AccountMixin):
             config = FormConfig()
             config.event = event
 
-        if EventPayable().is_satisfied_by(event):
+        if is_paid_event(event):
             config.email = True
             config.phone = True
             config.city = True
@@ -300,6 +301,7 @@ class SubscriptionListView(SubscriptionViewMixin, generic.ListView):
             'can_add_subscription': self.can_add_subscription(),
             'lots': self.get_lots(),
             'has_filter': self.has_filter,
+            'event_is_paid': is_paid_event(self.event),
             'has_inside_bar': True,
             'active': 'inscricoes',
         })
@@ -974,7 +976,7 @@ class SubscriptionAttendanceDashboardView(CheckinFeatureFlagMixin,
             'search_by': self.search_by,
             'has_inside_bar': True,
             'active': 'checkin-dashboard',
-            'event_has_had_payments': event_has_had_payment(self.event),
+            'is_paid_event': is_paid_event(self.event),
             'confirmed': self.get_number_confirmed(),
             'number_attendances': self.get_number_attendances(),
             'total_subscriptions': self.get_number_subscription(),
@@ -1257,7 +1259,7 @@ class SubscriptionAttendanceSearchView(CheckinFeatureFlagMixin,
         context = super().get_context_data(**kwargs)
         context['has_inside_bar'] = True
         context['active'] = 'checkin'
-        context['event_has_had_payments'] = event_has_had_payment(self.event)
+        context['is_paid_event'] = is_paid_event(self.event)
         return context
 
 

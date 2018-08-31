@@ -1,9 +1,11 @@
 from decimal import Decimal
 
+from django.db.models import Count
+
 from addon.models import Product, Service
 from core.specification import AndSpecification
 from gatheros_event.models import Event
-from gatheros_subscription.models import Lot
+from gatheros_subscription.models import Lot, Subscription
 from .mixins import (
     EventCompositeSpecificationMixin,
     LotCompositeSpecificationMixin,
@@ -32,6 +34,9 @@ class EventPayable(EventCompositeSpecificationMixin):
 
             if spec.is_satisfied_by(lot):
                 return True
+
+        if EventHasHadTransactions().is_satisfied_by(event):
+            return True
 
         return False
 
@@ -107,3 +112,20 @@ class ServicePayable(ServiceCompositeSpecificationMixin):
             return False
 
         return True
+
+
+class EventHasHadTransactions(EventCompositeSpecificationMixin):
+    """
+        Essa especificação informa se o evento já possuiu algum lote ou algum
+        opcional, produto ou serviço
+    """
+
+    def is_satisfied_by(self, event: Event):
+        super().is_satisfied_by(event)
+
+        return Subscription.objects.annotate(
+            num_transactions=Count('transactions')
+        ).filter(
+            event=event,
+            num_transactions__gt=0,
+        ).count() > 0

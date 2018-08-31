@@ -10,10 +10,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404, redirect
 from django.views import generic
 
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
 from hotsite.views import EventMixin
-from gatheros_event.event_specifications import EventPayable
 from payment.models import Transaction
 
 
@@ -39,7 +39,7 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
         self.person = self.get_person()
 
         # Se  não há lotes pagos, não há o que fazer aqui.
-        if not EventPayable().is_satisfied_by(self.event):
+        if not is_paid_event(self.event):
             return redirect('public:hotsite', slug=self.event.slug)
 
         try:

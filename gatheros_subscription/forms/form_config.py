@@ -34,7 +34,7 @@ class FormConfigForm(forms.ModelForm):
 
     def __init__(self, event, **kwargs):
         self.event = event
-        self.event_is_payable = EventPayable().is_satisfied_by(event)
+        self.event_is_payable = is_paid_event(event)
 
         super().__init__(**kwargs)
 
