@@ -6,69 +6,11 @@ from django.views import generic
 
 from core.util import represents_int
 from core.views.mixins import TemplateNameableMixin
-from gatheros_event.helpers.account import update_account
-from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.event_specifications import EventPayable
+from gatheros_event.views.mixins import EventViewMixin
 from gatheros_subscription.forms import EventSurveyForm, FormConfigForm
 from gatheros_subscription.models import EventSurvey
 from .mixins import SurveyFeatureFlagMixin
-
-
-class EventViewMixin(AccountMixin, generic.View):
-    """ Mixin de view para vincular com informações de event. """
-    event = None
-
-    def dispatch(self, request, *args, **kwargs):
-        event = self.get_event()
-
-        update_account(
-            request=self.request,
-            organization=event.organization,
-            force=True
-        )
-
-        self.permission_denied_url = reverse(
-            'event:event-panel',
-            kwargs={'pk': self.kwargs.get('event_pk')}
-        )
-        return super(EventViewMixin, self).dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        # noinspection PyUnresolvedReferences
-        context = super(EventViewMixin, self).get_context_data(**kwargs)
-        context['event'] = self.get_event()
-        context['has_paid_lots'] = self.has_paid_lots()
-
-        return context
-
-    def get_event(self):
-        """ Resgata organização do contexto da view. """
-
-        if self.event:
-            return self.event
-
-        self.event = get_object_or_404(
-            Event,
-            pk=self.kwargs.get('event_pk')
-        )
-        return self.event
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-
-            price = lot.price
-
-            if price and price > 0:
-                return True
-
-        return False
-
-    def can_access(self):
-        return self.get_event().organization == self.organization
-
-    def get_permission_denied_url(self):
-        return reverse('event:event-list')
 
 
 class FormConfigView(SurveyFeatureFlagMixin,
@@ -79,8 +21,11 @@ class FormConfigView(SurveyFeatureFlagMixin,
 
     form_class = FormConfigForm
     template_name = 'subscription/form_config.html'
-    object = None
-    survey = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.object = None
+        self.survey = None
 
     def dispatch(self, request, *args, **kwargs):
 
@@ -105,7 +50,9 @@ class FormConfigView(SurveyFeatureFlagMixin,
     def get_initial(self):
         initial = super().get_initial()
 
-        if self.has_paid_lots():
+        is_payable = EventPayable().is_satisfied_by(self.event)
+
+        if is_payable:
             initial.update({
                 'email': True,
                 'phone': True,
@@ -120,8 +67,6 @@ class FormConfigView(SurveyFeatureFlagMixin,
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['event'] = self.get_event()
-        kwargs['has_paid_lots'] = self.has_paid_lots()
-
         self.event = self.get_event()
         if self.object:
             kwargs['instance'] = self.object

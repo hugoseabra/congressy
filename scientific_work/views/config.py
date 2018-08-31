@@ -3,10 +3,9 @@ from datetime import datetime
 from django.views.generic import TemplateView
 
 from core.views.mixins import TemplateNameableMixin
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.views.mixins import AccountMixin, EventViewMixin
 from scientific_work.forms import WorkConfigForm
 from scientific_work.models import WorkConfig
-from .mixins import EventViewMixin
 
 
 class ScientificWorkConfigView(TemplateNameableMixin,

@@ -48,10 +48,12 @@ from survey.models import Question, Answer
 from .mixins import CheckinFeatureFlagMixin
 
 
-class EventViewMixin(TemplateNameableMixin, AccountMixin):
+class SubscriptionViewMixin(TemplateNameableMixin, AccountMixin):
     """ Mixin de view para vincular com informações de event. """
 
-    event = None
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.event = None
 
     def dispatch(self, request, *args, **kwargs):
         self.event = self.get_event()
@@ -63,7 +65,8 @@ class EventViewMixin(TemplateNameableMixin, AccountMixin):
         )
 
         self.permission_denied_url = reverse('event:event-list')
-        return super(EventViewMixin, self).dispatch(request, *args, **kwargs)
+        return super(SubscriptionViewMixin, self).dispatch(request, *args,
+                                                           **kwargs)
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
@@ -136,7 +139,7 @@ class EventViewMixin(TemplateNameableMixin, AccountMixin):
         return self.event.organization == self.organization
 
 
-class SubscriptionFormMixin(EventViewMixin, generic.FormView):
+class SubscriptionFormMixin(SubscriptionViewMixin, generic.FormView):
     template_name = 'subscription/form.html'
     form_class = SubscriptionPersonForm
     success_message = None
@@ -275,7 +278,7 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
         return super().form_valid(form)
 
 
-class SubscriptionListView(EventViewMixin, generic.ListView):
+class SubscriptionListView(SubscriptionViewMixin, generic.ListView):
     """ Lista de inscrições """
 
     model = Subscription
@@ -327,7 +330,7 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
         return num_lots > 0
 
 
-class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
+class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
     template_name = 'subscription/view.html'
     object = None
     queryset = Subscription.objects.get_queryset()
@@ -835,7 +838,7 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
         return survey_form
 
 
-class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
+class SubscriptionConfirmationView(SubscriptionViewMixin, generic.TemplateView):
     """ Inscrição de pessoa que já possui perfil. """
     subscription_user = None
     submitted_data = None
@@ -877,7 +880,7 @@ class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
         return self.get(request, *args, **kwargs)
 
 
-class SubscriptionCancelView(EventViewMixin, generic.DetailView):
+class SubscriptionCancelView(SubscriptionViewMixin, generic.DetailView):
     template_name = 'subscription/delete.html'
     model = Subscription
     success_message = 'Inscrição cancelada com sucesso.'
@@ -1116,7 +1119,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
         return False
 
 
-class SubscriptionExportView(EventViewMixin, generic.View):
+class SubscriptionExportView(SubscriptionViewMixin, generic.View):
     http_method_names = ['post']
     template_name = 'subscription/export.html'
     form_class = SubscriptionFilterForm
@@ -1247,7 +1250,7 @@ class SubscriptionAttendanceSearchView(CheckinFeatureFlagMixin,
         return context
 
 
-class SubscriptionAttendanceView(EventViewMixin, generic.FormView):
+class SubscriptionAttendanceView(SubscriptionViewMixin, generic.FormView):
     form_class = SubscriptionAttendanceForm
     http_method_names = ['post']
     search_by = 'name'
@@ -1350,7 +1353,7 @@ class SubscriptionAttendanceListView(CheckinFeatureFlagMixin,
         ).exclude(status=Subscription.CANCELED_STATUS).order_by('-attended_on')
 
 
-class SwitchSubscriptionTestView(EventViewMixin, generic.View):
+class SwitchSubscriptionTestView(SubscriptionViewMixin, generic.View):
     """
     Gerenciamento de inscrições que podem ou não serem setados como Teste.
     """
