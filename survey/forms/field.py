@@ -113,7 +113,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_INPUT_NUMBER:
             self.django_field = fields.CharField(
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -122,7 +122,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_INPUT_DATE:
             self.django_field = fields.DateField(
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -131,7 +131,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_INPUT_DATETIME:
             self.django_field = fields.CharField(
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -140,7 +140,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_INPUT_EMAIL:
             self.django_field = fields.EmailField(
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -149,7 +149,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_INPUT_FILE_PDF:
             self.django_field = fields.FileField(
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -160,7 +160,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_INPUT_FILE_IMAGE:
             self.django_field = fields.ImageField(
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -169,7 +169,7 @@ class SurveyField(object):
         if self.type == self.FIELD_INPUT_PHONE:
             self.django_field = fields.CharField(
                 max_length=18,
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -179,7 +179,7 @@ class SurveyField(object):
         if self.type == self.FIELD_INPUT_PHONE_CPF:
             self.django_field = fields.CharField(
                 max_length=14,  # máscara será aplicada
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -189,7 +189,7 @@ class SurveyField(object):
         if self.type == self.FIELD_INPUT_PHONE_CNPJ:
             self.django_field = fields.CharField(
                 max_length=18,  # máscara será aplicada
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -199,7 +199,7 @@ class SurveyField(object):
         if self.type == self.FIELD_INPUT_PHONE_PHONE:
             self.django_field = fields.CharField(
                 max_length=14,  # máscara será aplicada
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -209,7 +209,7 @@ class SurveyField(object):
         if self.type == self.FIELD_INPUT_PHONE_CELLPHONE:
             self.django_field = fields.CharField(
                 max_length=15,  # máscara será aplicada
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -218,7 +218,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_BOOLEAN:
             self.django_field = fields.BooleanField(
-                label=self.label.title(),
+                label=self.label,
                 initial=self.initial,
                 required=False,
                 help_text=self.help_text,
@@ -227,7 +227,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_SELECT:
             self.django_field = fields.ChoiceField(
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -236,7 +236,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_TEXTAREA:
             self.django_field = fields.CharField(
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -245,7 +245,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_RADIO_GROUP:
             self.django_field = fields.ChoiceField(
-                label=self.label.title(),
+                label=self.label,
                 initial=self.initial,
                 required=self.required,
                 help_text=self.help_text,
@@ -254,7 +254,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_CHECKBOX_GROUP:
             self.django_field = fields.MultipleChoiceField(
-                label=self.label.title(),
+                label=self.label,
                 initial=self.initial,
                 required=self.required,
                 help_text=self.help_text,
