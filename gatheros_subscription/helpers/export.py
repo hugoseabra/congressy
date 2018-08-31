@@ -28,11 +28,13 @@ def clean_sheet_title(title):
         '/',
         '&',
         '*',
+        ':',
+        '?',
     )
     for char in invalid_chars:
         title = title.replace(char, '_')
 
-    return title[0:30]
+    return title[0:28]
 
 
 def export_event_data(event):
@@ -66,6 +68,46 @@ def export_event_data(event):
             'Formulário-{}'.format(ev_survey.survey.name)
         )
         _export_survey_answers(wb.create_sheet(title=title), ev_survey)
+
+    for lot_category in event.lot_categories.all():
+        cat_name = lot_category.name
+
+        products_queryset = lot_category.product_optionals
+        services_queryset = lot_category.service_optionals
+
+        if products_queryset.count():
+            num_subs = products_queryset.filter(
+                subscription_products__subscription__completed=True,
+                subscription_products__subscription__test_subscription=False
+            ).count()
+
+            if num_subs > 0:
+                sheet_name = 'Opcionais - {}'.format(cat_name)
+                title = clean_sheet_title(sheet_name)
+                worksheet = wb.create_sheet(title=title)
+
+                _export_addon_products(
+                    worksheet,
+                    sheet_name,
+                    products_queryset.all()
+                )
+
+        if services_queryset.count():
+            num_subs = services_queryset.filter(
+                subscription_services__subscription__completed=True,
+                subscription_services__subscription__test_subscription=False
+            ).count()
+
+            if num_subs > 0:
+                sheet_name = 'Ativ. Extras - {}'.format(cat_name)
+                title = clean_sheet_title(sheet_name)
+                worksheet = wb.create_sheet(title=title)
+
+                _export_addon_services(
+                    worksheet,
+                    sheet_name,
+                    services_queryset.all()
+                )
 
     wb.save(stream)
 
@@ -167,8 +209,8 @@ def _export_payments(worksheet, event):
         'TIPO',
         'STATUS',
         'DATA PAGAMENTO',
-        'VALOR INSCRICAO (R$)'
-        'VALOR A RECEBER (R$)'
+        'VALOR INSCRICAO (R$)',
+        'VALOR A RECEBER (R$)',
     ])
 
     transactions = Transaction.objects.filter(subscription__event=event)
@@ -272,3 +314,115 @@ def _export_survey_answers(worksheet, event_survey):
 
     for row in collector.keys():
         worksheet.append(collector[row])
+
+
+def _export_addon_products(worksheet, title, products):
+    """
+    Exporta Insrições de Opcionais de um evento.
+    """
+    columns = [
+        'CATEGORIA',
+        'NÚMERO DE INSCRIÇÃO',
+        'CÓDIGO DA INSCRIÇÃO',
+        'NOME',
+        'E-MAIL',
+        'NOME DO OPCIONAL',
+        'STATUS',
+        'DATA PAGAMENTO',
+        'VALOR INSCRICAO (R$)',
+        'VALOR A RECEBER (R$)',
+    ]
+
+    collector = {}
+    row_idx = 1
+
+    for product in products:
+        subs = product.subscription_products.filter(
+            subscription__completed=True,
+            subscription__test_subscription=False,
+        )
+
+        for addon_sub in subs:
+            sub = addon_sub.subscription
+            person = sub.person
+
+            created = addon_sub.created.strftime('%d/%m/%Y %H:%M:%S')
+
+            if row_idx not in collector:
+                collector[row_idx] = []
+
+            collector[row_idx].append(sub.lot.category.name)
+            collector[row_idx].append(get_object_value(sub, 'event_count'))
+            collector[row_idx].append(get_object_value(sub, 'code'))
+            collector[row_idx].append(person.name)
+            collector[row_idx].append(person.email)
+            collector[row_idx].append(addon_sub.optional.name)
+            collector[row_idx].append(sub.get_status_display())
+            collector[row_idx].append(created)
+            collector[row_idx].append(addon_sub.optional_price)
+            collector[row_idx].append(addon_sub.optional_liquid_price)
+
+            row_idx += 1
+
+    rows = collector.keys()
+
+    if rows:
+        worksheet.append(columns)
+        [worksheet.append(collector[row]) for row in rows]
+
+
+def _export_addon_services(worksheet, title, services):
+    """
+    Exporta Insrições de atividades extras.
+    """
+    columns = [
+        'CATEGORIA',
+        'TEMA',
+        'NÚMERO DE INSCRIÇÃO',
+        'CÓDIGO DA INSCRIÇÃO',
+        'NOME',
+        'E-MAIL',
+        'NOME DA ATIVIDADE EXTRA',
+        'STATUS',
+        'DATA PAGAMENTO',
+        'VALOR INSCRICAO (R$)',
+        'VALOR A RECEBER (R$)',
+    ]
+
+    collector = {}
+    row_idx = 1
+
+    for service in services:
+        subs = service.subscription_services.filter(
+            subscription__completed=True,
+            subscription__test_subscription=False,
+        )
+
+        for addon_sub in subs:
+            sub = addon_sub.subscription
+            person = sub.person
+
+            created = addon_sub.created.strftime('%d/%m/%Y %H:%M:%S')
+
+            if row_idx not in collector:
+                collector[row_idx] = []
+
+            collector[row_idx].append(sub.lot.category.name)
+            collector[row_idx].append(addon_sub.optional.theme.name)
+            collector[row_idx].append(get_object_value(sub, 'event_count'))
+            collector[row_idx].append(get_object_value(sub, 'code'))
+            collector[row_idx].append(person.name)
+            collector[row_idx].append(person.email)
+            collector[row_idx].append(addon_sub.optional.name)
+            collector[row_idx].append(sub.get_status_display())
+            collector[row_idx].append(created)
+            collector[row_idx].append(addon_sub.optional_price)
+            collector[row_idx].append(addon_sub.optional_liquid_price)
+
+            row_idx += 1
+
+    rows = collector.keys()
+
+    if rows:
+        worksheet.append(columns)
+        [worksheet.append(collector[row]) for row in rows]

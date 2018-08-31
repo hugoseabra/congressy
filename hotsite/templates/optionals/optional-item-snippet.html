@@ -1,0 +1,82 @@
+{% load static humanize %}
+
+<tr>
+    {% if optional.banner %}
+    <td width="130px" class="image-link-parent">
+        <a href="{{ optional.banner.default.url }}" class="image-link" title="Abrir detalhes" data-optional-name="{{ optional.name }}">
+            <img src="{{ optional.banner.thumbnail.url }}" width="100%"/>
+        </a>
+    </td>
+    {% endif %}
+    <td colspan="2">
+        <div class="text-bold" style="font-size: 18px">
+            {{ optional.name }}
+        </div>
+        {% if optional.description %}
+        <div class="text-muted hidden-xs {% if optional.name|length > 45 %}hidden-sm{% endif %}">
+            {{ optional.description |safe }}
+        </div>
+        {% endif %}
+    </td>
+</tr>
+{% if optional.description %}
+<tr class="{% if optional.name|length <= 45 %}hidden-sm{% endif %} hidden-md hidden-lg">
+    <td colspan="2">
+        <div class="text-muted">
+            {{ optional.description |safe }}
+        </div>
+    </td>
+</tr>
+{% endif %}
+<tr>
+    <td colspan="2" class="optional-action-buttons">
+        <hr style="margin-top:0;margin-bottom:5px;"  />
+        <div class="row">
+            {% if optional.schedule_start and optional.schedule_end %}
+            <div class="col-sm-7">
+                <div style="margin-top: 8px;">
+                    <div class="row">
+                        <div class="col-sm-2">
+                            Horário:
+                        </div>
+                        <div class="col-sm-10">
+                            <strong>{{ optional.schedule_start|date:"d/m H\hi" }}</strong> a <strong>{{ optional.schedule_end|date:"d/m H\hi" }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="{% if optional.schedule_start and optional.schedule_end %}col-sm-5{% else %}col-sm-12{% endif %} text-right">
+                {{ optional.get_cname }}
+                <div style="float:right;">
+                    {% if available %}
+                        {% if action == 'add' %}
+                            <button style="padding:5px 10px" onclick="{% if optional_type == 'service' %}addOptionalService(this, {{ optional.pk }}){% elif optional_type == 'product' %}addOptionalProduct(this, {{ optional.pk }}){% endif %}" class="btn btn-success" data-toggle="tooltip" title="Adicionar">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        {% elif action == 'remove' %}
+                            <button style="width: 100%;padding:5px 10px" onclick="{% if optional_type == 'service' %}removeOptionalService(this, {{ service.optional.pk }}){% elif optional_type == 'product' %}removeOptionalProduct(this, {{ optional.pk }}){% endif %}" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Remover">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        {% endif %}
+                    {% else %}
+                        <div data-toggle="tooltip" title="Conflito de Horário">
+                            <button style="padding:5px 10px" disabled="disabled" class="btn btn-sm btn-warning btn-block">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+                <div style="float:right;margin-top: 6px;margin-right: 8px;font-size: 18px;font-weight: bold;color:darkblue">
+                    {% if not optional.price %}
+                        Grátis
+                    {% else %}
+                        R$ {{ optional.price|intcomma }}
+                    {% endif %}
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        <hr style="margin-top:5px;height:2px;border:none;color:#DDD;background-color:#DDD;"  />
+    </td>
+</tr>

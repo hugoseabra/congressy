@@ -1,10 +1,20 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import FieldError
+from django.core.validators import FileExtensionValidator
 from django.forms import fields, widgets, SelectDateWidget, Media
 
 from core.forms.widgets import DateTimeInput, TelephoneInput
 from core.util.date import create_years_list
+
+
+# def get_file_path(instance, filename):
+#     """ Resgata localização onde as imagens serão inseridas. """
+#
+#     return os.path.join(
+#         'survey',
+#         str(instance.survey.pk),
+#         str(instance.id),
+#         os.path.basename(filename)
+#     )
 
 
 class SurveyField(object):
@@ -22,6 +32,8 @@ class SurveyField(object):
     FIELD_INPUT_DATE = 'input-date'
     FIELD_INPUT_DATETIME = 'input-datetime-local'
     FIELD_INPUT_EMAIL = 'input-email'
+    FIELD_INPUT_FILE_PDF = 'input-file-pdf'
+    FIELD_INPUT_FILE_IMAGE = 'input-file-image'
     FIELD_INPUT_PHONE = 'input-phone'
     FIELD_INPUT_PHONE_PHONE = 'input-phone-phone'
     FIELD_INPUT_PHONE_CELLPHONE = 'input-phone-cellphone'
@@ -37,6 +49,8 @@ class SurveyField(object):
         FIELD_INPUT_TEXT,
         FIELD_INPUT_PHONE_CPF,
         FIELD_INPUT_PHONE_CNPJ,
+        FIELD_INPUT_FILE_PDF,
+        FIELD_INPUT_FILE_IMAGE,
         FIELD_INPUT_PHONE_PHONE,
         FIELD_INPUT_PHONE_CELLPHONE,
         FIELD_INPUT_NUMBER,
@@ -99,7 +113,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_INPUT_NUMBER:
             self.django_field = fields.CharField(
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -108,7 +122,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_INPUT_DATE:
             self.django_field = fields.DateField(
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -117,7 +131,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_INPUT_DATETIME:
             self.django_field = fields.CharField(
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -126,17 +140,36 @@ class SurveyField(object):
 
         if self.type == self.FIELD_INPUT_EMAIL:
             self.django_field = fields.EmailField(
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
                 widget=self._get_widget()
             )
 
+        if self.type == self.FIELD_INPUT_FILE_PDF:
+            self.django_field = fields.FileField(
+                label=self.label,
+                required=self.required,
+                initial=self.initial,
+                help_text=self.help_text,
+                validators=[
+                    FileExtensionValidator(allowed_extensions=['pdf']),
+                ]
+            )
+
+        if self.type == self.FIELD_INPUT_FILE_IMAGE:
+            self.django_field = fields.ImageField(
+                label=self.label,
+                required=self.required,
+                initial=self.initial,
+                help_text=self.help_text,
+            )
+
         if self.type == self.FIELD_INPUT_PHONE:
             self.django_field = fields.CharField(
                 max_length=18,
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -146,17 +179,17 @@ class SurveyField(object):
         if self.type == self.FIELD_INPUT_PHONE_CPF:
             self.django_field = fields.CharField(
                 max_length=14,  # máscara será aplicada
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
-                widget=self._get_widget()
+                widget=self._get_widget(),
             )
 
         if self.type == self.FIELD_INPUT_PHONE_CNPJ:
             self.django_field = fields.CharField(
                 max_length=18,  # máscara será aplicada
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -166,7 +199,7 @@ class SurveyField(object):
         if self.type == self.FIELD_INPUT_PHONE_PHONE:
             self.django_field = fields.CharField(
                 max_length=14,  # máscara será aplicada
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -176,7 +209,7 @@ class SurveyField(object):
         if self.type == self.FIELD_INPUT_PHONE_CELLPHONE:
             self.django_field = fields.CharField(
                 max_length=15,  # máscara será aplicada
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -185,7 +218,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_BOOLEAN:
             self.django_field = fields.BooleanField(
-                label=self.label.title(),
+                label=self.label,
                 initial=self.initial,
                 required=False,
                 help_text=self.help_text,
@@ -194,7 +227,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_SELECT:
             self.django_field = fields.ChoiceField(
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -203,7 +236,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_TEXTAREA:
             self.django_field = fields.CharField(
-                label=self.label.title(),
+                label=self.label,
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
@@ -212,7 +245,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_RADIO_GROUP:
             self.django_field = fields.ChoiceField(
-                label=self.label.title(),
+                label=self.label,
                 initial=self.initial,
                 required=self.required,
                 help_text=self.help_text,
@@ -221,7 +254,7 @@ class SurveyField(object):
 
         if self.type == self.FIELD_CHECKBOX_GROUP:
             self.django_field = fields.MultipleChoiceField(
-                label=self.label.title(),
+                label=self.label,
                 initial=self.initial,
                 required=self.required,
                 help_text=self.help_text,
@@ -239,7 +272,6 @@ class SurveyField(object):
         self.django_field.field_type = self.type
         self.django_field.question_id = self.question.pk
         self.django_field.question_name = self.question.name
-
 
         return self.django_field
 

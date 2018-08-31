@@ -46,7 +46,7 @@ def get_err_file_path(instance, *args, **kwargs):
         str(instance.event.id),
         "import",
         "csv",
-        "Err_" + filename
+        "Err_" + str(instance.pk) + '_' + filename
     )
 
 
@@ -60,7 +60,7 @@ def get_correction_file_path(instance, *args, **kwargs):
         str(instance.event.id),
         "import",
         "csv",
-        "fix_" + filename
+        "fix_" + str(instance.pk) + '_' +  filename
     )
 
 

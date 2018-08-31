@@ -3,6 +3,8 @@ FIELD_INPUT_NUMBER = 'input-number'
 FIELD_INPUT_DATE = 'input-date'
 FIELD_INPUT_DATETIME = 'input-datetime-local'
 FIELD_INPUT_EMAIL = 'input-email'
+FIELD_INPUT_FILE_PDF = 'input-file-pdf'
+FIELD_INPUT_FILE_IMAGE = 'input-file-image'
 FIELD_INPUT_PHONE = 'input-phone'
 FIELD_TEXTAREA = 'textarea'
 FIELD_BOOLEAN = 'boolean'
@@ -26,6 +28,8 @@ TYPE_LIST = [
     'input-phone-cnpj',
     'input-phone-phone',
     'input-phone-cellphone',
+    'input-file-pdf',
+    'input-file-image',
     'textarea',
     'boolean',
     'select',
@@ -39,6 +43,8 @@ TYPES = (
     (FIELD_INPUT_DATE, 'Data'),
     (FIELD_INPUT_DATETIME, 'Data e hora'),
     (FIELD_INPUT_EMAIL, 'E-mail'),
+    (FIELD_INPUT_FILE_PDF, 'Envio de PDF'),
+    (FIELD_INPUT_FILE_IMAGE, 'Envio de Imagem'),
     (FIELD_INPUT_PHONE, 'Telefone'),
     (FIELD_TEXTAREA, 'Texto longo'),
     (FIELD_BOOLEAN, 'SIM/NÃO'),

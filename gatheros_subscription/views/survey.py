@@ -72,14 +72,13 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
             elif action == 'update_order':
 
-                new_order = json.loads(self.request.POST.get(
-                    'new_order'))
+                new_order = json.loads(self.request.POST.get('new_order'))
 
                 counter = 1
                 try:
-                    for question_name in new_order:
+                    for question_id in new_order:
                         question = Question.objects.get(survey=self.survey,
-                                                        name=question_name)
+                                                        pk=question_id)
                         question.order = counter
                         question.save()
                         counter += 1
@@ -93,7 +92,7 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
                 set_to = self.request.POST.get('setTo')
                 try:
-                    question = Question.objects.get(name=question_id,
+                    question = Question.objects.get(pk=question_id,
                                                     survey=self.survey)
                 except Question.DoesNotExist:
                     return HttpResponse(status=404)
@@ -121,12 +120,15 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
                 question_data = {
                     'name': data.get('name_edit', question.name),
                     'label': data.get('name_edit', question.label),
-                    'help_text': data.get('help_text_edit',
-                                          question.help_text),
+                    'help_text': data.get(
+                        'help_text_edit',
+                        question.help_text
+                    ),
                     'intro': bool(data.get('intro_edit', False)),
                     'options': data.get('options_edit', question.options),
                     'survey': self.survey.pk,
                     'type': question.type,
+                    'active': question.active,
                 }
 
                 question_form = QuestionForm(

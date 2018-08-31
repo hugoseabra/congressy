@@ -215,12 +215,17 @@
                                 <div class="panel-body">
                                     <div class="row">
                                         <div class="col-md-12">
-
                                             {% for item in survey_answers %}
                                                 <div class="form-group">
-                                                    <label>{{ item.question }}</label>
+                                                    <label>{{ item.question|title }}</label>
                                                     <div>
-                                                        {{ item.answer }}
+                                                        {{ item.human_display }}
+                                                        {% if item.is_file %}
+                                                            &ensp;&ensp;
+                                                            <a href="/media/{{ item.value }}" class="btn btn-sm btn-primary" target="_blank">
+                                                                <i class="fas fa-eye"></i> Abrir arquivo
+                                                            </a>
+                                                        {% endif %}
                                                     </div>
                                                 </div>
                                             {% endfor %}

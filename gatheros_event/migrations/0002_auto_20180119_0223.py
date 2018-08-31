@@ -163,10 +163,18 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='person',
             name='gender',
-            field=models.CharField(blank=True, choices=[('M', 'Masculino'),
-                                                        ('F', 'Feminino')],
-                                   default='M', max_length=1, null=True,
-                                   verbose_name='sexo'),
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ('M', 'Masculino'),
+                    ('F', 'Feminino'),
+                    ('U', 'Prefiro não definir')
+                ],
+                default='M',
+                max_length=1,
+                null=True,
+                verbose_name='sexo'
+            ),
         ),
         migrations.AlterField(
             model_name='person',

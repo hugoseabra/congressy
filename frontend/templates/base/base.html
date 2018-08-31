@@ -66,20 +66,6 @@
         {{ form.media.css }}
     {% endif %}
 
-    <style>
-        input[type="file"] {
-            display: none;
-        }
-
-        .custom-file-upload {
-            border: 1px solid #ccc;
-            display: inline-block;
-            padding: 6px 12px;
-            cursor: pointer;
-        }
-
-    </style>
-
     {% block styles %}{% endblock %}
 
     <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
@@ -103,10 +89,8 @@
 
         <!--logo start-->
         <div class="brand">
-            <a href="{% url 'front:start' %}">
-                <img class="img base_logo" src=
-                        "{% static "assets/img/header-logo_black.png" %}"
-                />
+            <a href="{% url 'event:event-list' %}">
+                <img class="img base_logo" src= "{% static "assets/img/header-logo_black.png" %}" />
             </a>
         </div>
         <!--logo end-->
@@ -322,6 +306,7 @@
 <script src="{% static "assets/plugins/messenger/js/messenger.min.js" %}"></script>
 <script src="{% static "assets/plugins/messenger/js/messenger-theme-flat.js" %}"></script>
 <script src="{% static "assets/plugins/messenger/js/messenger-theme-future.js" %}"></script>
+<script src="{% static "assets/js/messenger.js" %}"></script>
 <script src="{% static "assets/plugins/sortable/js/Sortable.min.js" %}"></script>
 <script src="{% static "assets/js/src/app.js" %}"></script>
 <script src="{% static "assets/js/cgsy.js" %}"></script>
