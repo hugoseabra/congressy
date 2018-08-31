@@ -8,6 +8,7 @@ from django.views import View, generic
 
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.helpers.account import update_account
+from gatheros_event.helpers.event_business import event_has_had_payment
 from gatheros_event.models import Event, Organization
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin, \
     MultiLotsFeatureFlagMixin
@@ -148,6 +149,7 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
         context['exhibition_code'] = Lot.objects.generate_exhibition_code()
         context['categories'] = self.get_categories()
         context['event_is_full'] = self.event_is_full()
+        context['event_has_had_payments'] = event_has_had_payment(self.event)
         return context
 
     def event_is_full(self):
@@ -224,6 +226,7 @@ class LotAddFormView(MultiLotsFeatureFlagMixin, BaseFormLotView,
         context['form_title'] = "Novo lote para '{}'".format(self.event.name)
         context['full_banking'] = self._get_full_banking()
         context['has_surveys'] = self._event_has_surveys()
+        context['event_has_had_payments'] = event_has_had_payment(self.event)
 
         return context
 
@@ -304,6 +307,7 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         context['full_banking'] = self._get_full_banking()
         context['has_surveys'] = self._event_has_surveys()
         context['has_optionals'] = self._lot_has_optionals()
+        context['event_has_had_payments'] = event_has_had_payment(self.event)
         context['lot_has_subscriptions'] = self.object.subscriptions.filter(
             completed=True, test_subscription=False,
         ).count() > 0

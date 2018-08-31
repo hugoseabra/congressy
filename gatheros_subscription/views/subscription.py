@@ -4,6 +4,7 @@ from datetime import datetime
 import qrcode
 import qrcode.image.svg
 from django.conf import settings
+from gatheros_event.helpers.event_business import event_has_had_payment
 from django.contrib import messages
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.transaction import atomic
@@ -75,6 +76,7 @@ class SubscriptionViewMixin(TemplateNameableMixin, AccountMixin):
 
         event = self.get_event()
         context['event'] = event
+        context['event_has_had_payments'] = event_has_had_payment(event)
         context['has_paid_lots'] = self.has_paid_lots()
 
         try:
@@ -985,6 +987,7 @@ class SubscriptionAttendanceDashboardView(CheckinFeatureFlagMixin,
             'search_by': self.search_by,
             'has_inside_bar': True,
             'active': 'checkin-dashboard',
+            'event_has_had_payments': event_has_had_payment(self.event),
             'confirmed': self.get_number_confirmed(),
             'number_attendances': self.get_number_attendances(),
             'total_subscriptions': self.get_number_subscription(),
@@ -1267,6 +1270,7 @@ class SubscriptionAttendanceSearchView(CheckinFeatureFlagMixin,
         context = super().get_context_data(**kwargs)
         context['has_inside_bar'] = True
         context['active'] = 'checkin'
+        context['event_has_had_payments'] = event_has_had_payment(self.event)
         return context
 
 

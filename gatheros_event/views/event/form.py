@@ -12,6 +12,7 @@ from gatheros_event.models import Organization, Event
 from gatheros_event.views.mixins import AccountMixin
 from gatheros_event.helpers.account import update_account
 from core.util import model_field_slugify, ReservedSlugException
+from gatheros_event.helpers.event_business import event_has_had_payment
 
 
 class BaseEventView(AccountMixin, View):
@@ -242,7 +243,8 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
         context = super().get_context_data(**kwargs)
         context['has_inside_bar'] = True
         context['active'] = 'dados-do-evento'
-        context['has_paid_lots'] = self.has_paid_lots()
+        context['event_has_had_payments'] = \
+            event_has_had_payment(self.get_event())
 
         return context
 

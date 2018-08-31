@@ -303,7 +303,7 @@ class EventViewMixin(AccountMixin):
         context = super(EventViewMixin, self).get_context_data(**kwargs)
         is_payable = EventPayable().is_satisfied_by(self.event)
         context['event'] = self.get_event()
-        context['event_has_has_payments'] = event_has_had_payment(self.event)
+        context['event_has_had_payments'] = event_has_had_payment(self.event)
         context['event_is_payable'] = is_payable
 
         return context

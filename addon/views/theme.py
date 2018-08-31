@@ -7,7 +7,7 @@ from addon import services
 from addon.models import Theme
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
-
+from gatheros_event.helpers.event_business import event_has_had_payment
 
 class ThemeListView(AccountMixin, generic.ListView):
     """Lista de lotes de acordo com o evento do contexto"""
@@ -34,7 +34,7 @@ class ThemeListView(AccountMixin, generic.ListView):
         context = super().get_context_data(**kwargs)
         context['has_inside_bar'] = True
         context['active'] = 'addon-themes'
-
+        context['event_has_had_payments'] = event_has_had_payment(self.event)
         context['event'] = self.event
         context['has_paid_lots'] = self.has_paid_lots()
         return context

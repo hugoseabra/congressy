@@ -7,11 +7,12 @@ from django.urls import reverse_lazy
 from django.views.generic import DetailView
 
 from core.views.mixins import TemplateNameableMixin
+from gatheros_event.event_specifications.subscribable import EventSubscribable
+from gatheros_event.helpers.event_business import event_has_had_payment
 from gatheros_event.models import Event, Info, Organization
 from gatheros_event.views.mixins import AccountMixin
 from gatheros_subscription.models import Subscription, EventSurvey, Lot
 from payment.models import Transaction
-from gatheros_event.event_specifications.subscribable import EventSubscribable
 
 
 class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
@@ -96,7 +97,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         context['totals'] = self._get_payables()
         context['limit'] = self._get_limit()
         context['has_paid_lots'] = self.has_paid_lots()
-        context['event_is_subscribable'] = EventSubscribable()\
+        context['event_is_subscribable'] = EventSubscribable() \
             .is_satisfied_by(self.object)
         context['all_lots'] = self.all_lots_status()
         context['gender'] = self._get_gender()
@@ -119,6 +120,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         context['number_attendances'] = self.get_number_attendances()
         context['status_addons'] = self.get_status_addons()
         context['event_is_full'] = self.event_is_full()
+        context['event_has_had_payments'] = event_has_had_payment(self.object)
 
         try:
             context['is_configured'] = self.object.work_config.is_configured

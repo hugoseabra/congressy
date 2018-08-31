@@ -4,7 +4,7 @@
 Variáveis:
 - active
 - event
-- has_paid_lots
+- event_has_had_payments
 
 {% endcomment %}
 <h5 class="sidebar-header" style="color:#4c4c4c;">Início</h5>
@@ -32,7 +32,7 @@ Variáveis:
             </span>
         </a>
     </li>
-    {% if has_paid_lots %}
+    {% if event_has_had_payments %}
         <li {% if active == 'pagamentos' %}class="active"{% endif %}>
             <a class="sidebar-itens" href=
                     "{% url 'payment:event-payments' event.pk %}"
@@ -175,8 +175,6 @@ Variáveis:
 
     </ul>
 {% endif %}
-
-{% has_paid_lots event as has_paid_lots %}
 
 {% if event.feature_management.products and  event.feature_configuration.feature_products or event.feature_configuration.feature_services and event.feature_management.services %}
     <h5 class="sidebar-header" style="color:#4c4c4c;">Recursos Extras</h5>

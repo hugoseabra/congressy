@@ -19,6 +19,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from gatheros_event.helpers.account import update_account
+from gatheros_event.helpers.event_business import event_has_had_payment
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
 from mailer import exception as mailer_notification
@@ -126,7 +127,6 @@ def notify_postback(transaction, data):
 
 class EventPaymentView(AccountMixin, ListView):
     template_name = 'payments/list.html'
-    # template_name = 'maintainance.html'
     event = None
 
     def can_access(self):
@@ -156,6 +156,7 @@ class EventPaymentView(AccountMixin, ListView):
         context['has_inside_bar'] = True
         context['active'] = 'pagamentos'
         context['has_paid_lots'] = True
+        context['event_has_had_payments'] = event_has_had_payment(self.event)
 
         return context
 

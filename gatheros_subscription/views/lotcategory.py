@@ -9,7 +9,7 @@ from gatheros_event.views.mixins import DeleteViewMixin, \
     MultiLotsFeatureFlagMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import LotCategory
-
+from gatheros_event.helpers.event_business import event_has_had_payment
 try:
     from raven.contrib.django.raven_compat.models import client
 
@@ -52,6 +52,7 @@ class LotCategoryListView(generic.ListView):
         context['event'] = self.event
         context['has_inside_bar'] = True
         context['active'] = 'categorias'
+        context['event_has_had_payments'] = event_has_had_payment(self.event)
         return context
 
     def get_queryset(self):
