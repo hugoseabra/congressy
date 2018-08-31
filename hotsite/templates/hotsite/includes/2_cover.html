@@ -54,7 +54,7 @@
                                 </p>
                             {% endif %}
 
-                            {% if subscription_enabled and lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS and not subsciption_finished %}
+                            {% if subscription_enabled and lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS and not subscription_finished %}
                                 <ul class="icon-list">
                                     {% for lot in lots %}
                                         {% if lot.status != lot.LOT_STATUS_NOT_STARTED %}
@@ -76,12 +76,12 @@
                                         {% endif %}
                                     {% endfor %}
                                 </ul>
-                            {% elif subscription_enabled and private_lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS and not subsciption_finished %}
+                            {% elif subscription_enabled and private_lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS and not subscription_finished %}
 
                                 <p style="font-size: 20px;font-style: italic;">
                                     Este é um evento restrito a convidados.</p>
 
-                            {% elif subsciption_finished %}
+                            {% elif subscription_finished %}
                                 <p style="font-size: 20px;font-style: italic;">
                                     Inscrições encerradas.</p>
                             {% elif not subscription_enabled %}
@@ -92,7 +92,7 @@
 
                         <div class="hero-features-right col-md-5"
                              data-animation="fadeIn">
-                            {% if subscription_enabled and not subsciption_finished %}
+                            {% if subscription_enabled and not subscription_finished %}
                                 {% if has_paid_lots and not has_active_bank_account %}
                                     <p style="position: relative;font-size: 20px;font-style: italic;padding: 10px 0 25px;">
                                         Evento está sendo configurado, volte em
@@ -112,7 +112,7 @@
                                     </p>
                                 {% endif %}
 
-                                {% if subscription_enabled and lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS and not subsciption_finished %}
+                                {% if subscription_enabled and lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS and not subscription_finished %}
                                     <ul class="icon-list">
                                         {% for lot in lots %}
                                             {% if lot.status != lot.LOT_STATUS_NOT_STARTED %}
@@ -137,13 +137,13 @@
                                             {% endif %}
                                         {% endfor %}
                                     </ul>
-                                {% elif subscription_enabled and private_lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS and not subsciption_finished %}
+                                {% elif subscription_enabled and private_lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS and not subscription_finished %}
 
                                     <p style="font-size: 20px;font-style: italic;">
                                         Este é um evento restrito a
                                         convidados.</p>
 
-                                {% elif subsciption_finished %}
+                                {% elif subscription_finished %}
                                     <p style="font-size: 20px;font-style: italic;">
                                         Inscrições encerradas.</p>
                                 {% elif not subscription_enabled %}
@@ -154,7 +154,7 @@
 
                             <div class="hero-features-right col-md-5"
                                  data-animation="fadeIn">
-                                {% if subscription_enabled and not subsciption_finished %}
+                                {% if subscription_enabled and not subscription_finished %}
                                     {% if has_paid_lots and not has_active_bank_account %}
                                         <p style="position: relative;font-size: 20px;font-style: italic;padding: 10px 0 25px;">
                                             Evento está sendo configurado, volte

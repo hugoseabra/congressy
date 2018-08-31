@@ -13,6 +13,7 @@ from django.views import generic
 from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
 from hotsite.views import EventMixin
+from gatheros_event.event_specifications import EventPayable
 from payment.models import Transaction
 
 
@@ -38,7 +39,7 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
         self.person = self.get_person()
 
         # Se  não há lotes pagos, não há o que fazer aqui.
-        if not self.has_paid_lots() and not self.has_paid_optionals():
+        if not EventPayable().is_satisfied_by(self.event):
             return redirect('public:hotsite', slug=self.event.slug)
 
         try:
@@ -73,29 +74,6 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
             return redirect('public:hotsite', slug=self.event.slug)
 
         return super().dispatch(request, *args, **kwargs)
-
-    def has_paid_optionals(self):
-        """ Retorna se evento possui algum lote pago. """
-
-        try:
-            sub = Subscription.objects.get(
-                person=self.person,
-                event=self.event,
-                completed=True, test_subscription=False
-            )
-
-            has_products = sub.subscription_products.filter(
-                optional_price__gt=0
-            ).count() > 0
-
-            has_services = sub.subscription_services.filter(
-                optional_price__gt=0
-            ).count() > 0
-
-            return has_products is True or has_services is True
-
-        except Subscription.DoesNotExist:
-            return False
 
     def get_context_data(self, **kwargs):
 

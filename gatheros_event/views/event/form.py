@@ -228,17 +228,6 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
             kwargs={'pk': event.pk}
         )
 
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-            if lot.price is None:
-                continue
-
-            if lot.price and lot.price > 0:
-                return True
-
-        return False
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['has_inside_bar'] = True

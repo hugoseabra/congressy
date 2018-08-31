@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
 # from django.core.files.storage import FileSystemStorage
+from gatheros_event.event_specifications import EventPayable
 from django.db.transaction import atomic
 from django.forms import ValidationError
 from django.http import QueryDict
@@ -716,7 +717,7 @@ class SubscriptionWizardView(SessionWizardView):
             except AttributeError:
                 config = FormConfig()
 
-            if self.has_paid_lots():
+            if EventPayable().is_satisfied_by(self.event):
                 config.email = True
                 config.phone = True
                 config.city = True
@@ -907,14 +908,6 @@ class SubscriptionWizardView(SessionWizardView):
                 data[field_name] = value
 
         return data
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-            if lot.price and lot.price > 0:
-                return True
-
-        return False
 
     def has_coupon(self):
         """ Retorna se possui cupon, seja qual for. """

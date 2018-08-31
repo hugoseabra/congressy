@@ -6,6 +6,7 @@ from six import BytesIO
 
 from payment.models import Transaction
 from survey.models import Answer
+from gatheros_event.helpers.event_business import event_has_had_payment
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
@@ -54,13 +55,7 @@ def export_event_data(event):
     _export_subscriptions(ws1, event.subscriptions.filter(completed=True,
                                                           test_subscription=False))
 
-    has_paid_lots = False
-    for lot in event.lots.all():
-        if lot.price and lot.price > 0:
-            has_paid_lots = True
-            break
-
-    if has_paid_lots:
+    if event_has_had_payment(event):
         _export_payments(wb.create_sheet(title='Pagamentos'), event)
 
     for ev_survey in event.surveys.all():

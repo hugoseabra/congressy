@@ -1,6 +1,7 @@
 """ Formulários de `FormConfig` """
 from django import forms
 
+from gatheros_event.event_specifications import EventPayable
 from gatheros_subscription.models import FormConfig
 
 
@@ -31,13 +32,13 @@ class FormConfigForm(forms.ModelForm):
             'function': forms.RadioSelect(),
         }
 
-    def __init__(self, event, has_paid_lots=False, **kwargs):
+    def __init__(self, event, **kwargs):
         self.event = event
-        self.has_paid_lots = has_paid_lots
+        self.event_is_payable = EventPayable().is_satisfied_by(event)
 
         super().__init__(**kwargs)
 
-        if has_paid_lots:
+        if self.event_is_payable:
             # Força campos como não obrigatórios para não dar erro de submissão
             self.fields['email'].required = False
             self.fields['phone'].required = False
@@ -47,7 +48,7 @@ class FormConfigForm(forms.ModelForm):
 
     def save(self, commit=True):
 
-        if self.instance and self.has_paid_lots:
+        if self.instance and self.event_is_payable:
             # Força valores
             self.instance.email = True
             self.instance.city = True

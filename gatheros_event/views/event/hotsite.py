@@ -77,7 +77,6 @@ class EventHotsiteView(AccountMixin, FormView):
         context['has_inside_bar'] = True
         context['active'] = 'pagina-do-evento'
         context['event'] = event
-        context['has_paid_lots'] = self.has_paid_lots()
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
         context['event_has_had_payments'] = event_has_had_payment(event)
 
@@ -87,18 +86,6 @@ class EventHotsiteView(AccountMixin, FormView):
             pass
 
         return context
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-            price = lot.price
-            if price is None:
-                continue
-
-            if lot.price and lot.price > 0:
-                return True
-
-        return False
 
     def get_success_url(self):
         return reverse('event:event-hotsite', kwargs={

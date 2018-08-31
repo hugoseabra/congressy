@@ -155,7 +155,6 @@ class EventPaymentView(AccountMixin, ListView):
         context['totals'] = self._get_payables()
         context['has_inside_bar'] = True
         context['active'] = 'pagamentos'
-        context['has_paid_lots'] = True
         context['event_has_had_payments'] = event_has_had_payment(self.event)
 
         return context

@@ -5,9 +5,10 @@ from django.views import generic
 
 from addon import services
 from addon.models import Theme
+from gatheros_event.helpers.event_business import event_has_had_payment
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
-from gatheros_event.helpers.event_business import event_has_had_payment
+
 
 class ThemeListView(AccountMixin, generic.ListView):
     """Lista de lotes de acordo com o evento do contexto"""
@@ -36,19 +37,7 @@ class ThemeListView(AccountMixin, generic.ListView):
         context['active'] = 'addon-themes'
         context['event_has_had_payments'] = event_has_had_payment(self.event)
         context['event'] = self.event
-        context['has_paid_lots'] = self.has_paid_lots()
         return context
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-
-            price = lot.price
-
-            if price and price > 0:
-                return True
-
-        return False
 
     def get_queryset(self):
         """Lotes a exibir são de acordo com o evento e não-interno"""
@@ -95,19 +84,7 @@ class ThemeAddView(AccountMixin, generic.CreateView):
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
         context['active'] = 'service'
-        context['has_paid_lots'] = self.has_paid_lots()
         return context
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-
-            price = lot.price
-
-            if price and price > 0:
-                return True
-
-        return False
 
     def post(self, request, *args, **kwargs):
         data = request.POST
@@ -146,19 +123,7 @@ class ThemeEditView(AccountMixin, generic.UpdateView):
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
         context['active'] = 'service'
-        context['has_paid_lots'] = self.has_paid_lots()
         return context
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-
-            price = lot.price
-
-            if price and price > 0:
-                return True
-
-        return False
 
     def post(self, request, *args, **kwargs):
         data = request.POST

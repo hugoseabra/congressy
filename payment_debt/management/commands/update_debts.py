@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 
+from gatheros_event.event_state import EventPayable
 from gatheros_event.models import Event
 from payment_debt.models import Debt
 
@@ -16,7 +17,7 @@ class Command(BaseCommand):
         events = Event.objects.all()
 
         for event in events:
-            if self._has_paid_lots(event) is False:
+            if EventPayable().is_satisfied_by(event) is False:
                 continue
 
             debts_created = 0
@@ -24,12 +25,10 @@ class Command(BaseCommand):
                 if sub.free is True:
                     continue
 
-                lot = sub.lot
-
                 if sub.debts.count() > 0:
                     continue
 
-                debt = Debt.objects.create(
+                Debt.objects.create(
                     subscription=sub,
                     type=Debt.DEBT_TYPE_SUBSCRIPTION,
                     status=Debt.DEBT_STATUS_DEBT,
@@ -63,13 +62,3 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             'Total debts: {}'.format(total_debts)
         ))
-
-
-    def _has_paid_lots(self, event):
-        for lot in event.lots.all():
-            if not lot.price:
-                continue
-
-            return True
-
-        return False

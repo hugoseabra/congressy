@@ -96,7 +96,6 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         context['status'] = self._get_status()
         context['totals'] = self._get_payables()
         context['limit'] = self._get_limit()
-        context['has_paid_lots'] = self.has_paid_lots()
         context['event_is_subscribable'] = EventSubscribable() \
             .is_satisfied_by(self.object)
         context['all_lots'] = self.all_lots_status()
@@ -193,18 +192,6 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
 
         except Subscription.DoesNotExist:
             return 0
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.object.lots.all():
-
-            if lot.price is None:
-                continue
-
-            if lot.price > 0 and lot.active:
-                return True
-
-        return False
 
     def _get_full_banking(self):
 

@@ -61,19 +61,5 @@ class EventOptionalMixin(OptionalBaseMixin):
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
-        context['has_paid_lots'] = self.has_paid_lots()
         context['themes'] = self.event.themes.all()
         return context
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-
-        if self.event.lots:
-            for lot in self.event.lots.all():
-
-                price = lot.price
-
-                if price and price > 0:
-                    return True
-
-        return False

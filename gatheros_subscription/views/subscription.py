@@ -48,6 +48,7 @@ from payment.helpers import payment_helpers
 from payment.models import Transaction
 from survey.models import Question, Answer
 from .mixins import CheckinFeatureFlagMixin
+from gatheros_event.event_specifications.payable import EventPayable
 
 
 class SubscriptionViewMixin(TemplateNameableMixin, AccountMixin):
@@ -77,7 +78,6 @@ class SubscriptionViewMixin(TemplateNameableMixin, AccountMixin):
         event = self.get_event()
         context['event'] = event
         context['event_has_had_payments'] = event_has_had_payment(event)
-        context['has_paid_lots'] = self.has_paid_lots()
 
         try:
             config = FormConfig.objects.get(event=event)
@@ -85,7 +85,7 @@ class SubscriptionViewMixin(TemplateNameableMixin, AccountMixin):
             config = FormConfig()
             config.event = event
 
-        if self.has_paid_lots():
+        if EventPayable().is_satisfied_by(event):
             config.email = True
             config.phone = True
             config.city = True
@@ -122,18 +122,6 @@ class SubscriptionViewMixin(TemplateNameableMixin, AccountMixin):
         """ Recupera número de lotes a serem usados nas inscrições. """
         lot_qs = self.get_lots()
         return lot_qs.count() if lot_qs else 0
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-            price = lot.price
-            if price is None:
-                continue
-
-            if lot.price and lot.price > 0:
-                return True
-
-        return False
 
     def can_access(self):
         if not self.event:
@@ -312,7 +300,6 @@ class SubscriptionListView(SubscriptionViewMixin, generic.ListView):
             'can_add_subscription': self.can_add_subscription(),
             'lots': self.get_lots(),
             'has_filter': self.has_filter,
-            'has_paid_lots': self.has_paid_lots(),
             'has_inside_bar': True,
             'active': 'inscricoes',
         })
@@ -373,15 +360,15 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
         response = super().dispatch(request, *args, **kwargs)
 
         if self.financial is True:
-            has_paid_products = self.object.subscription_products.filter(
+            has_payable_products = self.object.subscription_products.filter(
                 optional_price__gt=0
             ).count() > 0
-            has_paid_services = self.object.subscription_services.filter(
+            has_payable_services = self.object.subscription_services.filter(
                 optional_price__gt=0
             ).count() > 0
 
-            if not has_paid_products \
-                    and not has_paid_products \
+            if not has_payable_products \
+                    and not has_payable_services \
                     and self.object.free:
                 messages.warning(
                     request,

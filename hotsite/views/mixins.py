@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404, redirect
+from gatheros_event.event_specifications import EventPayable
 from django.views import generic
 
 from core.views.mixins import TemplateNameableMixin
@@ -35,7 +36,7 @@ class EventMixin(TemplateNameableMixin, generic.View):
         except AttributeError:
             config = FormConfig()
 
-        if self.has_paid_lots():
+        if EventPayable().is_satisfied_by(self.event):
             config.email = True
             config.phone = True
             config.city = True
@@ -61,8 +62,7 @@ class EventMixin(TemplateNameableMixin, generic.View):
             if lot.status == lot.LOT_STATUS_RUNNING
         ]
         context['subscription_enabled'] = self.subscription_enabled()
-        context['subsciption_finished'] = self.subsciption_finished()
-        context['has_paid_lots'] = self.has_paid_lots()
+        context['subscription_finished'] = self.subscription_finished()
         context['has_available_lots'] = self.has_available_lots()
         context['available_lots'] = self.get_available_lots()
         context['has_coupon'] = self.has_coupon()
@@ -73,18 +73,6 @@ class EventMixin(TemplateNameableMixin, generic.View):
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
 
         return context
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.filter(active=True):
-            price = lot.price
-            if price is None:
-                continue
-
-            if lot.price and lot.price > 0:
-                return True
-
-        return False
 
     def has_coupon(self):
         """ Retorna se possui cupom, seja qual for. """
@@ -102,7 +90,7 @@ class EventMixin(TemplateNameableMixin, generic.View):
 
         return self.event.status == Event.EVENT_STATUS_NOT_STARTED
 
-    def subsciption_finished(self):
+    def subscription_finished(self):
         for lot in self.event.lots.filter(active=True):
             if lot.status == Lot.LOT_STATUS_RUNNING:
                 return False
@@ -264,34 +252,6 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
 
         return False
 
-    def has_paid_optionals(self):
-        """ Retorna se evento possui algum lote pago. """
-
-        person = self.get_person()
-        if not person:
-            return False
-
-        try:
-            sub = Subscription.objects.get(
-                person=person,
-                event=self.event,
-                completed=True,
-                test_subscription=False
-            )
-
-            has_products = sub.subscription_products.filter(
-                optional_price__gt=0
-            ).count() > 0
-
-            has_services = sub.subscription_services.filter(
-                optional_price__gt=0
-            ).count() > 0
-
-            return has_products is True or has_services is True
-
-        except Subscription.DoesNotExist:
-            return False
-
     def subscriber_has_account(self, email):
         if self.request.user.is_authenticated:
             return True
@@ -305,7 +265,8 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
 
         return False
 
-    def subscriber_has_logged(self, email):
+    @staticmethod
+    def subscriber_has_logged(email):
         try:
             user = User.objects.get(email=email)
             return user.last_login is not None

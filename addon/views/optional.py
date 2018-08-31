@@ -38,21 +38,9 @@ class EventOptionalMixin(AccountMixin, generic.View):
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
         context['event_has_had_payments'] = event_has_had_payment(self.event)
-        context['has_paid_lots'] = self.has_paid_lots()
         context['themes'] = self.event.themes.all()
         context['cgsy_percent'] = Decimal(self.event.congressy_percent) / 100
         return context
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-
-            price = lot.price
-
-            if price and price > 0:
-                return True
-
-        return False
 
 
 class OptionalServiceListView(ServiceFeatureFlagMixin,
