@@ -8,6 +8,12 @@
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'assets/plugins/icheck/css/all.css' %}">
+
+    <!-- Select2 lib -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
+    <!-- Select2 theme -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2-bootstrap4.min.css' %}">
+
     <link rel="stylesheet"
           href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
 {% endblock %}
@@ -33,6 +39,8 @@
     <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
 
     <script src="{% static 'assets/js/date-time.js' %}"></script>
+    <!-- Select2 lib -->
+    <script src="{% static 'assets/plugins/select2/js/select2.min.js' %}"></script>
 
 
     <script type="application/javascript">
@@ -95,6 +103,12 @@
 
             $('#id_zip_code').on('keyup', function () {
                 searchByCep();
+            });
+        
+            // Starting select2
+            $('#id_subscription-lot').select2({
+                theme: "bootstrap4",
+                width: 'resolve'
             });
 
         });
