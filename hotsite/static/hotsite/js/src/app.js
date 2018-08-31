@@ -5,6 +5,8 @@ window.app = function () {
     $(function () {
         switcheryToggle();
         icheckStart();
+        tooltips();
+        createFileUploadEvents();
     });
 
     var switcheryElements = {};
@@ -28,9 +30,17 @@ window.app = function () {
     };
 
     var icheckStart = function() {
-        $('input[type=radio]').iCheck({
+        var radios = $('input[type=radio]');
+        var checkboxes = $('input[type=checkbox]');
+
+        radios.iCheck({
             checkboxClass: 'icheckbox_flat-grey',
-            radioClass: 'iradio_flat-blue'
+            radioClass: 'iradio_flat-grey'
+        });
+
+        checkboxes.iCheck({
+            checkboxClass: 'icheckbox_flat-grey',
+            radioClass: 'iradio_flat-grey'
         });
     };
 
@@ -45,6 +55,15 @@ window.app = function () {
         }
     };
 
+    //tooltips
+    var tooltips = function() {
+        $('.tooltip-wrapper').tooltip({
+            selector: "[data-toggle=tooltip]",
+            container: "body",
+            html:true
+        })
+    };
+
     var enableDisableSwitchery = function(elem, disable) {
         var checkbox = $(elem);
         if (disable === true && checkbox.prop('disabled') === false) {
@@ -56,12 +75,50 @@ window.app = function () {
         }
     };
 
+    var createFileUploadEvents = function() {
+            var btn_file_group = $('.btn-file-group');
+
+            var read_only_input = btn_file_group.find('input[readonly]');
+                read_only_input.unbind('click');
+
+                read_only_input.on('click', function(e) {
+                    e.preventDefault();
+                    $(this).parent().parent().find(':file').trigger('click');
+                });
+
+            $(document).unbind('change', ':file');
+            $(document).on('change', ':file', function () {
+                var input = $(this),
+                    numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                    label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+                input.trigger('fileselect', [numFiles, label]);
+            });
+
+            // We can watch for our custom `fileselect` event like this
+            var all_files_els = $(':file');
+            all_files_els.unbind('fileselect');
+
+            all_files_els.on('fileselect', function(event, numFiles, label) {
+                var input = $(this).parents('.input-group').find(':text'),
+                    log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+                if( input.length ) {
+                    input.val(log);
+                } else {
+                    if( log ) alert(log);
+                }
+            });
+        };
+
     //return functions
     return {
         'setSwitchery': setSwitchery,
         'disableSwitchery': enableDisableSwitchery,
         'switcheryToggle': switcheryToggle,
-        'switcheryElements': switcheryElements
+        'switcheryElements': switcheryElements,
+        'iCheckStart': icheckStart,
+        'tooltips': tooltips,
+        'createFileUploadEvents': createFileUploadEvents
     };
 }();
 

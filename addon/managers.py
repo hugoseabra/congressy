@@ -1,7 +1,12 @@
+import base64
+import binascii
+from uuid import uuid4
+
 from django import forms
+from django.core.files.base import ContentFile
 
 from base import managers
-from core.forms.widgets import SplitDateTimeWidget, PriceInput,SplitDateTimeBootsrapWidget
+from core.forms.widgets import PriceInput, SplitDateTimeBootsrapWidget
 from .constants import MINIMUM_RELEASE_DAYS
 from .models import (
     Product,
@@ -41,6 +46,11 @@ class OptionalServiceTypeManager(managers.Manager):
 class ProductManager(managers.Manager):
     """ Manager de produtos opcionais. """
 
+    banner = forms.CharField(
+        widget=forms.HiddenInput,
+        required=False,
+    )
+
     class Meta:
         model = Product
         fields = '__all__'
@@ -67,7 +77,8 @@ class ProductManager(managers.Manager):
         if self.instance.pk \
                 and self.instance.has_changed('liquid_price') \
                 and self.instance.subscription_products \
-                        .filter(subscription__completed=True, subscription__test_subscription=False) \
+                        .filter(subscription__completed=True,
+                                subscription__test_subscription=False) \
                         .count() > 0:
             raise forms.ValidationError(
                 'Este opcional já possui inscrições. Seu valor não pode ser'
@@ -76,9 +87,35 @@ class ProductManager(managers.Manager):
 
         return liquid_price
 
+    def clean_banner(self):
+        banner = self.cleaned_data.get('banner')
+
+        if not banner:
+            return None
+
+        # Decoding from base64 avatar into a file obj.
+        try:
+            file_ext, imgstr = banner.split(';base64,')
+            ext = file_ext.split('/')[-1]
+            file_name = str(uuid4()) + "." + ext
+            banner = ContentFile(
+                base64.b64decode(imgstr),
+                name=file_name
+            )
+
+        except (binascii.Error, ValueError):
+            pass
+
+        return banner
+
 
 class ServiceManager(managers.Manager):
     """ Manager de serviços opcionais """
+
+    banner = forms.CharField(
+        widget=forms.HiddenInput,
+        required=False,
+    )
 
     class Meta:
         model = Service
@@ -108,15 +145,37 @@ class ServiceManager(managers.Manager):
         # Não é permitido editar preço para opcionais com inscrições.
         if self.instance.pk \
                 and self.instance.has_changed('liquid_price') \
-                and self.instance.subscription_services \
-                        .filter(subscription__completed=True, subscription__test_subscription=False) \
-                        .count() > 0:
+                and self.instance.subscription_services.filter(
+                    subscription__completed=True,
+                    subscription__test_subscription=False
+                ).count() > 0:
             raise forms.ValidationError(
                 'Este opcional já possui inscrições. Seu valor não pode ser'
                 ' alterado.'
             )
 
         return liquid_price
+
+    def clean_banner(self):
+        banner = self.cleaned_data.get('banner')
+
+        if not banner:
+            return None
+
+        # Decoding from base64 avatar into a file obj.
+        try:
+            file_ext, imgstr = banner.split(';base64,')
+            ext = file_ext.split('/')[-1]
+            file_name = str(uuid4()) + "." + ext
+            banner = ContentFile(
+                base64.b64decode(imgstr),
+                name=file_name
+            )
+
+        except (binascii.Error, ValueError):
+            pass
+
+        return banner
 
 
 class SubscriptionServiceManager(managers.Manager):

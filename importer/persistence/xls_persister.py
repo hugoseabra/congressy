@@ -149,7 +149,7 @@ class XLSErrorPersister(CSVMixin, XLSPersister):
                 else:
                     ws1[cell] = ''
 
-                if form_key in errors:
+                if form_key in errors and form_key != 'city':
                     ws1[cell].fill = self.redFill
                     ws1[cell].comment = Comment(errors[form_key], 'Congressy')
 

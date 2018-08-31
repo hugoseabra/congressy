@@ -36,14 +36,13 @@
 <script>
     document.addEventListener("DOMContentLoaded", function (event) {
         window.setTimeout(function () {
-            render_available_optional_products_list();
             render_currently_selected_products_list();
         }, 300);
     });
 
 
     function render_available_optional_products_list() {
-        var url = '{% url 'public:hotsite_products' subscription.pk %}';
+        var url = '{% url 'public:hotsite_products' selected_lot.category.pk subscription.pk %}';
 
         send(
             url,
@@ -51,12 +50,17 @@
             null,
             function (response) {
                 $('#available_optional_products').html(response);
+                loadImageViewerEvents();
+                reloadStickyDiv();
             },
-            null
+            function (err) {
+                console.log(err);
+                cgsy.messenger.triggerError('Não foi possível carregar itens disponíveis.');
+            }
         );
     }
     function render_currently_selected_products_list() {
-        var url = '{% url 'public:hotsite_products' subscription.pk %}';
+        var url = '{% url 'public:hotsite_products' selected_lot.category.pk subscription.pk %}';
 
         send(
             url,
@@ -66,15 +70,23 @@
             },
             function (response) {
                 $('#currently_selected_products').html(response);
+                loadImageViewerEvents();
                 render_available_optional_products_list();
+                reloadStickyDiv();
             },
-            null
+            function (err) {
+                console.log(err);
+                cgsy.messenger.triggerError('Não foi possível carregar itens selecionados.');
+            }
         );
     }
 
-    function addOptionalProduct(product_id) {
+    function addOptionalProduct(button_el, product_id) {
 
-        var url = '{% url 'public:hotsite_products' subscription.pk %}';
+        $('.optional-action-buttons').find('button').attr('disabled', '');
+        insertLoaderIntoButton(button_el);
+
+        var url = '{% url 'public:hotsite_products' selected_lot.category.pk subscription.pk %}';
 
         send(
             url,
@@ -85,18 +97,24 @@
             },
             function (res) {
                 console.log(res);
-                render_available_optional_products_list();
                 render_currently_selected_products_list();
+                window.setTimeout(function() {
+                    cgsy.messenger.triggerSuccess('Item adicionado com sucesso.')
+                }, 350);
             },
             function (err) {
                 console.log('err');
                 console.error(err);
+                cgsy.messenger.triggerError('Não foi possível adicionar item.');
             }
         );
     }
-    function removeOptionalProduct(product_id) {
+    function removeOptionalProduct(button_el, product_id) {
 
-        var url = '{% url 'public:hotsite_products' subscription.pk %}';
+        $('.optional-action-buttons').find('button').attr('disabled', '');
+        insertLoaderIntoButton(button_el);
+
+        var url = '{% url 'public:hotsite_products' selected_lot.category.pk subscription.pk %}';
 
         send(
             url,
@@ -108,13 +126,59 @@
             function (res) {
                 console.log(res);
                 render_currently_selected_products_list();
-                render_available_optional_products_list();
+                window.setTimeout(function() {
+                    cgsy.messenger.triggerSuccess('Item removido com sucesso.')
+                }, 350);
             },
             function (err) {
                 console.log('err');
                 console.error(err);
+                cgsy.messenger.triggerError('Não foi possível remover item.');
             }
         );
+    }
+
+    function loadImageViewerEvents() {
+        $('.image-link-parent').magnificPopup({
+            delegate: 'a',
+            type: 'image',
+            closeOnContentClick: true,
+            closeBtnInside: false,
+            fixedContentPos: false,
+            mainClass: 'mfp-with-zoom mfp-img-mobile',
+            image: {
+                verticalFit: true,
+                titleSrc: function (item) {
+                    return item.el.data('optional-name');
+                }
+            },
+            zoom: {
+                enabled: true,
+                duration: 300, // don't foget to change the duration also in CSS
+                opener: function (element) {
+                    return element.find('img');
+                }
+            }
+        });
+        reloadTooltipEvents();
+    }
+
+    function insertLoaderIntoButton(button_el) {
+        button_el = $(button_el);
+        var current_icon = button_el.find('i');
+            current_icon.addClass('hide');
+        var loader_icon = $('<i>').addClass('fas fa-circle-notch fa-spin');
+        loader_icon.appendTo(button_el);
+    }
+
+    function reloadTooltipEvents()
+    {
+        $('.tooltip').remove();
+        app.tooltips();
+    }
+
+    function reloadStickyDiv() {
+{#        var sticky = new Sticky('.sticky');#}
     }
 
     function send(url, method, data, success_callback, error_callback) {

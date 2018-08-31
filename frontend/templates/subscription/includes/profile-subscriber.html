@@ -22,7 +22,6 @@
             </div>
             <div class="float-right">
                 {% if event.allow_internal_subscription %}
-
                     <button onclick="window.location.href='{% url 'subscription:subscription-edit' event.pk object.pk %}'"
                             class="btn btn-info btn-trans"
                             data-toggle="tooltip"
@@ -558,21 +557,6 @@
                                             Ver Painel Financeiro
                                         </button>
                                     </li>
-                                {% endif %}
-
-                                {% if survey_answers|length > 0 %}
-
-                                    <li>
-                                        <button type="button"
-                                                class="btn btn-info btn-trans"
-                                                data-toggle="tooltip"
-                                                title="Abrir formulário de perguntas do participante"
-                                                onclick="window.location.href='{% url 'subscription:subscription-internal-survey' event.pk object.pk %}'">
-                                            <span class="fas fa-clipboard-list"></span>
-                                            Editar respostas do participante
-                                        </button>
-                                    </li>
-
                                 {% endif %}
 
                                 <li>

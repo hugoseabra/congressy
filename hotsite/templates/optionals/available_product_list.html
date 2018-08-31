@@ -1,51 +1,11 @@
 {% load humanize %}
 
 {% if  object_list %}
-    <label for="products_table">Produtos</label>
-
-    <div class="table-responsive" id="products_table">
+    <div id="products_table">
         <table class="table">
-            <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Tipo</th>
-                <th>Preço</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
             {% for product in object_list %}
-                <tr>
-                    <td>{{ product.optional.name }}</td>
-                    <td>{{ product.optional.optional_type.name }}</td>
-                    <td>
-                        {% if product.optional.price == 0.00 %}
-                            Grátis
-                        {% else %}
-                            R$ {{ product.optional.price|intcomma }}
-                        {% endif %}
-                    </td>
-                    {% if product.available %}
-                        <td>
-                            <button style="width: 100%"
-                                    onclick="addOptionalProduct({{ product.optional.pk }})"
-                                    class="btn btn-sm btn-success">
-                                Selecionar
-                            </button>
-                        </td>
-                    {% else %}
-                        <td>
-                            <button style="width: 100%"
-                                    disabled="disabled"
-                                    class="btn btn-sm btn-warning">
-                                Esgotado
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </button>
-                        </td>
-                    {% endif %}
-                </tr>
+                {% include 'optionals/optional-item-snippet.html' with optional_type='product' action='add' optional=product.optional available=product.available %}
             {% endfor %}
-            </tbody>
         </table>
     </div>
 {% else %}

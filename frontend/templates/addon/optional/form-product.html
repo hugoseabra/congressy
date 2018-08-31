@@ -28,9 +28,34 @@
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
     <script src="{% static "assets/js/addon.js" %}"></script>
+
+    <!-- Script used for cropping -->
+    <script src="{% static "assets/plugins/croppie/croppie.js" %}"></script>
+    <script src="{% static "assets/js/image-crop.js" %}"></script>
+
+    <!-- Script price calculator -->
+    <script src="{% static "assets/js/price-format.min.js" %}"></script>
+    <script src="{% static "assets/js/cgsy-price.js" %}"></script>
+
     <script type="application/javascript">
+        var price_calculator;
+        function getLiquidPrice(value, to_el) {
+            if (!value) {
+                to_el.val('');
+                return;
+            }
+
+            value = value.replace('.', '').replace(',', '.');
+            value = price_calculator.getLiquidPrice(parseFloat(value));
+
+            to_el = $(to_el);
+            to_el.val(as_currency(parseFloat(value)));
+        }
+
         $(document).ready(function () {
-            var date = createDatePicker();
+            price_calculator = new window.cgsy.PriceCalculator(parseFloat('{{ cgsy_percent|unlocalize }}'), true);
+
+            var date = createDatePicker($('#id_date_end_sub_0'));
             {% if object %}
                 date.data("DateTimePicker").minDate(false);
             {% endif %}
@@ -53,7 +78,7 @@
                 $('#id_date_end_sub_1').mask("99:99");
                 $('#id_schedule_start_1').mask("99:99");
                 $('#id_schedule_end_1').mask("99:99");
-                $('#id_liquid_price').mask('#.##0,00', {reverse: true});
+                $('#id_price').mask('#.##0,00', {reverse: true});
 
                 window.setTimeout(function () {
                     window.cgsy.addon.create_events();
@@ -67,6 +92,35 @@
             });
 
         })(jQuery);
+
+        var modal_obj;
+        $(document).ready(function() {
+            "use strict";
+
+            var cropper = new window.cgsy.Cropper(900, 580, 'square');
+                cropper.setWindowProportionalPercent(40);
+                cropper.setBoundaryMargin(20);
+
+            var banner_img;
+            {% if object.banner %}
+                banner_img = "{{ object.banner.default.url }}";
+            {% endif %}
+
+            modal_obj = new window.cgsy.ModalBlock(cropper, banner_img, 'banner');
+            modal_obj.setDefaultImgSrc("{% static 'assets/img/addon/opcional-sample-900x580.png' %}");
+            modal_obj.addPostCropCallback(function(base64_image) {
+                $('#banner-thumbnail').attr('src', base64_image);
+                window.cgsy.messenger.triggerSuccess('Imagem recortada com sucesso.');
+            });
+
+            {% if object.pk %}
+                // Assincrono
+                modal_obj.setAsyncMode('{% url 'api:addon:product-detail' object.pk %}');
+            {% else %}
+                // Sincrono
+                modal_obj.setSyncMode($('#optional_form'));
+            {% endif %}
+        });
     </script>
 {% endblock %}
 
@@ -78,7 +132,7 @@
 
     <div id="output"></div>
 
-    <form action="" id="optional_form" method="post"
+    <form  novalidate action="" id="optional_form" method="post"
           class="form-horizontal form-border"
           role="form" name="optional_form">
         {% csrf_token %}
@@ -126,24 +180,46 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-xl-10 col-xl-push-1 col-md-12">
-                                {% render_generic_field form.name autofocus=True %}
+                            <div class="col-xl-3 col-xl-push-1 col-md-4">
+                                <div class="row banner">
+                                    <div class="col-md-12 text-center image-link-parent">
+                                        <img class="img-responsive" width="270px" style="margin: 0 auto" src="{% if object.banner %}{{ object.banner.thumbnail.url }}{% else %}{% static 'assets/img/addon/thumbnail-opcional-sample-135x87.png' %}{% endif %}" id="banner-thumbnail" />
+                                    </div>
+                                </div>
+                                <div class="row banner" style="margin-top: 10px">
+                                    <div class="col-md-12 text-center">
+                                        <button type="button" class="btn btn-primary" id="open_banner_modal" onclick="modal_obj.open()">
+                                            <i class="fas fa-image"></i>
+                                            Configurar imagem
+                                        </button>
+                                        <small class="row text-muted">
+                                            {{ object.banner.field.help_text }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-7 col-xl-push-1 col-md-8">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.name autofocus=True %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.optional_type %}
+
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.lot_category %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-xl-5 col-xl-push-1 col-md-6">
-                                {% render_generic_field form.optional_type %}
-
-                            </div>
-                            <div class="col-xl-5 col-xl-push-1 col-md-6">
-                                {% render_generic_field form.lot_category %}
+                            <div class="col-xl-10 col-xl-push-1 col-md-12">
+                                {% render_generic_field form.description help_text="Deixe claro ao participante do que se trata esta Atividade Extra." %}
                             </div>
                         </div>
-                        {#                        <div class="row">#}
-                        {#                            <div class="col-xl-10 col-xl-push-1 col-md-12">#}
-                        {#                                {% render_generic_field form.description %}#}
-                        {#                            </div>#}
-                        {#                        </div>#}
                     </div>
                 </div>
 
@@ -179,20 +255,44 @@
                             {% if optonal_has_subscriptions and not object.liquid_price %}
                             {% else %}
                                 <div class="col-xl-3 col-xl-push-1 col-md-4">
-                                    {% render_generic_field form.liquid_price %}
+                                    <div class="form-group" style="margin-top: 20px">
+                                        <label for="id_liquid_price" style="margin-bottom:0">Preço de venda</label>
+                                        <small>
+                                            <i class="fas fa-question-circle" data-toggle="tooltip" data-placement="right" title="Qual o preço que você irá pedir pela venda deste item opcional?"></i>
+                                        </small>
+                                        <div>
+                                            <div class="input-group">
+                                                <div class="input-group-addon">R$</div>
+                                                <input class="form-control" type="tel" name="price" value="{{ object.price|default_if_none:'' }}" id="id_price" required="required" onkeyup="getLiquidPrice(this.value, $('#id_liquid_price'))">
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="form-group" style="margin-top: 20px">
+                                        <label for="id_liquid_price" style="margin-bottom:0">Valor a receber</label>
+                                        <small>
+                                            <i class="fas fa-question-circle" data-toggle="tooltip" data-placement="right" title="Valor líquido a receber por cada venda deste item opcional?"></i>
+                                        </small>
+                                        <div>
+                                            <div class="input-group">
+                                                <div class="input-group-addon">R$</div>
+                                                <input class="form-control" style="background-color: white;color:blue" type="text" readonly name="liquid_price" value="{{ object.liquid_price|default_if_none:'' }}" id="id_liquid_price">
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <input type="hidden"  name="" id="id_liquid_price" >
                                 </div>
                                 <div class="col-xl-7 col-xl-push-1 col-md-8">
                                     <div class="well well-sm"
                                          style="text-align: justify">
                                         <div><strong>Importante:</strong></div>
                                         <small class="help-text text-muted">
-                                            As
-                                            <strongs>Taxas de Transação
-                                            </strongs>
-                                            serão transferidas para o
-                                            participante.
-                                            Verifique se o <strong>valor
-                                            final</strong>.
+                                            Este item irá transferir as <strongs>Taxas</strongs> para o participante.
+                                            Então é importante verificar o <span style="text-decoration: underline;">valor a receber</span>
+                                            para saber quanto você receberá por este opcional.
                                         </small>
                                     </div>
                                 </div>
@@ -241,6 +341,6 @@
 
 {% endblock %}
 {% block styles %}
-    <link rel="stylesheet"
-          href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
+    <link rel="stylesheet" href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
+    <link href="{% static "assets/plugins/croppie/croppie.css" %}" rel="stylesheet">
 {% endblock %}

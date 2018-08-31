@@ -492,11 +492,15 @@ class CSVFixCitiesView(CSVProcessedViewMixin, generic.FormView):
         invalid_city = self.get_invalid_city_line()
 
         if invalid_city:
+            survey = None
+            if self.object.lot.event_survey:
+                survey = self.object.lot.event_survey.survey
+
             csvfile = CSVCityCorrectionPersister(
                 old=invalid_city,
                 new=form.cleaned_data['city'],
                 line_data_collection=self.get_data_collection(raw=False)
-            ).write()
+            ).write(survey)
 
             self.object.correction_csv_file.save(self.object.filename(),
                                                  csvfile)
@@ -561,5 +565,10 @@ class CSVFixCitiesView(CSVProcessedViewMixin, generic.FormView):
         ).get_collection(size)
 
     def _create_correction_csv(self):
-        csvfile = CSVCorrectionPersister(self.get_data_collection()).write()
+        survey = None
+        if self.object.lot.event_survey:
+            survey = self.object.lot.event_survey.survey
+
+        csvfile = CSVCorrectionPersister(self.get_data_collection()).write(
+            survey)
         self.object.correction_csv_file.save(self.object.filename(), csvfile)

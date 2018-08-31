@@ -42,6 +42,8 @@ KEY_MAP = {
         'csv_keys': [
             'data de nasc',
             'data de nasc.',
+            'data nasc.',
+            'data nascimento',
             'data nasc',
             'nascimento',
             'data de nascimento',
@@ -127,11 +129,8 @@ KEY_MAP = {
         ],
         'possible_values': [],
     },
-
 }
 
 REQUIRED_KEYS = [
     'name',
-    'email',
-    'gender',
 ]

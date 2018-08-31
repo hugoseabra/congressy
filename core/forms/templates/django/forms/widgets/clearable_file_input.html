@@ -1,0 +1,25 @@
+<div class="input-group btn-file-group">
+    <label for="{% for attr,value in widget.attrs.items %}{% if attr == 'id' %}{{ value}}{% endif %}{% endfor %}" class="input-group-btn">
+        <span class="btn btn-primary btn-file">Selecione:</span>
+    </label>
+    <input type="text" class="form-control" readonly value="{% if is_initial and not widget.required %}{{ widget.value }}{% endif %}" />
+    {% if is_initial and not widget.required %}
+    <div class="input-group-btn">
+        <a href="{{ widget.value.url }}" target="_blank" class="btn btn-info" data-toggle="tooltip" title="Ver arquivo">
+            <i class="fas fa-eye"></i>
+        </a>
+    </div>
+    {% endif %}
+    <div>
+{#        {% if is_initial %}#}
+{#            {{ initial_text }}: <a href="{{ widget.value.url }}">{{ widget.value }}</a>#}
+{#            {% if not widget.required %}#}
+{#                <input type="checkbox" name="{{ checkbox_name }}" id="{{ checkbox_id }}" style="display: none;" />#}
+{#                <label for="{{ checkbox_id }}">{{ clear_checkbox_label }}</label>#}
+{#            {% endif %}#}
+{#            <br />#}
+{#            {{ input_text }}:#}
+{#        {% endif %}#}
+        <input type="file" name="{{ widget.name }}" style="display: none;"{% for attr,value in widget.attrs.items %}{% if attr == 'id' %}{{ attr }}={{ value}}{% endif %}{% endfor %} />
+    </div>
+</div>

@@ -11,6 +11,7 @@
             icheckStart();
             tooltips();
             modal_onload();
+            createFileUploadEvents();
         });
 
         var navToggleRight = function () {
@@ -115,13 +116,49 @@
             });
         };
 
+        var createFileUploadEvents = function() {
+            var btn_file_group = $('.btn-file-group');
+
+            var read_only_input = btn_file_group.find('input[readonly]');
+                read_only_input.unbind('click');
+
+                read_only_input.on('click', function(e) {
+                    e.preventDefault();
+                    $(this).parent().parent().find(':file').trigger('click');
+                });
+
+            $(document).unbind('change', ':file');
+            $(document).on('change', ':file', function () {
+                var input = $(this),
+                    numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                    label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+                input.trigger('fileselect', [numFiles, label]);
+            });
+
+            // We can watch for our custom `fileselect` event like this
+            var all_files_els = $(':file');
+            all_files_els.unbind('fileselect');
+
+            all_files_els.on('fileselect', function(event, numFiles, label) {
+                var input = $(this).parents('.input-group').find(':text'),
+                    log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+                if( input.length ) {
+                    input.val(log);
+                } else {
+                    if( log ) alert(log);
+                }
+            });
+        };
+
         //return functions
         return {
             'setSwitchery': setSwitchery,
             'disableSwitchery': enableDisableSwitchery,
             'switcheryToggle': switcheryToggle,
             'switcheryElements': switcheryElements,
-            'tooltips': tooltips
+            'tooltips': tooltips,
+            'createFileUploadEvents': createFileUploadEvents
         };
     }();
 

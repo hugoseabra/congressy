@@ -13,6 +13,9 @@
     <!-- Select2 lib -->
     <link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
 
+    <!-- Select2 theme -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2-bootstrap4.min.css' %}">
+
 {% endblock %}
 
 {% block scripts %}
@@ -31,7 +34,7 @@
 
             // Starting select2
             lot_select_el.select2({
-                theme: "classic",
+                theme: "bootstrap4",
                 width: 'resolve'
             });
 
