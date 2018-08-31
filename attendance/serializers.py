@@ -62,7 +62,7 @@ class CheckinsField(serializers.Field):
                 checkout = checkin.checkout
                 checkout = {
                     'id': checkout.pk,
-                    'attended_by': checkout.attended_by,
+                    'created_by': checkout.created_by,
                     'created_on': checkin.created_on.strftime(
                         '%d/%m/%Y %H:%M:%S'
                     ),
@@ -72,7 +72,7 @@ class CheckinsField(serializers.Field):
 
             checkins.append({
                 'id': checkin.pk,
-                'attended_by': checkin.attended_by,
+                'created_by': checkin.created_by,
                 'attendance_service': checkin.attendance_service.name,
                 'printed_on': checkin.printed_on.strftime(
                     '%d/%m/%Y %H:%M:%S'
