@@ -2,7 +2,6 @@ from gatheros_event.event_specifications import (
     EventHasSubscriptions,
     EventSubscribable,
 )
-from gatheros_event.models import Event
 from .mixins import EventAndSpecificationMixin
 
 

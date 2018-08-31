@@ -1,4 +1,4 @@
-from addon.models import Product, Service
+from addon.models import Product, Service, AbstractOptional
 from core.specification import CompositeSpecification, AndSpecification
 from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription, Lot
@@ -37,12 +37,6 @@ class EventAndSpecificationMixin(AndSpecification):
 
 
 class LotCompositeSpecificationMixin(CompositeSpecification):
-    """
-        Esse mixin que garante que o candidato repassado via o metodo
-        'is_satisfied_by' seja uma instancia de Lote, além de oferecer uns
-        metodos privados que são compartilhados por seus filhos
-    """
-
     """
         Esse mixin que garante que o candidato repassado via o metodo
         'is_satisfied_by' seja uma instancia de Lote, além de oferecer uns

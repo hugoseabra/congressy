@@ -8,3 +8,4 @@ from .privacy_specifications import (
     OpenWithAudience,
     OpenWithNoAudience,
 )
+from .publishable import EventPublishable
