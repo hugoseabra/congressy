@@ -97,6 +97,26 @@ window.cgsy = window.cgsy || {};
                 error: fail_callback
             });
         };
+
+        this.get = function(data) {
+            this.send('GET', data || {});
+        };
+
+        this.post = function(data) {
+            this.send('POST', data || {});
+        };
+
+        this.put = function(data) {
+            this.send('PUT', data);
+        };
+
+        this.patch = function(data) {
+            this.send('PATCH', data || {});
+        };
+
+        this.delete = function(data) {
+            this.send('DELETE', data || {});
+        };
     };
 
     cgsy.AjaxFormDataSender = function (url) {
