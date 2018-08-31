@@ -23,6 +23,7 @@ from gatheros_event.models import Event, Person
 from gatheros_event.views.mixins import (
     AccountMixin,
     PermissionDenied,
+    EventViewMixin,
 )
 from gatheros_subscription.directors import SubscriptionSurveyDirector
 from gatheros_subscription.forms import (
@@ -898,7 +899,8 @@ class SubscriptionConfirmationView(SubscriptionViewMixin, generic.TemplateView):
         return self.get(request, *args, **kwargs)
 
 
-class SubscriptionCancelView(SubscriptionViewMixin, generic.DetailView):
+class SubscriptionCancelView(EventViewMixin,
+                             SubscriptionViewMixin, generic.DetailView):
     template_name = 'subscription/delete.html'
     model = Subscription
     success_message = 'Inscrição cancelada com sucesso.'
