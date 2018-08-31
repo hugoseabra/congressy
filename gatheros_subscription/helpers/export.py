@@ -377,6 +377,7 @@ def _export_addon_services(worksheet, title, services):
     """
     columns = [
         'CATEGORIA',
+        'TEMA',
         'NÚMERO DE INSCRIÇÃO',
         'CÓDIGO DA INSCRIÇÃO',
         'NOME',
@@ -407,6 +408,7 @@ def _export_addon_services(worksheet, title, services):
                 collector[row_idx] = []
 
             collector[row_idx].append(sub.lot.category.name)
+            collector[row_idx].append(addon_sub.optional.theme.name)
             collector[row_idx].append(get_object_value(sub, 'event_count'))
             collector[row_idx].append(get_object_value(sub, 'code'))
             collector[row_idx].append(person.name)
