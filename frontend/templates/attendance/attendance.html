@@ -83,7 +83,7 @@
                             </h3>
                         </div>
                     </div>
-                    <div id="cards-list"></div>
+                    <div class="row" id="cards-list"></div>
                 </div>
             </div>
         </div>
@@ -94,18 +94,18 @@
 
 {% block scripts %}
     <script src="{% static 'assets/js/ajax.js' %}"></script>,
-    <script src="{% static 'assets/js/attendance/attendance.js' %}"></script>,
+    <script src="{% static 'assets/js/attendance/attendance.js' %}"></script>
     <script>
-        $(document).ready(function () {
-            var typingSearch = new window.cgsy.attendance.TypingSearch(
-                '{{ attendance_list.pk }}',
-                '{{ request.user.get_full_name }}',
-                '{% url 'api:attendance:subscription-list' attendance_list.pk %}',
-                $('#search'),
-                $('#submit'),
-                $('#cards-list')
-            );
-            typingSearch.bindSubmitEvent()
+        $(document).ready(function() {
+            createTypingSearch({
+                'subscriptionUri': "{% url 'api:attendance:subscription-list' attendance_list.pk %}",
+                'checkinUri': "{% url 'api:attendance:checkin-list' %}",
+                'checkoutUri': "{% url 'api:attendance:checkout-list' %}",
+                'servicePk': '{{ attendance_list.pk }}',
+                'createdBy': '{{ request.user.get_full_name }}',
+                'listEl': $('#cards-list'),
+                'inputEl': $('#search'),
+            });
         });
     </script>
 

@@ -6,6 +6,7 @@ window.cgsy = window.cgsy || {};
 
         url = url || window.location.href;
 
+        var beforeSendCallback = function (response) {};
         var success_callback = function (response) {};
 
         var default_fail_callback = function (response) {

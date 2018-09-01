@@ -88,11 +88,11 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
         var subscription_uri = null;
 
-        this.setUri = function(uri) {
+        this.setUri = function (uri) {
             subscription_uri = uri;
         };
 
-        this.fetch = function(service_pk) {
+        this.fetch = function (service_pk) {
             if (!uuid) {
                 console.error('No UUID provided to fetch subscription.');
                 return;
@@ -108,10 +108,10 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
             subscription_uri = subscription_uri.replace(':pk', uuid);
 
-            return new Promise(function(resolve) {
+            return new Promise(function (resolve) {
 
                 var sender = new AjaxSender(subscription_uri);
-                sender.setSuccessCallback(function(response) {
+                sender.setSuccessCallback(function (response) {
                     console.log('1. Fetch - status anterior: ' + response['attendance_status']);
 
                     self.name = response['person']['name'];
@@ -126,7 +126,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     self.checkins = [];
                     var incoming_checkins = response['checkins'];
                     if (incoming_checkins.length) {
-                        $.each(incoming_checkins, function(i, item) {
+                        $.each(incoming_checkins, function (i, item) {
                             var checkout = item['checkout'];
 
                             self.addCheckinNote(
@@ -181,7 +181,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         this.subscriptions = [];
         var subscription_uri = collection_uri + ':pk/';
 
-        var createSubscription = function(data) {
+        var createSubscription = function (data) {
             var subscription = new Subscription(
                 data['uuid'],
                 data['person']['name'],
@@ -197,7 +197,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
             var incoming_checkins = data['checkins'];
             if (incoming_checkins.length) {
-                $.each(incoming_checkins, function(i, item) {
+                $.each(incoming_checkins, function (i, item) {
                     var checkout = item['checkout'];
 
                     subscription.addCheckinNote(
@@ -213,20 +213,22 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             return subscription;
         };
 
-        this.fetch = function(search_criteria) {
-            return new Promise(function(resolve) {
+        this.fetch = function (search_criteria) {
+            this.subscriptions = [];
+
+            return new Promise(function (resolve) {
                 var uri = collection_uri + '?page=1&search=' + search_criteria;
                 var sender = new AjaxSender(uri);
-                    sender.setSuccessCallback(function(response) {
-                        if (response.length === 0) {
-                            return;
-                        }
-                        $.each(response, function(i, item) {
-                            self.subscriptions.push(createSubscription(item));
-                        });
-                        resolve();
+                sender.setSuccessCallback(function (response) {
+                    if (response.length === 0) {
+                        return;
+                    }
+                    $.each(response, function (i, item) {
+                        self.subscriptions.push(createSubscription(item));
                     });
-                    sender.send('GET');
+                    resolve(self.subscriptions);
+                });
+                sender.get();
             });
         };
     };
@@ -278,13 +280,13 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         };
 
         this.checkin = function (service_pk, subscription, created_by) {
-            return new Promise(function(resolve) {
+            return new Promise(function (resolve) {
                 if (!checkin_uri) {
                     alert('You must provide checkin endpoint URI.');
                     return;
                 }
 
-                subscription.fetch(service_pk).then(function() {
+                subscription.fetch(service_pk).then(function () {
                     if (subscription.attendance_status === true) {
                         $.each(preCheckinCallbacks, function (i, callback) {
                             callback();
@@ -310,12 +312,12 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                             callback();
                         });
                         console.log('2. checkin realizado.');
-                        subscription.fetch(service_pk, created_by).then(function() {
+                        subscription.fetch(service_pk, created_by).then(function () {
                             resolve();
                         });
                     });
 
-                    sender.send('POST', {
+                    sender.post({
                         'subscription': subscription.uuid,
                         'attendance_service': service_pk,
                         'created_by': created_by
@@ -325,7 +327,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         };
 
         this.checkout = function (service_pk, subscription, created_by) {
-            return new Promise(function(resolve) {
+            return new Promise(function (resolve) {
                 if (!checkout_uri) {
                     alert('You must provide checkout endpoint URI.');
                     return;
@@ -336,7 +338,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     return;
                 }
 
-                subscription.fetch(service_pk).then(function() {
+                subscription.fetch(service_pk).then(function () {
                     if (subscription.attendance_status === false) {
                         $.each(preCheckoutCallbacks, function (i, callback) {
                             callback();
@@ -357,7 +359,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                         alert('Subscription is not attended in this service.');
                         return;
                     }
-                    var last_checkin = checkins[checkins.length-1];
+                    var last_checkin = checkins[checkins.length - 1];
 
 
                     var sender = new AjaxSender(checkout_uri);
@@ -371,12 +373,12 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                             callback();
                         });
 
-                        subscription.fetch(service_pk, created_by).then(function() {
+                        subscription.fetch(service_pk, created_by).then(function () {
                             resolve();
                         });
                     });
 
-                    sender.send('POST', {
+                    sender.post({
                         'checkin': last_checkin['pk'],
                         'created_by': created_by
                     });
@@ -393,8 +395,6 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 (function ($, attendance) {
 
     /**
-     *
-     * @param {object} parent_el - jQuery element
      * @param {Subscription} subscription
      * @param {Attendance} attendance
      * @constructor
@@ -404,6 +404,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         var self = this;
         var card_parent_el = null;
         var card_el = null;
+        var card_size = 4;
 
         const STATUS_PENDING = 'awaiting';
         const STATUS_CANCELLED = 'canceled';
@@ -414,7 +415,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         const COLOR_CHECKED = '#27ae60';
         const COLOR_NOT_CHECKED = '#d0021b';
 
-        var getStatus = function() {
+        var getStatus = function () {
             if (subscription.subscription_status === 'confirmed') {
                 var is_checked = subscription.attendance_status === true;
                 if (is_checked) {
@@ -430,7 +431,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             return STATUS_PENDING;
         };
 
-        this.create_card_el = function(service_pk, created_by) {
+        this.create_card_el = function (service_pk, created_by) {
 
             var header_color;
             var button_disabled = false;
@@ -482,7 +483,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     break;
             }
 
-            button.addClass('btn-'+button_class_name);
+            button.addClass('btn-' + button_class_name);
 
             if (button_disabled) {
                 button.attr('disabled', '');
@@ -491,67 +492,67 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             button.text(button_text);
 
 
-            var card_html =   "<div class=\"panel\" style=\"border-radius: 5px; box-shadow: 0 10px 15px 0 rgba(223, 223, 223, 0.5);\">";
-                card_html +=       "<div class=\"container-fluid\" style=\"height: 70px;border-top-left-radius: 5px;border-top-right-radius: 5px;background-color:"+header_color+"\"></div>";
-                card_html +=       "<div class=\"row\">";
-                card_html +=           "<div class=\"col-xs-6 col-xs-offset-3\" style=\"margin-top:-50px;\">";
-                //card_html +=               "<img src=\"http://cdn.staticneo.com/w/evangelion/6/6a/Shinji.jpg\" class=\"img-responsive img-circle\" alt=\"Responsive image\">";
-                card_html +=           "</div>";
-                card_html +=       "</div>";
-                card_html +=       "<div class=\"panel-body\">";
-                card_html +=           "<h2 class=\"text-center\" style=\"font-size: 20px;padding-top: 10px\">"+subscription.name+"</h2>";
-                card_html +=           "<div class=\"row\" style=\"padding-top: 8px\">";
-                card_html +=               "<div class=\"col-md-7 text-center\">";
-                card_html +=                   "<h3 style=\"padding-bottom: 5px\">";
-                card_html +=                       "<i class=\"fas fa-barcode\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"código da inscrição\"></i>";
-                card_html +=                       "<span> "+subscription.code+"</span>";
-                card_html +=                   "</h3>";
-                card_html +=               "</div>";
-                card_html +=               "<div class=\"col-md-5 text-center\">";
-                card_html +=                   "<h3 style=\" padding-bottom: 5px\">";
-                card_html +=                       "<i class=\"fas fa-list-ol\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Número da Inscrição\"></i>";
-                card_html +=                       "<span> "+subscription.event_count+"</span>";
-                card_html +=                   "</h3>";
-                card_html +=               "</div>";
-                card_html +=           "</div>";
-                card_html +=           "<div class=\"row\" style=\"padding-top: 8px\">";
-                card_html +=               "<div class=\"col-md-12 text-center\">";
-                card_html +=                   "<div style=\"height: 0.5px;width: 100%; background-color: #e6e6e6; margin-top: 10px; margin-bottom: 10px\"></div>";
-                card_html +=                   "<h3 style=\"padding-bottom: 5px\" >";
-                card_html +=                       "<i class=\"far fa-envelope\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Email\"></i>";
-                card_html +=                       "<span> "+subscription.email+"</span>";
-                card_html +=                   "</h3>";
-                card_html +=                   "<h3 style=\"padding-bottom: 5px\" >";
-                card_html +=                       "<i class=\"fas fa-th-list\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Categoria\"></i>";
-                card_html +=                       "<span> "+subscription.category_name+"</span>";
-                card_html +=                   "</h3>";
-                card_html +=                   "<h3 style=\"padding-bottom: 5px\" >";
-                card_html +=                       "<i class=\"fas fa-th-large\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Lote\"></i>";
-                card_html +=                       "<span> "+subscription.lot_name+"</span>";
-                card_html +=                   "</h3>";
-                card_html +=                   "<h3 style=\"padding-bottom: 5px\" >";
-                card_html +=                       "<i class=\"far fa-id-badge\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Status\"></i>";
-                card_html +=                       "<span> "+status_text+" <i class=\"fa fa-circle\" style=\"color:"+status_pointer_color+"\"></i></span>";
-                card_html +=                   "</h3>";
-                card_html +=                   "<div style=\" text-align: center\">"+button.prop('outerHTML')+"<div>";
-                card_html +=               "</div>";
-                card_html +=           "</div>";
-                card_html +=       "</div>";
-                card_html +=   "</div>";
+            var card_html = "<div class=\"panel\" style=\"border-radius: 5px; box-shadow: 0 10px 15px 0 rgba(223, 223, 223, 0.5);\">";
+            card_html += "<div class=\"container-fluid\" style=\"height: 70px;border-top-left-radius: 5px;border-top-right-radius: 5px;background-color:" + header_color + "\"></div>";
+            card_html += "<div class=\"row\">";
+            card_html += "<div class=\"col-xs-6 col-xs-offset-3\" style=\"margin-top:-50px;\">";
+            //card_html +=               "<img src=\"http://cdn.staticneo.com/w/evangelion/6/6a/Shinji.jpg\" class=\"img-responsive img-circle\" alt=\"Responsive image\">";
+            card_html += "</div>";
+            card_html += "</div>";
+            card_html += "<div class=\"panel-body\">";
+            card_html += "<h2 class=\"text-center\" style=\"font-size: 20px;padding-top: 10px\">" + subscription.name + "</h2>";
+            card_html += "<div class=\"row\" style=\"padding-top: 8px\">";
+            card_html += "<div class=\"col-md-7 text-center\">";
+            card_html += "<h3 style=\"padding-bottom: 5px\">";
+            card_html += "<i class=\"fas fa-barcode\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"código da inscrição\"></i>";
+            card_html += "<span> " + subscription.code + "</span>";
+            card_html += "</h3>";
+            card_html += "</div>";
+            card_html += "<div class=\"col-md-5 text-center\">";
+            card_html += "<h3 style=\" padding-bottom: 5px\">";
+            card_html += "<i class=\"fas fa-list-ol\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Número da Inscrição\"></i>";
+            card_html += "<span> " + subscription.event_count + "</span>";
+            card_html += "</h3>";
+            card_html += "</div>";
+            card_html += "</div>";
+            card_html += "<div class=\"row\" style=\"padding-top: 8px\">";
+            card_html += "<div class=\"col-md-12 text-center\">";
+            card_html += "<div style=\"height: 0.5px;width: 100%; background-color: #e6e6e6; margin-top: 10px; margin-bottom: 10px\"></div>";
+            card_html += "<h3 style=\"padding-bottom: 5px\" >";
+            card_html += "<i class=\"far fa-envelope\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Email\"></i>";
+            card_html += "<span> " + subscription.email + "</span>";
+            card_html += "</h3>";
+            card_html += "<h3 style=\"padding-bottom: 5px\" >";
+            card_html += "<i class=\"fas fa-th-list\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Categoria\"></i>";
+            card_html += "<span> " + subscription.category_name + "</span>";
+            card_html += "</h3>";
+            card_html += "<h3 style=\"padding-bottom: 5px\" >";
+            card_html += "<i class=\"fas fa-th-large\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Lote\"></i>";
+            card_html += "<span> " + subscription.lot_name + "</span>";
+            card_html += "</h3>";
+            card_html += "<h3 style=\"padding-bottom: 5px\" >";
+            card_html += "<i class=\"far fa-id-badge\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Status\"></i>";
+            card_html += "<span> " + status_text + " <i class=\"fa fa-circle\" style=\"color:" + status_pointer_color + "\"></i></span>";
+            card_html += "</h3>";
+            card_html += "<div style=\" text-align: center\">" + button.prop('outerHTML') + "<div>";
+            card_html += "</div>";
+            card_html += "</div>";
+            card_html += "</div>";
+            card_html += "</div>";
 
             card_el = $(card_html);
 
             if (!card_parent_el) {
-                card_parent_el = $('<div>').addClass('col-md-4');
+                card_parent_el = $('<div>').addClass('col-md-' + card_size);
             }
 
             card_parent_el.html(card_el);
 
-            window.setTimeout(function() {
+            window.setTimeout(function () {
                 var button = card_parent_el.find('button');
                 switch (getStatus()) {
                     case STATUS_CHECKED:
-                        button.on('click', function() {
+                        button.on('click', function () {
                             console.log('0. trigger checkout.');
 
                             var button_text = button.text();
@@ -561,7 +562,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                                 service_pk,
                                 subscription,
                                 created_by
-                            ).then(function() {
+                            ).then(function () {
                                 console.log('3. recriando card.');
                                 self.create_card_el(service_pk, created_by);
 
@@ -572,7 +573,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                         break;
 
                     case STATUS_NOT_CHECKED:
-                        button.on('click', function() {
+                        button.on('click', function () {
                             console.log('0. trigger checkin.');
                             var button_text = button.text();
                             button.attr('disabled', '');
@@ -581,7 +582,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                                 service_pk,
                                 subscription,
                                 created_by
-                            ).then(function() {
+                            ).then(function () {
                                 console.log('3. recriando card.');
                                 self.create_card_el(service_pk, created_by);
                                 button.removeAttr('disabled');
@@ -593,7 +594,11 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             }, 300);
         };
 
-        this.getElement = function(service_pk, created_by) {
+        this.setSize = function (size) {
+            card_size = size || 4;
+        };
+
+        this.getElement = function (service_pk, created_by) {
             self.create_card_el(service_pk, created_by);
 
             return card_parent_el;
@@ -607,21 +612,26 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 // ==========================================================================//
 (function ($, attendance) {
 
-    attendance.List = function(service_pk, created_by) {
+    attendance.List = function (service_pk, created_by) {
         var self = this;
         this.cards = [];
 
-        this.addCard = function(card) {
+        this.addCard = function (card) {
             this.cards.push(card);
         };
 
-        this.render = function(parent_el) {
+        this.clear = function () {
+            this.cards = [];
+        };
+
+        this.render = function (parent_el) {
             parent_el = $(parent_el);
             parent_el.html('');
 
-            $.each(this.cards, function(i, card) {
+            $.each(this.cards, function (i, card) {
                 parent_el.append(card.getElement(service_pk, created_by));
             });
+            this.clear();
         };
     };
 
@@ -630,46 +640,120 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 // ==========================================================================//
 // TYPING SEARCH
 // ==========================================================================//
-(function ($, attendance, AjaxSender, List, subscriptionCollection ) {
+// SEARCH
+// --------------------------------------------------------------------------//
+(function ($, attendance, SubscriptionCollection, Card) {
+    attendance.Search = function (attendance, subscription_uri) {
 
-    attendance.TypingSearch = function(service_pk, created_by, subscription_uri, input_el, submit_el, output_el) {
-        var typingInput;
-        var subscriptions;
-        var self = this;
-        input_el = $(input_el);
-        submit_el = $(submit_el);
-
-        var getTypingInput = function () {
-            self.typingInput = input_el.val();
+        var collection = new SubscriptionCollection(subscription_uri);
+        var card_size = 4;
+        var preSearchCallback = function () {
+        };
+        var afterSearchCallback = function () {
         };
 
-        var getSubscriptionCollection = function () {
-            console.log(self.typingInput);
-            var SubscriptionCollection = new subscriptionCollection(subscription_uri);
-            SubscriptionCollection.fetch(self.typingInput).then(function () {
-                self.subscriptions = SubscriptionCollection;
+        var createCard = function (subscription) {
+            var card = new Card(subscription, attendance);
+            card.setSize(card_size);
+            return card;
+        };
+
+        this.setPreSearchCallback = function (callback) {
+            if (typeof callback !== 'function') {
+                console.error('Callback is not a function: ' + callback);
+                return;
+            }
+            preSearchCallback = callback;
+        };
+
+        this.setAfterSearchCallback = function (callback) {
+            if (typeof callback !== 'function') {
+                console.error('Callback is not a function: ' + callback);
+                return;
+            }
+            afterSearchCallback = callback;
+        };
+
+        this.fetch = function (search_criteria) {
+            preSearchCallback();
+
+            return new Promise(function (resolve) {
+                collection.fetch(search_criteria).then(function (subscriptions) {
+                    var cards = [];
+                    $.each(subscriptions, function (i, subscription) {
+                        cards.push(createCard(subscription));
+                    });
+                    resolve(cards);
+                    afterSearchCallback();
+                });
             });
         };
 
-        var renderCards = function () {
-            var cardList = new List(service_pk, created_by);
-            cardList.render(output_el);
+        this.setCardSize = function (size) {
+            card_size = size || 4;
         };
-
-        var search = function () {
-            getTypingInput();
-            getSubscriptionCollection();
-            renderCards();
-        };
-
-        this.bindSubmitEvent = function () {
-            submit_el.click(function () {
-                search();
-            })
-        }
-
-        
-         
     };
+})(
+    jQuery,
+    window.cgsy.attendance,
+    window.cgsy.attendance.SubscriptionCollection,
+    window.cgsy.attendance.Card
+);
+// --------------------------------------------------------------------------//
+// TYPING SEARCH
+// --------------------------------------------------------------------------//
+(function ($, attendance, List) {
+    attendance.TypingSearch = function (search, service_pk, created_by) {
+        var searchTimer = null;
+        var cards_list = new List(service_pk, created_by);
 
-})(jQuery,window.cgsy.attendance,  window.cgsy.AjaxSender, window.cgsy.attendance.List, window.cgsy.attendance.SubscriptionCollection);
+        var fetch = function (search_criteria, list_el) {
+            list_el = $(list_el);
+
+            window.clearTimeout(searchTimer);
+
+            searchTimer = window.setTimeout(function () {
+                search.fetch(search_criteria).then(function (cards) {
+                    cards_list.clear();
+                    $.each(cards, function (i, card) {
+                        cards_list.addCard(card);
+                    });
+                    cards_list.render(list_el);
+                });
+            }, 350);
+        };
+
+        this.watch = function (input_el, list_el) {
+            $(input_el).on('keyup', function () {
+                var input = $(this);
+                $(list_el).html('');
+                fetch(input.val(), list_el);
+            });
+        };
+    };
+})(jQuery, window.cgsy.attendance, window.cgsy.attendance.List);
+
+function createTypingSearch(options) {
+    var attendance = new window.cgsy.attendance.Attendance(
+        options['checkinUri'],
+        options['checkoutUri']
+    );
+
+    var search = new window.cgsy.attendance.Search(
+        attendance,
+        options['subscriptionUri']
+    );
+    search.setPreSearchCallback(function() {
+        console.log('set some loader');
+    });
+    search.setAfterSearchCallback(function() {
+        console.log('hide loader');
+    });
+
+    var typingSearch = new window.cgsy.attendance.TypingSearch(
+        search,
+        options['servicePk'],
+        options['createdBy']
+    );
+    typingSearch.watch($(options['inputEl']), $(options['listEl']));
+}
