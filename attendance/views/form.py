@@ -118,9 +118,7 @@ class EditAttendanceServiceView(BaseAttendanceServiceView, generic.UpdateView):
 
         for lc in self.event.lot_categories.all().order_by('name'):
             items.append({
-                'name': lc.name,
-                'value': lc.pk,
-                'checked': lc.pk in lc_filter_pks
+                'name': lc.name
             })
 
         return items
