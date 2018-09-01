@@ -5,6 +5,7 @@ from rest_framework import viewsets
 from rest_framework.authentication import (
     BasicAuthentication,
     SessionAuthentication,
+    TokenAuthentication,
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -14,7 +15,7 @@ from gatheros_subscription.models import Subscription
 
 
 class RestrictionViewMixin(object):
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
     permission_classes = (IsAuthenticated,)
 
 
@@ -169,6 +170,9 @@ class CheckinViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         }
         return Response(content, status=405)
 
+    def update(self, request, *args, **kwargs):
+        super().update(request, *args, **kwargs)
+
 
 class CheckoutViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
     queryset = models.Checkout.objects.all()
@@ -192,3 +196,6 @@ class CheckoutViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
             'status': 'request is not allowed.'
         }
         return Response(content, status=405)
+
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)

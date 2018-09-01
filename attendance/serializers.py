@@ -133,8 +133,36 @@ class CheckinSerializer(serializers.ModelSerializer):
         model = models.Checkin
         fields = '__all__'
 
+    def validate_subscription(self, value):
+        if value.confirmed is False:
+            raise serializers.ValidationError(
+                'Esta inscrição não está confirmada.'
+            )
+
+        return value
+
+    def validate(self, attrs):
+        subscription = attrs.get('subscription')
+        service = attrs.get('attendance_service')
+        checkins = subscription.checkins.filter(attendance_service=service)
+        if checkins.count() and not hasattr(checkins.last(), 'checkout'):
+            raise serializers.ValidationError({
+                'subscription': 'Entrada já registrada neste Atendimento para'
+                                ' esta inscrição.'
+            })
+
+        return attrs
+
 
 class CheckoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Checkout
         fields = '__all__'
+
+    def validate_checkin(self, value):
+        if hasattr(value, 'checkout') and value.checkout.pk:
+            raise serializers.ValidationError(
+                'Saída já registrada.'
+            )
+
+        return value
