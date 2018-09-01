@@ -96,12 +96,7 @@ class AttendedStatusField(serializers.Field):
         if not checkin:
             return False
 
-        try:
-            checkin.checkout
-            return False
-
-        except AttributeError:
-            return True
+        return not hasattr(checkin, 'checkout')
 
 
 class SubscriptionAttendanceSerializer(DynamicFieldsModelSerializer):

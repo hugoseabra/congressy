@@ -141,10 +141,29 @@ class SubscriptionAttendanceViewSet(RestrictionViewMixin,
 
         return queryset
 
-    def get_serializer(self, *args, **kwargs):
-        serializer = super().get_serializer(*args, **kwargs)
+    def create(self, request, *args, **kwargs):
+        content = {
+            'status': 'request is not allowed.'
+        }
+        return Response(content, status=405)
 
-        return serializer
+    def update(self, request, *args, **kwargs):
+        content = {
+            'status': 'request is not allowed.'
+        }
+        return Response(content, status=405)
+
+    def partial_update(self, request, *args, **kwargs):
+        content = {
+            'status': 'request is not allowed.'
+        }
+        return Response(content, status=405)
+
+    def destroy(self, request, *args, **kwargs):
+        content = {
+            'status': 'request is not allowed.'
+        }
+        return Response(content, status=405)
 
 
 class CheckinViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
@@ -170,9 +189,6 @@ class CheckinViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         }
         return Response(content, status=405)
 
-    def update(self, request, *args, **kwargs):
-        super().update(request, *args, **kwargs)
-
 
 class CheckoutViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
     queryset = models.Checkout.objects.all()
@@ -196,6 +212,3 @@ class CheckoutViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
             'status': 'request is not allowed.'
         }
         return Response(content, status=405)
-
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
