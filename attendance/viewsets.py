@@ -19,9 +19,9 @@ class RestrictionViewMixin(object):
     permission_classes = (IsAuthenticated,)
 
 
-def search_subscriptions(service, queryset, search_criteria):
+def search_subscriptions(queryset, search_criteria):
     if not search_criteria:
-        return queryset
+        return queryset.none()
 
     # Fetch by event count
     if search_criteria.isdigit():
@@ -135,9 +135,9 @@ class SubscriptionAttendanceViewSet(RestrictionViewMixin,
                     Q(checkins__checkout__isnull=False)
                 )
 
-        search_criteria = self.request.query_params.get('search')
-        if search_criteria:
-            queryset = search_subscriptions(service, queryset, search_criteria)
+        if 'search' in self.request.query_params:
+            search_criteria = self.request.query_params.get('search')
+            queryset = search_subscriptions(queryset, search_criteria)
 
         return queryset
 
