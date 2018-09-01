@@ -699,6 +699,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
     window.cgsy.attendance.SubscriptionCollection,
     window.cgsy.attendance.Card
 );
+
 // --------------------------------------------------------------------------//
 // TYPING SEARCH
 // --------------------------------------------------------------------------//
@@ -732,6 +733,44 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         };
     };
 })(jQuery, window.cgsy.attendance, window.cgsy.attendance.List);
+
+// --------------------------------------------------------------------------//
+// BARCODE SEARCH
+// --------------------------------------------------------------------------//
+(function ($, attendance) {
+    attendance.BarcodeSearch = function (search, service_pk, created_by) {
+        var searchTimer = null;
+
+        var fetch = function (search_criteria, result_el) {
+
+        };
+
+        this.watch = function (input_el, result_el) {
+            $(input_el).on('keyup', function () {
+                var input = $(this);
+                $(result_el).html('');
+                fetch(input.val(), result_el);
+            });
+        };
+    };
+})(jQuery, window.cgsy.attendance);
+
+// --------------------------------------------------------------------------//
+// QRCODE SEARCH
+// --------------------------------------------------------------------------//
+(function ($, attendance) {
+    attendance.BarcodeSearch = function (search, service_pk, created_by) {
+        var searchTimer = null;
+
+        var fetch = function (search_criteria, result_el) {
+
+        };
+
+        this.start = function() {};
+
+        this.stop = function() {};
+    };
+})(jQuery, window.cgsy.attendance);
 
 function createTypingSearch(options) {
     var attendance = new window.cgsy.attendance.Attendance(
