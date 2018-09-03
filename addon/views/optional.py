@@ -364,18 +364,8 @@ class OptionalServiceEditView(EventOptionalMixin, generic.UpdateView):
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        try:
-            response = super().form_valid(form)
-
-        except Exception as e:
-            messages.error(self.request, str(e))
-            return self.form_invalid(form)
-
         messages.success(
             self.request,
             'Atividae Extra Opcional alterado com sucesso.'
         )
-        return response
-
-    def form_invalid(self, form):
-        return super().form_invalid(form)
+        return super().form_valid(form)
