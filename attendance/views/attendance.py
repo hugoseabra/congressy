@@ -7,15 +7,15 @@ from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
 
 
-
-
 class AttendancePageSearchView(generic.TemplateView):
     template_name = 'attendance/attendance.html'
     object = None
     event = None
+    search_type = None
 
     def dispatch(self, request, *args, **kwargs):
         self.object = AttendanceService.objects.get(pk=self.kwargs.get('pk'))
+        self.search_type = request.GET.get('search_type')
         self.event = Event.objects.get(pk=self.kwargs.get('event_pk'))
         return super().dispatch(request, *args, **kwargs)
 
@@ -39,7 +39,7 @@ class AttendancePageSearchView(generic.TemplateView):
         context['attendance_list'] = AttendanceService.objects.get(
             pk=self.kwargs.get('pk'))
         context['lot_categories'] = self.get_lot_categories()
-
+        context['search_type'] = self.search_type
         return context
 
 

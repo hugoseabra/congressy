@@ -27,7 +27,10 @@
         <div class="col-md-10">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <div class="panel-title">Realizar Checkin</div>
+                    <div class="panel-title">Realizar Checkin por
+                    {% if search_type == 'typing' %} Teclado
+                    {% elif search_type == 'barcode' %} Código de Barras
+                    {% elif search_type == 'qrcode' %} QrCode {% endif %}</div>
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -40,20 +43,22 @@
                                             data-toggle="dropdown"
                                             aria-haspopup="true"
                                             aria-expanded="false"><i
-                                            class="far fa-keyboard"></i>
-                                        Teclado
+                                            class="
+                                            {% if search_type == 'typing' %} far fa-keyboard
+                                            {% elif search_type == 'barcode' %} fas fa-barcode
+                                             {% elif search_type == 'qrcode' %} fas fa-qrcode {% endif %}"></i>
                                         <span
                                                 class="caret"></span></button>
                                     <ul class="dropdown-menu dropdown-search">
-                                        <li><a href="#"><i
+                                        <li><a href="?search_type=typing" ><i
                                                 class="far fa-keyboard"></i>
                                             Teclado
                                         </a></li>
-                                        <li><a href="#"><i
+                                        <li><a href="?search_type=qrcode"><i
                                                 class="fas fa-qrcode"></i>
                                             QrCode
                                         </a></li>
-                                        <li><a href="#"><i
+                                        <li><a href="?search_type=barcode"><i
                                                 class="fas fa-barcode"></i>
                                             Cód. Barra
                                         </a>
@@ -90,11 +95,7 @@
     <script src="{% static 'assets/js/attendance/attendance.js' %}"></script>
     <script>
         $(document).ready(function () {
-            $(".dropdown-search li a").click(function () {
-
-                $("#type-search:first-child").html($(this).html()+'<span\n' +
-                    'class="caret"></span>');
-            });
+            {% if search_type == 'typing' %}
             createTypingSearch({
                 'subscriptionUri': "{% url 'api:attendance:subscription-list' attendance_list.pk %}",
                 'checkinUri': "{% url 'api:attendance:checkin-list' %}",
@@ -104,6 +105,7 @@
                 'listEl': $('#cards-list'),
                 'inputEl': $('#search')
             });
+            {% endif %}
         });
     </script>
 
