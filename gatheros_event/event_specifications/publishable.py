@@ -14,8 +14,6 @@ class EventPublishable(EventCompositeSpecificationMixin):
         - Deve possuir uma descrição do evento
         - Caso o evento seja pago:
             - Deve possuir dados bancarios cadastrados
-        - TODO: Caso seja cientifico:
-            - ????
     """
 
     def is_satisfied_by(self, event: Event):
