@@ -31,59 +31,52 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-md-10 col-sm-10 col-xs-9 col-lg-11 col-xl-11">
+                        <div class="col-md-12">
                             <div class="input-group input-group-lg">
                                 <div class="input-group-btn">
-                                    <button type="button"
+                                    <button id="type-search"
+                                            type="button"
                                             class="btn btn-default dropdown-toggle"
                                             data-toggle="dropdown"
                                             aria-haspopup="true"
                                             aria-expanded="false"><i
                                             class="far fa-keyboard"></i>
-                                            Teclado
+                                        Teclado
                                         <span
                                                 class="caret"></span></button>
-                                    <ul class="dropdown-menu">
+                                    <ul class="dropdown-menu dropdown-search">
                                         <li><a href="#"><i
                                                 class="far fa-keyboard"></i>
-                                                Teclado
+                                            Teclado
                                         </a></li>
                                         <li><a href="#"><i
                                                 class="fas fa-qrcode"></i>
-                                                QrCode
+                                            QrCode
                                         </a></li>
                                         <li><a href="#"><i
                                                 class="fas fa-barcode"></i>
-                                                Cód. Barra
+                                            Cód. Barra
                                         </a>
                                         </li>
                                     </ul>
                                 </div>
-                                <input id="search" type="text" class="form-control"
+                                <input id="search" type="text"
+                                       class="form-control"
                                        aria-label="...">
                             </div>
                         </div>
-                        <div class="col-md-2 col-sm-2 col-xs-3 col-lg-1 col-xl-1"
-                             style="padding-left: 0">
-                            <button id="submit" type="button"
-                                    class="btn
-                        btn-lg btn-primary btn-3d"
-                                    id="searchBtn"
-                                    style="margin-left: 5px">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div><!-- /input-group -->
                     </div>
                     <div class="row">
                         <div class="col-md-12">
                             <h3>Categorias:
-                            {% for cat in lot_categories %}
-                                 <span class="badge badge-primary">{{ cat.name }}</span>
-                            {% endfor %}
+                                {% for cat in lot_categories %}
+                                    <span class="badge badge-primary">{{ cat.name }}</span>
+                                {% endfor %}
                             </h3>
                         </div>
                     </div>
-                    <div class="row" id="cards-list"></div>
+                    <div class="row" id="cards-list"
+                         style="padding-top: 20px"></div>
                 </div>
             </div>
         </div>
@@ -96,7 +89,12 @@
     <script src="{% static 'assets/js/ajax.js' %}"></script>,
     <script src="{% static 'assets/js/attendance/attendance.js' %}"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
+            $(".dropdown-search li a").click(function () {
+
+                $("#type-search:first-child").html($(this).html()+'<span\n' +
+                    'class="caret"></span>');
+            });
             createTypingSearch({
                 'subscriptionUri': "{% url 'api:attendance:subscription-list' attendance_list.pk %}",
                 'checkinUri': "{% url 'api:attendance:checkin-list' %}",
@@ -104,7 +102,7 @@
                 'servicePk': '{{ attendance_list.pk }}',
                 'createdBy': '{{ request.user.get_full_name }}',
                 'listEl': $('#cards-list'),
-                'inputEl': $('#search'),
+                'inputEl': $('#search')
             });
         });
     </script>
