@@ -220,7 +220,10 @@ def has_products(wizard):
 
     try:
         optionals = lot.category.product_optionals
-        return optionals.filter(published=True).count() > 0
+        return optionals.filter(
+            published=True,
+            date_end_sub__gte=datetime.now(),
+        ).count() > 0
 
     except AttributeError:
         return False
@@ -249,7 +252,10 @@ def has_services(wizard):
 
     try:
         optionals = lot.category.service_optionals
-        return optionals.filter(published=True).count() > 0
+        return optionals.filter(
+            published=True,
+            date_end_sub__gte=datetime.now(),
+        ).count() > 0
 
     except AttributeError:
         return False
