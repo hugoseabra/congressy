@@ -11,14 +11,11 @@ class EventPublishable(EventCompositeSpecificationMixin):
         possuir as seguintes condições:
 
         - Lotes que estão ou serão vigentes no futuro.
-        - Caso o evento seja pago, tenha opcional pago ou lote pago:
-            - Deve possuir dados bancarios cadastrados
         - Deve possuir uma descrição do evento
+        - Caso o evento seja pago:
+            - Deve possuir dados bancarios cadastrados
         - TODO: Caso seja cientifico:
             - ????
-            
-
-
     """
 
     def is_satisfied_by(self, event: Event):
