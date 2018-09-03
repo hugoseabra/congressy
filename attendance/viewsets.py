@@ -15,7 +15,8 @@ from gatheros_subscription.models import Subscription
 
 
 class RestrictionViewMixin(object):
-    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
+    authentication_classes = (
+    SessionAuthentication, BasicAuthentication, TokenAuthentication)
     permission_classes = (IsAuthenticated,)
 
 
@@ -102,7 +103,7 @@ class SubscriptionAttendanceViewSet(RestrictionViewMixin,
         queryset = queryset.filter(
             completed=True,
             test_subscription=False,
-            event__organization_id__in=org_pks
+            event__organization_id__in=org_pks,
         )
 
         # Neste caso, inscrições são atreladas a algum Atendimento e,
@@ -140,6 +141,11 @@ class SubscriptionAttendanceViewSet(RestrictionViewMixin,
             queryset = search_subscriptions(queryset, search_criteria)
 
         return queryset
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['attendance_service_pk'] = self.kwargs.get('service_pk')
+        return context
 
     def create(self, request, *args, **kwargs):
         content = {
