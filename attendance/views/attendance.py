@@ -5,18 +5,24 @@ from attendance.models import AttendanceCategoryFilter, \
     AttendanceService, Checkin, Checkout
 from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
-
+from django.shortcuts import redirect
 
 class AttendancePageSearchView(generic.TemplateView):
     template_name = 'attendance/attendance.html'
     object = None
     event = None
     search_type = None
+    types_accepted = ['typing', 'qrcode', 'barcode', None]
 
     def dispatch(self, request, *args, **kwargs):
         self.object = AttendanceService.objects.get(pk=self.kwargs.get('pk'))
-        self.search_type = request.GET.get('search_type')
         self.event = Event.objects.get(pk=self.kwargs.get('event_pk'))
+        search_type = request.GET.get('search_type')
+        if search_type not in self.types_accepted:
+            return redirect("attendance:attendance", event_pk=self.event.pk,
+                            pk=self.object.pk)
+        else:
+            self.search_type = search_type
         return super().dispatch(request, *args, **kwargs)
 
     def get_lot_categories(self):

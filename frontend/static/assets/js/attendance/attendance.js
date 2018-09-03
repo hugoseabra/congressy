@@ -415,6 +415,8 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         const COLOR_CHECKED = '#27ae60';
         const COLOR_NOT_CHECKED = '#d0021b';
 
+        this.subscription = subscription;
+
         var getStatus = function () {
             if (subscription.subscription_status === 'confirmed') {
                 var is_checked = subscription.attendance_status === true;
@@ -429,6 +431,24 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             }
 
             return STATUS_PENDING;
+        };
+
+        this.status = getStatus();
+        this.id = subscription.uuid;
+
+
+        this.active = function () {
+            var activeStatus = [STATUS_CHECKED, STATUS_NOT_CHECKED];
+            if (activeStatus.indexOf(getStatus()) > -1)
+                return true;
+            else return false;
+        };
+
+        this.disable = function() {
+            var disableStatus = [STATUS_CANCELLED, STATUS_PENDING];
+            if (disableStatus.indexOf(getStatus()) > -1)
+                return true;
+            else return false;
         };
 
         this.create_card_el = function (service_pk, created_by) {
@@ -603,6 +623,14 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
             return card_parent_el;
         };
+        this.toogle = function (service_pk, created_by) {
+            if (getStatus() === STATUS_CHECKED){
+                attendance.checkout(service_pk,subscription,created_by)
+            }
+            if (getStatus() === STATUS_NOT_CHECKED){
+                attendance.checkin(service_pk,subscription,created_by)
+            }
+        }
     };
 
 })(jQuery, window.cgsy.attendance);
@@ -740,16 +768,54 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 (function ($, attendance) {
     attendance.BarcodeSearch = function (search, service_pk, created_by) {
         var searchTimer = null;
+        var selected_card = null;
+        
+        var fetch = function (search_criteria, list_el) {
+            list_el = $(list_el);
 
-        var fetch = function (search_criteria, result_el) {
+            window.clearTimeout(searchTimer);
 
+            searchTimer = window.setTimeout(function () {
+                search.fetch(search_criteria).then(function (cards) {
+                    if (!cards.length) {
+                        selected_card = null;
+                        list_el.html('');
+                        return;
+                    }
+                    var card = cards[0];
+
+                    var reread = selected_card && selected_card.id === card.id && card.active() === true;
+
+                    if (reread === true) {
+                        console.log("releitura");
+                        card.toggle(service_pk, created_by);
+                        return;
+                    }
+                    console.log("primeira leitura");
+                    selected_card = card;
+                    list_el.append(selected_card.getElement(service_pk, created_by));
+                });
+            }, 350);
         };
 
-        this.watch = function (input_el, result_el) {
+        this.watch = function (input_el, list_el) {
+            $(input_el).on('keydown', function (event) {
+                if (event.keyCode == 13 || event.keyCode == 16 || event.keyCode == 17) {
+                    event.preventDefault();
+                }
+
+                if (event.ctrlKey) {
+                    event.preventDefault();
+                }
+            });
+
             $(input_el).on('keyup', function () {
                 var input = $(this);
-                $(result_el).html('');
-                fetch(input.val(), result_el);
+                $(list_el).html('');
+                if (input.val().length === 8) {
+                    fetch(input.val(), list_el);
+                    input.val('');
+                }
             });
         };
     };
@@ -759,16 +825,18 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 // QRCODE SEARCH
 // --------------------------------------------------------------------------//
 (function ($, attendance) {
-    attendance.BarcodeSearch = function (search, service_pk, created_by) {
+    attendance.QrcodeSearch = function (search, service_pk, created_by) {
         var searchTimer = null;
 
         var fetch = function (search_criteria, result_el) {
 
         };
 
-        this.start = function() {};
+        this.start = function () {
+        };
 
-        this.stop = function() {};
+        this.stop = function () {
+        };
     };
 })(jQuery, window.cgsy.attendance);
 
@@ -782,10 +850,10 @@ function createTypingSearch(options) {
         attendance,
         options['subscriptionUri']
     );
-    search.setPreSearchCallback(function() {
+    search.setPreSearchCallback(function () {
         console.log('set some loader');
     });
-    search.setAfterSearchCallback(function() {
+    search.setAfterSearchCallback(function () {
         console.log('hide loader');
     });
 
@@ -795,4 +863,25 @@ function createTypingSearch(options) {
         options['createdBy']
     );
     typingSearch.watch($(options['inputEl']), $(options['listEl']));
+}
+
+function createBarCodeSearch(options) {
+    var attendance = new window.cgsy.attendance.Attendance(
+        options['checkinUri'],
+        options['checkoutUri']
+    );
+
+    var search = new window.cgsy.attendance.Search(
+        attendance,
+        options['subscriptionUri']
+    );
+    search.setCardSize(6);
+
+    var barCodeSearch = new window.cgsy.attendance.BarcodeSearch(
+        search,
+        options['servicePk'],
+        options['createdBy']
+    );
+    $(options['inputEl']).focus();
+    barCodeSearch.watch($(options['inputEl']), $(options['listEl']));
 }
