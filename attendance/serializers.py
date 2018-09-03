@@ -55,8 +55,25 @@ class LotSerializer(serializers.ModelSerializer):
 
 class CheckinsField(serializers.Field):
     def to_representation(self, obj):
+
         checkins = []
-        for checkin in obj.all():
+
+        service_pk = self.context.get('attendance_service_pk')
+        if not service_pk:
+            raise Exception(
+                'You must provide "attendance_service_pk" in Serializer'
+                ' context.'
+            )
+
+        subs_checkins = obj.filter(attendance_service__pk=service_pk)
+        subs_checkins = subs_checkins.order_by(
+            'created_on',
+            'attendance_service__name'
+        )
+
+        for checkin in subs_checkins:
+
+            service = checkin.attendance_service
 
             try:
                 checkout = checkin.checkout
@@ -72,8 +89,9 @@ class CheckinsField(serializers.Field):
 
             checkins.append({
                 'id': checkin.pk,
+                'attendance_name': service.name,
+                'attendance_pk': service.pk,
                 'created_by': checkin.created_by,
-                'attendance_service': checkin.attendance_service.name,
                 'printed_on': checkin.printed_on.strftime(
                     '%d/%m/%Y %H:%M:%S'
                 ) if checkin.printed_on else None,
@@ -91,10 +109,19 @@ class AttendedStatusField(serializers.Field):
         pass
 
     def to_representation(self, obj):
-        checkin = obj.checkins.last()
+        service_pk = self.context.get('attendance_service_pk')
+        if not service_pk:
+            raise Exception(
+                'You must provide "attendance_service_pk" in Serializer'
+                ' context.'
+            )
 
-        if not checkin:
+        checkin = obj.checkins.filter(attendance_service__pk=service_pk)
+
+        if checkin.count() == 0:
             return False
+
+        checkin = checkin.last()
 
         return not hasattr(checkin, 'checkout')
 
