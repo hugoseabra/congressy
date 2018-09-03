@@ -10,7 +10,7 @@ class EventPublishable(EventCompositeSpecificationMixin):
         seu hotsite possa disponibilizar inscrições. Para isso o evento deve
         possuir as seguintes condições:
 
-        - Lotes que estão ou serão vigentes no futuro.
+        - Lotes que estão ou serão vigentes no futuro
         - Deve possuir uma descrição do evento
         - Caso o evento seja pago:
             - Deve possuir dados bancarios cadastrados
