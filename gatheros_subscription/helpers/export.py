@@ -321,11 +321,11 @@ def _export_addon_products(worksheet, title, products):
     Exporta Insrições de Opcionais de um evento.
     """
     columns = [
-        'CATEGORIA',
         'NÚMERO DE INSCRIÇÃO',
         'CÓDIGO DA INSCRIÇÃO',
         'NOME',
         'E-MAIL',
+        'CATEGORIA',
         'NOME DO OPCIONAL',
         'STATUS',
         'DATA PAGAMENTO',
@@ -351,11 +351,11 @@ def _export_addon_products(worksheet, title, products):
             if row_idx not in collector:
                 collector[row_idx] = []
 
-            collector[row_idx].append(sub.lot.category.name)
             collector[row_idx].append(get_object_value(sub, 'event_count'))
             collector[row_idx].append(get_object_value(sub, 'code'))
             collector[row_idx].append(person.name)
             collector[row_idx].append(person.email)
+            collector[row_idx].append(sub.lot.category.name)
             collector[row_idx].append(addon_sub.optional.name)
             collector[row_idx].append(sub.get_status_display())
             collector[row_idx].append(created)
@@ -376,11 +376,11 @@ def _export_addon_services(worksheet, title, services):
     Exporta Insrições de atividades extras.
     """
     columns = [
-        'CATEGORIA',
         'NÚMERO DE INSCRIÇÃO',
         'CÓDIGO DA INSCRIÇÃO',
         'NOME',
         'E-MAIL',
+        'CATEGORIA',
         'TEMA',
         'NOME DA ATIVIDADE EXTRA',
         'STATUS',
@@ -407,11 +407,11 @@ def _export_addon_services(worksheet, title, services):
             if row_idx not in collector:
                 collector[row_idx] = []
 
-            collector[row_idx].append(sub.lot.category.name)
             collector[row_idx].append(get_object_value(sub, 'event_count'))
             collector[row_idx].append(get_object_value(sub, 'code'))
             collector[row_idx].append(person.name)
             collector[row_idx].append(person.email)
+            collector[row_idx].append(sub.lot.category.name)
             collector[row_idx].append(addon_sub.optional.theme.name)
             collector[row_idx].append(addon_sub.optional.name)
             collector[row_idx].append(sub.get_status_display())
