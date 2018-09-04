@@ -18,8 +18,12 @@ class EventSubscribable(EventCompositeSpecificationMixin):
         if event.date_end < datetime.now() or event.date_start < datetime.now():
             return False
 
-        for lot in event.lots.filter(active=True):
+        lots = event.lots.all()
 
+        if lots.count() == 0:
+            return False
+
+        for lot in lots:
             lot_spec = LotSubscribable()
             if not lot_spec.is_satisfied_by(lot):
                 return False
@@ -35,8 +39,12 @@ class LotSubscribable(LotCompositeSpecificationMixin):
 
     def is_satisfied_by(self, lot: Lot):
         super().is_satisfied_by(lot)
-        now = datetime.now()
-        if now < lot.date_end:
-            return True
 
-        return False
+        if not lot.active:
+            return False
+
+        now = datetime.now()
+        if now > lot.date_end:
+            return False
+
+        return True

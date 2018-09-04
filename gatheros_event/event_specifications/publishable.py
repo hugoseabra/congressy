@@ -2,6 +2,8 @@ from gatheros_event.models import Event
 from .mixins import (
     EventCompositeSpecificationMixin,
 )
+from .payable import EventPayable, OrganizationHasBanking
+from .subscribable import EventSubscribable
 
 
 class EventPublishable(EventCompositeSpecificationMixin):
@@ -18,8 +20,19 @@ class EventPublishable(EventCompositeSpecificationMixin):
 
     def is_satisfied_by(self, event: Event):
         super().is_satisfied_by(event)
-        return False
 
+        visibility_spec = EventSubscribable().is_satisfied_by(event)
+        org = event.organization
+        payable_spec = EventPayable().is_satisfied_by(event)
+        banking_spec = OrganizationHasBanking().is_satisfied_by(org)
 
-class EventAllowsSubscriptions(EventCompositeSpecificationMixin):
-    pass
+        if not visibility_spec:
+            return False
+
+        if not event.info.description:
+            return False
+
+        if payable_spec and not banking_spec:
+            return False
+
+        return True

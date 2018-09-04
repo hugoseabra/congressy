@@ -39,7 +39,7 @@ def update_event_config_flags(event: Event):
         for feature, value in FREE_EVENT_FEATURES.items():
             setattr(feature_config, feature, value)
 
-    if not feature_config.feature_multi_lots:
+    if not feature_config.feature_multi_lots and event.lots.count() > 1:
         _deactivate_all_lotes(event)
 
     event.save()

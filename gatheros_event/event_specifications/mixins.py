@@ -1,6 +1,6 @@
-from addon.models import Product, Service, AbstractOptional
+from addon.models import Product, Service
 from core.specification import CompositeSpecification, AndSpecification
-from gatheros_event.models import Event
+from gatheros_event.models import Event, Organization
 from gatheros_subscription.models import Subscription, Lot
 
 
@@ -34,6 +34,22 @@ class EventAndSpecificationMixin(AndSpecification):
     def is_satisfied_by(self, event: Event):
         self._is_event_instance(event)
         return super().is_satisfied_by(event)
+
+
+class OrganizationCompositeSpecificationMixin(CompositeSpecification):
+    """
+        Esse mixin que garante que o candidato repassado via o metodo
+        'is_satisfied_by' seja uma instancia de Organization
+    """
+
+    @staticmethod
+    def _is_org_instance(organization):
+        if not isinstance(organization, Organization):
+            raise ValueError('organization não é uma instancia de Organization')
+
+    def is_satisfied_by(self, organization: Organization):
+        self._is_org_instance(organization)
+        return super().is_satisfied_by(organization)
 
 
 class LotCompositeSpecificationMixin(CompositeSpecification):

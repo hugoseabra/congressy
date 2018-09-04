@@ -4,13 +4,14 @@ from django.db.models import Count
 
 from addon.models import Product, Service
 from core.specification import AndSpecification
-from gatheros_event.models import Event
+from gatheros_event.models import Event, Organization
 from gatheros_subscription.models import Lot, Subscription
 from .mixins import (
     EventCompositeSpecificationMixin,
     LotCompositeSpecificationMixin,
     ProductCompositeSpecificationMixin,
     ServiceCompositeSpecificationMixin,
+    OrganizationCompositeSpecificationMixin,
 )
 from .visible import LotVisible
 
@@ -129,3 +130,28 @@ class EventHasHadTransactions(EventCompositeSpecificationMixin):
             event=event,
             num_transactions__gt=0,
         ).count() > 0
+
+
+class OrganizationHasBanking(OrganizationCompositeSpecificationMixin):
+
+    def is_satisfied_by(self, organization: Organization):
+        super().is_satisfied_by(organization)
+
+        banking_required_fields = [
+            'bank_code',
+            'agency',
+            'account',
+            'cnpj_ou_cpf',
+            'account_type',
+        ]
+
+        for field in Organization._meta.get_fields():
+
+            for required_field in banking_required_fields:
+
+                if field.name == required_field:
+
+                    if not getattr(organization, field.name):
+                        return False
+
+        return True
