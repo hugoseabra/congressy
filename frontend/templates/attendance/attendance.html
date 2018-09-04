@@ -74,20 +74,22 @@
                     <div class="row">
                         <div class="col-md-12">
                             <h3>Categorias:
-                            {% for cat in lot_categories %}
-                                <span style="padding: 4px 7px 4px 7px"
-                                class="badge badge-primary">{{ cat.name }}</span>
-                            {% endfor %}
+                                {% for cat in lot_categories %}
+                                    <span style="padding: 4px 7px 4px 7px"
+                                          class="badge badge-primary">{{ cat.name }}</span>
+                                {% endfor %}
                             </h3>
                         </div>
                     </div>
                     <div class="row" id="cards-list"
                          style="padding-top: 20px"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
 
 {% endblock %}
 

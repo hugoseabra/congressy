@@ -444,7 +444,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             else return false;
         };
 
-        this.disable = function() {
+        this.disable = function () {
             var disableStatus = [STATUS_CANCELLED, STATUS_PENDING];
             if (disableStatus.indexOf(getStatus()) > -1)
                 return true;
@@ -512,7 +512,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             button.text(button_text);
 
 
-            var card_html = "<div class=\"panel\" style=\"border-radius: 5px; box-shadow: 0 10px 15px 0 rgba(223, 223, 223, 0.5);\">";
+            var card_html = "<div class=\"panel panel-card\" style=\"border-radius: 5px; box-shadow: 0 10px 15px 0 rgba(223, 223, 223, 0.5);\">";
             card_html += "<div class=\"container-fluid\" style=\"height: 70px;border-top-left-radius: 5px;border-top-right-radius: 5px;background-color:" + header_color + "\"></div>";
             card_html += "<div class=\"row\">";
             card_html += "<div class=\"col-xs-6 col-xs-offset-3\" style=\"margin-top:-50px;\">";
@@ -623,14 +623,22 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
             return card_parent_el;
         };
-        this.toogle = function (service_pk, created_by) {
-            if (getStatus() === STATUS_CHECKED){
-                attendance.checkout(service_pk,subscription,created_by)
+
+        this.toggle = function (service_pk, created_by) {
+            if (getStatus() === STATUS_CHECKED) {
+                attendance.checkout(service_pk, subscription, created_by).then(
+                    function () {
+                        self.create_card_el(service_pk, created_by);
+                    });
             }
-            if (getStatus() === STATUS_NOT_CHECKED){
-                attendance.checkin(service_pk,subscription,created_by)
+            if (getStatus() === STATUS_NOT_CHECKED) {
+                console.log("Realizar Checkin");
+                attendance.checkin(service_pk, subscription, created_by).then(
+                    function () {
+                        self.create_card_el(service_pk, created_by);
+                    });
             }
-        }
+        };
     };
 
 })(jQuery, window.cgsy.attendance);
@@ -763,18 +771,90 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 })(jQuery, window.cgsy.attendance, window.cgsy.attendance.List);
 
 // --------------------------------------------------------------------------//
-// BARCODE SEARCH
+// PROCESSCOUNTER SEARCH
 // --------------------------------------------------------------------------//
 (function ($, attendance) {
+    attendance.ProcessCounter = function () {
+
+        var cleanCounterTimer = null;
+        var preProcessCounterCallback = function () {
+        };
+        var afterProcessCounterCallback = function () {
+        };
+
+        var setPreProcessCounterCallback = function (callback) {
+            if (typeof callback !== 'function') {
+                console.error('Callback is not a function: ' + callback);
+                return;
+            }
+            preProcessCounterCallback = callback;
+        };
+
+        var setAfterProcessCounterCallback = function (callback) {
+            if (typeof callback !== 'function') {
+                console.error('Callback is not a function: ' + callback);
+                return;
+            }
+            afterProcessCounterCallback = callback;
+        };
+
+        this.createProcessCounter = function (preCallback, afterCallback, elCard, ends_in) {
+            createCounterAlert(elCard.find(".panel-body"));
+            setPreProcessCounterCallback(preCallback);
+            preProcessCounterCallback();
+            setAfterProcessCounterCallback(afterCallback);
+            runProcessCounter(elCard.find(".alert-time"), ends_in);
+        };
+
+        var runProcessCounter = function (el, ends_in) {
+
+            window.clearTimeout(cleanCounterTimer);
+
+            if (ends_in > 0) {
+                cleanCounterTimer = window.setTimeout(function () {
+                    el.text(ends_in);
+                    console.log(ends_in);
+                    runProcessCounter(el, ends_in - 1);
+                }, 1000);
+            }
+            afterProcessCounterCallback()
+        };
+
+        var createCounterAlert = function (elCard) {
+            var alert_time = "<div class=\"row\">";
+                    alert_time += "<div class=\"col-md-4 col-md-offset-4\">";
+                    alert_time += "<div class=\"alert alert-warning alert-time\" style=\"border-radius: 25px\" role=\"alert\">";
+                    alert_time += "<div style=\"text-align: center\">";
+                    alert_time += "<span class=\"alert-timer font-weight-bold\"></span>";
+                    alert_time += "</div>";
+                    alert_time += "</div>";
+                    alert_time += "</div>";
+                    alert_time += "</div>";
+
+            var alert_el = $(alert_time);
+            elCard.append(alert_el)
+        };
+        this.stopProcessCounter = function () {
+            window.clearTimeout(cleanCounterTimer);
+        }
+    }
+})(jQuery, window.cgsy.attendance);
+
+// --------------------------------------------------------------------------//
+// BARCODE SEARCH
+// --------------------------------------------------------------------------//
+(function ($, attendance, ProcessCounter) {
     attendance.BarcodeSearch = function (search, service_pk, created_by) {
         var searchTimer = null;
         var selected_card = null;
-        
+        var cleanTimer = null;
+        var processCounter = new ProcessCounter();
+
         var fetch = function (search_criteria, list_el) {
             list_el = $(list_el);
 
             window.clearTimeout(searchTimer);
-
+            processCounter.stopProcessCounter();
             searchTimer = window.setTimeout(function () {
                 search.fetch(search_criteria).then(function (cards) {
                     if (!cards.length) {
@@ -787,20 +867,28 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     var reread = selected_card && selected_card.id === card.id && card.active() === true;
 
                     if (reread === true) {
-                        console.log("releitura");
-                        card.toggle(service_pk, created_by);
+                        selected_card.toggle(service_pk, created_by);
+                        selected_card = null;
+                        cleanTimer = setTimeout(function () {
+                            list_el.html('');
+                        }, 5000);
                         return;
                     }
-                    console.log("primeira leitura");
+
                     selected_card = card;
-                    list_el.append(selected_card.getElement(service_pk, created_by));
-                });
+                    var outputCard = selected_card.getElement(service_pk, created_by);
+                    list_el.html(outputCard);
+                    processCounter.createProcessCounter(
+                        function () {},
+                        function () {},
+                        $(outputCard), 5);
+                    });
             }, 350);
         };
 
         this.watch = function (input_el, list_el) {
-            $(input_el).on('keydown', function (event) {
-                if (event.keyCode == 13 || event.keyCode == 16 || event.keyCode == 17) {
+            $(document).on('keydown', function (event) {
+                if (event.keyCode === 13 || event.keyCode === 16 || event.keyCode === 17) {
                     event.preventDefault();
                 }
 
@@ -811,15 +899,18 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
             $(input_el).on('keyup', function () {
                 var input = $(this);
-                $(list_el).html('');
+                if (!selected_card) {
+                    $(list_el).html('');
+                }
                 if (input.val().length === 8) {
+                    window.clearTimeout(cleanTimer);
                     fetch(input.val(), list_el);
                     input.val('');
                 }
             });
         };
     };
-})(jQuery, window.cgsy.attendance);
+})(jQuery, window.cgsy.attendance, window.cgsy.attendance.ProcessCounter);
 
 // --------------------------------------------------------------------------//
 // QRCODE SEARCH
