@@ -801,13 +801,12 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         this.createProcessCounter = function (preCallback, afterCallback, elCard, ends_in) {
             createCounterAlert(elCard.find(".panel-body"));
             setPreProcessCounterCallback(preCallback);
-            preProcessCounterCallback();
             setAfterProcessCounterCallback(afterCallback);
-            runProcessCounter(elCard.find(".alert-time"), ends_in);
+            runProcessCounter(elCard.find(".alert-timer"), ends_in);
         };
 
         var runProcessCounter = function (el, ends_in) {
-
+            preProcessCounterCallback();
             window.clearTimeout(cleanCounterTimer);
 
             if (ends_in > 0) {
@@ -817,7 +816,9 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     runProcessCounter(el, ends_in - 1);
                 }, 1000);
             }
-            afterProcessCounterCallback()
+            else {
+            afterProcessCounterCallback();
+                }
         };
 
         var createCounterAlert = function (elCard) {
@@ -857,6 +858,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             processCounter.stopProcessCounter();
             searchTimer = window.setTimeout(function () {
                 search.fetch(search_criteria).then(function (cards) {
+
                     if (!cards.length) {
                         selected_card = null;
                         list_el.html('');
@@ -877,11 +879,17 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
                     selected_card = card;
                     var outputCard = selected_card.getElement(service_pk, created_by);
+
                     list_el.html(outputCard);
+
+                    if (card.active() === true){
                     processCounter.createProcessCounter(
                         function () {},
-                        function () {},
-                        $(outputCard), 5);
+                        function () {
+                            list_el.html('');
+                        },
+                        $(outputCard), 10);
+                    }
                     });
             }, 350);
         };
