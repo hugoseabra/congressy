@@ -1,4 +1,6 @@
 """ Mixins de views. """
+from datetime import datetime
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import redirect_to_login
@@ -19,6 +21,7 @@ from core.model.deletable import DeletableModelMixin
 from gatheros_event.helpers.account import get_member, get_organization, \
     get_organizations, is_manager, update_account
 from gatheros_event.helpers.event_business import is_paid_event
+from gatheros_event.helpers.publishing import event_is_publishable
 from gatheros_event.models import Event, Member
 
 
@@ -324,6 +327,27 @@ class EventViewMixin(AccountMixin):
 
     def get_permission_denied_url(self):
         return reverse('event:event-list')
+
+
+class EventDraftStateMixin(object):
+
+    def get_context_data(self, **kwargs):
+
+        if 'view' not in kwargs:
+            kwargs['view'] = self
+
+        context = kwargs
+
+        event = kwargs.get('event')
+        if not event:
+            return context
+
+        context['selected_event'] = event
+        # context['is_event_publishable'] = event_is_publishable(event)
+        context['is_event_publishable'] = True
+        context['time'] = datetime.now().strftime('%I:%M')
+
+        return context
 
 
 class MultiLotsFeatureFlagMixin(AccountMixin, generic.View):
