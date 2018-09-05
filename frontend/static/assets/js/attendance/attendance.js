@@ -312,8 +312,18 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                             callback();
                         });
                         console.log('2. checkin realizado.');
+                        Messenger().post({
+                            message: 'Entrada registrada com sucesso!',
+                            type: 'success'
+                        });
                         subscription.fetch(service_pk, created_by).then(function () {
                             resolve();
+                        });
+                    });
+                    sender.setFailCallback(function () {
+                        Messenger().post({
+                            message: 'Falha ao registrar entrada!',
+                            type: 'error'
                         });
                     });
 
@@ -372,12 +382,21 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                         $.each(postCheckoutCallbacks, function (i, callback) {
                             callback();
                         });
-
+                        Messenger().post({
+                            message: 'Saída registrada com sucesso!',
+                            type: 'success'
+                        });
                         subscription.fetch(service_pk, created_by).then(function () {
                             resolve();
                         });
                     });
 
+                    sender.setFailCallback(function () {
+                        Messenger().post({
+                            message: 'Falha ao registrar saída!',
+                            type: 'error'
+                        });
+                    });
                     sender.post({
                         'checkin': last_checkin['pk'],
                         'created_by': created_by
@@ -585,9 +604,12 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                             ).then(function () {
                                 console.log('3. recriando card.');
                                 self.create_card_el(service_pk, created_by);
-
                                 button.removeAttr('disabled');
                                 button.text(button_text);
+                                Messenger().post({
+                                    message: 'Saída registrada com sucesso!',
+                                    type: 'danger'
+                                });
                             });
                         });
                         break;
@@ -812,25 +834,24 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             if (ends_in > 0) {
                 cleanCounterTimer = window.setTimeout(function () {
                     el.text(ends_in);
-                    console.log(ends_in);
                     runProcessCounter(el, ends_in - 1);
                 }, 1000);
             }
             else {
-            afterProcessCounterCallback();
-                }
+                afterProcessCounterCallback();
+            }
         };
 
         var createCounterAlert = function (elCard) {
             var alert_time = "<div class=\"row\">";
-                    alert_time += "<div class=\"col-md-4 col-md-offset-4\">";
-                    alert_time += "<div class=\"alert alert-warning alert-time\" style=\"border-radius: 25px\" role=\"alert\">";
-                    alert_time += "<div style=\"text-align: center\">";
-                    alert_time += "<span class=\"alert-timer font-weight-bold\"></span>";
-                    alert_time += "</div>";
-                    alert_time += "</div>";
-                    alert_time += "</div>";
-                    alert_time += "</div>";
+            alert_time += "<div class=\"col-md-4 col-md-offset-4\">";
+            alert_time += "<div class=\"alert alert-warning alert-time\" style=\"border-radius: 25px\" role=\"alert\">";
+            alert_time += "<div style=\"text-align: center\">";
+            alert_time += "<span class=\"alert-timer font-weight-bold\"></span>";
+            alert_time += "</div>";
+            alert_time += "</div>";
+            alert_time += "</div>";
+            alert_time += "</div>";
 
             var alert_el = $(alert_time);
             elCard.append(alert_el)
@@ -856,6 +877,8 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
             window.clearTimeout(searchTimer);
             processCounter.stopProcessCounter();
+
+            removeAttendanceEnterEvent();
             searchTimer = window.setTimeout(function () {
                 search.fetch(search_criteria).then(function (cards) {
 
@@ -879,24 +902,40 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
                     selected_card = card;
                     var outputCard = selected_card.getElement(service_pk, created_by);
-
                     list_el.html(outputCard);
 
-                    if (card.active() === true){
-                    processCounter.createProcessCounter(
-                        function () {},
+                    if (card.active() === true) {
+                        processCounter.createProcessCounter(
+                        function () {
+                            $(document).on('keydown', function (event) {
+                                removeAttendanceEnterEvent();
+                                if (event.keyCode === 13) {
+                                    if (selected_card !== null) {
+                                        selected_card.toggle(service_pk, created_by);
+                                        selected_card = null;
+                                        event.preventDefault();
+                                    }
+                                }
+                            });
+                        },
                         function () {
                             list_el.html('');
+                            removeAttendanceEnterEvent();
                         },
                         $(outputCard), 10);
                     }
-                    });
+                });
             }, 350);
         };
 
-        this.watch = function (input_el, list_el) {
+        var removeAttendanceEnterEvent = function () {
+            $(document).off('keydown');
+            preventDefaultScanner();
+        };
+
+        var preventDefaultScanner = function () {
             $(document).on('keydown', function (event) {
-                if (event.keyCode === 13 || event.keyCode === 16 || event.keyCode === 17) {
+                if (event.keyCode === 16 || event.keyCode === 17) {
                     event.preventDefault();
                 }
 
@@ -904,6 +943,10 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     event.preventDefault();
                 }
             });
+        };
+
+        this.watch = function (input_el, list_el) {
+            preventDefaultScanner();
 
             $(input_el).on('keyup', function () {
                 var input = $(this);
