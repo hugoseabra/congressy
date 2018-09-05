@@ -2,7 +2,10 @@
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
-from gatheros_event.signals.helpers import update_event_config_flags
+from gatheros_event.signals.helpers import (
+    update_event_config_flags,
+    update_event_publishing,
+)
 from gatheros_subscription.models import Lot
 
 
@@ -13,3 +16,4 @@ def set_feature_flags_on_event_type_change(instance, **_):
 
     event = instance.event
     update_event_config_flags(event)
+    update_event_publishing(event)

@@ -6,7 +6,10 @@ from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 
 from addon.models import Service, Product
-from gatheros_event.signals.helpers import update_event_config_flags
+from gatheros_event.signals.helpers import (
+    update_event_config_flags,
+    update_event_publishing,
+)
 
 
 @receiver(post_save, sender=Product)
@@ -18,6 +21,7 @@ def set_feature_flags_on_event_type_change(instance, **_):
 
     event = instance.lot_category.event
     update_event_config_flags(event)
+    update_event_publishing(event)
 
 
 @receiver(post_save, sender=Product)
