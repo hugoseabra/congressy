@@ -30,9 +30,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         var cameras;
         var selected_camera;
 
-        var scan_callback = default_scan_callback;
-        var active_callback = default_active_callback;
-        var inactive_callback = default_inactive_callback;
+
 
         var clearLogClasses = function () {
             $.each(LOG_CLASSES, function (i, class_name) {
@@ -102,6 +100,9 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             return cameras;
         };
 
+        var scan_callback = default_scan_callback;
+        var active_callback = default_active_callback;
+        var inactive_callback = default_inactive_callback;
         /**
          * Suporte a 2 câmeras comente.
          */
@@ -122,7 +123,6 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             if (scanner) {
                 scanner.stop();
             }
-
             scanner = createScanner(mirror);
             scanner.addListener('scan', scan_callback);
             scanner.addListener('active', active_callback);
@@ -204,7 +204,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             }
         };
 
-        var createScanner = function(mirror) {
+        var createScanner = function (mirror) {
             return new Instascan.Scanner({
                 video: video_el[0],
                 backgroundScan: false,

@@ -34,7 +34,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="{% if search_type == 'qrcode' %} col-md-6 {% else %} col-md-12 {% endif %}">
                             <div class="input-group input-group-lg">
                                 <div class="input-group-btn">
                                     <button id="type-search"
@@ -65,11 +65,33 @@
                                         </li>
                                     </ul>
                                 </div>
-                                <input id="search" type="text"
-                                       class="form-control"
-                                       aria-label="...">
+                                {% if search_type != 'qrcode' %}
+                                    <input id="search" type="text"
+                                           class="form-control"
+                                           aria-label="...">
+                                {% endif %}
                             </div>
                         </div>
+                        {% if search_type == 'qrcode' %}
+                            <div class="col-md-6">
+                                <div class="float-left">
+                                    <label for="other-window-switch">Abrir em
+                                        outra Janela ?</label>
+                                    <input id="other-window-switch"
+                                           type="checkbox"
+                                           class="js-switch"
+                                           data-toggle="tooltip"
+                                           title="Abrir em outra Janela ?">
+                                </div>
+                                <div class="float-right">
+                                    <button type="button"
+                                            class="btn btn-primary btn-3d">
+                                        Iniciar
+                                    </button>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="row">
                         <div class="col-md-12">
@@ -81,21 +103,60 @@
                             </h3>
                         </div>
                     </div>
-                    <div class="row" id="cards-list"
-                         style="padding-top: 20px"></div>
-
-
+                    <div class="row"
+                         style="padding-top: 20px">
+                        {% if search_type == 'qrcode' %}
+                            <div class="col-md-6">
+                                <video width="100%" height="100%"
+                                       id="webcam"></video>
                             </div>
+                        {% endif %}
+                        <div class="container-fluid">
+                            <div class="alert alert-info alert-dismissable">
+                                <button type="button" class="close"
+                                        data-dismiss="alert"
+                                        aria-hidden="true">×
+                                </button>
+                                <span>Através do leitor de código de barras você
+                                    pode
+                                    fazer o check-in/out de 3 maneiras: </span>
+                                <ul>
+                                    <li>Lendo o Código de barras do voucher e
+                                        relendo ele.
+                                    </li>
+                                    <li>Lendo o Código de barras do voucher e
+                                        clicando no botão de realizar
+                                        check-in/out
+                                        no card do participante
+                                    </li>
+                                    <li>Lendo o Código de barras do voucher e
+                                        apertando Enter
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="cards-list"
+                             class="{% if search_type == 'qrcode' %} col-md-6
+                                    {% elif search_type == 'barcode' %} col-md-6 col-md-offset-3
+                                    {% else %} col-md-12 {% endif %}">
 
                         </div>
+
                     </div>
+
                 </div>
+            </div>
+        </div>
+    </div>
+
 
 {% endblock %}
 
 {% block scripts %}
     <script src="{% static 'assets/js/ajax.js' %}"></script>,
     <script src="{% static 'assets/js/attendance/attendance.js' %}"></script>
+    <script src="{% static 'assets/plugins/instascan/instascan-1.0.0.min.js' %}"></script>
+    <script src="{% static 'assets/js/attendance/cgsy-scanner.js' %}"></script>
     <script>
         $(document).ready(function () {
             {% if search_type == 'barcode' %}
@@ -108,6 +169,11 @@
                     'listEl': $('#cards-list'),
                     'inputEl': $('#search')
                 });
+            {% elif search_type == 'qrcode' %}
+
+                var scan = new window.cgsy.QRCodeScanner($('#webcam'), $('#cards-list'));
+                scan.start();
+
             {% else %}
                 createTypingSearch({
                     'subscriptionUri': "{% url 'api:attendance:subscription-list' attendance_list.pk %}",

@@ -890,8 +890,9 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     var card = cards[0];
 
                     var reread = selected_card && selected_card.id === card.id && card.active() === true;
-
+                    console.log("reread: " +reread);
                     if (reread === true) {
+                        console.log("oap");
                         selected_card.toggle(service_pk, created_by);
                         selected_card = null;
                         cleanTimer = setTimeout(function () {
@@ -906,23 +907,24 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
                     if (card.active() === true) {
                         processCounter.createProcessCounter(
-                        function () {
-                            $(document).on('keydown', function (event) {
-                                removeAttendanceEnterEvent();
-                                if (event.keyCode === 13) {
-                                    if (selected_card !== null) {
-                                        selected_card.toggle(service_pk, created_by);
-                                        selected_card = null;
-                                        event.preventDefault();
+                            function () {
+                                $(document).on('keydown', function (event) {
+                                    removeAttendanceEnterEvent();
+                                    if (event.keyCode === 13) {
+                                        if (selected_card !== null) {
+                                            selected_card.toggle(service_pk, created_by);
+                                            event.preventDefault();
+                                        }
                                     }
-                                }
-                            });
-                        },
-                        function () {
-                            list_el.html('');
-                            removeAttendanceEnterEvent();
-                        },
-                        $(outputCard), 10);
+                                });
+                            },
+                            function () {
+                                list_el.html('');
+                                removeAttendanceEnterEvent();
+                                selected_card = null;
+
+                            },
+                            $(outputCard), 10);
                     }
                 });
             }, 350);
@@ -982,6 +984,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
     };
 })(jQuery, window.cgsy.attendance);
 
+
 function createTypingSearch(options) {
     var attendance = new window.cgsy.attendance.Attendance(
         options['checkinUri'],
@@ -1017,7 +1020,7 @@ function createBarCodeSearch(options) {
         attendance,
         options['subscriptionUri']
     );
-    search.setCardSize(6);
+    search.setCardSize(12);
 
     var barCodeSearch = new window.cgsy.attendance.BarcodeSearch(
         search,
