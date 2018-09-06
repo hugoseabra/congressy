@@ -1,0 +1,31 @@
+<div class="modal fade" id="unpublishable_modal" role="dialog"
+     data-backdrop="static">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">
+                    Evento com pendências
+                </h4>
+            </div>
+            <div class="modal-body modal-scroll">
+                <div class="panel panel-primary">
+                    <div class="panel-body ">
+
+                        Não é possivel publicar seu evento pela seguinte razão:
+                        <div class="text-bold">
+                            {{ unpublishable_reason|safe }}
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

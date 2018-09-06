@@ -27,6 +27,10 @@ window.cgsy.messenger = window.cgsy.messenger || {};
         cgsy.messenger.triggerEvent('warning', msg);
     };
 
+    messenger.triggerInfo = function (msg) {
+        cgsy.messenger.triggerEvent('info', msg);
+    };
+
     messenger.triggerError = function (msg) {
         cgsy.messenger.triggerEvent('error', msg);
     };

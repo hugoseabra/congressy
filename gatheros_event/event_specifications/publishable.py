@@ -36,3 +36,25 @@ class EventPublishable(EventCompositeSpecificationMixin):
             return False
 
         return True
+
+    @staticmethod
+    def get_reason(event: Event):
+
+        visibility_spec = EventSubscribable().is_satisfied_by(event)
+        org = event.organization
+        payable_spec = EventPayable().is_satisfied_by(event)
+        banking_spec = OrganizationHasBanking().is_satisfied_by(org)
+
+        if not visibility_spec:
+            return 'Seu evento não está visivel.' \
+                   ' Veja a situação dos seus lotes!'
+
+        if not event.info.description:
+            return 'Seu evento não possui uma descrição. ' \
+                   'Veja os dados da pagina do evento!'
+
+        if payable_spec and not banking_spec:
+            return 'Seu evento é pago e não possui dados bancarios para ' \
+                   'receber pagamentos. Veja os detalhes da sua organização!'
+
+        return ''

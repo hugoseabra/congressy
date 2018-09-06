@@ -16,6 +16,7 @@ from .event.info import EventInfoView
 from .event.list import EventListView
 from .event.panel import EventPanelView
 from .event.transfer import EventTransferView
+from .event.publishing import EventPublishView
 # INVITATION
 from .invite import (
     InvitationCreateView,

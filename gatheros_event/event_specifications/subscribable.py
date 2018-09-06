@@ -23,10 +23,14 @@ class EventSubscribable(EventCompositeSpecificationMixin):
         if lots.count() == 0:
             return False
 
+        subscribable_lot_flag = False
         for lot in lots:
             lot_spec = LotSubscribable()
-            if not lot_spec.is_satisfied_by(lot):
-                return False
+            if lot_spec.is_satisfied_by(lot):
+                subscribable_lot_flag = True
+
+        if not subscribable_lot_flag:
+            return False
 
         return True
 

@@ -1,5 +1,4 @@
 """ Mixins de views. """
-from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -21,7 +20,7 @@ from core.model.deletable import DeletableModelMixin
 from gatheros_event.helpers.account import get_member, get_organization, \
     get_organizations, is_manager, update_account
 from gatheros_event.helpers.event_business import is_paid_event
-from gatheros_event.helpers.publishing import event_is_publishable
+from gatheros_event.helpers.publishing import event_is_publishable, get_unpublishable_reason
 from gatheros_event.models import Event, Member
 
 
@@ -296,7 +295,7 @@ class EventViewMixin(AccountMixin):
 
         self.permission_denied_url = reverse(
             'event:event-panel',
-            kwargs={'pk': self.kwargs.get('event_pk')}
+            kwargs={'pk': event.pk}
         )
         return super(EventViewMixin, self).dispatch(request, *args, **kwargs)
 
@@ -316,9 +315,14 @@ class EventViewMixin(AccountMixin):
         if self.event:
             return self.event
 
+        event_pk = self.kwargs.get('event_pk')
+
+        if not event_pk:
+            event_pk = self.kwargs.get('pk')
+
         self.event = get_object_or_404(
             Event,
-            pk=self.kwargs.get('event_pk')
+            pk=event_pk
         )
         return self.event
 
@@ -344,7 +348,7 @@ class EventDraftStateMixin(object):
 
         context['selected_event'] = event
         context['is_event_publishable'] = event_is_publishable(event)
-
+        context['unpublishable_reason'] = get_unpublishable_reason(event)
         return context
 
 

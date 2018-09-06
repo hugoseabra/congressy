@@ -51,6 +51,12 @@ urls = [
         name='event-delete'
     ),
     url(
+        r'^(?P<pk>[\d]+)/publish/',
+        views.EventPublishView.as_view(),
+        name='event-publish'
+    ),
+
+    url(
         r'^(?P<pk>[\d]+)/$',
         views.EventPanelView.as_view(),
         name='event-panel'

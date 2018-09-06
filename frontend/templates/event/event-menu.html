@@ -37,24 +37,24 @@ Variáveis:
 
         </small>
 
+    {% endif %}
 
+    {% if is_event_publishable != None %}
 
-        {% if is_event_publishable != None %}
+        <div class="small">
 
-            <div class="small">
+            {% if is_event_publishable %}
+                Publicar:
+                <input type="checkbox" class="js-switch" id="publish_event"
+                        {% if event.published %} checked {% endif %}/>
+            {% elif not is_event_publishable %}
+                <a onclick="$('#unpublishable_modal').modal('show');" href="javascript:void(0);">
+                    Seu evento possui pendencias
+                </a>
+            {% endif %}
 
-                {% if is_event_publishable %}
-                    Publicar:
-                    <input type="checkbox" class="js-switch publish_event"/>
-                {% elif not is_event_publishable %}
-                    <a href="#">
-                        Seu evento possui pendencias
-                    </a>
-                {% endif %}
+        </div>
 
-            </div>
-
-        {% endif %}
     {% endif %}
 
 </div>
@@ -264,4 +264,40 @@ Variáveis:
 <br/>
 <br/>
 <br/>
+
+<script>
+
+
+    $(document).ready(function () {
+
+        var publish_switch_el = $('#publish_event');
+
+        if (publish_switch_el.length) {
+
+            publish_switch_el.on('change', function () {
+
+                var sender = new cgsy.AjaxSender("{% url 'event:event-publish' event.pk %}");
+                sender.setSuccessCallback(function () {
+                    location.reload();
+                });
+
+                sender.setFailCallback(function (res) {
+                    console.error(res.statusText);
+                    location.reload();
+                });
+
+
+                if (publish_switch_el.prop('checked')) {
+                    sender.send('POST', {'state': 'publish'});
+                } else {
+                    sender.send('POST', {'state': 'unpublish'});
+                }
+
+            });
+        }
+
+    });
+
+
+</script>
 

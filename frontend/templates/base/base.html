@@ -241,23 +241,12 @@
                 <!--main content start-->
 
                 {% if selected_event and not selected_event.published %}
-
-
+                        
                     {% if is_event_publishable %}
 
                         <div class="alert alert-info text-center" role="alert">
 
-                            <div class="row">
-                                <i class="fas fa-exclamation-triangle info-color"></i>
-                                <span class="text-bold text-uppercase">
-                                    atenção
-                                </span>
-                                <i class="fas fa-exclamation-triangle info-color"></i>
-                            </div>
-
-                            <div class="row">
-                                Seu evento não está publicado!
-                            </div>
+                            Seu evento não está publicado!
 
                         </div>
 
@@ -265,7 +254,7 @@
 
                         <div class="alert alert-warning text-center" role="alert">
 
-                            <div class="row">
+                            <div>
 
                                 <i class="fas fa-exclamation-triangle warning-color"></i>
 
@@ -275,8 +264,9 @@
 
                                 <i class="fas fa-exclamation-triangle warning-color"></i>
                             </div>
-                            <div class="row">
-                                <a href="#">
+
+                            <div>
+                                <a onclick="$('#unpublishable_modal').modal('show');" href="javascript:void(0);">
                                     Seu evento possui pendencias que impeçam que ele seja publicado, click para maiores informações!
                                 </a>
                             </div>
@@ -330,6 +320,7 @@
 
 <!-- Modals -->
 {% include 'organization/modal-switch-organization.html' %}
+{% include 'event/modal-upublishable.html' %}
 <div class="tooltip-wrapper">
     {% block modals %}{% endblock %}
 </div>
