@@ -2,6 +2,7 @@
 {# @TODO Change the icons in nav_aside_itens  #}
 
 {% load static event_tags  base_tags  widget_tweaks form_config_tags humanize l10n queryset_filter %}
+
 {% block styles %}
     <style>
         .add_todo_element {
@@ -32,11 +33,13 @@
         }
     </style>
 {% endblock %}
+
 {% block pageheader %}
     <div class="pageheader">
         <h2>Painel do Evento</h2>
     </div>
 {% endblock %}
+
 {% block scripts %}
     <script src="{% static "/assets/plugins/gauge/gauge.min.js" %}"></script>
     <script src="{% static "assets/js/messenger.js" %}"></script>
@@ -219,11 +222,9 @@
 
 {% endblock %}
 
-
 {% block title %} Painel do evento | Congressy{% endblock %}
 
 {% block page_title %}{{ object.name }}{% endblock %}
-
 
 {% block content %}
 
@@ -333,8 +334,9 @@
     {% endif %}
 
     <div id="graph-data" class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
-        <div class=" col-lg-6 col-md-6 col-sm-12 col-xs-12"
-             style="margin-bottom: 15px ">
+
+        <div class=" col-lg-6 col-md-6 col-sm-12 col-xs-12" style="margin-bottom: 15px ">
+
             <div class="panel {% if limit == 0 or total_subscriptions  > limit %} widget-mini panel-solid-info {% endif %} panel-primary">
                 {% if limit != 0 and  total_subscriptions  < limit %}
                     <div class="panel-heading">
@@ -365,7 +367,9 @@
                     {% endif %}
                 </div>
             </div>
+
         </div>
+
         {% if gender.men != 0 or gender.women != 0 %}
             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
                  style="padding-bottom: 20px;margin-bottom: 20px ">
@@ -400,6 +404,7 @@
                 </div>
             </div>
         {% endif %}
+    
     </div>
 
 
