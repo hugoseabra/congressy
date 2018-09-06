@@ -7,6 +7,58 @@ Variáveis:
 - is_paid_event
 
 {% endcomment %}
+
+
+<div class="sidebar-header well text-center" style="margin-left: 5px">
+
+    {% if event.published %}
+
+        <small>
+            <div class="text-bold">
+                Status: <i class="fas fa-circle success-color"></i>
+            </div>
+
+            <div class=" small text-muted">
+                Publicado
+            </div>
+
+        </small>
+
+    {% else %}
+
+        <small>
+            <div class="text-bold">
+                Status: <i class="fas fa-circle danger-color"></i>
+            </div>
+
+            <div class="small text-muted">
+                Não publicado
+            </div>
+
+        </small>
+
+
+
+        {% if is_event_publishable != None %}
+
+            <div class="small">
+
+                {% if is_event_publishable %}
+                    Publicar:
+                    <input type="checkbox" class="js-switch publish_event"/>
+                {% elif not is_event_publishable %}
+                    <a href="#">
+                        Seu evento possui pendencias
+                    </a>
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+    {% endif %}
+
+</div>
+
 <h5 class="sidebar-header" style="color:#4c4c4c;">Início</h5>
 <ul class="nav nav-pills nav-stacked">
     <li {% if active == 'panel' %}class="active"{% endif %}>

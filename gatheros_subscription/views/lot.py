@@ -11,12 +11,12 @@ from gatheros_event.helpers.account import update_account
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event, Organization
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin, \
-    MultiLotsFeatureFlagMixin
+    MultiLotsFeatureFlagMixin, EventDraftStateMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import Lot, EventSurvey
 
 
-class BaseLotView(AccountMixin, View):
+class BaseLotView(AccountMixin, View, EventDraftStateMixin):
     event = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -45,6 +45,8 @@ class BaseLotView(AccountMixin, View):
         # noinspection PyUnresolvedReferences
         context = super(BaseLotView, self).get_context_data(**kwargs)
         context['event'] = self.event
+        kwargs.update({'event': self.event})
+        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
         return context
 
     def _set_event(self):

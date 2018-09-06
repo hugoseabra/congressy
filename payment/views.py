@@ -21,7 +21,7 @@ from rest_framework.response import Response
 from gatheros_event.helpers.account import update_account
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
 from mailer import exception as mailer_notification
 from mailer.services import (
     notify_chargedback_subscription,
@@ -46,6 +46,7 @@ from payment.helpers import (
     TransactionSubscriptionStatusIntegrator,
 )
 from payment.models import Transaction, TransactionStatus
+
 
 try:
     from raven.contrib.django.raven_compat.models import client
@@ -125,7 +126,7 @@ def notify_postback(transaction, data):
     )
 
 
-class EventPaymentView(AccountMixin, ListView):
+class EventPaymentView(AccountMixin, ListView, EventDraftStateMixin):
     template_name = 'payments/list.html'
     event = None
 
@@ -150,7 +151,9 @@ class EventPaymentView(AccountMixin, ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(EventPaymentView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
+        kwargs.update({'event': self.event})
+        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
         context['event'] = self.event
         context['totals'] = self._get_payables()
         context['has_inside_bar'] = True
@@ -232,7 +235,7 @@ class CheckoutView(AccountMixin, FormView):
 
         for hidden_field in form.hidden_fields():
             if hidden_field.errors:
-                for error in errors:
+                for error in hidden_field.errors:
                     messages.error(self.request, str(error))
 
         return super().form_valid(form)

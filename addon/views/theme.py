@@ -5,12 +5,18 @@ from django.views import generic
 
 from addon import services
 from addon.models import Theme
+from addon.views.mixins import ServiceFeatureFlagMixin
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
+from gatheros_event.views.mixins import DeleteViewMixin, \
+    EventDraftStateMixin
 
 
-class ThemeListView(AccountMixin, generic.ListView):
+class ThemeMixin(ServiceFeatureFlagMixin, EventDraftStateMixin):
+    pass
+
+
+class ThemeListView(ThemeMixin, generic.ListView):
     """Lista de lotes de acordo com o evento do contexto"""
     model = Theme
     template_name = 'addon/theme/list.html'
@@ -45,7 +51,7 @@ class ThemeListView(AccountMixin, generic.ListView):
         return query_set.filter(event=self.event).order_by('pk')
 
 
-class ThemeAddView(AccountMixin, generic.CreateView):
+class ThemeAddView(ThemeMixin, generic.CreateView):
     form_class = services.ThemeService
     template_name = 'addon/theme/form.html'
     event = None
@@ -94,7 +100,7 @@ class ThemeAddView(AccountMixin, generic.CreateView):
         return super().post(request, *args, **kwargs)
 
 
-class ThemeEditView(AccountMixin, generic.UpdateView):
+class ThemeEditView(ThemeMixin, generic.UpdateView):
     form_class = services.ThemeService
     model = services.ThemeService.manager_class.Meta.model
     template_name = 'addon/theme/form.html'
@@ -147,7 +153,7 @@ class ThemeEditView(AccountMixin, generic.UpdateView):
         return response
 
 
-class ThemeDeleteView(DeleteViewMixin):
+class ThemeDeleteView(ThemeMixin, DeleteViewMixin):
     model = services.ThemeService.manager_class.Meta.model
     delete_message = "Tem certeza que deseja excluir o tema \"{name}\"?"
     success_message = "Categoria excluída com sucesso!"

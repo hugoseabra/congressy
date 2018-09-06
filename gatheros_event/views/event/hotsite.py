@@ -7,10 +7,10 @@ from gatheros_event import forms
 from gatheros_event.helpers.account import update_account
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event, Info
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
 
 
-class EventHotsiteView(AccountMixin, FormView):
+class EventHotsiteView(AccountMixin, FormView, EventDraftStateMixin):
     form_class = forms.HotsiteForm
     template_name = 'event/hotsite.html'
     event = None
@@ -74,6 +74,8 @@ class EventHotsiteView(AccountMixin, FormView):
         event = self._get_event()
 
         context = super().get_context_data(**kwargs)
+        kwargs.update({'event': event})
+        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
         context['has_inside_bar'] = True
         context['active'] = 'pagina-do-evento'
         context['event'] = event

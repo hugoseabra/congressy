@@ -3,22 +3,25 @@ from decimal import Decimal
 
 from django.db.models import Q
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import DetailView
 
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.event_specifications import (
     EventSubscribable,
-    EventPayable,
 )
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event, Info, Organization
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
 from gatheros_subscription.models import Subscription, EventSurvey, Lot
 from payment.models import Transaction
 
 
-class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
+class EventPanelView(EventDraftStateMixin,
+                     TemplateNameableMixin,
+                     AccountMixin,
+                     DetailView, ):
     model = Event
     template_name = 'event/panel.html'
     permission_denied_url = reverse_lazy('event:event-list')
@@ -90,6 +93,8 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         return HttpResponse(status=200)
 
     def get_context_data(self, **kwargs):
+
+        kwargs.update({'event': self.object})
 
         context = super(EventPanelView, self).get_context_data(**kwargs)
 

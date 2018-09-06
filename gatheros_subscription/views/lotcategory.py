@@ -4,12 +4,13 @@ from django.urls import reverse_lazy, reverse
 from django.views import generic
 
 from gatheros_event.helpers.account import update_account
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import DeleteViewMixin, \
-    MultiLotsFeatureFlagMixin
+    MultiLotsFeatureFlagMixin, EventDraftStateMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import LotCategory
-from gatheros_event.helpers.event_business import is_paid_event
+
 try:
     from raven.contrib.django.raven_compat.models import client
 
@@ -19,7 +20,7 @@ except ImportError:
     SENTRY_RAVEN = False
 
 
-class LotCategoryListView(generic.ListView):
+class LotCategoryListView(generic.ListView, EventDraftStateMixin):
     """Lista de lotes de acordo com o evento do contexto"""
     model = LotCategory
     template_name = 'lotcategory/list.html'
@@ -49,6 +50,8 @@ class LotCategoryListView(generic.ListView):
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
+        kwargs.update({'event': self.event})
+        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
         context['event'] = self.event
         context['has_inside_bar'] = True
         context['active'] = 'categorias'
@@ -82,7 +85,8 @@ class LotCategoryListView(generic.ListView):
         return query_set.order_by('pk')
 
 
-class LotCategoryAddView(MultiLotsFeatureFlagMixin, generic.CreateView):
+class LotCategoryAddView(MultiLotsFeatureFlagMixin, generic.CreateView,
+                         EventDraftStateMixin):
     form_class = forms.LotCategoryForm
     template_name = 'lotcategory/form.html'
     event = None
@@ -115,6 +119,8 @@ class LotCategoryAddView(MultiLotsFeatureFlagMixin, generic.CreateView):
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
+        kwargs.update({'event': self.event})
+        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
         context['event'] = self.event
         return context
 
@@ -135,7 +141,7 @@ class LotCategoryAddView(MultiLotsFeatureFlagMixin, generic.CreateView):
         return response
 
 
-class LotCategoryEditView(generic.UpdateView):
+class LotCategoryEditView(generic.UpdateView, EventDraftStateMixin):
     form_class = forms.LotCategoryForm
     model = forms.LotCategoryForm.Meta.model
     template_name = 'lotcategory/form.html'
@@ -170,6 +176,8 @@ class LotCategoryEditView(generic.UpdateView):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
+        kwargs.update({'event': self.event})
+        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
         return context
 
     def get_form_kwargs(self):
@@ -192,10 +200,16 @@ class LotCategoryEditView(generic.UpdateView):
         return response
 
 
-class LotCategoryDeleteView(DeleteViewMixin):
+class LotCategoryDeleteView(DeleteViewMixin, EventDraftStateMixin):
     model = LotCategory
     delete_message = "Tem certeza que deseja excluir a categoria \"{name}\"?"
     success_message = "Categoria excluída com sucesso!"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        kwargs.update({'event': self.object})
+        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
+        return context
 
     def get_success_url(self):
         return reverse(

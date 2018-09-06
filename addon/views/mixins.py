@@ -4,10 +4,10 @@ from django.urls import reverse
 from django.views import generic
 
 from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
 
 
-class OptionalBaseMixin(AccountMixin, generic.View):
+class OptionalBaseMixin(AccountMixin, generic.View, EventDraftStateMixin):
     event = None
     permission_denied_message = 'Você não pode realizar esta ação.'
 
@@ -30,6 +30,8 @@ class OptionalBaseMixin(AccountMixin, generic.View):
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
+        kwargs.update({'event': self.event})
+        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
         context['event'] = self.event
         return context
 

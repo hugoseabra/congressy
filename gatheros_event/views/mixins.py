@@ -343,9 +343,7 @@ class EventDraftStateMixin(object):
             return context
 
         context['selected_event'] = event
-        # context['is_event_publishable'] = event_is_publishable(event)
-        context['is_event_publishable'] = True
-        context['time'] = datetime.now().strftime('%I:%M')
+        context['is_event_publishable'] = event_is_publishable(event)
 
         return context
 

@@ -4,7 +4,6 @@ from datetime import datetime
 import qrcode
 import qrcode.image.svg
 from django.conf import settings
-from gatheros_event.helpers.event_business import is_paid_event
 from django.contrib import messages
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.transaction import atomic
@@ -20,12 +19,10 @@ from wkhtmltopdf.views import PDFTemplateView
 from core.forms.cleaners import clear_string
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.helpers.account import update_account
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event, Person
-from gatheros_event.views.mixins import (
-    AccountMixin,
-    PermissionDenied,
-    EventViewMixin,
-)
+from gatheros_event.views.mixins import EventDraftStateMixin, \
+    AccountMixin, PermissionDenied, EventViewMixin
 from gatheros_subscription.directors import SubscriptionSurveyDirector
 from gatheros_subscription.forms import (
     SubscriptionAttendanceForm,
@@ -48,11 +45,10 @@ from payment.helpers import payment_helpers
 from payment.models import Transaction
 from survey.models import Question, Answer
 from .mixins import CheckinFeatureFlagMixin
-from gatheros_event.helpers.event_business import is_paid_event
-from gatheros_event.event_specifications.payable import EventPayable
 
 
-class SubscriptionViewMixin(TemplateNameableMixin, AccountMixin):
+class SubscriptionViewMixin(TemplateNameableMixin,
+                            AccountMixin, EventDraftStateMixin):
     """ Mixin de view para vincular com informações de event. """
 
     def __init__(self, *args, **kwargs):
@@ -74,9 +70,11 @@ class SubscriptionViewMixin(TemplateNameableMixin, AccountMixin):
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
-        context = super().get_context_data(**kwargs)
-
         event = self.get_event()
+        kwargs.update({'event': event})
+        context = super().get_context_data(**kwargs)
+        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
+
         context['event'] = event
         context['is_paid_event'] = is_paid_event(event)
 
@@ -295,7 +293,7 @@ class SubscriptionListView(SubscriptionViewMixin, generic.ListView):
         return query_set.filter(event=event, completed=True)
 
     def get_context_data(self, **kwargs):
-        cxt = super(SubscriptionListView, self).get_context_data(**kwargs)
+        cxt = super().get_context_data(**kwargs)
 
         cxt.update({
             'can_add_subscription': self.can_add_subscription(),

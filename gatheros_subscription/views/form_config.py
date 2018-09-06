@@ -7,7 +7,7 @@ from django.views import generic
 from core.util import represents_int
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.helpers.event_business import is_paid_event
-from gatheros_event.views.mixins import EventViewMixin
+from gatheros_event.views.mixins import EventViewMixin, EventDraftStateMixin
 from gatheros_subscription.forms import EventSurveyForm, FormConfigForm
 from gatheros_subscription.models import EventSurvey
 from .mixins import SurveyFeatureFlagMixin
@@ -16,7 +16,8 @@ from .mixins import SurveyFeatureFlagMixin
 class FormConfigView(SurveyFeatureFlagMixin,
                      TemplateNameableMixin,
                      EventViewMixin,
-                     generic.FormView):
+                     generic.FormView,
+                     EventDraftStateMixin,):
     """ Formulário de configuração de inscrição."""
 
     form_class = FormConfigForm
@@ -80,6 +81,8 @@ class FormConfigView(SurveyFeatureFlagMixin,
 
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
+        kwargs.update({'event': self.event})
+        cxt.update(EventDraftStateMixin.get_context_data(self, **kwargs))
         cxt['has_inside_bar'] = True
         cxt['active'] = 'form-personalizado'
         cxt['object'] = self.object
@@ -112,8 +115,10 @@ class FormConfigView(SurveyFeatureFlagMixin,
 
     def _get_selected_lots(self):
         lots_list = []
+        selected_lots = []
         all_lots = self.event.lots.all().order_by(Lower('name'))
-        selected_lots = self.survey.lots.all()
+        if self.survey:
+            selected_lots = self.survey.lots.all()
 
         for lot in all_lots:
             if lot in selected_lots:

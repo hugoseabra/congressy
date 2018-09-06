@@ -5,10 +5,10 @@ from django.views import generic
 
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
 
 
-class CertificateBaseMixin(AccountMixin, generic.View):
+class CertificateBaseMixin(AccountMixin, generic.View, EventDraftStateMixin):
     event = None
     permission_denied_message = 'Você não pode realizar esta ação.'
 
@@ -31,6 +31,8 @@ class CertificateBaseMixin(AccountMixin, generic.View):
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
+        kwargs.update({'event': self.event})
+        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
         context['event'] = self.event
         context['is_paid_event'] = is_paid_event(self.event)
 

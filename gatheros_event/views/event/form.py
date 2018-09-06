@@ -9,13 +9,13 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from gatheros_event import forms
 from gatheros_event.models import Organization, Event
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
 from gatheros_event.helpers.account import update_account
 from core.util import model_field_slugify, ReservedSlugException
 from gatheros_event.helpers.event_business import is_paid_event
 
 
-class BaseEventView(AccountMixin, View):
+class BaseEventView(AccountMixin, View, EventDraftStateMixin):
     template_name = 'event/form.html'
     success_message = ''
     success_url = None
@@ -63,6 +63,8 @@ class BaseEventView(AccountMixin, View):
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super(BaseEventView, self).get_context_data(**kwargs)
+        kwargs.update({'event': self.get_event()})
+        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
         context['next_path'] = self._get_referer_url()
         context['form_title'] = self.get_form_title()
         context['is_manager'] = self.has_internal_organization

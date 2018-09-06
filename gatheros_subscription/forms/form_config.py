@@ -1,7 +1,7 @@
 """ Formulários de `FormConfig` """
 from django import forms
 
-from gatheros_event.event_specifications import EventPayable
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_subscription.models import FormConfig
 
 
