@@ -228,6 +228,9 @@ class SurveyDirector(object):
                             )
                             answers.update({question.name: initial_storage})
                             continue
+                        elif question.type == question.FIELD_CHECKBOX_GROUP:
+                            # Must be a list to render in widget
+                            answer.value = answer.value.split(',')
 
                         answers.update({question.name: answer.value})
 

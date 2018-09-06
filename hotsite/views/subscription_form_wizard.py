@@ -28,6 +28,7 @@ from payment.helpers.payment_helpers import (
 )
 from payment.models import Transaction
 from survey.directors import SurveyDirector
+from survey.models import Question
 
 FORMS = [
     ("private_lot", forms.PrivateLotForm),
@@ -221,8 +222,10 @@ def has_products(wizard):
 
     try:
         optionals = lot.category.product_optionals
-        return optionals.filter(published=True).count() > 0 and \
-               lot.event.feature_configuration.feature_products
+        return optionals.filter(
+            published=True,
+            date_end_sub__gte=datetime.now(),
+        ).count() > 0
 
     except AttributeError:
         return False
@@ -251,7 +254,10 @@ def has_services(wizard):
 
     try:
         optionals = lot.category.service_optionals
-        return optionals.filter(published=True).count() > 0 and \
+        return optionals.filter(
+            published=True,
+            date_end_sub__gte=datetime.now(),
+        ).count() > 0 and \
                lot.event.feature_configuration.feature_services
 
     except AttributeError:
@@ -594,16 +600,34 @@ class SubscriptionWizardView(SessionWizardView):
             # Tratamento especial para extrair as respostas do form_data,
             # causado pelo uso do FormWizard que adiciona prefixos nas
             # respostas
-            survey_response = QueryDict('', mutable=True)
-            for form_question, form_response in form_data.items():
-                if form_question == 'csrfmiddlewaretoken':
-                    survey_response.update({form_question: form_response})
 
-                if 'survey-' in form_question:
-                    survey_response.update({
-                        form_question.replace('survey-', ''): form_response
-                    })
+            questions_that_need_parsing = Question.objects.filter(
+                survey=lot.event_survey.survey,
+                type=Question.FIELD_CHECKBOX_GROUP,
+            ).values_list("name")
 
+            needs_parsing = [x[0] for x in questions_that_need_parsing]
+
+            survey_data = dict()
+            for question, answer in form_data.items():
+                if question == 'csrfmiddlewaretoken':
+                    survey_data.update({question: answer})
+
+                if 'survey-' in question:
+                    raw_question_name = question
+                    question_name = question.replace('survey-', '')
+
+                    if question_name in needs_parsing:
+                        answer_list = form_data.getlist(raw_question_name)
+                        if not len(answer_list):
+                            answer_list = list()
+                            answer_list.append(answer)
+
+                        answer = answer_list
+
+                    survey_data[question_name] = answer
+
+            # TODO: MAYBE WE CAN CHANGE QUERYDICT INSTANCE TO A SIMPLE DICT ???
             survey_files = QueryDict('', mutable=True)
             for form_question, uploaded_file in form_files.items():
                 if form_question == 'csrfmiddlewaretoken':
@@ -616,7 +640,7 @@ class SubscriptionWizardView(SessionWizardView):
 
             survey_form = survey_director.get_active_form(
                 survey=lot.event_survey.survey,
-                data=survey_response,
+                data=survey_data,
                 files=survey_files,
                 update=self.request.method in ['POST', 'PUT']
             )
