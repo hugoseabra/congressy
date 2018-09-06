@@ -35,6 +35,10 @@ class EventPublishable(EventCompositeSpecificationMixin):
         if payable_spec and not banking_spec:
             return False
 
+        if event.is_scientific:
+            if not event.work_config and event.work_config.is_configured:
+                return False
+
         return True
 
     @staticmethod
@@ -56,5 +60,10 @@ class EventPublishable(EventCompositeSpecificationMixin):
         if payable_spec and not banking_spec:
             return 'Seu evento é pago e não possui dados bancarios para ' \
                    'receber pagamentos. Veja os detalhes da sua organização!'
+
+        if event.is_scientific:
+            if not event.work_config and event.work_config.is_configured:
+                return 'Você ainda não configurou seu evento para receber ' \
+                       'inscrições cientificas!'
 
         return ''

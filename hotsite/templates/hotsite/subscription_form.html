@@ -1,16 +1,6 @@
 {% load static form_config_tags %}
 
-{% if is_paid_event and has_configured_bank_account and not has_active_bank_account %}
-
-    <div class="alert alert-danger alert-dismissible" role="alert">
-        <button type="button" class="close" data-dismiss="alert"
-                aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-        Evento está sendo configurado. Volte em breve.
-    </div>
-
-{% else %}
+{% if event_is_published %}
     <!-- FORM -->
     <form action="" method="post"
           class="form"
@@ -318,4 +308,16 @@
              style="font-size:12px;color:lightgrey">
         {% include "base/footer.html" %}
     </section>
+
+
+{% else %}
+
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert"
+                aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        Evento ainda não foi publicado pelo Organizador. Volte em breve.
+    </div>
+
 {% endif %}

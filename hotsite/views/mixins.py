@@ -12,8 +12,7 @@ from core.views.mixins import TemplateNameableMixin
 from gatheros_event.forms import PersonForm
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event, Info
-from gatheros_subscription.models import FormConfig, Lot, \
-    Subscription
+from gatheros_subscription.models import FormConfig, Subscription
 
 
 class EventMixin(TemplateNameableMixin, generic.View):
@@ -61,15 +60,10 @@ class EventMixin(TemplateNameableMixin, generic.View):
             for lot in self.get_private_lots()
             if lot.status == lot.LOT_STATUS_RUNNING
         ]
-        context['subscription_enabled'] = self.subscription_enabled()
-        context['subscription_finished'] = self.subscription_finished()
         context['has_available_lots'] = self.has_available_lots()
         context['available_lots'] = self.get_available_lots()
         context['has_coupon'] = self.has_coupon()
-        context['has_configured_bank_account'] = \
-            self.event.organization.is_bank_account_configured()
-        context['has_active_bank_account'] = \
-            self.event.organization.active_recipient
+        context['event_is_published'] = self.event.published
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
 
         return context
@@ -82,20 +76,6 @@ class EventMixin(TemplateNameableMixin, generic.View):
                 return True
 
         return False
-
-    def subscription_enabled(self):
-
-        if self.has_available_lots() is False:
-            return False
-
-        return self.event.status == Event.EVENT_STATUS_NOT_STARTED
-
-    def subscription_finished(self):
-        for lot in self.event.lots.filter(active=True):
-            if lot.status == Lot.LOT_STATUS_RUNNING:
-                return False
-
-        return True
 
     def get_period(self):
         """ Resgata o prazo de duração do evento. """
