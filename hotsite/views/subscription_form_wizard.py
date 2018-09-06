@@ -14,6 +14,7 @@ from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
 from gatheros_event.helpers.event_business import is_paid_event
+from gatheros_event.helpers.publishing import event_is_publishable
 from gatheros_event.models import Event, Person
 from gatheros_subscription.models import FormConfig, Lot, Subscription
 from hotsite import forms
@@ -358,6 +359,10 @@ class SubscriptionWizardView(SessionWizardView):
             return redirect('https://congressy.com')
 
         self.event = get_object_or_404(Event, slug=slug)
+        if not event_is_publishable(self.event):
+            msg = 'Evento foi despublicado e não permite mais inscrições'
+            messages.warning(request, msg)
+            return redirect('public:hotsite', slug=self.event.slug)
 
         user = self.request.user
         if not isinstance(user, User):
