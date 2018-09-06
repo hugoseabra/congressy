@@ -287,19 +287,6 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                 }
 
                 subscription.fetch(service_pk).then(function () {
-                    if (subscription.attendance_status === true) {
-                        $.each(preCheckinCallbacks, function (i, callback) {
-                            callback();
-                        });
-
-                        $.each(postCheckinCallbacks, function (i, callback) {
-                            callback();
-                        });
-
-                        console.log('2. checkin não realizado - status igual');
-                        resolve();
-                        return;
-                    }
 
                     var sender = new AjaxSender(checkin_uri);
                     sender.setBeforeSendCallback(function () {
@@ -349,20 +336,6 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                 }
 
                 subscription.fetch(service_pk).then(function () {
-                    if (subscription.attendance_status === false) {
-                        $.each(preCheckoutCallbacks, function (i, callback) {
-                            callback();
-                        });
-
-                        $.each(postCheckoutCallbacks, function (i, callback) {
-                            callback();
-                        });
-
-                        console.log('2. checkout não-realizado - status igual.');
-                        resolve();
-
-                        return;
-                    }
 
                     var checkins = subscription.checkins;
                     if (checkins.length === 0) {
@@ -424,6 +397,8 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         var card_parent_el = null;
         var card_el = null;
         var card_size = 4;
+        var toggleStateCallbacks = [];
+        var toggleCallbacksInit = false;
 
         const STATUS_PENDING = 'awaiting';
         const STATUS_CANCELLED = 'canceled';
@@ -435,6 +410,15 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         const COLOR_NOT_CHECKED = '#d0021b';
 
         this.subscription = subscription;
+
+        this.addToggleStateCallback = function (callback) {
+
+            if (typeof callback !== 'function') {
+                console.error('Callback is not a function: ' + callback);
+                return;
+            }
+            toggleStateCallbacks.push(callback);
+        };
 
         var getStatus = function () {
             if (subscription.subscription_status === 'confirmed') {
@@ -470,6 +454,21 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             else return false;
         };
 
+        var setToggleCallbacks = function () {
+            if (toggleCallbacksInit === true) {
+                return;
+            }
+
+            $.each(toggleStateCallbacks, function (i, callback) {
+                attendance.addPostCheckoutCallback(function () {
+                    callback(this);
+                });
+                attendance.addPostCheckinCallback(function () {
+                    callback(this);
+                });
+            })
+        };
+
         this.create_card_el = function (service_pk, created_by) {
 
             var header_color;
@@ -486,6 +485,8 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             });
 
             console.log('4. Status de inscrição do card: ' + subscription.attendance_status);
+
+            setToggleCallbacks();
 
             switch (getStatus()) {
                 case STATUS_CANCELLED:
@@ -606,10 +607,6 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                                 self.create_card_el(service_pk, created_by);
                                 button.removeAttr('disabled');
                                 button.text(button_text);
-                                Messenger().post({
-                                    message: 'Saída registrada com sucesso!',
-                                    type: 'danger'
-                                });
                             });
                         });
                         break;
@@ -647,19 +644,24 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         };
 
         this.toggle = function (service_pk, created_by) {
-            if (getStatus() === STATUS_CHECKED) {
-                attendance.checkout(service_pk, subscription, created_by).then(
-                    function () {
-                        self.create_card_el(service_pk, created_by);
-                    });
-            }
-            if (getStatus() === STATUS_NOT_CHECKED) {
-                console.log("Realizar Checkin");
-                attendance.checkin(service_pk, subscription, created_by).then(
-                    function () {
-                        self.create_card_el(service_pk, created_by);
-                    });
-            }
+            return new Promise(function (resolve) {
+                if (getStatus() === STATUS_CHECKED) {
+                    attendance.checkout(service_pk, subscription, created_by).then(
+                        function () {
+                            self.create_card_el(service_pk, created_by);
+                            resolve();
+                        });
+                }
+                if (getStatus() === STATUS_NOT_CHECKED) {
+                    console.log("Realizar Checkin");
+                    attendance.checkin(service_pk, subscription, created_by).then(
+                        function () {
+                            self.create_card_el(service_pk, created_by);
+                            resolve();
+                        }
+                    );
+                }
+            });
         };
     };
 
@@ -709,10 +711,15 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         };
         var afterSearchCallback = function () {
         };
+        var cardStateCallback = function (card) {
+        };
 
         var createCard = function (subscription) {
             var card = new Card(subscription, attendance);
             card.setSize(card_size);
+            card.addToggleStateCallback(function () {
+                cardStateCallback(card);
+            });
             return card;
         };
 
@@ -730,6 +737,14 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                 return;
             }
             afterSearchCallback = callback;
+        };
+
+        this.setCardStateCallback = function (callback) {
+            if (typeof callback !== 'function') {
+                console.error('Callback is not a function: ' + callback);
+                return;
+            }
+            cardStateCallback = callback;
         };
 
         this.fetch = function (search_criteria) {
@@ -871,6 +886,12 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         var selected_card = null;
         var cleanTimer = null;
         var processCounter = new ProcessCounter();
+        var self = this;
+
+        var reset = function () {
+            selected_card = null;
+        };
+
 
         var fetch = function (search_criteria, list_el) {
             list_el = $(list_el);
@@ -878,22 +899,21 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             window.clearTimeout(searchTimer);
             processCounter.stopProcessCounter();
 
-            removeAttendanceEnterEvent();
             searchTimer = window.setTimeout(function () {
                 search.fetch(search_criteria).then(function (cards) {
 
                     if (!cards.length) {
-                        selected_card = null;
-                        list_el.html('');
+                        reset();
                         return;
                     }
                     var card = cards[0];
 
                     var reread = selected_card && selected_card.id === card.id && card.active() === true;
-                    console.log("reread: " +reread);
+
+
                     if (reread === true) {
-                        console.log("oap");
                         selected_card.toggle(service_pk, created_by);
+                        console.log("oap1");
                         selected_card = null;
                         cleanTimer = setTimeout(function () {
                             list_el.html('');
@@ -908,21 +928,29 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     if (card.active() === true) {
                         processCounter.createProcessCounter(
                             function () {
+                                var isNotOnlyEnter = false;
                                 $(document).on('keydown', function (event) {
-                                    removeAttendanceEnterEvent();
-                                    if (event.keyCode === 13) {
-                                        if (selected_card !== null) {
-                                            selected_card.toggle(service_pk, created_by);
-                                            event.preventDefault();
-                                        }
+                                    if (event.keyCode !== 13) {
+                                        isNotOnlyEnter = true;
+                                    }
+                                    if (event.keyCode === 13 && selected_card != null && isNotOnlyEnter === false) {
+                                        isNotOnlyEnter = true;
+                                        event.preventDefault()
+                                        selected_card.toggle(service_pk, created_by).then(
+                                            function () {
+                                                cleanTimer = setTimeout(function () {
+                                                    reset();
+                                                    list_el.html('');
+                                                }, 5000);
+                                            }
+                                        )
                                     }
                                 });
                             },
                             function () {
                                 list_el.html('');
                                 removeAttendanceEnterEvent();
-                                selected_card = null;
-
+                                reset();
                             },
                             $(outputCard), 10);
                     }
@@ -937,7 +965,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
         var preventDefaultScanner = function () {
             $(document).on('keydown', function (event) {
-                if (event.keyCode === 16 || event.keyCode === 17) {
+                if (event.keyCode === 13 || event.keyCode === 16 || event.keyCode === 17) {
                     event.preventDefault();
                 }
 
@@ -962,6 +990,12 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                 }
             });
         };
+
+        window.setTimeout(function () {
+            search.setCardStateCallback(function () {
+                reset();
+            });
+        }, 200);
     };
 })(jQuery, window.cgsy.attendance, window.cgsy.attendance.ProcessCounter);
 

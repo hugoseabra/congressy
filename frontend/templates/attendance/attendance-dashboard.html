@@ -199,7 +199,9 @@
 
 {% block content %}
     <div class="row">
-        {% include 'attendance/includes/attendance-menu.html' with active='dashboard' %}
+        <div class="col-md-2 col-sm-12">
+            {% include 'attendance/includes/attendance-menu.html' with active='dashboard' %}
+        </div>
         <div class="col-md-10">
 
             <div class="panel panel-primary">
