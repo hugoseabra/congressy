@@ -27,18 +27,19 @@
                                 <tbody>
                                 {% for item in organizations|slice:":5" %}
                                     <tr>
-                                        <td>
+                                        <td onclick="cgsy_submit({{ item.pk }})">
                                             <a>{{ item.name }}</a>
                                         </td>
                                         <td class=" text-center" >
-                                            <button type="button"
-                                                    class="btn btn-success btn-trans btn-sm dropdown-toggle"
-                                                    data-toggle="dropdown"
-                                                    aria-expanded="false"
-                                                    aria-haspopup="true"
-                                                    onclick="cgsy_submit({{ item.pk }})">
-                                                <span>Entrar</span>
-                                            </button>
+                                            
+                                            <a class="btn btn-primary btn-trans btn-sm"
+                                               data-toggle="tooltip"
+                                               data-placement="left"
+                                               title="Editar dados dessa organização"
+                                               onclick="location.href='{% url 'event:organization-edit' item.pk %}'">
+                                                <span>Gerenciar</span>
+                                            </a>
+
                                         </td>
                                     </tr>
                                 {% endfor %}
