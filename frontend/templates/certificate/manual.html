@@ -231,7 +231,26 @@
                         .replace(/\D/g, '')
                         .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5");
                 }
-                if (s['attended']) {
+
+
+                {% if certificate.only_attending_participantes %}
+
+                    if (s['attended']) {
+                        check_in_html +=
+                            "<button " +
+                            "style='margin-top:5px' class='btn btn-md btn-success" +
+                            " create-manual-certificate' " +
+                            "data-pk='" + s['pk'] + "'>" +
+                            "Ver certificado" +
+                            "</button>";
+                    } else {
+                        check_in_html +=
+                            "<i class='fas fa-exclamation-triangle " +
+                            "warning-color'>" +
+                            "</i> Certificado disponivel apenas para participantes com presença confirmada!<br/>"
+                    }
+                {% else %}
+
                     check_in_html +=
                         "<button " +
                         "style='margin-top:5px' class='btn btn-md btn-success" +
@@ -239,7 +258,8 @@
                         "data-pk='" + s['pk'] + "'>" +
                         "Ver certificado" +
                         "</button>";
-                }
+
+                {% endif %}
                 $(check_in).html(check_in_html);
                 $(subscription_status).html(subscription_status_html);
                 panel_body.appendChild(title);
@@ -265,7 +285,7 @@
 
 
         }
-                                        
+
         function search() {
 
             $('.res').remove();
