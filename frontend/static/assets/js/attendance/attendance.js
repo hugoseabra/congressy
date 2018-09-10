@@ -917,11 +917,12 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
 
                     if (reread === true) {
-                        checkinByToggle(selected_card, service_pk, created_by, list_el, input_el);
+                        checkinByToggle(selected_card, service_pk, created_by, list_el);
                         return;
                     }
 
                     selected_card = card;
+
                     var outputCard = selected_card.getElement(service_pk, created_by);
                     list_el.html(outputCard);
 
@@ -929,9 +930,10 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                         processCounter.createProcessCounter(
                             function () {
                                 $(document).on('keydown', function (event) {
+                                    list_el.focus();
                                     if (event.keyCode === 32 && selected_card != null) {
-                                        checkinByToggle(selected_card, service_pk, created_by, list_el, input_el);
-                                        reset()
+                                        checkinByToggle(selected_card, service_pk, created_by, input_el);
+                                        reset();
                                     }
                                 });
                             },
@@ -964,15 +966,19 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         };
 
         this.watch = function (input_el, list_el) {
+            input_el = $(input_el);
             preventDefaultScanner(input_el);
-            $('input_el').focus();
-            $(input_el).on('keyup', function () {
-                var input = $(this);
-                if (input.val().length === 8) {
+            input_el.focus();
+            input_el.on('keyup', function () {
+                if (input_el.val().length === 8) {
                     window.clearTimeout(cleanTimer);
-                    fetch(input.val(), list_el, input_el);
-                    input.val('');
+                    fetch(input_el.val(), list_el, input_el);
+                    window.setTimeout(function () {
+                        input_el.val('');
+                    }, 350);
+
                 }
+
             });
         };
 
