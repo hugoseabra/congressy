@@ -38,7 +38,7 @@ def search_subscriptions(queryset, search_criteria):
         return email_queryset
 
     # Fetch by subscription code
-    code_queryset = queryset.filter(code=search_criteria)
+    code_queryset = queryset.filter(code=str(search_criteria).upper())
     if code_queryset.count() > 0:
         return code_queryset
 
