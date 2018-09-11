@@ -45,9 +45,6 @@ class RaffleAddView(generic.CreateView):
             'pk': self.object.pk,
         })
 
-    def form_valid(self, form):
-        super().form_valid(form)
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['event'] = self.event

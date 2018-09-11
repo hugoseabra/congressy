@@ -73,16 +73,17 @@ window.cgsy.raffle = window.cgsy.raffle || {};
             var shuffle_interval = 50;
 
             return new Promise(function(resolve) {
+                var counter = 1;
                 $.each(subscriptions, function(i, sub) {
-                    console.log(sub);
                     window.setTimeout(function() {
                         target_el.text(sub.name);
-                    }, i * shuffle_interval);
+                    }, (shuffle_interval * counter));
+                    counter++;
 
                     if (i === num) {
                         window.setTimeout(function() {
                             target_el.text('processando ...');
-                        }, i * (shuffle_interval + 100));
+                        }, (shuffle_interval * counter) + 100);
 
                         window.setTimeout(function() {
                             var selected = self.select();
@@ -91,7 +92,7 @@ window.cgsy.raffle = window.cgsy.raffle || {};
                             target_el.addClass('text-success text-bold');
 
                             resolve(selected);
-                        }, (i * 2) * (shuffle_interval + 200));
+                        }, (shuffle_interval * counter) + 200);
                     }
                 });
             });

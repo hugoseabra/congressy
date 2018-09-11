@@ -107,10 +107,10 @@
                     timer.fadeIn();
 
                 $('#winner_form_button').removeAttr('disabled');
-                $('#id_subscription').attr('type', 'text');
+{#                $('#id_subscription').attr('type', 'text');#}
 
                 stop_counter = false;
-                registerTimerCounter($('#register_timer_time'), 2, function() {
+                registerTimerCounter($('#register_timer_time'), 30, function() {
                     $('#result').html('-');
                     $('#id_subscription').val('');
                     $('#shuffle_button').removeAttr('disabled');
