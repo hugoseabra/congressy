@@ -554,7 +554,7 @@
                                     </optgroup>
                                 </select>
                                 <small class="text-muted">Você pode alterar o tipo e mudar a forma de exibição ao participante.</small>
-                                <input type="hidden" name="question_id" value="" />
+                                <input type="hidden" name="question_id" value=""/>
                             </div>
                         </div>
                     </div>
@@ -601,7 +601,7 @@
                                     <option value="checkbox-group">Várias Opções</option>
                                 </select>
                                 <small class="text-muted">Você pode alterar o tipo e mudar a forma de exibição ao participante.</small>
-                                <input type="hidden" name="question_id" value="" />
+                                <input type="hidden" name="question_id" value=""/>
                             </div>
                         </div>
                     </div>
@@ -637,9 +637,9 @@
                         <strong>
                             Certeza que deseja deletar essa pergunta?
                         </strong>
-                        <hr />
-                        Isso irá excluir as respoatas desta pergunta.
-                        Talvez apenas desativar a pergunta possa ser suficiente para manter as respostas existentes.
+                    <hr/>
+                    Isso irá excluir as respoatas desta pergunta.
+                    Talvez apenas desativar a pergunta possa ser suficiente para manter as respostas existentes.
                     </p>
                     <hr/>
                     <i id="removingQuestion"></i>
@@ -667,8 +667,11 @@
 
     </div>
 {% endblock %}
+
 {% block scripts %}
+
     <script src="{% static 'assets/survey/js/predefined-fields.js' %}"></script>
+
     <script type="application/javascript">
 
         var complex_question_types = [
@@ -792,12 +795,16 @@
                         vals.push($(this).parent().parent().find('label').text().trim());
                     });
                 } else if (question_type === 'checkbox-group') {
-                    var column = $(question.find('td')[1]);
-                    var question_name = column.data('question-name');
-                    question_field = question.find('input[type=checkbox][name=' + question_name + ']');
+                    question_field = question.find('input[type=checkbox]');
 
                     question_field.each(function () {
-                        vals.push($(this).parent().parent().find('label').text().trim());
+
+                        var val = $(this).parent().parent().find('label').text().trim();
+
+                        if (val !== "Obrigatório") {
+                            vals.push(val);
+                        }
+
                     });
                 } else {
                     throw "cgsy: unknown question type"
@@ -1023,7 +1030,7 @@
                     var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
                     window.clearTimeout(checkbox_requirment_watcher);
-                    checkbox_requirment_watcher = window.setTimeout(function() {
+                    checkbox_requirment_watcher = window.setTimeout(function () {
                         $.ajax({
                             type: "POST",
                             url: location.pathname,
@@ -1049,7 +1056,7 @@
                     }, 300);
                 });
 
-                $('[data-mask]').each(function() {
+                $('[data-mask]').each(function () {
                     $(this).mask($(this).attr("data-mask"));
                 });
 
@@ -1069,7 +1076,6 @@
 
                     var liElement = $(evt.item).closest('li.list-group-item');
                     var question = liElement.data();
-                    console.log(question);
 
                     questionEl.text(question.label);
                     questionIdEl.val(question.id);
@@ -1130,14 +1136,14 @@
 
         function openEditInputQuestionTypeModal(question_name, question_type, question_id) {
             var form_el = $('#editQuestionTypeInputsForm');
-                form_el.unbind('submit');
+            form_el.unbind('submit');
 
             var modal_el = $('#editQuestionTypeInputs');
 
             form_el.find('.question_name').text(question_name);
             form_el.find('#new_type_input').val(question_type);
             form_el.find('input[name=question_id]').val(question_id);
-            form_el.submit(function(e) {
+            form_el.submit(function (e) {
                 e.preventDefault();
                 editQuestionTypeModal($(this), modal_el);
             });
@@ -1146,14 +1152,14 @@
 
         function openEditOptionQuestionTypeModal(question_name, question_type, question_id) {
             var form_el = $('#editQuestionTypeOptionsForm');
-                form_el.unbind('submit');
+            form_el.unbind('submit');
 
             var modal_el = $('#editQuestionTypeOptions');
 
             form_el.find('.question_name').text(question_name);
             form_el.find('#new_type_input').val(question_type);
             form_el.find('input[name=question_id]').val(questiosimpleListn_id);
-            form_el.submit(function(e) {
+            form_el.submit(function (e) {
                 e.preventDefault();
                 editQuestionTypeModal($(this), modal_el);
             });
@@ -1203,7 +1209,7 @@
         function duplicateField(question_name, questionId) {
             var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
-            if (!confirm('Deseja realmente duplicar a pergunta "'+question_name+'"?')) {
+            if (!confirm('Deseja realmente duplicar a pergunta "' + question_name + '"?')) {
                 return;
             }
 
@@ -1236,7 +1242,7 @@
         function deactivateField(question_name, questionId) {
             var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
-            if (!confirm('Deseja realmente desativar a pergunta "'+question_name+'"?')) {
+            if (!confirm('Deseja realmente desativar a pergunta "' + question_name + '"?')) {
                 return;
             }
 
@@ -1269,7 +1275,7 @@
         function activateField(question_name, questionId) {
             var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
-            if (!confirm('Deseja realmente ativar a pergunta "'+question_name+'"?')) {
+            if (!confirm('Deseja realmente ativar a pergunta "' + question_name + '"?')) {
                 return;
             }
 

@@ -86,18 +86,17 @@
                         "className": "nowrap"
                     },
                     {
+                        "searchable": false,
+                        "orderable": false,
                         "width": "10%",
                         "targets": 1,
                         "className": "text-center"
                     },
                     {
+                        "searchable": false,
+                        "orderable": false,
                         "width": "13%",
-                        "targets": 2,
-                        "className": "text-center"
-                    },
-                    {
-                        "width": "13%",
-                        "targets": 3,
+                        "targets": [2,3,4],
                         "className": "text-center"
                     }
 
@@ -121,8 +120,10 @@
                 {% if has_filter %}true{% else %}false{% endif %}
             )
         });
+
     </script>
 {% endblock %}
+
 {% block new_nav %}
     <ul class="nav nav-pills nav-stacked" style="width:70px;font-size: 25px;">
         <li>
@@ -173,14 +174,14 @@
                                 <th>Evento</th>
                                 <th>Status</th>
                                 <th>Código</th>
-                                <th>Data Inscrição
-                                </th>
                                 {% if needs_boleto_link %}
                                     <th>Boleto</th>
                                 {% endif %}
                                 <th>Voucher</th>
                                 <th>Certificado</th>
-                                <th></th>
+                                {% if item.event.is_scientific and event.work_config and event.work_config.is_submittable %}
+                                    <th></th>
+                                {% endif %}
                             </tr>
 
                             </thead>
@@ -191,35 +192,35 @@
 
                                 <tr>
                                     <td>
-                                        <a href="{% url 'public:hotsite' item.event.slug %}"
-                                           target="_blank">
-                                            <div>
-                                                <strong>{{ item.event.name }}</strong>
-                                                <span style="font-size: medium;color:dimgray">({{ item.event.organization.name }})</span>
-                                            </div>
-                                        </a>
+
+                                        <div>
+                                            <a href="{% url 'public:hotsite' item.event.slug %}"
+                                               target="_blank">
+                                                <div>
+                                                    <strong>{{ item.event.name }}</strong>
+                                                    <span style="font-size: medium;color:dimgray">({{ item.event.organization.name }})</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <small class="text-muted">
+                                            {{ item.created|date:"d/m/Y H\hi" }}
+                                        </small>
+
                                     </td>
 
                                     <td>
 
-                                        {% if item.status == item.CONFIRMED_STATUS %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"
-                                               style="color:#5cb85c"></i>
-                                        {% elif item.status == item.AWAITING_STATUS %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"
-                                               style="color: #f0ad4e"></i>
-                                        {% elif item.status == item.CANCELED_STATUS %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"
-                                               style="color: #d9534f"></i>
-                                        {% else %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"></i>
-                                        {% endif %}
-
-                                        {{ item.get_status_display }}
+                                        <i class="fa fa-circle"
+                                           aria-hidden="true"
+                                                {% if item.status == item.CONFIRMED_STATUS %}
+                                           style="color:#5cb85c"
+                                                {% elif item.status == item.AWAITING_STATUS %}
+                                           style="color: #f0ad4e"
+                                                {% elif item.status == item.CANCELED_STATUS %}
+                                           style="color: #d9534f"
+                                                {% endif %}
+                                           title="{{ item.get_status_display }}"
+                                           data-toggle="tooltip"></i>
 
                                     </td>
 
@@ -227,9 +228,6 @@
                                         {{ item.code }}
                                     </td>
 
-                                    <td>
-                                        {{ item.created|date:"d/m/Y H\hi" }}
-                                    </td>
                                     {% if needs_boleto_link %}
                                         <td>
                                             {% if item.transactions.count > 0 %}
@@ -288,9 +286,8 @@
                                             ---
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        {% if item.event.is_scientific and event.work_config and event.work_config.is_submittable %}
-
+                                    {% if item.event.is_scientific and event.work_config and event.work_config.is_submittable %}
+                                        <td>
                                             <div class="text-center">
                                                 <a href="{% url 'scientific_work:work-add' subscription_pk=item.pk %}"
                                                    class="btn-sm btn-success">
@@ -298,9 +295,8 @@
                                                     Novo trabalho
                                                 </a>
                                             </div>
-
-                                        {% endif %}
-                                    </td>
+                                        </td>
+                                    {% endif %}
 
                                 </tr>
 
@@ -327,4 +323,5 @@
     </div>
 
 {% endblock %}
+
 {% block support %}{% endblock %}
