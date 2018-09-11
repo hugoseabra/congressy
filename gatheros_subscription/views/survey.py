@@ -16,7 +16,7 @@ from gatheros_event.views.mixins import EventViewMixin, AccountMixin
 from gatheros_subscription.forms import EventSurveyForm
 from gatheros_subscription.models import EventSurvey, Lot
 from survey.api import SurveySerializer
-from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST
+from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST, COMPLEX_TYPES
 from survey.forms import QuestionForm, SurveyAnswerForm
 from survey.models import Question
 
@@ -52,6 +52,16 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
     def post(self, request, *args, **kwargs):
 
+        question_type = self.request.POST.get('question_type', None)
+
+        if question_type and question_type in COMPLEX_TYPES:
+            data = request.POST.copy()
+            options_list = request.POST.getlist('option')
+            options = '\n'.join(options_list)
+            data['options'] = options
+            request.POST = data
+
+        # Updates are done via AJAX
         if self.request.is_ajax():
 
             action = self.request.POST.get('action')
@@ -125,7 +135,7 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
                         question.help_text
                     ),
                     'intro': bool(data.get('intro_edit', False)),
-                    'options': data.get('options_edit', question.options),
+                    'options': data.get('option'),
                     'survey': self.survey.pk,
                     'type': question.type,
                     'active': question.active,
@@ -212,8 +222,6 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
                     return HttpResponse(status=200)
 
             return HttpResponse(status=500)
-
-        question_type = self.request.POST.get('question_type', None)
 
         if not question_type:
             messages.error(
