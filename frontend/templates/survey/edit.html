@@ -336,11 +336,21 @@
                         <hr>
 
                         <div id="intro">
-                            {% render_generic_field form.intro %}
+                            {% render_switchery_field form.intro %}
                         </div>
 
                         <div id="options">
-                            {% render_generic_field form.options %}
+                            
+                            <label>Opções(<span id="option-counter">0</span>):</label>
+
+                            <div id="option-input-tags"></div>
+                            <hr/>
+                            <div class="text-center">
+                                <button id="add-option-button" type="button" class="btn btn-sm btn-info">
+                                    <i class="glyphicon glyphicon-plus"></i>
+                                </button>
+                            </div>
+                            
                         </div>
 
 
@@ -441,6 +451,7 @@
                                 <div>
 
                                     <input id="id_intro_edit"
+                                           class="js-switch"
                                            name="intro_edit"
                                            type="checkbox">
 
@@ -462,29 +473,16 @@
 
                             <div class="form-group">
 
-                                <label>Opções:</label>
+                                <label>Opções(<span id="edit_option-counter">0</span>):</label>
 
-
-                                <div>
-
-                                <textarea cols="40" rows="10"
-                                          class="form-control"
-                                          name="options_edit"
-                                          id="id_options_edit">
-
-                                </textarea>
-
-
-                                    <div>
-                                        <small class="text-muted help-text">
-                                            Insira as opções da sua pergunta
-                                            uma
-                                            linha de cada vez.
-                                        </small>
-                                    </div>
-
-
+                                <div id="edit_option-input-tags"></div>
+                                <hr/>
+                                <div class="text-center">
+                                    <button id="edit_add-option-button" type="button" class="btn btn-sm btn-info">
+                                        <i class="glyphicon glyphicon-plus"></i>
+                                    </button>
                                 </div>
+
                             </div>
                         </div>
 
@@ -671,6 +669,7 @@
 {% block scripts %}
 
     <script src="{% static 'assets/survey/js/predefined-fields.js' %}"></script>
+    <script src="{% static 'assets/survey/js/option_manager.js' %}"></script>
 
     <script type="application/javascript">
 
@@ -723,6 +722,16 @@
             iconEl.addClass(IconOfField);
             formTypeEl.val('complex');
             $('#options').show();
+
+            var manager;
+
+            manager = new window.cgsy.survey.OptionManager(
+                $('#option-input-tags'),
+                $('#add-option-button'),
+                $('#option-counter')
+            );
+            manager.render();
+
 
             if (question_type === 'select') {
                 $('#intro').show();
@@ -840,8 +849,16 @@
             }
 
             if (has_options) {
+                var manager;
+
+                manager = new window.cgsy.survey.OptionManager(
+                    $('#edit_option-input-tags'),
+                    $('#edit_add-option-button'),
+                    $('#edit_option-counter')
+                );
+
+                manager.render(vals);
                 options_edit.show();
-                option_field.text(vals.join('\n'));
             }
 
         });
@@ -950,8 +967,15 @@
             var values = {};
 
             $.each($(form).serializeArray(), function (i, field) {
+                
+                if(field.name in values){
+                    field.value = values[field.name] +'\n' + field.value
+                }
+
                 values[field.name] = field.value;
             });
+
+
 
             var payload = {
                 action: 'edit',
