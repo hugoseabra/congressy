@@ -322,7 +322,7 @@
                     {% csrf_token %}
 
 
-                    <div class="modal-body" style="padding: 30px">
+                    <div class="modal-body">
 
 
                         <strong style="font-size: 25px">
@@ -341,16 +341,20 @@
 
                         <div id="options">
                             
-                            <label>Opções(<span id="option-counter">0</span>):</label>
+                            <label>Opções (<span id="option-counter">0</span>):</label>
 
                             <div id="option-input-tags"></div>
+                            <div>
+                                <small class="help-text text-muted">Você pode copiar e colar múltiplas linhas.</small>
+                            </div>
                             <hr/>
                             <div class="text-center">
-                                <button id="add-option-button" type="button" class="btn btn-sm btn-info">
-                                    <i class="glyphicon glyphicon-plus"></i>
-                                </button>
+                                <div>
+                                    <button id="add-option-button" type="button" class="btn btn-sm btn-info">
+                                        <i class="glyphicon glyphicon-plus"></i>
+                                    </button>
+                                </div>
                             </div>
-                            
                         </div>
 
 
@@ -473,14 +477,19 @@
 
                             <div class="form-group">
 
-                                <label>Opções(<span id="edit_option-counter">0</span>):</label>
+                                <label>Opções (<span id="edit_option-counter">0</span>):</label>
 
                                 <div id="edit_option-input-tags"></div>
+                                <div>
+                                    <small class="help-text text-muted">Você pode copiar e colar múltiplas linhas.</small>
+                                </div>
                                 <hr/>
                                 <div class="text-center">
-                                    <button id="edit_add-option-button" type="button" class="btn btn-sm btn-info">
-                                        <i class="glyphicon glyphicon-plus"></i>
-                                    </button>
+                                    <div>
+                                        <button id="edit_add-option-button" type="button" class="btn btn-sm btn-info">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </button>
+                                    </div>
                                 </div>
 
                             </div>
@@ -527,7 +536,7 @@
                 </div>
                 <form method="post" id="editQuestionTypeInputsForm">
                     {% csrf_token %}
-                    <div class="modal-body" style="padding: 30px">
+                    <div class="modal-body">
                         <strong style="font-size: 25px">
                             <span class="question_name"></span>
                         </strong>
@@ -595,6 +604,7 @@
                             <small style="color:#C9302C">*</small>
                             <div>
                                 <select name="new_type_input" id="new_type_input" class="form-control">
+                                    <option value="select">Lista</option>
                                     <option value="radio-group">Múltipla Escolha</option>
                                     <option value="checkbox-group">Várias Opções</option>
                                 </select>
@@ -1182,7 +1192,7 @@
 
             form_el.find('.question_name').text(question_name);
             form_el.find('#new_type_input').val(question_type);
-            form_el.find('input[name=question_id]').val(questiosimpleListn_id);
+            form_el.find('input[name=question_id]').val(question_id);
             form_el.submit(function (e) {
                 e.preventDefault();
                 editQuestionTypeModal($(this), modal_el);
@@ -1197,6 +1207,15 @@
             var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
             var new_type = form_el.find('#new_type_input').val();
             var question_id = form_el.find('input[name=question_id]').val();
+
+            if (!new_type) {
+                Messenger().post({
+                    message: 'Tipo da pergunta não foi alterada.',
+                    type: 'warning'
+                });
+                model_el.modal('hide');
+                return;
+            }
 
             $.ajax({
                 type: "POST",
