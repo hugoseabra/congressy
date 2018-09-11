@@ -1,0 +1,13 @@
+{% extends 'mailer/subscription/base_notification.html' %}
+{% load humanize %}
+
+{% block introduction %}
+    <p style="text-align: justify;">
+        Agradecemos o interesse pelo nosso evento.
+    </p>
+{% endblock %}
+
+{% block extra_content %}
+    {% include 'mailer/subscription/includes/pending_refund.html' %}
+    {% include 'mailer/subscription/includes/account.html' %}
+{% endblock %}
