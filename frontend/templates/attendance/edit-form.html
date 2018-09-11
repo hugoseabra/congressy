@@ -76,9 +76,8 @@
                                             <label>Categoria de lotes</label>
                                             <div>
                                                 {% for category in lot_categories %}
-
                                                     <input type="checkbox"
-                                                           name="lot_categories"
+                                                           name="category_list"
                                                            value="{{ category.value }}"
                                                            style="padding-bottom: 5px"
                                                             {% if category.checked %}

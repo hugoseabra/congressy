@@ -16,6 +16,7 @@ class AttendanceServiceForm(forms.ModelForm):
             'name',
             'event',
             'lot_categories',
+            'checkin_only'
         )
 
     def clean_lot_category_filter(self):
@@ -26,7 +27,7 @@ class AttendanceServiceForm(forms.ModelForm):
         return AttendanceCategoryFilter.objects.filter(pk__in=category_pks)
 
     def __create_lot_category_filters(self, service):
-        lc_pks = self.data.getlist('lot_categories', [])
+        lc_pks = self.data.getlist('category_list', [])
         lc_pks = list(map(int, lc_pks))
         existing_cat_filters = []
         for cat_filter in service.lot_category_filters.all():

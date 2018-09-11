@@ -20,6 +20,7 @@
 
 
 {% block content %}
+    {% include 'attendance/includes/top-menu.html' %}
     <div class="row">
         <div class="col-md-2 col-sm-12" id="compose-wrapper">
             {% include 'attendance/includes/attendance-menu.html' with active='checkin' %}
@@ -30,9 +31,19 @@
                     <div class="panel-title">Realizar Checkin por
                         {% if search_type == 'barcode' %} Código de Barras
                         {% elif search_type == 'qrcode' %}QrCode
-                        {% else %} Teclado{% endif %}</div>
+                        {% else %} Teclado{% endif %}
+                     <div class="pull-right" style="cursor: pointer">
+                        <i class="fa fa-expand"></i>
+
+                    </div></div>
+
                 </div>
                 <div class="panel-body">
+                    <div class="row" id="name-on-fullscren"  style="padding-bottom: 15px;display: none">
+                        <div class="col-xs-12">
+                            <h3 class="text-bold">{{ object.name }}</h3>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="{% if search_type == 'qrcode' %} col-md-6 {% else %} col-md-12 {% endif %}">
                             <div class="input-group input-group-lg">
@@ -98,7 +109,7 @@
                             <h3>Categorias:
                                 {% for cat in lot_categories %}
                                     <span style="padding: 4px 7px 4px 7px"
-                                          class="badge badge-primary">{{ cat.name }}</span>
+                                          class="badge badge-primary">{{ cat }}</span>
                                 {% endfor %}
                             </h3>
                         </div>
@@ -122,15 +133,18 @@
                                         pode
                                         fazer o check-in/out de 3 maneiras: </span>
                                     <ul>
-                                        <li>Lendo o Código de barras do voucher e
+                                        <li>Lendo o Código de barras do voucher
+                                            e
                                             relendo ele.
                                         </li>
-                                        <li>Lendo o Código de barras do voucher e
+                                        <li>Lendo o Código de barras do voucher
+                                            e
                                             clicando no botão de realizar
                                             check-in/out
                                             no card do participante
                                         </li>
-                                        <li>Lendo o Código de barras do voucher e
+                                        <li>Lendo o Código de barras do voucher
+                                            e
                                             apertando Enter
                                         </li>
                                     </ul>
@@ -161,6 +175,9 @@
     <script src="{% static 'assets/js/attendance/cgsy-scanner.js' %}"></script>
     <script>
         $(document).ready(function () {
+            $('.panel .fa-expand').click(function() {
+                $('#name-on-fullscren').toggle();
+            });
             {% if search_type == 'barcode' %}
                 createBarCodeSearch({
                     'subscriptionUri': "{% url 'api:attendance:subscription-list' attendance_list.pk %}",

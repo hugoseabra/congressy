@@ -33,15 +33,14 @@ class AttendancePageSearchView(generic.TemplateView):
             lc_filter_pks.append(item.lot_category_id)
 
         for lc in self.event.lot_categories.all().order_by('name'):
-            items.append({
-                'name': lc.name
-            })
-
+            if lc.id in lc_filter_pks:
+                items.append(lc.name)
         return items
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
+        context['object'] = self.object
         context['attendance_list'] = AttendanceService.objects.get(
             pk=self.kwargs.get('pk'))
         context['lot_categories'] = self.get_lot_categories()
@@ -65,6 +64,7 @@ class CheckinListView(generic.TemplateView):
         context = super().get_context_data(**kwargs)
         context['attendance_list'] = self.get_attendance_list()
         context['event'] = Event.objects.get(pk=self.kwargs.get('event_pk'))
+        context['object'] = self.object
         context['attendances'] = self.get_attendances()
 
         return context
@@ -96,6 +96,7 @@ class AttendanceDashboardView(generic.TemplateView):
         context = super().get_context_data(**kwargs)
         context['attendance_list'] = self.get_attendance_list()
         context['event'] = Event.objects.get(pk=self.kwargs.get('event_pk'))
+        context['object'] = self.object
         context.update({
             'attendances': self.get_attendances(),
             'search_by': self.search_by,
@@ -107,32 +108,48 @@ class AttendanceDashboardView(generic.TemplateView):
         return context
 
     def get_attendances(self):
-        try:
-            list = Checkin.objects.filter(
-                attendance_service=self.object,
-                checkout__isnull=True
-            ).order_by('-created_on')
-            return list[0:5]
+        list = Checkin.objects.filter(
+            attendance_service=self.object,
+            checkout__isnull=True
+        ).order_by('-created_on')
+        return list[0:5]
 
-        except Subscription.DoesNotExist:
-            return []
+    def get_category_filter(self):
+        category_id = []
+        all_category = AttendanceCategoryFilter.objects.filter(
+            attendance_service=self.get_attendance_list()
+        ).values('lot_category_id')
+        all_category = list(list(all_category))
+        for category in all_category:
+            category_id.append(category['lot_category_id'])
+
+        print(category_id)
+        return category_id
+
 
     def get_number_attendances(self):
-        try:
-            return Checkin.objects.filter(
-                attendance_service=self.object,
-                checkout__isnull=True
-            ).order_by('-created_on').count()
+        queryset = Subscription.objects.filter(
+            checkins__attendance_service__pk=self.get_attendance_list().pk,
+            status=Subscription.CONFIRMED_STATUS,
+            completed=True, test_subscription=False,
+            event=self.get_event()
+        )
 
-        except Subscription.DoesNotExist:
-            return 0
+        queryset = queryset.filter(
+            checkins__isnull=False,
+            checkins__checkout__isnull=True
+        )
+
+        return queryset.count()
+
 
     def get_number_subscription(self):
 
         total = \
             Subscription.objects.filter(
                 event=self.get_event(),
-                completed=True, test_subscription=False
+                completed=True, test_subscription=False,
+                lot__category_id__in =self.get_category_filter()
             ).exclude(status=Subscription.CANCELED_STATUS).count()
 
         return total
@@ -143,7 +160,8 @@ class AttendanceDashboardView(generic.TemplateView):
             Subscription.objects.filter(
                 status=Subscription.CONFIRMED_STATUS,
                 completed=True, test_subscription=False,
-                event=self.get_event()
+                event=self.get_event(),
+                lot__category_id__in=self.get_category_filter()
             ).count()
 
         return confirmed
@@ -161,6 +179,11 @@ class AttendanceDashboardView(generic.TemplateView):
 
         queryset = Subscription.objects.filter(
             checkins__attendance_service__pk=self.get_attendance_list().pk)
+
+        queryset = queryset.filter(
+            checkins__isnull=False,
+            checkins__checkout__isnull=True
+        )
 
         total = queryset.count()
 

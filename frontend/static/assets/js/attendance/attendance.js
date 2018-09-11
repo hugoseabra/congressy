@@ -846,8 +846,9 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             preProcessCounterCallback();
             window.clearTimeout(cleanCounterTimer);
 
-            if (ends_in > 0) {
+            if (ends_in >= 0) {
                 cleanCounterTimer = window.setTimeout(function () {
+                    console.log(ends_in);
                     el.text(ends_in);
                     runProcessCounter(el, ends_in - 1);
                 }, 1000);

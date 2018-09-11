@@ -16,6 +16,12 @@ class AttendanceService(models.Model):
     created_on = models.DateTimeField(auto_now_add=True,
                                       verbose_name='criado em')
 
+    checkin_only = models.BooleanField(
+        default=True,
+        verbose_name='Atendimento somente com check-in',
+        help_text="Este atendimento terá registros apenas de entradas"
+    )
+
     class Meta:
         verbose_name = 'Lista de Check-in/out'
         verbose_name_plural = 'Lista de Check-ins/outs'

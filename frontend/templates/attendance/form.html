@@ -69,13 +69,13 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <div class="form-group"
+                                        <div class="form-group lot-category-filter"
                                              style="margin-top: 20px">
                                             <label>Categoria de lotes</label>
                                             <div>
                                                 {% for category in category_list %}
                                                     <input type="checkbox"
-                                                           name="lot_categories"
+                                                           name="category_list"
                                                            value="{{ category.pk }}"
                                                            style="padding-bottom: 5px">
                                                     {{ category.name }}<br>
@@ -83,7 +83,11 @@
                                             </div>
                                         </div>
                                     </div>
-
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_switchery_field form.checkin_only %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -130,7 +134,7 @@
     <script src="{% static 'assets/js/user_notification.js' %}"></script>
 
     <script>
-        var radios = $('input[type=checkbox]');
+        var radios = $('.lot-category-filter input[type=checkbox]');
 
         radios.iCheck({
             checkboxClass: 'icheckbox_flat-grey',

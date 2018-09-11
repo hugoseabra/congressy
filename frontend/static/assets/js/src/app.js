@@ -12,6 +12,7 @@
             tooltips();
             modal_onload();
             createFileUploadEvents();
+            fullscreenWidget();
         });
 
         var navToggleRight = function () {
@@ -149,6 +150,15 @@
                     if( log ) alert(log);
                 }
             });
+        };
+        var fullscreenWidget = function() {
+            $('.panel .fa-expand').click(function() {
+                var panel = $(this).closest('.panel');
+                panel.toggleClass('widget-fullscreen');
+                $(this).toggleClass('fa-expand fa-compress');
+                $('body').toggleClass('fullscreen-widget-active')
+
+            })
         };
 
         //return functions
