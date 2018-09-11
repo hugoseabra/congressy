@@ -18,8 +18,8 @@ class RemarketingRedirectLanding(TemplateView):
         if not self.next:
             self.next = self.default_url
 
-        if settings.DEBUG:
-            redirect(self.next)
+        # if settings.DEBUG:
+        #     redirect(self.next)
 
         if not self.page_type:
             messages.warning(request,
