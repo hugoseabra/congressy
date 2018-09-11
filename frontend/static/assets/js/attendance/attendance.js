@@ -836,7 +836,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         };
 
         this.createProcessCounter = function (preCallback, afterCallback, elCard, ends_in) {
-            createCounterAlert(elCard.find(".panel-body"));
+            createCounterAlert(elCard.find(".panel-body"), ends_in);
             setPreProcessCounterCallback(preCallback);
             setAfterProcessCounterCallback(afterCallback);
             runProcessCounter(elCard.find(".alert-timer"), ends_in);
@@ -857,12 +857,12 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             }
         };
 
-        var createCounterAlert = function (elCard) {
+        var createCounterAlert = function (elCard, ends_in) {
             var alert_time = "<div class=\"row\">";
             alert_time += "<div class=\"col-md-4 col-md-offset-4\">";
             alert_time += "<div class=\"alert alert-warning alert-time\" style=\"border-radius: 25px\" role=\"alert\">";
             alert_time += "<div style=\"text-align: center\">";
-            alert_time += "<span class=\"alert-timer font-weight-bold\"></span>";
+            alert_time += "<span class=\"alert-timer font-weight-bold\">" + ends_in + "</span>";
             alert_time += "</div>";
             alert_time += "</div>";
             alert_time += "</div>";
@@ -886,20 +886,25 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         var selected_card = null;
         var cleanTimer = null;
         var processCounter = new ProcessCounter();
-        var self = this;
 
         var reset = function () {
             selected_card = null;
         };
 
+        var resetWithClean = function (list_el) {
+            list_el = $(list_el);
+            list_el.html('');
+            selected_card = null;
+        };
 
-        var fetch = function (search_criteria, list_el) {
+        var fetch = function (search_criteria, list_el, input_el) {
             list_el = $(list_el);
 
             window.clearTimeout(searchTimer);
             processCounter.stopProcessCounter();
 
             searchTimer = window.setTimeout(function () {
+
                 search.fetch(search_criteria).then(function (cards) {
 
                     if (!cards.length) {
@@ -912,45 +917,28 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
 
                     if (reread === true) {
-                        selected_card.toggle(service_pk, created_by);
-                        console.log("oap1");
-                        selected_card = null;
-                        cleanTimer = setTimeout(function () {
-                            list_el.html('');
-                        }, 5000);
+                        checkinByToggle(selected_card, service_pk, created_by, list_el);
                         return;
                     }
 
                     selected_card = card;
+
                     var outputCard = selected_card.getElement(service_pk, created_by);
                     list_el.html(outputCard);
 
                     if (card.active() === true) {
                         processCounter.createProcessCounter(
                             function () {
-                                var isNotOnlyEnter = false;
                                 $(document).on('keydown', function (event) {
-                                    if (event.keyCode !== 13) {
-                                        isNotOnlyEnter = true;
-                                    }
-                                    if (event.keyCode === 13 && selected_card != null && isNotOnlyEnter === false) {
-                                        isNotOnlyEnter = true;
-                                        event.preventDefault()
-                                        selected_card.toggle(service_pk, created_by).then(
-                                            function () {
-                                                cleanTimer = setTimeout(function () {
-                                                    reset();
-                                                    list_el.html('');
-                                                }, 5000);
-                                            }
-                                        )
+                                    list_el.focus();
+                                    if (event.keyCode === 32 && selected_card != null) {
+                                        checkinByToggle(selected_card, service_pk, created_by, input_el);
+                                        reset();
                                     }
                                 });
                             },
                             function () {
-                                list_el.html('');
-                                removeAttendanceEnterEvent();
-                                reset();
+                                resetWithClean(list_el);
                             },
                             $(outputCard), 10);
                     }
@@ -958,36 +946,39 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             }, 350);
         };
 
-        var removeAttendanceEnterEvent = function () {
-            $(document).off('keydown');
-            preventDefaultScanner();
+        var checkinByToggle = function (card, service_pk, created_by, input_el) {
+            card.toggle(service_pk, created_by).then(function () {
+                card = null;
+                $(input_el).val('');
+            });
         };
 
-        var preventDefaultScanner = function () {
+        var preventDefaultScanner = function (input_el) {
+            input_el = $(input_el);
+            input_el.val('');
             $(document).on('keydown', function (event) {
-                if (event.keyCode === 13 || event.keyCode === 16 || event.keyCode === 17) {
+                input_el.focus();
+                if (event.keyCode === 13 || event.keyCode === 74) {
                     event.preventDefault();
                 }
 
-                if (event.ctrlKey) {
-                    event.preventDefault();
-                }
             });
         };
 
         this.watch = function (input_el, list_el) {
-            preventDefaultScanner();
-
-            $(input_el).on('keyup', function () {
-                var input = $(this);
-                if (!selected_card) {
-                    $(list_el).html('');
-                }
-                if (input.val().length === 8) {
+            input_el = $(input_el);
+            preventDefaultScanner(input_el);
+            input_el.focus();
+            input_el.on('keyup', function () {
+                if (input_el.val().length === 8) {
                     window.clearTimeout(cleanTimer);
-                    fetch(input.val(), list_el);
-                    input.val('');
+                    fetch(input_el.val(), list_el, input_el);
+                    window.setTimeout(function () {
+                        input_el.val('');
+                    }, 350);
+
                 }
+
             });
         };
 
