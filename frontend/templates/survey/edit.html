@@ -726,6 +726,9 @@
             iconEl.addClass(IconOfField);
             formTypeEl.val('complex');
             $('#options').show();
+
+            var manager;
+
             manager = new window.cgsy.survey.OptionManager(
                 $('#option-input-tags'),
                 $('#add-option-button'),
@@ -857,11 +860,13 @@
                     $('#edit_add-option-button'),
                     $('#edit_option-counter')
                 );
+
+                vals.forEach(function (val) {
+                    manager.addAndRenderField(val)
+                });
+
                 manager.render();
-
-
                 options_edit.show();
-                //option_field.text(vals.join('\n'));
             }
 
         });
