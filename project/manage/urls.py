@@ -1,7 +1,5 @@
 # pylint: skip-file
 
-import os
-
 from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
@@ -24,6 +22,7 @@ from payment.urls import (
     urlpatterns_public_payments_api,
 )
 from raffle.urls import urlpatterns_private_raffles
+from service_tags.urls import service_tags_urlpatterns
 
 handler500 = 'project.views.handler500'
 
@@ -43,6 +42,7 @@ private_urlpatterns = [
 ]
 
 public_urls = gatheros_front_public
+public_urls += service_tags_urlpatterns
 public_urls += urlpatterns_public_account
 public_urls += urlpatterns_public_password
 public_urls += urlpatterns_public_invitation
