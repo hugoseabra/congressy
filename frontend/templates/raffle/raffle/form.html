@@ -6,10 +6,6 @@
 {% load event_tags %}
 {% load form_config_tags %}
 
-{% block sidebar %}{% endblock %}
-
-{% block sidebar-bars %}{% endblock %}
-
 {% block messages %}
     {% if messages %}
         {% for message in messages %}
@@ -30,6 +26,12 @@
 {% block page_title %}
     Novo Sorteio
 {% endblock %}
+
+{% block page_sub_title %}
+    {{ event.name }}
+{% endblock %}
+
+{% block page_description %}{% endblock %}
 
 {% block content %}
     <form action="" method="post" class="form-horizontal form-border" role="form" name="raffle_form">
@@ -71,11 +73,17 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-9">
                                         {% render_generic_field form.product_name autofocus=True %}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {% render_generic_field form.quantity %}
                                     </div>
                                 </div>
                                 <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.attended_only %}
+                                    </div>
                                     <div class="col-md-6">
                                         {% render_switchery_field form.winner_out %}
                                     </div>

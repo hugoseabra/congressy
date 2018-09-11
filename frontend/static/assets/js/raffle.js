@@ -5,16 +5,25 @@ window.cgsy.raffle = window.cgsy.raffle || {};
     "use strict";
 
     var subscriptions = [];
+    var winners = [];
 
     raffle.Raffle = function() {
+
+        var self = this;
+        var winner_out = true;
+
         var deleteSubscription = function(id) {
             var subs = [];
-            $.each(subscriptions, function(id, sub) {
+            $.each(subscriptions, function(i, sub) {
                 if (sub.id !== id) {
                     subs.push(sub);
                 }
             });
             subscriptions = subs;
+        };
+
+        this.shuffleAll = function() {
+            winner_out = false;
         };
 
         this.addSubscriber = function(id, name) {
@@ -23,24 +32,81 @@ window.cgsy.raffle = window.cgsy.raffle || {};
                 'name': name
             });
         };
+
+        this.registerWinner = function(sub_id) {
+            console.log('winner: ' + sub_id);
+            winners.push(sub_id)
+        };
+
+        this.unregisterWinner = function(sub_id) {
+            console.log('winner unregistered: ' + sub_id);
+            var winners2 = [];
+            $.each(winners, function(i, winner) {
+                if (winner !== sub_id) {
+                    winners2.push(winner);
+                }
+            });
+            winners = winners2;
+        };
         
-        this.run = function (target_el, sub_id_el, callback) {
+        this.run = function (target_el, sub_id_el, counter_el) {
             target_el = $(target_el);
             sub_id_el = $(sub_id_el);
-            if (!subscriptions.length) {
-                alert('Nenhuma inscrição registrada.');
-                return;
-            }
-            var selected = subscriptions[
-                Math.floor(Math.random() * subscriptions.length)
-            ];
-            sub_id_el.val(selected.id);
-            deleteSubscription(selected.id);
-            target_el.text(selected.name);
 
-            if (callback) {
-                callback();
+            var num = subscriptions.length - winners.length;
+            console.log(subscriptions);
+            console.log(winners);
+
+            if (counter_el) {
+                $(counter_el).text(num);
             }
+
+            target_el.removeClass('text-success text-bold');
+
+            if (!num) {
+                alert('Nenhuma inscrição a ser sorteada.');
+                return new Promise(function(resolve) { resolve(); });
+            }
+
+            // normalize
+            num = num - 1;
+            var shuffle_interval = 50;
+
+            return new Promise(function(resolve) {
+                var counter = 1;
+                $.each(subscriptions, function(i, sub) {
+                    window.setTimeout(function() {
+                        target_el.text(sub.name);
+                    }, (shuffle_interval * counter));
+                    counter++;
+
+                    if (i === num) {
+                        window.setTimeout(function() {
+                            target_el.text('processando ...');
+                        }, (shuffle_interval * counter) + 100);
+
+                        window.setTimeout(function() {
+                            var selected = self.select();
+                            sub_id_el.val(selected.id);
+                            target_el.text(selected.name);
+                            target_el.addClass('text-success text-bold');
+
+                            resolve(selected);
+                        }, (shuffle_interval * counter) + 200);
+                    }
+                });
+            });
+        };
+
+        this.select = function() {
+            var id = Math.floor(Math.random() * subscriptions.length);
+
+            var is_winner = $.inArray(id, winners) !== -1;
+            if (is_winner && winner_out === true) {
+                return this.select();
+            }
+
+            return subscriptions[id];
         }
     };
 
@@ -63,6 +129,16 @@ window.cgsy.raffle = window.cgsy.raffle || {};
                 sender.send('POST', {
                     'subscription': subscription_pk
                 });
+        };
+
+        this.delete = function(url, sub_k) {
+            return new Promise(function(resolve) {
+                var sender = new AjaxSender(url);
+                    sender.setSuccessCallback(function(response) {
+                        resolve(response)
+                    });
+                    sender.send('POST', {'pk': sub_k});
+            });
         };
 
         this.render = function(url, target_el) {
