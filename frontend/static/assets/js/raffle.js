@@ -92,7 +92,7 @@ window.cgsy.raffle = window.cgsy.raffle || {};
                             target_el.addClass('text-success text-bold');
 
                             resolve(selected);
-                        }, 2 * ((shuffle_interval * counter) + 200));
+                        }, (shuffle_interval * counter) + 200);
                     }
                 });
             });
