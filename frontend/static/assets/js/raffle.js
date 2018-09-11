@@ -82,7 +82,7 @@ window.cgsy.raffle = window.cgsy.raffle || {};
                     if (i === num) {
                         window.setTimeout(function() {
                             target_el.text('processando ...');
-                        }, i * (shuffle_interval + 100));
+                        }, shuffle_interval + 100);
 
                         window.setTimeout(function() {
                             var selected = self.select();
@@ -91,7 +91,7 @@ window.cgsy.raffle = window.cgsy.raffle || {};
                             target_el.addClass('text-success text-bold');
 
                             resolve(selected);
-                        }, (i * 2) * (shuffle_interval + 200));
+                        }, 2 * (shuffle_interval + 200));
                     }
                 });
             });
