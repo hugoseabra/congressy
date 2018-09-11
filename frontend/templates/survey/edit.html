@@ -967,8 +967,15 @@
             var values = {};
 
             $.each($(form).serializeArray(), function (i, field) {
+                
+                if(field.name in values){
+                    field.value = values[field.name] +'\n' + field.value
+                }
+
                 values[field.name] = field.value;
             });
+
+
 
             var payload = {
                 action: 'edit',
