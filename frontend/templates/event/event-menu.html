@@ -13,7 +13,7 @@ Variáveis:
 
     {% if event.published %}
 
-        <small>
+        <div style="font-size:14px">
             <div class="text-bold">
                 Status: <i class="fas fa-circle success-color"></i>
             </div>
@@ -22,11 +22,11 @@ Variáveis:
                 Publicado
             </div>
 
-        </small>
+        </div>
 
     {% else %}
 
-        <small>
+        <div style="font-size:14px">
             <div class="text-bold">
                 Status: <i class="fas fa-circle danger-color"></i>
             </div>
@@ -35,7 +35,7 @@ Variáveis:
                 Não publicado
             </div>
 
-        </small>
+        </div>
 
     {% endif %}
 
@@ -45,7 +45,7 @@ Variáveis:
 
             {% if is_event_publishable %}
                 Publicar:
-                <input type="checkbox" class="js-switch" id="publish_event"
+                <input type="checkbox" class="js-switch hide" id="publish_event"
                         {% if event.published %} checked {% endif %}/>
             {% elif not is_event_publishable %}
                 <a onclick="$('#unpublishable_modal').modal('show');" href="javascript:void(0);">
@@ -131,7 +131,7 @@ Variáveis:
         <a class="sidebar-itens" href="{% url 'subscription:category-list' event.pk %}"
            title="Categorias">
             <i class="fas fa-th-list"></i>
-            Categoria(s)
+            Categorias
         </a>
     </li>
 
@@ -140,7 +140,7 @@ Variáveis:
                 "{% url 'subscription:lot-list' event.pk %}"
            title="Lotes/Categorias">
             <i class="fas fa-th-large"></i>
-            Lote(s)
+            Lotes
         </a>
     </li>
 
