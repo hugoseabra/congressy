@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
+from django.http import HttpResponse
 
 from gatheros_event.models import Event
 from raffle import forms, models
@@ -23,6 +24,8 @@ class RaffleListView(generic.ListView):
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
         cxt['event'] = self.event
+        cxt['has_inside_bar'] = True
+        cxt['active'] = 'raffles'
         return cxt
 
 
@@ -37,9 +40,13 @@ class RaffleAddView(generic.CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse('raffle:raffle-list', kwargs={
+        return reverse('raffle:raffle-panel', kwargs={
             'event_pk': self.event.pk,
+            'pk': self.object.pk,
         })
+
+    def form_valid(self, form):
+        super().form_valid(form)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -133,9 +140,14 @@ class RafflePanelView(generic.DetailView):
         return cxt
 
     def get_subscriptions(self):
-        return self.event.subscriptions.filter(
-            attended=True,
+        queryset = self.event.subscriptions.filter(
+            completed=True,
+            test_subscription=False,
         )
+        if self.object.attended_only is True:
+            queryset = queryset.filter(attended=True)
+
+        return queryset
 
 
 class WinnerListView(generic.ListView):
@@ -204,18 +216,24 @@ class WinnerFormView(generic.FormView):
 
 
 class WinnerDeleteView(generic.DeleteView):
-    template_name = 'raffle/winner/delete.html'
     model = models.Winner
     event = None
+    http_method_names = ['post']
+    object_pk = None
 
     def dispatch(self, request, *args, **kwargs):
         event_pk = self.kwargs.get('event_pk')
         self.event = get_object_or_404(Event, pk=event_pk)
         return super().dispatch(request, *args, **kwargs)
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.filter(event=self.event)
+    def delete(self, request, *args, **kwargs):
+        self.object_pk = request.POST.get('pk')
+        self.object = self.get_object()
+        self.object.delete()
+        return HttpResponse('')
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(models.Winner, pk=self.object_pk)
 
     def get_success_url(self):
         return reverse('raffle:winner-list', kwargs={

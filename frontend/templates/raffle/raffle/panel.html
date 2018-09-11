@@ -4,7 +4,7 @@
 {% load event_tags %}
 {% block title %}Sorteio | Congressy{% endblock %}
 {% block page_title %}
-    <div style="padding-bottom:10px">Sorteio</div>
+    <div style="padding-bottom:10px">Sorteio de Produto</div>
     <div style="color:#666">{{ object.product_name }}</div>
 {% endblock %}
 
@@ -12,6 +12,7 @@
     <script src="{% static 'assets/js/ajax.js' %}"></script>
     <script src="{% static 'assets/js/raffle.js' %}"></script>
     <script>
+    var raffle, stop_counter = false, create_event_timer = null;
 
     function load_winners() {
         var winners = new window.cgsy.raffle.Winners();
@@ -31,50 +32,99 @@
         create_events();
     }
 
-    function register() {
+    function register(raffle) {
         var sub_pk = $('#id_subscription').val();
         if (!sub_pk) {
             alert('Inscrição não informada.');
             create_events();
             return;
         }
+
+        stop_counter = true;
+        $('#winner_form_button').attr('disabled', '');
+
         var winners = new window.cgsy.raffle.Winners();
             winners.register(
                 '{% url 'raffle:winner-register' event.pk object.pk %}',
                 $('#winner-form'),
                 sub_pk,
-                function() {
-                    load_winners()
-                    $('#winner_form_button').attr('disabled', 'disabled');
-                    window.setTimeout(function() {
-                        $('#winner_form_button').removeAttr('disabled');
-                    }, 1000);
+                function(response) {
+                    load_winners();
+                    raffle.registerWinner(sub_pk);
                 }
             );
         create_events();
     }
 
-    function run() {
-        var raffle = new window.cgsy.raffle.Raffle();
-            raffle.run(
-                $('#result'),
-                $('#id_subscription'),
-                function() {
-                    $('#shuffle_button').attr('disabled', 'disabled');
-                    window.setTimeout(function() {
-                        $('#result').html('');
-                        $('#id_subscription').val('');
-                        $('#shuffle_button').removeAttr('disabled');
-                    }, 3000);
-                }
-            );
+    function remove(sub_pk, winner_pk) {
+        if (!sub_pk || !winner_pk) {
+            alert('Inscrição não informada.');
+            return;
+        }
+
+        if (!confirm('Tem certeza que deseja remover o vencedor?')) {
+            return;
+        }
+
+        var winners = new window.cgsy.raffle.Winners();
+            winners.delete(
+                '{% url 'raffle:winner-delete' event.pk %}',
+                winner_pk
+            ).then(function() {
+                raffle.unregisterWinner(sub_pk);
+                load_winners();
+            });
+        create_events();
     }
 
-    var create_event_timer = null;
+    function registerTimerCounter(timer_el, ends_on, callback) {
+        timer_el = $(timer_el);
+        ends_on = parseInt(ends_on);
+
+        timer_el.text(ends_on);
+
+        if (stop_counter === true || ends_on === 0) {
+            if (callback && typeof callback === 'function') {
+                callback();
+            }
+            return;
+        }
+
+        window.setTimeout(function() {
+            registerTimerCounter(timer_el, ends_on - 1, callback);
+        }, 1000);
+    }
+
+    function run() {
+        var raffle = new window.cgsy.raffle.Raffle();
+        {% if object.winner_out is False %}
+            raffle.shuffleAll();
+        {% endif %}
+
+            raffle.run($('#result'), $('#id_subscription'), $('#num_participating')).then(function() {
+                $('#shuffle_button').attr('disabled', 'disabled');
+                var timer = $('#register_timer');
+                    timer.fadeIn();
+
+                $('#winner_form_button').removeAttr('disabled');
+                $('#id_subscription').attr('type', 'text');
+
+                stop_counter = false;
+                registerTimerCounter($('#register_timer_time'), 2, function() {
+                    $('#result').html('-');
+                    $('#id_subscription').val('');
+                    $('#shuffle_button').removeAttr('disabled');
+                    $('#winner_form_button').attr('disabled', '');
+                    timer.fadeOut();
+                    stop_counter = true;
+                });
+            });
+    }
+
     function create_events() {
         window.clearTimeout(create_event_timer);
         create_event_timer = window.setTimeout(function() {
-            $('#winner_form_button').on('click', function() { register(); });
+            $('#winner_form_button').on('click', function() { register(raffle); });
         }, 500);
     }
 
@@ -84,7 +134,7 @@
             load_winners();
             load_form();
 
-            var raffle = new window.cgsy.raffle.Raffle();
+            raffle = new window.cgsy.raffle.Raffle();
             {% for sub in subscriptions %}
             raffle.addSubscriber('{{ sub.pk }}', '{{ sub.person.name }}');
             {% endfor %}
@@ -95,34 +145,83 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-md-12">
-            {% if object.winner_out %}
-            <i class="fas fa-check-circle text-success"></i>
-            {% else %}
-            <i class="fas fa-times-circle text-danger"></i>
-            {% endif %}
-            <strong>Retirar vencedores</strong>
-        </div>
-        <div class="col-md-6 text-right">
-            <a href="{% url 'raffle:raffle-edit' event.pk object.pk %}" class="btn btn-primary">
-                <i class="fas fa-pencil-alt"></i>
-                Editar
+        <div class="col-sm-2 col-md-2">
+            <a href="{% url 'raffle:raffle-list' event.pk %}"
+               class="btn btn-primary">
+                <i class="fas fa-arrow-circle-left"></i>
+                Produtos
             </a>
         </div>
+        <div class="col-sm-10 col-md-10" >
+            <button type="button" class="btn btn-primary btn-trans"
+                    style="float: right"
+                    onclick="location.href= '{% url 'raffle:raffle-edit' event.pk object.pk %}'">
+                <i class="fas fa-pencil-alt"></i>
+                Editar
+            </button>
+        </div>
     </div>
+
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-3 col-lg-3 col-xl-2">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">Filtros:</div>
+                        </div>
+                        <div class="panel-body">
+                            <div>
+                                {% if object.attended_only %}
+                                <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                <i class="fas fa-times-circle text-danger"></i>
+                                {% endif %}
+                                <small>Somente presentes</small>
+                            </div>
+                            <div>
+                                {% if object.winner_out %}
+                                <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                <i class="fas fa-times-circle text-danger"></i>
+                                {% endif %}
+                                <small>Retirar vencedores</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">Prêmios sorteados:</div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="text-center" style="font-size: 36px">
+                                <span id="num_shuffled">1</span>/<span>{{ object.quantity }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9 col-lg-9 col-xl-10">
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <div class="panel-title">Realizar Sorteio</div>
                 </div>
                 <div class="panel-body text-center">
-                    <button type="button" class="btn btn-info btn-sm" id="shuffle_button" onclick="run()">
-                        <i class="fas fa-stroopwafel"></i>
-                        Sortear
-                    </button>
-                    <div class="well well-lg text-center" id="result"></div>
+                    <div style="padding: 10px 0"><span class="text-bold" id="num_participating">{{ subscriptions|length }}</span> participando.</div>
+                    <div>
+                        <button type="button" class="btn btn-info" id="shuffle_button" onclick="run()">
+                            <i class="fas fa-stroopwafel"></i>
+                            Sortear
+                        </button>
+                    </div>
+                    <div class="well well-lg text-center" id="result">-</div>
                     <div id="winner-form" class="text-center"></div>
+                    <small id="register_timer" style="display:none"><span id="register_timer_time">-</span> segundo(s) para registrar</small>
                 </div>
             </div>
 
