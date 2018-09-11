@@ -340,7 +340,22 @@
                         </div>
 
                         <div id="options">
-                            {% render_generic_field form.options %}
+
+                            <div class="form-group">
+
+                                <label>Opções(<span id="option-counter">0</span>):</label>
+
+                                <div id="option-input-tags"></div>
+                                <hr/>
+                                <div class="text-center">
+                                    <button id="add-option-button" type="button" class="btn btn-sm btn-info">
+                                        <i class="glyphicon glyphicon-plus"></i>
+                                    </button>
+                                </div>
+
+                            </div>
+
+
                         </div>
 
 
@@ -462,29 +477,16 @@
 
                             <div class="form-group">
 
-                                <label>Opções:</label>
+                                <label>Opções(<span id="edit_option-counter">0</span>):</label>
 
-
-                                <div>
-
-                                <textarea cols="40" rows="10"
-                                          class="form-control"
-                                          name="options_edit"
-                                          id="id_options_edit">
-
-                                </textarea>
-
-
-                                    <div>
-                                        <small class="text-muted help-text">
-                                            Insira as opções da sua pergunta
-                                            uma
-                                            linha de cada vez.
-                                        </small>
-                                    </div>
-
-
+                                <div id="edit_option-input-tags"></div>
+                                <hr/>
+                                <div class="text-center">
+                                    <button id="edit_add-option-button" type="button" class="btn btn-sm btn-info">
+                                        <i class="glyphicon glyphicon-plus"></i>
+                                    </button>
                                 </div>
+
                             </div>
                         </div>
 
@@ -671,6 +673,7 @@
 {% block scripts %}
 
     <script src="{% static 'assets/survey/js/predefined-fields.js' %}"></script>
+    <script src="{% static 'assets/survey/js/option_manager.js' %}"></script>
 
     <script type="application/javascript">
 
@@ -723,6 +726,13 @@
             iconEl.addClass(IconOfField);
             formTypeEl.val('complex');
             $('#options').show();
+            manager = new window.cgsy.survey.OptionManager(
+                $('#option-input-tags'),
+                $('#add-option-button'),
+                $('#option-counter')
+            );
+            manager.render();
+
 
             if (question_type === 'select') {
                 $('#intro').show();
@@ -840,8 +850,18 @@
             }
 
             if (has_options) {
+                var manager;
+
+                manager = new window.cgsy.survey.OptionManager(
+                    $('#edit_option-input-tags'),
+                    $('#edit_add-option-button'),
+                    $('#edit_option-counter')
+                );
+                manager.render();
+
+
                 options_edit.show();
-                option_field.text(vals.join('\n'));
+                //option_field.text(vals.join('\n'));
             }
 
         });
