@@ -56,3 +56,10 @@ TYPES = (
     (PREDEFIENED_PHONE, 'Número de Telefone Fixo'),
     (PREDEFIENED_CELLPHONE, 'Número de Celular'),
 )
+
+COMPLEX_TYPES = [
+    FIELD_SELECT,
+    FIELD_RADIO_GROUP,
+    FIELD_CHECKBOX_GROUP,
+]
+

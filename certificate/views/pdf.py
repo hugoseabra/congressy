@@ -89,8 +89,22 @@ class CertificatePDFView(AccountMixin, generic.View):
         return res
 
     def can_access(self):
-        return self.subscription.confirmed is True and \
-               self.subscription.attended is True
+
+        if not self.subscription.confirmed:
+            return False
+
+        certificate_config = self.subscription.event.certificate
+        
+        if certificate_config.only_attending_participantes:
+
+            if not self.subscription.attended:
+
+                self.permission_denied_message = "Certificado disponivel " \
+                                                 "apenas participantes com " \
+                                                 "presença confirmada!"
+                return False
+
+        return True
 
     def get(self, request, *args, **kwargs):
         html = self.create_html_string()
@@ -237,4 +251,5 @@ class CertificateManualView(EventViewMixin, generic.TemplateView):
         context = super().get_context_data(**kwargs)
         context['has_inside_bar'] = True
         context['active'] = 'certificate-manual'
+        context['certificate'] = self.event.certificate
         return context

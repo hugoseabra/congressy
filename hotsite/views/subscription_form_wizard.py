@@ -595,6 +595,14 @@ class SubscriptionWizardView(SessionWizardView):
             # Tratamento especial para extrair as respostas do form_data,
             # causado pelo uso do FormWizard que adiciona prefixos nas
             # respostas
+        
+            questions_that_need_parsing = Question.objects.filter(
+                survey=lot.event_survey.survey,
+                type=Question.FIELD_CHECKBOX_GROUP,
+            ).values_list("name")
+
+            needs_parsing = [x[0] for x in questions_that_need_parsing]
+
             survey_data = dict()
             for question, answer in form_data.items():
                 if question == 'csrfmiddlewaretoken':
@@ -603,8 +611,8 @@ class SubscriptionWizardView(SessionWizardView):
                 if 'survey-' in question:
                     raw_question_name = question
                     question_name = question.replace('survey-', '')
-                    question_instance = Question.objects.get(name=question_name)
-                    if question_instance.type == Question.FIELD_CHECKBOX_GROUP:
+                    
+                    if question_name in needs_parsing:
                         answer_list = form_data.getlist(raw_question_name)
                         if not len(answer_list):
                             answer_list = list()
