@@ -37,6 +37,7 @@ from mailer.services import (
     notify_new_user_and_unpaid_subscription_boleto,
     notify_new_user_and_unpaid_subscription_credit_card,
     notify_paid_subscription_boleto, notify_refunded_subscription_boleto,
+    notify_pending_refund_subscription_boleto,
     notify_refunded_subscription_credit_card,
 )
 from mailer.tasks import send_mail
@@ -371,6 +372,7 @@ def postback_url_view(request, uidb64):
         is_refused = incoming_status == Transaction.REFUSED
         is_refunded = incoming_status == Transaction.REFUNDED
         is_waiting = incoming_status == Transaction.WAITING_PAYMENT
+        is_peding_refund = incoming_status == Transaction.PENDING_REFUND
         is_chargedback = incoming_status == Transaction.CHARGEDBACK
 
         try:
@@ -509,6 +511,12 @@ def postback_url_view(request, uidb64):
 
                     elif is_refunded:
                         notify_refunded_subscription_boleto(event, transaction)
+
+                    elif is_peding_refund:
+                        notify_pending_refund_subscription_boleto(
+                            event,
+                            transaction
+                        )
 
                     else:
                         raise mailer_notification.NotifcationError(

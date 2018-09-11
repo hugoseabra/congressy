@@ -16,7 +16,6 @@ from gatheros_event.forms import ProfileCreateForm, ProfileForm
 from gatheros_event.views.mixins import AccountMixin
 from mailer.services import notify_reset_password
 
-
 LOGIN_SUPERUSER_ONLY = getattr(settings, 'LOGIN_SUPERUSER_ONLY', False)
 ALLOW_ACCOUNT_REGISTRATION = getattr(settings, 'ACCOUNT_REGISTRATION', False)
 
@@ -147,6 +146,14 @@ class ProfileCreateView(TemplateView, FormView):
 
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
+
+    def get_success_url(self):
+
+        next_page = '?next=' + super().get_success_url()
+        redirect_to = reverse_lazy('public:remarketing-redirect')
+        page_type = '&page_type=new_account'
+
+        return redirect_to + next_page + page_type
 
 
 class PasswordResetView(auth_views.PasswordResetView):

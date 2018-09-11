@@ -192,10 +192,14 @@ class EventAddFormView(BaseEventView, generic.CreateView):
     def get_success_url(self):
         form = self.get_form()
         event = form.instance
-        return reverse(
+        redirect_to = reverse_lazy('public:remarketing-redirect')
+        page_type = '&page_type=new_event'
+        next_page = '?next=' + reverse(
             'event:event-panel',
             kwargs={'pk': event.pk}
         )
+
+        return redirect_to + next_page + page_type
 
 
 class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):

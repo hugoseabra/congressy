@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'core',
     'base',
     'frontend',
+    'service_tags',
 ]
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
 LANGUAGE_CODE = 'pt-br'

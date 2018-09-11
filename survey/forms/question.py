@@ -76,7 +76,6 @@ class QuestionForm(forms.Form):
 
     def __init__(self, survey, instance=None, **kwargs):
         self.survey = survey
-
         self.question = None
         self.options_list = []
 
