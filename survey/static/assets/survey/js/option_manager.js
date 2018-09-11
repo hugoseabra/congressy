@@ -93,6 +93,10 @@ window.cgsy.survey = window.cgsy.survey || {};
       return field;
     };
 
+    this.clean = function () {
+        self.option_input_tags_el.html('');
+    };
+
     this.addField = function(value) {
       var field = self.createField(value);
       self.fields.push(field);
@@ -110,6 +114,8 @@ window.cgsy.survey = window.cgsy.survey || {};
     };
     
     this.render = function(data) {
+
+
       if (typeof data === 'undefined') {
         data = [];
       } else if (typeof data[Symbol.iterator] !== 'function') {
@@ -122,14 +128,18 @@ window.cgsy.survey = window.cgsy.survey || {};
         this.addField(null);
       } else if (data.length) {
         $.each(data, function(i, item) {
-
+         self.addField(item);
         });
       }
+
+      self.clean();
 
       $.each(self.fields, function(i, field) {
       	self.renderField(field);
       });
     };
+
+
 
     self.add_button_el.unbind('click');
     window.setTimeout(function() {
@@ -179,8 +189,8 @@ window.cgsy.survey = window.cgsy.survey || {};
 
       var delete_button_field = $('<div>').css({
         'position': 'absolute',
-        'right': '17px',
-        'margin-top': '-32px',
+        'right': '18px',
+        'margin-top': '-34px',
         'z-index': 3
       });
       self.main_el.append(delete_button_field);
