@@ -28,9 +28,9 @@
                                 {% for item in organizations|slice:":5" %}
                                     <tr>
                                         <td onclick="cgsy_submit({{ item.pk }})">
-                                            <a>{{ item.name }}</a>
+                                            <a href="javascript:void()">{{ item.name }}</a>
                                         </td>
-                                        <td class=" text-center" >
+                                        <td class=" text-center">
                                             
                                             <a class="btn btn-primary btn-trans btn-sm"
                                                data-toggle="tooltip"
