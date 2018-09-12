@@ -56,40 +56,41 @@
 </body>
 
 <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
+{% if not debug %}
+    {% if markting_type == 'adwords' %}
 
-{% if markting_type == 'adwords' %}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-827903122"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-827903122"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
 
-        function gtag() {
-            dataLayer.push(arguments);
-        }
+            {% if page_type == 'new_account' %}
 
-        {% if page_type == 'new_account' %}
-
-            gtag('event',
-                'conversion',
-                {
-                    'send_to': 'AW-827903122/ydKjCO_gh4cBEJKZ44oD'
-                });
-
-
-        {% elif page_type == 'new_event' %}
+                gtag('event',
+                    'conversion',
+                    {
+                        'send_to': 'AW-827903122/ydKjCO_gh4cBEJKZ44oD'
+                    });
 
 
-            gtag('event',
-                'conversion',
-                {
-                    'send_to': 'AW-827903122/3mskCIzdh4cBEJKZ44oD',
-                    'transaction_id': ''
-                });
+            {% elif page_type == 'new_event' %}
 
 
-        {% endif %}
-    </script>
+                gtag('event',
+                    'conversion',
+                    {
+                        'send_to': 'AW-827903122/3mskCIzdh4cBEJKZ44oD',
+                        'transaction_id': ''
+                    });
 
+
+            {% endif %}
+        </script>
+
+    {% endif %}
 {% endif %}
 
 
