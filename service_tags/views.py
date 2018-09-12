@@ -33,5 +33,6 @@ class RemarketingRedirectLanding(TemplateView):
         context = super().get_context_data(**kwargs)
         context['page_type'] = self.page_type
         context['next'] = self.next
+        context['debug'] = settings.DEBUG
 
         return context
