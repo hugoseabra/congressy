@@ -36,7 +36,8 @@ class EventPublishable(EventCompositeSpecificationMixin):
             return False
 
         if event.is_scientific:
-            if not event.work_config and event.work_config.is_configured:
+
+            if not hasattr(event, 'work_config') and event.work_config.is_configured:
                 return False
 
         return True
