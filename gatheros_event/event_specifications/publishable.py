@@ -29,7 +29,7 @@ class EventPublishable(EventCompositeSpecificationMixin):
         if not visibility_spec:
             return False
 
-        if not event.info.description:
+        if not hasattr(event, 'info') or not hasattr(event.info, 'description') and event.info.description !=  '':
             return False
 
         if payable_spec and not banking_spec:
