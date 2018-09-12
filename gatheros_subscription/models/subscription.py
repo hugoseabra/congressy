@@ -115,10 +115,6 @@ class Subscription(models.Model, GatherosModelMixin):
     )
     created_by = models.PositiveIntegerField(verbose_name='criado por')
 
-    attended = models.BooleanField(
-        default=False,
-        verbose_name='compareceu'
-    )
     code = models.CharField(
         max_length=15,
         blank=True,
@@ -135,11 +131,6 @@ class Subscription(models.Model, GatherosModelMixin):
         verbose_name='num. inscrição'
     )
 
-    attended_on = models.DateTimeField(
-        verbose_name='confirmado em',
-        null=True,
-        blank=True
-    )
     created = models.DateTimeField(
         auto_now_add=True,
         verbose_name='criado em'
@@ -236,10 +227,10 @@ class Subscription(models.Model, GatherosModelMixin):
             self.count = Subscription.objects.next_count(self.lot)
 
         # RULE 4 - test_rule_4_inscricao_confirmada_com_data_confirmacao
-        if self.attended is True:
-            self.attended_on = datetime.now()
-        else:
-            self.attended_on = None
+        # if self.attended is True:
+        #     self.attended_on = datetime.now()
+        # else:
+        #     self.attended_on = None
 
         rule.rule_5_inscricao_apos_data_final_lote(self, self._state.adding)
         rule.rule_6_inscricao_apos_data_final_evento(self, self._state.adding)

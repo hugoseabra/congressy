@@ -35,17 +35,17 @@ def rule_3_numero_inscricao_gerado(subscription):
         raise IntegrityError('Número sequencial inscrição não encontrado.')
 
 
-def rule_4_inscricao_confirmada_com_data_confirmacao(subscription):
-    """
-    Inscrição confirmada deve possuir data de confirmação de inscrição.
-    """
-    attended = subscription.attended
-    attended_on = subscription.attended_on
-    if (attended and not attended_on) or (not attended and attended_on):
-        raise IntegrityError(
-            'Inscrições com confirmação de presença precisam ter data de'
-            ' confirmação e vice-versa.'
-        )
+# def rule_4_inscricao_confirmada_com_data_confirmacao(subscription):
+#     """
+#     Inscrição confirmada deve possuir data de confirmação de inscrição.
+#     """
+#     attended = subscription.attended
+#     attended_on = subscription.attended_on
+#     if (attended and not attended_on) or (not attended and attended_on):
+#         raise IntegrityError(
+#             'Inscrições com confirmação de presença precisam ter data de'
+#             ' confirmação e vice-versa.'
+#         )
 
 
 def rule_5_inscricao_apos_data_final_lote(subscription, adding=False):

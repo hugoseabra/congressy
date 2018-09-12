@@ -26,7 +26,6 @@ from gatheros_event.views.mixins import (
 )
 from gatheros_subscription.directors import SubscriptionSurveyDirector
 from gatheros_subscription.forms import (
-    SubscriptionAttendanceForm,
     SubscriptionPersonForm,
     SubscriptionFilterForm,
     SubscriptionForm,
