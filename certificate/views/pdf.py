@@ -17,7 +17,7 @@ from django.views import generic
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin, EventViewMixin
 from gatheros_subscription.models import Subscription
-
+from attendance.helpers.attendance import subscription_is_checked
 
 class CertificatePDFView(AccountMixin, generic.View):
     template_name = 'pdf/certificate.html'
@@ -97,7 +97,7 @@ class CertificatePDFView(AccountMixin, generic.View):
         
         if certificate_config.only_attending_participantes:
 
-            if not self.subscription.attended:
+            if not subscription_is_checked(self.subscription.pk, self.event):
 
                 self.permission_denied_message = "Certificado disponivel " \
                                                  "apenas participantes com " \

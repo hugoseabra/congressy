@@ -71,7 +71,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <div class="form-group"
+                                        <div class="form-group lot-category-filter"
                                              style="margin-top: 20px">
                                             <label>Categoria de lotes</label>
                                             <div>
@@ -88,6 +88,11 @@
                                         </div>
                                     </div>
 
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_switchery_field form.checkin_only %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -123,7 +128,7 @@
 {% block scripts %}
 
     <script>
-        var radios = $('input[type=checkbox]');
+        var radios = $('.lot-category-filter input[type=checkbox]');
 
         radios.iCheck({
             checkboxClass: 'icheckbox_flat-grey',

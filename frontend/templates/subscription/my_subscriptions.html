@@ -96,7 +96,7 @@
                         "searchable": false,
                         "orderable": false,
                         "width": "13%",
-                        "targets": [2,3,4],
+                        "targets": [2, 3, 4],
                         "className": "text-center"
                     }
 
@@ -265,15 +265,19 @@
                                         {% if item.event.has_certificate_config and item.status == item.CONFIRMED_STATUS and item.completed %}
 
                                             {% if item.event.certificate.only_attending_participantes %}
-                                                {% if item.attended is True %}
-                                                    <div class="text-center">
-                                                        <a href="{% url 'certificate:event-certificate-pdf' item.event.pk item.pk %}">
-                                                            <i class="fas fa-graduation-cap"></i>
-                                                        </a>
-                                                    </div>
-                                                {% else %}
-                                                    ---
-                                                {% endif %}
+                                                {% for status in status_events %}
+                                                    {% if item.event.pk == status.event_pk %}
+                                                        {% if status.checked %}
+                                                            <div class="text-center">
+                                                                <a href="{% url 'certificate:event-certificate-pdf' item.event.pk item.pk %}">
+                                                                    <i class="fas fa-graduation-cap"></i>
+                                                                </a>
+                                                            </div>
+                                                        {% else %}
+                                                            ---
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
                                             {% else %}
                                                 <div class="text-center">
                                                     <a href="{% url 'certificate:event-certificate-pdf' item.event.pk item.pk %}">

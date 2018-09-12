@@ -21,6 +21,9 @@
 
 
     <script type="text/javascript">
+        console.log('confirmed'+ {{ confirmed }});
+        console.log('numero de atendimento'+ {{ number_attendances }});
+        console.log('numero de inscritos'+ {{ total_subscriptions }});
         var progress;
         if (parseFloat('{{confirmed }}') === 0) {
             progress = 0;

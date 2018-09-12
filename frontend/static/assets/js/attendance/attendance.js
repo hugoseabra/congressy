@@ -240,7 +240,9 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 // ==========================================================================//
 (function (AjaxSender, attendance) {
 
-    attendance.Attendance = function (checkin_uri, checkout_uri) {
+    attendance.Attendance = function (checkin_uri,success_checkin_msg,
+                                      fail_checkin_msg, checkout_uri,
+                                      success_checkout_msg, fail_checkout_msg) {
 
         var preCheckinCallbacks = [];
         var postCheckinCallbacks = [];
@@ -300,7 +302,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                         });
                         console.log('2. checkin realizado.');
                         Messenger().post({
-                            message: 'Entrada registrada com sucesso!',
+                            message: success_checkin_msg,
                             type: 'success'
                         });
                         subscription.fetch(service_pk, created_by).then(function () {
@@ -309,7 +311,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     });
                     sender.setFailCallback(function () {
                         Messenger().post({
-                            message: 'Falha ao registrar entrada!',
+                            message: fail_checkin_msg,
                             type: 'error'
                         });
                     });
@@ -356,7 +358,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                             callback();
                         });
                         Messenger().post({
-                            message: 'Saída registrada com sucesso!',
+                            message: success_checkout_msg,
                             type: 'success'
                         });
                         subscription.fetch(service_pk, created_by).then(function () {
@@ -366,7 +368,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
                     sender.setFailCallback(function () {
                         Messenger().post({
-                            message: 'Falha ao registrar saída!',
+                            message: fail_checkout_msg,
                             type: 'error'
                         });
                     });
@@ -1014,7 +1016,11 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 function createTypingSearch(options) {
     var attendance = new window.cgsy.attendance.Attendance(
         options['checkinUri'],
-        options['checkoutUri']
+        options['success_checkin_msg'],
+        options['fail_checkin_msg'],
+        options['checkoutUri'],
+        options['success_checkout_msg'],
+        options['fail_checkout_msg']
     );
 
     var search = new window.cgsy.attendance.Search(
@@ -1039,7 +1045,11 @@ function createTypingSearch(options) {
 function createBarCodeSearch(options) {
     var attendance = new window.cgsy.attendance.Attendance(
         options['checkinUri'],
-        options['checkoutUri']
+        options['success_checkin_msg'],
+        options['fail_checkin_msg'],
+        options['checkoutUri'],
+        options['success_checkout_msg'],
+        options['fail_checkout_msg']
     );
 
     var search = new window.cgsy.attendance.Search(
