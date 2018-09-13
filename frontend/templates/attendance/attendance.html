@@ -10,7 +10,10 @@
     Realize o credenciamento de inscritos confirmando sua presença no evento.
 {% endblock %}
 
-{% block styles %}{% endblock %}
+{% block styles %}
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/TimeCircles/TimeCircles.js' %}">
+{% endblock %}
 
 {% block pageheader %}
     <div class="pageheader">
@@ -122,8 +125,14 @@
                                        id="webcam"></video>
                             </div>
                         {% endif %}
+                    <div id="cards-list"
+                             class="{% if search_type == 'qrcode' %} col-md-6
+                                    {% elif search_type == 'barcode' %} col-md-6
+                                    {% else %} col-md-12 {% endif %}">
+
+                        </div>
                         {% if search_type == 'barcode' %}
-                            <div class="container-fluid">
+                            <div class="col-md-6">
                                 <div class="alert alert-info alert-dismissable">
                                     <button type="button" class="close"
                                             data-dismiss="alert"
@@ -151,12 +160,7 @@
                                 </div>
                             </div>
                         {% endif %}
-                        <div id="cards-list"
-                             class="{% if search_type == 'qrcode' %} col-md-6
-                                    {% elif search_type == 'barcode' %} col-md-6 col-md-offset-3
-                                    {% else %} col-md-12 {% endif %}">
 
-                        </div>
 
                     </div>
 
@@ -172,6 +176,7 @@
     <script src="{% static 'assets/js/ajax.js' %}"></script>,
     <script src="{% static 'assets/js/attendance/attendance.js' %}"></script>
     <script src="{% static 'assets/plugins/instascan/instascan-1.0.0.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/instascan/TimeCircles.jss' %}"></script>
     <script src="{% static 'assets/js/attendance/cgsy-scanner.js' %}"></script>
     <script>
         $(document).ready(function () {

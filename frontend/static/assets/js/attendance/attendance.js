@@ -240,7 +240,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 // ==========================================================================//
 (function (AjaxSender, attendance) {
 
-    attendance.Attendance = function (checkin_uri,success_checkin_msg,
+    attendance.Attendance = function (checkin_uri, success_checkin_msg,
                                       fail_checkin_msg, checkout_uri,
                                       success_checkout_msg, fail_checkout_msg) {
 
@@ -900,6 +900,57 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             selected_card = null;
         };
 
+        var createTimeCircles = function (el) {
+            var timeCirclesEl = "<div id=\"DateCountdown\" data-timer=\"900\"></div>";
+            timeCirclesEl = $(timeCirclesEl);
+            el.append(timeCirclesEl);
+            $("#DateCountdown").TimeCircles({
+                "animation": "smooth",
+                "bg_width": 0.2,
+                "fg_width": 0.015,
+                "circle_bg_color": "#90989F",
+                "time": {
+                    "Days": {
+                        "text": "Days",
+                        "color": "#40484F",
+                        "show": false
+                    },
+                    "Hours": {
+                        "text": "Hours",
+                        "color": "#40484F",
+                        "show": false
+                    },
+                    "Minutes": {
+                        "text": "Minutes",
+                        "color": "#40484F",
+                        "show": false
+                    },
+                    "Seconds": {
+                        "text": "Seconds",
+                        "color": "#40484F",
+                        "show": true
+                    }
+                }
+            });
+
+        };
+
+        var createAttendanceSpaceEvent = function (unit, value, total) {
+            $(document).on('keydown', function (event) {
+                list_el.focus();
+                if (event.keyCode === 32 && selected_card != null) {
+                    checkinByToggle(selected_card, service_pk, created_by, input_el);
+                    reset();
+                }
+            })
+        };
+
+        var DestroyTimeCircles = function (unit, value, total) {
+            if(total<=0){
+                $("#DateCountdown").TimeCircles().destroy();
+            }
+        };
+
         var fetch = function (search_criteria, list_el, input_el) {
             list_el = $(list_el);
 
@@ -930,20 +981,12 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     list_el.html(outputCard);
 
                     if (card.active() === true) {
-                        processCounter.createProcessCounter(
-                            function () {
-                                $(document).on('keydown', function (event) {
-                                    list_el.focus();
-                                    if (event.keyCode === 32 && selected_card != null) {
-                                        checkinByToggle(selected_card, service_pk, created_by, input_el);
-                                        reset();
-                                    }
-                                });
-                            },
-                            function () {
-                                resetWithClean(list_el);
-                            },
-                            $(outputCard), 10);
+                        createTimeCircles();
+                        $("#DateCountdown").TimeCircles({count_past_zero: false})
+                            .addListener(createAttendanceSpaceEvent);
+
+                        $("#DateCountdown").TimeCircles({count_past_zero: false})
+                            .addListener(DestroyTimeCircles);
                     }
                 });
             }, 350);
