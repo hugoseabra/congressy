@@ -826,7 +826,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
         var createTimeCirclesEl = function (el, ends_in) {
 
-            var timeCirclesEl = "<div id=\"DateCountdown\" data-timer=\"10\" style=\"height: 70px\" ></div>";
+            var timeCirclesEl = "<div id=\"DateCountdown\" data-timer=\"" + ends_in +"\" style=\"height: 70px\" ></div>";
             timeCirclesEl = $(timeCirclesEl);
             el.append(timeCirclesEl);
             $("#DateCountdown").TimeCircles({
