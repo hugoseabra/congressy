@@ -3,12 +3,7 @@ from gatheros_event.models import Event
 
 
 def event_is_publishable(event: Event):
-    spec = EventPublishable().is_satisfied_by(event)
-
-    if not spec:
-        return False
-
-    return True
+    return EventPublishable().is_satisfied_by(event)
 
 
 def get_unpublishable_reason(event: Event):
