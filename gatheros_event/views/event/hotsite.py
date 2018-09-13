@@ -74,13 +74,14 @@ class EventHotsiteView(AccountMixin, FormView, EventDraftStateMixin):
         event = self._get_event()
 
         context = super().get_context_data(**kwargs)
-        kwargs.update({'event': event})
-        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
+
         context['has_inside_bar'] = True
         context['active'] = 'pagina-do-evento'
         context['event'] = event
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
         context['is_paid_event'] = is_paid_event(event)
+
+        context.update(self.get_event_state_context_data(event))
 
         try:
             context['info'] = event.info

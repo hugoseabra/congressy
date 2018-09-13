@@ -1,34 +1,35 @@
 import absoluteuri
-
-from django.contrib import messages
 from django.conf import settings
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse, reverse_lazy
-from django.views import View, generic
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
-from gatheros_event import forms
-from gatheros_event.models import Organization, Event
-from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
-from gatheros_event.helpers.account import update_account
+from django.urls import reverse, reverse_lazy
+from django.views import View, generic
+
 from core.util import model_field_slugify, ReservedSlugException
+from gatheros_event import forms
+from gatheros_event.helpers.account import update_account
 from gatheros_event.helpers.event_business import is_paid_event
+from gatheros_event.models import Organization, Event
+from gatheros_event.views.mixins import AccountMixin
 
 
-class BaseEventView(AccountMixin, View, EventDraftStateMixin):
+class BaseEventView(AccountMixin, View):
     template_name = 'event/form.html'
     success_message = ''
     success_url = None
     form_title = None
     event = None
+    event_pk_field = 'pk'
 
     def pre_dispatch(self, request):
-        event = self.get_event()
+        self.event = self.get_event()
 
-        if event:
+        if self.event:
             update_account(
                 request=self.request,
-                organization=event.organization,
+                organization=self.event.organization,
                 force=True
             )
 
@@ -38,8 +39,10 @@ class BaseEventView(AccountMixin, View, EventDraftStateMixin):
         return reverse_lazy('event:event-list')
 
     def get_event(self):
-        if not self.event and self.kwargs.get('pk'):
-            self.event = get_object_or_404(Event, pk=self.kwargs.get('pk'))
+        if not self.event or self.event and not isinstance(self.event, Event):
+            pk = self.kwargs.get(self.event_pk_field)
+            if pk:
+                self.event = Event.objects.get(pk=pk)
 
         return self.event
 
@@ -62,9 +65,8 @@ class BaseEventView(AccountMixin, View, EventDraftStateMixin):
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
-        context = super(BaseEventView, self).get_context_data(**kwargs)
-        kwargs.update({'event': self.get_event()})
-        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
+        context = super().get_context_data(**kwargs)
+
         context['next_path'] = self._get_referer_url()
         context['form_title'] = self.get_form_title()
         context['is_manager'] = self.has_internal_organization
@@ -91,19 +93,10 @@ class BaseEventView(AccountMixin, View, EventDraftStateMixin):
 class BaseSimpleEditlView(BaseEventView):
     object = None
 
-    def get_object(self, queryset=None):
-        """ Resgata objeto principal da view. """
-        if self.object:
-            return self.object
-
-        self.object = super(BaseSimpleEditlView, self).get_object(queryset)
-        return self.object
-
     def can_access(self):
-        event = self.get_object()
         can_edit = self.request.user.has_perm(
             'gatheros_event.change_event',
-            event
+            self.event
         )
         if not can_edit:
             messages.warning(

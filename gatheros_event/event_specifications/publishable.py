@@ -57,7 +57,7 @@ class EventPublishable(EventCompositeSpecificationMixin):
             return 'Seu evento não está visivel.' \
                    ' Veja a situação dos seus lotes!'
 
-        if not event.info.description:
+        if not hasattr(event, 'info') or not hasattr(event.info, 'description'):
             return 'Seu evento não possui uma descrição. ' \
                    'Veja os dados da pagina do evento!'
 

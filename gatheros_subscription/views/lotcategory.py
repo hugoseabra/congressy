@@ -50,12 +50,13 @@ class LotCategoryListView(generic.ListView, EventDraftStateMixin):
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
-        kwargs.update({'event': self.event})
-        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
         context['event'] = self.event
         context['has_inside_bar'] = True
         context['active'] = 'categorias'
         context['is_paid_event'] = is_paid_event(self.event)
+
+        context.update(self.get_event_state_context_data(self.event))
+
         return context
 
     def get_queryset(self):
@@ -64,22 +65,7 @@ class LotCategoryListView(generic.ListView, EventDraftStateMixin):
         query_set = query_set.filter(event=self.event)
 
         if not self.event.feature_configuration.feature_multi_lots:
-            cats_with_active_lots = query_set.filter(
-                lots__active=True
-            )
-            if cats_with_active_lots.count() == 0:
-                cats_with_active_lots = query_set
-                if SENTRY_RAVEN:
-                    message = 'Nenhuma categoria com lote ativo'
-                    extra_data = {
-                        'event_pk': self.event.pk,
-                        'event': self.event.name,
-                    }
-                    client.captureMessage(message, **extra_data)
-                else:
-                    raise Exception('Nenhuma categoria com lote ativo')
-
-            first = cats_with_active_lots.first()
+            first = query_set.first()
             query_set = query_set.filter(pk=first.pk)
 
         return query_set.order_by('pk')
@@ -119,9 +105,10 @@ class LotCategoryAddView(MultiLotsFeatureFlagMixin, generic.CreateView,
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
-        kwargs.update({'event': self.event})
-        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
         context['event'] = self.event
+
+        context.update(self.get_event_state_context_data(self.event))
+
         return context
 
     def get_form_kwargs(self):
@@ -176,8 +163,7 @@ class LotCategoryEditView(generic.UpdateView, EventDraftStateMixin):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
-        kwargs.update({'event': self.event})
-        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
+        context.update(self.get_event_state_context_data(self.event))
         return context
 
     def get_form_kwargs(self):
@@ -207,8 +193,7 @@ class LotCategoryDeleteView(DeleteViewMixin, EventDraftStateMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        kwargs.update({'event': self.object})
-        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
+        context.update(self.get_event_state_context_data(self.object.event))
         return context
 
     def get_success_url(self):

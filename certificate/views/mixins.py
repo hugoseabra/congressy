@@ -31,10 +31,11 @@ class CertificateBaseMixin(AccountMixin, generic.View, EventDraftStateMixin):
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
-        kwargs.update({'event': self.event})
-        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
+
         context['event'] = self.event
         context['is_paid_event'] = is_paid_event(self.event)
+
+        context.update(self.get_event_state_context_data(self.event))
 
         return context
 
