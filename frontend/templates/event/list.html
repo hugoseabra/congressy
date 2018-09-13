@@ -173,14 +173,18 @@
                                             <a href="
     {% url 'event:event-panel' event.pk %}">
                                                 {{ event.name }}
-                                                {% if event.published == True %}
-                                                    &nbsp;&nbsp;
-                                                    <span class="badge badge-success">Publicado</span>
-                                                {% endif %}
 
                                                 {% if event.date_end < now %}
                                                     &nbsp;&nbsp;
                                                     <span class="badge badge-warning">Encerrado</span>
+                                                {% endif %}
+                                            
+                                                {% if event.published == True %}
+                                                    &nbsp;&nbsp;
+                                                    <span class="badge badge-success">Publicado</span>
+                                                {% else %}
+                                                    &nbsp;&nbsp;
+                                                    <span class="badge badge-error">Não-Publicado</span>
                                                 {% endif %}
 
                                                 <br/>
