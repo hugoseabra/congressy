@@ -535,7 +535,16 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
 
             var card_html = "<div class=\"panel panel-card\" style=\"border-radius: 5px; box-shadow: 0 10px 15px 0 rgba(223, 223, 223, 0.5);\">";
-            card_html += "<div class=\"container-fluid\" style=\"height: 70px;border-top-left-radius: 5px;border-top-right-radius: 5px;background-color:" + header_color + "\"></div>";
+            card_html += "<div class=\"container-fluid\" style=\"height: 70px;border-top-left-radius: 5px;border-top-right-radius: 5px;background-color:" + header_color + "\">";
+            card_html += "<div class=\"row\" style=\"height: 70px;\">";
+            card_html += "<div class=\"col-xs-3\">";
+            card_html += "</div>";
+            card_html += "<div class=\"col-xs-3 col-xs-offset-6\">";
+            card_html += "<div class=\"float-right time-circles\" style=\"width: 100%;height: 70px;\">";
+            card_html += "</div>";
+            card_html += "</div>";
+            card_html += "</div>";
+            card_html += "</div>";
             card_html += "<div class=\"row\">";
             card_html += "<div class=\"col-xs-6 col-xs-offset-3\" style=\"margin-top:-50px;\">";
             //card_html +=               "<img src=\"http://cdn.staticneo.com/w/evangelion/6/6a/Shinji.jpg\" class=\"img-responsive img-circle\" alt=\"Responsive image\">";
@@ -815,100 +824,17 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 (function ($, attendance) {
     attendance.ProcessCounter = function () {
 
-        var cleanCounterTimer = null;
-        var preProcessCounterCallback = function () {
-        };
-        var afterProcessCounterCallback = function () {
-        };
+        var createTimeCirclesEl = function (el, ends_in) {
 
-        var setPreProcessCounterCallback = function (callback) {
-            if (typeof callback !== 'function') {
-                console.error('Callback is not a function: ' + callback);
-                return;
-            }
-            preProcessCounterCallback = callback;
-        };
-
-        var setAfterProcessCounterCallback = function (callback) {
-            if (typeof callback !== 'function') {
-                console.error('Callback is not a function: ' + callback);
-                return;
-            }
-            afterProcessCounterCallback = callback;
-        };
-
-        this.createProcessCounter = function (preCallback, afterCallback, elCard, ends_in) {
-            createCounterAlert(elCard.find(".panel-body"), ends_in);
-            setPreProcessCounterCallback(preCallback);
-            setAfterProcessCounterCallback(afterCallback);
-            runProcessCounter(elCard.find(".alert-timer"), ends_in);
-        };
-
-        var runProcessCounter = function (el, ends_in) {
-            preProcessCounterCallback();
-            window.clearTimeout(cleanCounterTimer);
-
-            if (ends_in >= 0) {
-                cleanCounterTimer = window.setTimeout(function () {
-                    console.log(ends_in);
-                    el.text(ends_in);
-                    runProcessCounter(el, ends_in - 1);
-                }, 1000);
-            }
-            else {
-                afterProcessCounterCallback();
-            }
-        };
-
-        var createCounterAlert = function (elCard, ends_in) {
-            var alert_time = "<div class=\"row\">";
-            alert_time += "<div class=\"col-md-4 col-md-offset-4\">";
-            alert_time += "<div class=\"alert alert-warning alert-time\" style=\"border-radius: 25px\" role=\"alert\">";
-            alert_time += "<div style=\"text-align: center\">";
-            alert_time += "<span class=\"alert-timer font-weight-bold\">" + ends_in + "</span>";
-            alert_time += "</div>";
-            alert_time += "</div>";
-            alert_time += "</div>";
-            alert_time += "</div>";
-
-            var alert_el = $(alert_time);
-            elCard.append(alert_el)
-        };
-        this.stopProcessCounter = function () {
-            window.clearTimeout(cleanCounterTimer);
-        }
-    }
-})(jQuery, window.cgsy.attendance);
-
-// --------------------------------------------------------------------------//
-// BARCODE SEARCH
-// --------------------------------------------------------------------------//
-(function ($, attendance, ProcessCounter) {
-    attendance.BarcodeSearch = function (search, service_pk, created_by) {
-        var searchTimer = null;
-        var selected_card = null;
-        var cleanTimer = null;
-        var processCounter = new ProcessCounter();
-
-        var reset = function () {
-            selected_card = null;
-        };
-
-        var resetWithClean = function (list_el) {
-            list_el = $(list_el);
-            list_el.html('');
-            selected_card = null;
-        };
-
-        var createTimeCircles = function (el) {
-            var timeCirclesEl = "<div id=\"DateCountdown\" data-timer=\"900\"></div>";
+            var timeCirclesEl = "<div id=\"DateCountdown\" data-timer=\"10\" style=\"height: 70px\" ></div>";
             timeCirclesEl = $(timeCirclesEl);
             el.append(timeCirclesEl);
             $("#DateCountdown").TimeCircles({
                 "animation": "smooth",
-                "bg_width": 0.2,
-                "fg_width": 0.015,
-                "circle_bg_color": "#90989F",
+                "bg_width": 0.25,
+                "fg_width": 0.075,
+                "start_angle": 0,
+                "circle_bg_color": "#FFFFFF",
                 "time": {
                     "Days": {
                         "text": "Days",
@@ -926,36 +852,58 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                         "show": false
                     },
                     "Seconds": {
-                        "text": "Seconds",
-                        "color": "#40484F",
+                        "text": "",
+                        "color": "#FFFFFF",
                         "show": true
                     }
                 }
             });
 
         };
+    };
+})(jQuery, window.cgsy.attendance);
 
-        var createAttendanceSpaceEvent = function (unit, value, total) {
-            $(document).on('keydown', function (event) {
-                list_el.focus();
-                if (event.keyCode === 32 && selected_card != null) {
-                    checkinByToggle(selected_card, service_pk, created_by, input_el);
-                    reset();
-                }
-            })
+// --------------------------------------------------------------------------//
+// BARCODE SEARCH
+// --------------------------------------------------------------------------//
+(function ($, attendance, ProcessCounter) {
+    attendance.BarcodeSearch = function (search, service_pk, created_by) {
+        var searchTimer = null;
+        var selected_card = null;
+        var cleanTimer = null;
+        var reset = function () {
+            selected_card = null;
+        };
+        var last_fetch_result_el = null;
+
+        var resetWithClean = function (list_el) {
+            list_el = $(list_el);
+            list_el.html('');
+            selected_card = null;
         };
 
-        var DestroyTimeCircles = function (unit, value, total) {
-            if(total<=0){
-                $("#DateCountdown").TimeCircles().destroy();
-            }
-        };
 
         var fetch = function (search_criteria, list_el, input_el) {
             list_el = $(list_el);
-
+            input_el = $(input_el);
+            var self = this;
             window.clearTimeout(searchTimer);
-            processCounter.stopProcessCounter();
+
+            var createAttendanceSpaceEvent = function (unit, value, total) {
+                $(document).on('keydown', function (event) {
+                    list_el.focus();
+                    if (event.keyCode === 32 && selected_card != null) {
+                        checkinByToggle(selected_card, service_pk, created_by, input_el);
+                        reset();
+                    }
+                })
+            };
+
+            var DestroyTimeCircles = function (unit, value, total) {
+                if (total <= 0) {
+                    $("#DateCountdown").TimeCircles().destroy();
+                }
+            };
 
             searchTimer = window.setTimeout(function () {
 
@@ -976,12 +924,10 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     }
 
                     selected_card = card;
-
                     var outputCard = selected_card.getElement(service_pk, created_by);
                     list_el.html(outputCard);
-
                     if (card.active() === true) {
-                        createTimeCircles();
+                        createTimeCircles($(outputCard).find('.time-circles'));
                         $("#DateCountdown").TimeCircles({count_past_zero: false})
                             .addListener(createAttendanceSpaceEvent);
 
@@ -990,6 +936,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     }
                 });
             }, 350);
+
         };
 
         var checkinByToggle = function (card, service_pk, created_by, input_el) {
@@ -1034,7 +981,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             });
         }, 200);
     };
-})(jQuery, window.cgsy.attendance, window.cgsy.attendance.ProcessCounter);
+})(jQuery, window.cgsy.attendance);
 
 // --------------------------------------------------------------------------//
 // QRCODE SEARCH
