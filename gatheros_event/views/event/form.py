@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
 
@@ -12,10 +12,10 @@ from gatheros_event import forms
 from gatheros_event.helpers.account import update_account
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Organization, Event
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
 
 
-class BaseEventView(AccountMixin, View):
+class BaseEventView(EventDraftStateMixin, AccountMixin, View):
     template_name = 'event/form.html'
     success_message = ''
     success_url = None
@@ -71,6 +71,8 @@ class BaseEventView(AccountMixin, View):
         context['form_title'] = self.get_form_title()
         context['is_manager'] = self.has_internal_organization
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
+        context.update(
+            EventDraftStateMixin().get_event_state_context_data(self.event))
 
         return context
 

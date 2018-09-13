@@ -4,6 +4,7 @@ from .mixins import (
 )
 from .payable import EventPayable, OrganizationHasBanking
 from .subscribable import EventSubscribable
+from datetime import datetime
 
 
 class EventPublishable(EventCompositeSpecificationMixin):
@@ -25,6 +26,9 @@ class EventPublishable(EventCompositeSpecificationMixin):
         org = event.organization
         payable_spec = EventPayable().is_satisfied_by(event)
         banking_spec = OrganizationHasBanking().is_satisfied_by(org)
+
+        if event.date_end < datetime.now():
+            return False
 
         if not visibility_spec:
             return False
@@ -52,6 +56,9 @@ class EventPublishable(EventCompositeSpecificationMixin):
         org = event.organization
         payable_spec = EventPayable().is_satisfied_by(event)
         banking_spec = OrganizationHasBanking().is_satisfied_by(org)
+
+        if event.date_end < datetime.now():
+            return 'Seu evento já foi encerrado e não pode mais ser publicado!'
 
         if not visibility_spec:
             return 'Seu evento não está visivel.' \

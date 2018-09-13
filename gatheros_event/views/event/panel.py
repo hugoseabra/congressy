@@ -144,6 +144,9 @@ class EventPanelView(EventDraftStateMixin,
         except AttributeError:
             context['ready_certificate'] = False
 
+        context.update(
+            EventDraftStateMixin().get_event_state_context_data(self.object))
+
         return context
 
     def all_lots_status(self):
