@@ -71,8 +71,10 @@ class BaseEventView(EventDraftStateMixin, AccountMixin, View):
         context['form_title'] = self.get_form_title()
         context['is_manager'] = self.has_internal_organization
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
-        context.update(
-            EventDraftStateMixin().get_event_state_context_data(self.event))
+        if self.event:
+            event_draft_data = EventDraftStateMixin() \
+                .get_event_state_context_data(self.get_event())
+            context.update(event_draft_data)
 
         return context
 
