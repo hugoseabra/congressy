@@ -66,16 +66,6 @@ class Event(models.Model, GatherosModelMixin):
         (EVENT_STATUS_FINISHED, 'finalizado'),
     )
 
-    EVENT_TYPE_FREE = 'free'
-    EVENT_TYPE_PAID = 'paid'
-    EVENT_TYPE_SCIENTIFIC = 'scientific'
-
-    EVENT_TYPES = (
-        (EVENT_TYPE_FREE, 'gratuito'),
-        (EVENT_TYPE_PAID, 'pago'),
-        (EVENT_TYPE_SCIENTIFIC, 'cientifico'),
-    )
-
     RSVP_DISABLED = 'rsvp-disabled'
     RSVP_RESTRICTED = 'rsvp-restricted'
     RSVP_OPEN = 'rsvp-open'
@@ -99,14 +89,6 @@ class Event(models.Model, GatherosModelMixin):
         Category,
         on_delete=models.PROTECT,
         verbose_name='categoria do evento'
-    )
-
-    event_type = models.CharField(
-        max_length=15,
-        choices=EVENT_TYPES,
-        default=EVENT_TYPE_FREE,
-        verbose_name='Tipo de evento',
-        help_text="Como será seu evento?"
     )
 
     has_optionals = models.BooleanField(

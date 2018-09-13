@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from gatheros_event.models import Event
-from gatheros_subscription.models import Lot
+from gatheros_subscription.models import Lot, Subscription
 from .mixins import EventCompositeSpecificationMixin, \
     LotCompositeSpecificationMixin
 
@@ -30,6 +30,15 @@ class EventSubscribable(EventCompositeSpecificationMixin):
                 subscribable_lot_flag = True
 
         if not subscribable_lot_flag:
+            return False
+
+        valid_subs = Subscription.objects.filter(
+            event=event,
+            test_subscription=False,
+            status=Subscription.CONFIRMED_STATUS,
+        ).count()
+
+        if valid_subs > event.expected_subscriptions:
             return False
 
         return True

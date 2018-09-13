@@ -23,8 +23,6 @@ def update_event_config_flags(event: Event):
 
         event.business_status = event.EVENT_BUSINESS_STATUS_PAID
 
-        if event.event_type is not event.EVENT_TYPE_SCIENTIFIC:
-            event.event_type = event.EVENT_TYPE_PAID
 
         for feature, value in PAID_EVENT_FEATURES.items():
             setattr(feature_config, feature, value)
@@ -33,9 +31,6 @@ def update_event_config_flags(event: Event):
             feature_config.last_updated_by == feature_config.SYSTEM_USER_NAME:
 
         event.business_status = event.EVENT_BUSINESS_STATUS_FREE
-
-        if event.event_type is not event.EVENT_TYPE_SCIENTIFIC:
-            event.event_type = event.EVENT_TYPE_FREE
 
         for feature, value in FREE_EVENT_FEATURES.items():
             setattr(feature_config, feature, value)

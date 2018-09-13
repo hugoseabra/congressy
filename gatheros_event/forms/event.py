@@ -57,18 +57,16 @@ class EventForm(forms.ModelForm):
             'name',
             'date_start',
             'date_end',
-            'event_type',
             'rsvp_type',
             'expected_subscriptions',
+            'is_scientific'
         ]
 
         widgets = {
             'organization': forms.HiddenInput,
-            'event_type': forms.HiddenInput,
             'subscription_type': forms.RadioSelect,
             'date_start': SplitDateTimeBootsrapWidget,
             'date_end': SplitDateTimeBootsrapWidget,
-
         }
 
     def __init__(self, user, lang='pt-br', *args, **kwargs):
@@ -122,12 +120,6 @@ class EventForm(forms.ModelForm):
                 )
 
         return name
-
-    def clean_event_type(self):
-        event_type = self.cleaned_data.get('event_type')
-        self.instance.is_scientific = event_type == Event.EVENT_TYPE_SCIENTIFIC
-
-        return event_type
 
     def clean_date_end(self):
         date_end = self.cleaned_data.get('date_end')

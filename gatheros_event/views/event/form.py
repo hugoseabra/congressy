@@ -122,19 +122,6 @@ class EventAddFormView(BaseEventView, generic.CreateView):
     form_title = 'Novo evento'
     object = None
 
-    def dispatch(self, request, *args, **kwargs):
-
-        event_type = request.GET.get('event_type')
-        if event_type and event_type not in (
-                Event.EVENT_TYPE_FREE,
-                Event.EVENT_TYPE_PAID,
-                Event.EVENT_TYPE_SCIENTIFIC,
-        ):
-            messages.warning(request, 'Escolha um tipo de evento válido.')
-            return redirect('event:event-add')
-
-        return super().dispatch(request, *args, **kwargs)
-
     def get_form(self, form_class=None):
         if not form_class:
             form_class = self.form_class
@@ -143,15 +130,6 @@ class EventAddFormView(BaseEventView, generic.CreateView):
         kwargs['lang'] = self.request.LANGUAGE_CODE
 
         return form_class(user=self.request.user, **kwargs)
-
-    def get_context_data(self, **kwargs):
-
-        context = super().get_context_data(**kwargs)
-
-        context['step'] = self.request.GET.get('step')
-        context['event_type'] = self.request.GET.get('event_type')
-
-        return context
 
     def post(self, request, *args, **kwargs):
         org_pk = request.POST.get('organization')
@@ -180,9 +158,6 @@ class EventAddFormView(BaseEventView, generic.CreateView):
     def get_initial(self):
         initial = super(EventAddFormView, self).get_initial()
         initial['organization'] = self.organization
-
-        event_type = self.request.GET.get('event_type', Event.EVENT_TYPE_FREE)
-        initial['event_type'] = event_type
 
         return initial
 

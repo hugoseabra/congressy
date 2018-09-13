@@ -19,11 +19,7 @@ def create_feature_configuration(instance, raw, created, **_):
                 event=instance,
                 feature_certificate=True,
                 feature_internal_subscription=True,
-
             )
-
-        if instance.event_type == instance.EVENT_TYPE_PAID:
-            instance.feature_configuration.feature_checkin = True
 
         instance.feature_configuration.save()
 

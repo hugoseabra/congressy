@@ -178,7 +178,7 @@
                                                     &nbsp;&nbsp;
                                                     <span class="badge badge-warning">Encerrado</span>
                                                 {% endif %}
-                                            
+
                                                 {% if event.published == True %}
                                                     &nbsp;&nbsp;
                                                     <span class="badge badge-success">Publicado</span>
@@ -202,11 +202,7 @@
                                         </td>
                                         <td>{{ event.category.name }}</td>
                                         <td>
-                                            {% if event.event_type == event.EVENT_TYPE_FREE %}
-                                                Gratuito
-                                            {% elif event.event_type == event.EVENT_TYPE_PAID %}
-                                                Pago
-                                            {% elif event.event_type == event.EVENT_TYPE_SCIENTIFIC %}
+                                            {% if event.is_scientific %}
                                                 Científico
                                             {% endif %}
                                         </td>
