@@ -23,6 +23,8 @@ class Command(BaseCommand):
                 feature_checkin=True,
                 feature_multi_lots=True,
                 feature_survey=True,
+                feature_products=True,
+                feature_services=True,
             )
 
             management = FeatureManagement.objects.create(
@@ -30,15 +32,9 @@ class Command(BaseCommand):
                 certificate=True,
                 checkin=True,
                 survey=True,
+                products=True,
+                services=True,
             )
-
-            if event.has_extra_activities:
-                management.services = True
-                config.feature_services = True
-
-            if event.has_optionals:
-                management.products = True
-                config.feature_products = True
 
             management.save()
             config.save()
