@@ -16,6 +16,12 @@ class Command(BaseCommand):
                 'Configuring: {}'.format(event.name)
             ))
 
+            if hasattr(event, 'feature_configuration'):
+                FeatureConfiguration.objects.get(event=event).delete()
+
+            if hasattr(event, 'feature_management'):
+                FeatureManagement.objects.get(event=event).delete()
+
             config = FeatureConfiguration.objects.create(
                 event=event,
                 feature_certificate=True,
