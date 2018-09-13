@@ -35,14 +35,16 @@
                         {% if search_type == 'barcode' %} Código de Barras
                         {% elif search_type == 'qrcode' %}QrCode
                         {% else %} Teclado{% endif %}
-                     <div class="pull-right" style="cursor: pointer">
-                        <i class="fa fa-expand"></i>
+                        <div class="pull-right" style="cursor: pointer">
+                            <i class="fa fa-expand"></i>
 
-                    </div></div>
+                        </div>
+                    </div>
 
                 </div>
                 <div class="panel-body">
-                    <div class="row" id="name-on-fullscren"  style="padding-bottom: 15px;display: none">
+                    <div class="row" id="name-on-fullscren"
+                         style="padding-bottom: 15px;display: none">
                         <div class="col-xs-12">
                             <h3 class="text-bold">{{ object.name }}</h3>
                         </div>
@@ -125,7 +127,7 @@
                                        id="webcam"></video>
                             </div>
                         {% endif %}
-                    <div id="cards-list"
+                        <div id="cards-list"
                              class="{% if search_type == 'qrcode' %} col-md-6
                                     {% elif search_type == 'barcode' %} col-md-6
                                     {% else %} col-md-12 {% endif %}">
@@ -133,40 +135,33 @@
                         </div>
                         {% if search_type == 'barcode' %}
                             <div class="col-md-6">
-                                <div class="alert alert-info alert-dismissable">
-                                    <button type="button" class="close"
-                                            data-dismiss="alert"
-                                            aria-hidden="true">×
-                                    </button>
-                                    <span>Através do leitor de código de barras você
-                                        pode
-                                        fazer o check-in/out de 3 maneiras: </span>
-                                    <ul>
-                                        <li>Lendo o Código de barras do voucher
-                                            e
-                                            relendo ele.
-                                        </li>
-                                        <li>Lendo o Código de barras do voucher
-                                            e
-                                            clicando no botão de realizar
-                                            check-in/out
-                                            no card do participante
-                                        </li>
-                                        <li>Lendo o Código de barras do voucher
-                                            e
-                                            apertando Enter
-                                        </li>
-                                    </ul>
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+
+                                    </div>
+                                    <div class="panel-body">
+                                    <span>Faça o check-in/out de 3 maneiras. Após fazer a leitura do código de barras:  </span>
+                                        <ul>
+                                            <li>Releia o código de barras
+                                            </li>
+                                            <li>Clique no botão de realizar atendimento
+                                            </li>
+                                            <li>Aperte espaço
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
+                            </div>
+                            </div>
                             </div>
                         {% endif %}
 
 
-                    </div>
-
                 </div>
+
             </div>
         </div>
+    </div>
     </div>
 
 
@@ -180,7 +175,7 @@
     <script src="{% static 'assets/js/attendance/cgsy-scanner.js' %}"></script>
     <script>
         $(document).ready(function () {
-            $('.panel .fa-expand').click(function() {
+            $('.panel .fa-expand').click(function () {
                 $('#name-on-fullscren').toggle();
             });
             var success_checkin_msg, fail_checkin_msg;
