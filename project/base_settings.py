@@ -157,6 +157,7 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',
                 'project.context_processors.environment_version',
                 'frontend.context_processors.render_app_only',
+                'frontend.context_processors.is_debug_mode',
             ],
             'builtins': [
                 'permission.templatetags.permissionif',
@@ -280,7 +281,7 @@ ALLOW_PARALLEL_RUNS = True
 FAILED_RUNS_CRONJOB_EMAIL_PREFIX = "[Server check]: "
 
 CRON_CLASSES = [
-    "payment.cron.MyCronJob",
+    # "payment.cron.MyCronJob",
 ]
 # =============================== BITLY ===================================== #
 BITLY_LOGIN = 'congressy'

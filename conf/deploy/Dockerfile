@@ -8,10 +8,14 @@ MAINTAINER Hugo Seabra <hugoseabra19@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
+# Celery does not work with root unless you force it
+ENV C_FORCE_ROOT "true"
+
 LABEL cgsy.image.name="cgsy-platform-production"
 
 # -----------------------------------------------------------------------------
 # Basics
+
 RUN apt-get update -q && apt-get install -qy --no-install-recommends \
     apt-utils \
     nano \
@@ -58,7 +62,8 @@ RUN pip install --no-cache-dir --upgrade \
         flower \
         # send email
         sparkpost \
-        uwsgi \
+        # server
+        uwsgi django-uwsgi django-uwsgi-cache \
         # s3 synchronization
         s3cmd \
         # template engine
@@ -68,14 +73,6 @@ RUN pip install --no-cache-dir --upgrade \
 
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.
-
-# -----------------------------------------------------------------------------
-# Nginx
-COPY ./conf/deploy/nginx.conf /etc/nginx/nginx.conf
-
-# -----------------------------------------------------------------------------
-# Supervisor
-COPY ./conf/deploy/supervisor.conf /etc/supervisor/conf.d/
 
 # -----------------------------------------------------------------------------
 WORKDIR /var/www/cgsy
@@ -88,6 +85,14 @@ WORKDIR /var/www/cgsy
 # to prevent re-installing (all your) dependencies when you made a change a line or two in your app.
 COPY ./requirements.pip ./.
 RUN pip install --no-cache-dir --upgrade -r requirements.pip
+
+# -----------------------------------------------------------------------------
+# Nginx
+COPY ./conf/deploy/nginx.conf /etc/nginx/nginx.conf
+
+# -----------------------------------------------------------------------------
+# Supervisor
+COPY ./conf/deploy/supervisor.conf /etc/supervisor/conf.d/
 
 # -----------------------------------------------------------------------------
 # Setup configuration files
