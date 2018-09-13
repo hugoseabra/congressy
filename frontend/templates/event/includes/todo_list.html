@@ -50,7 +50,7 @@
         </td>
     </tr>
 
-    {% if event.event_type == event.EVENT_TYPE_PAID or event.event_type == event.EVENT_TYPE_SCIENTIFIC or event_is_payable %}
+    {% if event_is_payable %}
         <tr class="todo_list_element" role="presentation">
 
             <td>
@@ -117,7 +117,6 @@
         </td>
     </tr>
 
-
     <tr class="todo_list_element {% if not event_is_subscribable %}
                     warning {% endif %}"
         role="presentation"
@@ -128,7 +127,7 @@
         data-original-title="Para que seu evento receba inscrições você deve ter pelo menos um lote disponivel"
             {% endif %}>
         <td>
-            <a>Configurar multiplas categoria(s)</a>
+            <a>Configurar categorias para participantes </a>
         </td>
         <td>
             <button type="button"
