@@ -45,8 +45,9 @@ class BaseLotView(AccountMixin, View, EventDraftStateMixin):
         # noinspection PyUnresolvedReferences
         context = super(BaseLotView, self).get_context_data(**kwargs)
         context['event'] = self.event
-        kwargs.update({'event': self.event})
-        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
+
+        context.update(self.get_event_state_context_data(self.event))
+
         return context
 
     def _set_event(self):

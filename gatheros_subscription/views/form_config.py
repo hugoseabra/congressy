@@ -81,8 +81,7 @@ class FormConfigView(SurveyFeatureFlagMixin,
 
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
-        kwargs.update({'event': self.event})
-        cxt.update(EventDraftStateMixin.get_context_data(self, **kwargs))
+
         cxt['has_inside_bar'] = True
         cxt['active'] = 'form-personalizado'
         cxt['object'] = self.object
@@ -90,6 +89,8 @@ class FormConfigView(SurveyFeatureFlagMixin,
         cxt['event_is_payable'] = is_paid_event(self.event)
         cxt['event_survey_list'] = self._get_event_surveys()
         cxt['survey_list_form'] = EventSurveyForm(event=self.event)
+
+        cxt.update(self.get_event_state_context_data(self.event))
 
         if self.survey is not None:
             cxt['survey'] = self.survey.survey

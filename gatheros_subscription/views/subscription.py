@@ -71,12 +71,13 @@ class SubscriptionViewMixin(TemplateNameableMixin,
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         event = self.get_event()
-        kwargs.update({'event': event})
+
         context = super().get_context_data(**kwargs)
-        context.update(EventDraftStateMixin.get_context_data(self, **kwargs))
 
         context['event'] = event
         context['is_paid_event'] = is_paid_event(event)
+
+        context.update(self.get_event_state_context_data(event))
 
         try:
             config = FormConfig.objects.get(event=event)
