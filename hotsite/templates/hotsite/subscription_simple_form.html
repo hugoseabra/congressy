@@ -2,7 +2,7 @@
 {% is_subscription_free subscription as is_free %}
 
 
-{% if event_is_published %}
+{% if event.published %}
 
     <!-- FORM -->
     {% if is_subscribed_and_never_logged_in %}
