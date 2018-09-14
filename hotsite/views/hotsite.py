@@ -304,3 +304,30 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
             pass
 
         return False
+
+    def is_subscribed(self, email=None):
+        """
+            Se já estiver inscrito retornar True
+        """
+        if email:
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return False
+        else:
+            user = self.request.user
+
+        if user.is_authenticated:
+            try:
+                person = user.person
+                Subscription.objects.get(
+                    person=person,
+                    completed=True,
+                    test_subscription=False,
+                    event=self.event
+                )
+                return True
+            except (Subscription.DoesNotExist, AttributeError):
+                pass
+
+        return False
