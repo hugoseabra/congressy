@@ -9,7 +9,7 @@ MAINTAINER Hugo Seabra <hugoseabra19@gmail.com>
 ENV DEBIAN_FRONTEND noninteractive
 
 # Celery does not work with root unless you force it
-ENV C_FORCE_ROOT "true"
+ENV C_FORCE_ROOT true
 
 LABEL cgsy.image.name="cgsy-platform-staging"
 
@@ -112,10 +112,5 @@ RUN chmod 775 /services/volume/container-entry.sh \
               /services/migration/container-entry.sh \
               /services/cron/container-entry.sh \
               /services/web/manage/container-entry.sh
-
-# -----------------------------------------------------------------------------
-# USER
-RUN groupadd -g 999 appuser && useradd -r -u 999 -g appuser appuser
-USER appuser
 
 EXPOSE 80

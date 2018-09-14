@@ -9,7 +9,7 @@ MAINTAINER Hugo Seabra <hugoseabra19@gmail.com>
 ENV DEBIAN_FRONTEND noninteractive
 
 # Celery does not work with root unless you force it
-ENV C_FORCE_ROOT "true"
+ENV C_FORCE_ROOT true
 
 LABEL cgsy.image.name="cgsy-platform-production"
 
