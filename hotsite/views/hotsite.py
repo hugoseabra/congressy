@@ -15,7 +15,7 @@ from gatheros_subscription.models import Subscription
 from hotsite.views import SubscriptionFormMixin
 
 
-class HotsiteView(SubscriptionFormMixin, generic.View):
+class HotsiteView(SubscriptionFormMixin, generic.FormView):
     template_name = 'hotsite/main.html'
     has_private_subscription = False
     private_still_available = False
@@ -280,3 +280,27 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
                 person=person,
                 group=Member.ADMIN
             )
+
+    def subscriber_has_account(self, email):
+        if self.request.user.is_authenticated:
+            return True
+
+        try:
+            User.objects.get(email=email)
+            return True
+        except User.DoesNotExist:
+            pass
+
+        return False
+
+    def subscriber_has_logged(self, email):
+        if self.request.user.is_authenticated:
+            return True
+
+        try:
+            user = User.objects.get(email=email)
+            return user.last_login is not None
+        except User.DoesNotExist:
+            pass
+
+        return False

@@ -4,23 +4,22 @@ Lotes são importantes para agrupar as inscrições de um evento, para separar
 os critérios de inscrições: se gratuitas, se limitadas, se privados, etc.
 """
 
-import locale
 import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import force_text
 from django.utils.formats import localize
 
 from core.model import track_data
 from gatheros_event.models import Event
-from gatheros_subscription.models import LotCategory
 from gatheros_event.models.mixins import GatherosModelMixin
+from gatheros_subscription.models import LotCategory
 from .event_survey import EventSurvey
 from .rules import lot as rule
-from django.core.exceptions import ValidationError
 
 
 class LotManager(models.Manager):
@@ -300,7 +299,8 @@ class Lot(models.Model, GatherosModelMixin):
             return self.LOT_LIMIT_UNLIMIED
 
         num = self.subscriptions.filter(
-            completed=True, test_subscription=False
+            completed=True,
+            test_subscription=False
         ).exclude(
             status='canceled',
         ).count()
@@ -312,37 +312,32 @@ class Lot(models.Model, GatherosModelMixin):
         Status do lote de acordo com suas datas.
         :return: string
         """
-        if self.limit and self.limit > 0:
-            queryset = self.subscriptions.filter(
-                completed=True, test_subscription=False
-            ).exclude(status__in=['canceled'], )
-
-            if queryset.count() >= self.limit:
-                return Lot.LOT_STATUS_FINISHED
-
-            if self.event.expected_subscriptions and \
-                    self.event.expected_subscriptions > 0:
-
-                total_subscriptions_event = 0
-                for lot in self.event.lots.all():
-                    total_subscriptions_event += lot.subscriptions.filter(
-                        completed=True, test_subscription=False
-                    ).exclude(
-                        status='canceled'
-                    ).count()
-
-                if total_subscriptions_event >= self.event.expected_subscriptions:
-                    return Lot.LOT_STATUS_FINISHED
-
-
         now = datetime.now()
         if now >= self.date_end:
             return Lot.LOT_STATUS_FINISHED
 
-        if self.date_start <= now <= self.date_end:
-            return Lot.LOT_STATUS_RUNNING
+        elif now < self.date_start:
+            return Lot.LOT_STATUS_NOT_STARTED
 
-        return Lot.LOT_STATUS_NOT_STARTED
+        if self.limit and self.limit > 0:
+            limit_remaining = self.places_remaining
+            if limit_remaining != self.LOT_LIMIT_UNLIMIED and limit_remaining <= 0:
+                return Lot.LOT_STATUS_FINISHED
+
+            num_expected = self.event.expected_subscriptions
+
+            if num_expected and num_expected > 0:
+                total_subscriptions_event = self.event.lots.filter(
+                    subscriptions__completed=True,
+                    subscriptions__test_subscription=False,
+                ).exclude(
+                    subscriptions__status='canceled'
+                ).count()
+
+                if total_subscriptions_event >= num_expected:
+                    return Lot.LOT_STATUS_FINISHED
+
+        return Lot.LOT_STATUS_RUNNING
 
     def get_status_display(self):
         """
