@@ -38,7 +38,8 @@ class EventSubscribable(EventCompositeSpecificationMixin):
             status=Subscription.CONFIRMED_STATUS,
         ).count()
 
-        if valid_subs > event.expected_subscriptions:
+        if event.expected_subscriptions and \
+                valid_subs > event.expected_subscriptions:
             return False
 
         return True
