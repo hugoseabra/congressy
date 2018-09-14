@@ -166,12 +166,11 @@
 
                                 <tbody>
                                 {% for event in object_list %}
-                                    <tr>
+                                    
+                                    <tr {% if event.published is False %} class="warning" {% endif %}>
+
                                         <td>
-                                            {#                                        <a href="{% url 'event:event-panel' event.pk %}">#}
-                                            {#                                        <a href="{% url 'subscription:subscription-list' event.pk %}">#}
-                                            <a href="
-    {% url 'event:event-panel' event.pk %}">
+                                            <a href="{% url 'event:event-panel' event.pk %}">
                                                 {{ event.name }}
 
                                                 {% if event.date_end < now %}
@@ -188,31 +187,27 @@
                                                 {% endif %}
 
                                                 <br/>
+
                                                 <small class="text-muted">{{ event.get_period }}</small>
-                                                {#                                            <br/>#}
-                                                {#                                            <small class="text-muted">#}
-                                                {#                                                {% if event.place %}#}
-                                                {#                                                    {{ event.place.name }}#}
-                                                {#                                                {% else %}#}
-                                                {#                                                    Online#}
-                                                {#                                                {% endif %}#}
-                                                {#                                            </small>#}
 
                                             </a>
                                         </td>
+
                                         <td>{{ event.category.name }}</td>
+
                                         <td>
                                             {% if event.is_scientific %}
                                                 Científico
                                             {% endif %}
                                         </td>
-
+                                    
                                         <td>
                                             {% event_count_completed_subscriptions event %}
                                             {% if event.limit %} /
                                                 {{ event.limit }}
                                             {% endif %}
                                         </td>
+
                                         <td>
                                             <div class="btn-group">
                                                 {% if user has 'gatheros_event.change_event' of event or event.is_deletable and user has 'gatheros_event.delete_event' of event %}
@@ -250,6 +245,8 @@
                                             </div>
                                         </td>
                                     </tr>
+
+
                                 {% endfor %}
                                 </tbody>
 
