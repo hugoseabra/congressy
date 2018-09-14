@@ -177,11 +177,14 @@ class AttendanceDashboardView(generic.DetailView):
             return '{0:.2f}%'.format((num * 100) / num_total)
 
         queryset = Subscription.objects.filter(
-            checkins__attendance_service__pk=self.get_attendance_list().pk)
+            status=Subscription.CONFIRMED_STATUS,
+            completed=True, test_subscription=False,
+            event=self.event
+        )
 
         queryset = queryset.filter(
-            checkins__isnull=False,
-            checkins__checkout__isnull=True
+            checkins__attendance_service__pk=self.object.pk,
+            checkins__checkout__isnull=True,
         )
 
         total = queryset.count()

@@ -829,14 +829,14 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         var self = this;
         var createTimeCirclesEl = function (el_output, ends_in) {
 
-            var timeCirclesEl = "<div id=\"DateCountdown\" data-timer=\"" + ends_in + "\" style=\"height: 70px color: #ffffff\" ></div>";
+            var timeCirclesEl = "<div id=\"DateCountdown\" data-timer=\"" + ends_in + "\" style=\"height: 70px;color: #40484F\" ></div>";
             timeCirclesEl = $(timeCirclesEl);
             el_output.append(timeCirclesEl);
 
             $("#DateCountdown").TimeCircles({
                 "animation": "smooth",
                 "bg_width": 0.25,
-                "fg_width": 0.075,
+                "fg_width": 0.055,
                 "start_angle": 0,
                 "circle_bg_color": "#FFFFFF",
                 "time": {
@@ -894,7 +894,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                         if (destroyInEnd === true) {
                             self.finalizeCounter()
                         }
-                        else{
+                        else {
                             runEndCounterCallback();
                         }
                     }
@@ -902,7 +902,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         };
 
         var runEndCounterCallback = function () {
-             $.each(endCounterCallback, function (i, callback) {
+            $.each(endCounterCallback, function (i, callback) {
                 callback();
             });
         };
@@ -951,7 +951,11 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     list_el.focus();
                     if (event.keyCode === 32 && selected_card != null) {
                         checkinByToggle(selected_card, service_pk, created_by, input_el);
-                        processCounter.destroyCounter();
+                        processCounter.destroyCounter().then(
+                             function () {
+                                processCounter.destroyCounter();
+                            }
+                        );
                     }
                 })
             };
@@ -969,8 +973,11 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
 
                     if (reread === true) {
-                        checkinByToggle(selected_card, service_pk, created_by, list_el);
-                        processCounter.destroyCounter();
+                        checkinByToggle(selected_card, service_pk, created_by, list_el).then(
+                            function () {
+                                processCounter.destroyCounter();
+                            }
+                        );
                         return;
                     }
 
@@ -984,7 +991,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                             list_el.html('');
                             selected_card = null;
                         });
-                        processCounter.createCounter($(outputCard).find('.time-circles'), 10, true);
+                        processCounter.createCounter($(outputCard).find('.time-circles'), 60, true);
                     }
                 });
             }, 350);
@@ -992,9 +999,11 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         };
 
         var checkinByToggle = function (card, service_pk, created_by, input_el) {
-            card.toggle(service_pk, created_by).then(function () {
-                card = null;
-                $(input_el).val('');
+            return new Promise(function (resolve) {
+                card.toggle(service_pk, created_by).then(function () {
+                    card = null;
+                    $(input_el).val('');
+                });
             });
 
         };
