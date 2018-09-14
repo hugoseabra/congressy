@@ -57,6 +57,7 @@ def get_report_cities(queryset):
 
     return report_cities
 
+
 def get_report_age(queryset):
     ages = {
         'under_15' : 0,

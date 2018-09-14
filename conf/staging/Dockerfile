@@ -8,6 +8,9 @@ MAINTAINER Hugo Seabra <hugoseabra19@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
+# Celery does not work with root unless you force it
+ENV C_FORCE_ROOT true
+
 LABEL cgsy.image.name="cgsy-platform-staging"
 
 # -----------------------------------------------------------------------------
@@ -55,7 +58,8 @@ RUN pip install --no-cache-dir --upgrade \
         lxml \
         # send email
         sparkpost \
-        uwsgi \
+        # server
+        uwsgi django-uwsgi django-uwsgi-cache \
         # s3 synchronization
         s3cmd \
         # template engine
@@ -63,14 +67,6 @@ RUN pip install --no-cache-dir --upgrade \
 
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.
-
-# -----------------------------------------------------------------------------
-# Nginx
-COPY ./conf/deploy/nginx.conf /etc/nginx/nginx.conf
-
-# -----------------------------------------------------------------------------
-# Supervisor - STAGING
-COPY ./conf/staging/supervisor.conf /etc/supervisor/conf.d/
 
 # -----------------------------------------------------------------------------
 WORKDIR /var/www/cgsy
@@ -84,6 +80,14 @@ WORKDIR /var/www/cgsy
 COPY ./requirements.pip ./.
 COPY ./requirements_staging.pip ./.
 RUN pip install --no-cache-dir --upgrade -r requirements_staging.pip
+
+# -----------------------------------------------------------------------------
+# Nginx
+COPY ./conf/deploy/nginx.conf /etc/nginx/nginx.conf
+
+# -----------------------------------------------------------------------------
+# Supervisor - STAGING
+COPY ./conf/staging/supervisor.conf /etc/supervisor/conf.d/
 
 # -----------------------------------------------------------------------------
 # Setup configuration files

@@ -19,7 +19,7 @@ if os.path.exists(VERSION_FILE_PATH):
     version = f.read()
     f.close()
     version = version.rstrip('\r\n') if version else 'dev'
-    os.environ.setdefault("ENVIRONMENT_VERSION", version.rstrip('\r\n'))
+    os.environ.setdefault("ENVIRONMENT_VERSION", version)
 
 try:
     from raven.contrib.django.raven_compat.middleware.wsgi import Sentry

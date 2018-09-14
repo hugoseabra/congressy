@@ -1,5 +1,6 @@
 import os
 import sys
+import tempfile
 
 sys.path.append("..")
 
@@ -21,6 +22,17 @@ env_dict = {
     'DOMAIN': domain,
     'FORCE_HTTPS': force_https is True,
 }
+
+# https://github.com/dockerfile/nginx/issues/4
+# Create temp files for use of nginx
+body_client = os.path.join(tempfile.gettempdir(), 'nginx', 'client_body')
+proxy = os.path.join(tempfile.gettempdir(), 'nginx', 'proxy')
+fastcgi = os.path.join(tempfile.gettempdir(), 'nginx', 'fastcgi')
+uwsgi = os.path.join(tempfile.gettempdir(), 'nginx', 'uwsgi')
+
+for path in [body_client, proxy, fastcgi, uwsgi]:
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 setup(
     env_dict,

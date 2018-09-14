@@ -26,7 +26,15 @@ from service_tags.urls import service_tags_urlpatterns
 
 handler500 = 'project.views.handler500'
 
-admin_urlpatterns = [url(r'^cgsy-admin18/', admin.site.urls)]
+admin_urlpatterns = []
+
+if not settings.DEBUG:
+    admin_urlpatterns += url(
+        r'^cgsy-admin18/uwsgi/',
+        include('django_uwsgi.urls')
+    ),
+
+admin_urlpatterns += [url(r'^cgsy-admin18/', admin.site.urls)]
 
 private_urlpatterns = [
     url(r'^manage/', include('addon.urls', 'addon')),

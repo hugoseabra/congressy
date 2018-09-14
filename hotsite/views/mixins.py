@@ -3,39 +3,43 @@
 """
 
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404, redirect
-from django.views import generic
+from django.shortcuts import get_object_or_404
 
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.forms import PersonForm
+from gatheros_event.models import Event, Person
+from gatheros_subscription.models import Lot, Subscription
+from hotsite.state import CurrentEventState, CurrentSubscriptionState
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event, Info
 from gatheros_subscription.models import FormConfig, Subscription
 
 
-class EventMixin(TemplateNameableMixin, generic.View):
-    event = None
+class EventMixin(TemplateNameableMixin):
+    current_event = None
+
+    def pre_dispatch(self):
+        slug = self.kwargs.get('slug')
+        event = get_object_or_404(Event, slug=slug)
+        self.current_event = CurrentEventState(event=event)
 
     def dispatch(self, request, *args, **kwargs):
         slug = self.kwargs.get('slug')
 
         if not slug:
-            return redirect('https://congressy.com')
+            raise Exception('Nenhum slug encontrado.')
 
-        self.event = get_object_or_404(Event, slug=slug)
+        self.pre_dispatch()
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        try:
-            config = self.event.formconfig
-        except AttributeError:
-            config = FormConfig()
+        event_state = self.current_event
+        config = event_state.form_config
 
-        if is_paid_event(self.event):
+        if config and is_paid_event(self.current_event.event):
             config.email = True
             config.phone = True
             config.city = True
@@ -46,94 +50,94 @@ class EventMixin(TemplateNameableMixin, generic.View):
 
         context['config'] = config
 
-        context['event'] = self.event
-        context['info'] = get_object_or_404(Info, event=self.event)
-        context['period'] = self.get_period()
-        context['lots'] = self.get_available_lots()
-        context['paid_lots'] = [
-            lot
-            for lot in self.get_lots()
-            if lot.status == lot.LOT_STATUS_RUNNING
-        ]
-        context['private_lots'] = [
-            lot
-            for lot in self.get_private_lots()
-            if lot.status == lot.LOT_STATUS_RUNNING
-        ]
-        context['has_available_lots'] = self.has_available_lots()
-        context['available_lots'] = self.get_available_lots()
-        context['has_coupon'] = self.has_coupon()
-        context['event_is_published'] = self.event.published
+        context['event'] = event_state.event
+        context['info'] = event_state.info
+        context['period'] = event_state.period
+        context['lots'] = event_state.get_public_lots()
+        context['available_lots'] = event_state.get_public_lots()
+        context['has_available_lots'] = event_state.has_available_lots()
+        context['has_paid_lots'] = event_state.has_paid_lots()
+
+        context['paid_lots'] = event_state.get_all_lots()
+        context['private_lots'] = event_state.get_private_lots()
+        context['is_private_event'] = event_state.is_private_event()
+        context['subscription_enabled'] = event_state.subscription_enabled()
+        context['subscription_finished'] = event_state.subscription_finished()
+
+        context['has_coupon'] = event_state.has_coupon()
+        context['has_configured_bank_account'] = \
+            event_state.bank_account_configured
+
+        context['has_active_bank_account'] = \
+            event_state.active_bank_account_configured
+
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
 
         return context
 
-    def has_coupon(self):
-        """ Retorna se possui cupom, seja qual for. """
-        for lot in self.event.lots.filter(active=True):
-            # código de exibição
-            if lot.private and lot.exhibition_code:
-                return True
 
-        return False
-
-    def get_period(self):
-        """ Resgata o prazo de duração do evento. """
-        return self.event.get_period()
-
-    def get_lots(self):
-        return [
-            lot
-            for lot in self.event.lots.filter(private=False, active=True)
-            if lot.status == lot.LOT_STATUS_RUNNING
-        ]
-
-    def get_private_lots(self):
-        return [
-            lot
-            for lot in self.event.lots.filter(private=True, active=True)
-            if lot.status == lot.LOT_STATUS_RUNNING
-        ]
-
-    def has_available_lots(self):
-        available_lots = []
-
-        for lot in self.event.lots.filter(active=True):
-            if lot.status == lot.LOT_STATUS_RUNNING:
-                available_lots.append(lot)
-
-        return True if len(available_lots) > 0 else False
-
-    def has_available_public_lots(self):
-        available_lots = []
-
-        all_events = self.event.lots.filter(private=False)
-
-        for lot in all_events:
-            if lot.status == lot.LOT_STATUS_RUNNING:
-                available_lots.append(lot)
-
-        return True if len(available_lots) > 0 else False
-
-    def get_available_lots(self):
-        all_lots = self.event.lots.filter(private=False, active=True).order_by(
-            'date_end', 'name', 'price'
-        )
-        available_lots = []
-
-        for lot in all_lots:
-            if lot.status == lot.LOT_STATUS_RUNNING:
-                available_lots.append(lot)
-
-        return available_lots
-
-
-class SubscriptionFormMixin(EventMixin, generic.FormView):
+class SubscriptionFormMixin(EventMixin):
     form_class = PersonForm
     initial = {}
-    object = None
-    person = None
-    subscription = None
+    current_subscription = None
+
+    def pre_dispatch(self):
+        super().pre_dispatch()
+        self.current_subscription = CurrentSubscriptionState(
+            subscription=self._get_subscription()
+        )
+
+    def _get_subscription(self):
+
+        person = None
+        user = self.request.user
+        if hasattr(user, 'person'):
+            person = user.person
+
+        if not person:
+            person = Person()
+
+        try:
+            subscription = Subscription.objects.get(
+                person=person,
+                event=self.current_event.event,
+            )
+            subscription.is_new = False
+
+        except Subscription.DoesNotExist:
+            subscription = Subscription(
+                person=person,
+                event=self.current_event.event,
+                completed=False,
+                created_by=user.pk,
+                lot=self.current_event.get_all_lots()[0]
+            )
+            subscription.is_new = True
+
+        return subscription
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form_config'] = self.current_event.form_config
+
+        if 'form' not in kwargs:
+            context['form'] = self.get_form()
+
+        person = self.current_subscription.person
+        sub = self.current_subscription.subscription
+        sub_lot = self.current_subscription.lot
+
+        context['person'] = person
+
+        if person:
+            context['subscription'] = sub
+            context['is_subscribed'] = sub is not None
+            context['lot_still_available'] = \
+                sub_lot and self.current_event.is_lot_running(sub_lot)
+        else:
+            context['is_subscribed'] = sub is not None
+
+        return context
 
     def get_form_kwargs(self, **kwargs):
         """
@@ -144,7 +148,7 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
                 'initial': self.initial,
             }
 
-        person = self.get_person()
+        person = self.current_subscription.person
         if 'instance' not in kwargs and person:
             kwargs['instance'] = person
 
@@ -157,101 +161,26 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
     def get_form(self, **kwargs):
         return self.form_class(**self.get_form_kwargs(**kwargs))
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
 
-        if 'form' not in kwargs:
-            context['form'] = self.get_form()
-
-        try:
-            context['form_config'] = self.object.formconfig
-        except (ObjectDoesNotExist, AttributeError):
-            pass
-
-        person = self.get_person()
-        context['person'] = person
-
-        if person:
+class SelectLotMixin(SubscriptionFormMixin):
+    def get_selected_lot(self):
+        if 'lot_pk' in self.request.session and self.request.session['lot_pk']:
+            # se PK de lote existe na sessão, prioriza-lo pois ele pode
+            # ser um lote vindo do primeiro passo.
             try:
-                sub = Subscription.objects.get(
-                    person=person,
-                    event=self.event,
-                    completed=True, test_subscription=False
-                )
+                self.selected_lot = \
+                    Lot.objects.get(pk=self.request.session['lot_pk'])
 
-                context['subscription'] = sub
-                context['is_subscribed'] = True
-                context['lot_still_available'] = \
-                    sub.lot.status == sub.lot.LOT_STATUS_RUNNING
-
-            except Subscription.DoesNotExist:
-                context['is_subscribed'] = False
-
-        else:
-            context['is_subscribed'] = False
-
-        return context
-
-    def get_person(self):
-        """ Se usuario possui person """
-
-        if self.person or not self.request.user.is_authenticated():
-            return self.person
-
-        try:
-            self.person = self.request.user.person
-        except (ObjectDoesNotExist, AttributeError):
-            pass
-
-        return self.person
-
-    def is_subscribed(self, email=None):
-        """
-            Se já estiver inscrito retornar True
-        """
-        if email:
-            try:
-                user = User.objects.get(email=email)
-            except User.DoesNotExist:
-                return False
-        else:
-            user = self.request.user
-
-        if user.is_authenticated:
-            try:
-                person = user.person
-                Subscription.objects.get(
-                    person=person,
-                    completed=True,
-                    test_subscription=False,
-                    event=self.event
-                )
-                return True
-            except (Subscription.DoesNotExist, AttributeError):
+            except Lot.DoesNotExist:
                 pass
 
-        return False
+        else:
+            # se não há PK de lote, vamos verificar se usuário já possui
+            # inscrição
+            sub_lot = self.current_subscription.lot
 
-    def subscriber_has_account(self, email):
-        if self.request.user.is_authenticated:
-            return True
+            if sub_lot:
+                self.selected_lot = sub_lot
 
-        try:
-            User.objects.get(email=email)
-            return True
-
-        except User.DoesNotExist:
-            pass
-
-        return False
-
-    @staticmethod
-    def subscriber_has_logged(email):
-        try:
-            user = User.objects.get(email=email)
-            return user.last_login is not None
-
-        except User.DoesNotExist:
-            pass
-
-        return False
+        self.request.session['lot_pk'] = self.selected_lot.pk
+        return self.selected_lot

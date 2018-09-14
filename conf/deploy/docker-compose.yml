@@ -22,8 +22,6 @@ services:
   # Preparação de volumes.
   volume:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
-    depends_on:
-      - migration
     entrypoint:
       - /services/volume/container-entry.sh
     volumes:
@@ -48,6 +46,7 @@ services:
 
   manage:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    restart: unless-stopped
     depends_on:
       - migration
       - volume
@@ -69,6 +68,7 @@ services:
 
   partner:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    restart: unless-stopped
     depends_on:
       - migration
       - redis
@@ -86,6 +86,7 @@ services:
 
   admin_intranet:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    restart: unless-stopped
     depends_on:
       - migration
       - volume
