@@ -36,10 +36,18 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
             except Subscription.DoesNotExist:
                 pass
 
-        return super().dispatch(request, *args, **kwargs)
+        response = super().dispatch(request, *args, **kwargs)
+
+        return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        sub = self.current_subscription.subscription
+
+        # Força verificação se está inscrito apenas para inscrições completas.
+        context['is_subscribed'] = sub.completed is True if sub else False
+
         context['has_private_subscription'] = self.has_private_subscription
         context['private_still_available'] = self.has_private_subscription
         return context
@@ -80,7 +88,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
             - redireciona para página de inscrição;
         """
         # CONDIÇÃO 0
-        if not self.subscription_enabled():
+        if not self.current_event.subscription_enabled():
             return HttpResponseNotAllowed([])
 
         context = self.get_context_data(**kwargs)
@@ -90,8 +98,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
         email = self.request.POST.get('email')
         exihibition_code = None
 
-        is_private_event = not self.has_available_public_lots() and \
-                           len(self.get_private_lots()) > 0
+        is_private_event = self.current_event.is_private_event()
 
         if is_private_event:
             exihibition_code = self.request.POST.get('exhibition_code')
@@ -145,7 +152,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
 
             return redirect(
                 'public:hotsite-subscription',
-                slug=self.event.slug
+                slug=self.current_event.slug
             )
 
         # CONDIÇÃO 2
@@ -208,7 +215,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
             login_url = '{}?next={}'.format(
                 reverse('public:login'),
                 reverse('public:hotsite', kwargs={
-                    'slug': self.event.slug
+                    'slug': self.current_event.slug
                 })
             )
 
@@ -217,7 +224,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
         # Condição 5
         elif has_account:
 
-            is_subscribed = self.is_subscribed(email=email)
+            is_subscribed = self.current_subscription
 
             if is_subscribed:
                 context['remove_preloader'] = True
@@ -228,15 +235,15 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
             # Override anonymous user
             user = User.objects.get(email=email)
 
-            try:
-                person = user.person
-            except AttributeError:
+            if not hasattr(user, 'person') and user.person:
                 # Garante que usuário sempre terá pessoa.
                 form = get_person_form(user)
+
                 if not form.is_valid():
                     context['form'] = form
                     return self.render_to_response(context)
-                person = form.save()
+
+                form.save()
 
         # Condição 6
         else:
@@ -262,7 +269,10 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
             # Registra código para verificação mais adiante
             request.session['exhibition_code'] = exihibition_code
 
-        return redirect('public:hotsite-subscription', slug=self.event.slug)
+        return redirect(
+            'public:hotsite-subscription',
+            slug=self.current_event.slug
+        )
 
     def _configure_brand_person(self, person):
         """ Configura nova pessoa cadastrada. """
@@ -324,7 +334,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
                     person=person,
                     completed=True,
                     test_subscription=False,
-                    event=self.event
+                    event=self.current_event.event
                 )
                 return True
             except (Subscription.DoesNotExist, AttributeError):
