@@ -486,7 +486,9 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
             step = self.steps.current
 
         if step in self.loaded_forms and data is None:
-            return self.loaded_forms[step]
+            form = self.loaded_forms[step]
+            if form.data is None:
+                return self.loaded_forms[step]
 
         form = super().get_form(step, data, files)
         self.loaded_forms[step] = form
