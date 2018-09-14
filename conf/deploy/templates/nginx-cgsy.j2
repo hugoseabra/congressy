@@ -15,6 +15,7 @@ server {
       rewrite ^(.*)$ https://$server_name$REQUEST_URI permanent;
     }
     {% endif %}
+    location = /favicon.ico { access_log off; log_not_found off; }
     location /media  {
         alias /var/www/cgsy/media;
     }
@@ -25,12 +26,16 @@ server {
 
     location / {
         # the uwsgi_params file you installed
-        include    /var/www/cgsy/conf/deploy/uwsgi_params;
+        include         /var/www/cgsy/conf/deploy/uwsgi_params;
+
+        # https://github.com/dockerfile/nginx/issues/4
+        # Override temp file locations
+        uwsgi_temp_path /tmp/nginx/uwsgi;
 
         proxy_redirect     off;
-        proxy_set_header   Host $host;
-        proxy_set_header   X-Real-IP $remote_addr;
-        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header   Host             $http_host;
+        proxy_set_header   X-Real-IP        $remote_addr;
+        proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
         proxy_set_header   X-Forwarded-Host $server_name;
 
         if (!-f $request_filename) {

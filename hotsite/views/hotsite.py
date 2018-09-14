@@ -15,7 +15,7 @@ from gatheros_subscription.models import Subscription
 from hotsite.views import SubscriptionFormMixin
 
 
-class HotsiteView(SubscriptionFormMixin, generic.View):
+class HotsiteView(SubscriptionFormMixin, generic.FormView):
     template_name = 'hotsite/main.html'
     has_private_subscription = False
     private_still_available = False
@@ -36,10 +36,18 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             except Subscription.DoesNotExist:
                 pass
 
-        return super().dispatch(request, *args, **kwargs)
+        response = super().dispatch(request, *args, **kwargs)
+
+        return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        sub = self.current_subscription.subscription
+
+        # Força verificação se está inscrito apenas para inscrições completas.
+        context['is_subscribed'] = sub.completed is True if sub else False
+
         context['has_private_subscription'] = self.has_private_subscription
         context['private_still_available'] = self.has_private_subscription
         return context
@@ -80,7 +88,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             - redireciona para página de inscrição;
         """
         # CONDIÇÃO 0
-        if not self.event.published:
+        if not self.current_event.event.published:
             return HttpResponseNotAllowed([])
 
         context = self.get_context_data(**kwargs)
@@ -90,8 +98,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
         email = self.request.POST.get('email')
         exihibition_code = None
 
-        is_private_event = not self.has_available_public_lots() and \
-                           len(self.get_private_lots()) > 0
+        is_private_event = self.current_event.is_private_event()
 
         if is_private_event:
             exihibition_code = self.request.POST.get('exhibition_code')
@@ -145,7 +152,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
 
             return redirect(
                 'public:hotsite-subscription',
-                slug=self.event.slug
+                slug=self.current_event.slug
             )
 
         # CONDIÇÃO 2
@@ -208,7 +215,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             login_url = '{}?next={}'.format(
                 reverse('public:login'),
                 reverse('public:hotsite', kwargs={
-                    'slug': self.event.slug
+                    'slug': self.current_event.slug
                 })
             )
 
@@ -217,7 +224,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
         # Condição 5
         elif has_account:
 
-            is_subscribed = self.is_subscribed(email=email)
+            is_subscribed = self.current_subscription
 
             if is_subscribed:
                 context['remove_preloader'] = True
@@ -228,15 +235,15 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             # Override anonymous user
             user = User.objects.get(email=email)
 
-            try:
-                person = user.person
-            except AttributeError:
+            if not hasattr(user, 'person') and user.person:
                 # Garante que usuário sempre terá pessoa.
                 form = get_person_form(user)
+
                 if not form.is_valid():
                     context['form'] = form
                     return self.render_to_response(context)
-                person = form.save()
+
+                form.save()
 
         # Condição 6
         else:
@@ -262,7 +269,10 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             # Registra código para verificação mais adiante
             request.session['exhibition_code'] = exihibition_code
 
-        return redirect('public:hotsite-subscription', slug=self.event.slug)
+        return redirect(
+            'public:hotsite-subscription',
+            slug=self.current_event.slug
+        )
 
     def _configure_brand_person(self, person):
         """ Configura nova pessoa cadastrada. """
@@ -280,3 +290,54 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
                 person=person,
                 group=Member.ADMIN
             )
+
+    def subscriber_has_account(self, email):
+        if self.request.user.is_authenticated:
+            return True
+
+        try:
+            User.objects.get(email=email)
+            return True
+        except User.DoesNotExist:
+            pass
+
+        return False
+
+    def subscriber_has_logged(self, email):
+        if self.request.user.is_authenticated:
+            return True
+
+        try:
+            user = User.objects.get(email=email)
+            return user.last_login is not None
+        except User.DoesNotExist:
+            pass
+
+        return False
+
+    def is_subscribed(self, email=None):
+        """
+            Se já estiver inscrito retornar True
+        """
+        if email:
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return False
+        else:
+            user = self.request.user
+
+        if user.is_authenticated:
+            try:
+                person = user.person
+                Subscription.objects.get(
+                    person=person,
+                    completed=True,
+                    test_subscription=False,
+                    event=self.current_event.event
+                )
+                return True
+            except (Subscription.DoesNotExist, AttributeError):
+                pass
+
+        return False

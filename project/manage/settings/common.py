@@ -7,6 +7,10 @@
 
 from . import *
 
+# ================================= APPS ==================================== #
+INSTALLED_APPS.extend([
+    'django_uwsgi',
+])
 # ========================== BASE CONFIGURATION ============================= #
 SECRET_KEY = '{{ SECRET_KEY }}'
 # ========================= SERVER CONFIGURATION ============================ #
@@ -21,6 +25,12 @@ DATABASES = {
         'PORT': '{{ DBPORT }}',
         'HOST': '{{ DBHOST }}',
     },
+}
+# =============================== CACHE ===================================== #
+CACHES = {
+    'default': {
+        'BACKEND': 'uwsgicache.UWSGICache',
+    }
 }
 # ============================ VALIDATORS =================================== #
 AUTH_PASSWORD_VALIDATORS += [

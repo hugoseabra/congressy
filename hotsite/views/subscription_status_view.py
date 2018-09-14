@@ -1,29 +1,35 @@
 """
     View usada para verificar o status da sua inscrição
 """
-from datetime import datetime
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.views import generic
 
 from gatheros_event.helpers.event_business import is_paid_event
-from gatheros_event.models import Event
-from gatheros_subscription.models import Subscription
-from hotsite.views import EventMixin
+from hotsite.views import SubscriptionFormMixin
 from payment.models import Transaction
 
 
-class SubscriptionStatusView(EventMixin, generic.TemplateView):
+class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
     template_name = 'hotsite/subscription_status.html'
-    person = None
-    subscription = None
-    event = None
-    transactions = None
-    restart_private_event = False
+
+    def __init__(self, **initkwargs):
+        self.event = None
+        self.person = None
+        self.subscription = None
+        self.transactions = None
+        self.restart_private_event = False
+        super().__init__(**initkwargs)
+
+    def pre_dispatch(self):
+        super().pre_dispatch()
+
+        self.event = self.current_event.event
+        self.person = self.current_subscription.person
+        self.subscription = self.current_subscription.subscription
 
     def dispatch(self, request, *args, **kwargs):
 
@@ -31,47 +37,35 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
 
         if not slug:
             return redirect('https://congressy.com')
-        self.event = get_object_or_404(Event, slug=slug)
 
         if not request.user.is_authenticated:
-            return redirect('public:hotsite', slug=self.event.slug)
+            return redirect('public:hotsite', slug=slug)
 
-        self.person = self.get_person()
+        self.pre_dispatch()
 
         # Se  não há lotes pagos, não há o que fazer aqui.
         if not is_paid_event(self.event):
             return redirect('public:hotsite', slug=self.event.slug)
 
-        try:
-            self.subscription = Subscription.objects.get(
-                event=self.event,
-                person=self.person,
-                completed=True,
-                test_subscription=False
-            )
-
-            if not self.get_transactions():
-                if self.is_private_event():
-                    self.request.session['has_private_subscription'] = \
-                        str(self.subscription.pk)
-                else:
-                    messages.warning(
-                        message='Por favor, informe um lote para realizar o'
-                                ' pagamento ao final do processo de inscrição.',
-                        request=request
-                    )
-
-                return redirect(
-                    'public:hotsite-subscription',
-                    slug=self.event.slug
-                )
-
-        except Subscription.DoesNotExist:
+        if self.subscription.completed is False:
             messages.error(
                 message='Você não possui inscrição neste evento.',
                 request=request
             )
-            return redirect('public:hotsite', slug=self.event.slug)
+            return redirect('public:hotsite', slug=slug)
+
+        if not self.current_subscription.transactions:
+            if self.current_event.is_private_event():
+                self.request.session['has_private_subscription'] = \
+                    str(self.subscription.pk)
+            else:
+                messages.warning(
+                    message='Por favor, informe um lote para realizar o'
+                            ' pagamento ao final do processo de inscrição.',
+                    request=request
+                )
+
+            return redirect('public:hotsite-subscription', slug=slug)
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -80,15 +74,16 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
         context = super().get_context_data(**kwargs)
         has_paid_transaction = False
 
-        context['person'] = self.get_person()
-        context['is_subscribed'] = self.is_subscribed()
+        is_new = self.current_subscription.subscription.is_new
+        context['is_subscribed'] = is_new is False
+
+        context['person'] = self.subscription.person
         context['allow_transaction'] = self.get_allowed_transaction()
-        all_transactions = self.get_transactions()
-        context['transactions'] = all_transactions
+        context['transactions'] = self.current_subscription.transactions
 
         can_reprocess_payment = True
 
-        for trans in all_transactions:
+        for trans in self.current_subscription.payments:
             is_cc = trans.type == Transaction.CREDIT_CARD
             is_boleto = trans.type == Transaction.BOLETO
             if trans.status == Transaction.PAID:
@@ -107,14 +102,15 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
         context['pagarme_key'] = settings.PAGARME_ENCRYPTION_KEY
         context['remove_preloader'] = True
         context['subscription'] = self.subscription
-        context['is_private_event'] = self.is_private_event()
+        context['is_private_event'] = self.current_event.is_private_event()
         context['lot_is_still_valid'] = False
 
-        lot = self.subscription.lot
+        sub_lot = self.subscription.lot
+        lot_running = self.current_event.is_lot_running(sub_lot)
 
-        if lot.private is True and lot.status == lot.LOT_STATUS_RUNNING:
+        if sub_lot.private is True and lot_running:
             context['lot_is_still_valid'] = True
-            self.request.session['exhibition_code'] = lot.exhibition_code
+            self.request.session['exhibition_code'] = sub_lot.exhibition_code
 
         return context
 
@@ -128,21 +124,9 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
                 self.request.session['has_private_subscription'] = \
                     str(self.subscription.pk)
 
-            return redirect('public:hotsite', slug=self.event.slug)
+            return redirect('public:hotsite', slug=self.current_event.slug)
 
-        return redirect('public:hotsite-status', slug=self.event.slug)
-
-    def get_person(self):
-        """ Se usuario possui person """
-        if not self.request.user.is_authenticated or self.person:
-            return self.person
-        else:
-            try:
-                self.person = self.request.user.person
-            except (ObjectDoesNotExist, AttributeError):
-                pass
-
-        return self.person
+        return redirect('public:hotsite-status', slug=self.current_event.slug)
 
     def subscriber_has_account(self, email):
         if self.request.user.is_authenticated:
@@ -156,27 +140,6 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
             pass
 
         return False
-
-    def get_transactions(self):
-        if self.transactions:
-            return self.transactions
-
-        self.transactions = []
-
-        all_transactions = Transaction.objects.filter(
-            subscription=self.subscription,
-            lot=self.subscription.lot)
-
-        now = datetime.now().date()
-
-        for transaction in all_transactions:
-            if transaction.boleto_expiration_date:
-                if transaction.boleto_expiration_date > now:
-                    self.transactions.append(transaction)
-            else:
-                self.transactions.append(transaction)
-
-        return self.transactions
 
     def get_allowed_transaction(self):
 
@@ -204,45 +167,3 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
             return 'credit_card'
 
         return True
-
-    def is_subscribed(self):
-        """
-            Se já estiver inscrito retornar True
-        """
-        user = self.request.user
-
-        if user.is_authenticated:
-            try:
-                person = user.person
-                subscription = Subscription.objects.get(person=person,
-                                                        event=self.event)
-                self.subscription = subscription
-                return True
-
-            except (Subscription.DoesNotExist, AttributeError):
-                pass
-
-        return False
-
-    def is_private_event(self):
-        """ Verifica se evento possui apenas lotes privados. """
-        public_lots = []
-        private_lots = []
-
-        for lot in self.event.lots.all():
-            if lot.private is True:
-                private_lots.append(lot.pk)
-                continue
-
-            if self.is_lot_publicly_available(lot):
-                public_lots.append(lot.pk)
-
-        return len(public_lots) == 0 and len(private_lots) > 0
-
-    @staticmethod
-    def is_lot_publicly_available(lot):
-
-        if lot.status == lot.LOT_STATUS_RUNNING and not lot.private:
-            return True
-
-        return False

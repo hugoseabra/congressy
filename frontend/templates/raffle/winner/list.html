@@ -11,7 +11,7 @@
                 <th>Participante</th>
                 <th width="15%">CPF</th>
                 <th width="15%" class="hidden-xs hidden-sm">Código</th>
-{#                <th width="3%"></th>#}
+                <th width="3%"></th>
             </tr>
             </thead>
 
@@ -28,12 +28,12 @@
                     <td class="hidden-xs hidden-sm text-center">
                         {{ item.subscription.code }}
                     </td>
-{#                    <td>#}
-{#                        <a href="{% url 'raffle:raffle-delete' event.pk item.pk %}"#}
-{#                           class="text-danger">#}
-{#                            <i class="fas fa-times-circle text-danger"></i>#}
-{#                        </a>#}
-{#                    </td>#}
+                    <td>
+                        <a href="javascript:void(0)" onclick="remove('{{ item.subscription.pk }}', '{{ item.pk }}')"
+                           class="text-danger">
+                            <i class="fas fa-times-circle text-danger"></i>
+                        </a>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
