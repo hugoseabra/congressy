@@ -23,7 +23,6 @@ def update_event_config_flags(event: Event):
 
         event.business_status = event.EVENT_BUSINESS_STATUS_PAID
 
-
         for feature, value in PAID_EVENT_FEATURES.items():
             setattr(feature_config, feature, value)
 
@@ -72,6 +71,10 @@ def _event_business_state_has_changed(event: Event):
 
 
 def _deactivate_all_lotes(event: Event):
-    event.lots.all().update(
+    lots = event.lots.filter(
+        is_chosen_free_lot=False
+    )
+
+    lots.update(
         active=False,
     )

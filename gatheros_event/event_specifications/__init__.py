@@ -9,3 +9,4 @@ from .privacy_specifications import (
     OpenWithNoAudience,
 )
 from .publishable import EventPublishable
+from .saleable import Saleable

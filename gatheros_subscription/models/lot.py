@@ -225,6 +225,11 @@ class Lot(models.Model, GatherosModelMixin):
         verbose_name='ativo',
     )
 
+    is_chosen_free_lot = models.BooleanField(
+        default=False,
+        verbose_name='esse lote foi selecionado após perder multi-lotes',
+    )
+
     objects = LotManager()
 
     class Meta:

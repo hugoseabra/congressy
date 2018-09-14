@@ -11,6 +11,7 @@
 
 from gatheros_event.event_state import EventState
 from gatheros_event.models import Event
+from gatheros_event.event_specifications import Saleable
 
 
 def is_free_event(event: Event):
@@ -31,3 +32,17 @@ def is_paid_event(event: Event):
         ))
 
     return EventState(event).is_payable()
+
+
+def will_removing_saleable_cause_feature_change(candidate) -> bool:
+    """
+
+    :param candidate: Algo que cumpra com a spec Saleable
+    :return: bool
+    """
+    if not Saleable().is_satisfied_by(candidate):
+        raise Exception("{} '{}' não é uma instancia capaz de ser vendida".format(
+            candidate,
+            candidate.__class__,
+        ))
+    
