@@ -1,0 +1,48 @@
+<div class="row" id="name-on-fullscren"
+     style="padding-bottom: 15px;display: none">
+    <div class="col-xs-12">
+        <h3 class="text-bold">{{ object.name }}</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div id="cards-list">
+
+        </div>
+
+    </div>
+    <div class="col-md-6">
+        {% include 'attendance/includes/search-bar.html' %}
+        {% include 'attendance/includes/attendance-category-filter.html' %}
+        {% include 'attendance/includes/barcode-user-tips.html' %}
+    </div>
+
+</div>
+
+{#<div class="row" id="name-on-fullscren"#}
+{#     style="padding-bottom: 15px;display: none">#}
+{#    <div class="col-xs-12">#}
+{#        <h3 class="text-bold">{{ object.name }}</h3>#}
+{#    </div>#}
+{#</div>#}
+{#<div class="row">#}
+{#    <div class="col-md-12">#}
+{#        {% include 'attendance/includes/search-bar.html' %}#}
+{#    </div>#}
+{##}
+{#</div>#}
+{#<div class="row">#}
+{#    <div class="col-md-12">#}
+{#        {% include 'attendance/includes/attendance-category-filter.html' %}#}
+{#    </div>#}
+{#</div>#}
+{#<div class="row"#}
+{#     style="padding-top: 20px">#}
+{#    <div id="cards-list" class="col-md-5 col-md-offset-4" >#}
+{##}
+{#    </div>#}
+{##}
+{#</div>#}
+{##}
+{#{% include 'attendance/includes/barcode-user-tips.html' %}#}
+{##}

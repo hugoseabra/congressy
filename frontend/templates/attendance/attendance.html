@@ -43,125 +43,17 @@
 
                 </div>
                 <div class="panel-body">
-                    <div class="row" id="name-on-fullscren"
-                         style="padding-bottom: 15px;display: none">
-                        <div class="col-xs-12">
-                            <h3 class="text-bold">{{ object.name }}</h3>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="{% if search_type == 'qrcode' %} col-md-6 {% else %} col-md-12 {% endif %}">
-                            <div class="input-group input-group-lg">
-                                <div class="input-group-btn">
-                                    <button id="type-search"
-                                            type="button"
-                                            class="btn btn-default dropdown-toggle"
-                                            data-toggle="dropdown"
-                                            aria-haspopup="true"
-                                            aria-expanded="false"><i
-                                            class="
-                                            {% if search_type == 'barcode' %} fas fa-barcode
-                                            {% elif search_type == 'qrcode' %} fas fa-qrcode
-                                            {% else %}far fa-keyboard{% endif %}"></i>
-                                        <span
-                                                class="caret"></span></button>
-                                    <ul class="dropdown-menu dropdown-search">
-                                        <li><a href="?search_type=typing"><i
-                                                class="far fa-keyboard"></i>
-                                            Teclado
-                                        </a></li>
-                                        <li><a href="?search_type=qrcode"><i
-                                                class="fas fa-qrcode"></i>
-                                            QrCode
-                                        </a></li>
-                                        <li><a href="?search_type=barcode"><i
-                                                class="fas fa-barcode"></i>
-                                            Cód. Barra
-                                        </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                                {% if search_type != 'qrcode' %}
-                                    <input id="search" type="text"
-                                           class="form-control"
-                                           aria-label="...">
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% if search_type == 'qrcode' %}
-                            <div class="col-md-6">
-                                <div class="float-left">
-                                    <label for="other-window-switch">Abrir em
-                                        outra Janela ?</label>
-                                    <input id="other-window-switch"
-                                           type="checkbox"
-                                           class="js-switch"
-                                           data-toggle="tooltip"
-                                           title="Abrir em outra Janela ?">
-                                </div>
-                                <div class="float-right">
-                                    <button type="button"
-                                            class="btn btn-primary btn-3d">
-                                        Iniciar
-                                    </button>
-                                </div>
-                                <div class="clearfix"></div>
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h3>Categorias:
-                                {% for cat in lot_categories %}
-                                    <span style="padding: 4px 7px 4px 7px"
-                                          class="badge badge-primary">{{ cat }}</span>
-                                {% endfor %}
-                            </h3>
-                        </div>
-                    </div>
-                    <div class="row"
-                         style="padding-top: 20px">
-                        {% if search_type == 'qrcode' %}
-                            <div class="col-md-6">
-                                <video width="100%" height="100%"
-                                       id="webcam"></video>
-                            </div>
-                        {% endif %}
-                        <div id="cards-list"
-                             class="{% if search_type == 'qrcode' %} col-md-6
-                                    {% elif search_type == 'barcode' %} col-md-6
-                                    {% else %} col-md-12 {% endif %}">
-
-                        </div>
-                        {% if search_type == 'barcode' %}
-                            <div class="col-md-6">
-                                <div class="panel panel-primary">
-                                    <div class="panel-heading">
-
-                                    </div>
-                                    <div class="panel-body">
-                                    <span>Faça o check-in/out de 3 maneiras. Após fazer a leitura do código de barras:  </span>
-                                        <ul>
-                                            <li>Releia o código de barras
-                                            </li>
-                                            <li>Clique no botão de realizar atendimento
-                                            </li>
-                                            <li>Aperte espaço
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            </div>
-                            </div>
-                        {% endif %}
-
-
+                    {% if search_type == 'barcode' %}
+                        {% include 'attendance/includes/attendance-barcode.html' %}
+                    {% else %}
+                        {% include 'attendance/includes/attendance-typing.html' %}
+                    {% endif %}
                 </div>
 
+
             </div>
+
         </div>
-    </div>
     </div>
 
 
