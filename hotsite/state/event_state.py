@@ -84,20 +84,19 @@ class CurrentEventState(object):
 
     def has_available_lots(self):
         lots = self.get_all_lots()
-        return lots and len(lots) > 0
+        return len(lots) > 0
 
     def has_available_private_lots(self):
         lots = self.get_private_lots()
-        return lots and len(lots) > 0
+        return len(lots) > 0
 
     def has_available_public_lots(self):
         lots = self.get_public_lots()
-        return lots and len(lots) > 0
+        return len(lots) > 0
 
     def has_paid_lots(self):
         """ Retorna se evento possui algum lote pago. """
-        lots = self.get_paid_lots()
-        return lots and len(lots) > 0
+        return len(self.get_paid_lots()) > 0
 
     def has_coupon(self):
         """ Retorna se possui cupom, seja qual for. """
