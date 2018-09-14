@@ -5,9 +5,9 @@ from raffle import views
 
 private_raffle_urls = [
     url(
-        r'^raffles/winners/(?P<pk>[\d]+)/delete/$',
-        views.RaffleDeleteView.as_view(),
-        name='raffle-delete'
+        r'^raffles/winners/delete/$',
+        views.WinnerDeleteView.as_view(),
+        name='winner-delete'
     ),
     url(
         r'^raffles/(?P<pk>[\d]+)/winners/add/$',
@@ -25,7 +25,7 @@ private_raffle_urls = [
         name='winner-list'
     ),
     url(
-        r'^winners/(?P<pk>[\d]+)/delete/$',
+        r'^raffle/(?P<pk>[\d]+)/delete/$',
         views.WinnerDeleteView.as_view(),
         name='raffle-delete'
     ),

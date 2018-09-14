@@ -53,8 +53,8 @@ VERSION = shell_do('cat {}'.format(VERSION_FILE))
 VERSION = str(VERSION).rstrip('\r\n')
 LATEST_VERSION = LATEST_VERSION.rstrip('\r\n')
 
-print("VERSION: {}".format(VERSION))
 print("LATEST VERSION: {}".format(LATEST_VERSION))
+print("VERSION TO DEPLOY: {}".format(VERSION))
 
 higher_version = semver.compare(LATEST_VERSION, VERSION) == -1
 

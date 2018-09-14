@@ -148,6 +148,27 @@ def check_notification_transaction_refunded_boleto(transaction):
         )
 
 
+def check_notification_transaction_pending_refund_boleto(transaction):
+    """
+    Verifica notificação de transação de pendente para reembolso do tipo
+    'boleto'
+
+    - inscrição deve estar como 'confirmada';
+    - transação deve ser do tipo 'boleto';
+    - transação deve pode estar com status de 'paga';
+    """
+    _check_pending_refund_transaction(transaction)
+
+    if transaction.type != transaction.BOLETO:
+        raise exception.NotifcationError(
+            "Tipo de transação inválido para esta notificação: '{type}'. Esta"
+            " notificação é para transações do tipo '{tipo_trans}'".format(
+                type=transaction.type,
+                tipo_trans=transaction.BOLETO
+            )
+        )
+
+
 def check_notification_transaction_refunded_credit_card(transaction):
     """
     Verifica notificação de transação paga do tipo 'credit_card'
@@ -228,6 +249,24 @@ def _check_refunded_transaction(transaction):
         raise exception.NotifcationError(
             "Notificação de inscrição com reembolso só poderá ser feita se"
             " inscrição estiver confirmada. Esta inscrição não está"
+            " confirmada."
+        )
+
+    if transaction.status != transaction.PAID:
+        raise exception.NotifcationError(
+            "Transação ainda não está paga. A notificação é somente para"
+            " transação paga."
+        )
+
+
+def _check_pending_refund_transaction(transaction):
+    """ Verifica transações pagas e pendentes para reembolso. """
+    subscription = transaction.subscription
+
+    if subscription.status != subscription.CONFIRMED_STATUS:
+        raise exception.NotifcationError(
+            "Notificação de inscrição pendente para reembolso só poderá ser"
+            " feita se inscrição estiver confirmada. Esta inscrição não está"
             " confirmada."
         )
 

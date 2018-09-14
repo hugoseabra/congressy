@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Congressy | Aguarde... </title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- FAVICONS -->
+    <link rel="icon" href="{% static 'assets/img/favicons/favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'assets/img/favicons/apple-touch-icon.png' %}">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="{% static "assets/plugins/bootstrap/css/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "assets/plugins/bootstrap/css/bootstrap-xl.css" %}">
+
+    <!-- Fonts  -->
+    <link rel="stylesheet" href="{% static "assets/css/fontawesome-all.min.css" %}">
+    <link rel="stylesheet" href="{% static "assets/css/font-awesome-animation.min.css" %}">
+
+    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+
+    <!-- Custom styles for this theme -->
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="row text-center" style="margin-top: 75px">
+        <div class="col-md-4 col-sm-offset-4">
+
+            <div>
+                <i class="fas info-color fa-circle-notch fa-spin fa-4x" style="margin-top: 5px"></i>
+            </div>
+
+            <div style="margin-top: 16px">
+                <span style="font-size: 24px">aguarde...</span>
+            </div>
+
+            <div id="help_text" style="display: None">
+                <a class="text-muted" href="{% url 'front:start' %}">Caso não seja redirecionando, click aqui!</a>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+
+
+</body>
+
+<script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
+{% if not debug %}
+    {% if markting_type == 'adwords' %}
+
+        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-827903122"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+
+            {% if page_type == 'new_account' %}
+
+                gtag('event',
+                    'conversion',
+                    {
+                        'send_to': 'AW-827903122/ydKjCO_gh4cBEJKZ44oD'
+                    });
+
+
+            {% elif page_type == 'new_event' %}
+
+
+                gtag('event',
+                    'conversion',
+                    {
+                        'send_to': 'AW-827903122/3mskCIzdh4cBEJKZ44oD',
+                        'transaction_id': ''
+                    });
+
+
+            {% endif %}
+        </script>
+
+    {% endif %}
+{% endif %}
+
+
+
+<script>
+
+    setTimeout(function () {
+        window.location.href = '{{ next }}';
+    }, 5000);
+
+
+    setTimeout(function () {
+        $('#help_text').fadeIn();
+    }, 15000);
+
+
+</script>
+
+
+</html>

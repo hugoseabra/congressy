@@ -47,7 +47,7 @@ Variáveis:
             <a class="sidebar-itens"
                href="{% url 'certificate:event-certificate-config' event.pk %}"
                title="Editor de Certificados">
-                <i class="fas fa-graduation-cap"></i>Certificado
+                <i class="fas fa-graduation-cap"></i> Certificado
             </a>
         </li>
 
@@ -61,7 +61,13 @@ Variáveis:
             </a>
         </li>
     {% endif %}
-
+    <li {% if active == 'raffles' %}class=  "active"{% endif %}>
+        <a class="sidebar-itens"
+           href="{% url 'raffle:raffle-list' event.pk %}"
+           title="Sorteios">
+            <i class="fas fa-trophy"></i> Sorteios
+        </a>
+    </li>
 </ul>
 
 <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>

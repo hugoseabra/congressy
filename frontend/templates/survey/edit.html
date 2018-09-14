@@ -322,7 +322,7 @@
                     {% csrf_token %}
 
 
-                    <div class="modal-body" style="padding: 30px">
+                    <div class="modal-body">
 
 
                         <strong style="font-size: 25px">
@@ -336,11 +336,25 @@
                         <hr>
 
                         <div id="intro">
-                            {% render_generic_field form.intro %}
+                            {% render_switchery_field form.intro %}
                         </div>
 
                         <div id="options">
-                            {% render_generic_field form.options %}
+                            
+                            <label>Opções (<span id="option-counter">0</span>):</label>
+
+                            <div id="option-input-tags"></div>
+                            <div>
+                                <small class="help-text text-muted">Você pode copiar e colar múltiplas linhas.</small>
+                            </div>
+                            <hr/>
+                            <div class="text-center">
+                                <div>
+                                    <button id="add-option-button" type="button" class="btn btn-sm btn-info">
+                                        <i class="glyphicon glyphicon-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
 
@@ -441,6 +455,7 @@
                                 <div>
 
                                     <input id="id_intro_edit"
+                                           class="js-switch"
                                            name="intro_edit"
                                            type="checkbox">
 
@@ -462,29 +477,21 @@
 
                             <div class="form-group">
 
-                                <label>Opções:</label>
+                                <label>Opções (<span id="edit_option-counter">0</span>):</label>
 
-
+                                <div id="edit_option-input-tags"></div>
                                 <div>
-
-                                <textarea cols="40" rows="10"
-                                          class="form-control"
-                                          name="options_edit"
-                                          id="id_options_edit">
-
-                                </textarea>
-
-
-                                    <div>
-                                        <small class="text-muted help-text">
-                                            Insira as opções da sua pergunta
-                                            uma
-                                            linha de cada vez.
-                                        </small>
-                                    </div>
-
-
+                                    <small class="help-text text-muted">Você pode copiar e colar múltiplas linhas.</small>
                                 </div>
+                                <hr/>
+                                <div class="text-center">
+                                    <div>
+                                        <button id="edit_add-option-button" type="button" class="btn btn-sm btn-info">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
 
@@ -529,7 +536,7 @@
                 </div>
                 <form method="post" id="editQuestionTypeInputsForm">
                     {% csrf_token %}
-                    <div class="modal-body" style="padding: 30px">
+                    <div class="modal-body">
                         <strong style="font-size: 25px">
                             <span class="question_name"></span>
                         </strong>
@@ -597,6 +604,7 @@
                             <small style="color:#C9302C">*</small>
                             <div>
                                 <select name="new_type_input" id="new_type_input" class="form-control">
+                                    <option value="select">Lista</option>
                                     <option value="radio-group">Múltipla Escolha</option>
                                     <option value="checkbox-group">Várias Opções</option>
                                 </select>
@@ -671,6 +679,7 @@
 {% block scripts %}
 
     <script src="{% static 'assets/survey/js/predefined-fields.js' %}"></script>
+    <script src="{% static 'assets/survey/js/option_manager.js' %}"></script>
 
     <script type="application/javascript">
 
@@ -723,6 +732,16 @@
             iconEl.addClass(IconOfField);
             formTypeEl.val('complex');
             $('#options').show();
+
+            var manager;
+
+            manager = new window.cgsy.survey.OptionManager(
+                $('#option-input-tags'),
+                $('#add-option-button'),
+                $('#option-counter')
+            );
+            manager.render();
+
 
             if (question_type === 'select') {
                 $('#intro').show();
@@ -840,8 +859,16 @@
             }
 
             if (has_options) {
+                var manager;
+
+                manager = new window.cgsy.survey.OptionManager(
+                    $('#edit_option-input-tags'),
+                    $('#edit_add-option-button'),
+                    $('#edit_option-counter')
+                );
+
+                manager.render(vals);
                 options_edit.show();
-                option_field.text(vals.join('\n'));
             }
 
         });
@@ -950,8 +977,15 @@
             var values = {};
 
             $.each($(form).serializeArray(), function (i, field) {
+                
+                if(field.name in values){
+                    field.value = values[field.name] +'\n' + field.value
+                }
+
                 values[field.name] = field.value;
             });
+
+
 
             var payload = {
                 action: 'edit',
@@ -1158,7 +1192,7 @@
 
             form_el.find('.question_name').text(question_name);
             form_el.find('#new_type_input').val(question_type);
-            form_el.find('input[name=question_id]').val(questiosimpleListn_id);
+            form_el.find('input[name=question_id]').val(question_id);
             form_el.submit(function (e) {
                 e.preventDefault();
                 editQuestionTypeModal($(this), modal_el);
@@ -1173,6 +1207,15 @@
             var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
             var new_type = form_el.find('#new_type_input').val();
             var question_id = form_el.find('input[name=question_id]').val();
+
+            if (!new_type) {
+                Messenger().post({
+                    message: 'Tipo da pergunta não foi alterada.',
+                    type: 'warning'
+                });
+                model_el.modal('hide');
+                return;
+            }
 
             $.ajax({
                 type: "POST",

@@ -21,9 +21,21 @@ class Raffle(models.Model):
         verbose_name='nome do produto'
     )
 
+    quantity = models.PositiveSmallIntegerField(
+        verbose_name='Quantidade',
+        help_text='Quantos produtos serão sorteados?',
+        default=1,
+    )
+
     winner_out = models.BooleanField(
         verbose_name='retirar ganhadores',
         help_text='Ganhadores não serão sorteados novamente.'
+    )
+
+    attended_only = models.BooleanField(
+        default=True,
+        verbose_name='somente presentes',
+        help_text='Somente presentes (check-in) participarão do sorteio.'
     )
 
     created = models.DateTimeField(

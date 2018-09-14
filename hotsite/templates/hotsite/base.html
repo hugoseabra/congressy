@@ -22,8 +22,7 @@
     <!-- BASIC INFO -->
     <title>{{ event.name }} | Congressy</title>
     <meta name="author" content="{{ event.organization }}">
-    <meta name="description"
-          content="{{ info.description }}">
+    <meta name="description" content="{{ info.description|safe }}">
 
     <!-- FAVICONS -->
     <link rel="icon" href="{% static 'hotsite/images/favicons/favicon.ico' %}">

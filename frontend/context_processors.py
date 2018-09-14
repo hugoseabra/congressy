@@ -3,6 +3,8 @@ Sentry public DSN para suporte a erros do javascript
 """
 import os
 
+from django.conf import settings
+
 
 def render_app_only(request):
     """
@@ -15,6 +17,13 @@ def render_app_only(request):
     return {
         'apponly': apponly == '1',
         'notitle': notitle == '1',
+    }
+
+
+def is_debug_mode(request):
+    return {
+        'debug': settings.DEBUG is True,
+        'DEBUG': settings.DEBUG is True,
     }
 
 
