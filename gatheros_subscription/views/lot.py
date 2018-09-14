@@ -7,6 +7,7 @@ from django.urls import reverse, reverse_lazy
 from django.views import View, generic
 
 from core.views.mixins import TemplateNameableMixin
+from gatheros_event.event_specifications import OrganizationHasBanking
 from gatheros_event.helpers.account import update_account
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event, Organization
@@ -115,6 +116,20 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
         'date_end'
     )
 
+    def get_context_data(self, **kwargs):
+        context = super(LotListView, self).get_context_data(**kwargs)
+        context['event'] = self.event
+        context['can_add'] = self._can_add
+        context['has_inside_bar'] = True
+        context['active'] = 'lotes'
+        context['subscription_stats'] = self.get_subscription_stats()
+        context['full_banking'] = self.get_org_banking_status()
+        context['exhibition_code'] = Lot.objects.generate_exhibition_code()
+        context['categories'] = self.get_categories()
+        context['event_is_full'] = self._event_is_full()
+        context['is_paid_event'] = is_paid_event(self.event)
+        return context
+
     def get_queryset(self):
         """Lotes a exibir são de acordo com o evento e não-interno"""
         query_set = super(LotListView, self).get_queryset()
@@ -125,39 +140,9 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
     def get_categories(self):
         query_set = self.event.lot_categories.all()
         if not self.event.feature_configuration.feature_multi_lots:
-            first = query_set.first()
+            first = query_set.order_by('pk').first()
             query_set = query_set.filter(pk=first.pk)
         return query_set.order_by('pk')
-
-    def get_context_data(self, **kwargs):
-        context = super(LotListView, self).get_context_data(**kwargs)
-        context['event'] = self.event
-        context['can_add'] = self._can_add
-        context['has_inside_bar'] = True
-        context['active'] = 'lotes'
-        context['subscription_stats'] = self.get_subscription_stats()
-        context['full_banking'] = self._get_full_banking()
-        context['exhibition_code'] = Lot.objects.generate_exhibition_code()
-        context['categories'] = self.get_categories()
-        context['event_is_full'] = self.event_is_full()
-        context['is_paid_event'] = is_paid_event(self.event)
-        return context
-
-    def event_is_full(self):
-        if self.event.expected_subscriptions and \
-                self.event.expected_subscriptions > 0:
-
-            total_subscriptions_event = 0
-            for lot in self.event.lots.all():
-                total_subscriptions_event += lot.subscriptions.filter(
-                    completed=True, test_subscription=False
-                ).exclude(
-                    status='canceled'
-                ).count()
-            return total_subscriptions_event >= self.event.expected_subscriptions
-
-        else:
-            return False
 
     def get_subscription_stats(self):
         stats = {
@@ -182,21 +167,28 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
 
         return stats
 
-    def _get_full_banking(self):
+    def get_org_banking_status(self):
 
         if not self.organization:
             return False
 
-        banking_required_fields = ['bank_code', 'agency', 'account',
-            'cnpj_ou_cpf', 'account_type']
+        return OrganizationHasBanking().is_satisfied_by(self.organization)
 
-        for field in Organization._meta.get_fields():
-            for required_field in banking_required_fields:
-                if field.name == required_field:
-                    if not getattr(self.organization, field.name):
-                        return False
+    def _event_is_full(self):
+        if self.event.expected_subscriptions and \
+                self.event.expected_subscriptions > 0:
 
-        return True
+            total_subscriptions_event = 0
+            for lot in self.event.lots.all():
+                total_subscriptions_event += lot.subscriptions.filter(
+                    completed=True, test_subscription=False
+                ).exclude(
+                    status='canceled'
+                ).count()
+            return total_subscriptions_event >= self.event.expected_subscriptions
+
+        else:
+            return False
 
     def _can_add(self):
         return self.request.user.has_perm(

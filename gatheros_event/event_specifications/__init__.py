@@ -1,4 +1,4 @@
-from .payable import EventPayable
+from .payable import EventPayable, OrganizationHasBanking
 from .subscribable import EventSubscribable, LotSubscribable
 from .has_subscriptions import EventHasSubscriptions, LotHasSubscriptions
 from .visible import EventVisible, LotVisible
