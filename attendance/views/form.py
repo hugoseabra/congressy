@@ -100,13 +100,13 @@ class EditAttendanceServiceView(BaseAttendanceServiceView, generic.UpdateView):
     template_name = 'attendance/edit-form.html'
     form_class = AttendanceServiceForm
     model = AttendanceServiceForm.Meta.model
-    success_url = reverse_lazy('attendance:manage-list-attendance')
     success_message = 'Lista de checkin alterada com sucesso.'
 
     def get_success_url(self):
         return reverse(
-            'attendance:manage-list-attendance',
-            kwargs={'event_pk': self.event.pk}
+            'attendance:attendance',
+            kwargs={'event_pk': self.event.pk,
+                    'pk': self.object.pk}
         )
 
     def get_lot_categories(self):

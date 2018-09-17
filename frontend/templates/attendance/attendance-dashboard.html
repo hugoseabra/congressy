@@ -21,9 +21,10 @@
 
 
     <script type="text/javascript">
-        console.log('confirmed'+ {{ confirmed }});
-        console.log('numero de atendimento'+ {{ number_attendances }});
-        console.log('numero de inscritos'+ {{ total_subscriptions }});
+        $('.panel .fa-expand').click(function () {
+            $('#name-on-fullscren').toggle();
+        });
+
         var progress;
         if (parseFloat('{{confirmed }}') === 0) {
             progress = 0;
@@ -205,14 +206,25 @@
         <div class="col-md-2 col-sm-12">
             {% include 'attendance/includes/attendance-menu.html' with active='dashboard' %}
         </div>
-        <div class="col-md-10">
+        <div class="col-md-10 col-sm-12">
 
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <div class="panel-title">Painel de Check-in
+                        <div class="pull-right" style="cursor: pointer">
+                            <i class="fa fa-expand"></i>
+
+                        </div>
                     </div>
                 </div>
                 <div class="panel-body">
+                    <div class="row" id="name-on-fullscren"
+                         style="padding-bottom: 15px;display: none">
+                        <div class="col-xs-12">
+                            <h3 class="text-bold" style="font-size:
+                            22px">{{ object.name }}</h3>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="panel panel-default">
