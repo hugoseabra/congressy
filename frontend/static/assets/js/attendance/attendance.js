@@ -471,7 +471,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             })
         };
 
-        this.create_card_el = function (service_pk, created_by) {
+        this.create_card_el = function (service_pk, created_by, checkin_button_msg, checkout_button_msg) {
 
             var header_color;
             var button_disabled = false;
@@ -479,6 +479,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             var button_class_name;
             var status_text;
             var status_pointer_color;
+            var status_card_text;
 
             var button = $('<button>').addClass('btn btn-trans').css({
                 'margin-top': '5px',
@@ -495,6 +496,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     header_color = COLOR_DISABLED;
                     button_text = 'Registrar entrada';
                     status_text = 'Cancelado';
+                    status_card_text = '';
                     status_pointer_color = '#d9534f';
                     button_class_name = 'default';
                     button_disabled = true;
@@ -502,14 +504,17 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     break;
                 case STATUS_CHECKED:
                     header_color = COLOR_CHECKED;
-                    button_text = 'Registrar saída';
+                    button_text = checkout_button_msg;
+                    status_card_text = 'PRESENTE';
                     button_class_name = 'danger';
                     status_text = 'Confirmado';
                     status_pointer_color = '#5cb85c';
                     break;
+
                 case STATUS_NOT_CHECKED:
                     header_color = COLOR_NOT_CHECKED;
-                    button_text = 'Registrar entrada';
+                    button_text = checkin_button_msg;
+                    status_card_text = 'AUSENTE';
                     button_class_name = 'success';
                     status_text = 'Confirmado';
                     status_pointer_color = '#5cb85c';
@@ -519,6 +524,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     header_color = COLOR_DISABLED;
                     button_text = 'Registrar entrada';
                     status_text = 'Pendente';
+                    status_card_text = '';
                     status_pointer_color = '#f0ad4e';
                     button_class_name = 'default';
                     button_disabled = true;
@@ -537,9 +543,10 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             var card_html = "<div class=\"panel panel-card\" style=\"border-radius: 5px; box-shadow: 0 10px 15px 0 rgba(223, 223, 223, 0.5);\">";
             card_html += "<div class=\"container-fluid\" style=\"height: 70px;border-top-left-radius: 5px;border-top-right-radius: 5px;background-color:" + header_color + "\">";
             card_html += "<div class=\"row\" style=\"height: 70px;\">";
-            card_html += "<div class=\"col-xs-3\">";
+            card_html += "<div class=\"col-xs-6\">";
+            card_html += "<h3 style=\" color: #FFFFFF; padding-top: 10px\" >"+ status_card_text+"</h3>";
             card_html += "</div>";
-            card_html += "<div class=\"col-xs-3 col-xs-offset-6\">";
+            card_html += "<div class=\"col-xs-3 col-xs-offset-3\">";
             card_html += "<div class=\"float-right time-circles\" style=\"width: 100%;height: 70px;\">";
             card_html += "</div>";
             card_html += "</div>";
@@ -611,7 +618,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                                 created_by
                             ).then(function () {
                                 console.log('3. recriando card.');
-                                self.create_card_el(service_pk, created_by);
+                                self.create_card_el(service_pk, created_by, checkin_button_msg, checkout_button_msg);
                                 button.removeAttr('disabled');
                                 button.text(button_text);
                             });
@@ -630,7 +637,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                                 created_by
                             ).then(function () {
                                 console.log('3. recriando card.');
-                                self.create_card_el(service_pk, created_by);
+                                self.create_card_el(service_pk, created_by, checkin_button_msg, checkout_button_msg);
                                 button.removeAttr('disabled');
                                 button.text(button_text);
                             });
@@ -644,18 +651,18 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             card_size = size || 4;
         };
 
-        this.getElement = function (service_pk, created_by) {
-            self.create_card_el(service_pk, created_by);
+        this.getElement = function (service_pk, created_by,checkin_button_msg, checkout_button_msg) {
+            self.create_card_el(service_pk, created_by,checkin_button_msg, checkout_button_msg);
 
             return card_parent_el;
         };
 
-        this.toggle = function (service_pk, created_by) {
+        this.toggle = function (service_pk, created_by,checkin_button_msg, checkout_button_msg) {
             return new Promise(function (resolve) {
                 if (getStatus() === STATUS_CHECKED) {
                     attendance.checkout(service_pk, subscription, created_by).then(
                         function () {
-                            self.create_card_el(service_pk, created_by);
+                            self.create_card_el(service_pk, created_by,checkin_button_msg, checkout_button_msg);
                             resolve();
                         });
                 }
@@ -663,7 +670,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     console.log("Realizar Checkin");
                     attendance.checkin(service_pk, subscription, created_by).then(
                         function () {
-                            self.create_card_el(service_pk, created_by);
+                            self.create_card_el(service_pk, created_by,checkin_button_msg, checkout_button_msg);
                             resolve();
                         }
                     );
@@ -691,12 +698,12 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             this.cards = [];
         };
 
-        this.render = function (parent_el) {
+        this.render = function (parent_el,checkin_button_msg, checkout_button_msg) {
             parent_el = $(parent_el);
             parent_el.html('');
 
             $.each(this.cards, function (i, card) {
-                parent_el.append(card.getElement(service_pk, created_by));
+                parent_el.append(card.getElement(service_pk, created_by,checkin_button_msg, checkout_button_msg));
             });
             this.clear();
         };
@@ -784,7 +791,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 // TYPING SEARCH
 // --------------------------------------------------------------------------//
 (function ($, attendance, List) {
-    attendance.TypingSearch = function (search, service_pk, created_by) {
+    attendance.TypingSearch = function (search, service_pk, created_by, checkin_button_msg, checkout_button_msg) {
         var searchTimer = null;
         var cards_list = new List(service_pk, created_by);
 
@@ -799,7 +806,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     $.each(cards, function (i, card) {
                         cards_list.addCard(card);
                     });
-                    cards_list.render(list_el);
+                    cards_list.render(list_el,checkin_button_msg, checkout_button_msg);
                 });
             }, 350);
         };
@@ -924,7 +931,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 // BARCODE SEARCH
 // --------------------------------------------------------------------------//
 (function ($, attendance, ProcessCounter) {
-    attendance.BarcodeSearch = function (search, service_pk, created_by) {
+    attendance.BarcodeSearch = function (search, service_pk, created_by, checkin_button_msg, checkout_button_msg) {
         var searchTimer = null;
         var selected_card = null;
         var cleanTimer = null;
@@ -946,7 +953,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                 $(document).on('keydown', function (event) {
                     list_el.focus();
                     if (event.keyCode === 32 && selected_card != null) {
-                        checkinByToggle(selected_card, service_pk, created_by, input_el);
+                        checkinByToggle(selected_card, service_pk, created_by, input_el,checkin_button_msg, checkout_button_msg);
                         processCounter.destroyCounter().then(
                              function () {
                                 processCounter.destroyCounter();
@@ -969,7 +976,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
 
                     if (reread === true) {
-                        checkinByToggle(selected_card, service_pk, created_by, list_el).then(
+                        checkinByToggle(selected_card, service_pk, created_by, list_el,checkin_button_msg, checkout_button_msg).then(
                             function () {
                                 processCounter.destroyCounter();
                             }
@@ -978,7 +985,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     }
 
                     selected_card = card;
-                    var outputCard = selected_card.getElement(service_pk, created_by);
+                    var outputCard = selected_card.getElement(service_pk, created_by,checkin_button_msg, checkout_button_msg);
                     list_el.html(outputCard);
 
                     if (card.active() === true) {
@@ -994,9 +1001,9 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
         };
 
-        var checkinByToggle = function (card, service_pk, created_by, input_el) {
+        var checkinByToggle = function (card, service_pk, created_by, input_el,checkin_button_msg, checkout_button_msg) {
             return new Promise(function (resolve) {
-                card.toggle(service_pk, created_by).then(function () {
+                card.toggle(service_pk, created_by,checkin_button_msg, checkout_button_msg).then(function () {
                     card = null;
                     $(input_el).val('');
                 });
@@ -1086,7 +1093,9 @@ function createTypingSearch(options) {
     var typingSearch = new window.cgsy.attendance.TypingSearch(
         search,
         options['servicePk'],
-        options['createdBy']
+        options['createdBy'],
+        options['checkin_button_msg'],
+        options['checkout_button_msg']
     );
     typingSearch.watch($(options['inputEl']), $(options['listEl']));
 }
@@ -1110,7 +1119,9 @@ function createBarCodeSearch(options) {
     var barCodeSearch = new window.cgsy.attendance.BarcodeSearch(
         search,
         options['servicePk'],
-        options['createdBy']
+        options['createdBy'],
+        options['checkin_button_msg'],
+        options['checkout_button_msg']
     );
     $(options['inputEl']).focus();
     barCodeSearch.watch($(options['inputEl']), $(options['listEl']));

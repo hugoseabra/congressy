@@ -77,19 +77,24 @@
             $('.panel .fa-expand').click(function () {
                 $('#name-on-fullscren').toggle();
             });
-            var success_checkin_msg, fail_checkin_msg;
-            var success_checkout_msg, fail_checkout_msg;
-            console.log('{{ object.checkin_only }}');
+            var success_checkin_msg, fail_checkin_msg, checkin_button_msg;
+            var success_checkout_msg, fail_checkout_msg, checkout_button_msg;
+
             {% if object.checkin_only == True %}
                 success_checkin_msg = 'Entrada registrada com sucesso';
                 fail_checkin_msg = 'Falha ao registrar entrada';
                 success_checkout_msg = 'Cancelamento de entrada registrado com sucesso';
                 fail_checkout_msg = 'Falha ao registrar cancelamento de entrada';
+                checkin_button_msg = 'Registrar entrada';
+                checkout_button_msg = 'Cancelar registro';
+
             {% else %}
                 success_checkin_msg = 'Entrada registrada com sucesso';
                 fail_checkin_msg = 'Falha ao registrar entrada';
                 success_checkout_msg = 'Saída registrada com sucesso';
                 fail_checkout_msg = 'Falha ao registrar saída';
+                checkin_button_msg = 'Registrar entrada';
+                checkout_button_msg = 'Registrar saída';
 
             {% endif %}
 
@@ -102,6 +107,8 @@
                     'checkoutUri': "{% url 'api:attendance:checkout-list' %}",
                     'success_checkout_msg': success_checkout_msg,
                     'fail_checkout_msg': fail_checkout_msg,
+                    'checkin_button_msg': checkin_button_msg,
+                    'checkout_button_msg': checkout_button_msg,
                     'servicePk': '{{ attendance_list.pk }}',
                     'createdBy': '{{ request.user.get_full_name }}',
                     'listEl': $('#cards-list'),
@@ -121,6 +128,8 @@
                     'checkoutUri': "{% url 'api:attendance:checkout-list' %}",
                     'success_checkout_msg': success_checkout_msg,
                     'fail_checkout_msg': fail_checkout_msg,
+                    'checkin_button_msg': checkin_button_msg,
+                    'checkout_button_msg': checkout_button_msg,
                     'servicePk': '{{ attendance_list.pk }}',
                     'createdBy': '{{ request.user.get_full_name }}',
                     'listEl': $('#cards-list'),
