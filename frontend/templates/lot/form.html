@@ -26,17 +26,7 @@
 
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
     <script>
-        $(document).ready(function () {
-            var date = createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end .datapicker');
-            createTimePicker();
-            {% if object %}
-                date.data("DateTimePicker").minDate(false);
-                window.setTimeout(function() {
-                    $('#datepicker-begin .datapicker input').val('{{ object.date_start|date:'d/m/Y' }}');
-                    $('#datepicker-end .datapicker input').val('{{ object.date_end|date:'d/m/Y' }}');
-                }, 200);
-            {% endif %}
-        });
+
         (function ($) {
             function show(el) {
                 $(el).fadeIn();
@@ -305,41 +295,18 @@
                     $('#id_date_end_1').mask("99:99");
                 {% endif %}
 
-                var radios = $('input[type=radio]');
-                var checkboxes = $('input[type=checkbox]');
                 var price_el = $('#id_price');
 
-                radios.each(function () {
+                var date = createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end .datapicker');
 
-                    if (!$(this).hasClass('js-switch')) {
-                        if (!$(this).hasClass('js-switch')) {
-                            $(this).iCheck({
-                                checkboxClass: 'icheckbox_flat-grey',
-                                radioClass: 'iradio_flat-grey'
-                            });
-                        }
-                    }
-                });
-                checkboxes.each(function () {
-
-                    if (!$(this).hasClass('js-switch')) {
-                        $(this).iCheck({
-                            checkboxClass: 'icheckbox_flat-grey',
-                            radioClass: 'iradio_flat-grey'
-                        });
-                    }
-                });
-
-{#                var has_optionals = false;#}
-{##}
-{#                {% if has_optionals %}#}
-{#                    has_optionals = true;#}
-{#                {% endif %}#}
-
-{#                if (has_optionals && parseFloat(price_el.val()) === 0.00) {#}
-{#                    $('#has_optionals_warning').show();#}
-{#                    $('.btn-success').prop('disabled', true);#}
-{#                }#}
+                createTimePicker();
+                {% if object %}
+                    date.data("DateTimePicker").minDate(false);
+                    window.setTimeout(function () {
+                        $('#datepicker-begin .datapicker input').val('{{ object.date_start|date:'d/m/Y' }}');
+                        $('#datepicker-end .datapicker input').val('{{ object.date_end|date:'d/m/Y' }}');
+                    }, 200);
+                {% endif %}
 
                 price_el.mask('#.##0,00', {reverse: true});
 
@@ -398,11 +365,6 @@
                             hide(transfer_tax);
                             hide(allow_installment);
                             showPrices(false);
-
-                            if (has_optionals) {
-                                $('#has_optionals_warning').show();
-                                $('.btn-success').prop('disabled', true);
-                            }
                         }
                         showHideInstallmentFields();
                         calculatePrices();
@@ -418,6 +380,7 @@
             });
 
         })(jQuery);
+
     </script>
 {% endblock %}
 
@@ -464,6 +427,8 @@
 
         <div class="row">
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+
+
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <div class="panel-title">
@@ -502,13 +467,17 @@
                 {% comment %}DJANGO TEMPLATING possui bugs para tratar 'or' {% endcomment %}
                 {% if lot_has_subscriptions and not object.price %}
                 {% else %}
+
                     <div class="panel panel-primary">
+
                         <div class="panel-heading">
                             <div class="panel-title">
                                 Custos e taxas
                             </div>
                         </div>
+
                         <div class="panel-body">
+
                             {% if full_banking %}
                                 <div class="col-md-12"
                                      id="has_optionals_warning"
