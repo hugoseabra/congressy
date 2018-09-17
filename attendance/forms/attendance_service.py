@@ -16,7 +16,8 @@ class AttendanceServiceForm(forms.ModelForm):
             'name',
             'event',
             'lot_categories',
-            'checkin_only'
+            'checkin_only',
+            'with_certificate'
         )
 
     def clean_lot_category_filter(self):

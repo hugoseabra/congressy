@@ -1,13 +1,20 @@
 from gatheros_subscription.models import Subscription
+from attendance.models import AttendanceService
 
 
 def subscription_is_checked(subscription_pk, event_pk):
-    queryset = Subscription.objects.filter(
+    subscription = Subscription.objects.get(
         pk=subscription_pk,
         event_id=event_pk)
 
-    queryset = queryset.filter(
-        checkins__isnull=False,
-    ).count()
+    queryset = subscription.checkins.all()
 
-    return queryset > 0
+    for item in queryset:
+        if item.attendance_service.checkin_only:
+            if item.checkin.checkout:
+                return False
+
+        if not item.attendance_service.with_certificate:
+                return False
+
+        return True

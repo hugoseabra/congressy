@@ -59,9 +59,23 @@
 
 
             </div>
+            <div class="panel">
+                <div class="panel-body">
+                    <h3><i class="fas fa-circle" style="color: #2ecc71"></i>
+                        Inscrito presente no
+                        evento.</h3>
+                    <h3><i class="fas fa-circle" style="color: #f1c40f"></i>
+                        Inscrito ausente no
+                        evento. </h3>
+                    <h3><i class="fas fa-circle" style="color: #afafaf"></i>
+                        Inscrito que não pode ser
+                        atendido(Inscrição cancelada ou pendente).</h3>
 
+                </div>
+            </div>
         </div>
     </div>
+
 
 
 {% endblock %}
@@ -74,9 +88,52 @@
     <script src="{% static 'assets/js/attendance/cgsy-scanner.js' %}"></script>
     <script>
         $(document).ready(function () {
-            $('.panel .fa-expand').click(function () {
-                $('#name-on-fullscren').toggle();
+            var change_href_attendance_methods = function (fullscreen) {
+                if (fullscreen === true) {
+
+                    $('.search_type_typing').attr('href', '?search_type=typing#fullscreen=true');
+                    $('.search_type_qrcode').attr('href', '?search_type=qrcode#fullscreen=true');
+                    $('.search_type_barcode').attr('href', '?search_type=barcode#fullscreen=true');
+                }
+                else {
+                    if (fullscreen === false) {
+                        $('.search_type_typing').attr('href', '?search_type=typing');
+                        $('.search_type_qrcode').attr('href', '?search_type=qrcode');
+                        $('.search_type_barcode').attr('href', '?search_type=barcode');
+                    }
+                }
+            };
+
+            var hash = window.location.hash.substring(1);
+            var fullscreen = hash.replace('fullscreen=', '');
+
+            if (fullscreen === 'true') {
+                $('.panel i.fa-expand').trigger('click');
+                change_href_attendance_methods(true);
+                $('#name-on-fullscren').show();
+            }
+
+
+            if(fullscreen === 'false'){
+                change_href_attendance_methods(false);
+                $('#name-on-fullscren').hide();
+            }
+
+
+            $('.panel i.fa-expand').click(function () {
+                $('#name-on-fullscren').show();
+
+                window.location.hash = '#fullscreen=true';
+                change_href_attendance_methods(true);
             });
+
+            $('.panel i.fa-compress').click(function () {
+                $('#name-on-fullscren').hide();
+
+               window.location.hash = '#fullscreen=false';
+                    change_href_attendance_methods(false);
+            });
+
             var success_checkin_msg, fail_checkin_msg, checkin_button_msg;
             var success_checkout_msg, fail_checkout_msg, checkout_button_msg;
 

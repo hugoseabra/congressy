@@ -22,6 +22,12 @@ class AttendanceService(models.Model):
         help_text="Este atendimento terá registros apenas de entradas"
     )
 
+    with_certificate = models.BooleanField(
+        default=False,
+        verbose_name='Esse atendimento terá direito a certificado ?',
+
+    )
+
     class Meta:
         verbose_name = 'Lista de Check-in/out'
         verbose_name_plural = 'Lista de Check-ins/outs'

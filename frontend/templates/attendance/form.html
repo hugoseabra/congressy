@@ -68,7 +68,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-group lot-category-filter"
                                              style="margin-top: 20px">
                                             <label>Categoria de lotes</label>
@@ -85,8 +85,11 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-6">
                                         {% render_switchery_field form.checkin_only %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.with_certificate %}
                                     </div>
                                 </div>
                             </div>

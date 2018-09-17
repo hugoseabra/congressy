@@ -75,10 +75,10 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                                         attendance_status) {
         var self = this;
         this.uuid = uuid;
-        this.name = name;
-        this.lot_name = lot_name;
-        this.category_name = category_name;
-        this.email = email;
+        this.name = name.substring(0,22);
+        this.lot_name = lot_name.substring(0,25);
+        this.category_name = category_name.substring(0,25);
+        this.email = email.substring(0,23);
         this.event_count = event_count;
         this.code = code;
         this.subscription_status = subscription_status;
@@ -114,10 +114,10 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                 sender.setSuccessCallback(function (response) {
                     console.log('1. Fetch - status anterior: ' + response['attendance_status']);
 
-                    self.name = response['person']['name'];
-                    self.lot_name = response['lot']['name'];
-                    self.category_name = response['lot']['category'];
-                    self.email = response['person']['email'];
+                    self.name = response['person']['name'].substring(0,22);
+                    self.lot_name = response['lot']['name'].substring(0,25);
+                    self.category_name = response['lot']['category'].substring(0,25);
+                    self.email = response['person']['email'].substring(0,23);
                     self.event_count = response['event_count'];
                     self.code = response['code'];
                     self.subscription_status = response['status'];
@@ -409,8 +409,8 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         const STATUS_NOT_CHECKED = 'not-checked';
 
         const COLOR_DISABLED = '#afafaf';
-        const COLOR_CHECKED = '#27ae60';
-        const COLOR_NOT_CHECKED = '#d0021b';
+        const COLOR_CHECKED = '#2ecc71';
+        const COLOR_NOT_CHECKED = '#f1c40f';
 
         this.subscription = subscription;
 
@@ -481,6 +481,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             var status_text;
             var status_pointer_color;
             var status_card_text;
+            var tooltip_message;
 
             var button = $('<button>').addClass('btn btn-trans').css({
                 'margin-top': '5px',
@@ -498,6 +499,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     button_text = 'Registrar entrada';
                     status_text = 'Cancelado';
                     status_card_text = '';
+                    tooltip_message = 'Inscrição cancelada';
                     status_pointer_color = '#d9534f';
                     button_class_name = 'default';
                     button_disabled = true;
@@ -523,6 +525,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                 case STATUS_PENDING:
                 default:
                     header_color = COLOR_DISABLED;
+                    tooltip_message = 'Inscrição pendente';
                     button_text = 'Registrar entrada';
                     status_text = 'Pendente';
                     status_card_text = '';
@@ -541,13 +544,13 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             button.text(button_text);
 
 
-            var card_html = "<div class=\"panel panel-card\" style=\"border-radius: 5px; box-shadow: 0 10px 15px 0 rgba(223, 223, 223, 0.5);\">";
+            var card_html = "<div class=\"panel panel-card\" style=\"border-radius: 5px; box-shadow: 0 10px 15px 0 rgba(223, 223, 223, 0.5);\" >";
             card_html += "<div class=\"container-fluid\" style=\"height: 70px;border-top-left-radius: 5px;border-top-right-radius: 5px;background-color:" + header_color + "\">";
             card_html += "<div class=\"row\" style=\"height: 70px;\">";
             card_html += "<div class=\"col-xs-6\">";
-            card_html += "<h3 style=\" color: #FFFFFF\" >"+ status_card_text+"</h3>";
+            card_html += "<h3 style=\" color: #FFFFFF; padding-top: 10px;\" >"+ status_card_text+"</h3>";
             card_html += "</div>";
-            card_html += "<div class=\"col-xs-3 col-xs-offset-2\">";
+            card_html += "<div class=\"col-xs-3 col-xs-offset-3\">";
             card_html += "<div class=\"float-right time-circles\" style=\"width: 100%;height: 70px;\">";
             card_html += "</div>";
             card_html += "</div>";
@@ -575,7 +578,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             card_html += "</div>";
             card_html += "</div>";
             card_html += "<div class=\"row\" style=\"padding-top: 8px\">";
-            card_html += "<div class=\"col-md-12 text-center\">";
+            card_html += "<div class=\"col-md-12 text-center\" style=\"overflow: hidden\">";
             card_html += "<div style=\"height: 0.5px;width: 100%; background-color: #e6e6e6; margin-top: 10px; margin-bottom: 10px\"></div>";
             card_html += "<h3 style=\"padding-bottom: 5px\" >";
             card_html += "<i class=\"far fa-envelope\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Email\"></i>";
@@ -598,7 +601,17 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             card_el = $(card_html);
 
             if (!card_parent_el) {
+                var status = getStatus();
                 card_parent_el = $('<div>').addClass('col-md-' + card_size);
+                if (status === STATUS_CANCELLED || status === STATUS_PENDING){
+                    card_parent_el.attr('data-toggle','tooltip');
+                    card_parent_el.attr('data-placement','bottom');
+                    card_parent_el.attr('title','');
+                    card_parent_el.attr('data-original-title',tooltip_message);
+
+                }
+
+
             }
 
             card_parent_el.html(card_el);
