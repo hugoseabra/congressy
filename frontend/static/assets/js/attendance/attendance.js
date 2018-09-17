@@ -221,6 +221,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                 var sender = new AjaxSender(uri);
                 sender.setSuccessCallback(function (response) {
                     if (response.length === 0) {
+                        console.log('foi2');
                         return;
                     }
                     $.each(response, function (i, item) {
@@ -544,9 +545,9 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             card_html += "<div class=\"container-fluid\" style=\"height: 70px;border-top-left-radius: 5px;border-top-right-radius: 5px;background-color:" + header_color + "\">";
             card_html += "<div class=\"row\" style=\"height: 70px;\">";
             card_html += "<div class=\"col-xs-6\">";
-            card_html += "<h3 style=\" color: #FFFFFF; padding-top: 10px\" >"+ status_card_text+"</h3>";
+            card_html += "<h3 style=\" color: #FFFFFF\" >"+ status_card_text+"</h3>";
             card_html += "</div>";
-            card_html += "<div class=\"col-xs-3 col-xs-offset-3\">";
+            card_html += "<div class=\"col-xs-3 col-xs-offset-2\">";
             card_html += "<div class=\"float-right time-circles\" style=\"width: 100%;height: 70px;\">";
             card_html += "</div>";
             card_html += "</div>";
@@ -763,7 +764,6 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
         this.fetch = function (search_criteria) {
             preSearchCallback();
-
             return new Promise(function (resolve) {
                 collection.fetch(search_criteria).then(function (subscriptions) {
                     var cards = [];
@@ -799,7 +799,6 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             list_el = $(list_el);
 
             window.clearTimeout(searchTimer);
-
             searchTimer = window.setTimeout(function () {
                 search.fetch(search_criteria).then(function (cards) {
                     cards_list.clear();
@@ -931,7 +930,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 // BARCODE SEARCH
 // --------------------------------------------------------------------------//
 (function ($, attendance, ProcessCounter) {
-    attendance.BarcodeSearch = function (search, service_pk, created_by, checkin_button_msg, checkout_button_msg) {
+    attendance.BarcodeSearch = function (search, service_pk, created_by,checkin_button_msg, checkout_button_msg) {
         var searchTimer = null;
         var selected_card = null;
         var cleanTimer = null;
@@ -985,7 +984,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     }
 
                     selected_card = card;
-                    var outputCard = selected_card.getElement(service_pk, created_by,checkin_button_msg, checkout_button_msg);
+                    var outputCard = selected_card.getElement(service_pk, created_by, checkin_button_msg, checkout_button_msg);
                     list_el.html(outputCard);
 
                     if (card.active() === true) {
