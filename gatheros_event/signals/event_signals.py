@@ -19,6 +19,7 @@ def create_feature_configuration(instance, raw, created, **_):
                 event=instance,
                 feature_certificate=True,
                 feature_internal_subscription=True,
+                feature_multi_lots=True,
             )
 
         instance.feature_configuration.save()
