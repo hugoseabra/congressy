@@ -44,11 +44,10 @@ INSTALLED_APPS = [
     # KANU_APPS
     'kanu_locations',
 
-    # CONGRESSY APPS
+    # CONGRESSY APPS - GLOBALS
     'core',
     'base',
     'frontend',
-    'service_tags',
 ]
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
 LANGUAGE_CODE = 'pt-br'
