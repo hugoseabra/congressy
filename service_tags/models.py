@@ -13,6 +13,9 @@ class CustomServiceTag(models.Model):
         verbose_name = 'Script customizado'
         verbose_name_plural = 'Scripts customizados'
 
+    def __str__(self):
+        return str(self.pk) if self.pk else ''
+
     event = models.OneToOneField(
         'gatheros_event.Event',
         on_delete=models.CASCADE,
