@@ -354,6 +354,12 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
         self.event = self.current_event.event
         self.subscription = self.current_subscription.subscription
 
+        if 'conversion_unique_id' not in self.request.session:
+            # Ponto de controle para saber que participante passou pelo
+            # wizard e leva informação para o /subscription/done/
+            self.request.session['conversion_unique_id'] = \
+                str(self.subscription.pk)
+
     def dispatch(self, request, *args, **kwargs):
         path = request.path
         self.top_bar = '/subscription/' in path
@@ -850,10 +856,6 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
                     else:
                         msg = 'Inscrição salva com sucesso!'
 
-                    success_url = reverse_lazy('public:hotsite', kwargs={
-                        'slug': self.event.slug,
-                    })
-
                 else:
                     has_transactions = transactions_qs.exclude(
                         subscription__lot=subscription.lot
@@ -887,10 +889,10 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
                     else:
                         msg = 'Inscrição salva com sucesso!'
 
-                    success_url = reverse_lazy(
-                        'public:hotsite-subscription-status',
-                        kwargs={'slug': self.event.slug, }
-                    )
+                success_url = reverse_lazy(
+                    'public:hotsite-subscription-done',
+                    kwargs={'slug': self.event.slug, }
+                )
 
                 self.clear_session()
 

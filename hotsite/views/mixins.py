@@ -69,6 +69,7 @@ class EventMixin(TemplateNameableMixin):
             event_state.active_bank_account_configured
 
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
+        context['custom_service_tag'] = event_state.custom_service_tag
 
         return context
 

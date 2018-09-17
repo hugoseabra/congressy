@@ -25,6 +25,8 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
         self.subscription = None
         self.transactions = None
         self.restart_private_event = False
+        self.next_url = None
+
         super().__init__(**initkwargs)
 
     def pre_dispatch(self):
@@ -33,6 +35,12 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
         self.event = self.current_event.event
         self.person = self.current_subscription.person
         self.subscription = self.current_subscription.subscription
+        self.next_url = self.request.GET.get('next')
+        conversion_script = \
+            self.current_event.custom_service_tag.conversion_script
+
+        if conversion_script and self.next_url:
+            self.template_name = 'service_tags/redirect_landing.html'
 
     def dispatch(self, request, *args, **kwargs):
 
@@ -49,6 +57,7 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
         # Se  não há lotes pagos, não há o que fazer aqui.
         has_paid_lots = self.current_event.has_paid_lots()
         has_paid_optionals = self.current_subscription.has_paid_optionals()
+
         if not has_paid_lots and not has_paid_optionals:
             return redirect('public:hotsite', slug=slug)
 
@@ -108,6 +117,8 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
         context['person'] = self.subscription.person
         context['allow_transaction'] = self.get_allowed_transaction()
         context['transactions'] = self.current_subscription.transactions
+
+        context['next_url'] = self.next_url
 
         can_reprocess_payment = True
 
