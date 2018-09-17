@@ -23,13 +23,24 @@ class EventPayable(EventCompositeSpecificationMixin):
         no presente ou no passado.
     """
 
+    def __init__(self, exclude=None, exclude_type=None) -> None:
+        self.exclude = exclude
+        self.exclude_type = exclude_type
+        super().__init__()
+
     def is_satisfied_by(self, event: Event):
         super().is_satisfied_by(event)
 
         for lot in event.lots.all():
 
+            if (self.exclude_type and self.exclude) and \
+                    self.exclude_type == 'lot':
+                if lot == self.exclude:
+                    continue
+
             one = LotVisible()
-            other = LotPayable()
+            other = LotPayable(exclude=self.exclude,
+                               exclude_type=self.exclude_type)
 
             spec = AndSpecification(one, other)
 
@@ -48,6 +59,11 @@ class LotPayable(LotCompositeSpecificationMixin):
         serviço ativo vinculado ao lote.
     """
 
+    def __init__(self, exclude=None, exclude_type=None) -> None:
+        self.exclude = exclude
+        self.exclude_type = exclude_type
+        super().__init__()
+
     def is_satisfied_by(self, lot: Lot):
         super().is_satisfied_by(lot)
 
@@ -57,12 +73,22 @@ class LotPayable(LotCompositeSpecificationMixin):
         all_products = self._get_active_products_in_lot(lot)
         for product in all_products:
 
+            if (self.exclude_type and self.exclude) and \
+                    self.exclude_type == 'product':
+                if product == self.exclude:
+                    continue
+
             if ProductPayable().is_satisfied_by(product):
                 paid_service_or_product_flag = True
 
         # Services
         all_services = self._get_active_services_in_lot(lot)
         for service in all_services:
+
+            if (self.exclude_type and self.exclude) and \
+                    self.exclude_type == 'service':
+                if service == self.exclude:
+                    continue
 
             if ServicePayable().is_satisfied_by(service):
                 paid_service_or_product_flag = True
