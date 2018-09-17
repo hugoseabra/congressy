@@ -1,4 +1,4 @@
-{% if DEBUG is True %}
+{% if DEBUG is False %}
 {% load script_tag_variables %}
 {% process_template script_tag_content as tag_scripts %}
 {{ tag_scripts | safe | default_if_none:'' }}
