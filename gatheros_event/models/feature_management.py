@@ -49,3 +49,9 @@ class FeatureManagement(models.Model):
         verbose_name='Formulário Personalizado',
         help_text="Seu evento terá formulário com perguntas personalizadas ?"
     )
+
+    raffle = models.BooleanField(
+        default=False,
+        verbose_name='Sorteios',
+        help_text="Seu evento terá sorteios ?"
+    )

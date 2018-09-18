@@ -11,6 +11,7 @@ FREE_EVENT_FEATURES = {
     # During Event
     'feature_manual_payments': False,
     'feature_checkin': True,
+    'feature_raffle': False,
 }
 
 PAID_EVENT_FEATURES = {
@@ -26,4 +27,5 @@ PAID_EVENT_FEATURES = {
     # During Event
     'feature_manual_payments': False,
     'feature_checkin': True,
+    'feature_raffle': False,
 }

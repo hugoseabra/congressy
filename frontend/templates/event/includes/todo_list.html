@@ -391,6 +391,29 @@
         </tr>
     {% endif %}
 
+
+    {% if feature_management.raffle and feature_config.feature_raffle %}
+        <tr id="del-raffle" class="todo_list_element" role="presentation">
+            <td>
+                <a>Sorteios</a>
+            </td>
+            <td>
+                <button type="button"
+                        class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                        data-toggle="dropdown"
+                        onclick="location.href='{% url 'raffle:raffle-list' event.pk %}'"
+                        aria-expanded="false"
+                        aria-haspopup="true">
+                    <span>Acessar</span>
+                </button>
+            </td>
+
+            <td>
+                <i class="fas fa-check-circle success-color pull-right fa-2x"></i>
+            </td>
+        </tr>
+    {% endif %}
+
     </tbody>
 </table>
 <br>

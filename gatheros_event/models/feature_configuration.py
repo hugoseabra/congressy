@@ -95,3 +95,9 @@ class FeatureConfiguration(models.Model):
         verbose_name='funcionalidade - multi lotes',
         help_text='Liberar funcionalidade de multi lotes'
     )
+
+    feature_raffle = models.BooleanField(
+        default=False,
+        verbose_name='funcionalidade - sorteios',
+        help_text='Liberar funcionalidade de sorteios'
+    )

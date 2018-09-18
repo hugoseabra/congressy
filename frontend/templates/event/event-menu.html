@@ -113,13 +113,15 @@ Variáveis:
             </a>
         </li>
     {% endif %}
-    <li {% if active == 'raffles' %}class=  "active"{% endif %}>
-        <a class="sidebar-itens"
-           href="{% url 'raffle:raffle-list' event.pk %}"
-           title="Sorteios">
-            <i class="fas fa-trophy"></i> Sorteios
-        </a>
-    </li>
+    {% if event.feature_configuration.feature_raffle and  event.feature_management.raffle %}
+        <li {% if active == 'raffles' %}class=  "active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'raffle:raffle-list' event.pk %}"
+               title="Sorteios">
+                <i class="fas fa-trophy"></i> Sorteios
+            </a>
+        </li>
+    {% endif %}
 </ul>
 
 <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
