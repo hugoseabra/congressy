@@ -4162,24 +4162,53 @@ ul.messenger-theme-flat .messenger-message.alert-warning .messenger-message-inne
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
+.attendance-card .status-card {
+  padding-top: 10px;
+  color: #ffffff;
+  font-size: 16px;
+}
 .attendance-card .secondary-informations {
   padding-bottom: 5px;
   font-size: 14px;
 }
+.attendance-card .btn-success.btn-trans {
+  color: #27B6AF;
+  background-color: transparent;
+  border: solid thin #27B6AF;
+}
+.attendance-card .btn-success.btn-trans:hover,
+.attendance-card .btn-success.btn-trans:active,
+.attendance-card .btn-success.btn-trans:focus {
+  color: #fff;
+  background-color: #27B6AF;
+  border: solid thin #27B6AF;
+}
+.attendance-card .btn-warning.btn-trans {
+  color: #EDCE8C;
+  background-color: transparent;
+  border: solid thin #EDCE8C;
+}
+.attendance-card .btn-warning.btn-trans:hover,
+.attendance-card .btn-warning.btn-trans:active,
+.attendance-card .btn-warning.btn-trans:focus {
+  color: #fff;
+  background-color: #EDCE8C;
+  border: solid thin #EDCE8C;
+}
 .barcode-user-tips {
-  background-color: #f8f8f8;
+  background-color: #f0f0f0;
   margin-top: 15px;
   padding: 10px;
   border-left-width: 4px;
   border-left-style: solid;
-  border-left-color: #449D44;
+  border-left-color: #27B6AF;
   border-bottom-right-radius: 2px;
   border-top-right-radius: 2px;
 }
 .divider-card {
   height: 0.5px;
   width: 100%;
-  background-color: #e6e6e6;
+  background-color: #8f939e;
   margin-top: 10px;
   margin-bottom: 10px;
 }

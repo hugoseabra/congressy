@@ -408,11 +408,9 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         const STATUS_CHECKED = 'checked';
         const STATUS_NOT_CHECKED = 'not-checked';
 
-        const COLOR_DISABLED = '#909AA0';
+        const COLOR_DISABLED = '#e25d5d';
+        const COLOR_NOT_CHECKED = '#909AA0';
         const COLOR_CHECKED = '#27B6AF';
-        // const COLOR_CHECKED = '#449D44';
-        // const COLOR_NOT_CHECKED = '#EC971F';
-        const COLOR_NOT_CHECKED = '#EDCE8C';
 
         this.subscription = subscription;
 
@@ -545,7 +543,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             card_html += "<div class=\"header-card container-fluid\" style=\"background-color:" + header_color + "\">";
             card_html += "<div class=\"row\" style=\"height: 40px;\">";
             card_html += "<div class=\"col-xs-6\">";
-            card_html += "<h3 style=\" padding-top: 10px;\" >"+ status_card_text+"</h3>";
+            card_html += "<h3 class=\"status-card\"style=\" ;\" >"+ status_card_text+"</h3>";
             card_html += "</div>";
             card_html += "<div class=\"col-xs-3 col-xs-offset-3\">";
             card_html += "<div class=\"float-right time-circles\" style=\"width: 100%;height: 25px;\">";
@@ -847,7 +845,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
             $("#DateCountdown").TimeCircles({
                 "animation": "smooth",
-                "number_size": 0.001,
+                "number_size": 0.2,
                 "bg_width": 0.25,
                 "fg_width": 0.055,
                 "start_angle": 0,
