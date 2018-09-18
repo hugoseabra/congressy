@@ -19,6 +19,7 @@ from gatheros_event.views.mixins import AccountMixin, EventViewMixin
 from gatheros_subscription.models import Subscription
 from attendance.helpers.attendance import subscription_is_checked
 
+
 class CertificatePDFView(AccountMixin, generic.View):
     template_name = 'pdf/certificate.html'
     subscription = None
