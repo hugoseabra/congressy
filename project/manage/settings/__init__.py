@@ -22,6 +22,7 @@ INSTALLED_APPS += [
     'raffle',
     'importer',
     'attendance',
+    'service_tags',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'

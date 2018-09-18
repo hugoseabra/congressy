@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Congressy | Aguarde... </title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% if next_url %}
+    <meta http-equiv="refresh" content="3; url={{ next_url|default:'/' }}">
+    {% else %}
+    <meta http-equiv="refresh" content="3; url={% url 'public:hotsite' event.slug %}">
+    {% endif %}
+
+    <!-- FAVICONS -->
+    <link rel="icon" href="{% static 'assets/img/favicons/favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'assets/img/favicons/apple-touch-icon.png' %}">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="{% static "assets/plugins/bootstrap/css/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "assets/plugins/bootstrap/css/bootstrap-xl.css" %}">
+
+    <!-- Fonts  -->
+    <link rel="stylesheet" href="{% static "assets/css/fontawesome-all.min.css" %}">
+    <link rel="stylesheet" href="{% static "assets/css/font-awesome-animation.min.css" %}">
+
+    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+
+    <!-- Custom styles for this theme -->
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="row text-center" style="margin-top: 75px">
+        <div class="col-md-4 col-sm-offset-4">
+
+            <div>
+                <i class="fas info-color fa-circle-notch fa-spin fa-4x" style="margin-top: 5px"></i>
+            </div>
+
+            <div style="margin-top: 16px">
+                <span style="font-size: 24px">aguarde...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if include_tags_path %}
+{% include include_tags_path with script_tag_content=custom_service_tag %}
+{% endif %}
+</body>
+</html>
