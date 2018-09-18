@@ -97,7 +97,7 @@ class CertificatePDFView(AccountMixin, generic.View):
         
         if certificate_config.only_attending_participantes:
 
-            if not subscription_is_checked(self.subscription.pk, self.event):
+            if not subscription_is_checked(self.subscription.pk):
 
                 self.permission_denied_message = "Certificado disponivel " \
                                                  "apenas participantes com " \

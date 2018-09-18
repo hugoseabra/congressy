@@ -1046,7 +1046,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
         status_events = []
         subscription = self.get_queryset()
         for sub in subscription:
-            checked = subscription_is_checked(sub.pk, sub.event.id)
+            checked = subscription_is_checked(sub.pk)
             status_events.append({
                 'event_pk': sub.event.id,
                 'checked': checked

@@ -20,6 +20,7 @@ class SubscriptionSearchViewSet(generics.ListAPIView):
             self.query = request.GET.get('query')
 
         response = super().get(request, *args, **kwargs)
+        print (response)
         return response
 
     def get_queryset(self) -> list:
