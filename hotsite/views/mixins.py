@@ -1,7 +1,7 @@
 """
     Mixins usados no módulo de hotsite.
 """
-
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 
@@ -72,6 +72,7 @@ class EventMixin(TemplateNameableMixin):
             event_state.active_bank_account_configured
 
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
+        context['custom_service_tag'] = event_state.custom_service_tag
 
         return context
 
@@ -105,12 +106,27 @@ class SubscriptionFormMixin(EventMixin):
             subscription.is_new = False
 
         except Subscription.DoesNotExist:
+
+            lots = self.current_event.get_all_lots()
+            if lots:
+                lot = lots[0]
+            else:
+                lot = self.current_event.event.lots.first()
+
+            if not lot:
+                lot = Lot(
+                    event=self.current_event.event,
+                    date_start=datetime.now(),
+                    date_end=datetime.now() + timedelta(days=2),
+                    name='invalid',
+                )
+
             subscription = Subscription(
                 person=person,
                 event=self.current_event.event,
                 completed=False,
                 created_by=user.pk,
-                lot=self.current_event.get_all_lots()[0]
+                lot=lot,
             )
             subscription.is_new = True
 

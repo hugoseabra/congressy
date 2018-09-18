@@ -127,6 +127,12 @@
     });
 </script>
 
+{% block service_tag_scripts %}
+{% if custom_service_tag.tracking_script %}
+{% include 'service_tags/custom-script-tags.html' with script_tag_content=custom_service_tag.tracking_script %}
+{% endif %}
+{% endblock %}
+
 {% include 'sentry-javascript-sdk.html' %}
 
 </body>

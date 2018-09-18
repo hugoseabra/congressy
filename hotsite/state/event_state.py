@@ -1,5 +1,6 @@
 from gatheros_event.models import Event
 from gatheros_subscription.models import FormConfig
+from service_tags.models import CustomServiceTag
 
 
 class CurrentEventState(object):
@@ -8,6 +9,7 @@ class CurrentEventState(object):
         self.slug = event.slug
         self.organization = event.organization
 
+        self.custom_service_tag = self._get_custom_script_tags()
         self.info = self._get_info()
         self.form_config = self._get_form_config()
         self.period = event.get_period()
@@ -32,7 +34,14 @@ class CurrentEventState(object):
         if hasattr(self.event, 'form_config') and self.event.info is not None:
             return self.event.form_config
 
-        return FormConfig()
+        return FormConfig(event=self.event)
+
+    def _get_custom_script_tags(self):
+        if hasattr(self.event, 'custom_service_tag') and \
+                        self.event.custom_service_tag is not None:
+            return self.event.custom_service_tag
+
+        return CustomServiceTag(event=self.event)
 
     def is_lot_running(self, lot):
         status = self.get_lot_status(lot)
@@ -84,20 +93,19 @@ class CurrentEventState(object):
 
     def has_available_lots(self):
         lots = self.get_all_lots()
-        return lots and len(lots) > 0
+        return len(lots) > 0
 
     def has_available_private_lots(self):
         lots = self.get_private_lots()
-        return lots and len(lots) > 0
+        return len(lots) > 0
 
     def has_available_public_lots(self):
         lots = self.get_public_lots()
-        return lots and len(lots) > 0
+        return len(lots) > 0
 
     def has_paid_lots(self):
         """ Retorna se evento possui algum lote pago. """
-        lots = self.get_paid_lots()
-        return lots and len(lots) > 0
+        return len(self.get_paid_lots()) > 0
 
     def has_coupon(self):
         """ Retorna se possui cupom, seja qual for. """

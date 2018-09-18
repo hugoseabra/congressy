@@ -1,7 +1,19 @@
 """
     View usada para verificar o status da sua inscrição
 """
+from datetime import datetime
 
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404, redirect
+from django.views import generic
+
+from gatheros_event.models import Event
+from gatheros_subscription.models import Subscription
+from hotsite.views import SubscriptionFormMixin
+from payment.models import Transaction
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -22,6 +34,8 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
         self.subscription = None
         self.transactions = None
         self.restart_private_event = False
+        self.next_url = None
+
         super().__init__(**initkwargs)
 
     def pre_dispatch(self):
@@ -30,6 +44,12 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
         self.event = self.current_event.event
         self.person = self.current_subscription.person
         self.subscription = self.current_subscription.subscription
+        self.next_url = self.request.GET.get('next')
+        conversion_script = \
+            self.current_event.custom_service_tag.conversion_script
+
+        if conversion_script and self.next_url:
+            self.template_name = 'service_tags/redirect_landing.html'
 
     def dispatch(self, request, *args, **kwargs):
 
@@ -80,6 +100,8 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
         context['person'] = self.subscription.person
         context['allow_transaction'] = self.get_allowed_transaction()
         context['transactions'] = self.current_subscription.transactions
+
+        context['next_url'] = self.next_url
 
         can_reprocess_payment = True
 

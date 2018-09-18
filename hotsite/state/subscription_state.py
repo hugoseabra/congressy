@@ -47,6 +47,9 @@ class CurrentSubscriptionState(object):
 
         return payments
 
+    def has_transactions(self):
+        return len(self.transactions) > 0
+
     def has_payments(self):
         return len(self.payments) > 0
 
