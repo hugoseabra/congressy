@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.views.generic import ListView
 
 from gatheros_event.models import Event
@@ -18,3 +20,8 @@ class EventListView(AccountMixin, ListView):
 
     def can_access(self):
         return self.is_manager
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['now'] = datetime.now()
+        return context

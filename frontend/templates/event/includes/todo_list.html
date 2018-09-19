@@ -6,6 +6,7 @@
 </div>
 <table id="todo-list" class="table table-striped">
     <tbody>
+
     <tr class="todo_list_element" role="presentation">
         <td>
             <a>Criar evento</a>
@@ -19,6 +20,7 @@
 
         </td>
     </tr>
+
     <tr class="todo_list_element" role="presentation">
         <td>
             <a>Criar HotSite </a>
@@ -47,7 +49,8 @@
             {% endif %}
         </td>
     </tr>
-    {% if event.event_type == event.EVENT_TYPE_PAID or event.event_type == event.EVENT_TYPE_SCIENTIFIC or has_paid_lots %}
+
+    {% if event_is_payable %}
         <tr class="todo_list_element" role="presentation">
 
             <td>
@@ -80,43 +83,76 @@
         </tr>
     {% endif %}
 
-    {% if event.event_type == event.EVENT_TYPE_PAID or event.event_type == event.EVENT_TYPE_SCIENTIFIC or has_paid_lots %}
-        <tr class="todo_list_element {% if not has_paid_lots %}
-                    warning {% endif %}"
-            role="presentation"
-                {% if not has_paid_lots %}
-            data-toggle="tooltip"
-            data-placement="top"
-            title=""
-            data-original-title="Para que seu evento seja
-                           efetivamente pago você deve criar um lote pago"
-                {% endif %}>
-            <td>
-                <a>Configurar lotes</a>
-            </td>
-            <td>
-                <button type="button"
-                        class="btn btn-success btn-trans btn-sm dropdown-toggle"
-                        data-toggle="dropdown"
-                        onclick="location.href='{% url 'subscription:lot-list' event.pk %}'"
-                        aria-expanded="false"
-                        aria-haspopup="true">
-                    <span>Acessar</span>
-                </button>
-            </td>
-            <td>
-                {% if has_paid_lots %}
-                    <i class="fas fa-check-circle success-color
-                                    pull-right fa-2x"></i>
-                {% else %}
-                    <i class="fas fa-exclamation-circle warning-color
-                                    pull-right fa-2x"></i>
-                {% endif %}
-            </td>
-        </tr>
-    {% endif %}
 
-    {% if event.event_type == event.EVENT_TYPE_SCIENTIFIC %}
+    <tr class="todo_list_element {% if not event_is_subscribable %}
+                    warning {% endif %}"
+        role="presentation"
+            {% if not event_is_subscribable %}
+        data-toggle="tooltip"
+        data-placement="top"
+        title=""
+        data-original-title="Para que seu evento receba inscrições você deve ter pelo menos um lote disponivel"
+            {% endif %}>
+        <td>
+            <a>Configurar lote(s)</a>
+        </td>
+        <td>
+            <button type="button"
+                    class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                    data-toggle="dropdown"
+                    onclick="location.href='{% url 'subscription:lot-list' event.pk %}'"
+                    aria-expanded="false"
+                    aria-haspopup="true">
+                <span>Acessar</span>
+            </button>
+        </td>
+        <td>
+            {% if event_is_subscribable %}
+                <i class="fas fa-check-circle success-color
+                                    pull-right fa-2x"></i>
+            {% else %}
+                <i class="fas fa-exclamation-circle warning-color
+                                    pull-right fa-2x"></i>
+            {% endif %}
+        </td>
+    </tr>
+
+    <tr class="todo_list_element {% if not event_is_subscribable %}
+                    warning {% endif %}"
+        role="presentation"
+            {% if not event_is_subscribable %}
+        data-toggle="tooltip"
+        data-placement="top"
+        title=""
+        data-original-title="Para que seu evento receba inscrições você deve ter pelo menos um lote disponivel"
+            {% endif %}>
+        <td>
+            <a>Configurar categorias para participantes </a>
+        </td>
+        <td>
+            <button type="button"
+                    class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                    data-toggle="dropdown"
+                    onclick="location.href='{% url 'subscription:lot-list' event.pk %}'"
+                    aria-expanded="false"
+                    aria-haspopup="true">
+                <span>Acessar</span>
+            </button>
+        </td>
+        <td>
+            {% if event_is_subscribable %}
+                <i class="fas fa-check-circle success-color
+                                    pull-right fa-2x"></i>
+            {% else %}
+                <i class="fas fa-exclamation-circle warning-color
+                                    pull-right fa-2x"></i>
+            {% endif %}
+        </td>
+    </tr>
+
+
+
+    {% if event.is_scientific %}
         <tr class="todo_list_element" role="presentation">
             <td>
                 <a>Configurar a
@@ -148,7 +184,7 @@
         </tr>
     {% endif %}
 
-    {% if has_addons.checkin == True %}
+    {% if feature_management.checkin and feature_config.feature_checkin %}
         <tr id=del-checkin class="todo_list_element" role="presentation">
             <td>
                 {% if number_attendances == 0 %}
@@ -180,7 +216,8 @@
             </td>
         </tr>
     {% endif %}
-    {% if has_addons.extra_activities == True %}
+
+    {% if feature_management.services and feature_config.feature_services %}
         <tr id="del-extra_activities" class="todo_list_element"
             role="presentation">
             <td>
@@ -222,7 +259,8 @@
             </td>
         </tr>
     {% endif %}
-    {% if has_addons.optionals == True %}
+
+    {% if feature_management.products and feature_config.feature_products %}
         <tr id="del-optionals" class="todo_list_element" role="presentation">
             <td>
                 {% if status_addons.products == False %}
@@ -266,7 +304,8 @@
             </td>
         </tr>
     {% endif %}
-    {% if has_addons.survey == True %}
+
+    {% if feature_management.survey  and feature_config.feature_survey %}
         <tr id="del-survey" class="todo_list_element" role="presentation">
             <td>
                 {% if not has_survey_create %}
@@ -310,43 +349,71 @@
             </td>
         </tr>
     {% endif %}
-        {% if has_addons.certificate == True %}
-            <tr id="del-certificate" class="todo_list_element" role="presentation">
-                <td>
 
-                    <button type="button"
-                            class="add_todo_element btn btn-warning btn-trans
+    {% if feature_management.certificate and feature_config.feature_certificate %}
+        <tr id="del-certificate" class="todo_list_element" role="presentation">
+
+            <td>
+
+                <button type="button"
+                        class="add_todo_element btn btn-warning btn-trans
                             btn-sm dropdown-toggle"
-                            data-toggle="dropdown"
-                            aria-expanded="false"
-                            aria-haspopup="true">
+                        data-toggle="dropdown"
+                        aria-expanded="false"
+                        aria-haspopup="true">
                         <span class="fas
                 fa-minus"></span>
-                    </button>
-                    <a>Gerar Certificados</a>
-                </td>
-                <td>
-                    <button type="button"
-                            class="btn btn-success btn-trans btn-sm dropdown-toggle"
-                            data-toggle="dropdown"
-                            onclick="location.href='{% url 'certificate:event-certificate-config' event.pk %}'"
-                            aria-expanded="false"
-                            aria-haspopup="true">
-                        <span>Acessar</span>
-                    </button>
-                </td>
+                </button>
+                <a>Gerar Certificados</a>
+            </td>
 
-                <td>
-                    {% if ready_certificate %}
-                        <i class="fas fa-check-circle success-color
+            <td>
+                <button type="button"
+                        class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                        data-toggle="dropdown"
+                        onclick="location.href='{% url 'certificate:event-certificate-config' event.pk %}'"
+                        aria-expanded="false"
+                        aria-haspopup="true">
+                    <span>Acessar</span>
+                </button>
+            </td>
+
+            <td>
+                {% if ready_certificate %}
+                    <i class="fas fa-check-circle success-color
                                             pull-right fa-2x"></i>
-                    {% else %}
-                        <i class="fas fa-exclamation-circle warning-color
+                {% else %}
+                    <i class="fas fa-exclamation-circle warning-color
                                             pull-right fa-2x"></i>
-                    {% endif %}
-                </td>
-            </tr>
-        {% endif %}
+                {% endif %}
+            </td>
+
+        </tr>
+    {% endif %}
+
+
+    {% if feature_management.raffle and feature_config.feature_raffle %}
+        <tr id="del-raffle" class="todo_list_element" role="presentation">
+            <td>
+                <a>Sorteios</a>
+            </td>
+            <td>
+                <button type="button"
+                        class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                        data-toggle="dropdown"
+                        onclick="location.href='{% url 'raffle:raffle-list' event.pk %}'"
+                        aria-expanded="false"
+                        aria-haspopup="true">
+                    <span>Acessar</span>
+                </button>
+            </td>
+
+            <td>
+                <i class="fas fa-check-circle success-color pull-right fa-2x"></i>
+            </td>
+        </tr>
+    {% endif %}
+
     </tbody>
 </table>
 <br>
@@ -357,7 +424,8 @@
     <div class="panel-body">
         <table id="todo-list-add" class="table-striped table">
             <tbody>
-            {% if has_addons.survey == False %}
+
+            {% if not feature_management.survey and feature_config.feature_survey %}
                 <tr id="add-survey" class="todo_list_element"
                     role="presentation">
                     <td>
@@ -375,80 +443,83 @@
                     </td>
                 </tr>
             {% endif %}
-            {% if has_paid_lots or event.event_type == event.EVENT_TYPE_PAID or event.event_type == event.EVENT_TYPE_SCIENTIFIC %}
-                {% if has_addons.checkin == False %}
-                    <tr id="add-checkin" class="todo_list_element"
-                        role="presentation">
-                        <td>
 
-                            <button type="button"
-                                    class="add_todo_element btn btn-success btn-trans btn-sm dropdown-toggle"
-                                    data-toggle="tooltip"
-                                    data-placement="left"
-                                    title=""
-                                    data-original-title="Adicionar">
+            {% if not feature_management.checkin and feature_config.feature_checkin %}
+                <tr id="add-checkin" class="todo_list_element"
+                    role="presentation">
+                    <td>
+
+                        <button type="button"
+                                class="add_todo_element btn btn-success btn-trans btn-sm dropdown-toggle"
+                                data-toggle="tooltip"
+                                data-placement="left"
+                                title=""
+                                data-original-title="Adicionar">
                     <span class="fas
             fa-plus"></span>
-                            </button>
-                            <a>CheckIn</a>
-                        </td>
-                    </tr>
-                {% endif %}
-                {% if has_addons.extra_activities == False %}
-                    <tr id="add-extra_activities" class="todo_list_element"
-                        role="presentation">
-                        <td>
+                        </button>
+                        <a>CheckIn</a>
+                    </td>
+                </tr>
+            {% endif %}
 
-                            <button type="button"
-                                    class="add_todo_element btn btn-success btn-trans btn-sm"
-                                    data-toggle="tooltip"
-                                    data-placement="left"
-                                    title=""
-                                    data-original-title="Adicionar">
+            {% if not feature_management.services and feature_config.feature_services %}
+                <tr id="add-extra_activities" class="todo_list_element"
+                    role="presentation">
+                    <td>
+
+                        <button type="button"
+                                class="add_todo_element btn btn-success btn-trans btn-sm"
+                                data-toggle="tooltip"
+                                data-placement="left"
+                                title=""
+                                data-original-title="Adicionar">
                     <span class="fas
             fa-plus"></span>
-                            </button>
-                            <a>Atividades extras</a>
-                        </td>
-                    </tr>
-                {% endif %}
-                {% if has_addons.optionals == False %}
-                    <tr id="add-optionals" class="todo_list_element"
-                        role="presentation">
-                        <td>
+                        </button>
+                        <a>Atividades extras</a>
+                    </td>
+                </tr>
+            {% endif %}
 
-                            <button type="button"
-                                    class="add_todo_element btn btn-success btn-trans btn-sm"
-                                    data-toggle="tooltip"
-                                    data-placement="left"
-                                    title=""
-                                    data-original-title="Adicionar">
+            {% if not feature_management.products and feature_config.feature_products %}
+                <tr id="add-optionals" class="todo_list_element"
+                    role="presentation">
+                    <td>
+
+                        <button type="button"
+                                class="add_todo_element btn btn-success btn-trans btn-sm"
+                                data-toggle="tooltip"
+                                data-placement="left"
+                                title=""
+                                data-original-title="Adicionar">
                     <span class="fas
             fa-plus"></span>
-                            </button>
-                            <a>Opcionais</a>
-                        </td>
-                    </tr>
-                {% endif %}
-                                {% if has_addons.certificate == False %}
-                                    <tr id="add-certificate" class="todo_list_element"
-                                        role="presentation">
-                                        <td>
+                        </button>
+                        <a>Opcionais</a>
+                    </td>
+                </tr>
+            {% endif %}
 
-                                            <button type="button"
-                                                    class="add_todo_element btn btn-success btn-trans
+            {% if not feature_management.certificate and feature_config.feature_certificate %}
+                <tr id="add-certificate" class="todo_list_element"
+                    role="presentation">
+                    <td>
+
+                        <button type="button"
+                                class="add_todo_element btn btn-success btn-trans
                                         btn-sm dropdown-toggle"
-                                                    data-toggle="dropdown"
-                                                    aria-expanded="false"
-                                                    aria-haspopup="true">
+                                data-toggle="dropdown"
+                                aria-expanded="false"
+                                aria-haspopup="true">
                                     <span class="fas
                             fa-plus"></span>
-                                            </button>
-                                            <a>Gerar Certificados</a>
-                                        </td>
-                                    </tr>
-                                {% endif %}
+                        </button>
+                        <a>Gerar Certificados</a>
+                    </td>
+                </tr>
             {% endif %}
+
             </tbody>
         </table>
     </div>

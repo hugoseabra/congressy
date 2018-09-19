@@ -1,33 +1,35 @@
 import absoluteuri
-
-from django.contrib import messages
 from django.conf import settings
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect
-from gatheros_event import forms
-from gatheros_event.models import Organization, Event
-from gatheros_event.views.mixins import AccountMixin
-from gatheros_event.helpers.account import update_account
+
 from core.util import model_field_slugify, ReservedSlugException
+from gatheros_event import forms
+from gatheros_event.helpers.account import update_account
+from gatheros_event.helpers.event_business import is_paid_event
+from gatheros_event.models import Organization, Event
+from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
 
 
-class BaseEventView(AccountMixin, View):
+class BaseEventView(EventDraftStateMixin, AccountMixin, View):
     template_name = 'event/form.html'
     success_message = ''
     success_url = None
     form_title = None
     event = None
+    event_pk_field = 'pk'
 
     def pre_dispatch(self, request):
-        event = self.get_event()
+        self.event = self.get_event()
 
-        if event:
+        if self.event:
             update_account(
                 request=self.request,
-                organization=event.organization,
+                organization=self.event.organization,
                 force=True
             )
 
@@ -37,8 +39,10 @@ class BaseEventView(AccountMixin, View):
         return reverse_lazy('event:event-list')
 
     def get_event(self):
-        if not self.event and self.kwargs.get('pk'):
-            self.event = get_object_or_404(Event, pk=self.kwargs.get('pk'))
+        if not self.event or self.event and not isinstance(self.event, Event):
+            pk = self.kwargs.get(self.event_pk_field)
+            if pk:
+                self.event = Event.objects.get(pk=pk)
 
         return self.event
 
@@ -61,11 +65,16 @@ class BaseEventView(AccountMixin, View):
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
-        context = super(BaseEventView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
+
         context['next_path'] = self._get_referer_url()
         context['form_title'] = self.get_form_title()
         context['is_manager'] = self.has_internal_organization
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
+        if self.event:
+            event_draft_data = EventDraftStateMixin() \
+                .get_event_state_context_data(self.get_event())
+            context.update(event_draft_data)
 
         return context
 
@@ -88,19 +97,10 @@ class BaseEventView(AccountMixin, View):
 class BaseSimpleEditlView(BaseEventView):
     object = None
 
-    def get_object(self, queryset=None):
-        """ Resgata objeto principal da view. """
-        if self.object:
-            return self.object
-
-        self.object = super(BaseSimpleEditlView, self).get_object(queryset)
-        return self.object
-
     def can_access(self):
-        event = self.get_object()
         can_edit = self.request.user.has_perm(
             'gatheros_event.change_event',
-            event
+            self.event
         )
         if not can_edit:
             messages.warning(
@@ -122,19 +122,6 @@ class EventAddFormView(BaseEventView, generic.CreateView):
     form_title = 'Novo evento'
     object = None
 
-    def dispatch(self, request, *args, **kwargs):
-
-        event_type = request.GET.get('event_type')
-        if event_type and event_type not in (
-                Event.EVENT_TYPE_FREE,
-                Event.EVENT_TYPE_PAID,
-                Event.EVENT_TYPE_SCIENTIFIC,
-        ):
-            messages.warning(request, 'Escolha um tipo de evento válido.')
-            return redirect('event:event-add')
-
-        return super().dispatch(request, *args, **kwargs)
-
     def get_form(self, form_class=None):
         if not form_class:
             form_class = self.form_class
@@ -143,18 +130,6 @@ class EventAddFormView(BaseEventView, generic.CreateView):
         kwargs['lang'] = self.request.LANGUAGE_CODE
 
         return form_class(user=self.request.user, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        step = self.request.GET.get('step')
-        event_type = self.request.GET.get('event_type')
-        slug = self.request.GET.get('slug')
-        if step and event_type:
-            context['step'] = step
-            context['event_type'] = event_type
-
-        return context
 
     def post(self, request, *args, **kwargs):
         org_pk = request.POST.get('organization')
@@ -183,9 +158,6 @@ class EventAddFormView(BaseEventView, generic.CreateView):
     def get_initial(self):
         initial = super(EventAddFormView, self).get_initial()
         initial['organization'] = self.organization
-
-        event_type = self.request.GET.get('event_type', Event.EVENT_TYPE_FREE)
-        initial['event_type'] = event_type
 
         return initial
 
@@ -234,22 +206,12 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
             kwargs={'pk': event.pk}
         )
 
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-            if lot.price is None:
-                continue
-
-            if lot.price and lot.price > 0:
-                return True
-
-        return False
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['has_inside_bar'] = True
         context['active'] = 'dados-do-evento'
-        context['has_paid_lots'] = self.has_paid_lots()
+        context['is_paid_event'] = \
+            is_paid_event(self.get_event())
 
         return context
 

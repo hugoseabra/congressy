@@ -19,8 +19,9 @@ from rest_framework.response import Response
 
 from core.helpers import sentry_log as log
 from gatheros_event.helpers.account import update_account
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
 from mailer import exception as mailer_notification
 from mailer.services import (
     notify_chargedback_subscription,
@@ -97,9 +98,8 @@ def notify_postback(transaction, data):
     )
 
 
-class EventPaymentView(AccountMixin, ListView):
+class EventPaymentView(AccountMixin, ListView, EventDraftStateMixin):
     template_name = 'payments/list.html'
-    # template_name = 'maintainance.html'
     event = None
 
     def can_access(self):
@@ -123,12 +123,15 @@ class EventPaymentView(AccountMixin, ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(EventPaymentView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
+
         context['event'] = self.event
         context['totals'] = self._get_payables()
         context['has_inside_bar'] = True
         context['active'] = 'pagamentos'
-        context['has_paid_lots'] = True
+        context['is_paid_event'] = is_paid_event(self.event)
+
+        context.update(self.get_event_state_context_data(self.event))
 
         return context
 

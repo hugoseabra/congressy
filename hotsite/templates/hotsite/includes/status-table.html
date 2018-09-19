@@ -76,14 +76,14 @@
                                 Cartão de Crédito
                             </div>
                             {% if transaction.status == transaction.PROCESSING %}
-                            <div class="progress" style="width:100%;margin-bottom:0">
-                                <div class="progress-bar progress-bar-success progress-bar-striped active"
-                                     role="progressbar"
-                                     style="width: 100%;background-color:#5cb85c!important;">
-                                    <span class="sr-only"></span>
+                                <div class="progress" style="width:100%;margin-bottom:0">
+                                    <div class="progress-bar progress-bar-success progress-bar-striped active"
+                                         role="progressbar"
+                                         style="width: 100%;background-color:#5cb85c!important;">
+                                        <span class="sr-only"></span>
+                                    </div>
                                 </div>
-                            </div>
-                            <small style="width:100%">Processamento ...</small>
+                                <small style="width:100%">Processamento ...</small>
                             {% endif %}
                         </div>
 
@@ -111,7 +111,7 @@
 {% if can_reprocess_payment %}
     <div>
         {% if is_private_event and not has_paid_transaction %}
-            {% if lot_is_still_valid  %}
+            {% if lot_is_still_valid %}
                 <a href="{% url 'public:hotsite-subscription' event.slug %}"
                    class="btn btn-success btn-xs"
                    data-toggle="tooltip"
@@ -140,14 +140,12 @@
                 </a>
             {% endif %}
         {% else %}
-{#            {% if not has_paid_transaction %}#}
-                <a href="{% url 'public:hotsite-subscription' event.slug %}"
-                   class="btn btn-success btn-xs"
-                   data-toggle="tooltip"
-                   title="Realize um novo pagamento ou mude de lote quando desejar.">
-                    Novo pagamento
-                </a>
-{#            {% endif %}#}
+            <a href="{% url 'public:hotsite-subscription' event.slug %}"
+               class="btn btn-success btn-xs"
+               data-toggle="tooltip"
+               title="Realize um novo pagamento ou mude de lote quando desejar.">
+                Novo pagamento
+            </a>
         {% endif %}
         {% if event.is_scientific and event.work_config and event.work_config.is_submittable %}
             <br>

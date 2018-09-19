@@ -3,31 +3,41 @@ from decimal import Decimal
 
 from django.db.models import Q
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import DetailView
+
 from core.views.mixins import TemplateNameableMixin
-from gatheros_event.helpers.account import update_account
-from gatheros_event.models import Event
-from gatheros_event.models import Info, Organization
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.event_specifications import (
+    EventSubscribable,
+)
+from gatheros_event.helpers.event_business import is_paid_event
+from gatheros_event.models import Event, Info, Organization
+from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
 from gatheros_subscription.models import Subscription, EventSurvey, Lot
 from payment.models import Transaction
-from certificate.models import Certificate
 
 
-class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
+class EventPanelView(EventDraftStateMixin,
+                     TemplateNameableMixin,
+                     AccountMixin,
+                     DetailView, ):
     model = Event
-    # template_name = 'gatheros_event/event/panel.html'
     template_name = 'event/panel.html'
     permission_denied_url = reverse_lazy('event:event-list')
     object = None
 
     def post(self, request, *args, **kwargs):
+
+        self.object = self.get_object()
+        feature_config = self.object.feature_configuration
+        feature_management = self.object.feature_management
+
         id_row = request.POST.get('id_row')
         row_name = id_row[4:]
         val = True
+
         if id_row:
+
             if id_row[:3] == 'add':
                 val = True
 
@@ -35,54 +45,67 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
                 val = False
 
             if row_name == 'checkin':
-                self.event.has_checkin = val
+                if feature_config.feature_checkin:
+                    feature_management.checkin = val
+                    feature_management.save()
+                    return HttpResponse(status=201)
+                else:
+                    return HttpResponse("Evento não possui essa funcionalidade",
+                                        status=403)
 
             elif row_name == 'extra_activities':
-                self.event.has_extra_activities = val
+                if feature_config.feature_services:
+                    feature_management.services = val
+                    feature_management.save()
+                    return HttpResponse(status=201)
+                else:
+                    return HttpResponse("Evento não possui essa funcionalidade",
+                                        status=403)
 
             elif row_name == 'certificate':
-                self.event.has_certificate = val
+                if feature_config.feature_certificate:
+                    feature_management.certificate = val
+                    feature_management.save()
+                    return HttpResponse(status=201)
+                else:
+                    return HttpResponse("Evento não possui essa funcionalidade",
+                                        status=403)
 
             elif row_name == 'optionals':
-                self.event.has_optionals = val
+                if feature_config.feature_products:
+                    feature_management.products = val
+                    feature_management.save()
+                    return HttpResponse(status=201)
+                else:
+                    return HttpResponse("Evento não possui essa funcionalidade",
+                                        status=403)
 
             elif row_name == 'survey':
-                self.event.has_survey = val
+                if feature_config.feature_survey:
+                    feature_management.survey = val
+                    feature_management.save()
+                    return HttpResponse(status=201)
+                else:
+                    return HttpResponse("Evento não possui essa funcionalidade",
+                                        status=403)
 
-            self.event.save()
-
-        return HttpResponse(status=201)
-
-    def pre_dispatch(self, request):
-        self.object = self.get_object()
-
-        if self.object:
-            update_account(
-                request=self.request,
-                organization=self.object.organization,
-                force=True
-            )
-
-        return super().pre_dispatch(request)
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.event = get_object_or_404(Event, pk=self.kwargs.get('pk'))
-
-        # return redirect(reverse('subscription:subscription-list', kwargs={
-        #     'event_pk': self.object.pk
-        # }))
-
-        return super().dispatch(request, *args, **kwargs)
+        return HttpResponse(status=200)
 
     def get_context_data(self, **kwargs):
-        self.event = self.get_event(**kwargs)
+
+        kwargs.update({'event': self.object})
+
         context = super(EventPanelView, self).get_context_data(**kwargs)
-        context['event'] = self.get_event(**kwargs)
+
+        context['event'] = self.object
+        context['feature_config'] = self.object.feature_configuration
+        context['feature_management'] = self.object.feature_management
         context['status'] = self._get_status()
         context['totals'] = self._get_payables()
         context['limit'] = self._get_limit()
-        context['has_paid_lots'] = self.has_paid_lots()
+        context['event_is_subscribable'] = EventSubscribable() \
+            .is_satisfied_by(self.object)
+        context['event_is_payable'] = is_paid_event(self.object)
         context['all_lots'] = self.all_lots_status()
         context['gender'] = self._get_gender()
         context['pending'] = self._get_number_pending()
@@ -94,7 +117,6 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         context['can_delete'] = self._can_delete
         context['can_view_lots'] = self._can_view_lots
         context['can_manage_subscriptions'] = self.can_manage_subscriptions
-        context['has_addons'] = self.has_addons()
         context['percent_attended'] = {
             'label': round(self.object.percent_attended),
             'number': str(self.object.percent_attended).replace(',', '.'),
@@ -105,20 +127,25 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         context['number_attendances'] = self.get_number_attendances()
         context['status_addons'] = self.get_status_addons()
         context['event_is_full'] = self.event_is_full()
+        context['is_paid_event'] = is_paid_event(self.object)
+
         try:
-            context['is_configured'] = self.event.work_config.is_configured
+            context['is_configured'] = self.object.work_config.is_configured
         except AttributeError:
             context['is_configured'] = False
 
         try:
-            context['info'] = self.event.info
+            context['info'] = self.object.info
         except Info.DoesNotExist:
             pass
 
         try:
-            context['ready_certificate'] = self.event.certificate.is_ready
+            context['ready_certificate'] = self.object.certificate.is_ready
         except AttributeError:
             context['ready_certificate'] = False
+
+        context.update(
+            EventDraftStateMixin().get_event_state_context_data(self.object))
 
         return context
 
@@ -128,7 +155,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
             'finished': [],
             'notstarted': []
         }
-        for lot in self.event.lots.all():
+        for lot in self.object.lots.all():
             lot_istance = {
                 'name': lot.name,
                 'limit': lot.limit,
@@ -153,7 +180,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
     def get_status_addons(self):
         has_services = False
         has_products = False
-        for lotcategory in self.event.lot_categories.all():
+        for lotcategory in self.object.lot_categories.all():
             if lotcategory.service_optionals.count():
                 has_services = True
 
@@ -171,37 +198,11 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         try:
             return Subscription.objects.filter(
                 attended=True,
-                event=self.get_event(),
+                event=self.object,
             ).count()
 
         except Subscription.DoesNotExist:
             return 0
-
-    def get_event(self, **kwargs):
-        return get_object_or_404(Event, pk=self.kwargs.get('pk'))
-
-    def has_addons(self):
-        has_addons = {
-            'extra_activities': self.event.has_extra_activities,
-            'optionals': self.event.has_optionals,
-            'checkin': self.event.has_checkin,
-            'certificate': self.event.has_certificate,
-            'survey': self.event.has_survey,
-        }
-
-        return has_addons
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-
-            if lot.price is None:
-                continue
-
-            if lot.price > 0 and lot.active:
-                return True
-
-        return False
 
     def _get_full_banking(self):
 
@@ -209,7 +210,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
             return False
 
         banking_required_fields = ['bank_code', 'agency', 'account',
-                                   'cnpj_ou_cpf', 'account_type']
+            'cnpj_ou_cpf', 'account_type']
 
         for field in Organization._meta.get_fields():
 
@@ -223,13 +224,13 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         return True
 
     def _get_gender(self):
-        return self.event.get_report()
+        return self.object.get_report()
 
     def _get_limit(self):
-        return self.event.limit
+        return self.object.limit
 
     def _get_total_subscriptions(self):
-        return self.event.subscriptions.filter(
+        return self.object.subscriptions.filter(
             completed=True, test_subscription=False
         ).exclude(
             status=Subscription.CANCELED_STATUS
@@ -346,7 +347,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
 
         transactions = \
             Transaction.objects.filter(
-                Q(subscription__event=self.event) &
+                Q(subscription__event=self.object) &
                 Q(subscription__completed=True) &
                 Q(subscription__test_subscription=False) &
                 (
@@ -373,7 +374,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
                 status=Subscription.AWAITING_STATUS,
                 completed=True,
                 test_subscription=False,
-                event=self.event,
+                event=self.object,
             ).exclude(
                 status=Subscription.CANCELED_STATUS
             ).count()
@@ -381,7 +382,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         return pending
 
     def has_survey_create(self):
-        event_survey_qs = EventSurvey.objects.filter(event=self.event)
+        event_survey_qs = EventSurvey.objects.filter(event=self.object)
 
         for event_survey in event_survey_qs:
             survey = event_survey.survey
@@ -393,17 +394,17 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         return False
 
     def event_is_full(self):
-        if self.event.expected_subscriptions and \
-                self.event.expected_subscriptions > 0:
+        if self.object.expected_subscriptions and \
+                self.object.expected_subscriptions > 0:
 
             total_subscriptions_event = 0
-            for lot in self.event.lots.all():
+            for lot in self.object.lots.all():
                 total_subscriptions_event += lot.subscriptions.filter(
                     completed=True, test_subscription=False
                 ).exclude(
                     status='canceled'
                 ).count()
-            return total_subscriptions_event >= self.event.expected_subscriptions
+            return total_subscriptions_event >= self.object.expected_subscriptions
 
         else:
             return False

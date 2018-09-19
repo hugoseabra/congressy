@@ -3,6 +3,7 @@ from datetime import datetime
 
 from django import forms
 
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.forms import PersonForm
 from gatheros_subscription.models import Subscription, Lot, FormConfig
 
@@ -10,11 +11,11 @@ from gatheros_subscription.models import Subscription, Lot, FormConfig
 class SubscriptionPersonForm(PersonForm):
     def check_requirements(self, lot=None):
 
-        has_paid_lots = False
+        event_is_payable = False
         if lot:
-            has_paid_lots = lot.price > 0 if lot.price else False
+            event_is_payable = is_paid_event(lot.event)
 
-        if has_paid_lots:
+        if event_is_payable:
             try:
                 config = lot.event.formconfig
             except AttributeError:
@@ -27,10 +28,10 @@ class SubscriptionPersonForm(PersonForm):
         country = self.data.get('person-country', 'BR')
         required_fields = ['gender', 'country']
 
-        if has_paid_lots or config.phone:
+        if event_is_payable or config.phone:
             required_fields.append('phone')
 
-        if has_paid_lots:
+        if event_is_payable:
             required_fields.append('street')
             required_fields.append('village')
 
@@ -45,7 +46,7 @@ class SubscriptionPersonForm(PersonForm):
                 required_fields.append('city_international')
                 required_fields.append('state_international')
 
-        if not has_paid_lots \
+        if not event_is_payable \
                 and not config.address_show \
                 and config.city is True:
 
@@ -54,14 +55,14 @@ class SubscriptionPersonForm(PersonForm):
             else:
                 required_fields.append('city_international')
 
-        if has_paid_lots or config.cpf_required:
+        if event_is_payable or config.cpf_required:
             if country == 'BR':
                 required_fields.append('cpf')
             else:
                 required_fields.append('international_doc')
                 required_fields.append('state_international')
 
-        if has_paid_lots or config.birth_date_required:
+        if event_is_payable or config.birth_date_required:
             required_fields.append('birth_date')
 
         for field_name in required_fields:

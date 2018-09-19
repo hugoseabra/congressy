@@ -1,10 +1,9 @@
-import absoluteuri
 import base64
 import json
 
+import absoluteuri
 import requests
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.files.base import ContentFile
 from django.http import HttpResponse
@@ -14,12 +13,11 @@ from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views import generic
 
-from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin, EventViewMixin
 from gatheros_subscription.models import Subscription
+from .mixins import CertificateFeatureFlagMixin
 
 
-class CertificatePDFView(AccountMixin, generic.View):
+class CertificatePDFView(CertificateFeatureFlagMixin):
     template_name = 'pdf/certificate.html'
     subscription = None
     event = None
@@ -145,7 +143,7 @@ class CertificatePDFView(AccountMixin, generic.View):
         return response
 
 
-class CertificatePDFExampleView(AccountMixin, generic.View):
+class CertificatePDFExampleView(CertificateFeatureFlagMixin):
     template_name = 'pdf/certificate.html'
     event = None
     long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
@@ -159,11 +157,6 @@ class CertificatePDFExampleView(AccountMixin, generic.View):
             self.template_name,
             context=self.get_context_data()
         )
-
-    def pre_dispatch(self, request):
-        event_pk = self.kwargs.get('event_pk')
-        self.event = get_object_or_404(Event, pk=event_pk)
-        return super().pre_dispatch(request)
 
     def get_context_data(self):
         context = {}
@@ -184,7 +177,6 @@ class CertificatePDFExampleView(AccountMixin, generic.View):
         )
         context['main_css'] = absoluteuri.build_absolute_uri(main_css_path)
 
-        context['event'] = self.event
         context['certificate'] = self.event.certificate
         context['text'] = self.get_text()
         return context
@@ -244,7 +236,8 @@ class CertificatePDFExampleView(AccountMixin, generic.View):
         return response
 
 
-class CertificateManualView(EventViewMixin, generic.TemplateView):
+class CertificateManualView(CertificateFeatureFlagMixin,
+                            generic.TemplateView):
     template_name = 'certificate/manual.html'
 
     def get_context_data(self, **kwargs):

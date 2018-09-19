@@ -5,10 +5,10 @@ from django.views import generic
 
 from gatheros_subscription.helpers import report_payment
 from payment.models import Transaction
-from .subscription import EventViewMixin, PermissionDenied
+from .subscription import SubscriptionViewMixin, PermissionDenied
 
 
-class PaymentDeleteView(EventViewMixin, generic.View):
+class PaymentDeleteView(SubscriptionViewMixin, generic.View):
     http_method_names = ['post']
     queryset = Transaction.objects.get_queryset()
     object = None

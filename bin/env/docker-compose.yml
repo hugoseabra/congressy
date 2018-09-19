@@ -44,7 +44,7 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
-
+                    
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas
     container_name: wkhtmltopdf

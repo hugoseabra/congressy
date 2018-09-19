@@ -1,12 +1,13 @@
 from django.contrib import messages
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
-from django.shortcuts import redirect
 
+from gatheros_event.views.mixins import EventViewMixin
 from scientific_work.forms import NewWorkForm
 from scientific_work.models import Work
 from .helpers import is_ready
-from .mixins import WorkViewMixin, EventViewMixin
+from .mixins import WorkViewMixin
 
 
 class WorkAddView(WorkViewMixin, generic.FormView):

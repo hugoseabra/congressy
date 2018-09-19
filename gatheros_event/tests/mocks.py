@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 from faker import Faker
 
-from gatheros_event.models import Person, Event, Organization, Category, Member
+from gatheros_event.models import Person, Event, Organization, Category, Member, Info
 
 
 class MockFactory:
@@ -19,7 +19,8 @@ class MockFactory:
         self.fake_factory = Faker('pt_BR')
 
     def fake_person(self):
-        person = Person(name=self.fake_factory.name(), email=self.fake_factory.free_email())
+        person = Person(name=self.fake_factory.name(),
+                        email=self.fake_factory.free_email())
 
         first_name = person.name.split(' ')[0]
         email = person.email
@@ -37,36 +38,51 @@ class MockFactory:
         return person
 
     def fake_organization(self):
-        organization = Organization(name=self.fake_factory.company())
-        organization.save()
+        return Organization.objects.create(
+            name=self.fake_factory.company(),
+            email=self.fake_factory.ascii_email(),
+        )
 
-        assert organization is not None
+    def fake_paying_organization(self):
+        org = self.fake_organization()
+        org.bank_code = Organization.BANCO_DO_BRASIL
+        org.agency = '001'
+        org.account = '001'
+        org.cnpj_ou_cpf = '36876747034'
+        org.account_type = Organization.CONTA_CORRENTE
+        org.save()
+        return org
 
-        return organization
+    def fake_event(self, organization=None, date_start=None, date_end=None):
 
-    def fake_event(self, organization=None):
+        if date_start is None:
+            date_start = datetime.now() + timedelta(days=3)
+
+        if date_end is None:
+            date_end = datetime.now() + timedelta(days=4)
 
         if not organization:
-            raise Exception('No organization provided to event factory')
+            organization = self.fake_organization()
 
-        event = Event(
-            organization=organization,
+        event = Event.objects.create(
             name='Event: ' + ' '.join(self.fake_factory.words(nb=3)),
-            date_start=datetime.now() + timedelta(days=3),
-            date_end=datetime.now() + timedelta(days=4),
+            organization=organization,
+            date_start=date_start,
+            date_end=date_end,
             category=Category.objects.first(),
         )
-        event.save()
 
-        assert event is not None
+        Info.objects.create(
+            event=event
+        )
 
         return event
 
-    def join_organization(self, organization, person):
+    @staticmethod
+    def join_organization(organization, person):
 
         membership = Member(person=person, organization=organization,
                             group=Member.ADMIN)
         membership.save()
 
         return membership
-

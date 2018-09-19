@@ -4,11 +4,11 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import generic
 
-from gatheros_subscription.views.subscription import EventViewMixin
+from gatheros_subscription.views.subscription import SubscriptionViewMixin
 from importer.models import CSVFileConfig
 
 
-class CSVViewMixin(EventViewMixin):
+class CSVViewMixin(SubscriptionViewMixin):
     """
         Mixin utilizado para não permitir acesso sem determinada flag ativada.
     """
@@ -16,7 +16,7 @@ class CSVViewMixin(EventViewMixin):
     def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
 
-        if not self.event.allow_importing:
+        if not self.event.feature_configuration.feature_import_via_csv:
 
             if request.is_ajax():
                 message = 'Evento não permite importação via CSV'

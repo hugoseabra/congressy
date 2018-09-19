@@ -33,19 +33,6 @@ def is_filter_selected(context, filter_name, value):
 
 
 @register.simple_tag
-def has_paid_lots(event):
-    """ Retorna se evento possui algum lote pago. """
-    for lot in event.lots.all():
-        if lot.price is None:
-            continue
-
-        if lot.price and lot.price > 0:
-            return True
-
-    return False
-
-
-@register.simple_tag
 def event_count_completed_subscriptions(event):
     return Subscription.objects.filter(
         lot__event=event,

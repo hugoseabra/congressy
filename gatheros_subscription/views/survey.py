@@ -19,9 +19,12 @@ from survey.api import SurveySerializer
 from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST, COMPLEX_TYPES
 from survey.forms import QuestionForm, SurveyAnswerForm
 from survey.models import Question
+from .mixins import SurveyFeatureFlagMixin
 
 
-class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
+class SurveyEditView(SurveyFeatureFlagMixin,
+                     EventViewMixin,
+                     generic.TemplateView,
                      TemplateNameableMixin):
     template_name = 'survey/edit.html'
     survey = None
@@ -282,7 +285,9 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
         return lots_list
 
 
-class SurveyListView(EventViewMixin, AccountMixin, generic.ListView):
+class SurveyListView(SurveyFeatureFlagMixin,
+                     EventViewMixin,
+                     generic.ListView):
     """
         View responsavel pela listagens dos formularios pertencentes a um
         evento.
@@ -309,7 +314,8 @@ class SurveyListView(EventViewMixin, AccountMixin, generic.ListView):
         return context
 
 
-class EventSurveyCreateView(EventViewMixin, AccountMixin, generic.View):
+class EventSurveyCreateView(SurveyFeatureFlagMixin,
+                            EventViewMixin):
     def post(self, request, *args, **kwargs):
         data = request.POST.copy()
 
@@ -333,7 +339,8 @@ class EventSurveyCreateView(EventViewMixin, AccountMixin, generic.View):
         return HttpResponse(status=400)
 
 
-class EventSurveyDuplicateView(EventViewMixin, AccountMixin, generic.View):
+class EventSurveyDuplicateView(SurveyFeatureFlagMixin,
+                               EventViewMixin):
     def post(self, request, *args, **kwargs):
 
         event_survey = get_object_or_404(
@@ -378,7 +385,8 @@ class EventSurveyDuplicateView(EventViewMixin, AccountMixin, generic.View):
         return HttpResponse(status=200)
 
 
-class EventSurveyDeleteAjaxView(EventViewMixin, AccountMixin,
+class EventSurveyDeleteAjaxView(SurveyFeatureFlagMixin,
+                                EventViewMixin,
                                 generic.TemplateView):
     """
         View responsavel por deletar questionarios.
@@ -406,7 +414,8 @@ class EventSurveyDeleteAjaxView(EventViewMixin, AccountMixin,
         })
 
 
-class EventSurveyEditAjaxView(EventViewMixin, AccountMixin):
+class EventSurveyEditAjaxView(SurveyFeatureFlagMixin,
+                              EventViewMixin):
     """
         View responsavel por editar questionarios.
     """
@@ -436,7 +445,8 @@ class EventSurveyEditAjaxView(EventViewMixin, AccountMixin):
         return HttpResponse(status=500)
 
 
-class EventSurveyLotsEditAjaxView(EventViewMixin, AccountMixin):
+class EventSurveyLotsEditAjaxView(SurveyFeatureFlagMixin,
+                                  EventViewMixin):
     event_survey = None
 
     def dispatch(self, request, *args, **kwargs):

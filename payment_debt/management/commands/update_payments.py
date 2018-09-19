@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.core.management.base import BaseCommand
 
+from gatheros_event.event_state import EventPayable
 from gatheros_event.models import Event
 from payment.models import Payment, Transaction
 from payment_debt.models import Debt
@@ -19,7 +20,7 @@ class Command(BaseCommand):
         subs_notransctions = []
 
         for event in Event.objects.all():
-            if self._has_paid_lots(event) is False:
+            if is_paid_event(event) is False:
                 continue
 
             for sub in event.subscriptions.all():
@@ -172,16 +173,6 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             'Debts ajusted: {}'.format(total_debts)
         ))
-
-
-    def _has_paid_lots(self, event):
-        for lot in event.lots.all():
-            if not lot.price:
-                continue
-
-            return True
-
-        return False
 
     def _get_cash_type(self, transaction):
         trans_type = transaction.type

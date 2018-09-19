@@ -19,11 +19,10 @@ from wkhtmltopdf.views import PDFTemplateView
 from core.forms.cleaners import clear_string
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.helpers.account import update_account
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event, Person
-from gatheros_event.views.mixins import (
-    AccountMixin,
-    PermissionDenied,
-)
+from gatheros_event.views.mixins import EventDraftStateMixin, \
+    AccountMixin, PermissionDenied, EventViewMixin
 from gatheros_subscription.directors import SubscriptionSurveyDirector
 from gatheros_subscription.forms import (
     SubscriptionAttendanceForm,
@@ -45,12 +44,16 @@ from payment import forms
 from payment.helpers import payment_helpers
 from payment.models import Transaction
 from survey.models import Question, Answer
+from .mixins import CheckinFeatureFlagMixin
 
 
-class EventViewMixin(TemplateNameableMixin, AccountMixin):
+class SubscriptionViewMixin(TemplateNameableMixin,
+                            AccountMixin, EventDraftStateMixin):
     """ Mixin de view para vincular com informações de event. """
 
-    event = None
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.event = None
 
     def dispatch(self, request, *args, **kwargs):
         self.event = self.get_event()
@@ -62,15 +65,19 @@ class EventViewMixin(TemplateNameableMixin, AccountMixin):
         )
 
         self.permission_denied_url = reverse('event:event-list')
-        return super(EventViewMixin, self).dispatch(request, *args, **kwargs)
+        return super(SubscriptionViewMixin, self).dispatch(request, *args,
+                                                           **kwargs)
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
+        event = self.get_event()
+
         context = super().get_context_data(**kwargs)
 
-        event = self.get_event()
         context['event'] = event
-        context['has_paid_lots'] = self.has_paid_lots()
+        context['is_paid_event'] = is_paid_event(event)
+
+        context.update(self.get_event_state_context_data(event))
 
         try:
             config = FormConfig.objects.get(event=event)
@@ -78,7 +85,7 @@ class EventViewMixin(TemplateNameableMixin, AccountMixin):
             config = FormConfig()
             config.event = event
 
-        if self.has_paid_lots():
+        if is_paid_event(event):
             config.email = True
             config.phone = True
             config.city = True
@@ -116,18 +123,6 @@ class EventViewMixin(TemplateNameableMixin, AccountMixin):
         lot_qs = self.get_lots()
         return lot_qs.count() if lot_qs else 0
 
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-            price = lot.price
-            if price is None:
-                continue
-
-            if lot.price and lot.price > 0:
-                return True
-
-        return False
-
     def can_access(self):
         if not self.event:
             return False
@@ -135,7 +130,7 @@ class EventViewMixin(TemplateNameableMixin, AccountMixin):
         return self.event.organization == self.organization
 
 
-class SubscriptionFormMixin(EventViewMixin, generic.FormView):
+class SubscriptionFormMixin(SubscriptionViewMixin, generic.FormView):
     template_name = 'subscription/form.html'
     form_class = SubscriptionPersonForm
     success_message = None
@@ -274,7 +269,7 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
         return super().form_valid(form)
 
 
-class SubscriptionListView(EventViewMixin, generic.ListView):
+class SubscriptionListView(SubscriptionViewMixin, generic.ListView):
     """ Lista de inscrições """
 
     model = Subscription
@@ -299,13 +294,13 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
         return query_set.filter(event=event, completed=True)
 
     def get_context_data(self, **kwargs):
-        cxt = super(SubscriptionListView, self).get_context_data(**kwargs)
+        cxt = super().get_context_data(**kwargs)
 
         cxt.update({
             'can_add_subscription': self.can_add_subscription(),
             'lots': self.get_lots(),
             'has_filter': self.has_filter,
-            'has_paid_lots': self.has_paid_lots(),
+            'event_is_paid': is_paid_event(self.event),
             'has_inside_bar': True,
             'active': 'inscricoes',
         })
@@ -326,7 +321,7 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
         return num_lots > 0
 
 
-class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
+class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
     template_name = 'subscription/view.html'
     object = None
     queryset = Subscription.objects.get_queryset()
@@ -366,15 +361,15 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         response = super().dispatch(request, *args, **kwargs)
 
         if self.financial is True:
-            has_paid_products = self.object.subscription_products.filter(
+            has_payable_products = self.object.subscription_products.filter(
                 optional_price__gt=0
             ).count() > 0
-            has_paid_services = self.object.subscription_services.filter(
+            has_payable_services = self.object.subscription_services.filter(
                 optional_price__gt=0
             ).count() > 0
 
-            if not has_paid_products \
-                    and not has_paid_products \
+            if not has_payable_products \
+                    and not has_payable_services \
                     and self.object.free:
                 messages.warning(
                     request,
@@ -467,7 +462,7 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
 
             return redirect(url)
 
-        if self.event.allow_internal_subscription is False:
+        if not self.event.feature_configuration.feature_manual_payments:
             self.permission_denied_url = reverse(
                 'subscription:subscription-list', kwargs={
                     'event_pk': self.event.pk,
@@ -660,50 +655,50 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
                 request.POST[field] = clear_string(request.POST[field])
 
         form = self.get_form()
-        if not form.is_valid():
-            return self.form_invalid(form)
+        if form.is_valid():
 
-        if self.allow_edit_lot:
-            lot_pk = self.request.POST.get('subscription-lot')
+            if self.allow_edit_lot:
+                lot_pk = self.request.POST.get('subscription-lot')
 
-        elif self.subscription:
-            lot_pk = self.subscription.lot.pk
+            elif self.subscription:
+                lot_pk = self.subscription.lot.pk
 
+            else:
+                raise Exception('Edição de lote somente para nova inscrição.')
+
+            with atomic():
+                self.object = form.save()
+                subscription_form = self.get_subscription_form(
+                    person=self.object,
+                    lot_pk=lot_pk,
+                )
+                if not subscription_form.is_valid():
+                    for error in subscription_form.errors:
+                        messages.error(self.request, str(error))
+
+                    return redirect(self.get_error_url())
+
+                self.subscription = subscription_form.save()
+                if self.subscription.lot.event_survey:
+
+                    survey = self.subscription.lot.event_survey.survey
+
+                    survey_form = self.get_survey_form(
+                        survey=survey,
+                        data=self.request.POST,
+                        files=self.request.FILES,
+                        subscription=self.subscription,
+                    )
+
+                    if survey_form.is_valid():
+                        survey_form.save()
+                        return self.form_valid(form)
+                    else:
+                        return self.form_invalid(form, survey_form=survey_form)
+                else:
+                    return self.form_valid(form)
         else:
-            raise Exception('Edição de lote somente para nova inscrição.')
-
-        with atomic():
-            self.object = form.save()
-            subscription_form = self.get_subscription_form(
-                person=self.object,
-                lot_pk=lot_pk,
-            )
-            if not subscription_form.is_valid():
-                for error in subscription_form.errors:
-                    messages.error(self.request, str(error))
-
-                return redirect(self.get_error_url())
-
-            self.subscription = subscription_form.save()
-
-            if not self.subscription.lot.event_survey:
-                return self.form_valid(form)
-
-            survey = self.subscription.lot.event_survey.survey
-
-            survey_form = self.get_survey_form(
-                survey=survey,
-                data=self.request.POST,
-                files=self.request.FILES,
-                subscription=self.subscription,
-            )
-
-            if not survey_form.is_valid():
-                return self.form_invalid(form, survey_form=survey_form)
-
-            survey_form.save()
-
-        return self.form_valid(form)
+            return self.form_invalid(form)
 
     def form_invalid(self, form, survey_form=None):
         """
@@ -713,8 +708,7 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
         return self.render_to_response(
             self.get_context_data(form=form, survey_form=survey_form))
 
-    def get_survey_form(self, survey, subscription=None, data=None,
-                        files=None):
+    def get_survey_form(self, survey, subscription=None, data=None, files=None):
 
         survey_director = SubscriptionSurveyDirector(subscription)
 
@@ -788,50 +782,48 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
                 request.POST[field] = clear_string(request.POST[field])
 
         form = self.get_form()
-        if not form.is_valid():
-            return self.form_invalid(form)
+        if form.is_valid():
 
-        if self.allow_edit_lot:
-            lot_pk = self.request.POST.get('subscription-lot')
+            if self.allow_edit_lot:
+                lot_pk = self.request.POST.get('subscription-lot')
 
-        elif self.subscription:
-            lot_pk = self.subscription.lot.pk
+            elif self.subscription:
+                lot_pk = self.subscription.lot.pk
 
+            else:
+                raise Exception('Edição de lote somente para nova inscrição.')
+
+            with atomic():
+                self.object = form.save()
+                subscription_form = self.get_subscription_form(
+                    person=self.object,
+                    lot_pk=lot_pk,
+                )
+                if not subscription_form.is_valid():
+                    for error in subscription_form.errors:
+                        messages.error(self.request, str(error))
+
+                    return redirect(self.get_error_url())
+
+                self.subscription = subscription_form.save()
+                if self.subscription.lot.event_survey:
+
+                    survey = self.subscription.lot.event_survey.survey
+
+                    survey_form = self.get_survey_form(
+                        survey=survey,
+                        data=self.request.POST,
+                        files=self.request.FILES,
+                        subscription=self.subscription,
+                    )
+
+                    if survey_form.is_valid():
+                        survey_form.save()
+                        return self.form_valid(form)
+                    else:
+                        return self.form_invalid(form, survey_form=survey_form)
         else:
-            raise Exception('Edição de lote somente para nova inscrição.')
-
-        with atomic():
-            self.object = form.save()
-            subscription_form = self.get_subscription_form(
-                person=self.object,
-                lot_pk=lot_pk,
-            )
-            if not subscription_form.is_valid():
-                for error in subscription_form.errors:
-                    messages.error(self.request, str(error))
-
-                return redirect(self.get_error_url())
-
-            self.subscription = subscription_form.save()
-
-            if not self.subscription.lot.event_survey:
-                return self.form_valid(form)
-
-            survey = self.subscription.lot.event_survey.survey
-
-            survey_form = self.get_survey_form(
-                survey=survey,
-                data=self.request.POST,
-                files=self.request.FILES,
-                subscription=self.subscription,
-            )
-
-            if not survey_form.is_valid():
-                return self.form_invalid(form, survey_form=survey_form)
-
-            survey_form.save()
-
-        return self.form_valid(form)
+            return self.form_invalid(form)
 
     def form_invalid(self, form, survey_form=None):
         """
@@ -841,8 +833,7 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
         return self.render_to_response(
             self.get_context_data(form=form, survey_form=survey_form))
 
-    def get_survey_form(self, survey, subscription=None, data=None,
-                        files=None):
+    def get_survey_form(self, survey, subscription=None, data=None, files=None):
 
         survey_director = SubscriptionSurveyDirector(subscription)
 
@@ -856,7 +847,7 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
         return survey_form
 
 
-class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
+class SubscriptionConfirmationView(SubscriptionViewMixin, generic.TemplateView):
     """ Inscrição de pessoa que já possui perfil. """
     subscription_user = None
     submitted_data = None
@@ -898,7 +889,8 @@ class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
         return self.get(request, *args, **kwargs)
 
 
-class SubscriptionCancelView(EventViewMixin, generic.DetailView):
+class SubscriptionCancelView(EventViewMixin,
+                             SubscriptionViewMixin, generic.DetailView):
     template_name = 'subscription/delete.html'
     model = Subscription
     success_message = 'Inscrição cancelada com sucesso.'
@@ -968,7 +960,7 @@ class SubscriptionCancelView(EventViewMixin, generic.DetailView):
         })
 
 
-class SubscriptionAttendanceDashboardView(EventViewMixin,
+class SubscriptionAttendanceDashboardView(CheckinFeatureFlagMixin,
                                           generic.TemplateView):
     template_name = 'subscription/attendance-dashboard.html'
     search_by = 'name'
@@ -983,6 +975,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
             'search_by': self.search_by,
             'has_inside_bar': True,
             'active': 'checkin-dashboard',
+            'is_paid_event': is_paid_event(self.event),
             'confirmed': self.get_number_confirmed(),
             'number_attendances': self.get_number_attendances(),
             'total_subscriptions': self.get_number_subscription(),
@@ -991,25 +984,29 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
         return cxt
 
     def get_attendances(self):
+
+        sub_list = list()
+
         try:
-            list = Subscription.objects.filter(
+            sub_list = Subscription.objects.filter(
                 attended=True,
                 completed=True,
                 test_subscription=False,
-                event=self.get_event(),
+                event=self.event,
             ).order_by('-attended_on')
-            return list[0:5]
 
-
+            return sub_list[0:5]
         except Subscription.DoesNotExist:
-            return []
+            pass
+
+        return sub_list
 
     def get_number_attendances(self):
         try:
             return Subscription.objects.filter(
                 attended=True,
                 completed=True, test_subscription=False,
-                event=self.get_event(),
+                event=self.event,
             ).count()
 
         except Subscription.DoesNotExist:
@@ -1019,7 +1016,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
 
         total = \
             Subscription.objects.filter(
-                event=self.get_event(),
+                event=self.event,
                 completed=True, test_subscription=False
             ).exclude(status=Subscription.CANCELED_STATUS).count()
 
@@ -1031,14 +1028,14 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
             Subscription.objects.filter(
                 status=Subscription.CONFIRMED_STATUS,
                 completed=True, test_subscription=False,
-                event=self.get_event()
+                event=self.event,
             ).count()
 
         return confirmed
 
     def get_report(self):
         """ Resgata informações gerais do evento. """
-        return self.get_event().get_report(only_attended=True)
+        return self.event.get_report(only_attended=True)
 
 
 class MySubscriptionsListView(AccountMixin, generic.ListView):
@@ -1133,7 +1130,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
         return False
 
 
-class SubscriptionExportView(EventViewMixin, generic.View):
+class SubscriptionExportView(SubscriptionViewMixin, generic.View):
     http_method_names = ['post']
     template_name = 'subscription/export.html'
     form_class = SubscriptionFilterForm
@@ -1253,17 +1250,19 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
         return self.subscription.confirmed is True
 
 
-class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
+class SubscriptionAttendanceSearchView(CheckinFeatureFlagMixin,
+                                       generic.TemplateView):
     template_name = 'subscription/attendance.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['has_inside_bar'] = True
         context['active'] = 'checkin'
+        context['is_paid_event'] = is_paid_event(self.event)
         return context
 
 
-class SubscriptionAttendanceView(EventViewMixin, generic.FormView):
+class SubscriptionAttendanceView(SubscriptionViewMixin, generic.FormView):
     form_class = SubscriptionAttendanceForm
     http_method_names = ['post']
     search_by = 'name'
@@ -1347,7 +1346,8 @@ class SubscriptionAttendanceView(EventViewMixin, generic.FormView):
         return sub.event.pk == event.pk
 
 
-class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
+class SubscriptionAttendanceListView(CheckinFeatureFlagMixin,
+                                     generic.TemplateView):
     template_name = 'subscription/attendance-list.html'
 
     def get_context_data(self, **kwargs):
@@ -1361,11 +1361,11 @@ class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
         return Subscription.objects.filter(
             attended=True,
             completed=True,
-            event=self.get_event(),
+            event=self.event,
         ).exclude(status=Subscription.CANCELED_STATUS).order_by('-attended_on')
 
 
-class SwitchSubscriptionTestView(EventViewMixin, generic.View):
+class SwitchSubscriptionTestView(SubscriptionViewMixin, generic.View):
     """
     Gerenciamento de inscrições que podem ou não serem setados como Teste.
     """

@@ -3,7 +3,7 @@
 """
 from .theme import Theme
 from .optional_type import OptionalServiceType, OptionalProductType
-from .optional import Product, Service
+from .optional import Product, Service, AbstractOptional
 from .subscription_optional import (
     SubscriptionProduct,
     SubscriptionService,

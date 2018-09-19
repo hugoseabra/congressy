@@ -1,2 +1,2 @@
 """ signals de gatheros_subscription """
-from . import event_signals
+from . import event_signals, lot_signals
