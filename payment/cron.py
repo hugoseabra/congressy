@@ -1,9 +1,9 @@
 from django.contrib.auth.models import User
 from django_cron import CronJobBase, Schedule
 
+from core.helpers import sentry_log
 from gatheros_subscription.models import Subscription
 from payment.models import Transaction
-from core.helpers import sentry_log
 
 
 class MyCronJob(CronJobBase):
@@ -28,29 +28,30 @@ class SubscriptionStatusIrregularityTestJob(CronJobBase):
                         retry_after_failure_mins=RETRY_AFTER_FAILURE_MINS)
 
     def do(self):
-
         irregularities = Subscription.objects.filter(
             status=Subscription.AWAITING_STATUS,
             transactions__status=Transaction.PAID,
         )
 
         if irregularities.count() > 0:
-            subs_pk = list()
+            subs_pks = list()
             for sub in irregularities:
-                subs_pk.append(sub.pk)
+                subs_pks.append(sub.pk)
 
-            msg = 'Temos {} inscrições pendentes com pagamentos confirmados'\
-                .format(len(subs_pk))
-            
-            subs_pk = ', '.join(str(e) for e in subs_pk)
+            msg1 = 'Inscrições pagas e não confirmadas: {}'.format(
+                len(subs_pks)
+            )
 
-            print('{}: {}'.format(msg, subs_pk))
+            msg2 = "\n  - " + "\n  - ".join(
+                [str(sub_pk) for sub_pk in subs_pks]
+            )
 
             sentry_log(
-                message=msg,
+                message=msg1 + msg2,
                 type='error',
-                extra_data={
-                    'subscriptions_pk': subs_pk
-                },
                 notify_admins=True,
             )
+
+            print(msg1 + msg2)
+
+            return msg1
