@@ -27,7 +27,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
       - ./media:/var/www/cgsy/media"
-      - /logs:/var/www/cgsy/logs
+      - ./logs:/var/www/cgsy/logs
     env_file: ./env-file
 
   cron:
@@ -41,6 +41,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
       - ./media:/var/www/cgsy/media
+      - ./logs:/var/www/cgsy/logs
     env_file: ./env-file
     networks:
       - wkhtmltopdf
@@ -63,6 +64,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
       - ./media:/var/www/cgsy/media
+      - ./logs:/var/www/cgsy/logs
     env_file:
       - ./env-file
       - ./env-manage-file
@@ -78,7 +80,9 @@ services:
     ports:
       - "8001:80"
     volumes:
-      - "/etc/localtime:/etc/localtime"
+      - /etc/localtime:/etc/localtime
+      - ./media:/var/www/cgsy/media
+      - ./logs:/var/www/cgsy/logs
     entrypoint:
       - /services/web/partner/container-entry.sh
     env_file:
@@ -101,8 +105,9 @@ services:
     entrypoint:
       - /services/web/admin_intranet/container-entry.sh
     volumes:
-      - "/etc/localtime:/etc/localtime"
-      - "./media:/var/www/cgsy/media"
+      - /etc/localtime:/etc/localtime
+      - ./media:/var/www/cgsy/media
+      - ./logs:/var/www/cgsy/logs
     env_file:
       - ./env-file
       - ./env-admin_intranet-file
