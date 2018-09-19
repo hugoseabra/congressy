@@ -1,11 +1,15 @@
 from gatheros_subscription.models import Subscription
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def subscription_is_checked(subscription_pk):
     only_attending = False
+    try:
+        subscription = Subscription.objects.get(
+            pk=subscription_pk)
 
-    subscription = Subscription.objects.get(
-        pk=subscription_pk)
+    except ObjectDoesNotExist:
+        return False
 
     event = subscription.event
 
