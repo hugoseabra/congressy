@@ -408,7 +408,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         const STATUS_CHECKED = 'checked';
         const STATUS_NOT_CHECKED = 'not-checked';
 
-        const COLOR_PENDING = '#EC971F';
+        const COLOR_PENDING = '#EDCE8C';
         const COLOR_DISABLED = '#e25d5d';
         const COLOR_NOT_CHECKED = '#909AA0';
         const COLOR_CHECKED = '#27B6AF';

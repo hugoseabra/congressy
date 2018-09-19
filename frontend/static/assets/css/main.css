@@ -4198,10 +4198,19 @@ ul.messenger-theme-flat .messenger-message.alert-warning .messenger-message-inne
 }
 .attendance-card #DateCountdown {
   height: 40px;
-  margin-left: 50px;
+  margin-left: 90px;
   margin-top: 3px;
 }
 .attendance-card #DateCountdown span {
+  font-size: 0 !important;
+  color: #40484F;
+}
+.widget-fullscreen #DateCountdown {
+  height: 40px;
+  margin-left: 90px;
+  margin-top: 3px;
+}
+.widget-fullscreen #DateCountdown span {
   font-size: 0 !important;
   color: #40484F;
 }
