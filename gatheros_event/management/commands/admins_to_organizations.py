@@ -6,7 +6,8 @@ from django.db.models import Count
 
 
 class Command(BaseCommand):
-    help = 'Procurar por Users com emails duplicados'
+    help = 'Inserir super administradores e todas as organizações possuem' \
+           ' eventos.'
 
     def handle(self, *args, **options):
         admin_users = User.objects.filter(is_superuser=True,
@@ -16,9 +17,11 @@ class Command(BaseCommand):
             orgs = Organization.objects.annotate(
                 num_events=Count('events')
             ).filter(num_events__gt=0).exclude(members__person=person)
+
             self.stdout.write(self.style.SUCCESS(
-                'Orgs found: {}'.format(orgs.count())
+                'Orgs found for {}: {}'.format(user.first_name, orgs.count())
             ))
+
             for org in orgs:
                 Member.objects.create(
                     person=person,
@@ -26,5 +29,8 @@ class Command(BaseCommand):
                     group=Member.ADMIN,
                 )
                 self.stdout.write(self.style.SUCCESS(
-                    'Member created: {} on {}'.format(person.name, org.name)
+                    '   - Member created: {} on {}'.format(
+                        person.name,
+                        org.name
+                    )
                 ))
