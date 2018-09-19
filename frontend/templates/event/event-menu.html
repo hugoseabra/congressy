@@ -1,4 +1,4 @@
-{% load subscription_tags %}
+{% load subscription_tags static %}
 
 {% comment %}
 Variáveis:
@@ -7,6 +7,8 @@ Variáveis:
 - is_paid_event
 
 {% endcomment %}
+
+<script src="{% static "assets/js/publish.js" %}"></script>
 
 
 <div class="sidebar-header well text-center" style="margin-left: 5px">
@@ -275,30 +277,19 @@ Variáveis:
 
 <script>
 
-
     $(document).ready(function () {
 
         var publish_switch_el = $('#publish_event');
+        var url = "{% url 'event:event-publish' event.pk %}";
 
         if (publish_switch_el.length) {
 
             publish_switch_el.on('change', function () {
 
-                var sender = new cgsy.AjaxSender("{% url 'event:event-publish' event.pk %}");
-                sender.setSuccessCallback(function () {
-                    location.reload();
-                });
-
-                sender.setFailCallback(function (res) {
-                    console.error(res.statusText);
-                    location.reload();
-                });
-
-
                 if (publish_switch_el.prop('checked')) {
-                    sender.send('POST', {'state': 'publish'});
+                    update_publishing_state('publish', url);
                 } else {
-                    sender.send('POST', {'state': 'unpublish'});
+                    update_publishing_state('unpublish', url);
                 }
 
             });

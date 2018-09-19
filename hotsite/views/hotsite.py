@@ -10,6 +10,8 @@ from django.views import generic
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 
+from gatheros_event.helpers.publishing import event_is_publishable, \
+    get_unpublishable_reason
 from gatheros_event.models import Member, Organization
 from gatheros_subscription.models import Subscription
 from hotsite.views import SubscriptionFormMixin
@@ -21,6 +23,26 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
     private_still_available = False
 
     def dispatch(self, request, *args, **kwargs):
+        self.pre_dispatch()
+
+        is_anonymous = self.request.user.is_anonymous
+        is_in_org = False
+        person = None
+
+        if not is_anonymous:
+            person = self.request.user.person
+
+        if person:
+            org_pk = self.current_event.event.organization_id
+            try:
+                Member.objects.get(organization_id=org_pk, person_id=person.pk)
+                is_in_org = True
+            except Member.DoesNotExist:
+                pass
+
+        if is_anonymous or not is_in_org:
+            if not self.current_event.event.published:
+                return redirect("public:unpublished-hotsite")
 
         if 'has_private_subscription' in self.request.session:
 
@@ -44,12 +66,24 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
         context = super().get_context_data(**kwargs)
 
         sub = self.current_subscription.subscription
+        event = self.current_event.event
 
         # Força verificação se está inscrito apenas para inscrições completas.
         context['is_subscribed'] = sub.completed is True if sub else False
 
         context['has_private_subscription'] = self.has_private_subscription
         context['private_still_available'] = self.has_private_subscription
+
+        publishable = False
+        unpublishable_reason = None
+
+        if not event.published:
+            publishable = event_is_publishable(event)
+            unpublishable_reason = get_unpublishable_reason(event)
+
+        context['event_is_publishable'] = publishable
+        context['unpublishable_reason'] = unpublishable_reason
+
         return context
 
     @method_decorator(sensitive_post_parameters())
@@ -341,3 +375,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
                 pass
 
         return False
+
+
+class UnpublishHotsiteView(generic.TemplateView):
+    template_name = 'hotsite/unpublished.html'
