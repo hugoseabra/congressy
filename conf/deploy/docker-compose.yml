@@ -25,8 +25,9 @@ services:
     entrypoint:
       - /services/volume/container-entry.sh
     volumes:
-      - "/etc/localtime:/etc/localtime"
-      - "./media:/var/www/cgsy/media"
+      - /etc/localtime:/etc/localtime
+      - ./media:/var/www/cgsy/media"
+      - /logs:/var/www/cgsy/logs
     env_file: ./env-file
 
   cron:
@@ -38,8 +39,8 @@ services:
     entrypoint:
       - /services/cron/container-entry.sh
     volumes:
-      - "/etc/localtime:/etc/localtime"
-      - "./media:/var/www/cgsy/media"
+      - /etc/localtime:/etc/localtime
+      - ./media:/var/www/cgsy/media
     env_file: ./env-file
     networks:
       - wkhtmltopdf
@@ -60,8 +61,8 @@ services:
     entrypoint:
       - /services/web/manage/container-entry.sh
     volumes:
-      - "/etc/localtime:/etc/localtime"
-      - "./media:/var/www/cgsy/media"
+      - /etc/localtime:/etc/localtime
+      - ./media:/var/www/cgsy/media
     env_file:
       - ./env-file
       - ./env-manage-file

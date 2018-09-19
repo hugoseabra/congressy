@@ -20,7 +20,8 @@ services:
     container_name: migration-staging
     entrypoint:
       - /services/migration/container-entry.sh
-    env_file: /tmp/staging-files/env-manage-staging
+    env_file:
+      - /tmp/staging-files/env-manage-staging
     networks:
       - postgres
 
@@ -34,7 +35,8 @@ services:
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
-      - /media:/var/www/cgsy/media
+      - ./media:/var/www/cgsy/media
+      - ./logs:/var/www/cgsy/logs
 
   cron:
     image: cgsy-staging
@@ -50,7 +52,8 @@ services:
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
-      - /media:/var/www/cgsy/media
+      - ./media:/var/www/cgsy/media
+      - ./logs:/var/www/cgsy/logs
 
   manage:
     image: cgsy-staging
@@ -68,7 +71,8 @@ services:
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
-      - /media:/var/www/cgsy/media
+      - ./media:/var/www/cgsy/media
+      - ./logs:/var/www/cgsy/logs
 
 networks:
   postgres:
