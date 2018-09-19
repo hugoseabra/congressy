@@ -38,6 +38,7 @@ python $BASE_DIR/manage.py loaddata 005_user 006_person 007_organization 008_mem
 python $BASE_DIR/manage.py loaddata 009_event
 python $BASE_DIR/manage.py loaddata 010_place 011_info
 python $BASE_DIR/manage.py loaddata 012_invitation
+python $BASE_DIR/manage.py loaddata 013_feature_configuration 014_feature_management
 
 # gatheros_subscription
 python $BASE_DIR/manage.py loaddata 005_event_survey

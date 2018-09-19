@@ -6,7 +6,7 @@
 
 {% block title %} Lotes | Congressy{% endblock %}
 
-{% block page_title %}Lotes/Categorias{% endblock %}
+{% block page_title %}Lotes{% endblock %}
 
 {% block page_sub_title %}
     {{ event.name }}
@@ -108,22 +108,27 @@
 {% endblock %}
 
 {% block content %}
+
     <div class="row">
+
         <div class="col-md-12">
             <div class="row">
                 <div class="col-md-12">
                     <div class="buttonbar">
-                        <div class="float-left">
-                            <a href="{% url 'subscription:category-list' event.pk %}"
-                               class="btn btn-primary">
-                                <i class="fab fa-stack-exchange"></i>
-                                Gerenciar Categorias
-                            </a>
-                            <a href="{% url 'subscription:lot-add' event.pk %}"
-                               class="btn btn-success">
-                                <i class="fa fa-plus"></i>
-                                Novo Lote
-                            </a>
+                        <div class="float-right">
+                            {#                            <a href="{% url 'subscription:category-list' event.pk %}"#}
+                            {#                               class="btn btn-primary">#}
+                            {#                                <i class="fab fa-stack-exchange"></i>#}
+                            {#                                Gerenciar Categorias#}
+                            {#                            </a>#}
+
+                            {% if event.feature_configuration.feature_multi_lots %}
+                                <a href="{% url 'subscription:lot-add' event.pk %}"
+                                   class="btn btn-success">
+                                    <i class="fa fa-plus"></i>
+                                    Novo Lote
+                                </a>
+                            {% endif %}
                         </div>
 
                         <div class="clearfix"></div>
@@ -132,9 +137,13 @@
             </div>
 
             {% if categories.count %}
+
                 <div class="row">
+
                     <div class="col-md-12">
+
                         <div class="panel panel-primary">
+
                             <div class="panel-heading">
                                 <div class="panel-title">
                                     Gerenciamento de Lotes por Categoria
@@ -152,144 +161,178 @@
                                 {% endif %}
                                 {% include 'lot/categories-lots-list.html' %}
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
+
             {% endif %}
 
             {# LEGACY - LOTES SEM CATEGORIA #}
             {% if object_list %}
+
                 <div class="row">
+
                     <div class="col-md-12">
+
                         <div class="panel panel-primary">
+
                             <div class="panel-body">
+
                                 <div class="row">
+
                                     <div class="col-md-12 table-responsive">
-                                        <table id="lot_table"
-                                               class="table table-striped table-bordered">
+
+                                        <table id="lot_table" class="table table-striped table-bordered">
+
                                             <thead>
-                                            <tr>
-                                                <th>Nome</th>
-                                                <th class="hidden-xs hidden-sm">
-                                                    Tipo
-                                                </th>
-                                                <th class="hidden-xs hidden-sm">
-                                                    Inscrições
-                                                </th>
-                                                <th>Preço</th>
-                                                <th width="8%">Código</th>
-                                                <th width="3%"></th>
-                                            </tr>
+
+                                                <tr>
+
+                                                    <th>Nome</th>
+
+                                                    <th class="hidden-xs hidden-sm">
+                                                        Tipo
+                                                    </th>
+
+                                                    <th class="hidden-xs hidden-sm">
+                                                        Inscrições
+                                                    </th>
+
+                                                    <th>Preço</th>
+
+                                                    <th width="8%">Código</th>
+
+                                                    <th width="3%"></th>
+
+                                                </tr>
+
                                             </thead>
 
                                             <tbody>
+
                                             {% for lot in object_list %}
-                                                {% if lot.status == lot.LOT_STATUS_RUNNING %}
-                                                    <tr class="success">
-                                                        {% elif lot.status == lot.LOT_STATUS_FINISHED %}
-                                                    <tr class="danger">
-                                                        {% else %}
-                                                    <tr>
-                                                {% endif %}
-
-                                            <td>
-                                                {% if lot.rsvp_restrict %}
-                                                    <div>
-                                                        <span class="badge badge-primary">Associados</span>
-                                                    </div>
-                                                {% endif %}
-
-                                                {% if user has 'gatheros_subscription.change_lot' of lot %}
-                                                    <a href="{% url 'subscription:lot-edit' event.pk lot.pk %}">{{ lot.name }}</a>
-                                                {% else %}
-                                                    {{ lot.name }}
-                                                {% endif %}
-                                                <br/>
-                                                <small class="text-muted">{{ lot.get_period }}</small>
-                                            </td>
-
-                                            <td class="hidden-xs hidden-sm">
-                                                {% if lot.price and lot.price > 0 %}
-                                                    Pago{% else %}
-                                                    Gratuito{% endif %}</td>
 
 
-                                            <td class="hidden-xs hidden-sm">
-                                                {% lot_count_completed_subscriptions lot %}
-                                                {% if lot.limit %}
-                                                    / {{ lot.limit }}
-                                                    vagas
-                                                    <span style="color:dimgray">(limitadas)</span>
-                                                {% else %}
-                                                    vagas
-                                                    <span style="color:dimgray">(aberto)</span>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                {% if lot.price and lot.price > 0 %}
-                                                    {{ lot.display_publicly }}
-                                                {% else %}
-                                                    ----
-                                                {% endif %}
-                                            </td>
-                                            <td class="hidden-xs">
+                                                <tr {% if lot.status == lot.LOT_STATUS_RUNNING %} class="success"{% elif lot.status == lot.LOT_STATUS_FINISHED %} class="danger" {% endif %}>
 
-                                                {% if lot.private %}
-                                                    <div>
-                                                        <span class="badge badge-primary">Privado</span>
-                                                    </div>
-                                                    <div>
-                                                        {{ lot.exhibition_code|default_if_none:'' }}
-                                                    </div>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                <div class="btn-group">
-                                                    <button
-                                                            type="button"
-                                                            class="btn
-                                                        btn-primary btn-trans
-                                                        btn-sm dropdown-toggle"
-                                                            data-toggle="dropdown"
-                                                            aria-expanded="false">
-                                                        <span class="fas fa-cog"></span>
-                                                    </button>
-                                                    <ul class="dropdown-menu dropdown-menu-right"
-                                                        role="menu">
+                                                    <td>
+                                                        {% if lot.rsvp_restrict %}
+                                                            <div>
+                                                                <span class="badge badge-primary">Associados</span>
+                                                            </div>
+                                                        {% endif %}
+
                                                         {% if user has 'gatheros_subscription.change_lot' of lot %}
-                                                            <li>
-                                                                <a href="{% url 'subscription:lot-edit' event.pk lot.pk %}">
-                                                                    <i class="fas fa-pencil-alt"></i>
-                                                                    Editar
-                                                                </a>
-                                                            </li>
+                                                            <a href="{% url 'subscription:lot-edit' event.pk lot.pk %}">{{ lot.name }}</a>
+                                                        {% else %}
+                                                            {{ lot.name }}
                                                         {% endif %}
-                                                        {% if lot.is_deletable and user has 'gatheros_subscription.delete_lot' of lot %}
-                                                            <li>
-                                                                <a href="{% url 'subscription:lot-delete' event.pk lot.pk %}">
-                                                                    <i class="fas fa-trash-alt"></i>
-                                                                    Excluir
-                                                                </a>
-                                                            </li>
+                                                        <br/>
+                                                        <small class="text-muted">{{ lot.get_period }}</small>
+                                                    </td>
+
+                                                    <td class="hidden-xs hidden-sm">
+                                                        {% if lot.price and lot.price > 0 %}
+                                                            Pago{% else %}
+                                                            Gratuito{% endif %}</td>
+
+
+                                                    <td class="hidden-xs hidden-sm">
+                                                        {% lot_count_completed_subscriptions lot %}
+                                                        {% if lot.limit %}
+                                                            / {{ lot.limit }}
+                                                            vagas
+                                                            <span style="color:dimgray">(limitadas)</span>
+                                                        {% else %}
+                                                            vagas
+                                                            <span style="color:dimgray">(aberto)</span>
                                                         {% endif %}
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                            </tr>
+                                                    </td>
+
+                                                    <td>
+                                                        {% if lot.price and lot.price > 0 %}
+                                                            {{ lot.display_publicly }}
+                                                        {% else %}
+                                                            ----
+                                                        {% endif %}
+                                                    </td>
+
+                                                    <td class="hidden-xs">
+
+                                                        {% if lot.private %}
+                                                            <div>
+                                                                <span class="badge badge-primary">Privado</span>
+                                                            </div>
+                                                            <div>
+                                                                {{ lot.exhibition_code|default_if_none:'' }}
+                                                            </div>
+                                                        {% endif %}
+                                                    </td>
+
+                                                    <td>
+                                                        <div class="btn-group">
+                                                            <button
+                                                                    type="button"
+                                                                    class="btn
+                                                                btn-primary btn-trans
+                                                                btn-sm dropdown-toggle"
+                                                                    data-toggle="dropdown"
+                                                                    aria-expanded="false">
+                                                                <span class="fas fa-cog"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-right"
+                                                                role="menu">
+                                                                {% if user has 'gatheros_subscription.change_lot' of lot %}
+                                                                    <li>
+                                                                        <a href="{% url 'subscription:lot-edit' event.pk lot.pk %}">
+                                                                            <i class="fas fa-pencil-alt"></i>
+                                                                            Editar
+                                                                        </a>
+                                                                    </li>
+                                                                {% endif %}
+                                                                {% if lot.is_deletable and user has 'gatheros_subscription.delete_lot' of lot %}
+                                                                    <li>
+                                                                        <a href="{% url 'subscription:lot-delete' event.pk lot.pk %}">
+                                                                            <i class="fas fa-trash-alt"></i>
+                                                                            Excluir
+                                                                        </a>
+                                                                    </li>
+                                                                {% endif %}
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+
+                                                </tr>
+
                                             {% endfor %}
+
                                             </tbody>
+
                                         </table>
+
                                     </div>
+
                                 </div>
+
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
 
             {% endif %}
+
         </div>
+
     </div>
+
 {% endblock %}
+
 {% block modals %}
     <!-- Lot survey Modal -->
     <div class="modal fade" id="survey-lot-form" tabindex="-1" role="dialog"

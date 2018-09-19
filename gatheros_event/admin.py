@@ -6,7 +6,9 @@ from django.contrib import admin
 from django.db.models import Sum
 
 from .models import Category, Event, Info, Invitation, Member, Occupation, \
-    Organization, Person, Place, Segment, Subject
+    Organization, Person, Place, Segment, Subject, FeatureConfiguration, \
+    FeatureManagement
+from gatheros_event.forms import FeatureConfigurationForm
 
 
 @admin.register(Segment)
@@ -50,8 +52,6 @@ class EventAdmin(admin.ModelAdmin):
                 'is_scientific',
                 'published',
                 'slug',
-                'allow_boleto_expiration_on_lot_expiration',
-                'allow_importing',
             ),
         }),
         ('Inscrições', {
@@ -190,11 +190,6 @@ class OrganizationAdmin(admin.ModelAdmin):
                 'avatar',
                 'active',
                 'internal',
-            ),
-        }),
-        ('Inscrições', {
-            'fields': (
-                'allow_internal_subscription',
             ),
         }),
         ('Site e Redes Sociais', {
@@ -339,3 +334,36 @@ class InvitationAdmin(admin.ModelAdmin):
 
     get_organization.__name__ = 'organização'
     get_user.__name__ = 'convidado'
+
+
+@admin.register(FeatureConfiguration)
+class FeatureConfigurationAdmin(admin.ModelAdmin):
+    """
+    Admin para Configurações de Eventos
+    """
+    search_fields = ('event__name',)
+    exclude = ('event', 'last_updated_by')
+    form = FeatureConfigurationForm
+
+    def get_form(self, request, obj=None, **kwargs):
+        AdminForm = super(FeatureConfigurationAdmin, self).get_form(
+            request,
+            obj,
+            **kwargs
+        )
+
+        class AdminFormWithRequest(AdminForm):
+            def __new__(cls, *args, **kwargs):
+                kwargs['request'] = request
+                return AdminForm(*args, **kwargs)
+
+        return AdminFormWithRequest
+
+
+@admin.register(FeatureManagement)
+class FeatureManagementAdmin(admin.ModelAdmin):
+    """
+    Admin para Configurações de Eventos selecionadas pelos organizadores
+    """
+    search_fields = ('event__name',)
+    exclude = ('event',)

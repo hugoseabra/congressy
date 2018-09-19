@@ -1,13 +1,51 @@
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
-from django.http import HttpResponse
+from django.views.generic.base import ContextMixin
 
 from gatheros_event.models import Event
+from gatheros_event.views.mixins import EventDraftStateMixin, AccountMixin
 from raffle import forms, models
 
 
-class RaffleListView(generic.ListView):
+class RaffleBaseMixin(ContextMixin, AccountMixin, EventDraftStateMixin):
+    permission_denied_message = 'Você não pode realizar esta ação.'
+
+    def __init__(self, *args, **kwargs):
+        self.event = None
+        super().__init__(*args, **kwargs)
+
+    def pre_dispatch(self, request):
+        response = super().pre_dispatch(request)
+        self.event = get_object_or_404(
+            Event,
+            pk=self.kwargs.get('event_pk'),
+        )
+
+        features = self.event.feature_configuration
+
+        if not features.feature_raffle:
+            raise PermissionDenied(self.get_permission_denied_message())
+
+        return response
+
+    def get_permission_denied_url(self):
+        return reverse(
+            'event:event-panel',
+            kwargs={
+                'pk': self.event.pk,
+            }
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(self.get_event_state_context_data(self.event))
+        return context
+
+
+class RaffleListView(RaffleBaseMixin, generic.ListView):
     template_name = 'raffle/raffle/list.html'
     model = models.Raffle
     event = None
@@ -29,15 +67,9 @@ class RaffleListView(generic.ListView):
         return cxt
 
 
-class RaffleAddView(generic.CreateView):
+class RaffleAddView(generic.CreateView, RaffleBaseMixin):
     template_name = 'raffle/raffle/form.html'
     form_class = forms.RaffleForm
-    event = None
-
-    def dispatch(self, request, *args, **kwargs):
-        event_pk = self.kwargs.get('event_pk')
-        self.event = get_object_or_404(Event, pk=event_pk)
-        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse('raffle:raffle-panel', kwargs={
@@ -60,16 +92,10 @@ class RaffleAddView(generic.CreateView):
         return cxt
 
 
-class RaffleEditView(generic.UpdateView):
+class RaffleEditView(generic.UpdateView, RaffleBaseMixin):
     template_name = 'raffle/raffle/form.html'
     form_class = forms.RaffleForm
     model = forms.RaffleForm.Meta.model
-    event = None
-
-    def dispatch(self, request, *args, **kwargs):
-        event_pk = self.kwargs.get('event_pk')
-        self.event = get_object_or_404(Event, pk=event_pk)
-        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -91,15 +117,9 @@ class RaffleEditView(generic.UpdateView):
         })
 
 
-class RaffleDeleteView(generic.DeleteView):
+class RaffleDeleteView(generic.DeleteView, RaffleBaseMixin):
     template_name = 'raffle/raffle/delete.html'
     model = models.Raffle
-    event = None
-
-    def dispatch(self, request, *args, **kwargs):
-        event_pk = self.kwargs.get('event_pk')
-        self.event = get_object_or_404(Event, pk=event_pk)
-        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -116,15 +136,9 @@ class RaffleDeleteView(generic.DeleteView):
         return cxt
 
 
-class RafflePanelView(generic.DetailView):
+class RafflePanelView(generic.DetailView, RaffleBaseMixin):
     template_name = 'raffle/raffle/panel.html'
     model = models.Raffle
-    event = None
-
-    def dispatch(self, request, *args, **kwargs):
-        event_pk = self.kwargs.get('event_pk')
-        self.event = get_object_or_404(Event, pk=event_pk)
-        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -147,18 +161,17 @@ class RafflePanelView(generic.DetailView):
         return queryset
 
 
-class WinnerListView(generic.ListView):
+class WinnerListView(generic.ListView, RaffleBaseMixin):
     template_name = 'raffle/winner/list.html'
     model = models.Winner
     event = None
     raffle = None
 
     def dispatch(self, request, *args, **kwargs):
-        event_pk = self.kwargs.get('event_pk')
+        response = super().dispatch(request, *args, **kwargs)
         pk = self.kwargs.get('pk')
-        self.event = get_object_or_404(Event, pk=event_pk)
         self.raffle = get_object_or_404(models.Raffle, pk=pk)
-        return super().dispatch(request, *args, **kwargs)
+        return response
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -170,16 +183,10 @@ class WinnerListView(generic.ListView):
         return cxt
 
 
-class WinnerFormView(generic.FormView):
+class WinnerFormView(generic.FormView, RaffleBaseMixin):
     template_name = 'raffle/winner/form.html'
     form_class = forms.WinnerForm
-    event = None
     object = None
-
-    def dispatch(self, request, *args, **kwargs):
-        event_pk = self.kwargs.get('event_pk')
-        self.event = get_object_or_404(Event, pk=event_pk)
-        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse('raffle:winner-register', kwargs={
@@ -212,16 +219,10 @@ class WinnerFormView(generic.FormView):
         return super().form_invalid(form)
 
 
-class WinnerDeleteView(generic.DeleteView):
+class WinnerDeleteView(generic.DeleteView, RaffleBaseMixin):
     model = models.Winner
-    event = None
     http_method_names = ['post']
     object_pk = None
-
-    def dispatch(self, request, *args, **kwargs):
-        event_pk = self.kwargs.get('event_pk')
-        self.event = get_object_or_404(Event, pk=event_pk)
-        return super().dispatch(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         self.object_pk = request.POST.get('pk')

@@ -4,9 +4,61 @@
 Variáveis:
 - active
 - event
-- has_paid_lots
+- is_paid_event
 
 {% endcomment %}
+
+
+<div class="sidebar-header well text-center" style="margin-left: 5px">
+
+    {% if event.published %}
+
+        <div style="font-size:14px">
+            <div class="text-bold">
+                Status: <i class="fas fa-circle success-color"></i>
+            </div>
+
+            <div class=" small text-muted">
+                Publicado
+            </div>
+
+        </div>
+
+    {% else %}
+
+        <div style="font-size:14px">
+            <div class="text-bold">
+                Status: <i class="fas fa-circle danger-color"></i>
+            </div>
+
+            <div class="small text-muted">
+                Não publicado
+            </div>
+
+        </div>
+
+    {% endif %}
+
+    {% if is_event_publishable != None %}
+
+        <div class="small">
+
+            {% if is_event_publishable %}
+                Publicar:
+                <input type="checkbox" class="js-switch hide" id="publish_event"
+                        {% if event.published %} checked {% endif %}/>
+            {% elif not is_event_publishable %}
+                <a onclick="$('#unpublishable_modal').modal('show');" href="javascript:void(0);">
+                    Seu evento possui pendencias
+                </a>
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+</div>
+
 <h5 class="sidebar-header" style="color:#4c4c4c;">Início</h5>
 <ul class="nav nav-pills nav-stacked">
     <li {% if active == 'panel' %}class="active"{% endif %}>
@@ -32,7 +84,7 @@ Variáveis:
             </span>
         </a>
     </li>
-    {% if has_paid_lots %}
+    {% if is_paid_event %}
         <li {% if active == 'pagamentos' %}class="active"{% endif %}>
             <a class="sidebar-itens" href=
                     "{% url 'payment:event-payments' event.pk %}"
@@ -41,7 +93,7 @@ Variáveis:
             </a>
         </li>
     {% endif %}
-    {% if event.has_certificate %}
+    {% if event.feature_configuration.feature_certificate and  event.feature_management.certificate %}
 
         <li {% if active == 'certificate' %}class=  "active"{% endif %}>
             <a class="sidebar-itens"
@@ -61,13 +113,15 @@ Variáveis:
             </a>
         </li>
     {% endif %}
-    <li {% if active == 'raffles' %}class=  "active"{% endif %}>
-        <a class="sidebar-itens"
-           href="{% url 'raffle:raffle-list' event.pk %}"
-           title="Sorteios">
-            <i class="fas fa-trophy"></i> Sorteios
-        </a>
-    </li>
+    {% if event.feature_configuration.feature_raffle and  event.feature_management.raffle %}
+        <li {% if active == 'raffles' %}class=  "active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'raffle:raffle-list' event.pk %}"
+               title="Sorteios">
+                <i class="fas fa-trophy"></i> Sorteios
+            </a>
+        </li>
+    {% endif %}
 </ul>
 
 <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
@@ -79,16 +133,25 @@ Variáveis:
             <i class="fas fa-file-alt"></i> Página do evento
         </a>
     </li>
-    {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
-        <li {% if active == 'lotes-categorias' %}class="active"{% endif %}>
-            <a class="sidebar-itens" href=
-                    "{% url 'subscription:lot-list' event.pk %}"
-               title="Lotes/Categorias">
-                <i class="fas fa-th-large"></i>
-                Lotes/Categorias
-            </a>
-        </li>
-    {% endif %}
+
+
+    <li {% if active == 'categorias' %}class="active"{% endif %}>
+        <a class="sidebar-itens" href="{% url 'subscription:category-list' event.pk %}"
+           title="Categorias">
+            <i class="fas fa-th-list"></i>
+            Categorias
+        </a>
+    </li>
+
+    <li {% if active == 'lotes' %}class="active"{% endif %}>
+        <a class="sidebar-itens" href=
+                "{% url 'subscription:lot-list' event.pk %}"
+           title="Lotes/Categorias">
+            <i class="fas fa-th-large"></i>
+            Lotes
+        </a>
+    </li>
+
     <li {% if active == 'dados-do-evento' %}class="active"{% endif %}>
         <a class="sidebar-itens" href=
                 "{% url 'event:event-edit' event.pk %}"
@@ -96,14 +159,16 @@ Variáveis:
             <i class="fas fa-cog"></i> Dados do evento
         </a>
     </li>
-    <li {% if active == 'form-personalizado' %}class="active"{% endif %}>
-        <a class="sidebar-itens" href=
-                "{% url 'subscription:form-config' event.pk %}"
-           title="Form. Personalizado"
-           style="padding-right: 0;font-size: 15px">
-            <i class="fab fa-wpforms"></i> Form. Personalizado
-        </a>
-    </li>
+    {% if event.feature_configuration.feature_survey and event.feature_management.survey %}
+        <li {% if active == 'form-personalizado' %}class="active"{% endif %}>
+            <a class="sidebar-itens" href=
+                    "{% url 'subscription:form-config' event.pk %}"
+               title="Form. Personalizado"
+               style="padding-right: 0;font-size: 15px">
+                <i class="fab fa-wpforms"></i> Form. Personalizado
+            </a>
+        </li>
+    {% endif %}
     {#        <h5 class="sidebar-header" style="color:#4c4c4c;">Adicionais</h5>#}
     {#        <ul class="nav nav-pills nav-stacked">#}
     {#            <li>#}
@@ -121,7 +186,7 @@ Variáveis:
 
 </ul>
 
-{% if event.has_checkin %}
+{% if event.feature_configuration.feature_checkin and event.feature_management.checkin %}
     <h5 class="sidebar-header" style="color:#4c4c4c;">Credenciamento</h5>
     <ul class="nav nav-pills nav-stacked">
         <li {% if active == 'checkin-dashboard' %}class="active"{% endif %}>
@@ -171,12 +236,10 @@ Variáveis:
     </ul>
 {% endif %}
 
-{% has_paid_lots event as has_paid_lots %}
-
-{% if event.has_extra_activities or event.has_optionals %}
+{% if event.feature_management.products and  event.feature_configuration.feature_products or event.feature_configuration.feature_services and event.feature_management.services %}
     <h5 class="sidebar-header" style="color:#4c4c4c;">Recursos Extras</h5>
     <ul class="nav nav-pills nav-stacked">
-        {% if event.has_extra_activities %}
+        {% if event.feature_configuration.feature_services and event.feature_management.services %}
             <li {% if active == 'addon-themes' %}class="active"{% endif %}>
                 <a class="sidebar-itens"
                    href="{% url 'addon:theme-list' event.pk %}"
@@ -194,7 +257,7 @@ Variáveis:
                 </a>
             </li>
         {% endif %}
-        {% if event.has_optionals %}
+        {% if event.feature_configuration.feature_products and event.feature_management.products %}
             <li {% if active == 'addon-opcionais' %}class="active"{% endif %}>
                 <a class="sidebar-itens"
                    href="{% url 'addon:optional-product-list' event.pk %}"
@@ -209,4 +272,40 @@ Variáveis:
 <br/>
 <br/>
 <br/>
+
+<script>
+
+
+    $(document).ready(function () {
+
+        var publish_switch_el = $('#publish_event');
+
+        if (publish_switch_el.length) {
+
+            publish_switch_el.on('change', function () {
+
+                var sender = new cgsy.AjaxSender("{% url 'event:event-publish' event.pk %}");
+                sender.setSuccessCallback(function () {
+                    location.reload();
+                });
+
+                sender.setFailCallback(function (res) {
+                    console.error(res.statusText);
+                    location.reload();
+                });
+
+
+                if (publish_switch_el.prop('checked')) {
+                    sender.send('POST', {'state': 'publish'});
+                } else {
+                    sender.send('POST', {'state': 'unpublish'});
+                }
+
+            });
+        }
+
+    });
+
+
+</script>
 

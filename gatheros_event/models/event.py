@@ -51,21 +51,19 @@ class Event(models.Model, GatherosModelMixin):
     EVENT_STATUS_RUNNING = 'running'
     EVENT_STATUS_FINISHED = 'finished'
 
+    EVENT_BUSINESS_STATUS_PAID = 'paid'
+    EVENT_BUSINESS_STATUS_FREE = 'free'
+
+    BUSINESS_STATUSES = (
+        (EVENT_BUSINESS_STATUS_PAID, 'paid'),
+        (EVENT_BUSINESS_STATUS_FREE, 'free'),
+    )
+
     STATUSES = (
         (None, 'não-iniciado'),
         (EVENT_STATUS_NOT_STARTED, 'não-iniciado'),
         (EVENT_STATUS_RUNNING, 'andamento'),
         (EVENT_STATUS_FINISHED, 'finalizado'),
-    )
-
-    EVENT_TYPE_FREE = 'free'
-    EVENT_TYPE_PAID = 'paid'
-    EVENT_TYPE_SCIENTIFIC = 'scientific'
-
-    EVENT_TYPES = (
-        (EVENT_TYPE_FREE, 'gratuito'),
-        (EVENT_TYPE_PAID, 'pago'),
-        (EVENT_TYPE_SCIENTIFIC, 'cientifico'),
     )
 
     RSVP_DISABLED = 'rsvp-disabled'
@@ -91,14 +89,6 @@ class Event(models.Model, GatherosModelMixin):
         Category,
         on_delete=models.PROTECT,
         verbose_name='categoria do evento'
-    )
-
-    event_type = models.CharField(
-        max_length=15,
-        choices=EVENT_TYPES,
-        default=EVENT_TYPE_FREE,
-        verbose_name='Tipo de evento',
-        help_text="Como será seu evento?"
     )
 
     has_optionals = models.BooleanField(
@@ -266,14 +256,12 @@ class Event(models.Model, GatherosModelMixin):
         blank=True,
     )
 
-    allow_importing = models.BooleanField(
-        default=False,
-        verbose_name='permitir importação via csv',
-    )
-
-    allow_boleto_expiration_on_lot_expiration = models.BooleanField(
-        default=False,
-        verbose_name='vencimento dos boletos na da data de vencimento dos lotes',
+    business_status = models.CharField(
+        max_length=50,
+        choices=BUSINESS_STATUSES,
+        verbose_name='Ultimo status de negocios conhecido',
+        blank=True,
+        null=True,
     )
 
     class Meta:
@@ -317,7 +305,8 @@ class Event(models.Model, GatherosModelMixin):
         attended = 0.0
         if hasattr(self, 'subscriptions'):
             queryset = self.subscriptions
-            num = queryset.filter(completed=True, test_subscription=False).exclude(
+            num = queryset.filter(completed=True,
+                                  test_subscription=False).exclude(
                 status='canceled'
             ).count()
 
@@ -350,10 +339,7 @@ class Event(models.Model, GatherosModelMixin):
 
     @property
     def allow_internal_subscription(self):
-        if self.running is True:
-            return True
-
-        return self.organization.allow_internal_subscription
+        return self.feature_configuration.feature_internal_subscription
 
     def get_status_display(self):
         """ Recupera o status do evento de acordo com a propriedade 'status'"""

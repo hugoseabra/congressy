@@ -5,11 +5,12 @@ from django.views.generic import FormView
 
 from gatheros_event import forms
 from gatheros_event.helpers.account import update_account
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event, Info
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
 
 
-class EventHotsiteView(AccountMixin, FormView):
+class EventHotsiteView(AccountMixin, FormView, EventDraftStateMixin):
     form_class = forms.HotsiteForm
     template_name = 'event/hotsite.html'
     event = None
@@ -73,11 +74,14 @@ class EventHotsiteView(AccountMixin, FormView):
         event = self._get_event()
 
         context = super().get_context_data(**kwargs)
+
         context['has_inside_bar'] = True
         context['active'] = 'pagina-do-evento'
         context['event'] = event
-        context['has_paid_lots'] = self.has_paid_lots()
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
+        context['is_paid_event'] = is_paid_event(event)
+
+        context.update(self.get_event_state_context_data(event))
 
         try:
             context['info'] = event.info
@@ -85,18 +89,6 @@ class EventHotsiteView(AccountMixin, FormView):
             pass
 
         return context
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-            price = lot.price
-            if price is None:
-                continue
-
-            if lot.price and lot.price > 0:
-                return True
-
-        return False
 
     def get_success_url(self):
         return reverse('event:event-hotsite', kwargs={

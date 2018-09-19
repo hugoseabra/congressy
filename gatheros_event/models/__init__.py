@@ -13,3 +13,5 @@ from .event import Event
 from .place import Place
 from .info import Info
 from .invitation import Invitation
+from .feature_configuration import FeatureConfiguration
+from .feature_management import FeatureManagement

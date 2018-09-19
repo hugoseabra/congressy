@@ -88,7 +88,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
             - redireciona para página de inscrição;
         """
         # CONDIÇÃO 0
-        if not self.current_event.subscription_enabled():
+        if not self.current_event.event.published:
             return HttpResponseNotAllowed([])
 
         context = self.get_context_data(**kwargs)

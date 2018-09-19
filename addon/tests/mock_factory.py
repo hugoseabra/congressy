@@ -4,6 +4,7 @@
 
 import random
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 from django.contrib.auth.models import User
 from faker import Faker
@@ -30,7 +31,10 @@ class MockFactory:
         self.fake_factory = Faker()
 
     def fake_organization(self):
-        return Organization.objects.create(name=self.fake_factory.company())
+        return Organization.objects.create(
+            name=self.fake_factory.company(),
+            email=self.fake_factory.email(),
+        )
 
     def fake_event(self, organization=None):
 
@@ -112,7 +116,7 @@ class MockFactory:
             name=self.fake_factory.words(nb=3, ext_word_list=None),
         )
 
-    def fake_product(self, optional_type=None, lot_category=None):
+    def fake_product(self, optional_type=None, lot_category=None, price=None):
 
         if not lot_category:
             lot_category = self.fake_lot_category()
@@ -120,16 +124,25 @@ class MockFactory:
         if not optional_type:
             optional_type = self.fake_optional_product_type()
 
-        date_end = datetime.now() + timedelta(days=3)
+        if price is None:
+            price = Decimal(0.00)
+
+        date_end = lot_category.event.date_start
 
         return Product.objects.create(
             name='optional product',
             optional_type=optional_type,
             lot_category=lot_category,
             date_end_sub=date_end,
+            liquid_price=price,
+            published=True,
         )
 
-    def fake_service(self, optional_type=None, theme=None, lot_category=None):
+    def fake_service(self, optional_type=None, theme=None, lot_category=None,
+                     price=None):
+
+        if price is None:
+            price = Decimal(0.00)
 
         if not lot_category:
             lot_category = self.fake_lot_category()
@@ -151,6 +164,7 @@ class MockFactory:
             date_end_sub=date_end,
             schedule_start=date_start,
             schedule_end=date_end,
+            liquid_price=price,
             restrict_unique=False,
         )
 

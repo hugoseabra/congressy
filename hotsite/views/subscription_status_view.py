@@ -14,6 +14,15 @@ from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
 from hotsite.views import SubscriptionFormMixin
 from payment.models import Transaction
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.shortcuts import redirect
+from django.views import generic
+
+from gatheros_event.helpers.event_business import is_paid_event
+from hotsite.views import SubscriptionFormMixin
+from payment.models import Transaction
 
 
 class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
@@ -55,11 +64,8 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
         self.pre_dispatch()
 
         # Se  não há lotes pagos, não há o que fazer aqui.
-        has_paid_lots = self.current_event.has_paid_lots()
-        has_paid_optionals = self.current_subscription.has_paid_optionals()
-
-        if not has_paid_lots and not has_paid_optionals:
-            return redirect('public:hotsite', slug=slug)
+        if not is_paid_event(self.event):
+            return redirect('public:hotsite', slug=self.event.slug)
 
         if self.subscription.completed is False:
             messages.error(
@@ -82,29 +88,6 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
             return redirect('public:hotsite-subscription', slug=slug)
 
         return super().dispatch(request, *args, **kwargs)
-
-    def has_paid_optionals(self):
-        """ Retorna se evento possui algum lote pago. """
-
-        try:
-            sub = Subscription.objects.get(
-                person=self.person,
-                event=self.event,
-                completed=True, test_subscription=False
-            )
-
-            has_products = sub.subscription_products.filter(
-                optional_price__gt=0
-            ).count() > 0
-
-            has_services = sub.subscription_services.filter(
-                optional_price__gt=0
-            ).count() > 0
-
-            return has_products is True or has_services is True
-
-        except Subscription.DoesNotExist:
-            return False
 
     def get_context_data(self, **kwargs):
 

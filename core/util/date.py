@@ -1,11 +1,10 @@
 """
     Helper function used in an assortment of places.
 """
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 def create_years_list():
-
     current_year = datetime.now().year
     last_100_years = current_year - 100
 
@@ -24,6 +23,7 @@ class DateTimeRange(object):
     allows an open ended range. Also unlike range, it does not have an implicit step so it must be
     provided.
     """
+
     def __init__(self, start=None, stop=None):
 
         if start is None:
@@ -43,4 +43,3 @@ class DateTimeRange(object):
 
     def __contains__(self, x):
         return self.start <= x <= self.stop
-

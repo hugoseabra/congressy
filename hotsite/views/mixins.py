@@ -10,6 +10,9 @@ from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Person
 from gatheros_subscription.models import Lot, Subscription
 from hotsite.state import CurrentEventState, CurrentSubscriptionState
+from gatheros_event.helpers.event_business import is_paid_event
+from gatheros_event.models import Event, Info
+from gatheros_subscription.models import FormConfig, Subscription
 
 
 class EventMixin(TemplateNameableMixin):
@@ -36,7 +39,7 @@ class EventMixin(TemplateNameableMixin):
         event_state = self.current_event
         config = event_state.form_config
 
-        if config and event_state.has_paid_lots():
+        if config and is_paid_event(self.current_event.event):
             config.email = True
             config.phone = True
             config.city = True

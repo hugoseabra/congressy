@@ -45,16 +45,17 @@
 
                 <div class="hero-features row">
 
-                    {% if event.is_scientific is False %}
 
-                        <div class="hero-features-left col-md-7">
+                    <div class="hero-features-left col-md-7">
+
+                        {% if event.published %}
                             {% if info.lead %}
                                 <p class="lead">
                                     {{ info.lead }}
                                 </p>
                             {% endif %}
 
-                            {% if subscription_enabled and lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS and not subsciption_finished %}
+                            {% if lots %}
                                 <ul class="icon-list">
                                     {% for lot in lots %}
                                         {% if lot.status != lot.LOT_STATUS_NOT_STARTED %}
@@ -76,115 +77,29 @@
                                         {% endif %}
                                     {% endfor %}
                                 </ul>
-                            {% elif subscription_enabled and private_lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS and not subsciption_finished %}
+                            {% elif private_lots %}
 
                                 <p style="font-size: 20px;font-style: italic;">
                                     Este é um evento restrito a convidados.</p>
 
-                            {% elif subsciption_finished %}
-                                <p style="font-size: 20px;font-style: italic;">
-                                    Inscrições encerradas.</p>
-                            {% elif not subscription_enabled %}
-                                <p style="font-size: 20px;font-style: italic;">
-                                    Evento não permite inscrições.</p>
                             {% endif %}
-                        </div>
-
-                        <div class="hero-features-right col-md-5"
-                             data-animation="fadeIn">
-                            {% if subscription_enabled and not subsciption_finished %}
-                                {% if has_paid_lots and not has_active_bank_account %}
-                                    <p style="position: relative;font-size: 20px;font-style: italic;padding: 10px 0 25px;">
-                                        Evento está sendo configurado, volte em
-                                        breve para realizar sua inscrição!</p>
-                                {% else %}
-                                    {% include 'hotsite/subscription_simple_form.html' %}
-                                {% endif %}
-                            {% endif %}
-                        </div>
-                    {% else %}
-
-                        {% if event.work_config and event.work_config.is_configured %}
-                            <div class="hero-features-left col-md-7">
-                                {% if info.lead %}
-                                    <p class="lead">
-                                        {{ info.lead }}
-                                    </p>
-                                {% endif %}
-
-                                {% if subscription_enabled and lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS and not subsciption_finished %}
-                                    <ul class="icon-list">
-                                        {% for lot in lots %}
-                                            {% if lot.status != lot.LOT_STATUS_NOT_STARTED %}
-                                                <li>
-                                        <span class="icon-list-icon "
-                                              data-animation="bounceIn"
-                                              {% if lot.status == lot.LOT_STATUS_FINISHED %}style="background-color:#515050"{% endif %}>
-                                            <strong>{{ forloop.counter }}</strong>
-                                        </span>
-                                                    <h4 class="icon-list-title">
-                                                        <strong {% if lot.status == lot.LOT_STATUS_FINISHED %}style="text-decoration: line-through"{% endif %}>
-                                                            {{ lot.display_publicly }}
-                                                        </strong>
-                                                    </h4>
-
-                                                    <p>
-                                                        {#                                            <strong>{{ lot.places_remaining }} Vaga(s) restante(s)</strong>#}
-                                                        {#                                            <br/>#}
-                                                        <small class="text-muted">{{ lot.get_period }}</small>
-                                                    </p>
-                                                </li>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </ul>
-                                {% elif subscription_enabled and private_lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS and not subsciption_finished %}
-
-                                    <p style="font-size: 20px;font-style: italic;">
-                                        Este é um evento restrito a
-                                        convidados.</p>
-
-                                {% elif subsciption_finished %}
-                                    <p style="font-size: 20px;font-style: italic;">
-                                        Inscrições encerradas.</p>
-                                {% elif not subscription_enabled %}
-                                    <p style="font-size: 20px;font-style: italic;">
-                                        Evento não permite inscrições.</p>
-                                {% endif %}
-                            </div>
-
-                            <div class="hero-features-right col-md-5"
-                                 data-animation="fadeIn">
-                                {% if subscription_enabled and not subsciption_finished %}
-                                    {% if has_paid_lots and not has_active_bank_account %}
-                                        <p style="position: relative;font-size: 20px;font-style: italic;padding: 10px 0 25px;">
-                                            Evento está sendo configurado, volte
-                                            em
-                                            breve para realizar sua
-                                            inscrições cientificas no
-                                            momento.</p>
-                                    {% else %}
-                                        {% include 'hotsite/subscription_simple_form.html' %}
-                                    {% endif %}
-                                {% endif %}
-                            </div>
                         {% else %}
-                            <div class="hero-features-left col-md-7">
-
-                                <p style="font-size: 20px;font-style: italic;">
-                                    Evento está sendo configurado, volte em
-                                    breve para realizar sua
-                                    inscrições cientificas no
-                                    momento.
-                                </p>
-
-                            </div>
-
+                            
+                            <p style="font-size: 20px;font-style: italic;">
+                                Evento não permite inscrições no momento.
+                            </p>
 
                         {% endif %}
 
+                    </div>
 
+                    <div class="hero-features-right col-md-5"
+                         data-animation="fadeIn">
 
-                    {% endif %}
+                        {% include 'hotsite/subscription_simple_form.html' %}
+
+                    </div>
+
                 </div>
 
             </div>

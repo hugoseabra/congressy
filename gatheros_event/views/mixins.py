@@ -1,12 +1,12 @@
 """ Mixins de views. """
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.forms.models import model_to_dict
 from django.http import Http404
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import ugettext as _
@@ -17,15 +17,12 @@ from django.views.generic.edit import FormMixin
 from django.views.generic.list import ListView
 
 from core.model.deletable import DeletableModelMixin
-from gatheros_event.helpers.account import (
-    get_member,
-    get_organization,
-    get_organizations,
-    is_manager,
-)
-from gatheros_event.helpers.account import update_account
-from gatheros_event.models import Event
-from gatheros_event.models import Member
+from gatheros_event.helpers.account import get_member, get_organization, \
+    get_organizations, is_manager, update_account
+from gatheros_event.helpers.event_business import is_paid_event
+from gatheros_event.helpers.publishing import event_is_publishable, \
+    get_unpublishable_reason
+from gatheros_event.models import Event, Member
 
 
 class AccountMixin(LoginRequiredMixin, View):
@@ -281,9 +278,12 @@ class FormListViewMixin(FormMixin, ListView):
         return self.get(request, *args, **kwargs)
 
 
-class EventViewMixin(AccountMixin, generic.View):
+class EventViewMixin(AccountMixin):
     """ Mixin de view para vincular com informações de event. """
-    event = None
+
+    def __init__(self, *args, **kwargs):
+        self.event = None
+        super().__init__(*args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
         event = self.get_event()
@@ -296,15 +296,17 @@ class EventViewMixin(AccountMixin, generic.View):
 
         self.permission_denied_url = reverse(
             'event:event-panel',
-            kwargs={'pk': self.kwargs.get('event_pk')}
+            kwargs={'pk': event.pk}
         )
         return super(EventViewMixin, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super(EventViewMixin, self).get_context_data(**kwargs)
+        is_payable = is_paid_event(self.event)
         context['event'] = self.get_event()
-        context['has_paid_lots'] = self.has_paid_lots()
+        context['is_paid_event'] = is_paid_event(self.event)
+        context['event_is_payable'] = is_payable
 
         return context
 
@@ -314,25 +316,54 @@ class EventViewMixin(AccountMixin, generic.View):
         if self.event:
             return self.event
 
+        event_pk = self.kwargs.get('event_pk')
+
+        if not event_pk:
+            event_pk = self.kwargs.get('pk')
+
         self.event = get_object_or_404(
             Event,
-            pk=self.kwargs.get('event_pk')
+            pk=event_pk
         )
         return self.event
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-
-            price = lot.price
-
-            if price and price > 0:
-                return True
-
-        return False
 
     def can_access(self):
         return self.get_event().organization == self.organization
 
     def get_permission_denied_url(self):
         return reverse('event:event-list')
+
+
+class EventDraftStateMixin(object):
+    def get_event_state_context_data(self, event: Event):
+        return {
+            'selected_event': event,
+            'is_event_publishable': event_is_publishable(event),
+            'unpublishable_reason': get_unpublishable_reason(event),
+        }
+
+
+class MultiLotsFeatureFlagMixin(AccountMixin, generic.View):
+    event = None
+    permission_denied_message = 'Você não pode realizar esta ação.'
+
+    def get_permission_denied_url(self):
+        return reverse(
+            'event:event-panel',
+            kwargs={
+                'pk': self.event.pk,
+            }
+        )
+
+    def pre_dispatch(self, request):
+        self.event = get_object_or_404(
+            Event,
+            pk=self.kwargs.get('event_pk'),
+        )
+
+        response = super().pre_dispatch(request)
+        features = self.event.feature_configuration
+
+        if features.feature_multi_lots is False:
+            raise PermissionDenied(self.get_permission_denied_message())
+        return response

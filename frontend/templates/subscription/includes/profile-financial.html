@@ -325,8 +325,8 @@
                                         Ver Painel Participante
                                     </button>
                                 </li>
-                                {% if event.allow_internal_subscription %}
-                                    {% if not last_transaction or last_transaction and dividend_amount < 0 %}
+                                {% if event.feature_configuration.feature_manual_payments %}
+                                    {% if dividend_amount < 0 %}
                                         <li>
                                             <button type="button"
                                                     class="btn btn-success btn-trans"

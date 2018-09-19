@@ -90,7 +90,7 @@
         <!--logo start-->
         <div class="brand">
             <a href="{% url 'event:event-list' %}">
-                <img class="img base_logo" src= "{% static "assets/img/header-logo_black.png" %}" />
+                <img class="img base_logo" src="{% static "assets/img/header-logo_black.png" %}"/>
             </a>
         </div>
         <!--logo end-->
@@ -239,8 +239,47 @@
         <div class="{% if has_inside_bar %} main-page-full {% else %} main-page-sidebar {% endif %} col-xs-12 col-sm-8 col-md-9 col-lg-9 col-xl-10">
             <div class=" main-content-wrapper">
                 <!--main content start-->
+
+                {% if selected_event and not selected_event.published %}
+                        
+                    {% if is_event_publishable %}
+
+                        <div class="alert alert-info text-center" role="alert">
+
+                            Seu evento não está publicado!
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="alert alert-warning text-center" role="alert">
+
+                            <div>
+
+                                <i class="fas fa-exclamation-triangle warning-color"></i>
+
+                                <span class="text-bold text-uppercase">
+                                    atenção
+                                </span>
+
+                                <i class="fas fa-exclamation-triangle warning-color"></i>
+                            </div>
+
+                            <div>
+                                <a onclick="$('#unpublishable_modal').modal('show');" href="javascript:void(0);">
+                                    Seu evento possui pendencias que impeçam que ele seja publicado, click para maiores informações!
+                                </a>
+                            </div>
+
+
+                        </div>
+                    {% endif %}
+
+
+                {% endif %}
+
                 <section class="main-content-wrapper" style="position:
-                relative;padding-top: 0; {% if not has_inside_bar %} padding-left:15px {% endif %}">
+                        relative;padding-top: 0; {% if not has_inside_bar %} padding-left:15px {% endif %}">
                     <div class="pageheader">
                         <h1>{% block page_title %}{% endblock %}</h1>
                         <h2>{% block page_sub_title %}{% endblock %}</h2>
@@ -281,8 +320,9 @@
 
 <!-- Modals -->
 {% include 'organization/modal-switch-organization.html' %}
+{% include 'event/modal-upublishable.html' %}
 <div class="tooltip-wrapper">
-{% block modals %}{% endblock %}
+    {% block modals %}{% endblock %}
 </div>
 
 {% include 'sentry-javascript-sdk.html' %}

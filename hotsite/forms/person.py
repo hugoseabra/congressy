@@ -4,6 +4,7 @@
 """
 
 from gatheros_event.forms import PersonForm
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Person
 from gatheros_subscription.models import FormConfig
 
@@ -70,12 +71,12 @@ class SubscriptionPersonForm(PersonForm):
         country = self.data.get('person-country', 'BR')
         required_fields = ['gender', 'country']
 
-        has_paid_lots = self.lot.price > 0 if self.lot.price else False
+        event_is_payable = is_paid_event(self.event)
 
-        if has_paid_lots or config.phone:
+        if event_is_payable or config.phone:
             required_fields.append('phone')
 
-        if has_paid_lots or config.address_show:
+        if event_is_payable or config.address_show:
             required_fields.append('street')
             required_fields.append('village')
 
@@ -90,7 +91,7 @@ class SubscriptionPersonForm(PersonForm):
                 required_fields.append('city_international')
                 required_fields.append('state_international')
 
-        if not has_paid_lots \
+        if not event_is_payable \
                 and not config.address_show \
                 and config.city is True:
 
@@ -99,14 +100,14 @@ class SubscriptionPersonForm(PersonForm):
             else:
                 required_fields.append('city_international')
 
-        if has_paid_lots or config.cpf_required:
+        if event_is_payable or config.cpf_required:
             if country == 'BR':
                 required_fields.append('cpf')
             else:
                 required_fields.append('international_doc')
                 required_fields.append('state_international')
 
-        if has_paid_lots or config.birth_date_required:
+        if event_is_payable or config.birth_date_required:
             required_fields.append('birth_date')
 
         if config.institution_required:

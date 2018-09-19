@@ -4,7 +4,6 @@ from decimal import Decimal
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
-# from django.core.files.storage import FileSystemStorage
 from django.db.transaction import atomic
 from django.forms import ValidationError
 from django.http import QueryDict
@@ -15,6 +14,7 @@ from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
 from core.util.string import clear_string
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_subscription.models import FormConfig, Lot, Subscription
 from hotsite import forms
 from hotsite.views.mixins import SelectLotMixin
@@ -187,7 +187,9 @@ def has_survey(wizard):
         except Lot.DoesNotExist:
             return False
 
-    return lot.event_survey and lot.event_survey.survey.questions.count()
+    return lot.event_survey and \
+           lot.event_survey.survey.questions.count() and \
+           lot.event.feature_configuration.feature_survey
 
 
 def is_private_event(wizard):
@@ -256,7 +258,8 @@ def has_services(wizard):
         return optionals.filter(
             published=True,
             date_end_sub__gte=datetime.now(),
-        ).count() > 0
+        ).count() > 0 and \
+               lot.event.feature_configuration.feature_services
 
     except AttributeError:
         return False
@@ -286,7 +289,8 @@ def has_paid_products(wizard):
     try:
         optionals = lot.category.product_optionals
         for optional in optionals.all():
-            if optional.price and optional.price > 0:
+            if optional.price and optional.price > 0 and \
+                    lot.event.feature_configuration.feature_products:
                 return True
 
     except AttributeError:
@@ -319,7 +323,8 @@ def has_paid_services(wizard):
     try:
         optionals = lot.category.service_optionals
         for optional in optionals.all():
-            if optional.price and optional.price > 0:
+            if optional.price and optional.price > 0 and \
+                    lot.event.feature_configuration.feature_services:
                 return True
 
     except AttributeError:
@@ -734,7 +739,7 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
             except AttributeError:
                 config = FormConfig()
 
-            if self.current_event.has_paid_lots():
+            if is_paid_event(self.current_event.event):
                 config.email = True
                 config.phone = True
                 config.city = True

@@ -3,10 +3,10 @@ from django.shortcuts import reverse
 from django.views import generic
 
 from certificate import models, forms
-from gatheros_event.views.mixins import EventViewMixin
+from .mixins import CertificateFeatureFlagMixin
 
 
-class CertificateFormView(EventViewMixin, generic.FormView):
+class CertificateFormView(CertificateFeatureFlagMixin, generic.FormView):
     template_name = 'certificate/certificate_form.html'
     model = models.Certificate
     slug_field = 'event__pk'

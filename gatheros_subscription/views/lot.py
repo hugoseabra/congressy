@@ -7,14 +7,17 @@ from django.urls import reverse, reverse_lazy
 from django.views import View, generic
 
 from core.views.mixins import TemplateNameableMixin
+from gatheros_event.event_specifications import OrganizationHasBanking
 from gatheros_event.helpers.account import update_account
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event, Organization
-from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
+from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin, \
+    MultiLotsFeatureFlagMixin, EventDraftStateMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import Lot, EventSurvey
 
 
-class BaseLotView(AccountMixin, View):
+class BaseLotView(AccountMixin, View, EventDraftStateMixin):
     event = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -43,22 +46,13 @@ class BaseLotView(AccountMixin, View):
         # noinspection PyUnresolvedReferences
         context = super(BaseLotView, self).get_context_data(**kwargs)
         context['event'] = self.event
-        context['has_paid_lots'] = self.has_paid_lots()
+
+        context.update(self.get_event_state_context_data(self.event))
+
         return context
 
     def _set_event(self):
         self.event = Event.objects.get(pk=self.kwargs.get('event_pk'))
-
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-            if lot.price is None:
-                continue
-
-            if lot.price and lot.price > 0:
-                return True
-
-        return False
 
     def can_view(self, show_message=True):
         if not self.event:
@@ -122,6 +116,20 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
         'date_end'
     )
 
+    def get_context_data(self, **kwargs):
+        context = super(LotListView, self).get_context_data(**kwargs)
+        context['event'] = self.event
+        context['can_add'] = self._can_add
+        context['has_inside_bar'] = True
+        context['active'] = 'lotes'
+        context['subscription_stats'] = self.get_subscription_stats()
+        context['full_banking'] = self.get_org_banking_status()
+        context['exhibition_code'] = Lot.objects.generate_exhibition_code()
+        context['categories'] = self.get_categories()
+        context['event_is_full'] = self._event_is_full()
+        context['is_paid_event'] = is_paid_event(self.event)
+        return context
+
     def get_queryset(self):
         """Lotes a exibir são de acordo com o evento e não-interno"""
         query_set = super(LotListView, self).get_queryset()
@@ -129,34 +137,8 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
             'date_start', 'date_end'
         )
 
-    def get_context_data(self, **kwargs):
-        context = super(LotListView, self).get_context_data(**kwargs)
-        context['event'] = self.event
-        context['can_add'] = self._can_add
-        context['has_inside_bar'] = True
-        context['active'] = 'lotes-categorias'
-        context['subscription_stats'] = self.get_subscription_stats()
-        context['full_banking'] = self._get_full_banking()
-        context['exhibition_code'] = Lot.objects.generate_exhibition_code()
-        context['categories'] = self.event.lot_categories.all().order_by('pk')
-        context['event_is_full'] = self.event_is_full()
-        return context
-
-    def event_is_full(self):
-        if self.event.expected_subscriptions and \
-                self.event.expected_subscriptions > 0:
-
-            total_subscriptions_event = 0
-            for lot in self.event.lots.all():
-                total_subscriptions_event += lot.subscriptions.filter(
-                    completed=True, test_subscription=False
-                ).exclude(
-                    status='canceled'
-                ).count()
-            return total_subscriptions_event >= self.event.expected_subscriptions
-
-        else:
-            return False
+    def get_categories(self):
+        return self.event.lot_categories.all()
 
     def get_subscription_stats(self):
         stats = {
@@ -181,21 +163,28 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
 
         return stats
 
-    def _get_full_banking(self):
+    def get_org_banking_status(self):
 
         if not self.organization:
             return False
 
-        banking_required_fields = ['bank_code', 'agency', 'account',
-                                   'cnpj_ou_cpf', 'account_type']
+        return OrganizationHasBanking().is_satisfied_by(self.organization)
 
-        for field in Organization._meta.get_fields():
-            for required_field in banking_required_fields:
-                if field.name == required_field:
-                    if not getattr(self.organization, field.name):
-                        return False
+    def _event_is_full(self):
+        if self.event.expected_subscriptions and \
+                self.event.expected_subscriptions > 0:
 
-        return True
+            total_subscriptions_event = 0
+            for lot in self.event.lots.all():
+                total_subscriptions_event += lot.subscriptions.filter(
+                    completed=True, test_subscription=False
+                ).exclude(
+                    status='canceled'
+                ).count()
+            return total_subscriptions_event >= self.event.expected_subscriptions
+
+        else:
+            return False
 
     def _can_add(self):
         return self.request.user.has_perm(
@@ -204,7 +193,8 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
         )
 
 
-class LotAddFormView(BaseFormLotView, generic.CreateView):
+class LotAddFormView(MultiLotsFeatureFlagMixin, BaseFormLotView,
+                     generic.CreateView):
     form_class = forms.LotForm
     # template_name = 'gatheros_subscription/lot/form.html'
     template_name = 'lot/form.html'
@@ -215,6 +205,7 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
         context['form_title'] = "Novo lote para '{}'".format(self.event.name)
         context['full_banking'] = self._get_full_banking()
         context['has_surveys'] = self._event_has_surveys()
+        context['is_paid_event'] = is_paid_event(self.event)
 
         return context
 
@@ -263,7 +254,7 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
             return False
 
         banking_required_fields = ['bank_code', 'agency', 'account',
-                                   'cnpj_ou_cpf', 'account_type']
+            'cnpj_ou_cpf', 'account_type']
 
         for field in Organization._meta.get_fields():
 
@@ -295,6 +286,7 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         context['full_banking'] = self._get_full_banking()
         context['has_surveys'] = self._event_has_surveys()
         context['has_optionals'] = self._lot_has_optionals()
+        context['is_paid_event'] = is_paid_event(self.event)
         context['lot_has_subscriptions'] = self.object.subscriptions.filter(
             completed=True, test_subscription=False,
         ).count() > 0
