@@ -16,6 +16,7 @@ from django.utils.decorators import classonlymethod
 from django.views import generic
 from wkhtmltopdf.views import PDFTemplateView
 
+from attendance.helpers.attendance import subscription_is_checked
 from core.forms.cleaners import clear_string
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.helpers.account import update_account
@@ -25,7 +26,6 @@ from gatheros_event.views.mixins import EventDraftStateMixin, \
     AccountMixin, PermissionDenied, EventViewMixin
 from gatheros_subscription.directors import SubscriptionSurveyDirector
 from gatheros_subscription.forms import (
-    SubscriptionAttendanceForm,
     SubscriptionPersonForm,
     SubscriptionFilterForm,
     SubscriptionForm,
@@ -44,15 +44,14 @@ from payment import forms
 from payment.helpers import payment_helpers
 from payment.models import Transaction
 from survey.models import Question, Answer
-from .mixins import CheckinFeatureFlagMixin
 
 
 class SubscriptionViewMixin(TemplateNameableMixin,
                             AccountMixin, EventDraftStateMixin):
     """ Mixin de view para vincular com informações de event. """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **initargs):
+        super().__init__(**initargs)
         self.event = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -65,8 +64,7 @@ class SubscriptionViewMixin(TemplateNameableMixin,
         )
 
         self.permission_denied_url = reverse('event:event-list')
-        return super(SubscriptionViewMixin, self).dispatch(request, *args,
-                                                           **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
@@ -708,7 +706,8 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
         return self.render_to_response(
             self.get_context_data(form=form, survey_form=survey_form))
 
-    def get_survey_form(self, survey, subscription=None, data=None, files=None):
+    def get_survey_form(self, survey, subscription=None, data=None,
+                        files=None):
 
         survey_director = SubscriptionSurveyDirector(subscription)
 
@@ -833,7 +832,8 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
         return self.render_to_response(
             self.get_context_data(form=form, survey_form=survey_form))
 
-    def get_survey_form(self, survey, subscription=None, data=None, files=None):
+    def get_survey_form(self, survey, subscription=None, data=None,
+                        files=None):
 
         survey_director = SubscriptionSurveyDirector(subscription)
 
@@ -847,7 +847,8 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
         return survey_form
 
 
-class SubscriptionConfirmationView(SubscriptionViewMixin, generic.TemplateView):
+class SubscriptionConfirmationView(SubscriptionViewMixin,
+                                   generic.TemplateView):
     """ Inscrição de pessoa que já possui perfil. """
     subscription_user = None
     submitted_data = None
@@ -960,84 +961,6 @@ class SubscriptionCancelView(EventViewMixin,
         })
 
 
-class SubscriptionAttendanceDashboardView(CheckinFeatureFlagMixin,
-                                          generic.TemplateView):
-    template_name = 'subscription/attendance-dashboard.html'
-    search_by = 'name'
-
-    def get_permission_denied_url(self):
-        return reverse('event:event-list')
-
-    def get_context_data(self, **kwargs):
-        cxt = super().get_context_data(**kwargs)
-        cxt.update({
-            'attendances': self.get_attendances(),
-            'search_by': self.search_by,
-            'has_inside_bar': True,
-            'active': 'checkin-dashboard',
-            'is_paid_event': is_paid_event(self.event),
-            'confirmed': self.get_number_confirmed(),
-            'number_attendances': self.get_number_attendances(),
-            'total_subscriptions': self.get_number_subscription(),
-            'reports': self.get_report()
-        })
-        return cxt
-
-    def get_attendances(self):
-
-        sub_list = list()
-
-        try:
-            sub_list = Subscription.objects.filter(
-                attended=True,
-                completed=True,
-                test_subscription=False,
-                event=self.event,
-            ).order_by('-attended_on')
-
-            return sub_list[0:5]
-        except Subscription.DoesNotExist:
-            pass
-
-        return sub_list
-
-    def get_number_attendances(self):
-        try:
-            return Subscription.objects.filter(
-                attended=True,
-                completed=True, test_subscription=False,
-                event=self.event,
-            ).count()
-
-        except Subscription.DoesNotExist:
-            return 0
-
-    def get_number_subscription(self):
-
-        total = \
-            Subscription.objects.filter(
-                event=self.event,
-                completed=True, test_subscription=False
-            ).exclude(status=Subscription.CANCELED_STATUS).count()
-
-        return total
-
-    def get_number_confirmed(self):
-
-        confirmed = \
-            Subscription.objects.filter(
-                status=Subscription.CONFIRMED_STATUS,
-                completed=True, test_subscription=False,
-                event=self.event,
-            ).count()
-
-        return confirmed
-
-    def get_report(self):
-        """ Resgata informações gerais do evento. """
-        return self.event.get_report(only_attended=True)
-
-
 class MySubscriptionsListView(AccountMixin, generic.ListView):
     """ Lista de inscrições """
 
@@ -1089,6 +1012,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
         cxt = super(MySubscriptionsListView, self).get_context_data(**kwargs)
         cxt['has_filter'] = self.has_filter
         cxt['filter_events'] = self.get_events()
+        cxt['status_events'] = self.get_attendance_status_events()
         cxt['needs_boleto_link'] = self.check_if_needs_boleto_link()
         # cxt['filter_categories'] = self.get_categories()
         return cxt
@@ -1109,6 +1033,18 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
             'event__id',
         ).distinct().order_by('event__name')
 
+    def get_attendance_status_events(self):
+        status_events = []
+        subscription = self.get_queryset()
+        for sub in subscription:
+            checked = subscription_is_checked(sub.pk)
+            status_events.append({
+                'event_pk': sub.event.id,
+                'checked': checked
+            })
+
+        return status_events
+
     def can_access(self):
         try:
             self.request.user.person
@@ -1124,7 +1060,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
                 for transaction in subscription.transactions.all():
                     if transaction.status == transaction.WAITING_PAYMENT and \
-                            transaction.type == 'boleto':
+                                    transaction.type == 'boleto':
                         return True
 
         return False
@@ -1248,121 +1184,6 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
 
     def can_access(self):
         return self.subscription.confirmed is True
-
-
-class SubscriptionAttendanceSearchView(CheckinFeatureFlagMixin,
-                                       generic.TemplateView):
-    template_name = 'subscription/attendance.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['has_inside_bar'] = True
-        context['active'] = 'checkin'
-        context['is_paid_event'] = is_paid_event(self.event)
-        return context
-
-
-class SubscriptionAttendanceView(SubscriptionViewMixin, generic.FormView):
-    form_class = SubscriptionAttendanceForm
-    http_method_names = ['post']
-    search_by = 'name'
-    register_type = None
-    object = None
-
-    def get_object(self):
-        if self.object:
-            return self.object
-
-        try:
-            self.object = Subscription.objects.get(pk=self.kwargs.get('pk'))
-
-        except Subscription.DoesNotExist:
-            return None
-
-        else:
-            return self.object
-
-    def get_success_url(self):
-        url = reverse(
-            'subscription:subscription-attendance-search',
-            kwargs={'event_pk': self.kwargs.get('event_pk')}
-        )
-        if self.search_by is not None and self.search_by != 'name':
-            url += '?search_by=' + str(self.search_by)
-
-        return url
-
-    def get_permission_denied_url(self):
-        return self.get_success_url()
-
-    def get_form_kwargs(self):
-        kwargs = super(SubscriptionAttendanceView, self).get_form_kwargs()
-        kwargs.update({'instance': self.get_object()})
-        return kwargs
-
-    def form_invalid(self, form):
-        messages.error(self.request, form.errors)
-        return super(SubscriptionAttendanceView, self).form_invalid(form)
-
-    def form_valid(self, form):
-        sub = self.get_object()
-
-        try:
-            if self.register_type is None:
-                raise Exception('Nenhuma ação foi informada.')
-
-            register_name = 'Credenciamento' \
-                if self.register_type == 'register' \
-                else 'Cancelamento de credenciamento'
-
-        except Exception as e:
-            form.add_error(None, str(e))
-            return self.form_invalid(form)
-
-        else:
-            messages.success(
-                self.request,
-                '{} de `{}` registrado com sucesso.'.format(
-                    register_name,
-                    sub.person.name
-                )
-            )
-            form.attended(self.register_type == 'register')
-            return super(SubscriptionAttendanceView, self).form_valid(form)
-
-    def post(self, request, *args, **kwargs):
-        self.search_by = request.POST.get('search_by')
-        self.register_type = request.POST.get('action')
-
-        return super(SubscriptionAttendanceView, self).post(
-            request,
-            *args,
-            **kwargs
-        )
-
-    def can_access(self):
-        event = self.get_event()
-        sub = self.get_object()
-        return sub.event.pk == event.pk
-
-
-class SubscriptionAttendanceListView(CheckinFeatureFlagMixin,
-                                     generic.TemplateView):
-    template_name = 'subscription/attendance-list.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['attendances'] = self.get_attendances()
-        context['has_inside_bar'] = True
-        context['active'] = 'checkin-list'
-        return context
-
-    def get_attendances(self):
-        return Subscription.objects.filter(
-            attended=True,
-            completed=True,
-            event=self.event,
-        ).exclude(status=Subscription.CANCELED_STATUS).order_by('-attended_on')
 
 
 class SwitchSubscriptionTestView(SubscriptionViewMixin, generic.View):

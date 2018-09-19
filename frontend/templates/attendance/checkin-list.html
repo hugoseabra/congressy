@@ -7,7 +7,7 @@
 {% block page_title %}Credenciados{% endblock %}
 {% block page_sub_title %}{{ event.name }}{% endblock %}
 {% block page_description %}
-    Lista dos credenciados no evento.
+    Lista dos credenciados.
 {% endblock %}
 
 
@@ -17,55 +17,22 @@
     </div>
 {% endblock %}
 
-{% block nav_aside_itens %}
-    <h5 class="sidebar-header">Configurações</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento">
-                <i class="fa  fa-fw fa-rocket"></i> Página do evento
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário">
-                <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
-    </ul>
-
-    <h5 class="sidebar-header">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'subscription:lot-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Ingressos
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Inscrições
-            </a>
-        </li>
-        {#        <li class="active">#}
-        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
-        {#               title="Check-in">#}
-        {#                <i class="fa  fa-fw fa-rocket"></i>#}
-        {#                Check-in#}
-        {#            </a>#}
-        {#        </li>#}
-    </ul>
-{% endblock %}
 
 {% block content %}
-
+    {% include 'attendance/includes/top-menu.html' %}
     <div class="row">
-        <div class="col-md-12">
+    <div class="col-md-2 col-sm-12">
+
+        {% include 'attendance/includes/attendance-menu.html' with active='credenciados' %}
+    </div>
+        <div class="col-md-10">
 
             <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        Lista de participantes que realizaram Checkin
+                    </div>
+                </div>
                 <div class="panel-body">
                     <table id="attendance_table"
                            class="table table-striped table-bordered dataTable no-footer nowrap"
@@ -85,35 +52,35 @@
                         {% for att in attendances %}
                             <tr>
                                 <td>
-                                    {{ att.person.name }}
+                                    {{ att.subscription.person.name }}
                                     <br>
                                     <small class="text-muted">
-                                        {{ att.person.email }}
+                                        {{ att.person.person.email }}
                                     </small>
                                 </td>
                                 <td class="col-md-1">
-                                    {{ att.lot.name }}
+                                    {{ att.subscription.lot.name }}
 
                                 </td>
                                 <td>
-                                    {{ att.code }}
+                                    {{ att.subscription.code }}
                                 </td>
                                 <td>
-                                    {% if att.person.cpf %}
+                                    {% if  att.subscription.person.cpf %}
                                         <div class="cpf">
-                                            {{ att.person.cpf }}
+                                            {{ att.subscription.person.cpf }}
                                         </div>
-                                    {% elif att.person.institution_cnpj %}
+                                    {% elif  att.subscription.person.institution_cnpj %}
                                         <div class="cnpj">
-                                            {{ att.person.institution_cnpj }}
+                                            {{ att.subscription.person.institution_cnpj }}
                                         </div>
                                     {% else %}
                                         ...
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if att.attended_on %}
-                                        {{ att.attended_on|date:"d/m/Y H\hi" }}
+                                    {% if att.created_on %}
+                                        {{ att.created_on|date:"d/m/Y H\hi" }}
                                     {% else %}
                                         Não disponivel.
                                     {% endif %}
@@ -148,16 +115,16 @@
 
 
             $('.cpf').each(function () {
-                let str = $(this).text().trim();
-                let formatted = str.replace(/^(\d{3})(\d{3})?(\d{3})?(\d{2})?/,
+                var str = $(this).text().trim();
+                var formatted = str.replace(/^(\d{3})(\d{3})?(\d{3})?(\d{2})?/,
                     "$1.$2.$3-$4");
                 $(this).text(formatted);
             });
 
 
             $('.cnpj').each(function () {
-                let str = $(this).text().trim();
-                let formatted = str
+                var str = $(this).text().trim();
+                var formatted = str
                     .replace(/\D/g, '')
                     .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5");
                 $(this).text(formatted);

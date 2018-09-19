@@ -191,28 +191,12 @@ Variáveis:
 {% if event.feature_configuration.feature_checkin and event.feature_management.checkin %}
     <h5 class="sidebar-header" style="color:#4c4c4c;">Credenciamento</h5>
     <ul class="nav nav-pills nav-stacked">
-        <li {% if active == 'checkin-dashboard' %}class="active"{% endif %}>
+        <li {% if active == 'attendance' %}class="active"{% endif %}>
             <a class="sidebar-itens" href=
-                    "{% url 'subscription:subscription-attendance-dashboard' event.pk %}"
-               title="Check-in">
-                <i class="far fa-chart-bar"></i>
-                Painel de Check-in
-            </a>
-        </li>
-        <li {% if active == 'checkin' %}class="active"{% endif %}>
-            <a class="sidebar-itens"
-               href="{% url 'subscription:subscription-attendance-search' event.pk %}"
-               title="Check-in">
-                <i class="fas fa-calendar-check"></i>
-                Check-in
-            </a>
-        </li>
-        <li {% if active == 'checkin-list' %}class="active"{% endif %}>
-            <a class="sidebar-itens" href=
-                    "{% url 'subscription:subscription-attendance-list' event.pk %}"
+                    "{% url 'attendance:manage-list-attendance' event.pk %}"
                title="Credenciados">
-                <i class="fas fa-user-tag"></i>
-                Credenciados
+                <i class="fas fa-calendar-check"></i>
+                Atendimento
             </a>
         </li>
     </ul>

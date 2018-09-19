@@ -1,0 +1,141 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load static i18n queryset_filter %}
+{% load base_tags %}
+{% load form_config_tags %}
+
+{% block title %}
+    Editar Lista de Checkin | Congressy
+{% endblock %}
+
+{% block page_title %}
+    Editar Lista de Checkin
+{% endblock %}
+
+{% block page_sub_title %}
+    {% if object %}
+        {{ object.name }} (ID: {{ object.pk }})
+    {% endif %}
+{% endblock %}
+
+{% block nav_aside_itens %}
+    {% if object %}
+        {% include 'event/event-menu.html' with active='dados-do-evento' %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <form action="" method="post" class="form-horizontal form-border"
+          role="form" name="attendance_list_form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="buttonbar">
+                    <div class="float-left">
+                        <a href="{% url 'attendance:manage-list-attendance' event.pk %}"
+                           class="btn btn-primary">
+                            <i class="fas fa-arrow-circle-left"></i>
+                            Voltar
+                        </a>
+                    </div>
+
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Campos Principais</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.name autofocus=True %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group lot-category-filter"
+                                             style="margin-top: 20px">
+                                            <label>Categoria de lotes</label>
+                                            <div>
+                                                {% for category in lot_categories %}
+                                                    <input type="checkbox"
+                                                           name="category_list"
+                                                           value="{{ category.value }}"
+                                                           style="padding-bottom: 5px"
+                                                            {% if category.checked %}
+                                                           checked {% endif %}>
+                                                    {{ category.name }}<br>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.checkin_only %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.with_certificate %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="buttonbar bottom">
+                    <div class="float-right">
+
+                        <a href="{% url 'attendance:manage-list-attendance' event.pk %}"
+                           class="btn btn-danger">
+                            <i class="fas fa-times-circle"></i>Cancelar</a>
+
+
+                        <button type="submit"
+                                class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script>
+        var radios = $('.lot-category-filter input[type=checkbox]');
+
+        radios.iCheck({
+            checkboxClass: 'icheckbox_flat-grey',
+            radioClass: 'iradio_flat-grey'
+        });
+    </script>
+{% endblock %}

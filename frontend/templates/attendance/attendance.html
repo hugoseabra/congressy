@@ -1,0 +1,203 @@
+{% extends "base/base.html" %}
+{% load i18n static %}
+{% load subscription_tags %}
+
+{% block title %}Credenciamento | Congressy{% endblock %}
+
+{% block page_title %}Credenciamento{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_description %}
+    Realize o credenciamento de inscritos confirmando sua presença no evento.
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/timeCircles/TimeCircles.css' %}">
+{% endblock %}
+
+{% block pageheader %}
+    <div class="pageheader">
+        <h1>Mudar título</h1>
+    </div>
+{% endblock %}
+
+
+{% block content %}
+    {% include 'attendance/includes/top-menu.html' %}
+    <div class="row">
+        <div class="col-md-2 col-sm-12" id="compose-wrapper">
+            {% include 'attendance/includes/attendance-menu.html' with active='checkin' %}
+        </div>
+        <div class="col-md-10 col-sm-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">Realizar Checkin por
+                        {% if search_type == 'barcode' %} Código de Barras
+{#                        {% elif search_type == 'qrcode' %}QrCode#}
+                        {% else %} Teclado{% endif %}
+                        <div class="pull-right" style="cursor: pointer">
+                            <i class="fa fa-expand"></i>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="row" id="name-on-fullscren"
+                         style="padding-bottom: 15px;display: none">
+                        <div class="col-xs-12">
+                            <h3 class="text-bold" style="font-size:
+                            22px">{{ object.name }}</h3>
+                        </div>
+                    </div>
+                    {% if search_type == 'barcode' %}
+                        {% include 'attendance/includes/attendance-barcode.html' %}
+                    {% else %}
+                        {% include 'attendance/includes/attendance-typing.html' %}
+                    {% endif %}
+                </div>
+
+
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">Legenda </div>
+                </div>
+                <div class="panel-body">
+                    <h3><i class="fas fa-circle" style="color:#27B6AF"></i>
+                        Inscrito presente no
+                        evento.</h3>
+                    <h3><i class="fas fa-circle" style="color:#909AA0"></i>
+                        Inscrito ausente no
+                        evento. </h3>
+                    <h3><i class="fas fa-circle" style="color:#EDCE8C" ></i>
+                        Inscrito pendente</h3>
+                    <h3><i class="fas fa-circle" style="color:#e25d5d" ></i>
+                        Inscrito cancelado</h3>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'assets/js/ajax.js' %}"></script>,
+    <script src="{% static 'assets/js/attendance/attendance.js' %}"></script>
+    <script src="{% static 'assets/plugins/instascan/instascan-1.0.0.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/timeCircles/TimeCircles.js' %}"></script>
+    <script src="{% static 'assets/js/attendance/cgsy-scanner.js' %}"></script>
+    <script>
+
+        $(document).ready(function () {
+            var change_href_attendance_methods = function (fullscreen) {
+                if (fullscreen === true) {
+
+                    $('.search_type_typing').attr('href', '?search_type=typing#fullscreen=true');
+                    $('.search_type_qrcode').attr('href', '?search_type=qrcode#fullscreen=true');
+                    $('.search_type_barcode').attr('href', '?search_type=barcode#fullscreen=true');
+                }
+                else {
+                    if (fullscreen === false) {
+                        $('.search_type_typing').attr('href', '?search_type=typing');
+                        $('.search_type_qrcode').attr('href', '?search_type=qrcode');
+                        $('.search_type_barcode').attr('href', '?search_type=barcode');
+                    }
+                }
+            };
+
+            var hash = window.location.hash.substring(1);
+            var fullscreen = hash.replace('fullscreen=', '');
+
+            if (fullscreen === 'true') {
+                $('.panel i.fa-expand').trigger('click');
+                change_href_attendance_methods(true);
+                $('#name-on-fullscren').show();
+            }
+
+
+            if(fullscreen === 'false'){
+                change_href_attendance_methods(false);
+                $('#name-on-fullscren').hide();
+            }
+
+            $('.panel i.fa-expand').click(function () {
+                $('#name-on-fullscren').show();
+
+                window.location.hash = '#fullscreen=true';
+                change_href_attendance_methods(true);
+            });
+
+            $('.panel i.fa-compress').click(function () {
+                $('#name-on-fullscren').hide();
+
+               window.location.hash = '#fullscreen=false';
+                    change_href_attendance_methods(false);
+            });
+
+            var success_checkin_msg, fail_checkin_msg, checkin_button_msg;
+            var success_checkout_msg, fail_checkout_msg, checkout_button_msg;
+
+            {% if object.checkin_only == True %}
+                success_checkin_msg = 'Entrada registrada com sucesso';
+                fail_checkin_msg = 'Falha ao registrar entrada';
+                success_checkout_msg = 'Cancelamento de entrada registrado com sucesso';
+                fail_checkout_msg = 'Falha ao registrar cancelamento de entrada';
+                checkin_button_msg = 'Registrar entrada';
+                checkout_button_msg = 'Cancelar registro';
+
+            {% else %}
+                success_checkin_msg = 'Entrada registrada com sucesso';
+                fail_checkin_msg = 'Falha ao registrar entrada';
+                success_checkout_msg = 'Saída registrada com sucesso';
+                fail_checkout_msg = 'Falha ao registrar saída';
+                checkin_button_msg = 'Registrar entrada';
+                checkout_button_msg = 'Registrar saída';
+
+            {% endif %}
+
+            {% if search_type == 'barcode' %}
+                createBarCodeSearch({
+                    'subscriptionUri': "{% url 'api:attendance:subscription-list' attendance_list.pk %}",
+                    'checkinUri': "{% url 'api:attendance:checkin-list' %}",
+                    'success_checkin_msg': success_checkin_msg,
+                    'fail_checkin_msg': fail_checkin_msg,
+                    'checkoutUri': "{% url 'api:attendance:checkout-list' %}",
+                    'success_checkout_msg': success_checkout_msg,
+                    'fail_checkout_msg': fail_checkout_msg,
+                    'checkin_button_msg': checkin_button_msg,
+                    'checkout_button_msg': checkout_button_msg,
+                    'servicePk': '{{ attendance_list.pk }}',
+                    'createdBy': '{{ request.user.get_full_name }}',
+                    'listEl': $('#cards-list'),
+                    'inputEl': $('#search')
+                });
+            {% elif search_type == 'qrcode' %}
+
+                var scan = new window.cgsy.QRCodeScanner($('#webcam'), $('#cards-list'));
+                scan.start();
+
+            {% else %}
+                createTypingSearch({
+                    'subscriptionUri': "{% url 'api:attendance:subscription-list' attendance_list.pk %}",
+                    'checkinUri': "{% url 'api:attendance:checkin-list' %}",
+                    'success_checkin_msg': success_checkin_msg,
+                    'fail_checkin_msg': fail_checkin_msg,
+                    'checkoutUri': "{% url 'api:attendance:checkout-list' %}",
+                    'success_checkout_msg': success_checkout_msg,
+                    'fail_checkout_msg': fail_checkout_msg,
+                    'checkin_button_msg': checkin_button_msg,
+                    'checkout_button_msg': checkout_button_msg,
+                    'servicePk': '{{ attendance_list.pk }}',
+                    'createdBy': '{{ request.user.get_full_name }}',
+                    'listEl': $('#cards-list'),
+                    'inputEl': $('#search')
+                });
+            {% endif %}
+        });
+    </script>
+
+{% endblock %}
