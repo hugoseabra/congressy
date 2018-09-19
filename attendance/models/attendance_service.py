@@ -24,7 +24,8 @@ class AttendanceService(models.Model):
 
     with_certificate = models.BooleanField(
         default=False,
-        verbose_name='Esse atendimento terá direito a certificado ?',
+        verbose_name='Atendimento com certificado',
+        help_text='Esse atendimento terá direito a certificado ?'
 
     )
 
