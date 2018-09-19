@@ -61,11 +61,13 @@ class MemberListView(BaseOrganizationMixin, ListView):
 
     def get_queryset(self):
         query_set = super(MemberListView, self).get_queryset()
-        # organization = self.get_member_organization()
         organization = self.organization
 
-        return query_set.filter(organization=organization).exclude(
-            person__user=self.request.user
+        return query_set.filter(
+            organization=organization,
+            person__user__is_superuser=False,
+        ).exclude(
+            person__user=self.request.user,
         )
 
     def get_context_data(self, **kwargs):

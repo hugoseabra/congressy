@@ -1,5 +1,4 @@
 import json
-import logging
 from datetime import datetime
 from decimal import Decimal
 
@@ -18,6 +17,7 @@ from django.views.generic import FormView, ListView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from core.helpers import sentry_log as log
 from gatheros_event.helpers.account import update_account
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
@@ -43,40 +43,11 @@ from mailer.services import (
 from mailer.tasks import send_mail
 from payment.forms import PagarMeCheckoutForm, PaymentForm
 from payment.helpers import (
-    TransactionDirector,
+    TransactionDirector, \
     TransactionSubscriptionStatusIntegrator,
+    TransactionLog,
 )
 from payment.models import Transaction, TransactionStatus
-
-
-try:
-    from raven.contrib.django.raven_compat.models import client
-
-    SENTRY_RAVEN = True
-
-except ImportError:
-    SENTRY_RAVEN = False
-
-
-def log(message, extra_data=None, type='error', notify_admins=False):
-    logger = logging.getLogger(__name__)
-
-    if type == 'error':
-        logger.error(message, extra=extra_data)
-        if SENTRY_RAVEN:
-            client.captureMessage(message, **extra_data)
-
-    if type == 'warning':
-        logger.warning(message, extra=extra_data)
-
-        if notify_admins is True and SENTRY_RAVEN:
-            client.captureMessage(message, **extra_data)
-
-    if type == 'message':
-        logger.info(message, extra=extra_data)
-
-        if notify_admins is True and SENTRY_RAVEN:
-            client.captureMessage(message)
 
 
 def notify_postback(transaction, data):
@@ -245,39 +216,55 @@ class CheckoutView(AccountMixin, FormView):
 
 @api_view(['POST'])
 def postback_url_view(request, uidb64):
+    transaction_log = TransactionLog(uidb64)
+
     if not uidb64:
-        log(
-            message='Houve uma tentativa de postback sem identificador do'
-                    ' postback.',
-            type='warning',
-            notify_admins=True,
-        )
+        msg = 'Houve uma tentativa de postback sem identificador do postback.'
+        transaction_log.add_message(msg, save=True)
+        log(message=msg, type='warning', notify_admins=True, )
         raise Http404
 
+    transaction_log.add_message('Buscando transação na persistência.', True)
     transaction = Transaction.objects.get(uuid=uidb64)
+    transaction_log.add_message('Transação encontrada.')
 
     data = request.data.copy()
-    subscription = transaction.subscription
 
     if not data:
-        log(
-            message='Houve uma tentativa de postback sem dados de'
-                    ' transação para a transação "{}"'.format(uidb64),
-            type='warning',
-            extra_data={
-                'uuid': uidb64,
-                'transaction': transaction.pk,
-                'send_data': data,
-            },
-            notify_admins=True,
-        )
+        msg = 'Houve uma tentativa de postback sem dados de transação para a' \
+              ' transação "{}"'.format(uidb64)
+
+        transaction_log.add_message(msg, save=True)
+
+        log(message=msg, type='warning', notify_admins=True, extra_data={
+            'uuid': uidb64,
+            'transaction': transaction.pk,
+            'send_data': data,
+        })
         return HttpResponseBadRequest()
+
+    transaction_log.add_message(
+        "Dados da transação recebidos: \n----- \n{} \n-----".format(
+            json.dumps(data)
+        )
+    )
+    subscription = transaction.subscription
+    transaction_log.add_message('ID da Inscrição: {}.'.format(subscription.pk))
 
     previous_status = transaction.status
     incoming_status = data.get('current_status', '')
 
+    transaction_log.add_message('Status anterior: {}.'.format(previous_status))
+    transaction_log.add_message('Status a ser registrado: {}.'.format(
+        incoming_status
+    ))
+
     # Se não irá mudar o status de transação, não há o que processar.
     if previous_status == incoming_status:
+        transaction_log.add_message(
+            'Nada a ser feito: o status não mudou',
+            save=True
+        )
         # @TODO - caso algum erro aconteça no lado da Congressy, coloca
         # a transação paga em uma fila para ser reprocessada novamente
         # em caso de ser o mesmo status mas não houve registro correto
@@ -286,6 +273,10 @@ def postback_url_view(request, uidb64):
 
     transaction.status = incoming_status
 
+    transaction_log.add_message('Tipo de transação: {}.'.format(
+        transaction.type
+    ))
+
     if transaction.type == Transaction.BOLETO:
         boleto_url = data.get('transaction[boleto_url]')
         transaction.data['boleto_url'] = boleto_url
@@ -293,6 +284,8 @@ def postback_url_view(request, uidb64):
 
     # ============================== PAYMENT ============================ #
     with atomic():
+        transaction_log.add_message('Iniciando processamento atômico.', True)
+
         # Create a state machine using the old transaction status as it's
         # initial value.
         transaction_director = TransactionDirector(
@@ -300,6 +293,12 @@ def postback_url_view(request, uidb64):
             old_status=previous_status,
         )
         transaction_director_status = transaction_director.direct()
+        transaction_log.add_message(
+            'Validação do Diretor do status da transação: {}'.format(
+                transaction_director_status
+            ),
+            save=True
+        )
 
         # Translate/integrate the status returned from the director to a
         #   subscription status.
@@ -314,20 +313,38 @@ def postback_url_view(request, uidb64):
         # novamente.
         subscription_status = trans_sub_status_integrator.integrate()
         transaction.subscription.status = subscription_status
-        transaction.subscription.completed = True
+
+        transaction_log.add_message(
+            'Validação do Integrador do status de inscrição a ser'
+            ' registrado de acordo com status de transação:'
+            ' {}'.format(subscription_status),
+            save=True
+        )
         transaction.subscription.save()
+
+        transaction_log.add_message(
+            'Preparando para atualizar inscrição - status: {}'.format(
+                subscription_status
+            ),
+            True
+        )
 
         # Persists transaction change
         transaction.save()
+        transaction_log.add_message('Transação atualizada.')
 
         if incoming_status == Transaction.PAID:
+            transaction_log.add_message(
+                'Iniciando registro de pagamento.',
+                save=True
+            )
 
             try:
-                payment = transaction.payment
-                transaction.type = transaction.type
-                transaction.amount = transaction.amount
-                payment.paid = True
-                payment.save()
+                transaction.payment.paid = True
+                transaction.payment.save()
+                transaction_log.add_message(
+                    'Pagamento atualizado - status: pago.'
+                )
 
             except AttributeError:
                 payment_form = PaymentForm(
@@ -344,14 +361,18 @@ def postback_url_view(request, uidb64):
                     for field, errs in payment_form.errors.items():
                         error_msgs.append(str(errs))
 
-                    raise Exception(
-                        'Erro ao criar pagamento de uma transação: {}'.format(
-                            "".join(error_msgs)
-                        )
-                    )
+                    msg = 'Erro ao criar pagamento de uma transação:' \
+                          ' {}'.format("".join(error_msgs))
+
+                    transaction_log.add_message(msg, save=True)
+
+                    raise Exception(msg)
 
                 # por agora, não vamos vincular pagamento a nada.
                 payment_form.save()
+                transaction_log.add_message('Novo Pagamento registrado.')
+
+        transaction_log.add_message('Preparando registro de status.', True)
 
         # Registra status de transação.
         TransactionStatus.objects.create(
@@ -362,6 +383,7 @@ def postback_url_view(request, uidb64):
             ),
             status=incoming_status,
         )
+        transaction_log.add_message('Status criado com sucesso.')
 
         subscription = transaction.subscription
         event = subscription.event
@@ -373,11 +395,32 @@ def postback_url_view(request, uidb64):
         is_refused = incoming_status == Transaction.REFUSED
         is_refunded = incoming_status == Transaction.REFUNDED
         is_waiting = incoming_status == Transaction.WAITING_PAYMENT
-        is_peding_refund = incoming_status == Transaction.PENDING_REFUND
+        is_pending_refund = incoming_status == Transaction.PENDING_REFUND
         is_chargedback = incoming_status == Transaction.CHARGEDBACK
+
+        transaction_log.add_message(
+            'Registro condições de notificação: \n{}'.format(
+                "\n".join([
+                    '   - Nova Inscrição: {}'.format(is_new_subscription),
+                    '   - Pago: {}'.format(is_paid),
+                    '   - Recusado: {}'.format(is_refused),
+                    '   - Reembolso: {}'.format(is_refunded),
+                    '   - Aguardando: {}'.format(is_waiting),
+                    '   - Pendente para reembolso: {}'.format(
+                        is_pending_refund),
+                    '   - Chargedback: {}'.format(is_chargedback),
+                ])
+            )
+        )
 
         try:
             if is_new_subscription is True:
+                transaction_log.add_message(
+                    'Processando notificação como nova inscrição:'
+                    ' {}'.format(transaction.type),
+                    save=True
+                )
+
                 if transaction.type == Transaction.BOLETO:
 
                     if is_waiting:
@@ -386,6 +429,9 @@ def postback_url_view(request, uidb64):
                             event,
                             transaction
                         )
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_new_user_and_unpaid_subscription_boleto'
+                        ))
 
                     elif is_paid:
                         # Se não é status inicial, certamente o boleto foi]
@@ -394,35 +440,50 @@ def postback_url_view(request, uidb64):
                             event,
                             transaction
                         )
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_new_user_and_paid_subscription_boleto'
+                        ))
+
                     elif is_refused:
                         # Quando a emissão do boleto falha por algum motivo.
                         notify_new_user_and_refused_subscription_boleto(
                             event,
                             transaction
                         )
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_new_user_and_refused_subscription_boleto'
+                        ))
 
                     elif is_refunded:
                         notify_refunded_subscription_boleto(event, transaction)
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_refunded_subscription_boleto'
+                        ))
 
                     elif is_chargedback:
                         notify_chargedback_subscription(event, transaction)
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_chargedback_subscription'
+                        ))
 
                     else:
-                        raise mailer_notification.NotifcationError(
-                            'Notificação de transação de boleto de nova'
-                            ' inscrição não pôde ser realizada devido ao'
-                            ' seguinte erro: status desconhecido para'
-                            ' notificação - "{}". Evento: {}. Inscrição:'
-                            ' {} ({} - {} - {}). Transaction {}: '.format(
-                                incoming_status,
-                                event.name,
-                                sub_user.get_full_name(),
-                                sub_user.pk,
-                                sub_user.email,
-                                transaction.subscription.pk,
-                                transaction.pk,
-                            )
+                        msg = 'Notificação de transação de boleto de nova' \
+                              ' inscrição não pôde ser realizada devido ao' \
+                              ' seguinte erro: status desconhecido para' \
+                              ' notificação - "{}". Evento: {}. Inscrição:' \
+                              ' {} ({} - {} - {}). Transaction {}.'.format(
+                            incoming_status,
+                            event.name,
+                            sub_user.get_full_name(),
+                            sub_user.pk,
+                            sub_user.email,
+                            transaction.subscription.pk,
+                            transaction.pk,
                         )
+
+                        transaction_log.add_message(msg, save=True)
+
+                        raise mailer_notification.NotifcationError(msg)
 
                 elif transaction.type == Transaction.CREDIT_CARD:
 
@@ -432,6 +493,10 @@ def postback_url_view(request, uidb64):
                             event,
                             transaction
                         )
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_new_user_and_unpaid_subscription_credit'
+                            '_card'
+                        ))
 
                     elif is_paid:
                         # Se não é status inicial, certamente o boleto foi
@@ -440,11 +505,20 @@ def postback_url_view(request, uidb64):
                             event,
                             transaction
                         )
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_new_user_and_paid_subscription_credit_card'
+                        ))
 
                     elif is_refused:
                         notify_new_user_and_refused_subscription_credit_card(
                             event,
                             transaction
+                        )
+                        transaction_log.add_message(
+                            'Enviado por {}'.format(
+                                'notify_new_user_and_refused_subscription_'
+                                'credit_card'
+                            )
                         )
 
                     elif is_refunded:
@@ -452,34 +526,25 @@ def postback_url_view(request, uidb64):
                             event,
                             transaction
                         )
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_refunded_subscription_credit_card'
+                        ))
 
                     elif is_chargedback:
                         notify_chargedback_subscription(event, transaction)
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_chargedback_subscription'
+                        ))
 
                     else:
-                        raise mailer_notification.NotifcationError(
-                            'Notificação de transação de cartão de crédito de'
-                            ' nova inscrição não pôde ser realizada devido ao'
-                            ' seguinte erro: status desconhecido para'
-                            ' notificação - "{}". Evento: {}. Inscrição: {}'
-                            ' ({} - {} - {}). Transaction {}: '.format(
-                                incoming_status,
-                                event.name,
-                                sub_user.get_full_name(),
-                                sub_user.pk,
-                                sub_user.email,
-                                transaction.subscription.pk,
-                                transaction.pk,
-                            )
-                        )
 
-                else:
-                    raise mailer_notification.NotifcationError(
-                        'Notificação de transação de nova inscrição não pôde'
-                        ' ser realizada devido ao seguinte erro: método de'
-                        ' pagamento desconhecido para notificação - "{}".'
-                        ' Evento: {}. Inscrição: {} ({} - {} - {}).'
-                        ' Transaction {}: '.format(
+                        msg = 'Notificação de transação de cartão de crédito'
+                        msg += ' de nova inscrição não pôde ser realizada'
+                        msg += ' devido ao seguinte erro: status desconhecido'
+                        msg += ' para notificação - "{}". Evento: {}.'
+                        msg += ' Inscrição: {} ({} - {} - {}).'
+                        msg += ' Transaction {}.'
+                        msg += msg.format(
                             incoming_status,
                             event.name,
                             sub_user.get_full_name(),
@@ -488,20 +553,56 @@ def postback_url_view(request, uidb64):
                             transaction.subscription.pk,
                             transaction.pk,
                         )
+
+                        transaction_log.add_message(msg, save=True)
+
+                        raise mailer_notification.NotifcationError(msg)
+
+                else:
+                    msg = 'Notificação de transação de nova inscrição não'
+                    msg += ' pôde ser realizada devido ao seguinte erro:'
+                    msg += ' método de pagamento desconhecido para'
+                    msg += ' notificação - "{}". Evento: {}. Inscrição:'
+                    msg += ' {} ({} - {} - {}). Transaction {}. '
+                    msg += msg.format(
+                        incoming_status,
+                        event.name,
+                        sub_user.get_full_name(),
+                        sub_user.pk,
+                        sub_user.email,
+                        transaction.subscription.pk,
+                        transaction.pk,
                     )
+
+                    transaction_log.add_message(msg, save=True)
+
+                    raise mailer_notification.NotifcationError(msg)
 
             # Não é nova inscrição
             else:
+                transaction_log.add_message(
+                    'Processando notificação como atualização de inscrição:'
+                    ' {}'.format(transaction.type),
+                    save=True
+                )
+
                 if transaction.type == Transaction.BOLETO:
 
                     if is_waiting:
                         notify_new_unpaid_subscription_boleto(
                             event,
-                            transaction)
+                            transaction
+                        )
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_new_unpaid_subscription_boleto'
+                        ))
 
                     # Se não é status inicial, certamente o boleto foi pago.
                     elif is_paid:
                         notify_paid_subscription_boleto(event, transaction)
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_paid_subscription_boleto'
+                        ))
 
                     elif is_refused:
                         # Possivelmente por alguma falha.
@@ -509,32 +610,45 @@ def postback_url_view(request, uidb64):
                             event,
                             transaction
                         )
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_new_refused_subscription_boleto'
+                        ))
 
                     elif is_refunded:
                         notify_refunded_subscription_boleto(event, transaction)
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_refunded_subscription_boleto'
+                        ))
 
-                    elif is_peding_refund:
+                    elif is_pending_refund:
                         notify_pending_refund_subscription_boleto(
                             event,
                             transaction
                         )
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_pending_refund_subscription_boleto'
+                        ))
 
                     else:
-                        raise mailer_notification.NotifcationError(
-                            'Notificação de transação de boleto de inscrição'
-                            ' não pôde ser realizada devido ao seguinte erro:'
-                            ' status desconhecido para notificação - "{}".'
-                            ' Evento: {}. Inscrição: {} ({} - {} - {}).'
-                            ' Transaction {}: '.format(
-                                incoming_status,
-                                event.name,
-                                sub_user.get_full_name(),
-                                sub_user.pk,
-                                sub_user.email,
-                                transaction.subscription.pk,
-                                transaction.pk,
-                            )
+                        msg = 'Notificação de transação de boleto de inscrição'
+                        msg += ' não pôde ser realizada devido ao seguinte'
+                        msg += ' erro: status desconhecido para notificação'
+                        msg += '  - "{}".'
+                        msg += ' Evento: {}. Inscrição: {} ({} - {} - {}).'
+                        msg += ' Transaction {}.'
+                        msg += msg.format(
+                            incoming_status,
+                            event.name,
+                            sub_user.get_full_name(),
+                            sub_user.pk,
+                            sub_user.email,
+                            transaction.subscription.pk,
+                            transaction.pk,
                         )
+
+                        transaction_log.add_message(msg, save=True)
+
+                        raise mailer_notification.NotifcationError(msg)
 
                 elif transaction.type == Transaction.CREDIT_CARD:
 
@@ -544,6 +658,9 @@ def postback_url_view(request, uidb64):
                             event,
                             transaction
                         )
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_new_unpaid_subscription_credit_card'
+                        ))
 
                     elif is_paid:
                         # Se não é status inicial, certamente o boleto foi
@@ -552,43 +669,35 @@ def postback_url_view(request, uidb64):
                             event,
                             transaction
                         )
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_new_paid_subscription_credit_card'
+                        ))
 
                     elif is_refused:
                         notify_new_refused_subscription_credit_card(
                             event,
                             transaction
                         )
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_new_refused_subscription_credit_card'
+                        ))
 
                     elif is_refunded:
                         notify_refunded_subscription_credit_card(
                             event,
                             transaction
                         )
+                        transaction_log.add_message('Enviado por {}'.format(
+                            'notify_refunded_subscription_credit_card'
+                        ))
 
                     else:
-                        raise mailer_notification.NotifcationError(
-                            'Notificação de transação de cartão de crédito de'
-                            ' inscrição não pôde ser realizada devido ao'
-                            ' seguinte erro: status desconhecido para'
-                            ' notificação - "{}". Evento: {}. Inscrição: {}'
-                            ' ({} - {} - {}). Transaction {}: '.format(
-                                incoming_status,
-                                event.name,
-                                sub_user.get_full_name(),
-                                sub_user.pk,
-                                sub_user.email,
-                                transaction.subscription.pk,
-                                transaction.pk,
-                            )
-                        )
-
-                else:
-                    raise mailer_notification.NotifcationError(
-                        'Notificação de transação de inscrição não pôde ser'
-                        ' realizada devido ao seguinte erro: método de'
-                        ' pagamento desconhecido para notificação - "{}".'
-                        ' Evento: {}. Inscrição: {} ({} - {} - {}).'
-                        ' Transaction {}: '.format(
+                        msg = 'Notificação de transação de cartão de crédito'
+                        msg += ' de inscrição não pôde ser realizada devido ao'
+                        msg += ' seguinte erro: status desconhecido para'
+                        msg += ' notificação - "{}". Evento: {}. Inscrição: {}'
+                        msg += ' ({} - {} - {}). Transaction {}.'
+                        msg += msg.format(
                             incoming_status,
                             event.name,
                             sub_user.get_full_name(),
@@ -597,33 +706,73 @@ def postback_url_view(request, uidb64):
                             transaction.subscription.pk,
                             transaction.pk,
                         )
+
+                        transaction_log.add_message(msg, save=True)
+
+                        raise mailer_notification.NotifcationError(msg)
+
+                else:
+                    msg = 'Notificação de transação de inscrição não pôde ser'
+                    msg += ' realizada devido ao seguinte erro: método de'
+                    msg += ' pagamento desconhecido para notificação - "{}".'
+                    msg += ' Evento: {}. Inscrição: {} ({} - {} - {}).'
+                    msg += ' Transaction {}.'.format(
+                        incoming_status,
+                        event.name,
+                        sub_user.get_full_name(),
+                        sub_user.pk,
+                        sub_user.email,
+                        transaction.subscription.pk,
+                        transaction.pk,
                     )
 
+                    transaction_log.add_message(msg, save=True)
+
+                    raise mailer_notification.NotifcationError(msg)
+
         except mailer_notification.NotifcationError as e:
+            transaction_log.add_message(str(e), save=True)
             raise e
 
+        transaction_log.add_message('Notificação realizada com sucesso')
+
         # Registra inscrição como notificada.
+        transaction_log.add_message('Registrando inscrição como notificada.')
         transaction.subscription.notified = True
         transaction.subscription.save()
+        transaction_log.add_message('Inscrição registrada como notificada.')
 
-    try:
-        notify_postback(transaction, data)
+        try:
+            transaction_log.add_message(
+                'Preparando notificação de postback para admins.',
+                save=True
+            )
+            notify_postback(transaction, data)
+            transaction_log.add_message(
+                'Postback para admins realizado com sucesso.'
+            )
 
-    except Exception as e:
-        log(
-            message='Erro na notificação para administradores sobre novo'
-                    ' postback. Tudo funcionou bem, menos a notificação. O'
-                    ' provedor foi notificado como tudo certo e não tentará'
-                    ' novamente. Erro(s): {}'.format(e),
-            type='error',
-            extra_data={
-                'uuid': uidb64,
-                'transaction': transaction.pk,
-                'transaction_status': previous_status,
-                'incoming_status': incoming_status,
-                'send_data': data,
-            },
-            notify_admins=True,
-        )
+        except Exception as e:
+            msg = 'Erro na notificação para administradores sobre novo' \
+                  ' postback. Tudo funcionou bem, menos a notificação. O' \
+                  ' provedor foi notificado como tudo certo e não' \
+                  ' tentará novamente. Erro(s): {}'.format(e)
 
-    return Response(status=201)
+            transaction_log.add_message(msg)
+
+            log(
+                message=msg,
+                type='error',
+                extra_data={
+                    'uuid': uidb64,
+                    'transaction': transaction.pk,
+                    'transaction_status': previous_status,
+                    'incoming_status': incoming_status,
+                    'send_data': data,
+                },
+                notify_admins=True,
+            )
+
+        transaction_log.add_message('Fim de processamento.', save=True)
+
+        return Response(status=201)

@@ -270,6 +270,9 @@ SALES_ALERT_EMAILS = [
     'Wyndson Oliveira <wyndson@congressy.com>',
     'Infra Congressy <infra@congressy.com>'
 ]
+# ============================== LOGGING ==================================== #
+CGSY_LOGS_DIR = os.path.join(BASE_DIR, 'logs')
+
 # ============================ WKHTML PDF =================================== #
 WKHTMLTOPDF_CMD = os.path.join(
     BASE_DIR, "bin", "wkhtmltox", "bin", 'wkhtmltopdf'
@@ -281,6 +284,7 @@ FAILED_RUNS_CRONJOB_EMAIL_PREFIX = "[Server check]: "
 
 CRON_CLASSES = [
     # "payment.cron.MyCronJob",
+    "payment.cron.SubscriptionStatusIrregularityTestJob",
 ]
 # =============================== BITLY ===================================== #
 BITLY_LOGIN = 'congressy'
