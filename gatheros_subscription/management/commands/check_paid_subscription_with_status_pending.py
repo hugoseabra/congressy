@@ -1,8 +1,7 @@
+from collections import OrderedDict
+
 from django.core.management.base import BaseCommand
 
-import json
-from collections import OrderedDict
-from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
 from payment.models import Transaction
 
@@ -61,4 +60,3 @@ class Command(BaseCommand):
                     print('       - Version: NONE')
 
                 print()
-
