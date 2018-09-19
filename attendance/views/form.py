@@ -84,8 +84,9 @@ class AddAttendanceServiceView(BaseAttendanceServiceView, generic.CreateView):
 
     def get_success_url(self):
         return reverse(
-            'attendance:manage-list-attendance',
-            kwargs={'event_pk': self.event.pk}
+            'attendance:attendance',
+            kwargs={'event_pk': self.event.pk,
+                    'pk': self.object.pk}
         )
 
     def get_context_data(self, **kwargs):

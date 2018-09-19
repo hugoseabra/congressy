@@ -18,7 +18,6 @@ class AttendancePageSearchView(AttendanceFeatureFlagMixin,
     types_accepted = ['typing', 'barcode', None]
 
     def __init__(self, **initargs):
-        self.search_type = None
         self.lot_categories = None
         super().__init__(**initargs)
 
@@ -59,7 +58,7 @@ class AttendancePageSearchView(AttendanceFeatureFlagMixin,
         context['event'] = self.event
         context['object'] = self.object
         context['lot_categories'] = self.get_lot_categories()
-        context['search_type'] = self.search_type
+        context['search_type'] = self.request.GET.get('search_type')
         return context
 
 

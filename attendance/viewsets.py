@@ -7,6 +7,7 @@ from rest_framework.authentication import (
     SessionAuthentication,
     TokenAuthentication,
 )
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -16,7 +17,10 @@ from gatheros_subscription.models import Subscription
 
 class RestrictionViewMixin(object):
     authentication_classes = (
-    SessionAuthentication, BasicAuthentication, TokenAuthentication)
+        SessionAuthentication,
+        BasicAuthentication,
+        TokenAuthentication,
+    )
     permission_classes = (IsAuthenticated,)
 
 
@@ -86,10 +90,15 @@ class AttendanceServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         return queryset.filter(event__organization_id__in=org_pks)
 
 
+class AttendancePageSizer(LimitOffsetPagination):
+    default_limit = 6
+
+
 class SubscriptionAttendanceViewSet(RestrictionViewMixin,
                                     viewsets.ModelViewSet):
     queryset = Subscription.objects.all().order_by('person__name')
     serializer_class = serializers.SubscriptionAttendanceSerializer
+    pagination_class = AttendancePageSizer
 
     def get_queryset(self):
         user = self.request.user
