@@ -1,18 +1,19 @@
 from gatheros_event.helpers import reports
-from django.views import View, generic
-from attendance.forms import AttendanceServiceForm
+from django.views import  generic
 from attendance.models import AttendanceCategoryFilter, \
-    AttendanceService, Checkin, Checkout
+    AttendanceService, Checkin
 from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
 from django.shortcuts import redirect
+from gatheros_event.views.mixins import AccountMixin
 
-class AttendancePageSearchView(generic.TemplateView):
+
+class AttendancePageSearchView(AccountMixin, generic.TemplateView):
     template_name = 'attendance/attendance.html'
     object = None
     event = None
     search_type = None
-    types_accepted = ['typing', 'qrcode', 'barcode', None]
+    types_accepted = ['typing', 'barcode', None]
 
     def dispatch(self, request, *args, **kwargs):
         self.object = AttendanceService.objects.get(pk=self.kwargs.get('pk'))
@@ -48,7 +49,7 @@ class AttendancePageSearchView(generic.TemplateView):
         return context
 
 
-class CheckinListView(generic.TemplateView):
+class CheckinListView(AccountMixin, generic.TemplateView):
     template_name = 'attendance/checkin-list.html'
     object = None
 
@@ -76,7 +77,7 @@ class CheckinListView(generic.TemplateView):
         ).order_by('-created_on')
 
 
-class AttendanceDashboardView(generic.DetailView):
+class AttendanceDashboardView(AccountMixin, generic.DetailView):
     model = AttendanceService
     template_name = 'attendance/attendance-dashboard.html'
     search_by = 'name'

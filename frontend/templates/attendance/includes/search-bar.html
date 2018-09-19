@@ -8,7 +8,7 @@
                 aria-expanded="false"><i
                 class="
                                             {% if search_type == 'barcode' %} fas fa-barcode
-                                            {% elif search_type == 'qrcode' %} fas fa-qrcode
+{#                                            {% elif search_type == 'qrcode' %} fas fa-qrcode#}
                                             {% else %}far fa-keyboard{% endif %}"></i>
             <span
                     class="caret"></span></button>
@@ -17,10 +17,10 @@
                     class="far fa-keyboard"></i>
                 Teclado
             </a></li>
-            <li><a class="search_type_qrcode" href="?search_type=qrcode"><i
-                    class="fas fa-qrcode"></i>
-                QrCode
-            </a></li>
+{#            <li><a class="search_type_qrcode" href="?search_type=qrcode"><i#}
+{#                    class="fas fa-qrcode"></i>#}
+{#                QrCode#}
+{#            </a></li>#}
             <li><a class="search_type_barcode" href="?search_type=barcode"><i
                     class="fas fa-barcode"></i>
                 Cód. Barra

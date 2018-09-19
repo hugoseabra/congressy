@@ -39,11 +39,6 @@ urls = [
         views.AttendanceDashboardView.as_view(),
         name='dashboard'
     ),
-    url(
-        r'^(?P<pk>[\d]+)/api/attendance/search/$',
-        views.SubscriptionSearchViewSet.as_view(),
-        name='subscription-api-attendance-search'
-    ),
 ]
 
 urlpatterns = [

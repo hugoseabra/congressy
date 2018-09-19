@@ -75,10 +75,10 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                                         attendance_status) {
         var self = this;
         this.uuid = uuid;
-        this.name = name.substring(0,22);
-        this.lot_name = lot_name.substring(0,30);
-        this.category_name = category_name.substring(0,30);
-        this.email = email.substring(0,30);
+        this.name = name.substring(0, 22);
+        this.lot_name = lot_name.substring(0, 30);
+        this.category_name = category_name.substring(0, 30);
+        this.email = email.substring(0, 30);
         this.event_count = event_count;
         this.code = code;
         this.subscription_status = subscription_status;
@@ -114,10 +114,10 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                 sender.setSuccessCallback(function (response) {
                     console.log('1. Fetch - status anterior: ' + response['attendance_status']);
 
-                    self.name = response['person']['name'].substring(0,22);
-                    self.lot_name = response['lot']['name'].substring(0,30);
-                    self.category_name = response['lot']['category'].substring(0,30);
-                    self.email = response['person']['email'].substring(0,30);
+                    self.name = response['person']['name'].substring(0, 22);
+                    self.lot_name = response['lot']['name'].substring(0, 30);
+                    self.category_name = response['lot']['category'].substring(0, 30);
+                    self.email = response['person']['email'].substring(0, 30);
                     self.event_count = response['event_count'];
                     self.code = response['code'];
                     self.subscription_status = response['status'];
@@ -543,7 +543,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             card_html += "<div class=\"header-card container-fluid\" style=\"background-color:" + header_color + "\">";
             card_html += "<div class=\"row\" style=\"height: 40px;\">";
             card_html += "<div class=\"col-xs-6\">";
-            card_html += "<h3 class=\"status-card\"style=\" ;\" >"+ status_card_text+"</h3>";
+            card_html += "<h3 class=\"status-card\"style=\" ;\" >" + status_card_text + "</h3>";
             card_html += "</div>";
             card_html += "<div class=\"col-xs-3 col-xs-offset-3\">";
             card_html += "<div class=\"float-right time-circles\" style=\"width: 100%;height: 25px;\">";
@@ -557,7 +557,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             card_html += "</div>";
             card_html += "</div>";
             card_html += "<div class=\"panel-body\">";
-            card_html += "<h2 class=\"text-center t\" style=\"font-size: 20px;padding-top: 10px\">" + subscription.name + "</h2>";
+            card_html += "<h2 class=\"text-center text-bold\" style=\"font-size: 20px;padding-top: 10px\">" + subscription.name + "</h2>";
             card_html += "<div class=\"row\" style=\"padding-top: 8px\">";
             card_html += "<div class=\"col-md-7 text-center\">";
             card_html += "<h3 style=\"padding-bottom: 5px\">";
@@ -598,11 +598,11 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             if (!card_parent_el) {
                 var status = getStatus();
                 card_parent_el = $('<div>').addClass('col-md-' + card_size);
-                if (status === STATUS_CANCELLED || status === STATUS_PENDING){
-                    card_parent_el.attr('data-toggle','tooltip');
-                    card_parent_el.attr('data-placement','bottom');
-                    card_parent_el.attr('title','');
-                    card_parent_el.attr('data-original-title',tooltip_message);
+                if (status === STATUS_CANCELLED || status === STATUS_PENDING) {
+                    card_parent_el.attr('data-toggle', 'tooltip');
+                    card_parent_el.attr('data-placement', 'bottom');
+                    card_parent_el.attr('title', '');
+                    card_parent_el.attr('data-original-title', tooltip_message);
 
                 }
 
@@ -660,18 +660,18 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             card_size = size || 4;
         };
 
-        this.getElement = function (service_pk, created_by,checkin_button_msg, checkout_button_msg) {
-            self.create_card_el(service_pk, created_by,checkin_button_msg, checkout_button_msg);
+        this.getElement = function (service_pk, created_by, checkin_button_msg, checkout_button_msg) {
+            self.create_card_el(service_pk, created_by, checkin_button_msg, checkout_button_msg);
 
             return card_parent_el;
         };
 
-        this.toggle = function (service_pk, created_by,checkin_button_msg, checkout_button_msg) {
+        this.toggle = function (service_pk, created_by, checkin_button_msg, checkout_button_msg) {
             return new Promise(function (resolve) {
                 if (getStatus() === STATUS_CHECKED) {
                     attendance.checkout(service_pk, subscription, created_by).then(
                         function () {
-                            self.create_card_el(service_pk, created_by,checkin_button_msg, checkout_button_msg);
+                            self.create_card_el(service_pk, created_by, checkin_button_msg, checkout_button_msg);
                             resolve();
                         });
                 }
@@ -679,7 +679,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     console.log("Realizar Checkin");
                     attendance.checkin(service_pk, subscription, created_by).then(
                         function () {
-                            self.create_card_el(service_pk, created_by,checkin_button_msg, checkout_button_msg);
+                            self.create_card_el(service_pk, created_by, checkin_button_msg, checkout_button_msg);
                             resolve();
                         }
                     );
@@ -707,12 +707,12 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             this.cards = [];
         };
 
-        this.render = function (parent_el,checkin_button_msg, checkout_button_msg) {
+        this.render = function (parent_el, checkin_button_msg, checkout_button_msg) {
             parent_el = $(parent_el);
             parent_el.html('');
 
             $.each(this.cards, function (i, card) {
-                parent_el.append(card.getElement(service_pk, created_by,checkin_button_msg, checkout_button_msg));
+                parent_el.append(card.getElement(service_pk, created_by, checkin_button_msg, checkout_button_msg));
             });
             this.clear();
         };
@@ -813,7 +813,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     $.each(cards, function (i, card) {
                         cards_list.addCard(card);
                     });
-                    cards_list.render(list_el,checkin_button_msg, checkout_button_msg);
+                    cards_list.render(list_el, checkin_button_msg, checkout_button_msg);
                 });
             }, 400);
         };
@@ -838,14 +838,13 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         var endCounterCallback = [];
         var self = this;
         var createTimeCirclesEl = function (el_output, ends_in) {
-
-            var timeCirclesEl = "<div id=\"DateCountdown\" data-timer=\"" + ends_in + "\" style=\"height: 40px;color: #40484F\" ></div>";
+            var timeCirclesEl = "<div id=\"DateCountdown\" data-timer=\"" + ends_in + "\" style=\"font-size: 0 !important;\" ></div>";
             timeCirclesEl = $(timeCirclesEl);
             el_output.append(timeCirclesEl);
 
             $("#DateCountdown").TimeCircles({
                 "animation": "smooth",
-                "number_size": 0.2,
+                "number_size": 0.01,
                 "bg_width": 0.25,
                 "fg_width": 0.055,
                 "start_angle": 0,
@@ -939,7 +938,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 // BARCODE SEARCH
 // --------------------------------------------------------------------------//
 (function ($, attendance, ProcessCounter) {
-    attendance.BarcodeSearch = function (search, service_pk, created_by,checkin_button_msg, checkout_button_msg) {
+    attendance.BarcodeSearch = function (search, service_pk, created_by, checkin_button_msg, checkout_button_msg) {
         var searchTimer = null;
         var selected_card = null;
         var cleanTimer = null;
@@ -961,9 +960,9 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                 $(document).on('keydown', function (event) {
                     list_el.focus();
                     if (event.keyCode === 32 && selected_card != null) {
-                        checkinByToggle(selected_card, service_pk, created_by, input_el,checkin_button_msg, checkout_button_msg);
+                        checkinByToggle(selected_card, service_pk, created_by, input_el, checkin_button_msg, checkout_button_msg);
                         processCounter.destroyCounter().then(
-                             function () {
+                            function () {
                                 processCounter.destroyCounter();
                             }
                         );
@@ -984,7 +983,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
 
                     if (reread === true) {
-                        checkinByToggle(selected_card, service_pk, created_by, list_el,checkin_button_msg, checkout_button_msg).then(
+                        checkinByToggle(selected_card, service_pk, created_by, list_el, checkin_button_msg, checkout_button_msg).then(
                             function () {
                                 processCounter.destroyCounter();
                             }
@@ -1009,9 +1008,9 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
         };
 
-        var checkinByToggle = function (card, service_pk, created_by, input_el,checkin_button_msg, checkout_button_msg) {
+        var checkinByToggle = function (card, service_pk, created_by, input_el, checkin_button_msg, checkout_button_msg) {
             return new Promise(function (resolve) {
-                card.toggle(service_pk, created_by,checkin_button_msg, checkout_button_msg).then(function () {
+                card.toggle(service_pk, created_by, checkin_button_msg, checkout_button_msg).then(function () {
                     card = null;
                     $(input_el).val('');
                 });
