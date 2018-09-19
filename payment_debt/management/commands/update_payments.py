@@ -20,7 +20,7 @@ class Command(BaseCommand):
         subs_notransctions = []
 
         for event in Event.objects.all():
-            if is_paid_event(event) is False:
+            if EventPayable().is_satisfied_by(event) is False:
                 continue
 
             for sub in event.subscriptions.all():
