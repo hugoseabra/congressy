@@ -7,11 +7,20 @@ ROOT_URLCONF = 'project.partner.urls'
 INSTALLED_APPS += [
     'gatheros_event',
     'gatheros_subscription',
+    'gatheros_front',
+    'mailer',
     'payment_debt',
     'payment',
-    'mailer',
     'partner',
     'survey',
+    'addon',
+    'associate',
+    # 'bitly',
+    'scientific_work',
+    'certificate',
+    'raffle',
+    'importer',
+    'service_tags',
 ]
 # ========================= SERVER CONFIGURATION ============================ #
 WSGI_APPLICATION = 'project.wsgi.application'
