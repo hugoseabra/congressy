@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from gatheros_event.helpers.event_business import is_paid_event, is_free_event
-from gatheros_event.helpers.publishing import event_is_publishable
+from gatheros_event.helpers.publishing import event_is_publishable, get_unpublishable_reason
 from gatheros_event.models import Event, FeatureManagement, FeatureConfiguration
 
 
@@ -54,8 +54,12 @@ class Command(BaseCommand):
             else:
                 raise Exception('Unknown event state')
 
-            event.published = event_is_publishable(event)
-
+            publishable = event_is_publishable(event)
+            if not publishable:
+                self.stdout.write(self.style.ERROR(
+                    '{} - {}'.format(event.name, get_unpublishable_reason(event))
+                ))
+            event.published = publishable
             event.save()
 
             i += 1

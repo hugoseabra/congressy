@@ -34,4 +34,28 @@
             });
         </script>
     {% endif %}
+
+    {% if event_is_publishable %}
+
+        <script src="{% static "assets/js/publish.js" %}"></script>
+        <script src="{% static 'assets/js/ajax.js' %}"></script>
+        <script>
+            $(document).ready(function () {
+
+                var publish_el = $('#publish_event');
+                var url = "{% url 'event:event-publish' event.pk %}";
+
+                publish_el.on('click', function () {
+                    var loader_icon = $('<i>').addClass('fas fa-circle-notch fa-lg fa-spin');
+                    loader_icon.appendTo(publish_el);
+
+                    update_publishing_state('publish', url);
+                });
+
+            });
+        </script>
+
+    {% endif %}
+
+
 {% endblock %}

@@ -5,6 +5,11 @@ from hotsite.views.subscription_form_wizard import FORMS
 from . import views
 
 public_hotsite_urls = [
+    url(
+        r'^not-found/$',
+        views.UnpublishHotsiteView.as_view(),
+        name='unpublished-hotsite'
+    ),
     url(r'^(?P<slug>[\w-]+)/$', views.HotsiteView.as_view(), name='hotsite'),
     url(
         r'^(?P<slug>[\w-]+)/subscription/$',
