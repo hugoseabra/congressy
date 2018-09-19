@@ -17,6 +17,7 @@ from django.views.generic import FormView, ListView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from core.helpers import sentry_log as log
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
@@ -41,12 +42,11 @@ from mailer.services import (
 from mailer.tasks import send_mail
 from payment.forms import PagarMeCheckoutForm, PaymentForm
 from payment.helpers import (
-    TransactionDirector,
+    TransactionDirector, \
     TransactionSubscriptionStatusIntegrator,
+    TransactionLog,
 )
 from payment.models import Transaction, TransactionStatus
-from payment.helpers import TransactionLog
-from core.helpers import sentry_log as log
 
 
 def notify_postback(transaction, data):
@@ -403,7 +403,8 @@ def postback_url_view(request, uidb64):
                     '   - Recusado: {}'.format(is_refused),
                     '   - Reembolso: {}'.format(is_refunded),
                     '   - Aguardando: {}'.format(is_waiting),
-                    '   - Pendente para reembolso: {}'.format(is_pending_refund),
+                    '   - Pendente para reembolso: {}'.format(
+                        is_pending_refund),
                     '   - Chargedback: {}'.format(is_chargedback),
                 ])
             )
