@@ -408,6 +408,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         const STATUS_CHECKED = 'checked';
         const STATUS_NOT_CHECKED = 'not-checked';
 
+        const COLOR_PENDING = '#EC971F';
         const COLOR_DISABLED = '#e25d5d';
         const COLOR_NOT_CHECKED = '#909AA0';
         const COLOR_CHECKED = '#27B6AF';
@@ -497,7 +498,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     header_color = COLOR_DISABLED;
                     button_text = 'Registrar entrada';
                     status_text = 'Cancelado';
-                    status_card_text = '';
+                    status_card_text = 'CANCELADO';
                     tooltip_message = 'Inscrição cancelada';
                     button_class_name = 'default';
                     button_disabled = true;
@@ -507,7 +508,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     header_color = COLOR_CHECKED;
                     button_text = checkout_button_msg;
                     status_card_text = 'PRESENTE';
-                    button_class_name = 'warning';
+                    button_class_name = 'success';
                     status_text = 'Confirmado';
                     break;
 
@@ -520,11 +521,11 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     break;
                 case STATUS_PENDING:
                 default:
-                    header_color = COLOR_DISABLED;
+                    header_color = COLOR_PENDING;
                     tooltip_message = 'Inscrição pendente';
                     button_text = 'Registrar entrada';
                     status_text = 'Pendente';
-                    status_card_text = '';
+                    status_card_text = 'PENDENTE';
                     button_class_name = 'default';
                     button_disabled = true;
                     break;
@@ -567,7 +568,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             card_html += "</div>";
             card_html += "<div class=\"col-md-5 text-center\">";
             card_html += "<h3 style=\" padding-bottom: 5px\">";
-            card_html += "<i class=\"fas fa-list-ol\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Número da Inscrição\"></i>";
+            card_html += "<i class=\"fas fa-list-ol\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Número da Inscrição\"></i>";
             card_html += "<span> " + subscription.event_count + "</span>";
             card_html += "</h3>";
             card_html += "</div>";
@@ -576,15 +577,15 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             card_html += "<div class=\"col-md-12\" style=\"overflow: hidden\">";
             card_html += "<div class=\"divider-card\"></div>";
             card_html += "<h3 class=\"secondary-informations\" >";
-            card_html += "<i class=\"far fa-envelope\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Email\"></i>";
+            card_html += "<i class=\"far fa-envelope\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Email\"></i>";
             card_html += "<span> " + subscription.email + "</span>";
             card_html += "</h3>";
             card_html += "<h3 class=\"secondary-informations\" >";
-            card_html += "<i class=\"fas fa-th-list\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Categoria\"></i>";
+            card_html += "<i class=\"fas fa-th-list\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Categoria\"></i>";
             card_html += "<span> " + subscription.category_name + "</span>";
             card_html += "</h3>";
             card_html += "<h3 class=\"secondary-informations\" >";
-            card_html += "<i class=\"fas fa-th-large\" data-toggle=\"tooltip\" data-placement=\"left\" title=\"\" data-original-title=\"Lote\"></i>";
+            card_html += "<i class=\"fas fa-th-large\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Lote\"></i>";
             card_html += "<span> " + subscription.lot_name + "</span>";
             card_html += "</h3>";
             card_html += "<div style=\" text-align: center\">" + button.prop('outerHTML') + "<div>";
@@ -600,7 +601,6 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                 card_parent_el = $('<div>').addClass('col-md-' + card_size);
                 if (status === STATUS_CANCELLED || status === STATUS_PENDING) {
                     card_parent_el.attr('data-toggle', 'tooltip');
-                    card_parent_el.attr('data-placement', 'bottom');
                     card_parent_el.attr('title', '');
                     card_parent_el.attr('data-original-title', tooltip_message);
 
@@ -819,6 +819,11 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         };
 
         this.watch = function (input_el, list_el) {
+            $(document).on('keydown', function (event) {
+                input_el.focus();
+
+            });
+
             $(input_el).on('keyup', function () {
                 var input = $(this);
                 $(list_el).html('');

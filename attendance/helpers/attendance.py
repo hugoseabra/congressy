@@ -1,22 +1,21 @@
 from gatheros_subscription.models import Subscription
-from django.core.exceptions import ObjectDoesNotExist
 
 
 def subscription_is_checked(subscription_pk):
-    only_attending = False
-    try:
-        subscription = Subscription.objects.get(
-            pk=subscription_pk)
 
-    except ObjectDoesNotExist:
+    try:
+        subscription = Subscription.objects.get(pk=subscription_pk)
+
+    except Subscription.DoesNotExist:
         return False
 
     event = subscription.event
 
+    only_attended = False
     if hasattr(event, 'certificate'):
-        only_attending = event.certificate.only_attending_participantes
+        only_attended = event.certificate.only_attending_participantes
 
-    if not only_attending:
+    if not only_attended:
         return True
 
     checkin = subscription.checkins.filter(
