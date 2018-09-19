@@ -161,7 +161,7 @@
 
             {% if search_type == 'barcode' %}
                 createBarCodeSearch({
-                    'subscriptionUri': "{% url 'api:attendance:subscription-list' attendance_list.pk %}",
+                    'subscriptionUri': "{% url 'api:attendance:subscription-list' object.pk %}",
                     'checkinUri': "{% url 'api:attendance:checkin-list' %}",
                     'success_checkin_msg': success_checkin_msg,
                     'fail_checkin_msg': fail_checkin_msg,
@@ -170,7 +170,7 @@
                     'fail_checkout_msg': fail_checkout_msg,
                     'checkin_button_msg': checkin_button_msg,
                     'checkout_button_msg': checkout_button_msg,
-                    'servicePk': '{{ attendance_list.pk }}',
+                    'servicePk': '{{ object.pk }}',
                     'createdBy': '{{ request.user.get_full_name }}',
                     'listEl': $('#cards-list'),
                     'inputEl': $('#search')
@@ -182,7 +182,7 @@
 
             {% else %}
                 createTypingSearch({
-                    'subscriptionUri': "{% url 'api:attendance:subscription-list' attendance_list.pk %}",
+                    'subscriptionUri': "{% url 'api:attendance:subscription-list' object.pk %}",
                     'checkinUri': "{% url 'api:attendance:checkin-list' %}",
                     'success_checkin_msg': success_checkin_msg,
                     'fail_checkin_msg': fail_checkin_msg,
@@ -191,7 +191,7 @@
                     'fail_checkout_msg': fail_checkout_msg,
                     'checkin_button_msg': checkin_button_msg,
                     'checkout_button_msg': checkout_button_msg,
-                    'servicePk': '{{ attendance_list.pk }}',
+                    'servicePk': '{{ object.pk }}',
                     'createdBy': '{{ request.user.get_full_name }}',
                     'listEl': $('#cards-list'),
                     'inputEl': $('#search')

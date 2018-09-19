@@ -1,32 +1,45 @@
+from django.shortcuts import redirect, reverse
+from django.views import generic
+
+from attendance.models import (
+    AttendanceCategoryFilter,
+    AttendanceService,
+    Checkin,
+)
 from gatheros_event.helpers import reports
-from django.views import  generic
-from attendance.models import AttendanceCategoryFilter, \
-    AttendanceService, Checkin
 from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
-from django.shortcuts import redirect
-from gatheros_event.views.mixins import AccountMixin
+from .mixins import AttendanceFeatureFlagMixin
 
 
-class AttendancePageSearchView(AccountMixin, generic.TemplateView):
+class AttendancePageSearchView(AttendanceFeatureFlagMixin,
+                               generic.TemplateView):
     template_name = 'attendance/attendance.html'
-    object = None
-    event = None
-    search_type = None
     types_accepted = ['typing', 'barcode', None]
 
-    def dispatch(self, request, *args, **kwargs):
-        self.object = AttendanceService.objects.get(pk=self.kwargs.get('pk'))
-        self.event = Event.objects.get(pk=self.kwargs.get('event_pk'))
-        search_type = request.GET.get('search_type')
-        if search_type not in self.types_accepted:
-            return redirect("attendance:attendance", event_pk=self.event.pk,
-                            pk=self.object.pk)
-        else:
-            self.search_type = search_type
-        return super().dispatch(request, *args, **kwargs)
+    def __init__(self, **initargs):
+        self.search_type = None
+        self.lot_categories = None
+        super().__init__(**initargs)
+
+    def can_access(self):
+        can = super().can_access()
+        if can is False:
+            return False
+
+        self.permission_denied_url = reverse(
+            'event:event-panel',
+            kwargs={
+                'pk': self.event.pk,
+            }
+        )
+        search_type = self.request.GET.get('search_type')
+        return search_type in self.types_accepted
 
     def get_lot_categories(self):
+        if self.lot_categories:
+            return self.lot_categories
+
         items = []
         lc_filter_pks = []
         for item in AttendanceCategoryFilter.objects.filter(
@@ -36,67 +49,59 @@ class AttendancePageSearchView(AccountMixin, generic.TemplateView):
         for lc in self.event.lot_categories.all().order_by('name'):
             if lc.id in lc_filter_pks:
                 items.append(lc.name)
+
+        self.lot_categories = items
+
         return items
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
         context['object'] = self.object
-        context['attendance_list'] = AttendanceService.objects.get(
-            pk=self.kwargs.get('pk'))
         context['lot_categories'] = self.get_lot_categories()
         context['search_type'] = self.search_type
         return context
 
 
-class CheckinListView(AccountMixin, generic.TemplateView):
+class CheckinListView(AttendanceFeatureFlagMixin, generic.TemplateView):
     template_name = 'attendance/checkin-list.html'
     object = None
 
-    def get_attendance_list(self):
-        return AttendanceService.objects.get(pk=self.kwargs.get('pk'))
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_attendance_list()
-
-        return super().dispatch(request, *args, **kwargs)
+    def __init__(self, **initargs):
+        self.attendances = []
+        super().__init__(**initargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['attendance_list'] = self.get_attendance_list()
-        context['event'] = Event.objects.get(pk=self.kwargs.get('event_pk'))
+        context['event'] = self.event
         context['object'] = self.object
         context['attendances'] = self.get_attendances()
 
         return context
 
     def get_attendances(self):
-        return Checkin.objects.filter(
+        if self.attendances:
+            return self.attendances
+
+        self.attendances = Checkin.objects.filter(
             attendance_service=self.object,
             checkout__isnull=True
         ).order_by('-created_on')
+        return self.attendances
 
 
-class AttendanceDashboardView(AccountMixin, generic.DetailView):
+class AttendanceDashboardView(AttendanceFeatureFlagMixin, generic.DetailView):
     model = AttendanceService
     template_name = 'attendance/attendance-dashboard.html'
     search_by = 'name'
-    event = None
 
-    def get_event(self):
-        return Event.objects.get(pk=self.kwargs.get('event_pk'))
-
-    def get_attendance_list(self):
-        return AttendanceService.objects.get(pk=self.kwargs.get('pk'))
-
-    def dispatch(self, request, *args, **kwargs):
-        self.event = Event.objects.get(pk=self.kwargs.get('event_pk'))
-
-        return super().dispatch(request, *args, **kwargs)
+    def __init__(self, **initargs):
+        self.attendances = []
+        self.category_ids = []
+        super().__init__(**initargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['attendance_list'] = self.get_attendance_list()
         context['event'] = self.event
         context['object'] = self.object
         context.update({
@@ -110,23 +115,30 @@ class AttendanceDashboardView(AccountMixin, generic.DetailView):
         return context
 
     def get_attendances(self):
-        list = Checkin.objects.filter(
+        if self.attendances:
+            return self.attendances[0:5]
+
+        self.attendances = Checkin.objects.filter(
             attendance_service=self.object,
             checkout__isnull=True
         ).order_by('-created_on')
-        return list[0:5]
+
+        return self.attendances[0:5]
 
     def get_category_filter(self):
-        category_id = []
+        if self.category_ids:
+            return self.category_ids
+
+        self.category_ids = []
         all_category = AttendanceCategoryFilter.objects.filter(
-            attendance_service=self.get_attendance_list()
+            attendance_service=self.object
         ).values('lot_category_id')
+
         all_category = list(list(all_category))
         for category in all_category:
-            category_id.append(category['lot_category_id'])
+            self.category_ids.append(category['lot_category_id'])
 
-        return category_id
-
+        return self.category_ids
 
     def get_number_attendances(self):
         queryset = Subscription.objects.filter(
@@ -142,12 +154,11 @@ class AttendanceDashboardView(AccountMixin, generic.DetailView):
 
         return queryset.count()
 
-
     def get_number_subscription(self):
 
         total = \
             Subscription.objects.filter(
-                event=self.get_event(),
+                event=self.event,
                 completed=True, test_subscription=False,
                 lot__category_id__in=self.get_category_filter()
             ).exclude(status=Subscription.CANCELED_STATUS).count()
@@ -160,7 +171,7 @@ class AttendanceDashboardView(AccountMixin, generic.DetailView):
             Subscription.objects.filter(
                 status=Subscription.CONFIRMED_STATUS,
                 completed=True, test_subscription=False,
-                event=self.get_event(),
+                event=self.event,
                 lot__category_id__in=self.get_category_filter()
             ).count()
 

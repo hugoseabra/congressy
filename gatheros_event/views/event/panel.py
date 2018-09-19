@@ -122,12 +122,7 @@ class EventPanelView(EventDraftStateMixin,
         context['can_delete'] = self._can_delete
         context['can_view_lots'] = self._can_view_lots
         context['can_manage_subscriptions'] = self.can_manage_subscriptions
-        context['has_addons'] = self.has_addons()
 
-        context['percent_attended'] = {
-            'label': round(self.object.percent_attended),
-            'number': str(self.object.percent_attended).replace(',', '.'),
-        }
         context['report'] = self._get_report()
         context['full_banking'] = self._get_full_banking()
         context['has_survey_create'] = self.has_survey_create()

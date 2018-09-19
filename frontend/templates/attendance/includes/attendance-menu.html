@@ -7,17 +7,17 @@
         <ul class="nav nav-stacked compose-nav">
 
             <li {% if active == 'dashboard' %}class="active" {% endif %}>
-                <a href="{% url 'attendance:dashboard' event.pk attendance_list.pk %}">
+                <a href="{% url 'attendance:dashboard' event.pk object.pk %}">
                     Painel de Check-in
                 </a>
             </li>
             <li {% if active == 'checkin' %}class="active" {% endif %}>
-                <a href="{% url 'attendance:attendance' event.pk attendance_list.pk %}">
+                <a href="{% url 'attendance:attendance' event.pk object.pk %}">
                     Check-in
                 </a>
             </li>
             <li {% if active == 'credenciados' %}class="active" {% endif %}>
-                <a href="{% url 'attendance:checkin-list' event.pk attendance_list.pk %}">Credenciados</a>
+                <a href="{% url 'attendance:checkin-list' event.pk object.pk %}">Credenciados</a>
             </li>
         </ul>
     </div>
