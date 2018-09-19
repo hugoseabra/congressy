@@ -310,7 +310,6 @@ def postback_url_view(request, uidb64):
         # novamente.
         subscription_status = trans_sub_status_integrator.integrate()
         transaction.subscription.status = subscription_status
-        transaction.subscription.completed = True
         transaction.subscription.save()
 
         # Persists transaction change
@@ -319,11 +318,8 @@ def postback_url_view(request, uidb64):
         if incoming_status == Transaction.PAID:
 
             try:
-                payment = transaction.payment
-                transaction.type = transaction.type
-                transaction.amount = transaction.amount
-                payment.paid = True
-                payment.save()
+                transaction.payment.paid = True
+                transaction.payment.save()
 
             except AttributeError:
                 payment_form = PaymentForm(
