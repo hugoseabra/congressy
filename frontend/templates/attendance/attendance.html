@@ -2,12 +2,12 @@
 {% load i18n static %}
 {% load subscription_tags %}
 
-{% block title %}Credenciamento | Congressy{% endblock %}
+{% block title %}Entradas/Saídas | Congressy{% endblock %}
 
-{% block page_title %}Credenciamento{% endblock %}
+{% block page_title %}Entradas/Saídas{% endblock %}
 {% block page_sub_title %}{{ event.name }}{% endblock %}
 {% block page_description %}
-    Realize o credenciamento de inscritos confirmando sua presença no evento.
+    Realize o atendimento para os participantes.
 {% endblock %}
 
 {% block styles %}
@@ -31,7 +31,8 @@
         <div class="col-md-10 col-sm-12">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <div class="panel-title">Realizar Checkin por
+                    <div class="panel-title">
+                        Realizar atendimento por
                         {% if search_type == 'barcode' %} Código de Barras
 {#                        {% elif search_type == 'qrcode' %}QrCode#}
                         {% else %} Teclado{% endif %}
@@ -64,16 +65,22 @@
                     <div class="panel-title">Legenda </div>
                 </div>
                 <div class="panel-body">
-                    <h3><i class="fas fa-circle" style="color:#27B6AF"></i>
-                        Inscrito presente no
-                        evento.</h3>
-                    <h3><i class="fas fa-circle" style="color:#909AA0"></i>
-                        Inscrito ausente no
-                        evento. </h3>
-                    <h3><i class="fas fa-circle" style="color:#EDCE8C" ></i>
-                        Inscrito pendente</h3>
-                    <h3><i class="fas fa-circle" style="color:#e25d5d" ></i>
-                        Inscrito cancelado</h3>
+                    <h3 style="padding: 4px 0">
+                        <i class="fas fa-circle" style="color:#27B6AF"></i>
+                        Atendido (Entrada registrada).
+                    </h3>
+                    <h3 style="padding: 4px 0">
+                        <i class="fas fa-circle" style="color:#909AA0"></i>
+                        Ausente (nunca registrado ou {% if object.checkin_only %}entrada cancelada{% else %}saída já realizada{% endif %}).
+                    </h3>
+                    <h3 style="padding: 4px 0">
+                        <i class="fas fa-circle" style="color:#EDCE8C" ></i>
+                        Participante pendente
+                    </h3>
+                    <h3 style="padding: 4px 0">
+                        <i class="fas fa-circle" style="color:#e25d5d" ></i>
+                        Participante cancelado
+                    </h3>
 
                 </div>
             </div>

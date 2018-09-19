@@ -220,11 +220,10 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                 var uri = collection_uri + '?page=1&search=' + search_criteria;
                 var sender = new AjaxSender(uri);
                 sender.setSuccessCallback(function (response) {
-                    if (response.length === 0) {
-                        console.log('foi2');
+                    if (response.results.length === 0) {
                         return;
                     }
-                    $.each(response, function (i, item) {
+                    $.each(response.results, function (i, item) {
                         self.subscriptions.push(createSubscription(item));
                     });
                     resolve(self.subscriptions);

@@ -46,7 +46,6 @@ Variáveis:
         <div class="small">
 
             {% if is_event_publishable %}
-                Publicar:
                 <input type="checkbox" class="js-switch hide" id="publish_event"
                         {% if event.published %} checked {% endif %}/>
             {% elif not is_event_publishable %}
