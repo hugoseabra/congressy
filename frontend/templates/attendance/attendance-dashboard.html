@@ -60,9 +60,15 @@
                 return data.formatted;
             }
         });
-        var confirmed_percent = ((parseFloat('{{ confirmed }}') /
-            parseFloat('{{total_subscriptions }}')) *
-            100).toFixed(1);
+        var confirmed_percent;
+        if (parseFloat('{{ total_subscriptions }}') === 0) {
+            confirmed_percent = 0;
+        }
+        else {
+            confirmed_percent = ((parseFloat('{{ confirmed }}') /
+                parseFloat('{{total_subscriptions }}')) *
+                100).toFixed(1);
+        }
         var invert_confirmed = (100 - confirmed_percent).toFixed(1);
         Morris.Donut({
             element: 'donut_confirmed',
