@@ -35,7 +35,7 @@ class LotAdmin(admin.ModelAdmin):
         'date_start',
         'date_end',
         'get_percent_completed',
-        'get_percent_attended',
+        # 'get_percent_attended',
         'private',
         'internal',
         'pk'
@@ -88,20 +88,20 @@ class LotAdmin(admin.ModelAdmin):
         percent = '{0:.2f}'.format(100 - instance.percent_completed)
         return '{} ({}%)'.format(remaining, percent)
 
-    def get_percent_attended(self, instance):
-        queryset = instance.subscriptions.filter(
-            completed=True, test_subscription=False
-        ).exclude(
-            status=Subscription.CANCELED_STATUS,
-        )
-        return '{}/{} ({}%)'.format(
-            queryset.filter(attended=True).count(),
-            queryset.count(),
-            '{0:.2f}'.format(instance.percent_attended)
-        )
+    # def get_percent_attended(self, instance):
+    #     queryset = instance.subscriptions.filter(
+    #         completed=True, test_subscription=False
+    #     ).exclude(
+    #         status=Subscription.CANCELED_STATUS,
+    #     )
+    #     return '{}/{} ({}%)'.format(
+    #         queryset.filter(attended=True).count(),
+    #         queryset.count(),
+    #         '{0:.2f}'.format(instance.percent_attended)
+    #     )
 
     get_percent_completed.__name__ = 'Vagas restantes'
-    get_percent_attended.__name__ = 'Credenciados'
+    # get_percent_attended.__name__ = 'Credenciados'
 
 
 @admin.register(Subscription)
@@ -114,14 +114,12 @@ class SubscriptionAdmin(admin.ModelAdmin):
         'created',
         'event__name',
     )
-    list_display = ('person', 'count', 'lot', 'code', 'attended',)
+    list_display = ('person', 'count', 'lot', 'code',)
     list_filter = ('completed',)
     readonly_fields = [
         'event',
         'code',
         'count',
-        'attended',
-        'attended_on',
         'completed',
         'synchronized',
         'congressy_percent',

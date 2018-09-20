@@ -406,7 +406,7 @@ var app = function() {
 
     var fullscreenMode = function() {
        $('#toggle-fullscreen.expand').on('click',function(){
-        $(document).toggleFullScreen()
+        $(document).toggleFullScreen();
         $('#toggle-fullscreen .fa').toggleClass('fa-expand fa-compress');  
        });
     };

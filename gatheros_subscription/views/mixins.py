@@ -9,7 +9,8 @@ from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
 
 
-class FeatureFlagMixinBaseMixin(AccountMixin, generic.View, EventDraftStateMixin):
+class FeatureFlagMixinBaseMixin(AccountMixin, generic.View,
+                                EventDraftStateMixin):
     event = None
     permission_denied_message = 'Você não pode realizar esta ação.'
 
@@ -41,19 +42,7 @@ class FeatureFlagMixinBaseMixin(AccountMixin, generic.View, EventDraftStateMixin
         return context
 
 
-class CheckinFeatureFlagMixin(FeatureFlagMixinBaseMixin):
-
-    def pre_dispatch(self, request):
-        response = super().pre_dispatch(request)
-        features = self.event.feature_configuration
-
-        if features.feature_checkin is False:
-            raise PermissionDenied(self.get_permission_denied_message())
-        return response
-
-
 class SurveyFeatureFlagMixin(FeatureFlagMixinBaseMixin):
-
     def pre_dispatch(self, request):
         response = super().pre_dispatch(request)
         features = self.event.feature_configuration

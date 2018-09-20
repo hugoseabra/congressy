@@ -1,0 +1,38 @@
+<div class="input-group input-group-lg">
+    <div class="input-group-btn">
+        <button id="type-search"
+                type="button"
+                class="btn btn-default dropdown-toggle"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"><i
+                class="
+                                            {% if search_type == 'barcode' %} fas fa-barcode
+{#                                            {% elif search_type == 'qrcode' %} fas fa-qrcode#}
+                                            {% else %}far fa-keyboard{% endif %}"></i>
+            <span
+                    class="caret"></span></button>
+        <ul class="dropdown-menu dropdown-search">
+            <li><a class="search_type_typing" href="?search_type=typing"><i
+                    class="far fa-keyboard"></i>
+                Teclado
+            </a></li>
+{#            <li><a class="search_type_qrcode" href="?search_type=qrcode"><i#}
+{#                    class="fas fa-qrcode"></i>#}
+{#                QrCode#}
+{#            </a></li>#}
+            <li><a class="search_type_barcode" href="?search_type=barcode"><i
+                    class="fas fa-barcode"></i>
+                Cód. Barra
+            </a>
+            </li>
+        </ul>
+    </div>
+
+    {% if search_type != 'qrcode' %}
+        <input id="search" type="text"
+               class="form-control" autocomplete="off"
+               aria-label="...">
+    {% endif %}
+
+</div>

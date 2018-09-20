@@ -1,0 +1,9 @@
+{% if lot_categories %}
+<h3>
+    Categorias:
+    {% for cat in lot_categories %}
+        <span style="padding: 4px 7px 4px 7px"
+              class="badge badge-primary">{{ cat }}</span>
+    {% endfor %}
+</h3>
+{% endif %}

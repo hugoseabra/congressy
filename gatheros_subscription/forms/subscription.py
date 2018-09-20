@@ -135,16 +135,3 @@ class SubscriptionForm(forms.ModelForm):
 
         return super().save(commit=commit)
 
-
-class SubscriptionAttendanceForm(forms.Form):
-    """ Formulário de credenciamento de Inscrições. """
-
-    def __init__(self, instance=None, *args, **kwargs):
-        self.instance = instance
-        super(SubscriptionAttendanceForm, self).__init__(*args, **kwargs)
-
-    def attended(self, attended):
-        """ Persiste atendimento de acordo com parâmetro. """
-        self.instance.attended_on = datetime.now() if attended else None
-        self.instance.attended = attended
-        self.instance.save()

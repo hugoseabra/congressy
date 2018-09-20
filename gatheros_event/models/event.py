@@ -299,22 +299,21 @@ class Event(models.Model, GatherosModelMixin):
                 completed = completed / self.lots.count()
 
         return round(completed, 2)
-
-    @property
-    def percent_attended(self):
-        attended = 0.0
-        if hasattr(self, 'subscriptions'):
-            queryset = self.subscriptions
-            num = queryset.filter(completed=True,
-                                  test_subscription=False).exclude(
-                status='canceled'
-            ).count()
-
-            if num > 0:
-                num_attended = queryset.filter(attended=True).count()
-                attended = (num_attended * 100) / num
-
-        return round(attended, 2)
+    #
+    # @property
+    # def percent_attended(self):
+    #     attended = 0.0
+    #     if hasattr(self, 'subscriptions'):
+    #         queryset = self.subscriptions
+    #         num = queryset.filter(completed=True, test_subscription=False).exclude(
+    #             status='canceled'
+    #         ).count()
+    #
+    #         if num > 0:
+    #             num_attended = queryset.filter(attended=True).count()
+    #             attended = (num_attended * 100) / num
+    #
+    #     return round(attended, 2)
 
     @property
     def status(self):

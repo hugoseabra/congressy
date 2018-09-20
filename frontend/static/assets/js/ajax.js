@@ -7,6 +7,7 @@ window.cgsy = window.cgsy || {};
         url = url || window.location.href;
         var sender_method = null;
 
+        var beforeSendCallback = function (response) {};
         var success_callback = function (response) {};
 
         var default_fail_callback = function (response) {
@@ -48,14 +49,31 @@ window.cgsy = window.cgsy || {};
         }
 
         this.setSuccessCallback = function (callback) {
+            if (typeof callback !== 'function') {
+                console.error('Callback is not a function: ' + callback);
+                return;
+            }
             success_callback = callback
         };
 
         this.setFailCallback = function (callback) {
+            if (typeof callback !== 'function') {
+                console.error('Callback is not a function: ' + callback);
+                return;
+            }
+
             fail_callback = function (response) {
                 callback(response);
                 default_fail_callback(response);
             }
+        };
+
+        this.setBeforeSendCallback = function(callback) {
+            if (typeof callback !== 'function') {
+                console.error('Callback is not a function: ' + callback);
+                return;
+            }
+            beforeSendCallback = callback;
         };
 
         this.send = function (method, data) {
@@ -73,10 +91,32 @@ window.cgsy = window.cgsy || {};
                     if (!csrfSafeMethod(settings.type)) {
                         xhr.setRequestHeader("X-CSRFToken", csrftoken);
                     }
+
+                    beforeSendCallback();
                 },
                 success: success_callback,
                 error: fail_callback
             });
+        };
+
+        this.get = function(data) {
+            this.send('GET', data || {});
+        };
+
+        this.post = function(data) {
+            this.send('POST', data || {});
+        };
+
+        this.put = function(data) {
+            this.send('PUT', data);
+        };
+
+        this.patch = function(data) {
+            this.send('PATCH', data || {});
+        };
+
+        this.delete = function(data) {
+            this.send('DELETE', data || {});
         };
     };
 
