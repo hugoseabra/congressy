@@ -14,17 +14,18 @@ class CertificateConfigView(CertificateFeatureFlagMixin, generic.DetailView):
     long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
 
     def get_object(self, queryset=None):
-        return models.Certificate.objects.get_or_create(
+
+        obj, _ = models.Certificate.objects.get_or_create(
             event=self.event
         )
+
+        return obj
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if not self.object:
-            self.object, _ = models.Certificate.objects.get_or_create(
-                event=self.event
-            )
+        if not isinstance(self.object, models.Certificate):
+            self.object = self.get_object()
 
         ref_object = copy(self.object)
         # Objeto de referencia criado para não manipular o self.object que o
