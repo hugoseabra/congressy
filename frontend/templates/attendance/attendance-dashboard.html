@@ -8,7 +8,7 @@
 
 {% block title %}Painel de Atendimentos | Congressy{% endblock %}
 
-{% block page_title %}Painel de Atendimentos{% endblock %}
+{% block page_title %}{{ object.name|truncatechars:30 }}{% endblock %}
 {% block page_sub_title %}{{ event.name }}{% endblock %}
 
 {% block scripts %}
@@ -41,12 +41,12 @@
             element: 'donut_attendances',
             data: [
                 {
-                    value: progress, label: 'Credenciados', formatted:
+                    value: progress, label: 'Atendidos', formatted:
                     progress + '%'
                 },
                 {
                     value: invert_progress,
-                    label: 'Não Credenciados',
+                    label: 'Não Atendidos',
                     formatted:
                     invert_progress + '%'
                 }
@@ -198,7 +198,7 @@
 
 
 {% block content %}
-    {% include 'attendance/includes/top-menu.html' %}
+    {% include 'attendance/includes/top-menu.html' with title="Painel de Atendimentos" %}
     <div class="row">
         <div class="col-md-2 col-sm-12">
             {% include 'attendance/includes/attendance-menu.html' with active='dashboard' %}
@@ -207,7 +207,7 @@
 
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <div class="panel-title">Painel de Check-in
+                    <div class="panel-title">Resumos
                         <div class="pull-right" style="cursor: pointer">
                             <i class="fa fa-expand"></i>
 
@@ -219,7 +219,7 @@
                          style="padding-bottom: 15px;display: none">
                         <div class="col-xs-12">
                             <h3 class="text-bold" style="font-size:
-                            22px">{{ object.name }}</h3>
+                            22px">Painel de Atendimentos</h3>
                         </div>
                     </div>
                     <div class="row">
@@ -227,7 +227,7 @@
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <div class="panel-title">Taxa de inscritos
-                                        Credenciados
+                                        Atendidos
                                     </div>
                                 </div>
                                 <div class="panel-body">
@@ -272,7 +272,7 @@
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">Informações do
-                                        Credenciamento</h3>
+                                        Atendimento</h3>
                                 </div>
                                 <div class="panel-body">
                                     <div class="col-lg-6 col-xl-6 col-md-6 col-sm-12 col-xs-12">

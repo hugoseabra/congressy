@@ -4,7 +4,7 @@
 
 {% block title %}Entradas/Saídas | Congressy{% endblock %}
 
-{% block page_title %}Entradas/Saídas{% endblock %}
+{% block page_title %}{{ object.name|truncatechars:30 }}{% endblock %}
 {% block page_sub_title %}{{ event.name }}{% endblock %}
 {% block page_description %}
     Realize o atendimento para os participantes.
@@ -23,7 +23,7 @@
 
 
 {% block content %}
-    {% include 'attendance/includes/top-menu.html' %}
+    {% include 'attendance/includes/top-menu.html' with title='Entradas/Saídas' %}
     <div class="row">
         <div class="col-md-2 col-sm-12" id="compose-wrapper">
             {% include 'attendance/includes/attendance-menu.html' with active='checkin' %}
@@ -71,7 +71,7 @@
                     </h3>
                     <h3 style="padding: 4px 0">
                         <i class="fas fa-circle" style="color:#909AA0"></i>
-                        Ausente (nunca registrado ou {% if object.checkin_only %}entrada cancelada{% else %}saída já realizada{% endif %}).
+                        Ausente (nunca registrado ou {% if object.checkout_enabled %}saída já realizada{% else %}entrada cancelada{% endif %}).
                     </h3>
                     <h3 style="padding: 4px 0">
                         <i class="fas fa-circle" style="color:#EDCE8C" ></i>
@@ -148,7 +148,7 @@
             var success_checkin_msg, fail_checkin_msg, checkin_button_msg;
             var success_checkout_msg, fail_checkout_msg, checkout_button_msg;
 
-            {% if object.checkin_only == True %}
+            {% if object.checkout_enabled is False %}
                 success_checkin_msg = 'Entrada registrada com sucesso';
                 fail_checkin_msg = 'Falha ao registrar entrada';
                 success_checkout_msg = 'Cancelamento de entrada registrado com sucesso';

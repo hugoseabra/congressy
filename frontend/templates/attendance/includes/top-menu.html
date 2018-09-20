@@ -8,17 +8,17 @@
     </div>
     <div class="col-xs-12 col-sm-7">
         <h3 class="text-bold" style="margin: 8px 0 0 20px;font-size:22px;">
-            {{ object.name|truncatechars:30 }}
+            {{ title }}
+
         </h3>
     </div>
     <div class="col-xs-12 col-sm-3">
         <div class="row" >
             <div class="col-xs-9">
                 <h3 style="margin: 8px 0 0 20px;padding-top: 4px">
-                    {% if object.checkin_only %}
-                        Somente registro de entrada
-                    {% else %}
-                        Entradas e Saídas
+                    {% if object.checkout_enabled %}
+                        <i class="fas fa-check-circle text-success"></i>
+                        Registro de horas ativado
                     {% endif %}
                 </h3>
             </div>
