@@ -24,6 +24,7 @@ from payment.urls import (
 from raffle.urls import urlpatterns_private_raffles
 from service_tags.urls import service_tags_urlpatterns
 
+
 handler500 = 'project.views.handler500'
 
 admin_urlpatterns = []
@@ -37,6 +38,7 @@ if not settings.DEBUG:
 admin_urlpatterns += [url(r'^cgsy-admin18/', admin.site.urls)]
 
 private_urlpatterns = [
+    url(r'^manage/', include('attendance.urls', 'attendance')),
     url(r'^manage/', include('addon.urls', 'addon')),
     url(r'^manage/', include('scientific_work.urls', 'scientific_work')),
     url(r'^manage/', include('gatheros_subscription.urls', 'subscription')),
@@ -86,6 +88,7 @@ api_urls = [
     url(r'^', include(urlpatterns_public_payments_api, 'payment')),
     url(r'^', include('gatheros_subscription.api_urls', 'subscription')),
     url(r'^', include('addon.api_urls', 'addon')),
+    url(r'^', include('attendance.api_urls', 'attendance')),
     url(r'^', include('kanu_locations.urls', 'city')),
 ]
 

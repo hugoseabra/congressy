@@ -119,8 +119,6 @@ def _export_subscriptions(worksheet, subscriptions):
         'LOTE',
         'STATUS',
         'SEXO',
-        'CREDENCIADO (CHECK-IN)',
-        'CREDENCIADO EM',
         'NOME',
         'CPF',
         'DATA NASC',
@@ -161,10 +159,6 @@ def _export_subscriptions(worksheet, subscriptions):
         collector[row_idx].append(sub.get_status_display())
         collector[row_idx].append(person.get_gender_display())
 
-        collector[row_idx].append('Sim' if sub.attended else 'Não')
-        collector[row_idx].append(
-            sub.attended_on.strftime('%d/%m/%Y') if sub.attended else ''
-        )
 
         collector[row_idx].append(get_object_value(person, 'name'))
         collector[row_idx].append(get_object_value(person, 'cpf'))

@@ -21,6 +21,7 @@ INSTALLED_APPS += [
     'certificate',
     'raffle',
     'importer',
+    'attendance',
     'service_tags',
 ]
 # =========================== AUTH BACKENDS ================================= #

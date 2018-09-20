@@ -50,8 +50,9 @@ class EventPanelView(EventDraftStateMixin,
                     feature_management.save()
                     return HttpResponse(status=201)
                 else:
-                    return HttpResponse("Evento não possui essa funcionalidade",
-                                        status=403)
+                    return HttpResponse(
+                        "Evento não possui essa funcionalidade",
+                        status=403)
 
             elif row_name == 'extra_activities':
                 if feature_config.feature_services:
@@ -59,8 +60,9 @@ class EventPanelView(EventDraftStateMixin,
                     feature_management.save()
                     return HttpResponse(status=201)
                 else:
-                    return HttpResponse("Evento não possui essa funcionalidade",
-                                        status=403)
+                    return HttpResponse(
+                        "Evento não possui essa funcionalidade",
+                        status=403)
 
             elif row_name == 'certificate':
                 if feature_config.feature_certificate:
@@ -68,8 +70,9 @@ class EventPanelView(EventDraftStateMixin,
                     feature_management.save()
                     return HttpResponse(status=201)
                 else:
-                    return HttpResponse("Evento não possui essa funcionalidade",
-                                        status=403)
+                    return HttpResponse(
+                        "Evento não possui essa funcionalidade",
+                        status=403)
 
             elif row_name == 'optionals':
                 if feature_config.feature_products:
@@ -77,8 +80,9 @@ class EventPanelView(EventDraftStateMixin,
                     feature_management.save()
                     return HttpResponse(status=201)
                 else:
-                    return HttpResponse("Evento não possui essa funcionalidade",
-                                        status=403)
+                    return HttpResponse(
+                        "Evento não possui essa funcionalidade",
+                        status=403)
 
             elif row_name == 'survey':
                 if feature_config.feature_survey:
@@ -86,8 +90,9 @@ class EventPanelView(EventDraftStateMixin,
                     feature_management.save()
                     return HttpResponse(status=201)
                 else:
-                    return HttpResponse("Evento não possui essa funcionalidade",
-                                        status=403)
+                    return HttpResponse(
+                        "Evento não possui essa funcionalidade",
+                        status=403)
 
         return HttpResponse(status=200)
 
@@ -117,17 +122,15 @@ class EventPanelView(EventDraftStateMixin,
         context['can_delete'] = self._can_delete
         context['can_view_lots'] = self._can_view_lots
         context['can_manage_subscriptions'] = self.can_manage_subscriptions
-        context['percent_attended'] = {
-            'label': round(self.object.percent_attended),
-            'number': str(self.object.percent_attended).replace(',', '.'),
-        }
+
         context['report'] = self._get_report()
         context['full_banking'] = self._get_full_banking()
         context['has_survey_create'] = self.has_survey_create()
-        context['number_attendances'] = self.get_number_attendances()
         context['status_addons'] = self.get_status_addons()
         context['event_is_full'] = self.event_is_full()
         context['is_paid_event'] = is_paid_event(self.object)
+        context['attendance_list_count'] = \
+            self.object.attendance_services.all().count()
 
         try:
             context['is_configured'] = self.object.work_config.is_configured
@@ -210,7 +213,7 @@ class EventPanelView(EventDraftStateMixin,
             return False
 
         banking_required_fields = ['bank_code', 'agency', 'account',
-            'cnpj_ou_cpf', 'account_type']
+                                   'cnpj_ou_cpf', 'account_type']
 
         for field in Organization._meta.get_fields():
 
@@ -351,8 +354,8 @@ class EventPanelView(EventDraftStateMixin,
                 Q(subscription__completed=True) &
                 Q(subscription__test_subscription=False) &
                 (
-                        Q(status=Transaction.PAID) |
-                        Q(status=Transaction.WAITING_PAYMENT)
+                    Q(status=Transaction.PAID) |
+                    Q(status=Transaction.WAITING_PAYMENT)
                 )
             ).exclude(subscription__status=Subscription.CANCELED_STATUS)
 
@@ -395,7 +398,7 @@ class EventPanelView(EventDraftStateMixin,
 
     def event_is_full(self):
         if self.object.expected_subscriptions and \
-                self.object.expected_subscriptions > 0:
+                        self.object.expected_subscriptions > 0:
 
             total_subscriptions_event = 0
             for lot in self.object.lots.all():
