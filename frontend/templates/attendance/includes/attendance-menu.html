@@ -1,6 +1,6 @@
 <div class="panel panel-primary">
     <div class="panel-heading">
-        <div class="panel-title">Atendimento</div>
+        <div class="panel-title">Menu</div>
     </div>
     <div class="panel-body">
 
@@ -8,7 +8,7 @@
 
             <li {% if active == 'dashboard' %}class="active" {% endif %}>
                 <a href="{% url 'attendance:dashboard' event.pk object.pk %}">
-                    Painel de Check-in
+                    Painel
                 </a>
             </li>
             <li {% if active == 'checkin' %}class="active" {% endif %}>
@@ -17,7 +17,7 @@
                 </a>
             </li>
             <li {% if active == 'credenciados' %}class="active" {% endif %}>
-                <a href="{% url 'attendance:checkin-list' event.pk object.pk %}">Credenciados</a>
+                <a href="{% url 'attendance:checkin-list' event.pk object.pk %}">Atendidos</a>
             </li>
         </ul>
     </div>

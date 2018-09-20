@@ -2,21 +2,13 @@
 {% load i18n static %}
 {% load subscription_tags %}
 
-{% block title %}Credenciados | Congressy{% endblock %}
+{% block title %}Atendidos | Congressy{% endblock %}
 
-{% block page_title %}Credenciados{% endblock %}
+{% block page_title %}Atendidos{% endblock %}
 {% block page_sub_title %}{{ event.name }}{% endblock %}
 {% block page_description %}
-    Lista dos credenciados.
+    Lista dos atendidos.
 {% endblock %}
-
-
-{% block pageheader %}
-    <div class="pageheader">
-        <h1> Últimos check-in's </h1>
-    </div>
-{% endblock %}
-
 
 {% block content %}
     {% include 'attendance/includes/top-menu.html' %}
@@ -30,7 +22,7 @@
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <div class="panel-title">
-                        Lista de participantes que realizaram Checkin
+                        Lista de participantes que foram atendidos
                     </div>
                 </div>
                 <div class="panel-body">

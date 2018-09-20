@@ -188,14 +188,14 @@ Variáveis:
 </ul>
 
 {% if event.feature_configuration.feature_checkin and event.feature_management.checkin %}
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Credenciamento</h5>
+    <h5 class="sidebar-header" style="color:#4c4c4c;">Atendimentos</h5>
     <ul class="nav nav-pills nav-stacked">
         <li {% if active == 'attendance' %}class="active"{% endif %}>
             <a class="sidebar-itens" href=
                     "{% url 'attendance:manage-list-attendance' event.pk %}"
                title="Credenciados">
-                <i class="fas fa-calendar-check"></i>
-                Atendimento
+                <i class="fas fa-smile"></i>
+                Serviços
             </a>
         </li>
     </ul>
