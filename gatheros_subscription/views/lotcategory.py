@@ -20,7 +20,6 @@ except ImportError:
     SENTRY_RAVEN = False
 
 
-
 class LotCategoryListView(AccountMixin, generic.ListView, EventDraftStateMixin):
     """Lista de lotes de acordo com o evento do contexto"""
     model = LotCategory
