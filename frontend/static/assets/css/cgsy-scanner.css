@@ -1,0 +1,67 @@
+.scanner-status {
+    padding: 10px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1001;
+}
+
+.scanner-status.notready {
+    background-color: black;
+    color: white;
+}
+
+.scanner-status.notready:before {
+    content: 'aguardando câmera'
+}
+
+.scanner-status.idle {
+    background-color: #d9edf7;
+    color: green;
+}
+
+.scanner-status.idle:before {
+    content: 'Ativo'
+}
+
+.scanner-status.reading {
+    background-color: #d9edf7;
+    color: #333;
+}
+
+.scanner-status.reading:before {
+    content: "processando ...";
+}
+
+.scanner-status.found {
+    background-color: green;
+    color: white;
+}
+
+.scanner-status.found:before {
+    content: "Encontrado!";
+}
+
+.scanner-status.error {
+    background-color: darkred;
+    color: white;
+}
+
+.scanner-status.error:before {
+    content: "Erro: ";
+}
+
+video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+#turn-camera-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1001;
+}

@@ -14,6 +14,7 @@ from django.urls import reverse_lazy
 from django.views import generic
 
 from gatheros_subscription.models import Subscription
+from attendance.helpers.attendance import subscription_is_checked
 from .mixins import CertificateFeatureFlagMixin
 
 
@@ -95,7 +96,7 @@ class CertificatePDFView(CertificateFeatureFlagMixin):
         
         if certificate_config.only_attending_participantes:
 
-            if not self.subscription.attended:
+            if not subscription_is_checked(self.subscription.pk):
 
                 self.permission_denied_message = "Certificado disponivel " \
                                                  "apenas participantes com " \

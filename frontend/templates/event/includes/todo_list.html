@@ -199,20 +199,31 @@
             fa-minus"></span>
                     </button>
                 {% endif %}
-                <a>CheckIn</a>
+                <a>Check-in/out</a>
             </td>
             <td>
                 <button type="button"
                         class="btn btn-success btn-trans btn-sm dropdown-toggle"
-                        onclick="location.href='{% url 'subscription:subscription-attendance-dashboard' event.pk %}'"
+                        onclick="location.href='{% url 'attendance:manage-list-attendance' event.pk %}'"
 
                 >
                     <span>Acessar</span>
                 </button>
             </td>
             <td>
-                <i class="fas fa-check-circle success-color
+
+                {% if attendance_list_count > 0 %}
+                    <i class="fas fa-check-circle success-color
                                     pull-right fa-2x"></i>
+                {% else %}
+                    <i class="fas fa-exclamation-circle warning-color
+                                    pull-right fa-2x"
+                       data-toggle="tooltip"
+                       data-placement="left"
+                       title=""
+                       data-original-title="Você deve criar um serviço de atendimento"></i>
+                {% endif %}
+
             </td>
         </tr>
     {% endif %}

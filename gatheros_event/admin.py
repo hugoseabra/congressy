@@ -83,13 +83,13 @@ class EventAdmin(admin.ModelAdmin):
         percent = '{0:.2f}'.format(100 - instance.percent_completed)
         return '{} ({}%)'.format(remaining, percent)
 
-    def get_percent_attended(self, instance):
-        queryset = instance.subscriptions
-        return '{}/{} ({}%)'.format(
-            queryset.filter(attended=True).count(),
-            queryset.count(),
-            '{0:.2f}'.format(instance.percent_attended)
-        )
+    # def get_percent_attended(self, instance):
+    #     queryset = instance.subscriptions
+    #     return '{}/{} ({}%)'.format(
+    #         queryset.filter(attended=True).count(),
+    #         queryset.count(),
+    #         '{0:.2f}'.format(instance.percent_attended)
+    #     )
 
     def get_partner_percents(self, instance):
         total_query = instance.partner_contracts.aggregate(
@@ -99,7 +99,7 @@ class EventAdmin(admin.ModelAdmin):
         return '{}%'.format(total or 0)
 
     get_percent_completed.__name__ = 'Vagas restantes'
-    get_percent_attended.__name__ = 'Credenciados'
+    # get_percent_attended.__name__ = 'Credenciados'
     get_partner_percents.__name__ = '% Parceiros'
 
 

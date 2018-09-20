@@ -4,8 +4,42 @@
  *   Copyright 2014 Authentic Goods Co. http://authenticgoods.co
  *
 */
-@import url("https://fonts.googleapis.com/css?family=Montserrat:400,700");
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800");
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Montserrat Regular'), local('Montserrat-Regular'), url(https://fonts.gstatic.com/s/montserrat/v12/JTUSjIg1_i6t8kCHKm459Wlhzg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Montserrat Bold'), local('Montserrat-Bold'), url(https://fonts.gstatic.com/s/montserrat/v12/JTURjIg1_i6t8kCHKm45_dJE3gnD-w.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans Regular'), local('OpenSans-Regular'), url(https://fonts.gstatic.com/s/opensans/v15/mem8YaGs126MiZpBA-UFVZ0e.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Open Sans SemiBold'), local('OpenSans-SemiBold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UNirkOUuhs.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UN7rgOUuhs.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 800;
+  src: local('Open Sans ExtraBold'), local('OpenSans-ExtraBold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UN8rsOUuhs.ttf) format('truetype');
+}
 html {
   height: 100%;
   font-size: 100%;
@@ -3795,7 +3829,6 @@ label.valid {
 .theme-cgsy-full .dropdown-menu > li.active > a.btn-danger,
 .theme-cgsy-full .dropdown-menu > li > a.btn-danger:focus,
 .theme-cgsy-full .dropdown-menu > li > a.btn-danger:hover,
-.theme-cgsy-full .btn-danger,
 .theme-cgsy-full a.btn-danger:link,
 .theme-cgsy-full a.btn-danger:visited,
 .theme-cgsy-full a.btn-danger:hover {
@@ -3806,7 +3839,6 @@ label.valid {
 .theme-cgsy-full .dropdown-menu > li.active > a.btn-danger i,
 .theme-cgsy-full .dropdown-menu > li > a.btn-danger:focus i,
 .theme-cgsy-full .dropdown-menu > li > a.btn-danger:hover i,
-.theme-cgsy-full .btn-danger i,
 .theme-cgsy-full a.btn-danger:link i,
 .theme-cgsy-full a.btn-danger:visited i,
 .theme-cgsy-full a.btn-danger:hover i,
@@ -3814,7 +3846,6 @@ label.valid {
 .theme-cgsy-full .dropdown-menu > li.active > a.btn-danger span,
 .theme-cgsy-full .dropdown-menu > li > a.btn-danger:focus span,
 .theme-cgsy-full .dropdown-menu > li > a.btn-danger:hover span,
-.theme-cgsy-full .btn-danger span,
 .theme-cgsy-full a.btn-danger:link span,
 .theme-cgsy-full a.btn-danger:visited span,
 .theme-cgsy-full a.btn-danger:hover span {
@@ -4078,6 +4109,9 @@ label.valid {
   font-size: 0.75em;
   margin-right: 8px;
 }
+.panel i.fa-expand:hover {
+  cursor: pointer;
+}
 ul.messenger-theme-flat .messenger-message.alert-success .messenger-message-inner:before {
   background: #449D44;
 }
@@ -4118,4 +4152,80 @@ ul.messenger-theme-flat .messenger-message.alert-warning .messenger-message-inne
   width: 1024px;
   height: 724px;
   margin: 0 auto;
+}
+.attendance-card {
+  border-radius: 5px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+}
+.attendance-card .header-card {
+  height: 40px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+.attendance-card .status-card {
+  padding-top: 13px;
+  padding-bottom: 10px;
+  color: #ffffff;
+  font-size: 16px;
+}
+.attendance-card .secondary-informations {
+  padding-bottom: 5px;
+  font-size: 14px;
+}
+.attendance-card .btn-success.btn-trans {
+  color: #27B6AF;
+  background-color: transparent;
+  border: solid thin #27B6AF;
+}
+.attendance-card .btn-success.btn-trans:hover,
+.attendance-card .btn-success.btn-trans:active,
+.attendance-card .btn-success.btn-trans:focus {
+  color: #fff;
+  background-color: #27B6AF;
+  border: solid thin #27B6AF;
+}
+.attendance-card .btn-warning.btn-trans {
+  color: #EDCE8C;
+  background-color: transparent;
+  border: solid thin #EDCE8C;
+}
+.attendance-card .btn-warning.btn-trans:hover,
+.attendance-card .btn-warning.btn-trans:active,
+.attendance-card .btn-warning.btn-trans:focus {
+  color: #fff;
+  background-color: #EDCE8C;
+  border: solid thin #EDCE8C;
+}
+.attendance-card #DateCountdown {
+  height: 40px;
+  margin-left: 90px;
+  margin-top: 3px;
+}
+.attendance-card #DateCountdown span {
+  font-size: 0 !important;
+  color: #40484F;
+}
+.widget-fullscreen #DateCountdown {
+  height: 40px;
+  margin-left: 90px;
+  margin-top: 3px;
+}
+.widget-fullscreen #DateCountdown span {
+  font-size: 0 !important;
+  color: #40484F;
+}
+.barcode-user-tips {
+  background-color: #FFFFFF;
+  margin-top: 15px;
+  padding: 10px;
+  border: 1px solid #8f939e;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+.divider-card {
+  height: 0.5px;
+  width: 100%;
+  background-color: #8f939e;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
