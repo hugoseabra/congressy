@@ -4,7 +4,7 @@ from gatheros_event.models import Event
 
 class AttendanceService(models.Model):
 
-    name = models.CharField(max_length=255, verbose_name='nome')
+    name = models.CharField(max_length=255, verbose_name='nome do atendimento')
 
     event = models.ForeignKey(
         Event,
@@ -16,10 +16,11 @@ class AttendanceService(models.Model):
     created_on = models.DateTimeField(auto_now_add=True,
                                       verbose_name='criado em')
 
-    checkin_only = models.BooleanField(
-        default=True,
-        verbose_name='Atendimento somente com check-in',
-        help_text="Este atendimento terá registros apenas de entradas"
+    checkout_enabled = models.BooleanField(
+        default=False,
+        verbose_name='Registrar horas?',
+        help_text="O atendimento irá contabilizar as horas em que o"
+                  " participante ficou presente no atendimento."
     )
 
     with_certificate = models.BooleanField(

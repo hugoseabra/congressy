@@ -16,7 +16,7 @@ class AttendanceServiceForm(forms.ModelForm):
             'name',
             'event',
             'lot_categories',
-            'checkin_only',
+            'checkout_enabled',
             'with_certificate'
         )
 

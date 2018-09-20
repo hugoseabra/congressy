@@ -25,7 +25,7 @@ def subscription_is_checked(subscription_pk):
     if not checkin:
         return False
 
-    if checkin.attendance_service.checkin_only:
+    if checkin.attendance_service.checkout_enabled is False:
         if hasattr(checkin, 'checkout') and checkin.checkout is not None:
             return False
 

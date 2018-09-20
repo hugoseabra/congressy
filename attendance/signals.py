@@ -16,5 +16,5 @@ def create_default_attendance(instance, raw, created, **_):
             event=instance,
             name='Credenciamento',
             with_certificate=True,
-            checkin_only=True,
+            checkout_enabled=False,
         )
