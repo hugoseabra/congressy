@@ -18,6 +18,9 @@
 
 
     <script type="text/javascript">
+    console.log("Inscritos" + parseFloat('{{ total_subscriptions }}'));
+    console.log("Confirmados" + parseFloat('{{ confirmed }}'));
+    console.log("Checados" + parseFloat('{{ number_attendances }}'));
         $('.panel .fa-expand').click(function () {
             $('#name-on-fullscren').toggle();
         });

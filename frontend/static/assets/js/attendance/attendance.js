@@ -116,7 +116,9 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 
                     self.name = response['person']['name'].substring(0, 22);
                     self.lot_name = response['lot']['name'].substring(0, 30);
-                    self.category_name = response['lot']['category'].substring(0, 30);
+                    if (response['lot']['category']) {
+                        self.category_name = response['lot']['category'].substring(0, 30);
+                    }
                     self.email = response['person']['email'].substring(0, 30);
                     self.event_count = response['event_count'];
                     self.code = response['code'];
