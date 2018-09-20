@@ -1,4 +1,3 @@
-from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
@@ -42,10 +41,9 @@ class CertificateBaseMixin(AccountMixin, generic.View, EventDraftStateMixin):
 
 class CertificateFeatureFlagMixin(CertificateBaseMixin):
 
-    def pre_dispatch(self, request):
-        response = super().pre_dispatch(request)
+    def can_access(self):
+        can = super().can_access()
+        if can is False:
+            return False
         features = self.event.feature_configuration
-
-        if features.feature_certificate is False:
-            raise PermissionDenied(self.get_permission_denied_message())
-        return response
+        return features.feature_certificate is True

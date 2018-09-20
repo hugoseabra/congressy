@@ -9,18 +9,14 @@ from certificate import models, forms
 from .mixins import CertificateFeatureFlagMixin
 
 
-class CertificateConfigView(CertificateFeatureFlagMixin, generic.TemplateView):
+class CertificateConfigView(CertificateFeatureFlagMixin, generic.DetailView):
     template_name = 'certificate/certificado_.html'
-    object = None
     long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
 
-    def dispatch(self, request, *args, **kwargs):
-        response = super(CertificateConfigView, self).dispatch(request, *args,
-                                                               **kwargs)
-        self.object = models.Certificate.objects.get_or_create(
+    def get_object(self, queryset=None):
+        return models.Certificate.objects.get_or_create(
             event=self.event
         )
-        return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
