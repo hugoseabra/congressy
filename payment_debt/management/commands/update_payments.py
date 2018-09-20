@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.core.management.base import BaseCommand
 
-from gatheros_event.event_state import EventPayable
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
 from payment.models import Payment, Transaction
 from payment_debt.models import Debt
@@ -20,7 +20,7 @@ class Command(BaseCommand):
         subs_notransctions = []
 
         for event in Event.objects.all():
-            if EventPayable().is_satisfied_by(event) is False:
+            if is_paid_event(event) is False:
                 continue
 
             for sub in event.subscriptions.all():
@@ -80,11 +80,8 @@ class Command(BaseCommand):
                         # quem está com crédito.
                         continue
 
-                    if transaction.installments == 1:
-                        interests_amount = 0
-                        installment_amount = transaction.amount
 
-                    elif transaction.installments > 1:
+                    if transaction.installments > 1:
 
                         if not transaction.installment_amount:
                             installment_amount = \
@@ -97,6 +94,10 @@ class Command(BaseCommand):
 
                         if interests_amount < 0:
                             interests_amount = 0
+
+                    else:
+                        interests_amount = 0
+                        installment_amount = transaction.amount
 
                     debt.amount = transaction.amount
                     debt.liquid_amount = transaction.liquid_amount

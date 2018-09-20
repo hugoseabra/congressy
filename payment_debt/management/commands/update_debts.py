@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from gatheros_event.event_state import EventPayable
+from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
 from payment_debt.models import Debt
 
