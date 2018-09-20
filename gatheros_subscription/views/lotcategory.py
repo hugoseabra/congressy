@@ -7,7 +7,7 @@ from gatheros_event.helpers.account import update_account
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import DeleteViewMixin, \
-    MultiLotsFeatureFlagMixin, EventDraftStateMixin
+    MultiLotsFeatureFlagMixin, EventDraftStateMixin, AccountMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import LotCategory
 
@@ -20,7 +20,7 @@ except ImportError:
     SENTRY_RAVEN = False
 
 
-class LotCategoryListView(generic.ListView, EventDraftStateMixin):
+class LotCategoryListView(AccountMixin, generic.ListView, EventDraftStateMixin):
     """Lista de lotes de acordo com o evento do contexto"""
     model = LotCategory
     template_name = 'lotcategory/list.html'
