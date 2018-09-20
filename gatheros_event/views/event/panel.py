@@ -129,6 +129,8 @@ class EventPanelView(EventDraftStateMixin,
         context['status_addons'] = self.get_status_addons()
         context['event_is_full'] = self.event_is_full()
         context['is_paid_event'] = is_paid_event(self.object)
+        context['attendance_list_count'] = \
+            self.object.attendance_services.all().count()
 
         try:
             context['is_configured'] = self.object.work_config.is_configured
