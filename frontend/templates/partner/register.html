@@ -16,7 +16,7 @@
     <form id="createForm"
           action=""
           method="post"
-          class="form-horizontal form-border"
+          class="form-horizontal form-border tooltip-wrapper"
           role="form"
           onsubmit="submit_form(this);">
 
@@ -36,10 +36,19 @@
         <div class="row">
             <div class="col-md-12">
                 {% render_generic_field form.name autofocus=True %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
                 {% render_generic_field form.email %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
                 {% render_generic_field form.phone %}
             </div>
         </div>
+
 
         <div class="row">
             <div class="col-md-12">
@@ -48,11 +57,11 @@
         </div>
 
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-6" style="margin-top: 20px">
                 {% render_switchery_field form.type_of_document label="CPF/CNPJ" help_text="Tipo de Documento" %}
             </div>
             <div class="col-md-6">
-                {% render_generic_field form.document_number label="CPF" %}
+                {% render_generic_field form.document_number label="CPF" required=True %}
             </div>
         </div>
 
@@ -66,19 +75,19 @@
         </div>
 
         <div class="row">
-            <div class="col-md-9">
+            <div class="col-md-6" style="font-size: 14px">
                 {% render_generic_field form.agency label="Agencia" %}
             </div>
-            <div class="col-md-3">
-                {% render_generic_field form.agency_dv label='Dígito' %}
+            <div class="col-md-6" style="font-size: 14px">
+                {% render_generic_field form.agency_dv label='Dígito'  required=True%}
             </div>
         </div>
 
         <div class="row">
-            <div class="col-md-9">
+            <div class="col-md-6" style="font-size: 14px">
                 {% render_generic_field form.account label="Conta" %}
             </div>
-            <div class="col-md-3">
+            <div class="col-md-6" style="font-size: 14px">
                 {% render_generic_field form.account_dv label='Dígito' %}
             </div>
         </div>
@@ -115,9 +124,13 @@
 
             if (type_of_document.is(':checked')) {
                 type_of_document_lable.text('CNPJ:');
+                type_of_document_lable.append("<span style=\"color:#C9302C\">*</span>");
+
                 document_number.mask("99.999.999/9999-99");
             } else {
                 type_of_document_lable.text('CPF:');
+                type_of_document_lable.append("<span style=\"color:#C9302C\">*</span>");
+
                 document_number.mask("999.999.999-99");
             }
 
@@ -125,11 +138,13 @@
 
                 if ($(this).is(':checked')) {
                     type_of_document_lable.text('CNPJ:');
+                    type_of_document_lable.append("<span style=\"color:#C9302C\">*</span>");
                     document_number.val("");
                     document_number.mask("99.999.999/9999-99");
                 } else {
                     type_of_document_lable.text('CPF:');
                     document_number.val("");
+                    type_of_document_lable.append("<span style=\"color:#C9302C\">*</span>");
                     document_number.mask("999.999.999-99");
                 }
 
@@ -141,5 +156,14 @@
 
     </script>
 
+
+{% endblock %}
+
+{% block local_css %}
+    <style>
+        #createForm i {
+            position: initial;
+        }
+    </style>
 
 {% endblock %}

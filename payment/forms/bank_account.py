@@ -62,10 +62,11 @@ class BankAccountForm(forms.ModelForm):
             'type': cleaned_data.get('account_type'),
         }
 
-        for key, value in self.banking_required_fields:
+        for value in self.banking_required_fields:
+
             if value is None:
                 raise forms.ValidationError("O valor {} é "
-                                            "obrigatorio.".format(key))
+                                            "obrigatorio.".format(value))
 
         try:
             recipient = create_pagarme_recipient(recipient_dict=recipient_dict)

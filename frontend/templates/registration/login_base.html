@@ -18,8 +18,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{% block title %}Congressy{% endblock %}</title>
     <meta name="description" content="">
-        <meta name="viewport"
-              content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
     <!-- FAVICONS -->
     <link rel="icon" href="{% static 'assets/img/favicons/favicon.ico' %}">
@@ -54,6 +54,8 @@
         <script src="{% static "assets/js/vendor/html5shiv.js"%}"></script>
         <script src="{% static "assets/js/vendor/respond.min.js"%}"></script>
     <![endif]-->
+    {% block local_css %}
+    {% endblock %}
 </head>
 
 <body class="theme-cgsy-full cgsy-login">
@@ -126,7 +128,9 @@
                 <div class="text-muted text-right cgsy-version">
                     <div class="row">
                         <div class="col-xs-6 col-sm-8 col-md-8 col-lg-6 text-left">
-                            <a href="https://www.congressy.com/termos-de-uso/" style="color:white;font-size:14px;" target="_blank">Termos de uso</a>
+                            <a href="https://www.congressy.com/termos-de-uso/"
+                               style="color:white;font-size:14px;"
+                               target="_blank">Termos de uso</a>
                         </div>
                         <div class="col-xs-6 col-sm-4 col-md-4 col-lg-6">
                             {% include "base/footer.html" %}
@@ -169,5 +173,7 @@
 </script>
 {% block local_js %}
 {% endblock %}
+
+
 </body>
 </html>
