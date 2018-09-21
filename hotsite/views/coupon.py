@@ -20,7 +20,11 @@ class CouponView(EventMixin, generic.TemplateView):
         code = request.POST.get('coupon')
         if code:
             try:
-                lot = Lot.objects.get(exhibition_code=str(code).upper())
+
+                lot = Lot.objects.get(
+                    exhibition_code=str(code).upper(),
+                    event_id=self.current_event.event.pk
+                )
 
                 if lot.status != Lot.LOT_STATUS_RUNNING:
                     raise Http404

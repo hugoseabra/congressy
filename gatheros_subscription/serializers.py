@@ -63,6 +63,20 @@ class LotSerializer(serializers.ModelSerializer):
         model = Lot
         fields = '__all__'
 
+    def validate_exhibition_code(self, value):
+
+        event = self.instance.event.pk
+        existing = Lot.objects.filter(
+            event_id=event,
+            exhibition_code=value
+        )
+
+        if existing.count() > 0:
+            msg = "Cupom com esse código já existe no evento!"
+            raise serializers.ValidationError(msg)
+
+        return value
+
 
 class SubscriptionExportSerializer(serializers.ModelSerializer):
     person = PersonExportSerializer()
@@ -92,7 +106,6 @@ class SubscriptionExportSerializer(serializers.ModelSerializer):
 
 
 class CheckInPersonSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Person
         fields = (
