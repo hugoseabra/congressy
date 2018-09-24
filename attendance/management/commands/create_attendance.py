@@ -40,7 +40,7 @@ class Command(BaseCommand):
         ))
 
         process = str(input("Deseja realmente processar essas inscrições? "
-                            "Y/N [N]: ") or "n")
+                            "y/N: ") or "n")
 
         if process in self.accepts:
             attendance_service = AttendanceService.objects.create(
@@ -89,7 +89,7 @@ class Command(BaseCommand):
         ))
 
         process_manuals = str(input("Deseja realmente processar inscrições "
-                                    "manuais? Y/N [N]: ") or "n")
+                                    "manuais? y/N: ") or "n")
 
         if process_manuals in self.accepts:
 
