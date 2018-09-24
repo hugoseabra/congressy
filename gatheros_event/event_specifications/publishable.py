@@ -59,9 +59,9 @@ class EventPublishable(EventCompositeSpecificationMixin):
                        'receber pagamentos. Veja os detalhes da sua ' \
                        'organização!'
 
-        if event.is_scientific:
-            if not event.work_config and event.work_config.is_configured:
-                return 'Você ainda não configurou seu evento para receber ' \
-                       'inscrições cientificas!'
+        # if event.is_scientific:
+        #     if not event.work_config and event.work_config.is_configured:
+        #         return 'Você ainda não configurou seu evento para receber ' \
+        #                'inscrições cientificas!'
 
         return ''

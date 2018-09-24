@@ -28,7 +28,7 @@
 
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script type="application/javascript">
-
+        {#console.log("teste" + {{ person.city.uf }});#}
         var croppie_obj;
 
         // Functions
@@ -101,15 +101,18 @@
             var cpf_el = $('#id_cpf');
             var cnpj_el = $('#id_institution_cnpj');
             var avatar_file_el = $('#id_avatar_file');
+            var phone = $('#id_phone');
 
             //Masking
             cpf_el.mask("999.999.999-99");
             cnpj_el.mask("99.999.999/9999-99");
             zip_el.mask("99999-999");
+            phone.mask("(99) 99999-9999");
 
             showHideCepLoader();
 
             window.setTimeout(function () {
+
                 {% if person.city %}
                     uf_el.val('{{ person.city.uf }}');
                     fetch_cities(uf_el, $('#id_city_name'), $('#id_city'), '{{ person.city.pk }}');

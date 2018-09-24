@@ -11,6 +11,9 @@ except ImportError:
 def log(message, extra_data=None, type='error', notify_admins=False):
     logger = logging.getLogger(__name__)
 
+    if extra_data is None:
+        extra_data = dict()
+
     if type == 'error':
         logger.error(message, extra=extra_data)
         if SENTRY_RAVEN:

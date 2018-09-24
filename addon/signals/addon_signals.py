@@ -30,7 +30,7 @@ def erase_previous_files(instance, raw, created, **_):
     if raw is True and created is True:
         return
 
-    if instance.has_changed('banner') and instance.banner:
+    if instance.banner and instance.has_changed('banner'):
         current_banner_path = instance.banner.path
 
         # Inclui os arquivos do StdImage

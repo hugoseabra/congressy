@@ -110,18 +110,22 @@ class ApplicationService(forms.Form):
         return self.manager_class
 
     def is_valid(self):
+        application_valid = super().is_valid()
+
+        if not application_valid:
+            return application_valid
+
         manager_valid = self.manager.is_valid()
         if not manager_valid:
             self.errors.update(self.manager.errors)
 
-        application_valid = super().is_valid()
+        self.clean_manager()
 
         return application_valid is True and manager_valid is True
 
-    def clean(self):
-        cleaned_data = super().clean()
-        cleaned_data.update(self.manager.cleaned_data)
-        return cleaned_data
+    def clean_manager(self):
+        self.cleaned_data.update(self.manager.cleaned_data)
+        return self.cleaned_data
 
     def save(self, commit=True):
         return self.manager.save(commit=commit)
