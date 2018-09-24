@@ -26,6 +26,8 @@ class Command(BaseCommand):
                                    minute=30)
 
     def handle(self, *args, **options):
+        
+        self.handle_manual_subscriptions()
 
         subscriptions = Subscription.objects.filter(
             event_id=self.event_pk,
