@@ -183,8 +183,8 @@
                                         <div class="row" id="zip_code_block">
                                             <div class="col-md-3">
                                                 {% render_generic_field form.zip_code required=True %}
-                                                <div id="cep_loader"
-                                                     style="width: 22px;position: absolute;top: 40px;right: 24px;">
+                                                <div id="cep_loader" class="cep-loader-hotsite"
+                                                >
                                                     <img src="{% static 'assets/img/loader.gif' %}"/>
                                                 </div>
                                             </div>
@@ -286,6 +286,7 @@
         $(document).ready(function () {
             var dateInput = $('#id_person-birth_date');
             if (dateInput.length) {
+                dateInput.attr('autocomplete', 'off');
                 var birthDate = createDatePicker(dateInput);
                 birthDate.data("DateTimePicker").minDate(false);
                 birthDate.data("DateTimePicker").useCurrent(false);

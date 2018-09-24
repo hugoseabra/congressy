@@ -4112,6 +4112,17 @@ label.valid {
 .panel i.fa-expand:hover {
   cursor: pointer;
 }
+.cep-loader-profile {
+  width: 22px;
+  position: absolute;
+  top: 48px;
+  right: 33px;
+}
+@media only screen and (max-width: 991px) {
+  .cep-loader-profile {
+    top: 28px;
+  }
+}
 ul.messenger-theme-flat .messenger-message.alert-success .messenger-message-inner:before {
   background: #449D44;
 }
