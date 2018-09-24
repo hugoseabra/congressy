@@ -12,7 +12,8 @@
 
 {% block styles %}
 
-    <link href="{% static "assets/plugins/croppie/croppie.css" %}" rel="stylesheet">
+    <link href="{% static "assets/plugins/croppie/croppie.css" %}"
+          rel="stylesheet">
 
     <style>
         .event-info-status-item {
@@ -96,163 +97,169 @@
         cgsy.maps = cgsy.maps || {};
         var croppie_obj = undefined;
 
-        (function ($, window) {
-            window.cgsy.maps.retrieveAddress = function () {
-                var name = $('#id_name');
-                var street = $('#id_street');
-                var city = $('#id_city_name :selected');
-                var state = $('#id_state :selected');
-                var zip_code = $('#id_zip_code');
 
-                var address = name.val();
-                {#                    address += ', ' + street.val();#}
-                {#                    address += ', ' + city.text();#}
-                {#                    address += ', ' + state.text();#}
-                {#                    address += '. ' + zip_code.val();#}
+            console.log(!$('#id_show_location').is(':checked'));
+            (function ($, window) {
 
-                var map = new window.google.maps.Map(
-                    document.getElementById("map"),
-                    {
-                        zoom: 18,
-                        center: {lat: 40.731, lng: -73.997}
-                    }
-                );
+                window.cgsy.maps.retrieveAddress = function () {
+                    console.log("Foi3");
+                    var name = $('#id_name');
+                    var street = $('#id_street');
+                    var city = $('#id_city_name :selected');
+                    var state = $('#id_state :selected');
+                    var zip_code = $('#id_zip_code');
 
-                window.cgsy.maps.searchByAddress(map, address);
-            };
+                    var address = name.val();
+                    {#                    address += ', ' + street.val();#}
+                    {#                    address += ', ' + city.text();#}
+                    {#                    address += ', ' + state.text();#}
+                    {#                    address += '. ' + zip_code.val();#}
 
-            window.cgsy.maps.hideMap = function () {
-                $('#map').hide();
-                $('#map_banner').show();
-            };
+                    var map = new window.google.maps.Map(
+                        document.getElementById("map"),
+                        {
+                            zoom: 18,
+                            center: {lat: 40.731, lng: -73.997}
+                        }
+                    );
 
-            window.cgsy.maps.showMap = function () {
-                $('#map').show();
-                $('#map_banner').hide();
-            };
+                    window.cgsy.maps.searchByAddress(map, address);
+                };
 
-            window.cgsy.maps.init = function (lat, long, zoom) {
-                $('#map-loader').show();
-                $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
+                window.cgsy.maps.hideMap = function () {
+                    $('#map').hide();
+                    $('#map_banner').show();
+                };
 
-                var map = new window.google.maps.Map(
-                    document.getElementById("map"),
-                    {
-                        center: {
-                            lat: parseFloat(lat),
-                            lng: parseFloat(long)
-                        },
-                        zoom: parseInt(zoom) || 18
-                    }
-                );
-                window.cgsy.maps.addMarker(
-                    map,
-                    {lat: parseFloat(lat), lng: parseFloat(long)}
-                );
-            };
+                window.cgsy.maps.showMap = function () {
+                    $('#map').show();
+                    $('#map_banner').hide();
+                };
 
-            window.cgsy.maps.setCenter = function (map, location) {
-                map.setCenter(location);
-            };
+                window.cgsy.maps.init = function (lat, long, zoom) {
+                    $('#map-loader').show();
+                    $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
 
-            window.cgsy.maps.addMarker = function (map, location) {
-                window.cgsy.maps.showMap();
+                    var map = new window.google.maps.Map(
+                        document.getElementById("map"),
+                        {
+                            center: {
+                                lat: parseFloat(lat),
+                                lng: parseFloat(long)
+                            },
+                            zoom: parseInt(zoom) || 18
+                        }
+                    );
+                    window.cgsy.maps.addMarker(
+                        map,
+                        {lat: parseFloat(lat), lng: parseFloat(long)}
+                    );
+                };
 
-                window.cgsy.maps.setCenter(map, location);
+                window.cgsy.maps.setCenter = function (map, location) {
+                    map.setCenter(location);
+                };
 
-                var marker = new window.google.maps.Marker({
-                    position: location,
-                    map: map,
-                    draggable: true
-                });
+                window.cgsy.maps.addMarker = function (map, location) {
+                    window.cgsy.maps.showMap();
 
-                var lat_el = $('#id_lat');
-                var lng_el = $('#id_long');
-                var zoom_el = $('#id_zoom');
+                    window.cgsy.maps.setCenter(map, location);
 
-                lat_el.val(marker.position.lat());
-                lng_el.val(marker.position.lng());
-                zoom_el.val(map.getZoom());
+                    var marker = new window.google.maps.Marker({
+                        position: location,
+                        map: map,
+                        draggable: true
+                    });
 
-                window.google.maps.event.addListener(marker, 'dragend', function () {
+                    var lat_el = $('#id_lat');
+                    var lng_el = $('#id_long');
+                    var zoom_el = $('#id_zoom');
+
                     lat_el.val(marker.position.lat());
                     lng_el.val(marker.position.lng());
-                });
-
-                window.google.maps.event.addListener(map, 'zoom_changed', function () {
                     zoom_el.val(map.getZoom());
-                });
 
-                $('#map-loader').hide();
-                $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
-            };
+                    window.google.maps.event.addListener(marker, 'dragend', function () {
+                        lat_el.val(marker.position.lat());
+                        lng_el.val(marker.position.lng());
+                    });
 
-            window.cgsy.maps.searchByAddress = function (map, address) {
-                $('#map-loader').show();
-                $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
+                    window.google.maps.event.addListener(map, 'zoom_changed', function () {
+                        zoom_el.val(map.getZoom());
+                    });
 
-                var geocoder = new window.google.maps.Geocoder;
-                geocoder.geocode({'address': address}, function (results, status) {
-                    if (status !== 'OK') {
-                        $('#map-loader').hide();
-                        $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
-                        $('#error-maps').show();
-                        $('#id_city_name').prop('disabled', false);
-                        return;
-                    }
-                    var components = results[0].address_components;
-                    if (components.length) {
-                        $('#error-maps').hide();
-                        var uf, city;
-                        $.each(components, function (i, component) {
-                            if ($.inArray('postal_code', component.types) != -1) {
-                                $('#id_zip_code').val(component.short_name);
-                                searchByCep();
-                            }
-                            if ($.inArray('sublocality_level_1', component.types) != -1) {
-                                $('#id_street').val(component.short_name);
-                            }
-                            if ($.inArray('street_number', component.types) != -1) {
-                                $('#id_number').val(component.short_name);
-                            }
-                            if ($.inArray('administrative_area_level_1', component.types) != -1) {
-                                uf = component.short_name;
-                            }
-                            if ($.inArray('administrative_area_level_2', component.types) != -1) {
-                                city = component.short_name.toUpperCase();
-                            }
-                        });
+                    $('#map-loader').hide();
+                    $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
+                };
 
-                        if (uf) {
-                            $('#id_state').val(uf);
+                window.cgsy.maps.searchByAddress = function (map, address) {
+                    if ($('#id_show_location').is(':checked') === true) {
+                        $('#map-loader').show();
+                        $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
 
-                            if (city) {
-                                fetch_cities($('#id_state'), null, function (results) {
-                                    if (!results.length) {
-                                        return;
+                        var geocoder = new window.google.maps.Geocoder;
+                        geocoder.geocode({'address': address}, function (results, status) {
+                            if (status !== 'OK') {
+                                $('#map-loader').hide();
+                                $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
+                                $('#error-maps').show();
+                                $('#id_city_name').prop('disabled', false);
+                                return;
+                            }
+                            var components = results[0].address_components;
+                            if (components.length) {
+                                $('#error-maps').hide();
+                                var uf, city;
+                                $.each(components, function (i, component) {
+                                    if ($.inArray('postal_code', component.types) != -1) {
+                                        $('#id_zip_code').val(component.short_name);
+                                        searchByCep();
                                     }
-                                    $.each(results, function (i, city_obj) {
-                                        if (city_obj.name == city) {
-                                            var options = $('#id_city_name').find('option:contains(' + city + ')');
-                                            $.each(options, function (ii, option) {
-                                                var el = $(option);
-                                                if (el.text() == city) {
-                                                    $('#id_city_name').val(city_obj.id);
+                                    if ($.inArray('sublocality_level_1', component.types) != -1) {
+                                        $('#id_street').val(component.short_name);
+                                    }
+                                    if ($.inArray('street_number', component.types) != -1) {
+                                        $('#id_number').val(component.short_name);
+                                    }
+                                    if ($.inArray('administrative_area_level_1', component.types) != -1) {
+                                        uf = component.short_name;
+                                    }
+                                    if ($.inArray('administrative_area_level_2', component.types) != -1) {
+                                        city = component.short_name.toUpperCase();
+                                    }
+                                });
+
+                                if (uf) {
+                                    $('#id_state').val(uf);
+
+                                    if (city) {
+                                        fetch_cities($('#id_state'), null, function (results) {
+                                            if (!results.length) {
+                                                return;
+                                            }
+                                            $.each(results, function (i, city_obj) {
+                                                if (city_obj.name == city) {
+                                                    var options = $('#id_city_name').find('option:contains(' + city + ')');
+                                                    $.each(options, function (ii, option) {
+                                                        var el = $(option);
+                                                        if (el.text() == city) {
+                                                            $('#id_city_name').val(city_obj.id);
+                                                        }
+                                                    });
                                                 }
                                             });
-                                        }
-                                    });
-                                });
+                                        });
+                                    }
+                                }
                             }
-                        }
+
+                            var location = results[0].geometry.location;
+                            window.cgsy.maps.addMarker(map, location);
+                        });
                     }
+                }
+            })(jQuery, window);
 
-                    var location = results[0].geometry.location;
-                    window.cgsy.maps.addMarker(map, location);
-                });
-            };
-
-        })(jQuery, window);
 
         function resize_status_block() {
             var form_height = $('#block-form').height();
@@ -512,7 +519,8 @@
                                 <div class="row text-center banner-loader"
                                      style="margin-top:20px; display: none">
                                     <h3>Processando, aguarde...</h3>
-                                    <i class="fas info-color fa-circle-notch fa-spin fa-6x" style="margin-top: 20px"></i>
+                                    <i class="fas info-color fa-circle-notch fa-spin fa-6x"
+                                       style="margin-top: 20px"></i>
                                 </div>
 
                                 <div class="row text-center banner">
@@ -733,71 +741,72 @@
                                     </div>
                                 </div>
                                 <div id="address">
-                                <div class="row name-row">
-                                    <div class="col-md-12 col-lg-8 col-xl-9">
-                                        {% render_generic_field form.name help_text='Pesquise pelo nome do local.' %}
-                                        <p id="error-maps" class="danger-color"
-                                           style="display: none">Local não
-                                            encontrado no Google Maps</p>
+                                    <div class="row name-row">
+                                        <div class="col-md-12 col-lg-8 col-xl-9">
+                                            {% render_generic_field form.name help_text='Pesquise pelo nome do local.' %}
+                                            <p id="error-maps"
+                                               class="danger-color"
+                                               style="display: none">Local não
+                                                encontrado no Google Maps</p>
 
-                                    </div>
-                                    <div class="col-md-12 col-lg-4 col-xl-3"
-                                         style="padding-left: 30px;padding-right: 30px">
-                                        <div class="hidden-xs hidden-sm hidden-md"
-                                             style="height:32px"></div>
-                                        <button id="reload-map-button"
-                                                type="button"
-                                                class="btn btn-sm btn-block btn-primary">
-                                            Buscar
-                                        </button>
-                                        <div class="hidden-lg"
-                                             style="height:32px"></div>
-                                    </div>
-                                </div>
-                                <div class="row address-row">
-                                    <div class="col-md-6 col-xl-4">
-                                        {% render_generic_field form.zip_code help_text='Informe o CEP para encontrar o endereço.' %}
-                                        <div id="cep_loader" style="width: 22px;position: absolute;
-                                             top: 33px;right: 33px;">
-                                            <img src="{% static 'assets/img/loader.gif' %}"/>
+                                        </div>
+                                        <div class="col-md-12 col-lg-4 col-xl-3"
+                                             style="padding-left: 30px;padding-right: 30px">
+                                            <div class="hidden-xs hidden-sm hidden-md"
+                                                 style="height:32px"></div>
+                                            <button id="reload-map-button"
+                                                    type="button"
+                                                    class="btn btn-sm btn-block btn-primary">
+                                                Buscar
+                                            </button>
+                                            <div class="hidden-lg"
+                                                 style="height:32px"></div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row address-row">
-                                    <div class="col-md-12">
-                                        {% render_generic_field form.street %}
+                                    <div class="row address-row">
+                                        <div class="col-md-6 col-xl-4">
+                                            {% render_generic_field form.zip_code help_text='Informe o CEP para encontrar o endereço.' %}
+                                            <div id="cep_loader" style="width: 22px;position: absolute;
+                                             top: 33px;right: 33px;">
+                                                <img src="{% static 'assets/img/loader.gif' %}"/>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row address-row">
-                                    <div class="col-md-6">
-                                        {% render_generic_field form.number %}
+                                    <div class="row address-row">
+                                        <div class="col-md-12">
+                                            {% render_generic_field form.street %}
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        {% render_generic_field form.complement %}
+                                    <div class="row address-row">
+                                        <div class="col-md-6">
+                                            {% render_generic_field form.number %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% render_generic_field form.complement %}
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row address-row">
-                                    <div class="col-md-12">
-                                        {% render_generic_field form.village %}
+                                    <div class="row address-row">
+                                        <div class="col-md-12">
+                                            {% render_generic_field form.village %}
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row address-row">
-                                    <div class="col-md-4 address-row">
-                                        {% render_generic_field form.state %}
+                                    <div class="row address-row">
+                                        <div class="col-md-4 address-row">
+                                            {% render_generic_field form.state %}
+                                        </div>
+                                        <div class="col-md-8 address-row">
+                                            {% render_generic_field form.city_name %}
+                                        </div>
                                     </div>
-                                    <div class="col-md-8 address-row">
-                                        {% render_generic_field form.city_name %}
+                                    <hr/>
+                                    <div class="text-center text-muted"
+                                         style="font-size:12px">
+                                        A Congressy não se responsabiliza pelos
+                                        dados de pesquisa advindos
+                                        do Google.
                                     </div>
-                                </div>
-                                <hr/>
-                                <div class="text-center text-muted"
-                                     style="font-size:12px">
-                                    A Congressy não se responsabiliza pelos
-                                    dados de pesquisa advindos
-                                    do Google.
                                 </div>
                             </div>
-                                </div>
                             <div class="col-md-6" id="map-block">
                                 <div id="map-loader"
                                      class="fas info-color fa-2x fa-circle-notch fa-spin"
@@ -838,11 +847,13 @@
 
 
 {% block modals %}
-    <div class="modal fade" id="edit_banner_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" id="edit_banner_modal" tabindex="-1" role="dialog"
+         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">
                         ×
                     </button>
                     <h3 class="modal-title">Editar banner: </h3>

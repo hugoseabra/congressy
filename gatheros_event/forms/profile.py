@@ -396,7 +396,10 @@ class ProfileForm(forms.ModelForm):
         avatar = self.data.get('avatar')
         if isinstance(avatar, ContentFile):
             self.instance.avatar = avatar
+        # Correção de erro ao editar não salvar cidade
 
+        city_id = self.data.get('city_name')
+        self.user.person.city_id = city_id
         self.instance.user = self.user
         self.instance.save()
 

@@ -97,17 +97,26 @@ function save_lot(url, data, msg) {
         url,
         'PATCH',
         data,
-        function (response) {
+        function () {
             Messenger().post({
                 message: msg,
                 type: 'success'
             });
             render_lot_list();
         },
+
         function (response) {
             console.error(response.responseJSON);
+            var msg = 'Não foi possivel processar salvamento de lote.';
+
+            if (response.status === 400) {
+                var obj = response.responseJSON;
+                var k = Object.keys(obj)[0];
+                msg = obj[k][0];
+            }
+
             Messenger().post({
-                message: 'Não foi possivel processar salvamento de lote.',
+                message: msg,
                 type: 'error'
             });
         }
@@ -122,9 +131,9 @@ function createAnchorEvents() {
 
 function publishLot(lot_id) {
     if (!confirm(
-            'Tem certeza que deseja publicar o lote? Ele será exibido' +
-            ' conforme as configurações de data inicial e final.'
-        )) {
+        'Tem certeza que deseja publicar o lote? Ele será exibido' +
+        ' conforme as configurações de data inicial e final.'
+    )) {
         return;
     }
     var data = {'active': true};
@@ -134,8 +143,8 @@ function publishLot(lot_id) {
 
 function unpublishLot(lot_id) {
     if (!confirm(
-            'Tem certeza que deseja despublicar o lote?.'
-        )) {
+        'Tem certeza que deseja despublicar o lote?.'
+    )) {
         return;
     }
     var data = {'active': false};

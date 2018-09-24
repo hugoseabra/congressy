@@ -111,7 +111,7 @@ class BaseSimpleEditlView(BaseEventView):
         return can_edit
 
     def get_success_url(self):
-        event = self.get_object()
+        event = self.get_event()
         url = reverse('event:event-panel', kwargs={'pk': event.pk})
         return url
 
@@ -182,11 +182,11 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
     success_message = 'Evento alterado com sucesso.'
 
     def get_form(self, form_class=None):
-        if not form_class:
-            form_class = self.form_class
+        form_class = self.form_class
 
         kwargs = self.get_form_kwargs()
         kwargs['lang'] = self.request.LANGUAGE_CODE
+        kwargs['instance'] = self.event
 
         return form_class(user=self.request.user, **kwargs)
 

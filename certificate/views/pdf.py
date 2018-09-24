@@ -4,17 +4,19 @@ import json
 import absoluteuri
 import requests
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.template import Template, Context
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views import generic
 
-from gatheros_subscription.models import Subscription
 from attendance.helpers.attendance import subscription_is_checked
+from gatheros_subscription.models import Subscription
 from .mixins import CertificateFeatureFlagMixin
 
 
@@ -93,11 +95,10 @@ class CertificatePDFView(CertificateFeatureFlagMixin):
             return False
 
         certificate_config = self.subscription.event.certificate
-        
+
         if certificate_config.only_attending_participantes:
 
             if not subscription_is_checked(self.subscription.pk):
-
                 self.permission_denied_message = "Certificado disponivel " \
                                                  "apenas participantes com " \
                                                  "presença confirmada!"
@@ -240,6 +241,28 @@ class CertificatePDFExampleView(CertificateFeatureFlagMixin):
 class CertificateManualView(CertificateFeatureFlagMixin,
                             generic.TemplateView):
     template_name = 'certificate/manual.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.pre_dispatch(request)
+
+        has_cert = False
+
+        try:
+            cert = self.event.certificate
+            if cert.is_ready:
+                has_cert = True
+        except ObjectDoesNotExist:
+            pass
+
+        if not has_cert:
+            messages.warning(request,
+                             "Evento não possui um certificado configurado!")
+            return redirect(
+                reverse_lazy('certificate:event-certificate-config', kwargs={
+                    'event_pk': self.event.pk
+                }))
+        
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
