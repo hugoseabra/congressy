@@ -111,7 +111,7 @@ class BaseSimpleEditlView(BaseEventView):
         return can_edit
 
     def get_success_url(self):
-        event = self.get_object()
+        event = self.get_event()
         url = reverse('event:event-panel', kwargs={'pk': event.pk})
         return url
 
