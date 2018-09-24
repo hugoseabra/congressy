@@ -7,37 +7,41 @@
     <link rel="stylesheet" href="{% static 'hotsite/css/magnific-popup-custom.css' %}">
 
     <style>
-    .is-sticky {
-        background-color: #222;
-        border-top: 1px solid #DDD;
-        top: 60px !important;
-{#        top: 74px !important;#}
-        left: 0 !important;
-        width: 100% !important;
-        z-index: 1;
-        text-align: center;
-    }
-    .is-sticky h3 {
-        padding: 0 0 10px 0;
-        margin: 0;
-        color: white;
-        font-weight: bold;
-        font-size: 22px
-    }
-    .is-sticky .subtitle {
-        color: white;
-    }
-    .is-sticky .subtitle.hide {
-        display: inline-block !important;
-    }
-    @media ( max-width: 991px ) {
         .is-sticky {
-            top: 80px !important;
+            background-color: #222;
+            border-top: 1px solid #DDD;
+            top: 60px !important;
+        {#        top: 74px !important;#} left: 0 !important;
+            width: 100% !important;
+            z-index: 1;
+            text-align: center;
         }
+
         .is-sticky h3 {
-            font-size: 18px
+            padding: 0 0 10px 0;
+            margin: 0;
+            color: white;
+            font-weight: bold;
+            font-size: 22px
         }
-    }
+
+        .is-sticky .subtitle {
+            color: white;
+        }
+
+        .is-sticky .subtitle.hide {
+            display: inline-block !important;
+        }
+
+        @media ( max-width: 991px ) {
+            .is-sticky {
+                top: 80px !important;
+            }
+
+            .is-sticky h3 {
+                font-size: 18px
+            }
+        }
     </style>
 {% endblock %}
 
@@ -68,16 +72,16 @@
                     {% block messages %}
                         {% if messages %}
                             <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                            {% for message in messages %}
-                                <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
-                                    <button type="button" class="close"
-                                            data-dismiss="alert"
-                                            aria-label="Close"><span
-                                            aria-hidden="true">&times;</span>
-                                    </button>
-                                    {{ message|capfirst }}
-                                </div>
-                            {% endfor %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
+                                        <button type="button" class="close"
+                                                data-dismiss="alert"
+                                                aria-label="Close"><span
+                                                aria-hidden="true">&times;</span>
+                                        </button>
+                                        {{ message|capfirst }}
+                                    </div>
+                                {% endfor %}
                             </div>
                         {% endif %}
                     {% endblock messages %}
@@ -104,20 +108,32 @@
                                         {{ wizard.management_form }}
 
                                         <br/>
-                                        {% if wizard.steps.prev %}
-                                            <button name="wizard_goto_step"
-                                                    type="submit"
-                                                    class="btn btn-primary"
-                                                    value="{{ wizard.steps.prev }}">
-                                                <i class="fas fa-chevron-circle-left"></i>
-                                                Voltar
-                                            </button>
-                                        {% endif %}
 
-                                        <button type="submit" class="btn btn-primary pull-right">
-                                            {% if is_last %}Finalizar{% else %}Próximo{% endif %}
-                                            <i class="fas fa-chevron-circle-right"></i>
-                                        </button>
+                                        <div class="wizard_next_btn">
+
+                                            {% if wizard.steps.prev %}
+                                                <button name="wizard_goto_step"
+                                                        type="submit"
+                                                        class="btn btn-primary"
+                                                        value="{{ wizard.steps.prev }}">
+                                                    <i class="fas fa-chevron-circle-left"></i>
+                                                    Voltar
+                                                </button>
+                                            {% endif %}
+
+                                            <button type="submit"
+                                                    onclick="next_page('optional_form'); return false;"
+                                                    class="btn btn-primary pull-right">
+                                                {% if is_last %}Finalizar{% else %}Próximo{% endif %}
+                                                <i class="fas fa-chevron-circle-right"></i>
+                                            </button>
+
+                                        </div>
+
+                                        <div class="wizard_next_loader text-center" style="display: none">
+                                            <i class="fas info-color fa-circle-notch fa-spin fa-2x" style="color: #1F7BB6;"></i>
+                                        </div>
+
                                     </form>
                                 </div>
                             </div>
