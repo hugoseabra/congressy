@@ -128,9 +128,12 @@
                 city_el.html($('<option>').text('Carregando...'));
                 submit.prop('disabled', true);
                 var that = $(this);
-                window.setTimeout(function () {
-                    fetch_cities($(that), city_el);
+                var disableButton = function () {
                     submit.prop('disabled', false);
+                };
+                window.setTimeout(function () {
+                    fetch_cities($(that), city_el, null, null, disableButton );
+
                 }, 500);
 
             });

@@ -49,9 +49,8 @@
     <script type="application/javascript">
 
         $(document).ready(function () {
-            $('#id_subscription-lot').on('change',function () {
+            $('#id_subscription-lot').on('change', function () {
                 $('#loader-person').show();
-
             });
             var dateInput = $('#id_person-birth_date');
             if (dateInput.length) {
@@ -78,6 +77,7 @@
             var uf_el = $('#id_person-state');
             var city_el = $('#id_person-city_name');
             var zip_code_el = $('#id_person-zip_code');
+
             zip_code_el.on('keyup', function () {
                 hotsiteSearchByCep();
             });
@@ -95,11 +95,17 @@
             $('#id_person-phone').mask("(99) 99999-9999");
             zip_code_el.mask("99999-999");
 
-            $('#id_state').change(function () {
+            $(uf_el).change(function () {
+                var submit = $('form').find(':submit');
                 city_el.html($('<option>').text('Carregando...'));
+                submit.prop('disabled', true);
+                var disableButton = function () {
+                     var submit = $('form').find(':submit');
+                    submit.prop('disabled', false);
+                };
                 var that = $(this);
                 window.setTimeout(function () {
-                    fetch_cities($(that), $('#id_city_name'));
+                    fetch_cities($(that), $('#id_city_name'), null, null, disableButton);
                 }, 500);
             });
 
