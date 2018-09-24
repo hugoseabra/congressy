@@ -48,6 +48,13 @@
         $(document).ready(function () {
             selectFromHash();
             createAnchorEvents();
+
+            $('#delete-btn').on("click", function () {
+                 $('.delete-modal-btns').hide();
+                 $('.delete-modal-loader').show();
+            });
+
+
         });
     </script>
 
@@ -189,25 +196,25 @@
 
                                             <thead>
 
-                                                <tr>
+                                            <tr>
 
-                                                    <th>Nome</th>
+                                                <th>Nome</th>
 
-                                                    <th class="hidden-xs hidden-sm">
-                                                        Tipo
-                                                    </th>
+                                                <th class="hidden-xs hidden-sm">
+                                                    Tipo
+                                                </th>
 
-                                                    <th class="hidden-xs hidden-sm">
-                                                        Inscrições
-                                                    </th>
+                                                <th class="hidden-xs hidden-sm">
+                                                    Inscrições
+                                                </th>
 
-                                                    <th>Preço</th>
+                                                <th>Preço</th>
 
-                                                    <th width="8%">Código</th>
+                                                <th width="8%">Código</th>
 
-                                                    <th width="3%"></th>
+                                                <th width="3%"></th>
 
-                                                </tr>
+                                            </tr>
 
                                             </thead>
 
@@ -216,7 +223,8 @@
                                             {% for lot in object_list %}
 
 
-                                                <tr {% if lot.status == lot.LOT_STATUS_RUNNING %} class="success"{% elif lot.status == lot.LOT_STATUS_FINISHED %} class="danger" {% endif %}>
+                                                <tr
+                                                        {% if lot.status == lot.LOT_STATUS_RUNNING %} class="success"{% elif lot.status == lot.LOT_STATUS_FINISHED %} class="danger" {% endif %}>
 
                                                     <td>
                                                         {% if lot.rsvp_restrict %}
@@ -334,6 +342,7 @@
 {% endblock %}
 
 {% block modals %}
+
     <!-- Lot survey Modal -->
     <div class="modal fade" id="survey-lot-form" tabindex="-1" role="dialog"
          aria-labelledby="survey-lot-form-title" aria-hidden="true">
@@ -510,7 +519,7 @@
     </div>
     <!-- / Lot Privacy Modal -->
 
-
+    <!-- Lot Delete Modal -->
     <div class="modal" id="lot-delete-modal" role="dialog"
          data-backdrop="true">
         <div class="modal-dialog " role="document">
@@ -534,18 +543,28 @@
 
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-success" type="submit">
-                            Confirmar
-                        </button>
 
-                        <button class="btn btn-danger"
-                                data-dismiss="modal">Voltar
-                        </button>
+                        <div class="text-center delete-modal-loader" style="display: none">
+                            <i class="fas info-color fa-circle-notch fa-spin fa-4x" style="margin-top: 5px"></i>
+                        </div>
+
+                        <div class="delete-modal-btns">
+
+                            <button class="btn btn-success" type="submit" id="delete-btn">
+                                Confirmar
+                            </button>
+
+                            <button class="btn btn-danger"
+                                    data-dismiss="modal">Voltar
+                            </button>
+
+                        </div>
 
                     </div>
                 </form>
             </div>
         </div>
     </div>
+    <!-- / Lot Delete Modal -->
 
 {% endblock %}
