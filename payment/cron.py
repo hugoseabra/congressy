@@ -34,17 +34,17 @@ class SubscriptionStatusIrregularityTestJob(CronJobBase):
         )
 
         if irregularities.count() > 0:
-            subs_pks = list()
+            sub_txt = '\n'
             for sub in irregularities:
-                subs_pks.append(sub.pk)
+                sub_txt += '    - Subscription pk: {} - ' \
+                           'Last Transaction pk: {}\n' \
+                           ''.format(sub.pk, sub.transactions.last().pk)
 
             msg1 = 'Inscrições pagas e não confirmadas: {}'.format(
-                len(subs_pks)
+                irregularities.count(),
             )
 
-            msg2 = "\n  - " + "\n  - ".join(
-                [str(sub_pk) for sub_pk in subs_pks]
-            )
+            msg2 = sub_txt
 
             sentry_log(
                 message=msg1 + msg2,
