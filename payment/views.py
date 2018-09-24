@@ -318,13 +318,17 @@ def postback_url_view(request, uidb64):
             'Validação do Integrador do status de inscrição a ser'
             ' registrado de acordo com status de transação:'
             ' {}'.format(subscription_status),
-            save=True
         )
-        transaction.subscription.save()
-
         transaction_log.add_message(
             'Preparando para atualizar inscrição - status: {}'.format(
                 subscription_status
+            ),
+            True
+        )
+        transaction.subscription.save()
+        transaction_log.add_message(
+            'Inscriçao atualizada com sucesso - status: {}'.format(
+                transaction.subscription.status
             ),
             True
         )
