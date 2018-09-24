@@ -438,11 +438,7 @@
             $('#id_person-country').on('change', function () {
                 set_if_international();
             });
-            var submit = $('form').find(':submit');
-            var disableButton = function () {
-                submit.prop('disabled', false);
-                console.log('foi');
-            };
+
             var id_city = $('#id_person-city');
             window.setTimeout(function () {
                 set_if_international();
@@ -452,12 +448,11 @@
                 {% endif %}
 
                 if (id_city.val()) {
-
                     $.ajax({
                         url: "/api/cities/" + id_city.val(),
                         success: function (result) {
                             console.log(result);
-                            hotsiteRepopulate_cities(result.uf, result.id, disableButton);
+                            hotsiteRepopulate_cities(result.uf, result.id);
                         },
                         error: function (err) {
                             throw err;
