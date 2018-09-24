@@ -115,6 +115,12 @@ class Subscription(models.Model, GatherosModelMixin):
     )
     created_by = models.PositiveIntegerField(verbose_name='criado por')
 
+    # Needed for compatibility with 1.5.x
+    attended = models.BooleanField(
+        default=False,
+        verbose_name='compareceu'
+    )
+
     code = models.CharField(
         max_length=15,
         blank=True,
@@ -131,6 +137,12 @@ class Subscription(models.Model, GatherosModelMixin):
         verbose_name='num. inscrição'
     )
 
+    # Needed for compatibility with 1.5.x
+    attended_on = models.DateTimeField(
+        verbose_name='confirmado em',
+        null=True,
+        blank=True
+    )
     created = models.DateTimeField(
         auto_now_add=True,
         verbose_name='criado em'
