@@ -89,6 +89,7 @@
                     </div>
                 {% endif %}
 
+
                 <div class="hero-features row">
 
 
@@ -136,15 +137,20 @@
 
                     </div>
 
-                    <div class="hero-features-right col-md-5"
-                         data-animation="fadeIn">
+                    {% if not ended %}
 
-                        {% include 'hotsite/subscription_simple_form.html' %}
+                        <div class="hero-features-right col-md-5"
+                             data-animation="fadeIn">
 
-                    </div>
+                            {% include 'hotsite/subscription_simple_form.html' %}
+
+                        </div>
+
+                    {% endif %}
 
 
                 </div>
+
 
             </div>
 
