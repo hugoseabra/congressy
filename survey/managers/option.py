@@ -37,9 +37,10 @@ class OptionManager(Manager):
 
         return question
 
-    def save(self, commit=True):
-        self.instance.value = self._create_slug()
-        return super().save(commit)
+    def clean(self):
+        cleaned_data = super().clean()
+        cleaned_data['value'] = self._create_slug()
+        return cleaned_data
 
     def _create_slug(self):
         """

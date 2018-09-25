@@ -180,7 +180,7 @@ class OrganizationAdmin(admin.ModelAdmin):
     Admin para Organization
     """
     search_fields = ('name',)
-    list_display = ('name', 'legal_name', 'active', 'internal')
+    list_display = ('name', 'legal_name', 'active')
     fieldsets = (
         (None, {
             'fields': (
@@ -189,7 +189,6 @@ class OrganizationAdmin(admin.ModelAdmin):
                 'description_html',
                 'avatar',
                 'active',
-                'internal',
             ),
         }),
         ('Site e Redes Sociais', {

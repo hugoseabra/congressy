@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
@@ -83,6 +85,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
 
         context['event_is_publishable'] = publishable
         context['unpublishable_reason'] = unpublishable_reason
+        context['ended'] = event.date_end < datetime.now()
 
         return context
 

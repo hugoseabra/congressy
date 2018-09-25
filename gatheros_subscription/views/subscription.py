@@ -593,25 +593,17 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
         survey_form = kwargs.pop('survey_form', None)
 
+        future_status = Lot.LOT_STATUS_NOT_STARTED
+        finished_status = Lot.LOT_STATUS_FINISHED
+        running_status = Lot.LOT_STATUS_RUNNING
+
         context = super().get_context_data(**kwargs)
-        context['running_lots'] = [
-            lot
-            for lot in self.get_lots()
-            if lot.status == lot.LOT_STATUS_RUNNING
-               or (self.subscription and self.subscription.lot == lot)
-        ]
-        context['stopped_lots'] = [
-            lot
-            for lot in self.get_lots()
-            if lot.status == lot.LOT_STATUS_FINISHED
-               or (self.subscription and self.subscription.lot == lot)
-        ]
-        context['future_lots'] = [
-            lot
-            for lot in self.get_lots()
-            if lot.status == lot.LOT_STATUS_NOT_STARTED
-               or (self.subscription and self.subscription.lot == lot)
-        ]
+        context['running_lots'] = \
+            self._get_lots_with_status(running_status)
+        context['stopped_lots'] = \
+            self._get_lots_with_status(finished_status)
+        context['future_lots'] = \
+            self._get_lots_with_status(future_status)
 
         if context['selected_lot'] != 0:
             try:
@@ -719,6 +711,15 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
         )
 
         return survey_form
+
+    def _get_lots_with_status(self, status):
+        lot_list = list()
+
+        for lot in self.get_lots().filter():
+            if lot.status == status:
+                lot_list.append(lot)
+
+        return lot_list
 
 
 class SubscriptionEditFormView(SubscriptionFormMixin):
@@ -1094,7 +1095,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
                 for transaction in subscription.transactions.all():
                     if transaction.status == transaction.WAITING_PAYMENT and \
-                                    transaction.type == 'boleto':
+                            transaction.type == 'boleto':
                         return True
 
         return False

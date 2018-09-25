@@ -287,8 +287,8 @@ function start_popover() {
             $('#id_person-cpf').mask("999.999.999-99");
             start_popover();
 
-            $(document).on("input", ".numeric", function() {
-                this.value = this.value.replace(/\D/g,'');
+            $(document).on("input", ".numeric", function () {
+                this.value = this.value.replace(/\D/g, '');
             });
 
             var institution_cnpj = $('#id_person-institution_cnpj');
@@ -297,13 +297,19 @@ function start_popover() {
             }
 
             var city_el = $('#id_person-city_name');
+            var submit = $('form').find(':submit');
 
             $('#id_person-state').change(function () {
                 city_el.html($('<option>').text('Carregando...'));
+                submit.prop('disabled', true);
+
+                var enableButton = function () {
+                    submit.prop('disabled', false);
+                };
 
                 var that = $(this);
                 window.setTimeout(function () {
-                    fetch_cities($(that), $('#id_person-city_name'), $('#id_person-city'));
+                    fetch_cities($(that), $('#id_person-city_name'), $('#id_person-city'), null, enableButton);
                 }, 500);
             });
 
