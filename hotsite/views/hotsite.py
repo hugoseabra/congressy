@@ -85,7 +85,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
 
         context['event_is_publishable'] = publishable
         context['unpublishable_reason'] = unpublishable_reason
-        context['ended'] = event.date_end > datetime.now()
+        context['state'] = self._get_state()
 
         return context
 
@@ -378,6 +378,20 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
                 pass
 
         return False
+
+    def _get_state(self):
+
+        event = self.current_event.event
+        now = datetime.now()
+
+        if event.date_end >= now:
+            return 'ended'
+
+        if event.date_start > now >= event.date_end:
+            return 'running'
+
+        if event.date_start > now:
+            return 'future'
 
 
 class UnpublishHotsiteView(generic.TemplateView):

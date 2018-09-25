@@ -102,7 +102,7 @@
                         {% endif %}
 
 
-                        {% if not ended %}
+                        {% if state == 'future' %}
 
                             {% if lots %}
                                 <ul class="icon-list">
@@ -138,17 +138,23 @@
 
                             {% endif %}
 
-                        {% else %}
+                        {% elif state == 'running ' %}
 
                             <p style="font-size: 20px;font-style: italic;">
                                 Evento em andamento, procure a secretaria para realizar inscrições!
+                            </p>
+                            
+                        {% elif state == 'ended' %}
+
+                            <p style="font-size: 20px;font-style: italic;">
+                                Evento já foi encerrado.
                             </p>
 
                         {% endif %}
 
                     </div>
 
-                    {% if not ended %}
+                    {% if state == 'future' %}
 
                         <div class="hero-features-right col-md-5"
                              data-animation="fadeIn">
