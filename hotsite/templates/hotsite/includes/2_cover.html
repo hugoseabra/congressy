@@ -102,7 +102,7 @@
                         {% endif %}
 
 
-                        {% if state == 'future' %}
+                        {% if event.future is True %}
 
                             {% if lots %}
                                 <ul class="icon-list">
@@ -138,13 +138,13 @@
 
                             {% endif %}
 
-                        {% elif state == 'running ' %}
+                        {% elif event.running is True %}
 
                             <p style="font-size: 20px;font-style: italic;">
                                 Evento em andamento, procure a secretaria para realizar inscrições!
                             </p>
                             
-                        {% elif state == 'ended' %}
+                        {% elif event.finished is True %}
 
                             <p style="font-size: 20px;font-style: italic;">
                                 Evento já foi encerrado.
@@ -154,7 +154,7 @@
 
                     </div>
 
-                    {% if state == 'future' %}
+                    {% if event.future is True %}
 
                         <div class="hero-features-right col-md-5"
                              data-animation="fadeIn">
