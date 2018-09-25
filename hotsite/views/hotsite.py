@@ -384,10 +384,10 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
         event = self.current_event.event
         now = datetime.now()
 
-        if event.date_end >= now:
+        if event.date_end < now:
             return 'ended'
 
-        if event.date_start > now >= event.date_end:
+        if event.date_start > now < event.date_end:
             return 'running'
 
         if event.date_start > now:
