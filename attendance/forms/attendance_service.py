@@ -31,26 +31,26 @@ class AttendanceServiceForm(forms.ModelForm):
         lc_pks = self.data.getlist('category_list', [])
         lc_pks = list(map(int, lc_pks))
         existing_cat_filters = []
-        for cat_filter in service.lot_category_filters.all():
-            if cat_filter.lot_category.pk in lc_pks:
-                existing_cat_filters.append(cat_filter.lot_category.pk)
-                continue
 
-            cat_filter.delete()
+        if lc_pks:
+            all_category_filters = service.lot_category_filters.all()
 
-        cat_filters = service.lot_category_filters
+            for cat_filter in all_category_filters:
+                if cat_filter.lot_category.pk not in lc_pks:
+                    existing_cat_filters.append(cat_filter.lot_category.pk)
 
-        for cf in cat_filters.exclude(lot_category__pk__in=lc_pks):
-            cf.delete()
+            lc_pks = list(
+                filter(lambda x: x not in existing_cat_filters, lc_pks))
 
-        for lot_category in LotCategory.objects.filter(pk__in=lc_pks):
-            if lot_category.pk in existing_cat_filters:
-                continue
+            for lot_category in LotCategory.objects.filter(pk__in=lc_pks):
+                AttendanceCategoryFilter.objects.create(
+                    attendance_service=service, lot_category=lot_category)
 
-            AttendanceCategoryFilter.objects.create(
-                attendance_service=service,
-                lot_category=lot_category
-            )
+        else:
+            for lot_category in LotCategory.objects.filter(
+                    event_id=service.event_id):
+                AttendanceCategoryFilter.objects.create(
+                    attendance_service=service, lot_category=lot_category)
 
     def save(self, commit=True):
         service = super().save(commit)
