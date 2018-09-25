@@ -113,7 +113,7 @@ class SubscriptionViewMixin(TemplateNameableMixin,
 
     def get_lots(self):
         return self.get_event().lots.filter(
-            internal=False
+            internal=False,
         ).order_by('date_end', 'name')
 
     def get_num_lots(self):
@@ -755,6 +755,37 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
                 form = self.get_survey_form(survey,
                                             subscription=self.subscription)
                 context['survey_form'] = form
+
+        context['stopped_lots'] = [
+            lot
+            for lot in self.get_lots()
+            if lot.status == lot.LOT_STATUS_FINISHED
+        ]
+        context['running_lots'] = [
+            lot
+            for lot in self.get_lots()
+            if lot.status == lot.LOT_STATUS_RUNNING
+        ]
+        context['future_lots'] = [
+            lot
+            for lot in self.get_lots()
+            if lot.status == lot.LOT_STATUS_NOT_STARTED
+        ]
+
+        if context['selected_lot'] != 0:
+            try:
+
+                lot_pk = context['selected_lot']
+
+                lot = Lot.objects.get(pk=lot_pk)
+                if lot.event_survey:
+                    if survey_form:
+                        context['survey_form'] = survey_form
+                    else:
+                        survey = lot.event_survey.survey
+                        context['survey_form'] = self.get_survey_form(survey)
+            except Lot.DoesNotExist:
+                pass
 
         return context
 
