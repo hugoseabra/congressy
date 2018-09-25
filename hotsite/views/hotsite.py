@@ -85,7 +85,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
 
         context['event_is_publishable'] = publishable
         context['unpublishable_reason'] = unpublishable_reason
-        context['ended'] = event.date_end < datetime.now()
+        context['ended'] = event.date_end > datetime.now()
 
         return context
 
