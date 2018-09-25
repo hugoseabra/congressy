@@ -59,7 +59,6 @@
             }
 
 
-
             var checkboxes = $('#survey_questions_block input[type=checkbox]');
 
             checkboxes.iCheck({
@@ -106,7 +105,7 @@
                 searchByCep();
             });
 
-            window.setTimeout(function() {
+            window.setTimeout(function () {
                 // Starting select2
                 $('#id_subscription-lot').select2({
                     theme: "bootstrap4",
@@ -181,10 +180,13 @@
                                     {% if stopped_lots %}
                                         <optgroup label="Encerrados">
                                             {% for lot in stopped_lots %}
-                                                <option value="{{ lot.pk }}"
+                                                <option value=""
+                                                        disabled="disabled"
                                                         {% if selected_lot and selected_lot == lot.pk %}selected="selected"{% endif %}>
                                                     {{ lot.display_publicly|truncatechars:60 }} - até: {{ lot.date_end|date:'d/m/Y H\hi' }}
-                                                    {% if lot.private %}<small>(privado)</small>{% endif %}
+                                                    {% if lot.private %}
+                                                        <small>(privado)</small>
+                                                    {% endif %}
                                                 </option>
                                             {% endfor %}
                                         </optgroup>
