@@ -1,5 +1,5 @@
 from gatheros_subscription.models import Subscription
-
+from attendance.models import AttendanceService
 
 def subscription_is_checked(subscription_pk):
 
@@ -30,3 +30,21 @@ def subscription_is_checked(subscription_pk):
             return False
 
     return True
+
+
+def get_all_attended_in_event(attendance_pk):
+    attendance = AttendanceService.objects.get(pk=attendance_pk)
+
+    queryset = Subscription.objects.filter(
+        event_id=attendance.event_id,
+        checkins__attendance_service__pk=attendance_pk,
+        status=Subscription.CONFIRMED_STATUS,
+        completed=True, test_subscription=False,
+    )
+
+    if attendance.checkout_enabled is False:
+        queryset.filter(
+            checkins__checkout__isnull=True,
+        )
+
+    return queryset
