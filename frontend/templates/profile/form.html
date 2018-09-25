@@ -28,7 +28,6 @@
 
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script type="application/javascript">
-        {#console.log("teste" + {{ person.city.uf }});#}
         var croppie_obj;
 
         // Functions
@@ -97,6 +96,8 @@
         $(document).ready(function () {
             var uf_el = $('#id_state');
             var city_el = $('#id_city_name');
+            var submit = $('form').find(':submit');
+
             var zip_el = $('#id_zip_code');
             var cpf_el = $('#id_cpf');
             var cnpj_el = $('#id_institution_cnpj');
@@ -125,10 +126,16 @@
 
             uf_el.change(function () {
                 city_el.html($('<option>').text('Carregando...'));
+                submit.prop('disabled', true);
                 var that = $(this);
+                var disableButton = function () {
+                    submit.prop('disabled', false);
+                };
                 window.setTimeout(function () {
-                    fetch_cities($(that), city_el);
+                    fetch_cities($(that), city_el, null, null, disableButton );
+
                 }, 500);
+
             });
 
             city_el.change(function () {
@@ -322,9 +329,8 @@
                         <div class="row">
                             <div class="col-md-3">
                                 {% render_generic_field form.zip_code %}
-                                <div id="cep_loader"
-                                     style="width: 22px;position: absolute;
-                                     top: 33px;right: 33px;">
+                                <div id="cep_loader" class="cep-loader-profile"
+                                     >
                                     <img src="{% static 'assets/img/loader.gif' %}"/>
                                 </div>
                             </div>
