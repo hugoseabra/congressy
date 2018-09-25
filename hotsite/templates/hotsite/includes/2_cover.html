@@ -89,6 +89,7 @@
                     </div>
                 {% endif %}
 
+
                 <div class="hero-features row">
 
 
@@ -100,51 +101,73 @@
                             </p>
                         {% endif %}
 
-                        {% if lots %}
-                            <ul class="icon-list">
-                                {% for lot in lots %}
-                                    {% if lot.status != lot.LOT_STATUS_NOT_STARTED %}
-                                        <li>
+
+                        {% if state == 'future' %}
+
+                            {% if lots %}
+                                <ul class="icon-list">
+                                    {% for lot in lots %}
+                                        {% if lot.status != lot.LOT_STATUS_NOT_STARTED %}
+                                            <li>
                                         <span class="icon-list-icon "
                                               data-animation="bounceIn"
                                               {% if lot.status == lot.LOT_STATUS_FINISHED %}style="background-color:#515050"{% endif %}>
                                             <strong>{{ forloop.counter }}</strong>
                                         </span>
-                                            <h4 class="icon-list-title">
-                                                <strong {% if lot.status == lot.LOT_STATUS_FINISHED %}style="text-decoration: line-through"{% endif %}>
-                                                    {{ lot.display_publicly }}
-                                                </strong>
-                                            </h4>
-                                            <p>
-                                                <small class="text-muted">{{ lot.get_period }}</small>
-                                            </p>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        {% elif private_lots %}
+                                                <h4 class="icon-list-title">
+                                                    <strong {% if lot.status == lot.LOT_STATUS_FINISHED %}style="text-decoration: line-through"{% endif %}>
+                                                        {{ lot.display_publicly }}
+                                                    </strong>
+                                                </h4>
+                                                <p>
+                                                    <small class="text-muted">{{ lot.get_period }}</small>
+                                                </p>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% elif private_lots %}
+
+                                <p style="font-size: 20px;font-style: italic;">
+                                    Este é um evento restrito a convidados.</p>
+                            {% else %}
+
+                                <p style="font-size: 20px;font-style: italic;">
+                                    Nenhum lote disponivel no momento.
+                                </p>
+
+                            {% endif %}
+
+                        {% elif state == 'running ' %}
 
                             <p style="font-size: 20px;font-style: italic;">
-                                Este é um evento restrito a convidados.</p>
-                        {% else %}
+                                Evento em andamento, procure a secretaria para realizar inscrições!
+                            </p>
+                            
+                        {% elif state == 'ended' %}
 
                             <p style="font-size: 20px;font-style: italic;">
-                                Nenhum lote disponivel no momento.
+                                Evento já foi encerrado.
                             </p>
 
                         {% endif %}
 
                     </div>
 
-                    <div class="hero-features-right col-md-5"
-                         data-animation="fadeIn">
+                    {% if state == 'future' %}
 
-                        {% include 'hotsite/subscription_simple_form.html' %}
+                        <div class="hero-features-right col-md-5"
+                             data-animation="fadeIn">
 
-                    </div>
+                            {% include 'hotsite/subscription_simple_form.html' %}
+
+                        </div>
+
+                    {% endif %}
 
 
                 </div>
+
 
             </div>
 

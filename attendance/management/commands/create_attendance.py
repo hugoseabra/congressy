@@ -45,6 +45,8 @@ class Command(BaseCommand):
         if process in self.accepts:
             attendance_service = AttendanceService.objects.create(
                 event_id=self.event_pk,
+                name="Credenciamento",
+                with_certificate=True,
             )
 
             for sub in subscriptions:
@@ -52,12 +54,14 @@ class Command(BaseCommand):
                     'Processando inscrição: {}'
                     ' '.format(sub.pk)
                 ))
+
                 checkin = Checkin.objects.create(
                     created_by="Nathan (Congressy)",
                     created_on=self.manual_checkin_time,
                     attendance_service_id=attendance_service.pk,
-                    subscription=sub
+                    subscription=sub,
                 )
+
                 self.stdout.write(self.style.SUCCESS(
                     'Criado checkin: {}\n'.format(checkin.pk)
                 ))

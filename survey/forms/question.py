@@ -77,7 +77,6 @@ class QuestionForm(forms.Form):
     def __init__(self, survey, instance=None, **kwargs):
         self.survey = survey
         self.question = None
-        self.options_list = []
 
         super().__init__(**kwargs)
         self.service = QuestionService(instance=instance, **kwargs)
@@ -97,8 +96,13 @@ class QuestionForm(forms.Form):
 
             if options is not None:
                 self.question = self.service.save()
+                all_existing_options = self.question.options.all()
 
                 option_list = options.splitlines()
+
+                for option in all_existing_options:
+                    if option.name not in option_list:
+                        option.delete()
 
                 for option in option_list:
 
@@ -110,28 +114,18 @@ class QuestionForm(forms.Form):
 
                     option_service = OptionService(data=option_data)
                     if not option_service.is_valid():
-                        # self.question.delete()
+
                         for key, err in option_service.errors.items():
                             raise forms.ValidationError(
                                 "Problema ao salvar uma opção:"
                                 " {}".format(_(err[0]))
                             )
                     else:
-                        self.options_list.append(option_service)
+                        option_service.save(commit=True)
 
         return cleaned_data
 
     def save(self):
-
-        if self.options_list:
-
-            all_existing_options = self.question.options.all()
-
-            for option in all_existing_options:
-                option.delete()
-
-            for option in self.options_list:
-                option.save()
 
         if self.question is None and self.service.is_valid():
             self.question = self.service.save()

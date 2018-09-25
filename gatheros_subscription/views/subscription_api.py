@@ -19,7 +19,7 @@ class SubscriptionSearchViewSet(generics.ListAPIView):
             self.query = request.GET.get('query')
 
         response = super().get(request, *args, **kwargs)
-        for item in response.data:
+        for item in response.data['results']:
             item['has_certificate'] = subscription_is_checked(item['pk'])
 
         return response
