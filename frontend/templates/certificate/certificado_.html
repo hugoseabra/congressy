@@ -131,11 +131,15 @@
                             text-align: justify;"
                          id="cert-date">
                         {% language 'pt-br' %}
-                            {% if has_city %}
+
+
+                            {% if object.event_has_city %}
                                 {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
-                            {% elif has_location %}
-                                {{ object.event_location }},{{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
+                            {% else %}
+                                {{ object.event_location }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
                             {% endif %}
+
+
                         {% endlanguage %}
                     </div>
                 {% endif %}
