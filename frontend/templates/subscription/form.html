@@ -59,7 +59,8 @@
             }
 
 
-            var checkboxes = $('input[type=checkbox]');
+
+            var checkboxes = $('#survey_questions_block input[type=checkbox]');
 
             checkboxes.iCheck({
                 checkboxClass: 'icheckbox_flat-grey',
@@ -377,7 +378,7 @@
                             <div class="panel-body">
 
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-12" id="survey_questions_block">
                                         {% for field in survey_form.visible_fields %}
                                             {% render_generic_field field %}
                                         {% endfor %}
