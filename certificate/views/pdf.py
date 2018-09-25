@@ -161,7 +161,7 @@ class CertificatePDFExampleView(CertificateFeatureFlagMixin):
         )
 
     def get_context_data(self):
-        context = {}
+        context = super().get_context_data()
 
         if self.event.certificate.background_image:
             image_url = self.event.certificate.background_image.default.path
@@ -181,6 +181,7 @@ class CertificatePDFExampleView(CertificateFeatureFlagMixin):
 
         context['certificate'] = self.event.certificate
         context['text'] = self.get_text()
+
         return context
 
     def get_text(self):
