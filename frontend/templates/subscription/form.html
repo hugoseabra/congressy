@@ -7,12 +7,15 @@
 {% load form_config_tags %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'assets/plugins/icheck/css/all.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/icheck/css/all.css' %}">
 
     <!-- Select2 lib -->
-    <link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
     <!-- Select2 theme -->
-    <link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2-bootstrap4.min.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/select2/css/select2-bootstrap4.min.css' %}">
 
     <link rel="stylesheet"
           href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
@@ -46,6 +49,9 @@
     <script type="application/javascript">
 
         $(document).ready(function () {
+            $('#id_subscription-lot').on('change', function () {
+                $('#loader-person').show();
+            });
 
             var dateInput = $('#id_person-birth_date');
             if (dateInput.length) {
@@ -59,7 +65,7 @@
             }
 
 
-            var checkboxes = $('input[type=checkbox]');
+            var checkboxes = $('#survey_questions_block input[type=checkbox]');
 
             checkboxes.iCheck({
                 checkboxClass: 'icheckbox_flat-grey',
@@ -72,6 +78,7 @@
             var uf_el = $('#id_person-state');
             var city_el = $('#id_person-city_name');
             var zip_code_el = $('#id_person-zip_code');
+
             zip_code_el.on('keyup', function () {
                 hotsiteSearchByCep();
             });
@@ -89,11 +96,17 @@
             $('#id_person-phone').mask("(99) 99999-9999");
             zip_code_el.mask("99999-999");
 
-            $('#id_state').change(function () {
+            $(uf_el).change(function () {
+                var submit = $('form').find(':submit');
                 city_el.html($('<option>').text('Carregando...'));
+                submit.prop('disabled', true);
+                var disableButton = function () {
+                     var submit = $('form').find(':submit');
+                    submit.prop('disabled', false);
+                };
                 var that = $(this);
                 window.setTimeout(function () {
-                    fetch_cities($(that), $('#id_city_name'));
+                    fetch_cities($(that), $('#id_city_name'), null, null, disableButton);
                 }, 500);
             });
 
@@ -105,13 +118,12 @@
                 searchByCep();
             });
 
-            window.setTimeout(function() {
-                // Starting select2
-                $('#id_subscription-lot').select2({
-                    theme: "bootstrap4",
-                    width: 'resolve'
-                });
-            }, 200);
+            // Starting select2
+            $('#id_subscription-lot').select2({
+                theme: "bootstrap4",
+                width: 'resolve'
+            });
+
         });
 
     </script>
@@ -119,7 +131,8 @@
 {% endblock %}
 
 {% block content %}
-    <form action="" method="post" class="skip-submition-check" name="subscription_form" enctype="multipart/form-data">
+    <form action="" method="post" class="skip-submition-check"
+          name="subscription_form" enctype="multipart/form-data">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -133,25 +146,27 @@
             {{ hidden_field }}
         {% endfor %}
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="buttonbar">
-                    <div class="float-right">
-                        <a href="{% url 'subscription:subscription-list' event.pk %}"
-                           class="btn btn-danger">
-                            <i class="fas fa-times-circle"></i>
-                            Cancelar
-                        </a>
+        {% if  selected_lot != 0 %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="buttonbar">
+                        <div class="float-right">
+                            <a href="{% url 'subscription:subscription-list' event.pk %}"
+                               class="btn btn-danger">
+                                <i class="fas fa-times-circle"></i>
+                                Cancelar
+                            </a>
 
-                        <button type="submit" class="btn btn-success">
-                            <i class="fa fa-save"></i>
-                            Salvar
-                        </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa fa-save"></i>
+                                Salvar
+                            </button>
+                        </div>
+                        <div class="clearfix"></div>
                     </div>
-                    <div class="clearfix"></div>
                 </div>
             </div>
-        </div>
+        {% endif %}
         <div class="row">
             <div class="col-md-12">
                 <div class="panel panel-primary">
@@ -180,10 +195,13 @@
                                     {% if stopped_lots %}
                                         <optgroup label="Encerrados">
                                             {% for lot in stopped_lots %}
-                                                <option value="{{ lot.pk }}"
+                                                <option value=""
+                                                        disabled="disabled"
                                                         {% if selected_lot and selected_lot == lot.pk %}selected="selected"{% endif %}>
                                                     {{ lot.display_publicly|truncatechars:60 }} - até: {{ lot.date_end|date:'d/m/Y H\hi' }}
-                                                    {% if lot.private %}<small>(privado)</small>{% endif %}
+                                                    {% if lot.private %}
+                                                        <small>(privado)</small>
+                                                    {% endif %}
                                                 </option>
                                             {% endfor %}
                                         </optgroup>
@@ -215,10 +233,19 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="row text-center" id="loader-person"
+                             style="margin-top:20px;display: none">
+                            <h3>Processando, aguarde...</h3>
+                            <i class="fas info-color fa-circle-notch fa-spin
+                        fa-6x" style="margin-top: 20px"></i>
+                        </div>
                     </div>
+
                 </div>
             </div>
+
         </div>
+
         {% if selected_lot %}
 
             <div class="row">
@@ -330,7 +357,8 @@
                                     <div class="col-md-3">
                                         {% render_generic_field form.zip_code %}
                                         <div id="cep_loader"
-                                             style="width: 22px;position: absolute;top: 32px;right: 31px;">
+                                             class="cep-loader-profile"
+                                        >
                                             <img src="{% static 'assets/img/loader.gif' %}"/>
                                         </div>
                                     </div>
@@ -377,7 +405,7 @@
                             <div class="panel-body">
 
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-12" id="survey_questions_block">
                                         {% for field in survey_form.visible_fields %}
                                             {% render_generic_field field %}
                                         {% endfor %}
@@ -392,25 +420,27 @@
 
 
         {% endif %}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="buttonbar bottom">
-                    <div class="float-right">
-                        <a href="{% url 'subscription:subscription-list' event.pk %}"
-                           class="btn btn-danger">
-                            <i class="fas fa-times-circle"></i>
-                            Cancelar
-                        </a>
+        {% if selected_lot != 0 %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="buttonbar bottom">
+                        <div class="float-right">
+                            <a href="{% url 'subscription:subscription-list' event.pk %}"
+                               class="btn btn-danger">
+                                <i class="fas fa-times-circle"></i>
+                                Cancelar
+                            </a>
 
-                        <button type="submit" class="btn btn-success">
-                            <i class="fa fa-save"></i>
-                            Salvar
-                        </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa fa-save"></i>
+                                Salvar
+                            </button>
+                        </div>
+                        <div class="clearfix"></div>
                     </div>
-                    <div class="clearfix"></div>
                 </div>
             </div>
-        </div>
+        {% endif %}
     </form>
 {% endblock %}
 

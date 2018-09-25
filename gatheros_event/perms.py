@@ -108,7 +108,7 @@ def member_is_admin_and_internal(user_obj, organization=None):
     :param organization: Instância de organização
     :return: bool
     """
-    if not organization.internal:
+    if not organization or not organization.internal:
         return False
 
     person = Person.objects.get(user=user_obj)
@@ -117,8 +117,6 @@ def member_is_admin_and_internal(user_obj, organization=None):
     is_member_active = organization and organization.is_member_active(person)
 
     return is_auth and is_admin and is_member_active
-
-
 
 
 def member_is_member(user_obj, organization):

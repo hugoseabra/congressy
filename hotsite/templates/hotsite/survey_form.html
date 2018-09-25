@@ -87,23 +87,31 @@
                                             {% endfor %}
 
                                             <br>
+                                            <div class="wizard_next_btn">
+                                                {% if wizard.steps.prev %}
+                                                    <button name="wizard_goto_step"
+                                                            id="wizard_goto_step"
+                                                            type="submit"
+                                                            class="btn btn-primary"
+                                                            value="{{ wizard.steps.prev }}">
+                                                        <i class="fas fa-chevron-circle-left"></i>
+                                                        Voltar
+                                                    </button>
+                                                {% endif %}
 
-                                            {% if wizard.steps.prev %}
-                                                <button name="wizard_goto_step"
-                                                        id="wizard_goto_step"
-                                                        type="submit"
-                                                        class="btn btn-primary"
-                                                        value="{{ wizard.steps.prev }}">
-                                                    <i class="fas fa-chevron-circle-left"></i>
-                                                    Voltar
+                                                <button type="submit"
+                                                        onclick="next_page('survey_form'); return false;"
+                                                        class="btn btn-primary pull-right">
+                                                    {% if is_last %}Finalizar{% else %}Próximo{% endif %}
+                                                    <i class="fas fa-chevron-circle-right"></i>
                                                 </button>
-                                            {% endif %}
+                                            </div>
 
-                                            <button type="submit"
-                                                    class="btn btn-primary pull-right">
-                                                {% if is_last %}Finalizar{% else %}Próximo{% endif %}
-                                                <i class="fas fa-chevron-circle-right"></i>
-                                            </button>
+                                            <div class="wizard_next_loader text-center" style="display: none">
+                                                <i class="fas info-color fa-circle-notch fa-spin fa-2x" style="color: #1F7BB6;"></i>
+                                            </div>
+
+
                                         </form>
 
 

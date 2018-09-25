@@ -2249,3 +2249,15 @@ body.enable-preloader.preloader-dark #jpreLoader {
 	top: -59px;
 	z-index: 10000;
 }
+
+.cep-loader-hotsite {
+    width: 22px;
+    position: absolute;
+    top: 51px;
+    right: 24px;
+}
+@media ( max-width: 991px ) {
+    .cep-loader-hotsite{
+        top: 31px;
+  }
+}
