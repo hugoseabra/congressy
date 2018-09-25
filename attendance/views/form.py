@@ -71,17 +71,6 @@ class AddAttendanceServiceView(BaseAttendanceServiceView, generic.CreateView):
     form_title = 'Nova lista de checkin'
     object = None
 
-    def post(self, request, *args, **kwargs):
-        self.object = None
-        form = self.get_form()
-        if not form.is_valid():
-            return self.render_to_response(self.get_context_data(
-                form=form,
-            ))
-
-        self.object = form.save()
-        return self.form_valid(form)
-
     def get_success_url(self):
         return reverse(
             'attendance:attendance',

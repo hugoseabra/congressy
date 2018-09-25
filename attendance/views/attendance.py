@@ -7,7 +7,7 @@ from attendance.models import (
     Checkin,
 )
 from gatheros_event.helpers import reports
-from gatheros_event.models import Event
+from attendance.helpers.attendance import get_all_attended_in_event
 from gatheros_subscription.models import Subscription
 from .mixins import AttendanceFeatureFlagMixin
 
@@ -107,22 +107,19 @@ class AttendanceDashboardView(AttendanceFeatureFlagMixin, generic.DetailView):
             'attendances': self.get_attendances(),
             'search_by': self.search_by,
             'confirmed': self.get_number_confirmed(),
-            'number_attendances': self.get_number_attendances(),
+            'number_attendances': get_all_attended_in_event(
+                self.object.pk).count(),
             'total_subscriptions': self.get_number_subscription(),
             'reports': self.get_report()
         })
         return context
 
     def get_attendances(self):
-        if self.attendances:
-            return self.attendances[0:5]
-
-        self.attendances = Checkin.objects.filter(
+        list = Checkin.objects.filter(
             attendance_service=self.object,
             checkout__isnull=True
         ).order_by('-created_on')
-
-        return self.attendances[0:5]
+        return list[0:5]
 
     def get_category_filter(self):
         if self.category_ids:
@@ -138,20 +135,6 @@ class AttendanceDashboardView(AttendanceFeatureFlagMixin, generic.DetailView):
             self.category_ids.append(category['lot_category_id'])
 
         return self.category_ids
-
-    def get_number_attendances(self):
-        queryset = Subscription.objects.filter(
-            status=Subscription.CONFIRMED_STATUS,
-            completed=True, test_subscription=False,
-            event=self.event
-        )
-
-        queryset = queryset.filter(
-            checkins__attendance_service__pk=self.object.pk,
-            checkins__checkout__isnull=True,
-        )
-
-        return queryset.count()
 
     def get_number_subscription(self):
 

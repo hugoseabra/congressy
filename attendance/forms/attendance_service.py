@@ -27,34 +27,42 @@ class AttendanceServiceForm(forms.ModelForm):
 
         return AttendanceCategoryFilter.objects.filter(pk__in=category_pks)
 
-    def __create_lot_category_filters(self, service):
+    def _create_lot_category_filters(self, service):
+        print('gfdfhgsfad')
         lc_pks = self.data.getlist('category_list', [])
         lc_pks = list(map(int, lc_pks))
         existing_cat_filters = []
-        for cat_filter in service.lot_category_filters.all():
-            if cat_filter.lot_category.pk in lc_pks:
-                existing_cat_filters.append(cat_filter.lot_category.pk)
-                continue
 
-            cat_filter.delete()
+        if lc_pks:
+            for cat_filter in service.lot_category_filters.all():
+                if cat_filter.lot_category.pk in lc_pks:
+                    existing_cat_filters.append(cat_filter.lot_category.pk)
+                    continue
 
-        cat_filters = service.lot_category_filters
+                cat_filter.delete()
 
-        for cf in cat_filters.exclude(lot_category__pk__in=lc_pks):
-            cf.delete()
+            cat_filters = service.lot_category_filters
 
-        for lot_category in LotCategory.objects.filter(pk__in=lc_pks):
-            if lot_category.pk in existing_cat_filters:
-                continue
+            for cf in cat_filters.exclude(lot_category__pk__in=lc_pks):
+                cf.delete()
 
-            AttendanceCategoryFilter.objects.create(
-                attendance_service=service,
-                lot_category=lot_category
-            )
+            for lot_category in LotCategory.objects.filter(pk__in=lc_pks):
+                if lot_category.pk in existing_cat_filters:
+                    continue
+
+                AttendanceCategoryFilter.objects.create(
+                    attendance_service=service,
+                    lot_category=lot_category
+                )
+        else:
+            for lot_category in LotCategory.objects.filter(event_id=service.event_id):
+                AttendanceCategoryFilter.objects.create(
+                    attendance_service=service,
+                    lot_category=lot_category
+                )
 
     def save(self, commit=True):
         service = super().save(commit)
-
-        self.__create_lot_category_filters(service=service)
+        self._create_lot_category_filters(service=service)
 
         return service
