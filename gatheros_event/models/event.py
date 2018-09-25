@@ -333,8 +333,16 @@ class Event(models.Model, GatherosModelMixin):
         return self.organization.associates.count() > 0
 
     @property
+    def future(self):
+        return self.status == Event.EVENT_STATUS_NOT_STARTED
+
+    @property
     def running(self):
         return self.status == Event.EVENT_STATUS_RUNNING
+
+    @property
+    def finished(self):
+        return self.status == Event.EVENT_STATUS_FINISHED
 
     @property
     def allow_internal_subscription(self):
