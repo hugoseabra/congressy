@@ -290,71 +290,114 @@
       <widgets ref="109" width="2136" height="1193"/>
     </overrides>
   </widgets>
-  <widgets xsi:type="model:Master" id="113" x="168" y="168" height="589" measuredWidth="600" measuredHeight="589">
+  <widgets xsi:type="model:Master" id="113" x="176" y="156" height="733" measuredWidth="600" measuredHeight="733">
     <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Content.screen#Modal"/>
     <overrides>
-      <widgets ref="100" text="Novo Lote"/>
-      <widgets ref="102" height="488" text="&#xA;"/>
-      <widgets ref="94" height="589"/>
-      <widgets ref="98" y="510"/>
-      <widgets ref="104" y="533"/>
-      <widgets ref="106" y="533" text="Salvar"/>
+      <widgets ref="100" text="Novo Categoria"/>
+      <widgets ref="102" height="632" text="&#xA;"/>
+      <widgets ref="94" height="733"/>
+      <widgets ref="98" y="654"/>
+      <widgets ref="104" y="677"/>
+      <widgets ref="106" y="677" text="Salvar"/>
     </overrides>
   </widgets>
-  <widgets xsi:type="model:Master" id="116" x="334" y="300" measuredWidth="288" measuredHeight="40">
-    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Input%20Group%20Button%20Prefix"/>
-    <overrides>
-      <widgets ref="83" y="2" noText="true">
-        <attributes key="icon" value="assets/fa-calendar-alt (small)"/>
+  <widgets xsi:type="model:WidgetGroup" id="150" x="330" y="220" measuredWidth="292" measuredHeight="489">
+    <widgets xsi:type="model:WidgetGroup" id="140" measuredWidth="292" measuredHeight="247">
+      <widgets xsi:type="model:Master" id="117" x="3" measuredWidth="167" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="Nome da categoria:"/>
+        </overrides>
       </widgets>
-      <widgets ref="84" x="31"/>
-    </overrides>
-  </widgets>
-  <widgets xsi:type="model:Master" id="117" x="334" y="269" measuredWidth="191" measuredHeight="32">
-    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h4.%20Heading"/>
-    <overrides>
-      <widgets ref="9" text="Data de Inicio do lote: "/>
-    </overrides>
-  </widgets>
-  <widgets xsi:type="model:Master" id="121" x="334" y="391" measuredWidth="288" measuredHeight="40">
-    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Input%20Group%20Button%20Prefix"/>
-    <overrides>
-      <widgets ref="83" y="2" noText="true">
-        <attributes key="icon" value="assets/fa-calendar-alt (small)"/>
+      <widgets xsi:type="model:Master" id="122" y="88" measuredWidth="197" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="Descrição da categoria:"/>
+        </overrides>
       </widgets>
-      <widgets ref="84" x="31"/>
+      <widgets xsi:type="model:Master" id="124" y="170" measuredWidth="160" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="Número de vagas: "/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="130" x="1" y="207" measuredWidth="291" measuredHeight="40">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Input%20Group%20Button"/>
+        <overrides>
+          <widgetChanges xsi:type="o:Delete" ref="87"/>
+          <widgets ref="86" width="291"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="132" x="1" y="34" measuredWidth="291" measuredHeight="40">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Input%20Group%20Button"/>
+        <overrides>
+          <widgetChanges xsi:type="o:Delete" ref="87"/>
+          <widgets ref="86" width="291"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="133" x="1" y="119" measuredWidth="291" measuredHeight="40">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Input%20Group%20Button"/>
+        <overrides>
+          <widgetChanges xsi:type="o:Delete" ref="87"/>
+          <widgets ref="86" width="291"/>
+        </overrides>
+      </widgets>
+    </widgets>
+    <widgets xsi:type="model:Master" id="135" y="352" measuredWidth="158" measuredHeight="32">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+      <overrides>
+        <widgets ref="9" text="Tipo de categoria: "/>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Master" id="136" x="2" y="385" height="40" measuredWidth="288" measuredHeight="40">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button%20Group%20XSmall"/>
+      <overrides>
+        <widgets ref="13" width="288" height="29" text="Paga, Gratuita">
+          <items ref="@items.1" text="Paga"/>
+          <items ref="@items.2" text="Gratuita"/>
+          <itemChanges xsi:type="o:Delete" ref="@items.0"/>
+        </widgets>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Master" id="138" x="1" y="298" measuredWidth="289" measuredHeight="40">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Select"/>
+      <overrides>
+        <widgets ref="24" width="289" text="- - - - - - -&#xA;"/>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Master" id="139" x="2" y="263" measuredWidth="225" measuredHeight="32">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+      <overrides>
+        <widgets ref="9" text="Formulário Personalizado: "/>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Master" id="144" y="423" measuredWidth="134" measuredHeight="32">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+      <overrides>
+        <widgets ref="9" text="Repassar taxa:  "/>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Master" id="146" x="2" y="449" height="40" measuredWidth="288" measuredHeight="40">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button%20Group%20XSmall"/>
+      <overrides>
+        <widgets ref="13" width="288" height="29" text="Sim, Não">
+          <items ref="@items.1" text="Sim"/>
+          <items ref="@items.2" text="Não"/>
+          <itemChanges xsi:type="o:Delete" ref="@items.0"/>
+        </widgets>
+      </overrides>
+    </widgets>
+  </widgets>
+  <widgets xsi:type="model:Master" id="151" x="331" y="752" measuredWidth="289" measuredHeight="40">
+    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Select"/>
+    <overrides>
+      <widgets ref="24" width="289" text="- - - - - - - "/>
     </overrides>
   </widgets>
-  <widgets xsi:type="model:Master" id="122" x="334" y="360" measuredWidth="264" measuredHeight="32">
+  <widgets xsi:type="model:Master" id="152" x="331" y="711" measuredWidth="235" measuredHeight="32">
     <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h4.%20Heading"/>
     <overrides>
-      <widgets ref="9" text="Data de encerramento do lote: "/>
-    </overrides>
-  </widgets>
-  <widgets xsi:type="model:Master" id="124" x="332" y="447" measuredWidth="168" measuredHeight="32">
-    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h4.%20Heading"/>
-    <overrides>
-      <widgets ref="9" text="Limite de inscrições"/>
-    </overrides>
-  </widgets>
-  <widgets xsi:type="model:Master" id="125" x="332" y="539" measuredWidth="58" measuredHeight="32">
-    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h4.%20Heading"/>
-    <overrides>
-      <widgets ref="9" text="Preço:"/>
-    </overrides>
-  </widgets>
-  <widgets xsi:type="model:Master" id="130" x="332" y="478" measuredWidth="291" measuredHeight="40">
-    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Input%20Group%20Button"/>
-    <overrides>
-      <widgetChanges xsi:type="o:Delete" ref="87"/>
-      <widgets ref="86" width="291"/>
-    </overrides>
-  </widgets>
-  <widgets xsi:type="model:Master" id="131" x="332" y="579" measuredWidth="291" measuredHeight="40">
-    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Input%20Group%20Button"/>
-    <overrides>
-      <widgetChanges xsi:type="o:Delete" ref="87"/>
-      <widgets ref="86" width="291"/>
+      <widgets ref="9" text="Assumir Juros de Parcelas:  "/>
     </overrides>
   </widgets>
   <hRuler>
