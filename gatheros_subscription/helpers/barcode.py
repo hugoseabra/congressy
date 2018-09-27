@@ -15,7 +15,7 @@ def create_barcode(subscription):
     )
     code.writer.set_options(dict(dpi=130))
     code.default_writer_options['write_text'] = False
-    options = dict(compress=True)
+    options = dict(compress=True, quiet_zone=1, module_height=5.0)
 
     tmp_dir = os.path.join(gettempdir(), 'barcodes')
     if not os.path.exists(tmp_dir):
@@ -24,7 +24,7 @@ def create_barcode(subscription):
     barcode_path = os.path.join(tmp_dir, '{}.png'.format(subscription.code))
 
     if not os.path.isfile(barcode_path):
-        barcode_path = code.save(barcode_path, options)
+        barcode_path = code.save(barcode_path[0:-4], options)
 
     with open(barcode_path, 'rb') as f:
         read_data = f.read()
