@@ -441,15 +441,12 @@ pipeline:
     ]
     commands:
       - export VERSION="`cat ./version`"
-      - echo ;
       - echo "Updating Sentry Project: Congressy v1"
       - echo "New Release: congressy/cgsy:$${VERSION}"
-      - echo ;
       - echo "SENTRY_BASE_URL: https://bugs.congressy.com"
       - echo "SENTRY_ORG_ALIAS: sentry"
       - echo "VERSION: $${VERSION}"
       - echo "COMMIT_SHA: ${COMMIT_SHA}"
-      - echo ; echo ;
 #      - docker run --rm byrnedo/alpine-curl https://bugs.congressy.com/api/0/organizations/sentry/releases/ -X POST -H "Authorization: Bearer $${SENTRY_RELEASE_API_TOKEN}" -H "Content-Type: application/json" -d "{\"version\":\"$${VERSION}\",\"refs\":[{\"repository\":\"congressy/cgsy\",\"commit\":\"${COMMIT_SHA}\"}],\"projects\":[\"congressy-v1\"]}" | python -m json.tool
     when:
       status: [ success ]
