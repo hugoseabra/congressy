@@ -20,6 +20,7 @@ INSTALLED_APPS += [
     'certificate',
     'raffle',
     'importer',
+    'attendance',
     'service_tags',
 ]
 # ========================= SERVER CONFIGURATION ============================ #
