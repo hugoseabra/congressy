@@ -16,8 +16,6 @@ services:
   cron:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     depends_on:
-      - migration
-      - volume
       - wkhtmltopdf
     entrypoint:
       - /services/cron/container-entry.sh
@@ -33,8 +31,6 @@ services:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
     depends_on:
-      - migration
-      - volume
       - redis
       - wkhtmltopdf
     networks:
@@ -56,7 +52,6 @@ services:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
     depends_on:
-      - migration
       - redis
     networks:
       - redis
@@ -76,8 +71,6 @@ services:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
     depends_on:
-      - migration
-      - volume
       - redis
       - wkhtmltopdf
     networks:
