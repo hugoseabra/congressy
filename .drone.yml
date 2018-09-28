@@ -590,10 +590,10 @@ pipeline:
         target: ssh_key
     script:
       - ~/awsecr/01_create-awsecr-container.sh
-      - ~/cgsy/scripts/04_download_images.sh
-      - ~/cgsy/scripts/05_run_migration.sh
-      - ~/cgsy/scripts/06_run_volume.sh
-      - ~/cgsy/scripts/07_deploy-latest-image.sh
+      - ~/cgsy/scripts/prod/04_download_images.sh
+      - ~/cgsy/scripts/prod/05_run_migration.sh
+      - ~/cgsy/scripts/prod/06_run_volume.sh
+      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
     when:
       branch: [ master ]
 
@@ -610,10 +610,10 @@ pipeline:
         target: ssh_key
     script:
       - ~/awsecr/01_create-awsecr-container.sh
-      - ~/cgsy/scripts/04_download_images.sh
-      - ~/cgsy/scripts/05_run_migration.sh
-      - ~/cgsy/scripts/06_run_volume.sh
-      - ~/cgsy/scripts/07_deploy-latest-image.sh
+      - ~/cgsy/scripts/prod/04_download_images.sh
+      - ~/cgsy/scripts/prod/05_run_migration.sh
+      - ~/cgsy/scripts/prod/06_run_volume.sh
+      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
     when:
       branch: [ master ]
 
