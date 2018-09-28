@@ -101,7 +101,10 @@ class QuestionForm(forms.Form):
                 option_list = options.splitlines()
 
                 for option in all_existing_options:
-                    if option.name not in option_list:
+
+                    if option.name in option_list:
+                        option_list.remove(option.name)
+                    elif option.name not in option_list:
                         option.delete()
 
                 for option in option_list:
