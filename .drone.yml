@@ -230,13 +230,11 @@ pipeline:
     when:
       branch: [ master ]
 
-  prepare-production-server:
+  prepare-production-server-DEBIAN:
     image: appleboy/drone-ssh
     pull: true
     host:
       - 172.31.45.193
-      - 172.31.38.91
-      - 172.31.40.208
     username: admin
     port: 22
     secrets:
@@ -328,13 +326,108 @@ pipeline:
     when:
       branch: [ master ]
 
-  tranfer-stackfile-awsecr:
+  prepare-production-server-EC2-AWS:
+    image: appleboy/drone-ssh
+    pull: true
+    host:
+      - 172.31.38.91
+#      - 172.31.40.208
+    username: ec2-user
+    port: 22
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: ssh_key
+      - source: AWS_KEY
+        target: AWS_KEY
+      - source: AWS_SECRET
+        target: AWS_SECRET
+      - source: AWS_ACCOUNT_ID
+        target: AWS_ACCOUNT_ID
+      - source: DOMAIN_MANAGE
+        target: DOMAIN_MANAGE
+      - source: DOMAIN_PARTNER
+        target: DOMAIN_PARTNER
+      - source: DOMAIN_ADMIN
+        target: DOMAIN_ADMIN
+      - source: FORCE_HTTPS
+        target: FORCE_HTTPS
+      - source: BUCKET_LOCATION
+        target: BUCKET_LOCATION
+      - source: BUCKET_NAME
+        target: BUCKET_NAME
+      - source: DBHOST
+        target: DBHOST
+      - source: DBUSER
+        target: DBUSER
+      - source: DBPASS
+        target: DBPASS
+      - source: DBNAME
+        target: DBNAME
+      - source: DBPORT
+        target: DBPORT
+      - source: SENTRY_PUBLIC_DSN
+        target: SENTRY_PUBLIC_DSN
+      - source: SENTRY_PRIVATE_DSN
+        target: SENTRY_PRIVATE_DSN
+    envs: [
+      congressy_deploy,
+      aws_key,
+      aws_secret,
+      aws_account_id,
+      domain_manage,
+      domain_partner,
+      domain_admin,
+      force_https,
+      bucket_location,
+      bucket_name,
+      dbhost,
+      dbuser,
+      dbpass,
+      dbname,
+      dbport,
+      sentry_public_dsn,
+      sentry_private_dsn
+    ]
+    script:
+      - mkdir -p ~/awsecr
+      # env-file do awsecr
+      - echo "AWS_KEY=$${AWS_KEY}" > ~/awsecr/env-awsecr
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/awsecr/env-awsecr
+      - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ~/awsecr/env-awsecr
+      - echo "AWS_REGION=us-east-1" >> ~/awsecr/env-awsecr
+      - echo "AWS_FORMAT=json" >> ~/awsecr/env-awsecr
+
+      - mkdir -p ~/cgsy
+      # env-file do stack de produção - common
+      - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
+      - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> ~/cgsy/env-file
+      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ~/cgsy/env-file
+      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ~/cgsy/env-file
+      - echo "DBHOST=$${DBHOST}" >> ~/cgsy/env-file
+      - echo "DBUSER=$${DBUSER}" >> ~/cgsy/env-file
+      - echo "DBPASS=$${DBPASS}" >> ~/cgsy/env-file
+      - echo "DBNAME=$${DBNAME}" >> ~/cgsy/env-file
+      - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
+      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
+      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
+      # env-file do stack de produção - manage
+      - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.prod" > ~/cgsy/env-manage-file
+      - echo "DOMAIN=$${DOMAIN_MANAGE}" >> ~/cgsy/env-manage-file
+      # env-file do stack de produção - partner
+      - echo "DJANGO_SETTINGS_MODULE=project.partner.settings.prod" > ~/cgsy/env-partner-file
+      - echo "DOMAIN=$${DOMAIN_PARTNER}" >> ~/cgsy/env-partner-file
+      # env-file do stack de produção - admin_intranet
+      - echo "DJANGO_SETTINGS_MODULE=project.admin_intranet.settings.prod" > ~/cgsy/env-admin_intranet-file
+      - echo "DOMAIN=$${DOMAIN_ADMIN}" >> ~/cgsy/env-admin_intranet-file
+    when:
+      branch: [ master ]
+
+  tranfer-stackfile-awsecr-DEBIAN:
     image: drillster/drone-rsync
     pull: true
     host:
       - 172.31.45.193
-      - 172.31.38.91
-      - 172.31.40.208
     port: 22
     user: admin
     source: ./bin/env/prod/01_create-awsecr-container.sh
@@ -345,13 +438,27 @@ pipeline:
     when:
       branch: [ master ]
 
-  transfer-previous-version-file:
+  tranfer-stackfile-awsecr-EC2-AWS:
+    image: drillster/drone-rsync
+    pull: true
+    host:
+      - 172.31.38.91
+#      - 172.31.40.208
+    port: 22
+    user: ec2-user
+    source: ./bin/env/prod/01_create-awsecr-container.sh
+    target: ~/awsecr/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  transfer-previous-version-file-DEBIAN:
     image: drillster/drone-rsync
     pull: true
     host:
       - 172.31.45.193
-      - 172.31.38.91
-      - 172.31.40.208
     port: 22
     user: admin
     source: ./bin/env/prod/previous_version
@@ -362,13 +469,29 @@ pipeline:
     when:
       branch: [ master ]
 
-  transfer-build-version-file:
+  transfer-previous-version-file-EC2-AWS:
+    image: drillster/drone-rsync
+    pull: true
+    host:
+      - 172.31.38.91
+#      - 172.31.40.208
+    port: 22
+    user: ec2-user
+    source: ./bin/env/prod/previous_version
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  transfer-build-version-file-DEBIAN:
     image: drillster/drone-rsync
     pull: true
     host:
       - 172.31.45.193
       - 172.31.38.91
-      - 172.31.40.208
+#      - 172.31.40.208
     port: 22
     user: admin
     source: ./version
@@ -379,13 +502,27 @@ pipeline:
     when:
       branch: [ master ]
 
-  tranfer-stackfile-production-server:
+  transfer-build-version-file-EC2-AWS:
+    image: drillster/drone-rsync
+    pull: true
+    host:
+      - 172.31.38.91
+#      - 172.31.40.208
+    port: 22
+    user: ec2-user
+    source: ./version
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  tranfer-stackfile-production-server-DEBIAN:
     image: drillster/drone-rsync
     pull: true
     host:
       - 172.31.45.193
-      - 172.31.38.91
-      - 172.31.40.208
     port: 22
     user: admin
     source: ./conf/deploy/docker-compose.yml
@@ -396,13 +533,27 @@ pipeline:
     when:
       branch: [ master ]
 
-  tranfer-deploy-script:
+  tranfer-stackfile-production-server-EC2-AWS:
+    image: drillster/drone-rsync
+    pull: true
+    host:
+      - 172.31.38.91
+#      - 172.31.40.208
+    port: 22
+    user: ec2-user
+    source: ./conf/deploy/docker-compose.yml
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  tranfer-deploy-script-DEBIAN:
     image: drillster/drone-rsync
     pull: true
     host:
       - 172.31.45.193
-      - 172.31.38.91
-      - 172.31.40.208
     port: 22
     user: admin
     source: ./bin/env/prod/04_deploy-latest-image.sh
@@ -413,12 +564,45 @@ pipeline:
     when:
       branch: [ master ]
 
-  deploy-latest-version:
+  tranfer-deploy-script-EC2-AWS:
+    image: drillster/drone-rsync
+    pull: true
+    host:
+      - 172.31.38.91
+#      - 172.31.40.208
+    port: 22
+    user: ec2-user
+    source: ./bin/env/prod/04_deploy-latest-image.sh
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  deploy-latest-version-DEBIAN:
     image: appleboy/drone-ssh
     pull: true
     host:
       - 172.31.45.193
     username: admin
+    port: 22
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: ssh_key
+    script:
+      - ~/awsecr/01_create-awsecr-container.sh
+      - ~/cgsy/04_deploy-latest-image.sh
+    when:
+      branch: [ master ]
+
+  deploy-latest-version-EC2-AWS:
+    image: appleboy/drone-ssh
+    pull: true
+    host:
+      - 172.31.38.91
+#      - 172.31.40.208
+    username: ec2-user
     port: 22
     secrets:
       - source: CONGRESSY_DEPLOY
