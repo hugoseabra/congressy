@@ -734,10 +734,7 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
 
         if self.storage.current_step == 'person':
 
-            try:
-                config = self.event.formconfig
-            except AttributeError:
-                config = FormConfig()
+            config = self.current_event.form_config
 
             if is_paid_event(self.current_event.event):
                 config.email = True

@@ -31,8 +31,9 @@ class CurrentEventState(object):
         return None
 
     def _get_form_config(self):
-        if hasattr(self.event, 'form_config') and self.event.info is not None:
-            return self.event.form_config
+        has_form_config = hasattr(self.event, 'formconfig')
+        if has_form_config and self.event.formconfig is not None:
+            return self.event.formconfig
 
         return FormConfig(event=self.event)
 
