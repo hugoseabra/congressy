@@ -626,8 +626,8 @@ pipeline:
       - echo "SENTRY_BASE_URL = https://bugs.congressy.com"
       - echo "SENTRY_ORG_ALIAS = sentry"
       - echo "VERSION = $${VERSION}"
-      - echo "COMMIT_SHA = ${COMMIT_SHA}"
-      - docker run --rm byrnedo/alpine-curl https://bugs.congressy.com/api/0/organizations/sentry/releases/ -X POST -H "Authorization:Bearer $${SENTRY_RELEASE_API_TOKEN}" -H "Content-Type:application/json" -d "{\"version\":\"$${VERSION}\",\"refs\":[{\"repository\":\"congressy/cgsy\",\"commit\":\"${COMMIT_SHA}\"}],\"projects\":[\"congressy-v1\"]}"
+      - echo "COMMIT_SHA = ${DRONE_COMMIT_SHA}"
+      - docker run --rm byrnedo/alpine-curl https://bugs.congressy.com/api/0/organizations/sentry/releases/ -X POST -H "Authorization:Bearer $${SENTRY_RELEASE_API_TOKEN}" -H "Content-Type:application/json" -d "{\"version\":\"$${VERSION}\",\"refs\":[{\"repository\":\"congressy/cgsy\",\"commit\":\"${DRONE_COMMIT_SHA}\"}],\"projects\":[\"congressy-v1\"]}"
     when:
       status: [ success ]
       branch: [ master ]
