@@ -581,7 +581,7 @@ pipeline:
   deploy-latest-version-DEBIAN:
     image: appleboy/drone-ssh
     pull: true
-    hosts:
+    host:
       - 172.31.45.193
     username: admin
     port: 22
@@ -597,7 +597,7 @@ pipeline:
   deploy-latest-version-EC2-AWS:
     image: appleboy/drone-ssh
     pull: true
-    hosts:
+    host:
       - 172.31.38.91
       - 172.31.40.208
     username: ec2-user
@@ -627,7 +627,7 @@ pipeline:
       - echo "SENTRY_ORG_ALIAS = sentry"
       - echo "VERSION = $${VERSION}"
       - echo "COMMIT_SHA = ${COMMIT_SHA}"
-      - docker run --rm byrnedo/alpine-curl https://bugs.congressy.com/api/0/organizations/sentry/releases/ -X POST -H "Authorization:Bearer $${SENTRY_RELEASE_API_TOKEN}" -H "Content-Type:application/json" -d "{\"version\":\"$${VERSION}\",\"refs\":[{\"repository\":\"congressy/cgsy\",\"commit\":\"${COMMIT_SHA}\"}],\"projects\":[\"congressy-v1\"]}" | python -m json.tool
+      - docker run --rm byrnedo/alpine-curl https://bugs.congressy.com/api/0/organizations/sentry/releases/ -X POST -H "Authorization:Bearer $${SENTRY_RELEASE_API_TOKEN}" -H "Content-Type:application/json" -d "{\"version\":\"$${VERSION}\",\"refs\":[{\"repository\":\"congressy/cgsy\",\"commit\":\"${COMMIT_SHA}\"}],\"projects\":[\"congressy-v1\"]}"
     when:
       status: [ success ]
       branch: [ master ]
