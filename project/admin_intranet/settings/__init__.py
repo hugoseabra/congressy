@@ -5,15 +5,12 @@ from project.base_settings import *
 ROOT_URLCONF = 'project.admin_intranet.urls'
 # ================================= APPS ==================================== #
 INSTALLED_APPS += [
-    'admin_intranet',
     'gatheros_event',
     'gatheros_subscription',
     'gatheros_front',
     'mailer',
     'payment_debt',
     'payment',
-    'partner',
-    'hotsite',
     'survey',
     'addon',
     'associate',
@@ -22,6 +19,9 @@ INSTALLED_APPS += [
     'certificate',
     'raffle',
     'importer',
+    'attendance',
+    'service_tags',
+    'admin_intranet',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'
