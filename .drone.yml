@@ -331,7 +331,7 @@ pipeline:
     pull: true
     host:
       - 172.31.38.91
-#      - 172.31.40.208
+      - 172.31.40.208
     username: ec2-user
     port: 22
     secrets:
@@ -443,7 +443,7 @@ pipeline:
     pull: true
     hosts:
       - 172.31.38.91
-#      - 172.31.40.208
+      - 172.31.40.208
     port: 22
     user: ec2-user
     source: ./bin/env/prod/01_create-awsecr-container.sh
@@ -474,7 +474,7 @@ pipeline:
     pull: true
     hosts:
       - 172.31.38.91
-#      - 172.31.40.208
+      - 172.31.40.208
     port: 22
     user: ec2-user
     source: ./bin/env/prod/previous_version
@@ -490,8 +490,6 @@ pipeline:
     pull: true
     hosts:
       - 172.31.45.193
-      - 172.31.38.91
-#      - 172.31.40.208
     port: 22
     user: admin
     source: ./version
@@ -507,7 +505,7 @@ pipeline:
     pull: true
     hosts:
       - 172.31.38.91
-#      - 172.31.40.208
+      - 172.31.40.208
     port: 22
     user: ec2-user
     source: ./version
@@ -538,7 +536,7 @@ pipeline:
     pull: true
     hosts:
       - 172.31.38.91
-#      - 172.31.40.208
+      - 172.31.40.208
     port: 22
     user: ec2-user
     source: ./conf/deploy/docker-compose.yml
@@ -569,7 +567,7 @@ pipeline:
     pull: true
     hosts:
       - 172.31.38.91
-#      - 172.31.40.208
+      - 172.31.40.208
     port: 22
     user: ec2-user
     source: ./bin/env/prod/04_deploy-latest-image.sh
@@ -601,7 +599,7 @@ pipeline:
     pull: true
     hosts:
       - 172.31.38.91
-#      - 172.31.40.208
+      - 172.31.40.208
     username: ec2-user
     port: 22
     secrets:
