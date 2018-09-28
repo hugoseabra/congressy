@@ -426,7 +426,7 @@ pipeline:
   tranfer-stackfile-awsecr-DEBIAN:
     image: drillster/drone-rsync
     pull: true
-    host:
+    hosts:
       - 172.31.45.193
     port: 22
     user: admin
@@ -441,7 +441,7 @@ pipeline:
   tranfer-stackfile-awsecr-EC2-AWS:
     image: drillster/drone-rsync
     pull: true
-    host:
+    hosts:
       - 172.31.38.91
 #      - 172.31.40.208
     port: 22
@@ -457,7 +457,7 @@ pipeline:
   transfer-previous-version-file-DEBIAN:
     image: drillster/drone-rsync
     pull: true
-    host:
+    hosts:
       - 172.31.45.193
     port: 22
     user: admin
@@ -472,7 +472,7 @@ pipeline:
   transfer-previous-version-file-EC2-AWS:
     image: drillster/drone-rsync
     pull: true
-    host:
+    hosts:
       - 172.31.38.91
 #      - 172.31.40.208
     port: 22
@@ -488,7 +488,7 @@ pipeline:
   transfer-build-version-file-DEBIAN:
     image: drillster/drone-rsync
     pull: true
-    host:
+    hosts:
       - 172.31.45.193
       - 172.31.38.91
 #      - 172.31.40.208
@@ -505,7 +505,7 @@ pipeline:
   transfer-build-version-file-EC2-AWS:
     image: drillster/drone-rsync
     pull: true
-    host:
+    hosts:
       - 172.31.38.91
 #      - 172.31.40.208
     port: 22
@@ -521,7 +521,7 @@ pipeline:
   tranfer-stackfile-production-server-DEBIAN:
     image: drillster/drone-rsync
     pull: true
-    host:
+    hosts:
       - 172.31.45.193
     port: 22
     user: admin
@@ -536,7 +536,7 @@ pipeline:
   tranfer-stackfile-production-server-EC2-AWS:
     image: drillster/drone-rsync
     pull: true
-    host:
+    hosts:
       - 172.31.38.91
 #      - 172.31.40.208
     port: 22
@@ -552,7 +552,7 @@ pipeline:
   tranfer-deploy-script-DEBIAN:
     image: drillster/drone-rsync
     pull: true
-    host:
+    hosts:
       - 172.31.45.193
     port: 22
     user: admin
@@ -567,7 +567,7 @@ pipeline:
   tranfer-deploy-script-EC2-AWS:
     image: drillster/drone-rsync
     pull: true
-    host:
+    hosts:
       - 172.31.38.91
 #      - 172.31.40.208
     port: 22
@@ -583,7 +583,7 @@ pipeline:
   deploy-latest-version-DEBIAN:
     image: appleboy/drone-ssh
     pull: true
-    host:
+    hosts:
       - 172.31.45.193
     username: admin
     port: 22
@@ -599,7 +599,7 @@ pipeline:
   deploy-latest-version-EC2-AWS:
     image: appleboy/drone-ssh
     pull: true
-    host:
+    hosts:
       - 172.31.38.91
 #      - 172.31.40.208
     username: ec2-user
