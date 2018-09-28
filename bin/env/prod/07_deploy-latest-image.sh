@@ -39,8 +39,6 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     echo ;
     docker-compose -f ~/cgsy/docker-compose.yml logs redis
     docker-compose -f ~/cgsy/docker-compose.yml logs wkhtmltopdf
-    docker-compose -f ~/cgsy/docker-compose.yml logs migration
-    docker-compose -f ~/cgsy/docker-compose.yml logs volume
     docker-compose -f ~/cgsy/docker-compose.yml logs cron
     docker-compose -f ~/cgsy/docker-compose.yml logs manage
     docker-compose -f ~/cgsy/docker-compose.yml logs partner

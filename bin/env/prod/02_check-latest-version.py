@@ -38,31 +38,31 @@ LATEST_IMAGE = shell_do(
     'docker exec -i awsecr last-image {}'.format(REPO_NAME)
 )
 
-LATEST_VERSION = str(LATEST_IMAGE).replace(
+CURRENT_VERSION = str(LATEST_IMAGE).replace(
     'Repository: {}\n'.format(REPO_NAME),
     ''
 )
-LATEST_VERSION = str(LATEST_VERSION).replace(
+CURRENT_VERSION = str(CURRENT_VERSION).replace(
     '{}/{}:'.format(REPO_LINK, REPO_NAME),
     ''
 )
 
-VERSION_FILE = os.path.join(BASE, '..', '..', '..', 'version')
-VERSION = shell_do('cat {}'.format(VERSION_FILE))
+NEXT_VERSION_FILE = os.path.join(BASE, '..', '..', '..', 'version')
+NEXT_VERSION = shell_do('cat {}'.format(NEXT_VERSION_FILE))
 
-VERSION = str(VERSION).rstrip('\r\n')
-LATEST_VERSION = LATEST_VERSION.rstrip('\r\n')
+NEXT_VERSION = str(NEXT_VERSION).rstrip('\r\n')
+CURRENT_VERSION = CURRENT_VERSION.rstrip('\r\n')
 
-print("LATEST VERSION: {}".format(LATEST_VERSION))
-print("VERSION TO DEPLOY: {}".format(VERSION))
+print("CURRENT VERSION: {}".format(CURRENT_VERSION))
+print("VERSION TO DEPLOY: {}".format(NEXT_VERSION))
 
-higher_version = semver.compare(LATEST_VERSION, VERSION) == -1
+higher_version = semver.compare(CURRENT_VERSION, NEXT_VERSION) == -1
 
 tagged_version_file = os.path.join(BASE, 'tagged_version')
 
 with open(tagged_version_file, 'w+') as f:
     value = '1' if higher_version is True else '0'
-    print("Registrando valor '{}' em '{}'.".format(
+    print("Registrando versão a ser liberada '{}' em '{}'.".format(
         value,
         tagged_version_file
     ))
@@ -73,9 +73,9 @@ with open(tagged_version_file, 'w+') as f:
 previous_version_file = os.path.join(BASE, 'previous_version')
 
 with open(previous_version_file, 'w+') as f:
-    f.write(LATEST_VERSION)
+    f.write(CURRENT_VERSION)
     f.close()
-    print("Registrando versão anterior '{}' em '{}'.".format(
-        LATEST_VERSION,
+    print("Registrando versão atual '{}' em '{}'.".format(
+        CURRENT_VERSION,
         previous_version_file
     ))
