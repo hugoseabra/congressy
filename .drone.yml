@@ -292,6 +292,9 @@ pipeline:
       sentry_private_dsn
     ]
     script:
+      # create shared-volume
+      - mkdir /shared-volume
+
       - mkdir -p ~/awsecr
       # env-file do awsecr
       - echo "AWS_KEY=$${AWS_KEY}" > ~/awsecr/env-awsecr
@@ -331,7 +334,7 @@ pipeline:
     pull: true
     host:
       - 172.31.38.91
-#      - 172.31.40.208
+      - 172.31.40.208
     username: ec2-user
     port: 22
     secrets:
@@ -389,6 +392,9 @@ pipeline:
       sentry_private_dsn
     ]
     script:
+      # create shared-volume
+      - mkdir -p /shared-volume
+
       - mkdir -p ~/awsecr
       # env-file do awsecr
       - echo "AWS_KEY=$${AWS_KEY}" > ~/awsecr/env-awsecr

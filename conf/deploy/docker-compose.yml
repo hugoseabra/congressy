@@ -26,8 +26,8 @@ services:
       - /services/volume/container-entry.sh
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/var/www/cgsy/media"
-      - ./logs:/var/www/cgsy/logs
+      - /shared-volume/media:/var/www/cgsy/media"
+      - /shared-volume/logs:/var/www/cgsy/logs
     env_file: ./env-file
 
   cron:
@@ -40,8 +40,8 @@ services:
       - /services/cron/container-entry.sh
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/var/www/cgsy/media
-      - ./logs:/var/www/cgsy/logs
+      - /shared-volume/media:/var/www/cgsy/media
+      - /shared-volume/logs:/var/www/cgsy/logs
     env_file: ./env-file
     networks:
       - wkhtmltopdf
@@ -63,8 +63,8 @@ services:
       - /services/web/manage/container-entry.sh
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/var/www/cgsy/media
-      - ./logs:/var/www/cgsy/logs
+      - /shared-volume/media:/var/www/cgsy/media
+      - /shared-volume/logs:/var/www/cgsy/logs
     env_file:
       - ./env-file
       - ./env-manage-file
@@ -81,8 +81,8 @@ services:
       - "8001:80"
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/var/www/cgsy/media
-      - ./logs:/var/www/cgsy/logs
+      - /shared-volume/media:/var/www/cgsy/media
+      - /shared-volume/logs:/var/www/cgsy/logs
     entrypoint:
       - /services/web/partner/container-entry.sh
     env_file:
@@ -106,8 +106,8 @@ services:
       - /services/web/admin_intranet/container-entry.sh
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/var/www/cgsy/media
-      - ./logs:/var/www/cgsy/logs
+      - /shared-volume/media:/var/www/cgsy/media
+      - /shared-volume/logs:/var/www/cgsy/logs
     env_file:
       - ./env-file
       - ./env-admin_intranet-file
