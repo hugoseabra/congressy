@@ -79,28 +79,16 @@
                         {% if messages %}
                             <div style="width:100%;margin-top:3px;padding-bottom:10px">
                             {% for message in messages %}
-
-                                {% if message.tags %}
-                                    <div class="alert alert-{{ message.tags }} alert-dismissible"
-                                         role="alert">
-
-                                {% else %}
-                                    <div class="alert alert-warning alert-dismissible"
-                                         role="alert">
-                                {% endif %}
-
-                            <button type="button" class="close"
-                                    data-dismiss="alert"
-                                    aria-label="Close"><span
-                                    aria-hidden="true">&times;</span>
-                            </button>
-                            {{ message|capfirst }}
-                            </div>
-
+                                <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    {{ message|capfirst }}
+                                </div>
                             {% endfor %}
-                        </div>
+                            </div>
                         {% endif %}
-                    {% endblock messages %}
+                    {% endblock %}
 
                     <div class="form-validation alert"></div>
 
@@ -116,7 +104,7 @@
                             {% include 'hotsite/optionals_service_form.html' %}
                             <div id="optional-list-main-block">
 
-                                <form method="post" action="" id="optional_form" onsubmit="if(parseInt(num_selected_optionals)===0){return confirm('Você não selecionou nenhum item. Tem certeza que deseja prosseguir?')}">
+                                <form method="post" action="" id="optional_form" onsubmit="if(parseInt(num_selected_optionals)===0){if(!confirm('Você não selecionou nenhum item. Tem certeza que deseja prosseguir?')){return false;}}next_page();">
 
                                     {% csrf_token %}
                                     {{ wizard.management_form }}
@@ -134,9 +122,7 @@
                                             </button>
                                         {% endif %}
 
-                                        <button type="submit"
-                                                onclick="next_page('optional_form'); return false;"
-                                                class="btn btn-primary pull-right">
+                                        <button type="submit" class="btn btn-primary pull-right">
                                             {% if is_last %}Finalizar{% else %}Próximo{% endif %}
                                             <i class="fas fa-chevron-circle-right"></i>
                                         </button>
@@ -150,10 +136,14 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="col-md-12" style="margin-top: 10px">
+                    <div class="text-right cgsy-footer footer-wrapper text-muted" style="font-size:12px;color:lightgrey">
+                        {% include "base/footer.html" %}
                     </div>
-
                 </div>
             </div>
+        </div>
     </section>
 {% endblock %}
 

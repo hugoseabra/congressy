@@ -8,6 +8,8 @@
     <!-- FORM
 ================================= -->
     <section id="about" class="about-section section">
+    <form action="" method="post" novalidate>
+        {% csrf_token %}
         <div class="container">
             <h2 class="section-heading text-center">Inscrição</h2>
             <div class="about-row row">
@@ -25,20 +27,18 @@
                         <div class="panel-body">
                             {% block messages %}
                                 {% if messages %}
-                                <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                                    <div style="width:100%;margin-top:3px;padding-bottom:10px">
                                     {% for message in messages %}
-                                        <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible"role="alert">
-                                            <button type="button" class="close"
-                                                    data-dismiss="alert"
-                                                    aria-label="Close"><span
-                                                    aria-hidden="true">&times;</span>
+                                        <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
                                             </button>
-                                            {{ message|safe }}
+                                            {{ message|capfirst }}
                                         </div>
                                     {% endfor %}
-                                </div>
+                                    </div>
                                 {% endif %}
-                            {% endblock messages %}
+                            {% endblock %}
 
                             {% if form.non_field_errors %}
                                 {% render_errors form.non_field_errors %}
@@ -139,45 +139,45 @@
                                 <img style="width: 80%; margin-top: 20px" src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
                             </div>
                             <br/>
-                            <form action="" method="post" id="next_form">
-                                {% csrf_token %}
-                                {{ wizard.management_form }}
 
-                                {% for hidden in form.hidden_fields %}
-                                    {{ hidden }}
-                                {% endfor %}
-                            </form>
+                            {{ wizard.management_form }}
 
-                            <button type="button"
-                                    class="btn btn-primary pull-right"
-                                    id="id_button_pay">
-                                Realizar pagamento e finalizar
-                                <i class="fas fa-chevron-circle-right"></i>
-                            </button>
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
 
-                            <form action="" method="post" novalidate>
-                                {{ wizard.management_form }}
-                                {% csrf_token %}
-                                {% if wizard.steps.prev %}
-                                    <input type="hidden" name="wizard_goto_step"
-                                           value="{{ wizard.steps.prev }}">
-                                    <button type="submit"
-                                            class="btn btn-primary">
-                                        <i class="fas fa-chevron-circle-left"></i>
-                                        Voltar
-                                    </button>
-                                {% endif %}
-                            </form>
+
+
                         </div>
                     </div>
+
+                    <button type="button"
+                            class="btn btn-primary pull-right"
+                            id="id_button_pay">
+                        Realizar pagamento e finalizar
+                        <i class="fas fa-chevron-circle-right"></i>
+                    </button>
+
+                    {{ wizard.management_form }}
+                    {% if wizard.steps.prev %}
+                        <input type="hidden" name="wizard_goto_step"
+                               value="{{ wizard.steps.prev }}">
+                        <button type="submit"
+                                class="btn btn-primary">
+                            <i class="fas fa-chevron-circle-left"></i>
+                            Voltar
+                        </button>
+                    {% endif %}
+
                 </div>
-                <div class="col-md-9 col-md-offset-2">
+                <div class="col-md-9 col-md-offset-2" style="margin-top:10px">
                     <div class="text-right cgsy-footer footer-wrapper text-muted"
                          style="font-size:12px;color:lightgrey">
                         {% include "base/footer.html" %}
                     </div>
                 </div>
             </div>
+    </form>
     </section>
 
 {% endblock %}

@@ -6,55 +6,51 @@
     {% include 'hotsite/includes/2_cover_no_form.html' %}
 
     <section id="about" class="about-section section">
+        <form method="post" action="" onsubmit="next_page();">
+            {% csrf_token %}
+            {{ wizard.management_form }}
+            <div class="container">
+                <h2 class="section-heading text-center">Inscrição</h2>
+                <div class="about-row row">
+                    <div class="col-md-9 col-md-offset-2">
+                        {% include "hotsite/includes/greetings.html" %}
 
-        <div class="container">
-            <h2 class="section-heading text-center">Inscrição</h2>
-            <div class="about-row row">
-                <div class="col-md-9 col-md-offset-2">
-                    {% include "hotsite/includes/greetings.html" %}
-
-                    {% if form.non_field_errors %}
-                        {% render_errors form.non_field_errors %}
-                    {% endif %}
-
-                    {% for hidden_field in form.hidden_fields %}
-                        {% if hidden_field.errors %}
-                            {% render_errors hidden_field.errors %}
+                        {% if form.non_field_errors %}
+                            {% render_errors form.non_field_errors %}
                         {% endif %}
-                    {% endfor %}
 
-                    {% block messages %}
-                        {% if messages %}
-                            <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                            {% for message in messages %}
-                                <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible"
-                                    <button type="button" class="close"
-                                            data-dismiss="alert"
-                                            aria-label="Close"><span
-                                            aria-hidden="true">&times;</span>
-                                    </button>
-                                    {{ message|capfirst }}
+                        {% for hidden_field in form.hidden_fields %}
+                            {% if hidden_field.errors %}
+                                {% render_errors hidden_field.errors %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% block messages %}
+                            {% if messages %}
+                                <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        {{ message|capfirst }}
+                                    </div>
+                                {% endfor %}
                                 </div>
-                            {% endfor %}
-                            </div>
-                        {% endif %}
-                    {% endblock messages %}
+                            {% endif %}
+                        {% endblock %}
 
-                    <div class="form-validation alert"></div>
+                        <div class="form-validation alert"></div>
 
-                    <div style="margin-bottom: 20px">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="panel-title">Ingresso</div>
-                            </div>
-                            <div class="panel-body">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
-                                        <form method="post" action="">
-                                            {% csrf_token %}
-                                            {{ wizard.management_form }}
+                        <div style="margin-bottom: 20px">
 
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="panel-title">Ingresso</div>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-md-12">
                                             <div id="original-lots-field">
                                                 {% if not is_private_event %}
                                                     {% render_generic_field form.lots %}
@@ -76,8 +72,6 @@
 
                                                     {% endif %}
                                                 {% endif %}
-
-
                                             </div>
 
                                             <div id="lots-field" style="display: none">
@@ -94,35 +88,35 @@
                                                     <span style="color:darkgreen;font-weight: bold;" id="lot_display_publicly"></span>
                                                 </div>
                                             </div>
-                                            <br />
-                                            <a href="{% url 'public:hotsite' event.slug %}"
-                                               class="btn btn-primary pull-left"
-                                               style="margin-top: 5px;">
-                                                <i class="fas fa-chevron-circle-left"></i>
-                                                Início
-                                            </a>
-                                            <button style="margin-top: 5px;"
-                                                    class="btn
-                                                    btn-primary pull-right"
-                                                    type="submit">
-                                                Próximo
-                                                <i class="fas fa-chevron-circle-right"></i>
-                                            </button>
-                                        </form>
-                                        {% else %}
-                                            Evento não possui lotes.
-                                        {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="wizard_next_btn">
+                                <a href="{% url 'public:hotsite' event.slug %}" class="btn btn-primary pull-left">
+                                    <i class="fas fa-chevron-circle-left"></i>
+                                    Início
+                                </a>
+                                <button type="submit" class="btn btn-primary pull-right">
+                                    Próximo
+                                    <i class="fas fa-chevron-circle-right"></i>
+                                </button>
+                            </div>
+                            <div class="wizard_next_loader text-center" style="display: none">
+                                <i class="fas info-color fa-circle-notch fa-spin fa-2x" style="color: #1F7BB6;"></i>
+                            </div>
                         </div>
                     </div>
-                    <div class="text-right cgsy-footer footer-wrapper text-muted" style="font-size:12px;color:lightgrey">
-                        {% include "base/footer.html" %}
+                    <div class="col-md-9 col-md-offset-2" style="margin-top: 10px">
+                        <div class="text-right cgsy-footer footer-wrapper text-muted"
+                             style="font-size:12px;color:lightgrey">
+                            {% include "base/footer.html" %}
+                        </div>
                     </div>
+                </div>
             </div>
-
-        </div>
+        </form>
 
     </section>
 
