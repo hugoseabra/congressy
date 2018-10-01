@@ -55,7 +55,7 @@ class OptionManager(Manager):
 
         existing_options = Option.objects.filter(
             question=question,
-            name=slug,
+            value=slug,
         )
 
         if existing_options.count() >= 1:
