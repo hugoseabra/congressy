@@ -4,7 +4,6 @@
 
 from django import forms
 
-from gatheros_event.models import Person, Event
 from gatheros_subscription.models import Lot, Subscription
 
 
@@ -21,6 +20,25 @@ class SubscriptionForm(forms.Form):
         widget=forms.HiddenInput(),
         max_length=60,
     )
+
+    def clean_lot(self):
+        try:
+            lot = Lot.objects.get(pk=self.cleaned_data['lot'],
+                                  event_id=self.cleaned_data['event'])
+        except Lot.DoesNotExist:
+            raise forms.ValidationError('Lote não pertence a este evento.')
+
+        subscriptions = Subscription.objects.filter(
+            lot_id=lot.pk,
+            test_subscription=False,
+            completed=True,
+        ).count()
+
+        if subscriptions > lot.limit:
+            raise forms.ValidationError('Lote está lotado e não permite novas '
+                                        'inscrições')
+
+        return lot
 
     def save(self):
 
