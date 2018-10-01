@@ -195,8 +195,7 @@
                                     {% if stopped_lots %}
                                         <optgroup label="Encerrados">
                                             {% for lot in stopped_lots %}
-                                                <option value=""
-                                                        disabled="disabled"
+                                                <option value="{{ lot.pk }}"
                                                         {% if selected_lot and selected_lot == lot.pk %}selected="selected"{% endif %}>
                                                     {{ lot.display_publicly|truncatechars:60 }} - até: {{ lot.date_end|date:'d/m/Y H\hi' }}
                                                     {% if lot.private %}

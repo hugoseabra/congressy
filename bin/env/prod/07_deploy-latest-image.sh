@@ -13,7 +13,9 @@ set -ex
 # retornar um erro caso a versão já exista.
 ###############################################################################
 
-BASE=$(dirname "$0")
+# No servidor, este arquivo estará na pasta ~/cgsy/scrpits/prod e os arquivos
+# de versão na pasta raíz ~/cgsy
+BASE=$(dirname $(dirname $(dirname "$0")))
 VERSION_FILE="$BASE/version"
 PREVIOUS_VERSION_FILE="$BASE/previous_version"
 PREVIOUS_VERSION="dev"
