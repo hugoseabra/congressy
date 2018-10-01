@@ -37,10 +37,9 @@ class OptionManager(Manager):
 
         return question
 
-    def clean(self):
-        cleaned_data = super().clean()
-        cleaned_data['value'] = self._create_slug()
-        return cleaned_data
+    def save(self, commit=True):
+        self.instance.value = self._create_slug()
+        return super().save(commit)
 
     def _create_slug(self):
         """
@@ -56,7 +55,7 @@ class OptionManager(Manager):
 
         existing_options = Option.objects.filter(
             question=question,
-            name=slug,
+            value=slug,
         )
 
         if existing_options.count() >= 1:
