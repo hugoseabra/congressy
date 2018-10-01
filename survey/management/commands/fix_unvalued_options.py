@@ -8,7 +8,6 @@ class Command(BaseCommand):
     help = 'Criar value para options vazios - remover comando após uso #752'
 
     def handle(self, *args, **options):
-
         err_options = Option.objects.filter(
             value__isnull=True,
         )
@@ -17,47 +16,48 @@ class Command(BaseCommand):
             'Encontradas {} options sem value.'.format(err_options.count())
         ))
 
-        for err in err_options:
-            self._create_slug(err, err.name, err.question)
+        for option in err_options:
 
-    def _create_slug(self, option, name, question):
-        """
-            Slugify deve garantir que o nome de Option em uma Question seja
-            único.
-        """
+            slughorn = slugify(option.name)
 
-        original_slug = slugify(name)
+            existing_options = Option.objects.filter(
+                question=option.question,
+                value=slughorn,
+            )
 
-        slug = original_slug
+            if existing_options.count() >= 1:
+                self.stdout.write(self.style.WARNING(
+                    'Opção: {}, encontradas {} com o mesmo value'.format(
+                        option.name,
+                        existing_options.count())
+                ))
 
-        self.stdout.write(self.style.WARNING(
-            'Tentando: {}'.format(slug)
-        ))
+                counter = 1
 
-        existing_options = Option.objects.filter(
-            value=original_slug,
-            question=question,
-        )
+                for opt in existing_options:
 
-        self.stdout.write(self.style.WARNING(
-            'Encontradas {}!'.format(existing_options.count())
-        ))
+                    query_set = Option.objects.filter(
+                        value=slughorn + '-' + str(counter),
+                        question=opt.question,
+                    )
 
-        if existing_options.count() >= 1:
-            counter = 1
-            for option in existing_options:
+                    if query_set.exists():
+                        counter += 1
 
-                query_set = Option.objects.filter(
-                    value=option.value,
-                    question=question,
-                )
+                option.value = slughorn + '-' + str(counter)
+                option.save()
+                option.save()
+                self.stdout.write(self.style.WARNING(
+                    'Opção repetida: {}, salva com o value {}'.format(
+                        option.name,
+                        option.value)
+                ))
 
-                if query_set.exists():
-                    slug = original_slug + '-' + str(counter)
-                    counter += 1
+            else:
 
-        option.value = slug
-        option.save()
-        self.stdout.write(self.style.SUCCESS(
-            'Opção: {}, salva com o value {}'.format(option.name, option.value)
-        ))
+                option.value = slughorn
+                option.save()
+                self.stdout.write(self.style.SUCCESS(
+                    'Opção: {}, salva com o value {}'.format(option.name,
+                                                             option.value)
+                ))
