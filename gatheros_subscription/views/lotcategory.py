@@ -180,8 +180,7 @@ class LotCategoryEditView(generic.UpdateView, EventDraftStateMixin,
         return response
 
 
-class LotCategoryDeleteView(DeleteViewMixin, EventDraftStateMixin,
-                            AccountMixin):
+class LotCategoryDeleteView(DeleteViewMixin, EventDraftStateMixin,):
     model = LotCategory
     delete_message = "Tem certeza que deseja excluir a categoria \"{name}\"?"
     success_message = "Categoria excluída com sucesso!"
