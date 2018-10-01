@@ -13,7 +13,7 @@ set -ex
 # retornar um erro caso a versão já exista.
 ###############################################################################
 
-BASE='~/cgsy'
+BASE=$(dirname $(dirname $(dirname "$0")))
 VERSION_FILE="$BASE/version"
 PREVIOUS_VERSION_FILE="$BASE/previous_version"
 PREVIOUS_VERSION="dev"
@@ -27,9 +27,13 @@ if [ -f "$VERSION_FILE" ]; then
     VERSION=$(cat ${VERSION_FILE})
 fi
 
+echo "Download versão '${VERSION}' sobre a versão '${PREVIOUS_VERSION}'..."
+
 # A versão nunca será a anterior a atual devido ao CI controlar a continuidade
 # dos releases. Sendo assim, basta comparar
 if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
+
+    echo "Baixando não realizado '${VERSION}' ..."
 
     docker exec -i awsecr pull cgsy:latest
     docker exec -i awsecr pull cgsy:${VERSION}
@@ -38,6 +42,8 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     exit 0
 
 else
+    echo "Download não realizado '${VERSION}' ==  '${PREVIOUS_VERSION}'"
+
     # Erro: versão já está publicada.
     exit 1
 fi
