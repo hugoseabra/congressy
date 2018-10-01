@@ -121,7 +121,8 @@ class LotCategoryAddView(MultiLotsFeatureFlagMixin, generic.CreateView,
         return response
 
 
-class LotCategoryEditView(generic.UpdateView, EventDraftStateMixin):
+class LotCategoryEditView(generic.UpdateView, EventDraftStateMixin,
+                          AccountMixin):
     form_class = forms.LotCategoryForm
     model = forms.LotCategoryForm.Meta.model
     template_name = 'lotcategory/form.html'
@@ -179,7 +180,8 @@ class LotCategoryEditView(generic.UpdateView, EventDraftStateMixin):
         return response
 
 
-class LotCategoryDeleteView(DeleteViewMixin, EventDraftStateMixin):
+class LotCategoryDeleteView(DeleteViewMixin, EventDraftStateMixin,
+                            AccountMixin):
     model = LotCategory
     delete_message = "Tem certeza que deseja excluir a categoria \"{name}\"?"
     success_message = "Categoria excluída com sucesso!"
