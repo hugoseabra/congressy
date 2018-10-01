@@ -12,6 +12,7 @@ from gatheros_front.urls import (
     urlpatterns_public as gatheros_front_public,
 )
 
+handler404 = 'project.views.handler404'
 handler500 = 'project.views.handler500'
 
 private_urlpatterns = [

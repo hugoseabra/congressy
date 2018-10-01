@@ -2,6 +2,9 @@
 
 # the upstream component nginx needs to connect to
 upstream app {
+    # Load balance algorithm; empty for round robin, which is the default
+    least_conn;
+    keepalive 64;
     server unix:///var/run/cgsy.sock; # for a file socket
 }
 
@@ -27,12 +30,16 @@ server {
     location / {
         # the uwsgi_params file you installed
         include         /var/www/cgsy/conf/deploy/uwsgi_params;
+        uwsgi_buffers   256 16k;
 
         # https://github.com/dockerfile/nginx/issues/4
         # Override temp file locations
         uwsgi_temp_path /tmp/nginx/uwsgi;
 
-        proxy_redirect     off;
+        proxy_redirect          off;
+        proxy_buffering         off;
+        proxy_request_buffering off;
+
         proxy_set_header   Host             $http_host;
         proxy_set_header   X-Real-IP        $remote_addr;
         proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;

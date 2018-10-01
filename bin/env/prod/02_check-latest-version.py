@@ -63,7 +63,7 @@ tagged_version_file = os.path.join(BASE, 'tagged_version')
 with open(tagged_version_file, 'w+') as f:
     value = '1' if higher_version is True else '0'
     print("Registrando versão a ser liberada '{}' em '{}'.".format(
-        value,
+        NEXT_VERSION,
         tagged_version_file
     ))
 

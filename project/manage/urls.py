@@ -24,7 +24,7 @@ from payment.urls import (
 from raffle.urls import urlpatterns_private_raffles
 from service_tags.urls import service_tags_urlpatterns
 
-
+handler404 = 'project.views.handler404'
 handler500 = 'project.views.handler500'
 
 admin_urlpatterns = []

@@ -52,8 +52,12 @@ def export_event_data(event):
     ws1 = wb.active
     ws1.title = clean_sheet_title('Participantes')
 
-    _export_subscriptions(ws1, event.subscriptions.filter(completed=True,
-                                                          test_subscription=False))
+    _export_subscriptions(
+        ws1,
+        event.subscriptions.filter(
+            completed=True,
+            test_subscription=False,
+        ))
 
     if is_paid_event(event):
         _export_payments(wb.create_sheet(title='Pagamentos'), event)
@@ -81,11 +85,7 @@ def export_event_data(event):
                 title = clean_sheet_title(sheet_name)
                 worksheet = wb.create_sheet(title=title)
 
-                _export_addon_products(
-                    worksheet,
-                    sheet_name,
-                    products_queryset.all()
-                )
+                _export_addon_products(worksheet, products_queryset.all())
 
         if services_queryset.count():
             num_subs = services_queryset.filter(
@@ -98,11 +98,7 @@ def export_event_data(event):
                 title = clean_sheet_title(sheet_name)
                 worksheet = wb.create_sheet(title=title)
 
-                _export_addon_services(
-                    worksheet,
-                    sheet_name,
-                    services_queryset.all()
-                )
+                _export_addon_services(worksheet, services_queryset.all())
 
     wb.save(stream)
 
@@ -158,7 +154,6 @@ def _export_subscriptions(worksheet, subscriptions):
 
         collector[row_idx].append(sub.get_status_display())
         collector[row_idx].append(person.get_gender_display())
-
 
         collector[row_idx].append(get_object_value(person, 'name'))
         collector[row_idx].append(get_object_value(person, 'cpf'))
@@ -242,6 +237,7 @@ def _export_survey_answers(worksheet, event_survey):
     ]
 
     survey = event_survey.survey
+    event = event_survey.event
 
     questions = survey.questions.all().order_by('order')
 
@@ -264,7 +260,6 @@ def _export_survey_answers(worksheet, event_survey):
 
     worksheet.append(columns)
 
-    event = event_survey.event
     subscriptions = event.subscriptions.filter(completed=True,
                                                test_subscription=False,
                                                author__isnull=False)
@@ -305,7 +300,7 @@ def _export_survey_answers(worksheet, event_survey):
         worksheet.append(collector[row])
 
 
-def _export_addon_products(worksheet, title, products):
+def _export_addon_products(worksheet, products):
     """
     Exporta Insrições de Opcionais de um evento.
     """
@@ -360,7 +355,7 @@ def _export_addon_products(worksheet, title, products):
         [worksheet.append(collector[row]) for row in rows]
 
 
-def _export_addon_services(worksheet, title, services):
+def _export_addon_services(worksheet, services):
     """
     Exporta Insrições de atividades extras.
     """

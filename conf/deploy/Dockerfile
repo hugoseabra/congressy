@@ -69,7 +69,9 @@ RUN pip install --no-cache-dir --upgrade \
         # template engine
         jinja2 \
         # Sentry
-        raven
+        raven \
+        # nginx + sentry
+        sentrylogs
 
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.
