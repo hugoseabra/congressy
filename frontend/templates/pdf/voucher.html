@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <title>Voucher</title>
     <link rel="stylesheet"
-          href="{% static "assets/plugins/bootstrap/css/bootstrap.min.css" %}">
+          href="{{ base_url }}assets/plugins/bootstrap/css/bootstrap.min.css">
 
     <style>
         .table.no-border tr td, .table.no-border tr th {
@@ -104,53 +104,6 @@
                 </tbody>
 
             </table>
-
-            {#            <p style="margin-top: 5px; font-size: 25px">{{ person.name|upper }}</p>#}
-            {#            <p style="font-size: 20px;margin-top: 30px">Data / horário</p>#}
-            {#            <p style="font-size: 20px">{{ event.get_period }}</p>#}
-            {#            {% if event.place.name %}#}
-            {#                <p style="font-size: 18px;margin-top: 20px">Local:</p>#}
-            {#                <p style="font-size: 18px">{{ event.place.name|upper }}</p>#}
-            {#            {% endif %}#}
-            {#            <p style="font-size: 20px; margin-top: 20px">#}
-            {#                {{ lot.name }} | R$ {{ lot.get_calculated_price }}#}
-            {#            </p>#}
-            {#            <img src="data:image/png;base64,{{ qrcode }}"#}
-            {#                 style="margin-top: 25px">#}
-
-
-            {#            <table class="table" style="border: none;">#}
-            {#                <tbody>#}
-            {#                <thread>#}
-            {#                    <tr>#}
-            {#                        <th>#}
-            {#                            Organizador:#}
-            {#                        </th>#}
-            {#                        <th>#}
-            {#                            Nome do Participante:#}
-            {#                        </th>#}
-            {#                        <th>#}
-            {#                            Localização:#}
-            {#                        </th>#}
-            {#                        <th>#}
-            {#                            Lote:#}
-            {#                        </th>#}
-            {#                        <th></th>#}
-            {##}
-            {#                    </tr>#}
-            {#                </thread>#}
-            {#                <tr>#}
-            {#                    <td>{{ organization.name }}</td>#}
-            {#                    <td>{{ person.name }}</td>#}
-            {#                    <td>{{ event.place.name }}</td>#}
-            {#                    <td>{{ lot.name }} |#}
-            {#                        R$ {{ lot.get_calculated_price }}</td>#}
-            {#                    <td>#}
-            {#                        <img src="data:image/png;base64,{{ qrcode }}">#}
-            {#                    </td>#}
-            {#                </tr>#}
-            {#                </tbody>#}
-            {#            </table>#}
 
         </div>
     </div>

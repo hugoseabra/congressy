@@ -1,11 +1,7 @@
-import base64
 from datetime import datetime
 
-import qrcode
-import qrcode.image.svg
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.transaction import atomic
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
@@ -14,7 +10,6 @@ from django.urls import reverse, reverse_lazy
 from django.utils import six
 from django.utils.decorators import classonlymethod
 from django.views import generic
-from wkhtmltopdf.views import PDFTemplateView
 
 from attendance.helpers.attendance import subscription_is_checked
 from core.forms.cleaners import clear_string
@@ -30,10 +25,10 @@ from gatheros_subscription.forms import (
     SubscriptionFilterForm,
     SubscriptionForm,
 )
-from gatheros_subscription.helpers.barcode import create_barcode
 from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.helpers.report_payment import \
     PaymentReportCalculator
+from gatheros_subscription.helpers.voucher import create_voucher, get_voucher_file_name
 from gatheros_subscription.models import (
     FormConfig,
     Lot,
@@ -1136,81 +1131,23 @@ class SubscriptionExportView(SubscriptionViewMixin, generic.View):
         )
 
 
-class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
-    template_name = 'pdf/voucher.html'
-    subscription = None
-    event = None
-    person = None
-    lot = None
-    place = None
-    show_content_in_browser = True
-    permission_denied_url = reverse_lazy('front:start')
-
-    cmd_options = {
-        'margin-top': 5,
-        'javascript-delay': 500,
-    }
-
-    def get_filename(self):
-        return "{}-{}.pdf".format(self.event.slug, self.subscription.pk)
+class VoucherSubscriptionPDFView(AccountMixin):
 
     def pre_dispatch(self, request):
         uuid = self.kwargs.get('pk')
         self.subscription = get_object_or_404(Subscription,
                                               uuid=uuid)
-        self.get_complementary_data()
 
         return super().pre_dispatch(request)
 
-    def get_context_data(self, **kwargs):
-        context = super(VoucherSubscriptionPDFView, self).get_context_data(
-            **kwargs)
-        context['qrcode'] = self.generate_qr_code()
-        context['barcode'] = create_barcode(self.subscription)
-        context['logo'] = self.get_logo()
-        context['event'] = self.event
-        context['person'] = self.person
-        context['lot'] = self.lot
-        context['organization'] = self.event.organization
-        context['subscription'] = self.subscription
-        return context
-
-    def get_logo(self):
-        uri = staticfiles_storage.url('assets/img/logo_v3.png')
-        url = settings.BASE_DIR + "/frontend" + uri
-        with open(url, 'rb') as f:
-            read_data = f.read()
-            f.close()
-
-        return base64.b64encode(read_data)
-
-    def generate_qr_code(self):
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=5,
-            border=4,
+    def get(self, request, *args, **kwargs):
+        pdf = create_voucher(subscription=self.subscription)
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="{}"'.format(
+            get_voucher_file_name(subscription=self.subscription)
         )
 
-        qr.add_data(self.subscription.uuid)
-
-        qr.make(fit=True)
-
-        img = qr.make_image()
-
-        buffer = six.BytesIO()
-        img.save(buffer)
-
-        return base64.b64encode(buffer.getvalue())
-
-    def get_complementary_data(self):
-        self.event = self.subscription.event
-        self.person = self.subscription.person
-        self.lot = self.subscription.lot
-        self.place = self.subscription.event.place
-
-    def can_access(self):
-        return self.subscription.confirmed is True
+        return response
 
 
 class SwitchSubscriptionTestView(SubscriptionViewMixin, generic.View):
