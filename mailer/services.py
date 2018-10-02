@@ -201,9 +201,11 @@ def notify_new_user_and_paid_subscription_boleto(event, transaction):
 
     checks.check_notification_transaction_paid_boleto(transaction)
 
+    voucher_file = create_voucher(subscription)
+
     voucher_attach = MailerAttachment(
         name=get_voucher_file_name(subscription),
-        content=create_voucher(subscription),
+        content=voucher_file.read(),
         mime='application/pdf'
     )
 
@@ -390,9 +392,11 @@ def notify_new_paid_subscription_credit_card(event, transaction):
 
     checks.check_notification_transaction_paid_credit_card(transaction)
 
+    voucher_file = create_voucher(subscription)
+
     voucher_attach = MailerAttachment(
         name=get_voucher_file_name(subscription),
-        content=create_voucher(subscription),
+        content=voucher_file.read(),
         mime='application/pdf'
     )
 
@@ -607,9 +611,11 @@ def notify_new_user_and_paid_subscription_credit_card(event, transaction):
 
     checks.check_notification_transaction_paid_credit_card(transaction)
 
+    voucher_file = create_voucher(subscription)
+
     voucher_attach = MailerAttachment(
         name=get_voucher_file_name(subscription),
-        content=create_voucher(subscription),
+        content=voucher_file.read(),
         mime='application/pdf'
     )
 
@@ -667,10 +673,12 @@ def notify_new_free_subscription(event, subscription):
             " está como confirmada.."
         )
 
+    voucher_file = create_voucher(subscription)
+
     # Se inscrição confirmada, envia o voucher.
     voucher_attach = MailerAttachment(
         name=get_voucher_file_name(subscription),
-        content=create_voucher(subscription),
+        content=voucher_file.read(),
         mime='application/pdf'
     )
 
@@ -724,10 +732,12 @@ def notify_new_user_and_free_subscription(event, subscription):
             " está como confirmada.."
         )
 
+    voucher_file = create_voucher(subscription)
+
     # Se inscrição confirmada, envia o voucher.
     voucher_attach = MailerAttachment(
         name=get_voucher_file_name(subscription),
-        content=create_voucher(subscription),
+        content=voucher_file.read(),
         mime='application/pdf'
     )
 

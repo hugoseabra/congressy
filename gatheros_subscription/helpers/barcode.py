@@ -15,7 +15,7 @@ def create_barcode(subscription):
     )
     code.writer.set_options(dict(dpi=130))
     code.default_writer_options['write_text'] = False
-    options = dict(compress=True, quiet_zone=1, module_height=5.0)
+    options = dict(compress=True, quiet_zone=1, module_height=8.0)
 
     tmp_dir = os.path.join(gettempdir(), 'barcodes')
     if not os.path.exists(tmp_dir):
