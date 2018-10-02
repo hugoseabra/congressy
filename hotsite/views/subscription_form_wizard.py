@@ -188,7 +188,7 @@ def has_survey(wizard):
             return False
 
     return lot.event.feature_configuration.feature_survey and \
-           hasattr(lot, 'event_survey') and \
+           lot.event_survey and \
            lot.event_survey.survey.questions.count()
 
 
