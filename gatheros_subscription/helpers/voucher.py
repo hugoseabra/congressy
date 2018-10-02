@@ -1,13 +1,16 @@
 """ Helper para inscrições. """
-import base64
 
+import base64
+import json
+
+import requests
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.template import loader
-from wkhtmltopdf.utils import render_to_temporary_file, convert_to_pdf
+from django.core.files.base import ContentFile
+from django.template.loader import render_to_string
 
 from gatheros_subscription.helpers.qrcode import create_qrcode
-from gatheros_subscription.helpers.barcode import create_barcode
+import absoluteuri
 
 
 def get_logo():
@@ -36,6 +39,7 @@ def get_context(subscription):
         place = None
 
     return {
+        'base_url': absoluteuri.build_absolute_uri(settings.STATIC_URL),
         'qrcode': create_qrcode(subscription),
         'logo': get_logo(),
         'event': event,
@@ -48,18 +52,40 @@ def get_context(subscription):
 
 
 def create_voucher(subscription):
-    tempfile = render_to_temporary_file(
-        loader.get_template('pdf/voucher.html'),
+    wkhtml_ws_url = settings.WKHTMLTOPDF_WS_URL
+
+    html = render_to_string(
+        template_name='pdf/voucher.html',
         context=get_context(subscription)
     )
 
-    return convert_to_pdf(
-        filename=tempfile.name,
-        cmd_options={
+    encoded = base64.b64encode(html.encode()).decode()
+
+    data = {
+        'contents': encoded,
+        'options': {
+            'dpi': '96',
             'margin-top': 5,
             'javascript-delay': 500,
-        }
+        },
+    }
+
+    headers = {
+        'Content-Type': 'application/json',  # This is important
+    }
+
+    response = requests.post(
+        wkhtml_ws_url,
+        data=json.dumps(data),
+        headers=headers,
     )
+
+    if response.status_code != 200:
+        raise Exception('Could not create PDF: status code: {}'.format(
+            response.status_code))
+
+    return ContentFile(response.content,
+                       name=get_voucher_file_name(subscription))
 
 
 def get_voucher_file_name(subscription):
