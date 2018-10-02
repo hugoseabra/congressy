@@ -33,6 +33,9 @@ window.app = function () {
         var radios = $('input[type=radio]');
         var checkboxes = $('input[type=checkbox]');
 
+        radios.addClass('hide');
+        checkboxes.addClass('hide');
+
         radios.iCheck({
             checkboxClass: 'icheckbox_flat-grey',
             radioClass: 'iradio_flat-grey'
@@ -46,6 +49,7 @@ window.app = function () {
 
     var setSwitchery = function(elem, isChecked) {
         var checkbox = $(elem);
+            checkbox.addClass('hide');
         if (isChecked === true && checkbox.prop('checked') === false) {
             checkbox.trigger('click').attr("checked", "checked");
         }

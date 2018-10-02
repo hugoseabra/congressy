@@ -647,14 +647,9 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
         form = self.get_form()
         if form.is_valid():
 
-            if self.allow_edit_lot:
-                lot_pk = self.request.POST.get('subscription-lot')
-
-            elif self.subscription:
+            lot_pk = self.request.POST.get('subscription-lot')
+            if not lot_pk:
                 lot_pk = self.subscription.lot.pk
-
-            else:
-                raise Exception('Edição de lote somente para nova inscrição.')
 
             with atomic():
                 self.object = form.save()
@@ -663,10 +658,11 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
                     lot_pk=lot_pk,
                 )
                 if not subscription_form.is_valid():
-                    for error in subscription_form.errors:
-                        messages.error(self.request, str(error))
 
-                    return redirect(self.get_error_url())
+                    for name, error in subscription_form.errors.items():
+                        form.add_error(field='__all__', error=error[0])
+
+                    return self.form_invalid(form)
 
                 self.subscription = subscription_form.save()
                 if self.subscription.lot.event_survey:
@@ -795,7 +791,7 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
             Handles POST requests, instantiating a form instance with the passed
             POST variables and then checked for validity.
         """
-        if self.allow_edit_lot and 'subscription-lot' not in request.POST:
+        if 'subscription-lot' not in request.POST:
             messages.warning(request, 'Você deve informar um lote.')
             return redirect(self.get_error_url())
 
@@ -815,14 +811,9 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
         form = self.get_form()
         if form.is_valid():
 
-            if self.allow_edit_lot:
-                lot_pk = self.request.POST.get('subscription-lot')
-
-            elif self.subscription:
+            lot_pk = self.request.POST.get('subscription-lot')
+            if not lot_pk:
                 lot_pk = self.subscription.lot.pk
-
-            else:
-                raise Exception('Edição de lote somente para nova inscrição.')
 
             with atomic():
                 self.object = form.save()
@@ -831,10 +822,11 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
                     lot_pk=lot_pk,
                 )
                 if not subscription_form.is_valid():
-                    for error in subscription_form.errors:
-                        messages.error(self.request, str(error))
 
-                    return redirect(self.get_error_url())
+                    for name, error in subscription_form.errors.items():
+                        form.add_error(field='__all__', error=error[0])
+
+                    return self.form_invalid(form)
 
                 self.subscription = subscription_form.save()
                 if self.subscription.lot.event_survey:
