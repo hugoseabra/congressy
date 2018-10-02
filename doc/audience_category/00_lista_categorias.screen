@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model:Screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:model="http://wireframesketcher.com/1.0/model.ecore">
+  <widgets xsi:type="model:WidgetGroup" id="5" y="5" measuredWidth="841" measuredHeight="420">
+    <widgets xsi:type="model:WidgetGroup" id="7" width="841" height="439" measuredWidth="841" measuredHeight="420">
+      <widgets xsi:type="model:Master" id="3" width="407" measuredWidth="407" measuredHeight="42">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h1.%20Heading"/>
+        <overrides>
+          <widgets ref="1" width="407" text="Categoria de Participantes">
+            <attributes key="foreground" value="#444"/>
+            <font size="26px" bold="true"/>
+          </widgets>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:HLine" id="6" y="56" width="841" measuredWidth="841" measuredHeight="6" foreground="#999"/>
+      <widgets xsi:type="model:Label" id="10" x="5" y="66" width="180" text="Vagas confirmadas:" measuredWidth="180" measuredHeight="29">
+        <font size="16px" bold="true"/>
+      </widgets>
+      <widgets xsi:type="model:Master" id="15" x="5" y="98" width="834" height="27" measuredWidth="834" measuredHeight="27">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Media.screen#Progress%20Bar%20Success"/>
+        <overrides>
+          <widgets ref="25" width="834" height="27">
+            <attributes key="value" value="75"/>
+          </widgets>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="23" y="147" width="841" height="288" measuredWidth="841" measuredHeight="273">
+        <widgets xsi:type="model:Master" id="4" x="647" width="187" height="42" measuredWidth="187" measuredHeight="42" link="01-1_form_categoria-paid.screen">
+          <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button%20Success"/>
+          <overrides>
+            <widgets ref="37" width="187" height="42" text="{add} Adicinar categoria"/>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:WidgetGroup" id="22" y="61" width="841" height="226" measuredWidth="841" measuredHeight="212">
+          <widgets xsi:type="model:Table" id="2" width="841" height="212" text="(align:center).#,Nome da Categoria,# Lotes,# Inscrições,(align:center).% vagas,Lote Vigente,(align:right).Valor (R$) Vigente,(align:center).Ativo&#xA;(align:center).1,Médicos Profissionais,(align:center).4,(align:center).99/110,,Promocional,(align:right). R$ 150.00,(align:center).{assets/fa-check-circle},(align:center).{assets/fa-cog}&#xA;(align:center).2,Médicos Residentes,(align:center).4,(align:center).61/80,,Promocional,(align:right). R$ 250.00,(align:center).{assets/fa-check-circle},(align:center).{assets/fa-cog}&#xA;(align:center).3,[Universitários],(align:center).2,(align:center).181/200,,Promocional,(align:right). R$ 100.00,(align:center).{assets/fa-check-circle},(align:center).{assets/fa-cog}&#xA;(align:center).4,[Patrocinadores],(align:center).2,(align:center).9/15,,Parcerias,(align:right). -,{unselected},(align:center).{assets/fa-cog}&#xA;(align:center).5,[Parceiros],(align:center).2,(align:center).20/30,,Parcerias,(align:right). -,{assets/fa-check-circle},(align:center).{assets/fa-cog}&#xA;(align:center).6,[CRM],(align:center).1,(align:center).8/8,,Promocional,(align:right).R$ 88.00,{unselected},(align:center).{assets/fa-cog}&#xA;" measuredWidth="841" measuredHeight="212" alternative="#eee">
+            <font size="16px"/>
+            <items link="02-1_manage_category-paid-active.screen" x="30" y="91" width="97" height="21" text="Universitários"/>
+            <items link="02-4_manage_category-free-inactive.screen" x="30" y="120" width="106" height="21" text="Patrocinadores"/>
+            <items link="02-3_manage_category-free-active.screen" x="30" y="149" width="65" height="21" text="Parceiros"/>
+            <items link="02-2_manage_category-paid-inactive.screen" x="30" y="178" width="33" height="21" text="CRM"/>
+          </widgets>
+          <widgets xsi:type="model:Master" id="13" x="402" y="39" measuredWidth="65" measuredHeight="15">
+            <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Media.screen#Progress%20Bar"/>
+            <overrides>
+              <widgets ref="22" width="65" height="15">
+                <attributes key="value" value="71"/>
+              </widgets>
+            </overrides>
+          </widgets>
+          <widgets xsi:type="model:Master" id="24" x="402" y="66" measuredWidth="65" measuredHeight="15">
+            <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Media.screen#Progress%20Bar"/>
+            <overrides>
+              <widgets ref="22" width="65" height="15">
+                <attributes key="value" value="50"/>
+              </widgets>
+            </overrides>
+          </widgets>
+          <widgets xsi:type="model:Master" id="25" x="402" y="95" measuredWidth="65" measuredHeight="15">
+            <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Media.screen#Progress%20Bar"/>
+            <overrides>
+              <widgets ref="22" width="65" height="15">
+                <attributes key="value" value="55"/>
+              </widgets>
+            </overrides>
+          </widgets>
+          <widgets xsi:type="model:Master" id="26" x="402" y="123" measuredWidth="65" measuredHeight="15">
+            <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Media.screen#Progress%20Bar"/>
+            <overrides>
+              <widgets ref="22" width="65" height="15">
+                <attributes key="value" value="65"/>
+              </widgets>
+            </overrides>
+          </widgets>
+          <widgets xsi:type="model:Master" id="27" x="402" y="153" measuredWidth="65" measuredHeight="15">
+            <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Media.screen#Progress%20Bar"/>
+            <overrides>
+              <widgets ref="22" width="65" height="15">
+                <attributes key="value" value="65"/>
+              </widgets>
+            </overrides>
+          </widgets>
+          <widgets xsi:type="model:Master" id="28" x="402" y="181" measuredWidth="65" measuredHeight="15">
+            <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Media.screen#Progress%20Bar"/>
+            <overrides>
+              <widgets ref="22" width="65" height="15">
+                <attributes key="value" value="100"/>
+              </widgets>
+            </overrides>
+          </widgets>
+        </widgets>
+      </widgets>
+      <widgets xsi:type="model:Master" id="21" x="384" y="103" measuredWidth="29" measuredHeight="19">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#Small%20Text"/>
+        <overrides>
+          <widgets ref="21" width="29" height="19" text="88%">
+            <attributes key="foreground" value="#444"/>
+            <font bold="true"/>
+          </widgets>
+        </overrides>
+      </widgets>
+    </widgets>
+    <widgets xsi:type="model:Note" id="31" x="8" y="115" text="Se for inserido limite de vagas na categoria" measuredWidth="242" measuredHeight="30">
+      <font/>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="35" x="750" y="66" measuredWidth="91" measuredHeight="30">
+      <widgets xsi:type="model:Master" id="30" x="2" y="11" width="89" measuredWidth="89" measuredHeight="19">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#Small%20Text"/>
+        <overrides>
+          <widgets ref="21" width="89" height="19" text="278  /   443">
+            <attributes key="foreground" value="#444"/>
+            <font bold="true"/>
+          </widgets>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="34" measuredWidth="89" measuredHeight="19">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#Small%20Text"/>
+        <overrides>
+          <widgets ref="21" width="89" height="19" text="vagas       inscrições">
+            <attributes key="foreground" value="#444"/>
+            <font size="9px" bold="false"/>
+          </widgets>
+        </overrides>
+      </widgets>
+    </widgets>
+  </widgets>
+  <hRuler/>
+  <vRuler/>
+  <font size="12px"/>
+</model:Screen>

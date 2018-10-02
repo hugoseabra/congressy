@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model:Screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:model="http://wireframesketcher.com/1.0/model.ecore" xmlns:o="http://wireframesketcher.com/1.0/model/overrides">
+  <widgets xsi:type="model:Master" id="1" measuredWidth="818" measuredHeight="857" dimmed="true">
+    <screen xsi:type="model:Screen" href="02-1_manage_category-paid-active.screen#/"/>
+    <overrides>
+      <widgets ref="17/70">
+        <attributes key="background" value="#f0ad4e"/>
+        <attributes key="foreground" value="#f0ad4e"/>
+      </widgets>
+      <widgets ref="17">
+        <widgetChanges xsi:type="o:Insert" newIndex="2">
+          <object xsi:type="model:Label" id="2" x="720" y="11" text="{assets/fa-exclamation-triangle} INATIVO" foreground="#fff">
+            <font bold="true"/>
+          </object>
+        </widgetChanges>
+      </widgets>
+      <widgets ref="113" x="528"/>
+      <widgets ref="114/21" text="{assets/fa-exclamation-triangle}">
+        <attributes key="background" value="#f0ad4e"/>
+      </widgets>
+      <widgets ref="256" x="712"/>
+      <widgets ref="114" link="02-1_manage_category-paid-active.screen"/>
+    </overrides>
+  </widgets>
+  <hRuler>
+    <guides position="1288"/>
+  </hRuler>
+  <vRuler/>
+  <font size="14px"/>
+</model:Screen>

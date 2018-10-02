@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model:Screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:model="http://wireframesketcher.com/1.0/model.ecore">
+  <widgets xsi:type="model:Master" id="1" measuredWidth="945" measuredHeight="913" dimmed="true">
+    <screen xsi:type="model:Screen" href="03-2_form-lote-paid.screen#/"/>
+  </widgets>
+  <widgets xsi:type="model:Panel" id="2" width="945" height="913" measuredWidth="945" measuredHeight="913" background="black" alpha="128" border="none"/>
+  <widgets xsi:type="model:Master" id="3" x="119" y="64" measuredWidth="697" measuredHeight="809" dimmed="true">
+    <screen xsi:type="model:Screen" href="Components/modal_lote_relatorio_financeiro.screen#/"/>
+    <overrides>
+      <widgets ref="245/104" link="03-2_form-lote-paid.screen"/>
+    </overrides>
+  </widgets>
+  <hRuler>
+    <guides position="1288"/>
+  </hRuler>
+  <vRuler/>
+  <font size="14px"/>
+</model:Screen>

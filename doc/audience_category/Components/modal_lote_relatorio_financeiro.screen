@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model:Screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:model="http://wireframesketcher.com/1.0/model.ecore" xmlns:o="http://wireframesketcher.com/1.0/model/overrides">
+  <widgets xsi:type="model:Master" id="245" measuredWidth="697" measuredHeight="809">
+    <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Content.screen#Modal"/>
+    <overrides>
+      <widgetChanges xsi:type="o:Delete" ref="106"/>
+      <widgets ref="94" width="697" height="809"/>
+      <widgets ref="95" width="697"/>
+      <widgets ref="97" x="668"/>
+      <widgets ref="98" y="730" width="697"/>
+      <widgets ref="100" text="Simulação de Preços e Custos">
+        <font bold="true"/>
+      </widgets>
+      <widgets ref="102" width="657" height="708" text="&#xA;"/>
+      <widgets ref="104" x="614" y="753" text="Fechar">
+        <attributes key="background" value="#f00"/>
+      </widgets>
+    </overrides>
+  </widgets>
+  <widgets xsi:type="model:WidgetGroup" id="295" x="355" y="376" measuredWidth="297" measuredHeight="350">
+    <widgets xsi:type="model:Master" id="255" width="297" measuredWidth="297" measuredHeight="350">
+      <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Content.screen#Panel%20Primary"/>
+      <overrides>
+        <widgetChanges xsi:type="o:Delete" ref="72"/>
+        <widgets ref="70" width="297" height="350"/>
+        <widgets ref="71" text="Parcelas da compra:">
+          <font bold="true"/>
+        </widgets>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="256" x="18" y="56" measuredWidth="224" measuredHeight="280">
+      <widgets xsi:type="model:Master" id="257" x="6" measuredWidth="202" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="2x : R$110 (Sem Juros)"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="258" x="6" y="31" measuredWidth="218" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="3x : R$73,33 (Sem Juros)"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="259" x="6" y="62" measuredWidth="191" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="4x : R$60 (Sem Juros)"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="260" x="6" y="93" measuredWidth="117" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="5x : R$49,33 "/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="261" x="6" y="124" measuredWidth="117" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="6x : R$41,33 "/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="262" x="6" y="155" measuredWidth="117" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="7x : R$36,60 "/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="263" x="6" y="186" measuredWidth="117" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="8x : R$32,50 "/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="264" x="6" y="217" measuredWidth="112" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="9x : R$29,48"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="265" y="248" measuredWidth="128" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="10x : R$27,08 "/>
+        </overrides>
+      </widgets>
+    </widgets>
+  </widgets>
+  <widgets xsi:type="model:WidgetGroup" id="294" x="40" y="376" measuredWidth="300" measuredHeight="353">
+    <widgets xsi:type="model:WidgetGroup" id="293" measuredWidth="300" measuredHeight="353">
+      <widgets xsi:type="model:Master" id="266" height="353" measuredWidth="300" measuredHeight="353">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Content.screen#Panel%20Primary"/>
+        <overrides>
+          <widgetChanges xsi:type="o:Delete" ref="72"/>
+          <widgets ref="70" width="300" height="353">
+            <attributes key="foreground" value="#27b6af"/>
+            <attributes key="background" value="#27b6af"/>
+          </widgets>
+          <widgets ref="71" text="Você receberá:">
+            <font bold="true"/>
+          </widgets>
+        </overrides>
+      </widgets>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="267" x="26" y="54" measuredWidth="170" measuredHeight="282">
+      <widgets xsi:type="model:Master" id="268" measuredWidth="161" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text=" R$187,92 (se 2x) "/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="269" x="3" y="31" measuredWidth="156" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="R$ 182,89 (se 3x)"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="270" x="3" y="62" measuredWidth="156" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="R$ 198,00 (se 4x)"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="271" x="3" y="93" measuredWidth="156" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="R$ 198,00 (se 5x)"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="272" x="3" y="124" measuredWidth="156" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="R$ 198,00 (se 6x)"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="273" x="3" y="155" measuredWidth="156" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="R$ 198,00 (se 7x)"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="274" x="3" y="186" measuredWidth="156" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="R$ 198,00 (se 8x)"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="275" x="3" y="217" measuredWidth="156" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="R$ 198,00 (se 9x)"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="276" x="3" y="250" measuredWidth="167" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="R$ 198,00 (se 10x)"/>
+        </overrides>
+      </widgets>
+    </widgets>
+  </widgets>
+  <widgets xsi:type="model:WidgetGroup" id="286" x="40" y="216" measuredWidth="607" measuredHeight="106">
+    <widgets xsi:type="model:WidgetGroup" id="250" x="310" measuredWidth="297" measuredHeight="106">
+      <widgets xsi:type="model:Master" id="251" height="106" measuredWidth="297" measuredHeight="106">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Content.screen#Panel"/>
+        <overrides>
+          <widgetChanges xsi:type="o:Delete" ref="34"/>
+          <widgets ref="93" width="297" height="106">
+            <attributes key="foreground" value="#1f7bb6"/>
+            <attributes key="background" value="#1f7bb6"/>
+          </widgets>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="279" x="61" y="5" measuredWidth="176" measuredHeight="93">
+        <widgets xsi:type="model:Master" id="252" y="24" measuredWidth="176" measuredHeight="54">
+          <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h1.%20Heading"/>
+          <overrides>
+            <widgets ref="1" text="R$ 242,00">
+              <attributes key="foreground" value="#fff"/>
+              <font bold="true"/>
+            </widgets>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="253" x="5" measuredWidth="167" measuredHeight="34">
+          <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h2.%20Heading"/>
+          <overrides>
+            <widgets ref="5" text="Para o Participante">
+              <attributes key="foreground" value="#fff"/>
+              <font size="20px"/>
+            </widgets>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="254" x="38" y="65" measuredWidth="101" measuredHeight="28">
+          <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+          <overrides>
+            <widgets ref="14" text="Taxa: R$ 22,00">
+              <attributes key="foreground" value="#eee"/>
+            </widgets>
+          </overrides>
+        </widgets>
+      </widgets>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="287" measuredWidth="297" measuredHeight="106">
+      <widgets xsi:type="model:Master" id="288" height="106" measuredWidth="297" measuredHeight="106">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Content.screen#Panel"/>
+        <overrides>
+          <widgetChanges xsi:type="o:Delete" ref="34"/>
+          <widgets ref="93" width="297" height="106">
+            <attributes key="foreground" value="#27b6af"/>
+            <attributes key="background" value="#27b6af"/>
+          </widgets>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="289" x="61" y="5" measuredWidth="176" measuredHeight="78">
+        <widgets xsi:type="model:Master" id="290" y="24" measuredWidth="176" measuredHeight="54">
+          <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h1.%20Heading"/>
+          <overrides>
+            <widgets ref="1" text="R$ 200,00">
+              <attributes key="foreground" value="#fff"/>
+              <font bold="true"/>
+            </widgets>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="291" x="43" measuredWidth="89" measuredHeight="34">
+          <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h2.%20Heading"/>
+          <overrides>
+            <widgets ref="5" text="Para você">
+              <attributes key="foreground" value="#fff"/>
+              <font size="20px"/>
+            </widgets>
+          </overrides>
+        </widgets>
+      </widgets>
+    </widgets>
+  </widgets>
+  <widgets xsi:type="model:Label" id="300" x="45" y="80" text="Transferir taxa ao participante:" measuredWidth="210" measuredHeight="28">
+    <font bold="true"/>
+  </widgets>
+  <widgets xsi:type="model:Label" id="305" x="352" y="80" text="Assumir juros de parcelas:" measuredWidth="181" measuredHeight="28">
+    <font bold="true"/>
+  </widgets>
+  <widgets xsi:type="model:Master" id="306" x="352" y="107" measuredWidth="181" measuredHeight="32">
+    <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Forms.screen#Select%20Small"/>
+    <overrides>
+      <widgets ref="49" width="181" text="- Nenhuma parcela -"/>
+    </overrides>
+  </widgets>
+  <widgets xsi:type="model:Switch" id="307" x="45" y="107" text="Sim,Não" measuredWidth="83" measuredHeight="28" selected="true" background="#3d85c6">
+    <font/>
+  </widgets>
+  <widgets xsi:type="model:HLine" id="308" x="11" y="152" width="676" measuredWidth="676" measuredHeight="6" foreground="#999"/>
+  <widgets xsi:type="model:Label" id="309" x="40" y="168" text="Cálculos:" measuredWidth="105" measuredHeight="40">
+    <font size="24px" bold="true"/>
+  </widgets>
+  <widgets xsi:type="model:Label" id="310" x="40" y="336" text="Se compra parcelada:" measuredWidth="203" measuredHeight="34">
+    <font size="20px" bold="true"/>
+  </widgets>
+  <hRuler>
+    <guides position="1288"/>
+  </hRuler>
+  <vRuler/>
+  <font size="14px"/>
+</model:Screen>

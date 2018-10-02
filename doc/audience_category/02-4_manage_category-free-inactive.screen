@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model:Screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:model="http://wireframesketcher.com/1.0/model.ecore" xmlns:o="http://wireframesketcher.com/1.0/model/overrides">
+  <widgets xsi:type="model:WidgetGroup" id="253" measuredWidth="818" measuredHeight="905">
+    <widgets xsi:type="model:Master" id="255" measuredWidth="818" measuredHeight="905" dimmed="true">
+      <screen xsi:type="model:Screen" href="02-1_manage_category-paid-active.screen#/"/>
+      <overrides>
+        <widgets ref="114" link="02-3_manage_category-free-active.screen"/>
+        <widgets ref="114/21" text="{assets/fa-exclamation-triangle}">
+          <attributes key="background" value="#f0ad4e"/>
+        </widgets>
+        <widgets ref="255" y="336"/>
+        <widgets ref="40" height="-1"/>
+        <widgets ref="17" height="254"/>
+        <widgets ref="17/70" height="254">
+          <attributes key="background" value="#f0ad4e"/>
+          <attributes key="foreground" value="#f0ad4e"/>
+        </widgets>
+        <widgets ref="17">
+          <widgetChanges xsi:type="o:Insert" newIndex="2">
+            <object xsi:type="model:Label" id="258" x="720" y="11" text="{assets/fa-exclamation-triangle} INATIVO" foreground="#fff">
+              <font bold="true"/>
+            </object>
+          </widgetChanges>
+        </widgets>
+        <widgets ref="32" x="197"/>
+        <widgets ref="116" x="197"/>
+        <widgets ref="116/14" text="{assets/fa-flag-o} Gratuito"/>
+        <widgets ref="129" y="202"/>
+        <widgets ref="252" x="197" y="200"/>
+        <widgets ref="257">
+          <widgetChanges xsi:type="o:Delete" ref="132"/>
+          <widgetChanges xsi:type="o:Delete" ref="117"/>
+          <widgetChanges xsi:type="o:Delete" ref="37"/>
+          <widgetChanges xsi:type="o:Delete" ref="35"/>
+        </widgets>
+        <widgets ref="256" link="01-2_form_categoria-free.screen"/>
+        <widgets ref="258" y="57"/>
+      </overrides>
+    </widgets>
+  </widgets>
+  <hRuler>
+    <guides position="1288"/>
+  </hRuler>
+  <vRuler/>
+  <font size="14px"/>
+</model:Screen>
