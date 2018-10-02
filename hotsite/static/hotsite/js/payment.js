@@ -26,106 +26,109 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
 (function($, payment, raven) {
     "use strict";
 
-    const MAX_INSTALLMENTS = 10;
+    payment.Payment = function() {
+        const MAX_INSTALLMENTS = 10;
 
-    var allow_installment = true;
-    var interest_rate = 0;
-    var max_installments = 10;
-    var free_rate_installments = 0;
+        var allow_installment = true;
+        var interest_rate = 0;
+        var max_installments = 10;
+        var free_rate_installments = 0;
 
-    var total_amount = 0;
-    var items = [];
-    var enable_boleto = false;
+        var total_amount = 0;
+        var items = [];
+        var enable_boleto = false;
 
-    var _amount_as_payment = function(amount) {
-        var split = String(amount).split('.');
-        var cents = String(split[1]);
-        if (split.length === 1) {
-            cents = '00';
-        }
+        var _amount_as_payment = function(amount) {
+            var split = String(amount).split('.');
+            var cents = String(split[1]);
+            if (split.length === 1) {
+                cents = '00';
+            }
 
-        if (cents.length === 1) {
-            cents += 0;
-        }
-        return String(split[0]) + String(cents);
-    };
-
-    payment.enable_boleto = function() { enable_boleto = true; };
-
-    payment.disable_installment = function() { allow_installment = false; };
-
-    payment.set_interest_rate = function(rate) { interest_rate = rate; };
-
-    payment.set_max_installments = function(num) {
-        num = parseInt(num);
-        if (num > MAX_INSTALLMENTS) { num = MAX_INSTALLMENTS; }
-        max_installments = num;
-    };
-
-    payment.set_free_rate_installments = function (num) {
-
-        num = parseInt(num);
-        if (num > MAX_INSTALLMENTS) {
-            num = MAX_INSTALLMENTS;
-        }
-
-        free_rate_installments = num;
-    };
-
-    payment.add_item = function(type, id, title, quantity, amount) {
-        total_amount += amount;
-        items.push({
-            "object": "item",
-            "id": type + "-" + id,
-            "title": title,
-            "unit_price": _amount_as_payment(amount),
-            "quantity": quantity,
-            "tangible": false
-        })
-    };
-
-    payment.get_items = function() {
-        return items;
-    };
-
-    payment.get_payment_data = function() {
-
-        if (!interest_rate) {
-            alert('Erro: fale com o suporte.');
-            raven.trigger('Não há taxa de juros no pagamento configurada.');
-            return;
-        }
-
-        var methods = 'credit_card';
-        if (enable_boleto === true) {
-            methods += ',boleto';
-        }
-
-        var params = {
-            amount: _amount_as_payment(total_amount),
-            createToken: 'false',
-            paymentMethods: methods,
-            customerData: false,
-            interestRate: interest_rate,
-            items: items
+            if (cents.length === 1) {
+                cents += 0;
+            }
+            return String(split[0]) + String(cents);
         };
 
-        if (allow_installment) {
+        this.enable_boleto = function() { enable_boleto = true; };
 
-            var max_installments = parseInt(max_installments);
+        this.disable_installment = function() { allow_installment = false; };
 
-            if (max_installments > MAX_INSTALLMENTS) {
-                max_installments = MAX_INSTALLMENTS;
+        this.set_interest_rate = function(rate) { interest_rate = rate; };
+
+        this.set_max_installments = function(num) {
+            num = parseInt(num);
+            debugger;
+            if (num > MAX_INSTALLMENTS) { num = MAX_INSTALLMENTS; }
+            max_installments = num;
+            debugger;
+        };
+
+        this.set_free_rate_installments = function (num) {
+            num = parseInt(num);
+            if (num > MAX_INSTALLMENTS) {
+                num = MAX_INSTALLMENTS;
             }
 
-            params['maxInstallments'] = max_installments;
+            free_rate_installments = num;
+        };
 
-            if (free_rate_installments) {
-                params['freeInstallments'] = parseInt(free_rate_installments);
+        this.add_item = function(type, id, title, quantity, amount) {
+            total_amount += amount;
+            items.push({
+                "object": "item",
+                "id": type + "-" + id,
+                "title": title,
+                "unit_price": _amount_as_payment(amount),
+                "quantity": quantity,
+                "tangible": false
+            })
+        };
+
+        this.get_items = function() {
+            return items;
+        };
+
+        this.get_payment_data = function() {
+
+            if (!interest_rate) {
+                alert('Erro: fale com o suporte.');
+                raven.trigger('Não há taxa de juros no pagamento configurada.');
+                return;
             }
-        }
 
-        return params;
+            var methods = 'credit_card';
+            if (enable_boleto === true) {
+                methods += ',boleto';
+            }
+
+            var params = {
+                amount: _amount_as_payment(total_amount),
+                createToken: 'false',
+                paymentMethods: methods,
+                customerData: false,
+                interestRate: interest_rate,
+                items: items
+            };
+
+            if (allow_installment) {
+
+                max_installments = parseInt(max_installments);
+
+                if (max_installments > MAX_INSTALLMENTS) {
+                    max_installments = MAX_INSTALLMENTS;
+                }
+
+                params['maxInstallments'] = max_installments;
+
+                if (free_rate_installments) {
+                    params['freeInstallments'] = parseInt(free_rate_installments);
+                }
+            }
+
+            return params;
+        };
     };
 
 })(jQuery, window.cgsy.payment, window.cgsy.raven);
@@ -178,7 +181,7 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
         payment_btn_el.attr('disabled', 'disabled');
         payment_btn_el.text('Aguarde...');
 
-        $('#next_form').submit();
+        $('#payment_form').submit();
     };
 
     payment_form.error = function (data) {
@@ -193,10 +196,10 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
 
 })(jQuery, window.cgsy.payment_form, window.cgsy.raven);
 
-(function ($, payment, payment_form, pagarme, PagarMeCheckout) {
+(function ($, payment_form, pagarme, PagarMeCheckout) {
     "use strict";
 
-    pagarme.process_payment = function (encryption_key) {
+    pagarme.process_payment = function (encryption_key, payment) {
 
         var checkout = new PagarMeCheckout.Checkout({
             encryption_key: encryption_key,
@@ -207,4 +210,4 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
         checkout.open(payment.get_payment_data());
     };
 
-})(jQuery, window.cgsy.payment, window.cgsy.payment_form, window.cgsy.pagarme, PagarMeCheckout);
+})(jQuery, window.cgsy.payment_form, window.cgsy.pagarme, window.PagarMeCheckout);

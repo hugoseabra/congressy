@@ -8,8 +8,6 @@
     <!-- FORM
 ================================= -->
     <section id="about" class="about-section section">
-    <form action="" method="post" novalidate>
-        {% csrf_token %}
         <div class="container">
             <h2 class="section-heading text-center">Inscrição</h2>
             <div class="about-row row">
@@ -49,6 +47,7 @@
                                     {% render_errors field.error %}
                                 {% endif %}
                             {% endfor %}
+
                             <div class="well well-sm" style="text-align: justify">
                                 <h3>Checkout: {{ subscription.person.name}}</h3>
                                 <div>
@@ -140,14 +139,14 @@
                             </div>
                             <br/>
 
-                            {{ wizard.management_form }}
+                            <form action="" method="post" id="payment_form">
+                                {% csrf_token %}
+                                {{ wizard.management_form }}
 
-                            {% for hidden in form.hidden_fields %}
-                                {{ hidden }}
-                            {% endfor %}
-
-
-
+                                {% for hidden in form.hidden_fields %}
+                                    {{ hidden }}
+                                {% endfor %}
+                            </form>
                         </div>
                     </div>
 
@@ -158,16 +157,19 @@
                         <i class="fas fa-chevron-circle-right"></i>
                     </button>
 
-                    {{ wizard.management_form }}
-                    {% if wizard.steps.prev %}
-                        <input type="hidden" name="wizard_goto_step"
-                               value="{{ wizard.steps.prev }}">
-                        <button type="submit"
-                                class="btn btn-primary">
-                            <i class="fas fa-chevron-circle-left"></i>
-                            Voltar
-                        </button>
-                    {% endif %}
+                    <form action="" method="post" novalidate>
+                        {% csrf_token %}
+                        {{ wizard.management_form }}
+                        {% if wizard.steps.prev %}
+                            <input type="hidden" name="wizard_goto_step"
+                                   value="{{ wizard.steps.prev }}">
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                <i class="fas fa-chevron-circle-left"></i>
+                                Voltar
+                            </button>
+                        {% endif %}
+                    </form>
 
                 </div>
                 <div class="col-md-9 col-md-offset-2" style="margin-top:10px">
@@ -177,7 +179,7 @@
                     </div>
                 </div>
             </div>
-    </form>
+        </div>
     </section>
 
 {% endblock %}
@@ -193,30 +195,29 @@
             $('#back_form').submit()
         }
 
+        var payment_obj;
+
         jQuery(document).ready(function() {
             window.setTimeout(function () {
-                $('form').submit(function () {
-                    $(this).find(':submit').attr('disabled', 'disabled');
-                    $(this).attr('novalidate', 'novalidate');
-                });
+                payment_obj = new window.cgsy.payment.Payment();
 
                 // disable boleto method
                 {% if 'boleto' in allowed_transaction_types %}
-                window.cgsy.payment.enable_boleto();
+                payment_obj.enable_boleto();
                 {% endif %}
 
-                {% if lot.allow_installment is True %}
+                {% if lot.allow_installment is False %}
                 // disable installment
-                window.cgsy.payment.disable_installment();
+                payment_obj.disable_installment();
                 {% endif %}
 
-                window.cgsy.payment.set_interest_rate(2.29);
-                window.cgsy.payment.set_max_installments('{{ lot.installment_limit }}');
-                window.cgsy.payment.set_free_rate_installments('{{ lot.num_install_interest_absortion }}');
+                payment_obj.set_interest_rate(2.29);
+                payment_obj.set_max_installments('{{ lot.installment_limit }}');
+                payment_obj.set_free_rate_installments('{{ lot.num_install_interest_absortion }}');
 
                 {% if lot.get_calculated_price %}
                 // Adiciona billing de inscrição
-                window.cgsy.payment.add_item(
+                payment_obj.add_item(
                     'subscription',
                     '{{ subscription.pk }}',
                     'Inscrição: {{ lot.event.name }}',
@@ -225,11 +226,11 @@
                 );
                 {% endif %}
 
-                {% if products %}
+            {% if products %}
                     // Adiciona billing de opcionais de produtos/serviços
                     {% for product in products %}
                         {% if product.optional_price %}
-                        window.cgsy.payment.add_item(
+                        payment_obj.add_item(
                             'optional-product',
                             '{{ subscription.pk }}',
                             'Produto/Serviço: {{ product.optional.name }}',
@@ -244,7 +245,7 @@
                     // Adiciona billing de opcionais de atividades extras
                     {% for service in services %}
                         {% if service.optional_price %}
-                        window.cgsy.payment.add_item(
+                        payment_obj.add_item(
                             'optional-service',
                             '{{ subscription.pk }}',
                             'Atividade extra: {{ service.optional.name }}',
@@ -255,8 +256,13 @@
                     {% endfor %}
                 {% endif %}
 
+                $('form').submit(function () {
+                    $(this).find(':submit').attr('disabled', 'disabled');
+                    $(this).attr('novalidate', 'novalidate');
+                });
+
                  $('#id_button_pay').on('click', function () {
-                     window.cgsy.pagarme.process_payment('{{ pagarme_encryption_key }}');
+                     window.cgsy.pagarme.process_payment('{{ pagarme_encryption_key }}', payment_obj);
                  });
             }, 300);
         });
