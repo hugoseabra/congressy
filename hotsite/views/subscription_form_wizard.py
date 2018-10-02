@@ -13,9 +13,10 @@ from django.utils.translation import ugettext as _
 from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
+from core.helpers import sentry_log
 from core.util.string import clear_string
 from gatheros_event.helpers.event_business import is_paid_event
-from gatheros_subscription.models import FormConfig, Lot, Subscription
+from gatheros_subscription.models import Lot, Subscription
 from hotsite import forms
 from hotsite.views.mixins import SelectLotMixin
 from mailer.services import (
@@ -403,7 +404,9 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
 
             return super().dispatch(request, *args, **kwargs)
 
-        except InvalidStateStepError:
+        except InvalidStateStepError as e:
+
+            sentry_log(str(e), type='error', notify_admins=True)
 
             messages.warning(
                 request,

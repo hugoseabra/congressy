@@ -6,8 +6,8 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.template import loader
 from wkhtmltopdf.utils import render_to_temporary_file, convert_to_pdf
 
-from gatheros_subscription.helpers.qrcode import create_qrcode
 from gatheros_subscription.helpers.barcode import create_barcode
+from gatheros_subscription.helpers.qrcode import create_qrcode
 
 
 def get_logo():
@@ -35,17 +35,19 @@ def get_context(subscription):
     except AttributeError:
         place = None
 
-    return {
+    context = {
         'qrcode': create_qrcode(subscription),
-        'barcode': create_barcode(subscription),
+        # 'barcode': create_barcode(subscription),
         'logo': get_logo(),
         'event': event,
         'place': place,
         'person': subscription.person,
         'lot': subscription.lot,
-        'organization': subscription.event.organization,
+        'organization': event.organization,
         'subscription': subscription,
     }
+
+    return context
 
 
 def create_voucher(subscription):
