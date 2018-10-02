@@ -1,7 +1,7 @@
-from django.http import JsonResponse
-from rest_framework import viewsets
 from datetime import datetime
-from scientific_work import forms
+
+from rest_framework import viewsets
+
 from scientific_work.models import Work, Author, AreaCategory, WorkConfig
 from scientific_work.serializers import WorkSerializer, AuthorSerializer, \
     AreaCategorySerializer, WorkConfigSerializer
@@ -39,18 +39,22 @@ class WorkConfigViewSet(viewsets.ModelViewSet):
     serializer_class = WorkConfigSerializer
 
     def update(self, request, *args, **kwargs):
-        if 'date_start_0' in request.data and 'date_start_1':
-            request.POST._mutable = True
-            full_date = request.data['date_start_0'] + ' ' + request.data[
-                'date_start_1']
 
+        date_start_0 = request.data['date_start_0']
+        date_start_1 = request.data['date_start_1']
+
+        if date_start_0 and date_start_1:
+            request.POST._mutable = True
+            full_date = date_start_0 + ' ' + date_start_1
             start = datetime.strptime(full_date, '%d/%m/%Y %H:%M')
             request.data['date_start'] = start
 
-        if 'date_end_0' in request.data and 'date_end_1':
+        date_end_0 = request.data['date_end_0']
+        date_end_1 = request.data['date_end_1']
+
+        if date_end_0 and date_end_1:
             request.POST._mutable = True
-            full_date = request.data['date_end_0'] + ' ' + request.data[
-                'date_end_1']
+            full_date = date_end_0 + ' ' + date_end_1
 
             end = datetime.strptime(full_date, '%d/%m/%Y %H:%M')
             request.data['date_end'] = end
