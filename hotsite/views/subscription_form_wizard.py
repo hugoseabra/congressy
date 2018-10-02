@@ -15,7 +15,7 @@ from formtools.wizard.views import SessionWizardView
 
 from core.util.string import clear_string
 from gatheros_event.helpers.event_business import is_paid_event
-from gatheros_subscription.models import FormConfig, Lot, Subscription
+from gatheros_subscription.models import Lot, Subscription
 from hotsite import forms
 from hotsite.views.mixins import SelectLotMixin
 from mailer.services import (
@@ -187,9 +187,9 @@ def has_survey(wizard):
         except Lot.DoesNotExist:
             return False
 
-    return lot.event_survey and \
-           lot.event_survey.survey.questions.count() and \
-           lot.event.feature_configuration.feature_survey
+    return lot.event.feature_configuration.feature_survey and \
+           hasattr(lot, 'event_survey') and \
+           lot.event_survey.survey.questions.count()
 
 
 def is_private_event(wizard):
@@ -442,7 +442,7 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and
-                    self.storage.current_step is not None):
+                self.storage.current_step is not None):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
 
