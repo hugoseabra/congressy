@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model:Screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:model="http://wireframesketcher.com/1.0/model.ecore">
+  <widgets xsi:type="model:WidgetGroup" id="3" measuredWidth="897" measuredHeight="793">
+    <widgets xsi:type="model:WidgetGroup" id="4" measuredWidth="897" measuredHeight="793">
+      <widgets xsi:type="model:Master" id="1" x="30" y="30" measuredWidth="841" measuredHeight="434" dimmed="true">
+        <screen xsi:type="model:Screen" href="00_lista_categorias.screen#/"/>
+        <overrides>
+          <widgets ref="4" noLink="true"/>
+          <widgets ref="2">
+            <items ref="@items.0" noLink="true"/>
+          </widgets>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Panel" id="2" width="897" height="793" measuredWidth="897" measuredHeight="793" background="black" alpha="128" border="none"/>
+    </widgets>
+  </widgets>
+  <widgets xsi:type="model:Master" id="39" x="149" y="30" measuredWidth="600" measuredHeight="733" dimmed="true">
+    <screen xsi:type="model:Screen" href="Components/modal_form_categoria-paid.screen#/"/>
+    <overrides>
+      <widgets ref="115" link="01-2_form_categoria-free.screen"/>
+      <widgets ref="120" link="00_lista_categorias.screen"/>
+      <widgets ref="99/106" link="00_lista_categorias.screen"/>
+    </overrides>
+  </widgets>
+  <hRuler/>
+  <vRuler/>
+  <font size="12px"/>
+</model:Screen>

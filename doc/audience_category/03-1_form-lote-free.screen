@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model:Screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:model="http://wireframesketcher.com/1.0/model.ecore" xmlns:o="http://wireframesketcher.com/1.0/model/overrides">
+  <widgets xsi:type="model:Master" id="320" x="30" y="30" measuredWidth="818" measuredHeight="777" dimmed="true">
+    <screen xsi:type="model:Screen" href="02-3_manage_category-free-active.screen#/"/>
+  </widgets>
+  <widgets xsi:type="model:Panel" id="296" width="945" height="913" measuredWidth="945" measuredHeight="913" background="black" alpha="128" border="none"/>
+  <widgets xsi:type="model:WidgetGroup" id="319" x="168" y="168" measuredWidth="600" measuredHeight="521">
+    <widgets xsi:type="model:Master" id="297" height="521" measuredWidth="600" measuredHeight="521">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Content.screen#Modal"/>
+      <overrides>
+        <widgetChanges xsi:type="o:Delete" ref="102"/>
+        <widgets ref="94" height="521"/>
+        <widgets ref="98" y="442"/>
+        <widgets ref="100" text="Editar Lote #2">
+          <font bold="true"/>
+        </widgets>
+        <widgets ref="104" x="442" y="468" text="Fechar" link="02-3_manage_category-free-active.screen">
+          <attributes key="background" value="#d9534f"/>
+        </widgets>
+        <widgets ref="106" x="513" y="468" text="Salvar" link="02-3_manage_category-free-active.screen">
+          <attributes key="background" value="#5cb85c"/>
+        </widgets>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="298" x="47" y="312" measuredWidth="234" measuredHeight="57">
+      <widgets xsi:type="model:Master" id="299" measuredWidth="147" measuredHeight="29">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="Limite de inscrições">
+            <font size="16px" bold="true"/>
+          </widgets>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Spinner" id="300" y="28" width="234" text="150" measuredWidth="234" measuredHeight="29" borderColor="#444">
+        <font size="16px" bold="false"/>
+      </widgets>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="301" x="47" y="181" measuredWidth="490" measuredHeight="111">
+      <widgets xsi:type="model:WidgetGroup" id="302" measuredWidth="234" measuredHeight="111">
+        <widgets xsi:type="model:Master" id="303" y="29" width="234" measuredWidth="234" measuredHeight="40">
+          <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Input%20Group%20Button%20Prefix"/>
+          <overrides>
+            <widgets ref="83" y="2" noText="true">
+              <attributes key="icon" value="assets/fa-calendar-alt (small)"/>
+              <attributes key="background" value="#ccc"/>
+            </widgets>
+            <widgets ref="84" x="31" width="203"/>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="304" measuredWidth="169" measuredHeight="29">
+          <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+          <overrides>
+            <widgets ref="9" text="Data/hora de Inicio: {assets/fa-question-circle}">
+              <font size="16px" bold="true"/>
+            </widgets>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="305" y="71" width="234" measuredWidth="234" measuredHeight="40">
+          <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Input%20Group%20Button%20Prefix"/>
+          <overrides>
+            <widgets ref="83" y="2" noText="true">
+              <attributes key="icon" value="assets/fa-clock (small)"/>
+              <attributes key="background" value="#ccc"/>
+            </widgets>
+            <widgets ref="84" x="31" width="203"/>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="306" x="40" y="38" measuredWidth="85" measuredHeight="22">
+          <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#Small%20Text"/>
+          <overrides>
+            <widgets ref="21" text="28/10/2018">
+              <attributes key="foreground" value="#444"/>
+              <font size="16px"/>
+            </widgets>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="307" x="42" y="80" measuredWidth="41" measuredHeight="22">
+          <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#Small%20Text"/>
+          <overrides>
+            <widgets ref="21" text="08:00">
+              <attributes key="foreground" value="#444"/>
+              <font size="16px"/>
+            </widgets>
+          </overrides>
+        </widgets>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="308" x="256" measuredWidth="234" measuredHeight="111">
+        <widgets xsi:type="model:Master" id="309" y="29" width="234" measuredWidth="234" measuredHeight="40">
+          <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Input%20Group%20Button%20Prefix"/>
+          <overrides>
+            <widgets ref="83" y="2" noText="true">
+              <attributes key="icon" value="assets/fa-calendar-alt (small)"/>
+              <attributes key="background" value="#ccc"/>
+            </widgets>
+            <widgets ref="84" x="31" width="203"/>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="310" measuredWidth="234" measuredHeight="29">
+          <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+          <overrides>
+            <widgets ref="9" text="Data/hora de Encerramento: {assets/fa-question-circle}">
+              <font size="16px" bold="true"/>
+            </widgets>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="311" y="71" width="234" measuredWidth="234" measuredHeight="40">
+          <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Input%20Group%20Button%20Prefix"/>
+          <overrides>
+            <widgets ref="83" y="2" noText="true">
+              <attributes key="icon" value="assets/fa-clock (small)"/>
+              <attributes key="background" value="#ccc"/>
+            </widgets>
+            <widgets ref="84" x="31" width="203"/>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="312" x="41" y="38" measuredWidth="85" measuredHeight="22">
+          <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#Small%20Text"/>
+          <overrides>
+            <widgets ref="21" text="28/11/2018">
+              <attributes key="foreground" value="#444"/>
+              <font size="16px"/>
+            </widgets>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="313" x="41" y="80" measuredWidth="41" measuredHeight="22">
+          <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#Small%20Text"/>
+          <overrides>
+            <widgets ref="21" text="22:00">
+              <attributes key="foreground" value="#444"/>
+              <font size="16px"/>
+            </widgets>
+          </overrides>
+        </widgets>
+      </widgets>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="314" x="49" y="86" width="479" measuredWidth="488" measuredHeight="71">
+      <widgets xsi:type="model:Master" id="315" width="152" measuredWidth="152" measuredHeight="29">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" width="152" text="Nome do lote: {assets/fa-question-circle}">
+            <font size="16px" bold="true"/>
+          </widgets>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="316" y="31" width="488" measuredWidth="488" measuredHeight="40">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Input%20Group%20Button"/>
+        <overrides>
+          <widgetChanges xsi:type="o:Delete" ref="87"/>
+          <widgets ref="86" width="488"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="317" x="7" y="40" measuredWidth="89" measuredHeight="22">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#Small%20Text"/>
+        <overrides>
+          <widgets ref="21" text="Promocional">
+            <attributes key="foreground" value="#444"/>
+            <font size="16px"/>
+          </widgets>
+        </overrides>
+      </widgets>
+    </widgets>
+  </widgets>
+  <hRuler>
+    <guides position="1288"/>
+  </hRuler>
+  <vRuler/>
+  <font size="14px"/>
+</model:Screen>

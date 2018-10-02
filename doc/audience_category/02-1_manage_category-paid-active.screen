@@ -1,0 +1,677 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model:Screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:model="http://wireframesketcher.com/1.0/model.ecore" xmlns:o="http://wireframesketcher.com/1.0/model/overrides">
+  <widgets xsi:type="model:Master" id="113" x="528" y="2" measuredWidth="175" measuredHeight="45">
+    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Forms.screen#Select"/>
+    <overrides>
+      <widgets ref="24" text="{assets/fa-exchange} Outra categoria&#xA;">
+        <font size="16px"/>
+      </widgets>
+    </overrides>
+  </widgets>
+  <widgets xsi:type="model:Master" id="114" x="769" y="4" measuredWidth="49" measuredHeight="42" link="02-2_manage_category-paid-inactive.screen">
+    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button"/>
+    <overrides>
+      <widgets ref="21" width="49" height="42" text="{assets/fa-check-circle}">
+        <attributes key="background" value="#5cb85c"/>
+        <font size="16px"/>
+      </widgets>
+    </overrides>
+  </widgets>
+  <widgets xsi:type="model:WidgetGroup" id="258" y="473" measuredWidth="816" measuredHeight="481">
+    <widgets xsi:type="model:WidgetGroup" id="255" measuredWidth="816" measuredHeight="481">
+      <widgets xsi:type="model:Master" id="40" height="441" measuredWidth="816" measuredHeight="441">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Content.screen#Panel%20Primary"/>
+        <overrides>
+          <widgets ref="71" text="Lotes">
+            <font bold="true"/>
+          </widgets>
+          <widgets ref="72" height="378" text="&#xA;"/>
+          <widgets ref="70" height="512"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="250" x="11" y="62" measuredWidth="793" measuredHeight="419">
+        <widgets xsi:type="model:Master" id="41" x="665" y="385" measuredWidth="128" measuredHeight="34" link="03-2_form-lote-paid.screen">
+          <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button%20Success"/>
+          <overrides>
+            <widgets ref="37" text="Adicionar lote">
+              <attributes key="icon" value="assets/fa-plus-circle (small)"/>
+            </widgets>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:WidgetGroup" id="248" y="53" measuredWidth="793" measuredHeight="316">
+          <widgets xsi:type="model:WidgetGroup" id="299" measuredWidth="793" measuredHeight="58">
+            <widgets xsi:type="model:WidgetGroup" id="95" width="793" measuredWidth="793" measuredHeight="58">
+              <widgets xsi:type="model:Master" id="140" height="58" measuredWidth="793" measuredHeight="58">
+                <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button%20Block"/>
+                <overrides>
+                  <widgets ref="47" width="793" height="58" noText="true">
+                    <attributes key="background" value="#f3f3f3"/>
+                  </widgets>
+                </overrides>
+              </widgets>
+              <widgets xsi:type="model:Master" id="81" x="736" y="12" measuredWidth="50" measuredHeight="34">
+                <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button"/>
+                <overrides>
+                  <widgets ref="21" width="50" noText="true">
+                    <attributes key="icon" value="assets/fa-cog (small)"/>
+                  </widgets>
+                </overrides>
+              </widgets>
+              <widgets xsi:type="model:WidgetGroup" id="151" x="293" y="6" measuredWidth="340" measuredHeight="46">
+                <widgets xsi:type="model:WidgetGroup" id="147" measuredWidth="127" measuredHeight="46">
+                  <widgets xsi:type="model:Master" id="80" y="18" measuredWidth="127" measuredHeight="28">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="127" text="13-01-2018 08:00">
+                        <attributes key="foreground" value="#666"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                  <widgets xsi:type="model:Master" id="135" measuredWidth="127" measuredHeight="24">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="127" text="Início">
+                        <attributes key="foreground" value="#666"/>
+                        <font size="12px" bold="true"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                </widgets>
+                <widgets xsi:type="model:WidgetGroup" id="148" x="213" measuredWidth="127" measuredHeight="46">
+                  <widgets xsi:type="model:Master" id="134" y="18" measuredWidth="127" measuredHeight="28">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="127" text="13-01-2018 08:00">
+                        <attributes key="foreground" value="#666"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                  <widgets xsi:type="model:Master" id="136" measuredWidth="107" measuredHeight="24">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="107" text="Fim">
+                        <attributes key="foreground" value="#666"/>
+                        <font size="12px" bold="true"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                </widgets>
+              </widgets>
+              <widgets xsi:type="model:Master" id="141" x="8" y="14" measuredWidth="25" measuredHeight="29">
+                <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                <overrides>
+                  <widgets ref="14" width="25" text="1">
+                    <attributes key="foreground" value="#444"/>
+                    <attributes key="textAlignment" value="Right"/>
+                    <font size="16px" bold="true"/>
+                  </widgets>
+                </overrides>
+              </widgets>
+              <widgets xsi:type="model:WidgetGroup" id="146" x="40" y="6" width="238" measuredWidth="238" measuredHeight="46">
+                <widgets xsi:type="model:Master" id="144" y="18" width="238" measuredWidth="238" measuredHeight="28">
+                  <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                  <overrides>
+                    <widgets ref="14" width="238" text="Promocional para baixinhos e alt...">
+                      <attributes key="foreground" value="#666"/>
+                    </widgets>
+                  </overrides>
+                </widgets>
+                <widgets xsi:type="model:Master" id="145" width="238" measuredWidth="238" measuredHeight="24">
+                  <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                  <overrides>
+                    <widgets ref="14" width="238" text="nome">
+                      <attributes key="foreground" value="#666"/>
+                      <font size="12px" bold="true"/>
+                    </widgets>
+                  </overrides>
+                </widgets>
+              </widgets>
+            </widgets>
+          </widgets>
+          <widgets xsi:type="model:WidgetGroup" id="300" y="66" measuredWidth="793" measuredHeight="117">
+            <widgets xsi:type="model:WidgetGroup" id="301" y="28" height="73" measuredWidth="793" measuredHeight="89">
+              <widgets xsi:type="model:Master" id="302" height="89" measuredWidth="793" measuredHeight="89">
+                <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button%20Block"/>
+                <overrides>
+                  <widgets ref="47" width="793" height="89" noText="true"/>
+                </overrides>
+              </widgets>
+              <widgets xsi:type="model:WidgetGroup" id="303" x="509" y="39" measuredWidth="105" measuredHeight="43">
+                <widgets xsi:type="model:Master" id="304" y="15" measuredWidth="105" measuredHeight="28">
+                  <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                  <overrides>
+                    <widgets ref="14" width="105" text="R$ 10.800,00">
+                      <font bold="true"/>
+                    </widgets>
+                  </overrides>
+                </widgets>
+                <widgets xsi:type="model:Master" id="305" measuredWidth="78" measuredHeight="24">
+                  <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                  <overrides>
+                    <widgets ref="14" width="78" text="Valor (R$)">
+                      <attributes key="foreground" value="#666"/>
+                      <font size="12px" bold="true"/>
+                    </widgets>
+                  </overrides>
+                </widgets>
+              </widgets>
+              <widgets xsi:type="model:WidgetGroup" id="306" x="293" y="39" measuredWidth="86" measuredHeight="43">
+                <widgets xsi:type="model:Master" id="307" y="15" measuredWidth="57" measuredHeight="28">
+                  <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                  <overrides>
+                    <widgets ref="14" width="57" text="40 / 120">
+                      <font bold="true"/>
+                    </widgets>
+                  </overrides>
+                </widgets>
+                <widgets xsi:type="model:Master" id="308" measuredWidth="86" measuredHeight="24">
+                  <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                  <overrides>
+                    <widgets ref="14" width="86" text="# Insc. / Limite">
+                      <attributes key="foreground" value="#666"/>
+                      <font size="12px" bold="true"/>
+                    </widgets>
+                  </overrides>
+                </widgets>
+              </widgets>
+              <widgets xsi:type="model:Label" id="309" x="683" y="49" text="%(color:green){assets/fa-money}%" measuredWidth="38" measuredHeight="40" textAlignment="Center" foreground="#6aa84f" link="02-5_manage_category-paid-financeiro.screen">
+                <font size="24px"/>
+              </widgets>
+              <widgets xsi:type="model:Master" id="310" x="685" y="38" width="97" measuredWidth="97" measuredHeight="24">
+                <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                <overrides>
+                  <widgets ref="14" width="97" text="Preços / Custos">
+                    <attributes key="foreground" value="#666"/>
+                    <font size="12px" bold="true"/>
+                  </widgets>
+                </overrides>
+              </widgets>
+              <widgets xsi:type="model:WidgetGroup" id="311" x="21" y="47" measuredWidth="225" measuredHeight="25">
+                <widgets xsi:type="model:Master" id="312" width="225" measuredWidth="225" measuredHeight="25">
+                  <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Media.screen#Progress%20Bar"/>
+                  <overrides>
+                    <widgets ref="22" width="225" height="25">
+                      <attributes key="value" value="71"/>
+                    </widgets>
+                  </overrides>
+                </widgets>
+                <widgets xsi:type="model:Master" id="313" x="98" y="5" measuredWidth="29" measuredHeight="19">
+                  <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#Small%20Text"/>
+                  <overrides>
+                    <widgets ref="21" width="29" height="19" text="88%">
+                      <attributes key="foreground" value="#fff"/>
+                      <font bold="true"/>
+                    </widgets>
+                  </overrides>
+                </widgets>
+              </widgets>
+            </widgets>
+            <widgets xsi:type="model:WidgetGroup" id="314" width="793" measuredWidth="793" measuredHeight="58">
+              <widgets xsi:type="model:Master" id="315" height="58" measuredWidth="793" measuredHeight="58">
+                <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button%20Block"/>
+                <overrides>
+                  <widgets ref="47" width="793" height="58" noText="true"/>
+                </overrides>
+              </widgets>
+              <widgets xsi:type="model:Master" id="316" x="736" y="12" measuredWidth="50" measuredHeight="34">
+                <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button"/>
+                <overrides>
+                  <widgets ref="21" width="50" noText="true">
+                    <attributes key="icon" value="assets/fa-cog (small)"/>
+                  </widgets>
+                </overrides>
+              </widgets>
+              <widgets xsi:type="model:WidgetGroup" id="317" x="293" y="6" measuredWidth="340" measuredHeight="46">
+                <widgets xsi:type="model:WidgetGroup" id="318" measuredWidth="127" measuredHeight="46">
+                  <widgets xsi:type="model:Master" id="319" y="18" measuredWidth="127" measuredHeight="28">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="127" text="13-01-2018 08:00">
+                        <font bold="true"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                  <widgets xsi:type="model:Master" id="320" measuredWidth="127" measuredHeight="24">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="127" text="Início">
+                        <attributes key="foreground" value="#666"/>
+                        <font size="12px" bold="true"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                </widgets>
+                <widgets xsi:type="model:WidgetGroup" id="321" x="213" measuredWidth="127" measuredHeight="46">
+                  <widgets xsi:type="model:Master" id="322" y="18" measuredWidth="127" measuredHeight="28">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="127" text="13-01-2018 08:00">
+                        <font bold="true"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                  <widgets xsi:type="model:Master" id="323" measuredWidth="107" measuredHeight="24">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="107" text="Fim">
+                        <attributes key="foreground" value="#666"/>
+                        <font size="12px" bold="true"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                </widgets>
+              </widgets>
+              <widgets xsi:type="model:Master" id="324" x="8" y="14" measuredWidth="25" measuredHeight="29">
+                <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                <overrides>
+                  <widgets ref="14" width="25" text="2">
+                    <attributes key="foreground" value="#444"/>
+                    <attributes key="textAlignment" value="Right"/>
+                    <font size="16px" bold="true"/>
+                  </widgets>
+                </overrides>
+              </widgets>
+              <widgets xsi:type="model:WidgetGroup" id="325" x="40" y="6" width="238" measuredWidth="238" measuredHeight="46">
+                <widgets xsi:type="model:Master" id="326" y="18" width="238" measuredWidth="238" measuredHeight="28">
+                  <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                  <overrides>
+                    <widgets ref="14" width="238" text="Promocional para baixinhos e alt...">
+                      <font bold="true"/>
+                    </widgets>
+                  </overrides>
+                </widgets>
+                <widgets xsi:type="model:Master" id="327" width="238" measuredWidth="238" measuredHeight="24">
+                  <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                  <overrides>
+                    <widgets ref="14" width="238" text="nome">
+                      <attributes key="foreground" value="#666"/>
+                      <font size="12px" bold="true"/>
+                    </widgets>
+                  </overrides>
+                </widgets>
+              </widgets>
+            </widgets>
+            <widgets xsi:type="model:Master" id="328" measuredWidth="13" measuredHeight="58">
+              <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button%20Large"/>
+              <overrides>
+                <widgets ref="27" width="13" height="58" noText="true">
+                  <attributes key="background" value="#5cb85c"/>
+                </widgets>
+              </overrides>
+            </widgets>
+          </widgets>
+          <widgets xsi:type="model:WidgetGroup" id="442" y="192" measuredWidth="793" measuredHeight="58">
+            <widgets xsi:type="model:Master" id="470" measuredWidth="13" measuredHeight="58">
+              <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button%20Large"/>
+              <overrides>
+                <widgets ref="27" width="13" height="58" noText="true">
+                  <attributes key="background" value="#428bca"/>
+                </widgets>
+              </overrides>
+            </widgets>
+            <widgets xsi:type="model:WidgetGroup" id="456" width="793" measuredWidth="793" measuredHeight="58">
+              <widgets xsi:type="model:Master" id="457" height="58" measuredWidth="793" measuredHeight="58">
+                <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button%20Block"/>
+                <overrides>
+                  <widgets ref="47" width="793" height="58" noText="true"/>
+                </overrides>
+              </widgets>
+              <widgets xsi:type="model:Master" id="458" x="736" y="12" measuredWidth="50" measuredHeight="34">
+                <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button"/>
+                <overrides>
+                  <widgets ref="21" width="50" noText="true">
+                    <attributes key="icon" value="assets/fa-cog (small)"/>
+                  </widgets>
+                </overrides>
+              </widgets>
+              <widgets xsi:type="model:WidgetGroup" id="459" x="293" y="6" measuredWidth="340" measuredHeight="46">
+                <widgets xsi:type="model:WidgetGroup" id="460" measuredWidth="127" measuredHeight="46">
+                  <widgets xsi:type="model:Master" id="461" y="18" measuredWidth="127" measuredHeight="28">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="127" text="13-01-2018 08:00">
+                        <font bold="true"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                  <widgets xsi:type="model:Master" id="462" measuredWidth="127" measuredHeight="24">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="127" text="Início">
+                        <attributes key="foreground" value="#666"/>
+                        <font size="12px" bold="true"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                </widgets>
+                <widgets xsi:type="model:WidgetGroup" id="463" x="213" measuredWidth="127" measuredHeight="46">
+                  <widgets xsi:type="model:Master" id="464" y="18" measuredWidth="127" measuredHeight="28">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="127" text="13-01-2018 08:00">
+                        <font bold="true"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                  <widgets xsi:type="model:Master" id="465" measuredWidth="107" measuredHeight="24">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="107" text="Fim">
+                        <attributes key="foreground" value="#666"/>
+                        <font size="12px" bold="true"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                </widgets>
+              </widgets>
+              <widgets xsi:type="model:Master" id="466" x="8" y="14" measuredWidth="25" measuredHeight="29">
+                <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                <overrides>
+                  <widgets ref="14" width="25" text="3">
+                    <attributes key="foreground" value="#444"/>
+                    <attributes key="textAlignment" value="Right"/>
+                    <font size="16px" bold="true"/>
+                  </widgets>
+                </overrides>
+              </widgets>
+              <widgets xsi:type="model:WidgetGroup" id="467" x="40" y="6" width="238" measuredWidth="238" measuredHeight="46">
+                <widgets xsi:type="model:Master" id="468" y="18" width="238" measuredWidth="238" measuredHeight="28">
+                  <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                  <overrides>
+                    <widgets ref="14" width="238" text="Promocional para baixinhos e alt...">
+                      <font bold="true"/>
+                    </widgets>
+                  </overrides>
+                </widgets>
+                <widgets xsi:type="model:Master" id="469" width="238" measuredWidth="238" measuredHeight="24">
+                  <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                  <overrides>
+                    <widgets ref="14" width="238" text="nome">
+                      <attributes key="foreground" value="#666"/>
+                      <font size="12px" bold="true"/>
+                    </widgets>
+                  </overrides>
+                </widgets>
+              </widgets>
+            </widgets>
+            <widgets xsi:type="model:Master" id="513" measuredWidth="13" measuredHeight="58">
+              <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button%20Large"/>
+              <overrides>
+                <widgets ref="27" width="13" height="58" noText="true">
+                  <attributes key="background" value="#428bca"/>
+                </widgets>
+              </overrides>
+            </widgets>
+          </widgets>
+          <widgets xsi:type="model:WidgetGroup" id="471" y="258" measuredWidth="793" measuredHeight="58">
+            <widgets xsi:type="model:WidgetGroup" id="472" width="793" measuredWidth="793" measuredHeight="58">
+              <widgets xsi:type="model:Master" id="473" height="58" measuredWidth="793" measuredHeight="58">
+                <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button%20Block"/>
+                <overrides>
+                  <widgets ref="47" width="793" height="58" noText="true"/>
+                </overrides>
+              </widgets>
+              <widgets xsi:type="model:Master" id="474" x="736" y="12" measuredWidth="50" measuredHeight="34">
+                <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button"/>
+                <overrides>
+                  <widgets ref="21" width="50" noText="true">
+                    <attributes key="icon" value="assets/fa-cog (small)"/>
+                  </widgets>
+                </overrides>
+              </widgets>
+              <widgets xsi:type="model:WidgetGroup" id="475" x="293" y="6" measuredWidth="340" measuredHeight="46">
+                <widgets xsi:type="model:WidgetGroup" id="476" measuredWidth="127" measuredHeight="46">
+                  <widgets xsi:type="model:Master" id="477" y="18" measuredWidth="127" measuredHeight="28">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="127" text="13-01-2018 08:00">
+                        <font bold="true"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                  <widgets xsi:type="model:Master" id="478" measuredWidth="127" measuredHeight="24">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="127" text="Início">
+                        <attributes key="foreground" value="#666"/>
+                        <font size="12px" bold="true"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                </widgets>
+                <widgets xsi:type="model:WidgetGroup" id="479" x="213" measuredWidth="127" measuredHeight="46">
+                  <widgets xsi:type="model:Master" id="480" y="18" measuredWidth="127" measuredHeight="28">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="127" text="13-01-2018 08:00">
+                        <font bold="true"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                  <widgets xsi:type="model:Master" id="481" measuredWidth="107" measuredHeight="24">
+                    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                    <overrides>
+                      <widgets ref="14" width="107" text="Fim">
+                        <attributes key="foreground" value="#666"/>
+                        <font size="12px" bold="true"/>
+                      </widgets>
+                    </overrides>
+                  </widgets>
+                </widgets>
+              </widgets>
+              <widgets xsi:type="model:Master" id="482" x="8" y="14" measuredWidth="25" measuredHeight="29">
+                <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                <overrides>
+                  <widgets ref="14" width="25" text="4">
+                    <attributes key="foreground" value="#444"/>
+                    <attributes key="textAlignment" value="Right"/>
+                    <font size="16px" bold="true"/>
+                  </widgets>
+                </overrides>
+              </widgets>
+              <widgets xsi:type="model:WidgetGroup" id="483" x="40" y="6" width="238" measuredWidth="238" measuredHeight="46">
+                <widgets xsi:type="model:Master" id="484" y="18" width="238" measuredWidth="238" measuredHeight="28">
+                  <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                  <overrides>
+                    <widgets ref="14" width="238" text="Promocional para baixinhos e alt...">
+                      <font bold="true"/>
+                    </widgets>
+                  </overrides>
+                </widgets>
+                <widgets xsi:type="model:Master" id="485" width="238" measuredWidth="238" measuredHeight="24">
+                  <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+                  <overrides>
+                    <widgets ref="14" width="238" text="nome">
+                      <attributes key="foreground" value="#666"/>
+                      <font size="12px" bold="true"/>
+                    </widgets>
+                  </overrides>
+                </widgets>
+              </widgets>
+            </widgets>
+            <widgets xsi:type="model:Master" id="486" measuredWidth="13" measuredHeight="58">
+              <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button%20Large"/>
+              <overrides>
+                <widgets ref="27" width="13" height="58" noText="true">
+                  <attributes key="background" value="#428bca"/>
+                </widgets>
+              </overrides>
+            </widgets>
+          </widgets>
+        </widgets>
+        <widgets xsi:type="model:Master" id="249" x="665" measuredWidth="128" measuredHeight="34" link="03-2_form-lote-paid.screen">
+          <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button%20Success"/>
+          <overrides>
+            <widgets ref="37" text="Adicionar lote">
+              <attributes key="icon" value="assets/fa-plus-circle (small)"/>
+            </widgets>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Icon" id="330" x="429" y="89" measuredWidth="24" measuredHeight="24" icon="arrow-cursor (medium)"/>
+        <widgets xsi:type="model:Note" id="331" x="382" y="17" text="Abre informações&#xA;quando mouseover" measuredWidth="117" measuredHeight="46">
+          <font size="12px"/>
+        </widgets>
+        <widgets xsi:type="model:Note" id="441" x="637" y="89" text="Lote vigente fica com a&#xA;parte inferior aberta." measuredWidth="138" measuredHeight="46">
+          <font size="12px"/>
+        </widgets>
+      </widgets>
+    </widgets>
+  </widgets>
+  <widgets xsi:type="model:Label" id="251" text="Categoria de Participante" measuredWidth="380" measuredHeight="49">
+    <font size="32px" bold="true"/>
+  </widgets>
+  <widgets xsi:type="model:WidgetGroup" id="257" y="128" measuredWidth="817" measuredHeight="334">
+    <widgets xsi:type="model:Master" id="17" height="334" measuredWidth="817" measuredHeight="334">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Content.screen#Panel%20Primary"/>
+      <overrides>
+        <widgetChanges xsi:type="o:Delete" ref="72"/>
+        <widgets ref="70" width="817" height="334"/>
+        <widgets ref="71" x="23" text="Categoria">
+          <font bold="true"/>
+        </widgets>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Master" id="22" x="17" y="87" measuredWidth="329" measuredHeight="28">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+      <overrides>
+        <widgets ref="14" width="329" text="Descrição ausdhasudhasudashduashdasudhsau">
+          <attributes key="foreground" value="#444"/>
+        </widgets>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Master" id="31" x="18" y="132" measuredWidth="69" measuredHeight="28">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+      <overrides>
+        <widgets ref="14" text="Vagas: {assets/fa-question-circle}">
+          <font bold="true"/>
+        </widgets>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Master" id="32" x="272" y="132" measuredWidth="50" measuredHeight="28">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+      <overrides>
+        <widgets ref="14" text="{user} 200"/>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Master" id="33" x="18" y="166" measuredWidth="145" measuredHeight="28">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+      <overrides>
+        <widgets ref="14" text="Tipo de categoria: {assets/fa-question-circle}">
+          <font bold="true"/>
+        </widgets>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Master" id="35" x="18" y="199" measuredWidth="237" measuredHeight="28">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+      <overrides>
+        <widgets ref="14" text="Transferir taxas ao participante: {assets/fa-question-circle}">
+          <font bold="true"/>
+        </widgets>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Master" id="37" x="18" y="236" measuredWidth="217" measuredHeight="28">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+      <overrides>
+        <widgets ref="14" text="Assumir Juros de Parcelas:  {assets/fa-question-circle}  ">
+          <font bold="true"/>
+        </widgets>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Master" id="116" x="272" y="166" measuredWidth="57" measuredHeight="28">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+      <overrides>
+        <widgets ref="14" text="{assets/fa-money} Pago"/>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Master" id="117" x="272" y="201" measuredWidth="50" measuredHeight="28">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+      <overrides>
+        <widgets ref="14" text="{assets/fa-check-circle} Sim"/>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Master" id="129" x="18" y="270" measuredWidth="86" measuredHeight="28">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+      <overrides>
+        <widgets ref="14" text="Formulário: ">
+          <font bold="true"/>
+        </widgets>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="252" x="272" y="268" measuredWidth="166" measuredHeight="31">
+      <widgets xsi:type="model:Master" id="128" y="2" measuredWidth="128" measuredHeight="28">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+        <overrides>
+          <widgets ref="14" text="{assets/fa-bars} Para estudantes"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="130" x="133" measuredWidth="33" measuredHeight="31">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button"/>
+        <overrides>
+          <widgets ref="21" width="33" height="31" text="{assets/fa-cog}"/>
+        </overrides>
+      </widgets>
+    </widgets>
+    <widgets xsi:type="model:Master" id="132" x="272" y="236" measuredWidth="91" measuredHeight="28">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#h5.%20Heading"/>
+      <overrides>
+        <widgets ref="14" text="{list-bullet} 0 parcelas"/>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:Label" id="254" x="16" y="54" text="Univeristários" measuredWidth="182" measuredHeight="44">
+      <font size="28px" bold="true"/>
+    </widgets>
+  </widgets>
+  <widgets xsi:type="model:Master" id="256" x="712" y="4" measuredWidth="49" measuredHeight="42" link="01-1_form_categoria-paid.screen">
+    <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Buttons.screen#Button"/>
+    <overrides>
+      <widgets ref="21" width="49" height="42" text="{edit}">
+        <font size="16px"/>
+      </widgets>
+    </overrides>
+  </widgets>
+  <widgets xsi:type="model:WidgetGroup" id="264" y="69" measuredWidth="814" measuredHeight="41">
+    <widgets xsi:type="model:Master" id="259" y="11" width="657" measuredWidth="657" measuredHeight="30">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Media.screen#Progress%20Bar"/>
+      <overrides>
+        <widgets ref="22" width="657" height="30">
+          <attributes key="value" value="71"/>
+          <attributes key="background" value="#5cb85c"/>
+        </widgets>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="260" x="677" measuredWidth="137" measuredHeight="37">
+      <widgets xsi:type="model:Master" id="261" x="2" y="18" measuredWidth="89" measuredHeight="19">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#Small%20Text"/>
+        <overrides>
+          <widgets ref="21" width="89" height="19" text="181   /   200">
+            <attributes key="foreground" value="#444"/>
+            <font size="15px" bold="true"/>
+          </widgets>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="262" width="137" measuredWidth="137" measuredHeight="19">
+        <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#Small%20Text"/>
+        <overrides>
+          <widgets ref="21" width="137" height="19" text="vagas     inscrições">
+            <attributes key="foreground" value="#444"/>
+            <font size="15px" bold="false"/>
+          </widgets>
+        </overrides>
+      </widgets>
+    </widgets>
+    <widgets xsi:type="model:Master" id="263" x="314" y="17" measuredWidth="29" measuredHeight="19">
+      <screen xsi:type="model:WidgetGroup" href="assets/Bootstrap/Typography.screen#Small%20Text"/>
+      <overrides>
+        <widgets ref="21" width="29" height="19" text="88%">
+          <attributes key="foreground" value="#fff"/>
+          <font bold="true"/>
+        </widgets>
+      </overrides>
+    </widgets>
+  </widgets>
+  <hRuler>
+    <guides position="1288"/>
+  </hRuler>
+  <vRuler/>
+  <font size="14px"/>
+</model:Screen>

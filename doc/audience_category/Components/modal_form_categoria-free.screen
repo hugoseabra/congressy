@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model:Screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:model="http://wireframesketcher.com/1.0/model.ecore" xmlns:o="http://wireframesketcher.com/1.0/model/overrides">
+  <widgets xsi:type="model:WidgetGroup" id="756" measuredWidth="600" measuredHeight="579">
+    <widgets xsi:type="model:Master" id="738" measuredWidth="600" measuredHeight="579">
+      <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Content.screen#Modal"/>
+      <overrides>
+        <widgetChanges xsi:type="o:Delete" ref="104"/>
+        <widgetChanges xsi:type="o:Delete" ref="102"/>
+        <widgets ref="94" height="579"/>
+        <widgets ref="98" y="500"/>
+        <widgets ref="100" text="Editar Categoria #3">
+          <font bold="true"/>
+        </widgets>
+        <widgets ref="106" x="503" y="520" text="{save} Salvar">
+          <attributes key="background" value="#5cb85c"/>
+        </widgets>
+      </overrides>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="739" x="154" y="64" measuredWidth="292" measuredHeight="412">
+      <widgets xsi:type="model:WidgetGroup" id="740" measuredWidth="292" measuredHeight="247">
+        <widgets xsi:type="model:Master" id="741" x="3" measuredWidth="206" measuredHeight="32">
+          <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+          <overrides>
+            <widgets ref="9" text="Nome da categoria: {assets/fa-question-circle}  "/>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="742" y="88" measuredWidth="236" measuredHeight="32">
+          <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+          <overrides>
+            <widgets ref="9" text="Descrição da categoria: {assets/fa-question-circle}  "/>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="743" y="170" measuredWidth="194" measuredHeight="32">
+          <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+          <overrides>
+            <widgets ref="9" text="Número de vagas: {assets/fa-question-circle}  "/>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="744" x="1" y="207" measuredWidth="291" measuredHeight="40">
+          <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Forms.screen#Input%20Group%20Button"/>
+          <overrides>
+            <widgetChanges xsi:type="o:Delete" ref="87"/>
+            <widgets ref="86" width="291"/>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="745" x="1" y="34" measuredWidth="291" measuredHeight="40">
+          <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Forms.screen#Input%20Group%20Button"/>
+          <overrides>
+            <widgetChanges xsi:type="o:Delete" ref="87"/>
+            <widgets ref="86" width="291"/>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="746" x="1" y="119" measuredWidth="291" measuredHeight="40">
+          <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Forms.screen#Input%20Group%20Button"/>
+          <overrides>
+            <widgetChanges xsi:type="o:Delete" ref="87"/>
+            <widgets ref="86" width="291"/>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="747" x="14" y="44" measuredWidth="87" measuredHeight="21">
+          <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#Small%20Text"/>
+          <overrides>
+            <widgets ref="21" text="Universitários">
+              <attributes key="foreground" value="#444"/>
+              <font size="15px" bold="false"/>
+            </widgets>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="748" x="14" y="128" measuredWidth="266" measuredHeight="21">
+          <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#Small%20Text"/>
+          <overrides>
+            <widgets ref="21" text="Estudantes ainda não residentes que estã">
+              <attributes key="foreground" value="#444"/>
+              <font size="15px" bold="false"/>
+            </widgets>
+          </overrides>
+        </widgets>
+        <widgets xsi:type="model:Master" id="749" x="14" y="216" measuredWidth="25" measuredHeight="21">
+          <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#Small%20Text"/>
+          <overrides>
+            <widgets ref="21" text="250">
+              <attributes key="foreground" value="#444"/>
+              <font size="15px" bold="false"/>
+            </widgets>
+          </overrides>
+        </widgets>
+      </widgets>
+      <widgets xsi:type="model:Master" id="750" y="352" measuredWidth="192" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="Tipo de categoria: {assets/fa-question-circle}  "/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="751" x="1" y="298" measuredWidth="289" measuredHeight="40">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Forms.screen#Select"/>
+        <overrides>
+          <widgets ref="24" width="289" text="Para estudantes"/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:Master" id="752" x="2" y="263" measuredWidth="259" measuredHeight="32">
+        <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Typography.screen#h4.%20Heading"/>
+        <overrides>
+          <widgets ref="9" text="Formulário Personalizado: {assets/fa-question-circle}  "/>
+        </overrides>
+      </widgets>
+      <widgets xsi:type="model:RadioButton" id="753" x="2" y="383" text="Gratuito" measuredWidth="78" measuredHeight="29" selected="true">
+        <font size="16px"/>
+      </widgets>
+      <widgets xsi:type="model:RadioButton" id="754" x="133" y="383" text="Pago" measuredWidth="55" measuredHeight="29">
+        <font size="16px"/>
+      </widgets>
+    </widgets>
+    <widgets xsi:type="model:Master" id="755" x="407" y="520" measuredWidth="83" measuredHeight="34">
+      <screen xsi:type="model:WidgetGroup" href="../assets/Bootstrap/Buttons.screen#Button%20Danger"/>
+      <overrides>
+        <widgets ref="43" text="{assets/fa-times-circle} Fechar"/>
+      </overrides>
+    </widgets>
+  </widgets>
+  <hRuler/>
+  <vRuler/>
+  <font size="12px"/>
+</model:Screen>
