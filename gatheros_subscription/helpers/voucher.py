@@ -37,6 +37,7 @@ def get_context(subscription):
 
     return {
         'qrcode': create_qrcode(subscription),
+        'barcode': create_barcode(subscription),
         'logo': get_logo(),
         'event': event,
         'place': place,
