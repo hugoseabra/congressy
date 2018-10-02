@@ -260,7 +260,8 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
         # Condição 5
         elif has_account:
 
-            is_subscribed = self.current_subscription
+            is_subscribed = \
+                self.current_subscription.subscription.is_new is False
 
             if is_subscribed:
                 context['remove_preloader'] = True
