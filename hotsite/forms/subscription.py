@@ -34,7 +34,7 @@ class SubscriptionForm(forms.Form):
             completed=True,
         ).count()
 
-        if subscriptions > lot.limit:
+        if lot.limit and subscriptions > lot.limit:
             raise forms.ValidationError('Lote está lotado e não permite novas '
                                         'inscrições')
 
