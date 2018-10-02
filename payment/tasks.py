@@ -1,7 +1,6 @@
 import json
 import logging
 from datetime import datetime
-from decimal import Decimal
 
 import pagarme
 from django.conf import settings

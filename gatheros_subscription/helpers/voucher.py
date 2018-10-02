@@ -3,14 +3,15 @@
 import base64
 import json
 
+import absoluteuri
 import requests
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
 
+from gatheros_subscription.helpers.barcode import create_barcode
 from gatheros_subscription.helpers.qrcode import create_qrcode
-import absoluteuri
 
 
 def get_logo():
@@ -38,17 +39,20 @@ def get_context(subscription):
     except AttributeError:
         place = None
 
-    return {
+    context = {
         'base_url': absoluteuri.build_absolute_uri(settings.STATIC_URL),
         'qrcode': create_qrcode(subscription),
+        'barcode': create_barcode(subscription),
         'logo': get_logo(),
         'event': event,
         'place': place,
         'person': subscription.person,
         'lot': subscription.lot,
-        'organization': subscription.event.organization,
+        'organization': event.organization,
         'subscription': subscription,
     }
+
+    return context
 
 
 def create_voucher(subscription):
