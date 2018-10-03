@@ -82,9 +82,11 @@ def notify_paid_subscription_boleto(event, transaction):
     checks.check_notification_transaction_paid_boleto(transaction)
 
     # Se inscrição confirmada, envia o voucher.
+    voucher_file = create_voucher(subscription)
+
     voucher_attach = MailerAttachment(
         name=get_voucher_file_name(subscription),
-        content=create_voucher(subscription),
+        content=voucher_file.read(),
         mime='application/pdf'
     )
 
