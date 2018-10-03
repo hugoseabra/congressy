@@ -149,11 +149,12 @@ class ProfileCreateView(TemplateView, FormView):
 
     def get_success_url(self):
 
-        next_page = '?next=' + super().get_success_url()
         redirect_to = reverse_lazy('public:remarketing-redirect')
+        next_page = '?next=' + super().get_success_url()
+        marketing_type = '&marketing_type=adwords'
         page_type = '&page_type=new_account'
 
-        return redirect_to + next_page + page_type
+        return redirect_to + next_page + marketing_type + page_type
 
 
 class PasswordResetView(auth_views.PasswordResetView):
