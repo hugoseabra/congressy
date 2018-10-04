@@ -57,7 +57,7 @@
 
 <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
 {% if not debug %}
-    {% if markting_type == 'adwords' %}
+    {% if marketing_type == 'adwords' %}
 
         <script async src="https://www.googletagmanager.com/gtag/js?id=AW-827903122"></script>
         <script>
@@ -96,17 +96,13 @@
 
 
 <script>
-
     setTimeout(function () {
         window.location.href = '{{ next }}';
     }, 5000);
 
-
     setTimeout(function () {
         $('#help_text').fadeIn();
     }, 15000);
-
-
 </script>
 
 
