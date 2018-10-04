@@ -19,7 +19,7 @@ class Postback(object):
     """
         Responsabilidade: processar atualização de transação
 
-        Processar constitui em realizar as seguinte ações:
+        Processar atualização constitui em realizar as seguinte ações:
 
             -  validar dados de entrada
             - alterar os seguintes atributos de Transaction
