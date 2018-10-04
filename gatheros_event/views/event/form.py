@@ -165,15 +165,15 @@ class EventAddFormView(BaseEventView, generic.CreateView):
         form = self.get_form()
         event = form.instance
         redirect_to = reverse_lazy('public:remarketing-redirect')
-        marketing_type = '&marketing_type=adwords'
+        marketing_type = '?marketing_type=adwords'
         page_type = '&page_type=new_event'
 
-        next_page = '?next=' + reverse(
+        next_page = '&next=' + reverse(
             'event:event-panel',
             kwargs={'pk': event.pk}
         )
 
-        return redirect_to + next_page + marketing_type + page_type
+        return redirect_to + marketing_type + page_type + next_page
 
 
 class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
