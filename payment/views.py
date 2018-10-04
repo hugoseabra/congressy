@@ -48,6 +48,7 @@ from payment.helpers import (
     TransactionLog,
 )
 from payment.models import Transaction, TransactionStatus
+from .postback_helpers import TransactionValidator
 
 
 def notify_postback(transaction, data):
@@ -218,18 +219,21 @@ class CheckoutView(AccountMixin, FormView):
 def postback_url_view(request, uidb64):
     transaction_log = TransactionLog(uidb64)
 
+
+    # Verificação dos Parâmetros da Requisição
     if not uidb64:
         msg = 'Houve uma tentativa de postback sem identificador do postback.'
         transaction_log.add_message(msg, save=True)
         log(message=msg, type='warning', notify_admins=True, )
         raise Http404
-
+    
+    # Verificar se existe UUID da Transação a ser processada;
     transaction_log.add_message('Buscando transação na persistência.', True)
     transaction = Transaction.objects.get(uuid=uidb64)
     transaction_log.add_message('Transação encontrada.')
 
+    # Verificação Dados de Payload
     data = request.data.copy()
-
     if not data:
         msg = 'Houve uma tentativa de postback sem dados de transação para a' \
               ' transação "{}"'.format(uidb64)
@@ -248,30 +252,25 @@ def postback_url_view(request, uidb64):
             json.dumps(data)
         )
     )
+
+    # Why do we set this here ???
     subscription = transaction.subscription
     transaction_log.add_message('ID da Inscrição: {}.'.format(subscription.pk))
 
-    previous_status = transaction.status
-    incoming_status = data.get('current_status', '')
+    transaction_validator = TransactionValidator(
+        payload=data,
+        transaction_log=transaction_log,
+        transaction=transaction,
+    )
 
-    transaction_log.add_message('Status anterior: {}.'.format(previous_status))
-    transaction_log.add_message('Status a ser registrado: {}.'.format(
-        incoming_status
-    ))
-
-    # Se não irá mudar o status de transação, não há o que processar.
-    if previous_status == incoming_status:
-        transaction_log.add_message(
-            'Nada a ser feito: o status não mudou',
-            save=True
-        )
+    if transaction_validator.validate():
+        transaction.status = transaction_validator.fetch_new_status()
+    else:
         # @TODO - caso algum erro aconteça no lado da Congressy, coloca
         # a transação paga em uma fila para ser reprocessada novamente
         # em caso de ser o mesmo status mas não houve registro correto
         # de notificação ou criação de pagamento.
         return Response(status=200)
-
-    transaction.status = incoming_status
 
     transaction_log.add_message('Tipo de transação: {}.'.format(
         transaction.type
