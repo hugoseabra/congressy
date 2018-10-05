@@ -73,5 +73,7 @@ class TransactionSubscriptionStatusIntegrator:
         elif self.transaction_state in self.cancelled_status:
             return Subscription.CANCELED_STATUS
         else:
-            raise TransactionStatusIntegratorError(
-                'Unknown status given.')
+
+            msg = 'Unknown status for {}'.format(self.transaction_state)
+
+            raise TransactionStatusIntegratorError(msg)

@@ -1,6 +1,19 @@
+from decimal import Decimal
+
+
 class Error(Exception):
     """Base class for exceptions in this module."""
     pass
+
+
+class PostbackError(Exception):
+    """Base class for exceptions in a Postback."""
+
+    def __init__(self,
+                 transaction_pk: str,
+                 *args: object, **kwargs: object) -> None:
+        self.transaction_pk = transaction_pk
+        super().__init__(*args, **kwargs)
 
 
 # Receivers exception
@@ -98,13 +111,16 @@ class StateNotAllowedError(Error):
         message -- explanation of why the specific transaction is not allowed
     """
 
-    def __init__(self, message):
+    def __init__(self, message, new_state, old_state):
+        self.new_state = new_state
+        self.old_state = old_state
         self.message = message
 
 
 class TransactionApiError(Error):
     def __init__(self, message):
         self.message = message
+
 
 class TransactionStatusError(Error):
     """Raised when an operation when a Status update could not be processed.
@@ -125,7 +141,7 @@ class TransactionStatusIntegratorError(Error):
         message -- explanation of why the specific transaction is not allowed
     """
 
-    def __init__(self, message):
+    def __init__(self, message, ):
         self.message = message
 
 
@@ -138,3 +154,45 @@ class TransactionNotFound(Exception):
 
     def __init__(self):
         self.message = 'Transação não encontrada.'
+
+
+class PostbackAmountDiscrepancyError(PostbackError):
+    """
+        Raised when we have a discrepancy in values during a postback
+    """
+
+    def __init__(self, message: str,
+                 existing_amount: Decimal,
+                 new_amount: Decimal,
+                 *args, **kwargs) -> None:
+        """
+        :param message:  message to be printed
+        :param existing_amount: existing amount
+        :param new_amount: new amount
+        """
+
+        self.message = message
+        self.existing_amount = existing_amount
+        self.new_amount = new_amount
+
+        super().__init__(*args, **kwargs)
+
+
+class PostbackValueError(PostbackError):
+    """
+        Raised when our payload is missing data
+    """
+
+    def __init__(self, message: str,
+                 missing_key_name: str = None,
+                 payload: dict = None,
+                 *args, **kwargs) -> None:
+        """
+        :param message: message to be printed
+        :param payload: dict containing full payload
+        :param missing_key_name: the key that is missing from a payload
+        """
+        self.message = message
+        self.missing_key_name = missing_key_name
+        self.payload = payload
+        super().__init__(*args, **kwargs)

@@ -1,19 +1,8 @@
 from decimal import Decimal
 
+from payment.exception import PostbackValueError, PostbackAmountDiscrepancyError
 from payment.helpers import TransactionDirector
 from .models import Transaction
-
-
-class PostbackSameStatusError(Exception):
-    pass
-
-
-class PostbackAmountDiscrepancyError(Exception):
-    pass
-
-
-class PostbackValueError(Exception):
-    pass
 
 
 class Postback(object):
@@ -25,10 +14,12 @@ class Postback(object):
     """
 
     def __init__(self,
+                 transaction_pk: str,
                  transaction_status: str,
                  transaction_type: str,
                  transaction_amount: Decimal) -> None:
 
+        self.transaction_pk = transaction_pk
         self.transaction_status = transaction_status
         self.transaction_amount = transaction_amount
         self.transaction_type = transaction_type
@@ -56,27 +47,59 @@ class Postback(object):
     def _validate(self, payload: dict):
 
         # Garantindo que temos o novo status no payload
-        new_status = payload.get('current_status')
-        self._validate_status(new_status)
+        try:
+            new_status = payload.get('current_status')
+            self._validate_status(new_status)
+        except PostbackValueError as e:
+            e.payload = payload
+            e.missing_key_name = 'current_status'
+            raise e
 
         # Garantindo que temos o valor da compra no payload
-        amount = payload.get('amount')
-        self._validate_amount(amount)
+        try:
+            amount = payload.get('amount')
+            self._validate_amount(amount)
+        except PostbackValueError as e:
+            e.payload = payload
+            e.missing_key_name = 'amount'
+            raise e
 
         # Garantindo que temos link de boleto no payload
-        boleto_url = payload.get('transaction[boleto_url]')
-        self._validate_boleto_url(boleto_url)
+        try:
+            boleto_url = payload.get('transaction[boleto_url]')
+            self._validate_boleto_url(boleto_url)
+        except PostbackValueError as e:
+            e.payload = payload
+            e.missing_key_name = 'transaction[boleto_url]'
+            raise e
 
     # noinspection PyMethodMayBeStatic
     def _validate_status(self, new_status):
         if not new_status:
             msg = "No status for payload status: {}".format(new_status)
-            raise PostbackValueError(msg)
+            raise PostbackValueError(
+                message=msg,
+                transaction_pk=self.transaction_pk,
+            )
+
+    def _validate_boleto_url(self, boleto_url):
+
+        if self.transaction_type == Transaction.BOLETO:
+
+            if not boleto_url:
+                msg = "No value for payload boleto_url: {}".format(boleto_url)
+                raise PostbackValueError(
+                    message=msg,
+                    transaction_pk=self.transaction_pk,
+                )
 
     def _validate_amount(self, amount):
         if not amount:
             msg = "No value for payload amount: {}".format(amount)
-            raise PostbackValueError(msg)
+            raise PostbackValueError(
+                transaction_pk=self.transaction_pk,
+                message=msg,
+            )
 
         # Se tivermos discrepância no valor vindo do pagarme, temos uma
         # possivel edição e irá causar problemas
@@ -85,12 +108,9 @@ class Postback(object):
                   "and payload amount({})".format(self.transaction_amount,
                                                   amount)
 
-            raise PostbackAmountDiscrepancyError(msg)
-
-    def _validate_boleto_url(self, boleto_url):
-
-        if self.transaction_type == Transaction.BOLETO:
-
-            if not boleto_url:
-                msg = "No value for payload boleto_url: {}".format(boleto_url)
-                raise PostbackValueError(msg)
+            raise PostbackAmountDiscrepancyError(
+                message=msg,
+                transaction_pk=self.transaction_pk,
+                existing_amount=self.transaction_amount,
+                new_amount=amount,
+            )

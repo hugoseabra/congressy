@@ -12,9 +12,12 @@ class SubscriptionStatusManager(object):
     """
 
     def __init__(self,
+                 transaction_pk: str,
                  transaction_status: str,
                  transaction_value: Decimal,
                  subscription_status: str) -> None:
+
+        self.transaction_pk = transaction_pk
         self.transaction_status = transaction_status
         self.transaction_value = transaction_value
         self.subscription_status = subscription_status
@@ -23,7 +26,7 @@ class SubscriptionStatusManager(object):
     def get_new_status(self,
                        debt: Decimal,
                        existing_payments: Decimal):
-        new_status = self._fetch_subscription_status()
+        new_status = self._get_subscription_status()
 
         # Validar se o valor informado somado ao valor já existente já
         # consolida tudo como pago
@@ -39,7 +42,7 @@ class SubscriptionStatusManager(object):
 
         return new_status
 
-    def _fetch_subscription_status(self):
+    def _get_subscription_status(self):
         # Translate a transaction status to a subscription status.
         integrator = TransactionSubscriptionStatusIntegrator(
             self.transaction_status
