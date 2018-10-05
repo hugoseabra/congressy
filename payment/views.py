@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.db.transaction import atomic
 from django.http import (
     Http404,
@@ -28,6 +28,7 @@ from payment.helpers import (
 )
 from payment.models import Transaction
 from .postback import Postback, PostbackAmountDiscrepancyError
+from .subscription_status_manager import SubscriptionStatusManager
 
 
 def notify_postback(transaction, data):
@@ -233,6 +234,7 @@ def postback_url_view(request, uidb64):
 
         try:
 
+            # ================= TRANSACTION ====================================
             transaction.status = post_back.get_new_status(payload=data)
 
             # Alterando a URL de boleto
@@ -241,6 +243,43 @@ def postback_url_view(request, uidb64):
                 transaction.data['boleto_url'] = boleto_url
                 transaction.boleto_url = boleto_url
             transaction.save()
+
+            # ==================================================================
+
+            # ================= SUBSCRIPTION ===================================
+
+            subscription = transaction.subscription
+            subscription_status_manager = SubscriptionStatusManager(
+                subscription_status=subscription.status,
+                transaction_status=transaction.status,
+                transaction_value=transaction.amount,
+            )
+
+            debt = Decimal(0)
+            existing_amount = Decimal(0)
+
+            if transaction.amount > Decimal(0):
+
+                # Pegar o valor da divida
+                debts = subscription.debts.all()
+                for debt in debts:
+                    debt += debt.amount
+
+                # Pegar qualquer dinheiro já pago
+                existing_amount = subscription.payments.filter(
+                    paid=True
+                ).aggregate(total=Sum('amount'))
+
+                existing_amount = existing_amount['total']
+
+            subscription.status = subscription_status_manager.get_new_status(
+                debt=debt,
+                existing_payments=existing_amount,
+            )
+
+            subscription.save()
+
+            # ==================================================================
 
         except PostbackAmountDiscrepancyError as e:
 

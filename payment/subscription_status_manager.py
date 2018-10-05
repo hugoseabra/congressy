@@ -1,28 +1,43 @@
 from decimal import Decimal
 
-from django.db.models import Sum
-
 from gatheros_subscription.models import Subscription
 from payment.helpers import TransactionSubscriptionStatusIntegrator
 
 
 class SubscriptionStatusManager(object):
     """
-        Responsabilidade: processar atualização de inscrição
-
-        Processar atualização constitui em mudar o status da inscrição de
-        acordo com um status de transação e o valor da transação que é
-        repassado como dependencia
+        Responsabilidade: Estabelecer regras de transição de status de
+        inscrição. Caso esta inscrição seja paga, deve respeitar montante para
+        saber se a mudança deve ser realizada.
     """
 
     def __init__(self,
                  transaction_status: str,
                  transaction_value: Decimal,
-                 subscription: Subscription) -> None:
+                 subscription_status: str) -> None:
         self.transaction_status = transaction_status
         self.transaction_value = transaction_value
-        self.subscription = subscription
+        self.subscription_status = subscription_status
         super().__init__()
+
+    def get_new_status(self,
+                       debt: Decimal,
+                       existing_payments: Decimal):
+        new_status = self._fetch_subscription_status()
+
+        # Validar se o valor informado somado ao valor já existente já
+        # consolida tudo como pago
+        if new_status == Subscription.CONFIRMED_STATUS and \
+                self.transaction_value > Decimal(0):
+
+            if self._has_paid_total(debt, existing_payments):
+                return new_status
+
+            else:
+
+                return self.subscription_status
+
+        return new_status
 
     def _fetch_subscription_status(self):
         # Translate a transaction status to a subscription status.
@@ -32,17 +47,10 @@ class SubscriptionStatusManager(object):
 
         return integrator.integrate()
 
-    def _has_paid_total(self):
-        existing_amount = self.subscription.payments.filter(
-            paid=True
-        ).aggregate(total=Sum('amount'))
+    def _has_paid_total(self, debt: Decimal, existing_amount: Decimal):
 
-        existing_amount = existing_amount['total'] or Decimal(0)
-        whole_price = Decimal(0)
-
-        debts = self.subscription.debts.all()
-        for debt in debts:
-            whole_price += debt.amount
+        existing_amount = existing_amount or Decimal(0)
+        whole_price = debt or Decimal(0)
 
         summed_amount = existing_amount + self.transaction_value
 
@@ -50,16 +58,3 @@ class SubscriptionStatusManager(object):
             return True
 
         return False
-
-    def update_subscription_status(self):
-        new_status = self._fetch_subscription_status()
-
-        # Validar se o valor informado somado ao valor já existente já
-        # consolida tudo como pago
-        if new_status == Subscription.CONFIRMED_STATUS:
-            if self._has_paid_total():
-                self.subscription.status = new_status
-        else:
-            self.subscription.status = new_status
-
-            self.subscription.save()
