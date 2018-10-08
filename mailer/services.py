@@ -197,7 +197,7 @@ def notify_new_user_and_unpaid_subscription_boleto(event, transaction):
 def notify_new_user_and_paid_subscription_boleto(event, transaction):
     """
     Notifica participante de nova inscrição de um lote pago pelo método de
-    cartão de crédito.
+    boleto.
     """
     subscription = transaction.subscription
 
@@ -242,7 +242,7 @@ def notify_new_user_and_paid_subscription_boleto(event, transaction):
         'event_url': event_url,
         'date': subscription.created,
         'has_voucher': True,
-        'boleto_url': None,
+        'boleto_url': transaction.boleto_url,
         'my_account_url': absoluteuri.reverse('front:start'),
         'reset_password_url': absoluteuri.reverse('public:password_reset'),
         'password_set_url': password_set_url,
