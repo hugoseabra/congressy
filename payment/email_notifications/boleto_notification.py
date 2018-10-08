@@ -1,12 +1,14 @@
 from gatheros_subscription.models import Subscription
 from mailer.services import (
-    notify_new_user_and_paid_subscription_boleto,
-    notify_paid_subscription_boleto,
-    notify_new_unpaid_subscription_boleto,
-    notify_new_user_and_unpaid_subscription_boleto,
     notify_paid_with_incoming_installment,
     notify_unpaid_installment,
     notify_installment_with_discrepancy,
+    notify_new_unpaid_subscription_boleto,
+    notify_new_user_and_paid_subscription_boleto,
+    notify_new_user_and_refused_subscription_boleto,
+    notify_new_user_and_unpaid_subscription_boleto,
+    notify_paid_subscription_boleto, notify_refunded_subscription_boleto,
+    notify_pending_refund_subscription_boleto,
 )
 from payment.exception import PostbackNotificationError
 from payment.models import Transaction
@@ -55,10 +57,36 @@ class BoletoPaymentNotification(object):
     def _notify_pending_subscription(self):
 
         if self.transaction.status == Transaction.PAID:
-            self._notify_pending_sub_paid_transaction()
+
+            self.__notify_pending_sub_paid_transaction()
+
         elif self.transaction.status == Transaction.WAITING_PAYMENT:
-            self._notify_pending_sub_pending_transaction()
+
+            self.__notify_pending_sub_pending_transaction()
+
+        elif self.transaction.status == Transaction.REFUNDED:
+
+            notify_refunded_subscription_boleto(
+                self.subscription.event,
+                self.transaction,
+            )
+
+        elif self.transaction.status == Transaction.PENDING_REFUND:
+
+            notify_pending_refund_subscription_boleto(
+                self.subscription.event,
+                self.transaction,
+            )
+
+        elif self.transaction.status == Transaction.REFUSED:
+
+            notify_new_user_and_refused_subscription_boleto(
+                self.subscription.event,
+                self.transaction,
+            )
+
         else:
+
             raise PostbackNotificationError(
                 transaction_pk=str(self.transaction.pk),
                 message="Status de transação desconhecido para notificar "
@@ -66,7 +94,7 @@ class BoletoPaymentNotification(object):
                         "".format(self.transaction.status)
             )
 
-    def _notify_pending_sub_pending_transaction(self):
+    def __notify_pending_sub_pending_transaction(self):
         if self.transaction.installments == 1:
 
             if self.subscription.notified is False:
@@ -86,7 +114,7 @@ class BoletoPaymentNotification(object):
                 self.transaction,
             )
 
-    def _notify_pending_sub_paid_transaction(self):
+    def __notify_pending_sub_paid_transaction(self):
 
         if self.transaction.installments == 1:
             notify_installment_with_discrepancy(

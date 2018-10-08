@@ -28,10 +28,29 @@ class CreditCardPaymentNotification(object):
             )
 
     def _notify_pending_subscription(self):
-        notify_new_user_and_paid_subscription_credit_card_with_discrepancy(
-            self.subscription.event,
-            self.transaction,
-        )
+
+        if self.transaction.status == Transaction.PAID:
+
+            notify_new_user_and_paid_subscription_credit_card_with_discrepancy(
+                self.subscription.event,
+                self.transaction,
+            )
+
+        elif self.transaction.status == Transaction.WAITING_PAYMENT:
+            pass
+        elif self.transaction.status == Transaction.REFUNDED:
+            pass
+        elif self.transaction.status == Transaction.PENDING_REFUND:
+            pass
+        elif self.transaction.status == Transaction.REFUSED:
+            pass
+        else:
+            raise PostbackNotificationError(
+                transaction_pk=str(self.transaction.pk),
+                message="Status de transação desconhecido para notificar "
+                        "inscrição pendente: {}"
+                        "".format(self.transaction.status)
+            )
 
     def _notify_confirmed_subscription(self):
         notify_new_user_and_paid_subscription_credit_card(
