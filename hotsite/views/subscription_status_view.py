@@ -173,6 +173,10 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
                 subscription=self.subscription)
 
             for transaction in transactions:
+
+                if transaction.manual:
+                    return False
+
                 if transaction.data['payment_method'] == 'boleto':
                     found_boleto = True
                 elif transaction.data['payment_method'] == 'credit_card':
