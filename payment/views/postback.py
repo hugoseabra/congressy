@@ -11,12 +11,12 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from core.helpers import sentry_log
+from payment.email_notifications import PaymentNotification
 from payment.forms import PaymentForm
 from payment.helpers import (
     TransactionLog,
 )
 from payment.models import Transaction, TransactionStatus
-from payment.payment_notification import PaymentNotification
 from payment.postback import Postback
 from payment.subscription_status_manager import SubscriptionStatusManager
 from .helpers import notify_admins_postback
@@ -78,6 +78,7 @@ def postback_url_view(request, uidb64):
         subscription = transaction.subscription
         subscription_status_manager = SubscriptionStatusManager(
             subscription_status=subscription.status,
+            transaction_pk=str(transaction.pk),
             transaction_status=transaction.status,
             transaction_value=transaction.amount,
         )
@@ -161,7 +162,7 @@ def postback_url_view(request, uidb64):
             transaction=transaction,
         )
 
-        notification.notify(new_status=transaction.status)
+        notification.notify()
 
         # Registra inscrição como notificada.
         subscription.notified = True
