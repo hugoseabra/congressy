@@ -8,7 +8,7 @@ from mailer.services import (
     notify_new_user_and_refused_subscription_boleto,
     notify_new_user_and_unpaid_subscription_boleto,
     notify_paid_subscription_boleto, notify_refunded_subscription_boleto,
-    notify_pending_refund_subscription_boleto,
+    notify_pending_refund_subscription,
 )
 from payment.exception import PostbackNotificationError
 from payment.models import Transaction
@@ -73,7 +73,7 @@ class BoletoPaymentNotification(object):
 
         elif self.transaction.status == Transaction.PENDING_REFUND:
 
-            notify_pending_refund_subscription_boleto(
+            notify_pending_refund_subscription(
                 self.subscription.event,
                 self.transaction,
             )

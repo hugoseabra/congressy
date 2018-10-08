@@ -955,7 +955,7 @@ def notify_refunded_subscription_credit_card(event, transaction):
     )
 
 
-def notify_pending_refund_subscription_boleto(event, transaction):
+def notify_pending_refund_subscription(event, transaction):
     """
     Notifica participante quando notificação possui pendência de reembolso.
     """

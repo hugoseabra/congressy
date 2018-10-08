@@ -1,7 +1,22 @@
 from gatheros_subscription.models import Subscription
 from mailer.services import (
-    notify_new_user_and_paid_subscription_credit_card,
     notify_new_user_and_paid_subscription_credit_card_with_discrepancy,
+    notify_new_user_and_paid_subscription_credit_card,
+    notify_chargedback_subscription,
+    notify_new_paid_subscription_credit_card,
+    notify_new_refused_subscription_boleto,
+    notify_new_refused_subscription_credit_card,
+    notify_new_unpaid_subscription_boleto,
+    notify_new_unpaid_subscription_credit_card,
+    notify_new_user_and_paid_subscription_boleto,
+    notify_new_user_and_paid_subscription_credit_card,
+    notify_new_user_and_refused_subscription_boleto,
+    notify_new_user_and_refused_subscription_credit_card,
+    notify_new_user_and_unpaid_subscription_boleto,
+    notify_new_user_and_unpaid_subscription_credit_card,
+    notify_paid_subscription_boleto, notify_refunded_subscription_boleto,
+    notify_pending_refund_subscription,
+    notify_refunded_subscription_credit_card,
 )
 from payment.exception import PostbackNotificationError
 from payment.models import Transaction
@@ -37,13 +52,40 @@ class CreditCardPaymentNotification(object):
             )
 
         elif self.transaction.status == Transaction.WAITING_PAYMENT:
-            pass
+
+            notify_new_user_and_unpaid_subscription_credit_card(
+                self.subscription.event,
+                self.transaction,
+            )
+
         elif self.transaction.status == Transaction.REFUNDED:
-            pass
+
+            notify_refunded_subscription_credit_card(
+                self.subscription.event,
+                self.transaction,
+            )
+
         elif self.transaction.status == Transaction.PENDING_REFUND:
-            pass
+
+            notify_pending_refund_subscription(
+                self.subscription.event,
+                self.transaction,
+            )
+
         elif self.transaction.status == Transaction.REFUSED:
-            pass
+
+            notify_new_user_and_refused_subscription_credit_card(
+                self.subscription.event,
+                self.transaction,
+            )
+
+        elif self.transaction.status == Transaction.CHARGEDBACK:
+
+            notify_chargedback_subscription(
+                self.subscription.event,
+                self.transaction,
+            )
+
         else:
             raise PostbackNotificationError(
                 transaction_pk=str(self.transaction.pk),
