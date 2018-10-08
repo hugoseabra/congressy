@@ -45,7 +45,8 @@ class SubscriptionStatusManager(object):
     def _get_subscription_status(self):
         # Translate a transaction status to a subscription status.
         integrator = TransactionSubscriptionStatusIntegrator(
-            self.transaction_status
+            transaction_state=self.transaction_status,
+            transaction_pk=self.transaction_pk,
         )
 
         return integrator.integrate()

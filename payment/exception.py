@@ -1,17 +1,25 @@
 from decimal import Decimal
 
+from mailer.exception import NotifcationError
+
 
 class Error(Exception):
     """Base class for exceptions in this module."""
     pass
 
 
-class PostbackError(Exception):
+class PostbackError(Error):
     """Base class for exceptions in a Postback."""
 
     def __init__(self,
                  transaction_pk: str,
+                 message: str,
                  *args: object, **kwargs: object) -> None:
+        """
+        :param message: message to be printed
+        :param transaction_pk: the Transaction primary key as string
+        """
+        self.message = message
         self.transaction_pk = transaction_pk
         super().__init__(*args, **kwargs)
 
@@ -134,15 +142,23 @@ class TransactionStatusError(Error):
 
 
 class TransactionStatusIntegratorError(Error):
-    """Raised when an operation attempts to integrate a state update with a
+    """
+        Raised when an operation attempts to integrate a state update with a
         some other status.
-
-    Attributes:
-        message -- explanation of why the specific transaction is not allowed
     """
 
-    def __init__(self, message, ):
+    def __init__(self,
+                 transaction_pk: str,
+                 message: str,
+                 *args: object, **kwargs: object) -> None:
+        """
+        :param message:explanation of why the specific transaction is not
+                       allowed
+        :param transaction_pk: the Transaction primary key as string
+        """
         self.message = message
+        self.transaction_pk = transaction_pk
+        super().__init__(*args, **kwargs)
 
 
 class TransactionNotFound(Exception):
@@ -161,17 +177,15 @@ class PostbackAmountDiscrepancyError(PostbackError):
         Raised when we have a discrepancy in values during a postback
     """
 
-    def __init__(self, message: str,
+    def __init__(self,
                  existing_amount: Decimal,
                  new_amount: Decimal,
                  *args, **kwargs) -> None:
         """
-        :param message:  message to be printed
         :param existing_amount: existing amount
         :param new_amount: new amount
         """
 
-        self.message = message
         self.existing_amount = existing_amount
         self.new_amount = new_amount
 
@@ -183,16 +197,23 @@ class PostbackValueError(PostbackError):
         Raised when our payload is missing data
     """
 
-    def __init__(self, message: str,
+    def __init__(self,
                  missing_key_name: str = None,
                  payload: dict = None,
                  *args, **kwargs) -> None:
         """
-        :param message: message to be printed
         :param payload: dict containing full payload
         :param missing_key_name: the key that is missing from a payload
         """
-        self.message = message
         self.missing_key_name = missing_key_name
         self.payload = payload
         super().__init__(*args, **kwargs)
+
+
+class PostbackNotificationError(PostbackError, NotifcationError):
+    """
+        Raised when send_mail fails during a Postback
+    """
+    pass
+
+
