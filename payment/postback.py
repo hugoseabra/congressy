@@ -33,7 +33,7 @@ class Postback(object):
 
         new_status = payload.get('current_status')
         # Se não irá mudar o status de transação, não há o que processar.
-        if self.transaction_status != new_status:
+        if self.transaction_status == new_status:
             return self.transaction_status
 
         # Atualizando os status da Transaction
@@ -47,21 +47,24 @@ class Postback(object):
     def _validate(self, payload: dict):
 
         # Garantindo que temos o novo status no payload
+        key = 'current_status'
         try:
-            new_status = payload.get('current_status')
+            new_status = payload.get(key)
             self._validate_status(new_status)
         except PostbackValueError as e:
             e.payload = payload
-            e.missing_key_name = 'current_status'
+            e.missing_key_name = key
             raise e
 
         # Garantindo que temos o valor da compra no payload
+
+        key = 'transaction[amount]'
         try:
-            amount = payload.get('amount')
+            amount = payload.get(key)
             self._validate_amount(amount)
         except PostbackValueError as e:
             e.payload = payload
-            e.missing_key_name = 'amount'
+            e.missing_key_name = key
             raise e
 
         # Garantindo que temos link de boleto no payload
@@ -100,6 +103,8 @@ class Postback(object):
                 transaction_pk=self.transaction_pk,
                 message=msg,
             )
+
+        amount = Decimal(amount) / 100
 
         # Se tivermos discrepância no valor vindo do pagarme, temos uma
         # possivel edição e irá causar problemas

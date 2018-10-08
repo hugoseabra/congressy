@@ -61,7 +61,14 @@ def postback_url_view(request, uidb64):
     with atomic():
 
         # ================= TRANSACTION ====================================
-        transaction.status = post_back.get_new_status(payload=data)
+        new_status = post_back.get_new_status(payload=data)
+
+        if transaction.status == new_status:
+            return Response(status=303, data={
+                'error': 'Tentativa de atualizar status já persistido.'
+            })
+
+        transaction.status = new_status
 
         # Alterando a URL de boleto
         if transaction.type == Transaction.BOLETO:
@@ -83,7 +90,7 @@ def postback_url_view(request, uidb64):
             transaction_value=transaction.amount,
         )
 
-        debt = Decimal(0)
+        total_debt = Decimal(0)
         existing_amount = Decimal(0)
 
         if transaction.amount > Decimal(0):
@@ -91,7 +98,7 @@ def postback_url_view(request, uidb64):
             # Pegar o valor da divida
             debts = subscription.debts.all()
             for debt in debts:
-                debt += debt.amount
+                total_debt += debt.amount
 
             # Pegar qualquer dinheiro já pago
             existing_amount = subscription.payments.filter(
@@ -101,7 +108,7 @@ def postback_url_view(request, uidb64):
             existing_amount = existing_amount['total']
 
         subscription.status = subscription_status_manager.get_new_status(
-            debt=debt,
+            debt=total_debt,
             existing_payments=existing_amount,
         )
 
