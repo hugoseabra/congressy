@@ -659,6 +659,60 @@ def notify_new_user_and_paid_subscription_credit_card(event, transaction):
     )
 
 
+def notify_new_user_and_paid_subscription_credit_card_with_discrepancy(event,
+                                                                       transaction):
+    """
+    Notifica participante de nova inscrição de um lote pago pelo método de
+    cartão de crédito.
+    """
+    subscription = transaction.subscription
+
+    checks.check_notification_transaction_paid_credit_card(transaction)
+
+    voucher_file = create_voucher(subscription)
+
+    voucher_attach = MailerAttachment(
+        name=get_voucher_file_name(subscription),
+        content=voucher_file.read(),
+        mime='application/pdf'
+    )
+
+    person = subscription.person
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+    template_name = \
+        'mailer/subscription/notify_new_user_and_paid_subscription_credit' \
+        '_card_with_discrepancy.html'
+
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': True,
+        'boleto_url': None,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+        'password_set_url': '',
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Inscrição: {}'.format(event.name),
+        body=body,
+        to=person.email,
+        reply_to=event.organization.email,
+        attachment=voucher_attach,
+    )
+
+
 def notify_new_free_subscription(event, subscription):
     """
     Notifica participante de nova inscrição de um lote gratuito.
