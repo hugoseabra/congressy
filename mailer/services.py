@@ -1,11 +1,12 @@
 """ Mailer service. """
 import absoluteuri
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from django.contrib.auth.models import User
+
 from gatheros_subscription.helpers.voucher import (
     create_voucher,
     get_voucher_file_name,
@@ -988,6 +989,143 @@ def notify_chargedback_subscription(event, transaction):
 
     return sender(
         subject='Chargedback de Inscrição: {}'.format(event.name),
+        body=body,
+        to=person.email,
+        reply_to=event.organization.email,
+    )
+
+
+def notify_paid_with_incoming_installment(event, transaction):
+    """
+    Notifica participante de inscrição existente pagamento de parcela
+    """
+    subscription = transaction.subscription
+    person = subscription.person
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    template_name = \
+        'mailer/subscription/notify_paid_with_incoming_installment.html'
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'is_new': subscription.notified is False,
+        'part': transaction.installment_part,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': False,
+        'boleto_url': None,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+        'password_set_url': None,
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Inscrição: {}'.format(event.name),
+        body=body,
+        to=person.email,
+        reply_to=event.organization.email,
+    )
+
+
+def notify_unpaid_installment(event, transaction):
+    """
+    Notifica participante de inscrição existente pagamento de parcela
+    """
+    subscription = transaction.subscription
+    person = subscription.person
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    template_name = 'mailer/subscription/notify_unpaid_installment.html'
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'is_new': subscription.notified is False,
+        'part': transaction.installment_part,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': False,
+        'boleto_url': transaction.boleto_url,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+        'password_set_url': None,
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Inscrição: {}'.format(event.name),
+        body=body,
+        to=person.email,
+        reply_to=event.organization.email,
+    )
+
+
+def notify_installment_with_discrepancy(event, transaction):
+    """
+    Notifica participante de inscrição existente pagamento de parcela e uma
+    discrepância nos valores, ele deve consultar o organizador
+    """
+    subscription = transaction.subscription
+    person = subscription.person
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    org = event.organization
+    author_phone = None
+
+    if org.email:
+        author_email = org.email
+    else:
+        member = event.organization.members.first()
+        author_email = member.person.email
+
+    if org.phone:
+        author_phone = org.phone
+
+    template_name = \
+        'mailer/subscription/notify_paid_installment_discrepancy.html'
+    body = render_to_string(template_name, {
+        'person': person,
+        'organizer_email': author_email,
+        'organizer_phone': author_phone,
+        'event': event,
+        'is_new': subscription.notified is False,
+        'part': transaction.installment_part,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': False,
+        'boleto_url': None,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+        'password_set_url': None,
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Inscrição: {}'.format(event.name),
         body=body,
         to=person.email,
         reply_to=event.organization.email,
