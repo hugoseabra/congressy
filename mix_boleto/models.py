@@ -50,7 +50,7 @@ class SyncCategory(models.Model):
         unique_together = ((
             "sync_resource",
             "mix_category_id",
-            "cgsy_lot_id",
+            "cgsy_category_id",
         ))
 
     sync_resource = models.ForeignKey(
@@ -64,7 +64,7 @@ class SyncCategory(models.Model):
         db_index=True,
     )
 
-    cgsy_lot_id = models.PositiveSmallIntegerField(
+    cgsy_category_id = models.PositiveSmallIntegerField(
         verbose_name='ID da Categoria (Congressy)',
         db_index=True,
     )
@@ -89,7 +89,7 @@ class MixBoleto(models.Model):
         unique_together = ((
             "sync_resource",
             "mix_boleto_id",
-            "cgsy_subscription_uuid",
+            "cgsy_subscription_id",
         ))
 
     sync_resource = models.ForeignKey(
@@ -103,7 +103,7 @@ class MixBoleto(models.Model):
         db_index=True,
     )
 
-    cgsy_subscription_uuid = models.UUIDField(
+    cgsy_subscription_id = models.UUIDField(
         verbose_name='UUID de Inscrição (Congressy)',
         db_index=True,
     )
@@ -124,6 +124,11 @@ class MixBoleto(models.Model):
     installment_part = models.PositiveSmallIntegerField(
         default=1,
         verbose_name='número da parcela',
+    )
+
+    cancelled = models.BooleanField(
+        verbose_name='Cancelado',
+        default=False,
     )
 
     paid = models.BooleanField(
@@ -149,7 +154,7 @@ class SyncBoleto(models.Model):
     class Meta:
         verbose_name = 'Sync Boleto'
         verbose_name_plural = 'Sync Boletos'
-        unique_together = (("mix_boleto", "cgsy_transaction_uuid"),)
+        unique_together = (("mix_boleto", "cgsy_transaction_id"),)
 
     mix_boleto = models.ForeignKey(
         to=MixBoleto,
@@ -157,17 +162,9 @@ class SyncBoleto(models.Model):
         on_delete=models.PROTECT,
     )
 
-    cgsy_transaction_uuid = models.UUIDField(
+    cgsy_transaction_id = models.UUIDField(
         verbose_name='UUID de Transação (Congressy)',
         db_index=True,
-    )
-
-    mix_created = models.DateTimeField(
-        verbose_name='Data de criação (MixEvents)',
-    )
-
-    mix_updated = models.DateTimeField(
-        verbose_name='Data de atualização (MixEvents)',
     )
 
 
@@ -183,7 +180,7 @@ class SyncSubscription(models.Model):
         unique_together = ((
             "sync_resource",
             "mix_subscription_id",
-            "cgsy_subscription_uuid",
+            "cgsy_subscription_id",
         ))
 
     sync_resource = models.ForeignKey(
@@ -197,7 +194,7 @@ class SyncSubscription(models.Model):
         db_index=True,
     )
 
-    cgsy_subscription_uuid = models.UUIDField(
+    cgsy_subscription_id = models.UUIDField(
         verbose_name='UUID de Inscrição (Congressy)',
         db_index=True,
     )
