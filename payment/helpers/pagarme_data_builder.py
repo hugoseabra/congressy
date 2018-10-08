@@ -47,7 +47,7 @@ class PagarmeDataBuilder:
         if environment_version:
             self.metadata_items['system'] = {
                 'version': environment_version,
-                'enviroment': 'production'
+                'environment': 'production'
             }
 
     def add_debt(self, debt):

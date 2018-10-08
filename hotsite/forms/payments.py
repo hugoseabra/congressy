@@ -45,6 +45,11 @@ class PaymentForm(forms.Form):
         required=False,
     )
 
+    installment_part = forms.IntegerField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
     amount = forms.IntegerField(
         widget=forms.HiddenInput(),
         required=True,
@@ -107,9 +112,25 @@ class PaymentForm(forms.Form):
     def clean_installments(self):
         installments = self.cleaned_data['installments']
         if not installments or int(installments) <= 1:
-            return 1
+            installments = 1
+
+        if installments > 10:
+            installments = 10
 
         return int(installments)
+
+    def clean_installment_part(self):
+        part = self.cleaned_data.get('installment_part', 1)
+
+        if part < 1:
+            part = 1
+
+        if part > self.cleaned_data['installments']:
+            raise forms.ValidationError(
+                'Número de parcela excede a quantidade parcelamento.'
+            )
+
+        return part
 
     def clean_amount(self):
         amount = self.cleaned_data.get('amount')
@@ -182,8 +203,10 @@ class PaymentForm(forms.Form):
                     prod_debt = debt_form.save()
                     builder.add_debt(prod_debt)
 
+                installment_part = self.cleaned_data.get('installment_part')
+
                 # Cria transação.
-                create_pagarme_transaction(
+                return create_pagarme_transaction(
                     subscription=self.subscription,
                     data=builder.build(
                         amount=self.cleaned_data.get('amount'),
@@ -192,7 +215,8 @@ class PaymentForm(forms.Form):
                         ),
                         installments=self.cleaned_data.get('installments'),
                         card_hash=self.cleaned_data.get('card_hash'),
-                    )
+                    ),
+                    installment_part=installment_part,
                 )
 
             except TransactionDataError as e:
