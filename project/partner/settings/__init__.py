@@ -22,6 +22,7 @@ INSTALLED_APPS += [
     'importer',
     'attendance',
     'service_tags',
+    'mix_boleto',
 ]
 # ========================= SERVER CONFIGURATION ============================ #
 WSGI_APPLICATION = 'project.wsgi.application'
