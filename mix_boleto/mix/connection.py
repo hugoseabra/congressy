@@ -15,6 +15,9 @@ class MixConnection(object):
         self.connected = False
 
     def connect(self):
+        if self.connected:
+            return
+
         # Connect to the database
         self.connection = connect(
             host=self.host,
@@ -27,6 +30,9 @@ class MixConnection(object):
         self.connected = True
 
     def fetch_one(self, sql):
+
+        self.connect()
+
         try:
             with self.connection.cursor() as cursor:
                 cursor.execute(sql)
@@ -36,6 +42,9 @@ class MixConnection(object):
             pass
 
     def fetch(self, sql):
+
+        self.connect()
+
         try:
             with self.connection.cursor() as cursor:
                 cursor.execute(sql)
@@ -45,12 +54,18 @@ class MixConnection(object):
             pass
 
     def insert(self, sql):
+
+        self.connect()
+
         with self.connection.cursor() as cursor:
             cursor.execute(sql)
 
         self.connection.commit()
 
     def update(self, sql):
+
+        self.connect()
+
         with self.connection.cursor() as cursor:
             cursor.execute(sql)
 
