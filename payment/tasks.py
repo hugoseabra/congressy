@@ -26,7 +26,10 @@ def __notify_error(message, extra_data=None):
 
 
 # @TODO create a mock of the response to use during testing
-def create_pagarme_transaction(subscription, data, installment_part=None):
+def create_pagarme_transaction(subscription,
+                               data,
+                               installments=None,
+                               installment_part=None):
     try:
         trx = pagarme.transaction.create(data)
     except Exception as e:
@@ -68,7 +71,9 @@ def create_pagarme_transaction(subscription, data, installment_part=None):
     liquid_amount = payment_helpers.amount_as_decimal(
         str(data['liquid_amount'])
     )
-    installments = int(trx['installments'])
+
+    if not installments:
+        installments = int(trx['installments'])
 
     # por padrão
     installment_amount = round((amount / installments), 2)
