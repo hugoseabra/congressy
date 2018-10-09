@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.db.transaction import atomic
-
+from pprint import pprint
 from hotsite.forms import PaymentForm
 from mix_boleto.models import MixBoleto as MixBoletoModel, SyncBoleto
 from payment.helpers.payment_helpers import amount_as_decimal
@@ -77,6 +77,7 @@ class MixBoleto(object):
                 self.boleto = MixBoletoModel.objects.create(
                     sync_resource_id=db.sync_resource_id,
                     mix_boleto_id=self.id,
+                    mix_subscription_id=mix_subscription.mix_subscription_id,
                     cgsy_subscription_id=mix_subscription.cgsy_subscription.pk,
                     amount=self.amount,
                     installments=self.installments,
@@ -97,7 +98,6 @@ class MixBoleto(object):
             # Se boleto está sincronizado
             self.sync_boleto = SyncBoleto.objects.get(
                 mix_boleto_id=self.boleto.pk,
-                mix_subscription_id=mix_subscription.mix_subscription_id,
             )
 
             # Se existe, vamos verificar a transação:
@@ -145,7 +145,6 @@ class MixBoleto(object):
 
             self.sync_boleto = SyncBoleto.objects.create(
                 mix_boleto=self.boleto,
-                mix_subscription_id=mix_subscription.mix_subscription_id,
                 cgsy_transaction_id=self.transaction.pk,
             )
 
@@ -172,7 +171,8 @@ class MixBoleto(object):
         valid = form.is_valid()
 
         if valid is False:
-            raise Exception('PaymentForm not valid.')
+            raise Exception('PaymentForm not valid. Errors: {}'.format(
+                pprint(form.errors)))
 
         return form.save()
 
