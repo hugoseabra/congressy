@@ -49,6 +49,6 @@ class MixSync(object):
         :return: None
         """
         for subscription in self.mix_subscriptions:
-            subscription.sync_all()
+            subscription.sync_all(self.connection)
 
         self.connection.close()

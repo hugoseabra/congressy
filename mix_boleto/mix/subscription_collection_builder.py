@@ -22,7 +22,7 @@ class MixSubscriptionCollectionBuilder(object):
     def __init__(self, db: MixConnection, event_id: int) -> None:
         """
             Construtor
-            
+
         :param db: Uma conexão com o banco de dados
         :param event_id: chave primaria de evento
         """
@@ -49,8 +49,8 @@ class MixSubscriptionCollectionBuilder(object):
 
         for subscription in self.query:
             mix_subscription = self._build_subscription(subscription)
-            if subscription['idisncricao'] in boletos:
-                for boleto in boletos[subscription['idisncricao']]:
+            if subscription['idinscricao'] in boletos:
+                for boleto in boletos[subscription['idinscricao']]:
                     mix_subscription.add_boleto(boleto)
             mix_subscriptions.append(mix_subscription)
 
@@ -172,14 +172,15 @@ class MixSubscriptionCollectionBuilder(object):
         boletos = dict()
 
         boletos_data = self.connection.fetch(
-            'SELECT * FROM boleto WHERE situacao = 1'
+            'SELECT * FROM boleto WHERE situacao = 1 ORDER BY parci'
         )
 
         for payload in boletos_data:
-            if boletos_data['idinscricao'] not in boletos:
-                boletos[boletos_data['idinscricao']] = list()
 
-            boletos[boletos_data['idinscricao']].append(
+            if payload['idinscricao'] not in boletos.keys():
+                boletos[payload['idinscricao']] = list()
+
+            boletos[payload['idinscricao']].append(
                 self._build_boleto(payload)
             )
 
