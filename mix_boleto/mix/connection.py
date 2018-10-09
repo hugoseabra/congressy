@@ -59,8 +59,11 @@ class MixConnection(object):
 
         with self.connection.cursor() as cursor:
             cursor.execute(sql)
+            last_id = cursor.lastrowid
 
-        self.connection.commit()
+            self.connection.commit()
+
+        return last_id
 
     def update(self, sql):
 

@@ -120,6 +120,13 @@ class Transaction(models.Model):
         null=True,
     )
 
+    installment_part = models.PositiveIntegerField(
+        default=1,
+        verbose_name='número de parcelas',
+        blank=True,
+        null=True,
+    )
+
     installment_amount = models.DecimalField(
         decimal_places=2,
         max_digits=11,

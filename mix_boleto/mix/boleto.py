@@ -1,7 +1,10 @@
 from datetime import datetime
 
+from django.db.transaction import atomic
+
 from hotsite.forms import PaymentForm
 from mix_boleto.models import MixBoleto as MixBoletoModel, SyncBoleto
+from payment.helpers.payment_helpers import amount_as_decimal
 from payment.models import Transaction, TransactionStatus
 from .connection import MixConnection, DatabaseError
 
@@ -14,18 +17,17 @@ class MixBoleto(object):
 
     def __init__(self,
                  id,
-                 idcaixa,
                  expiration_date,
                  amount,
                  installments,
                  installment_part,
-                 link_boleto,
                  created,
                  updated,
+                 link_boleto=None,
+                 id_caixa=None,
                  cancelled=False):
 
         self.id = id
-        self.idcaixa = idcaixa
         self.expiration_date = expiration_date
         self.amount = amount
         self.installments = installments
@@ -33,6 +35,7 @@ class MixBoleto(object):
         self.link_boleto = link_boleto
         self.created = created
         self.updated = updated
+        self.id_caixa = id_caixa
         self.cancelled = cancelled
 
         self.boleto = None
@@ -58,30 +61,31 @@ class MixBoleto(object):
         MixBoleto;
         """
 
-        try:
-            self.boleto = MixBoletoModel.objects.get(
-                sync_resource_id=db.sync_resource_id,
-                mix_boleto_id=self.id,
-            )
+        with atomic():
+            try:
+                self.boleto = MixBoletoModel.objects.get(
+                    sync_resource_id=db.sync_resource_id,
+                    mix_boleto_id=self.id,
+                )
 
-            if self.boleto.paid is True or self.boleto.cancalled is True:
-                return
+                if self.boleto.paid is True or self.boleto.cancelled is True:
+                    return
 
-        except MixBoletoModel.DoesNotExist:
+            except MixBoletoModel.DoesNotExist:
 
-            self.boleto = MixBoletoModel.objects.filter(
-                sync_resource_id=db.sync_resource_id,
-                mix_boleto_id=self.id,
-                cgsy_subscription_id=mix_subscription.cgsy_subscription.pk,
-                amount=self.amount,
-                installments=self.installments,
-                installment_part=self.installment_part,
-                cancelled=self.cancelled,
-                mix_created=self.created,
-                mix_updated=self.updated,
-            )
+                self.boleto = MixBoletoModel.objects.create(
+                    sync_resource_id=db.sync_resource_id,
+                    mix_boleto_id=self.id,
+                    cgsy_subscription_id=mix_subscription.cgsy_subscription.pk,
+                    amount=self.amount,
+                    installments=self.installments,
+                    installment_part=self.installment_part,
+                    cancelled=self.cancelled,
+                    mix_created=self.created,
+                    mix_updated=self.updated,
+                )
 
-        self._sync_boleto(db, mix_subscription)
+            self._sync_boleto(db, mix_subscription)
 
         self.created = self.boleto.mix_created
         self.updated = self.boleto.mix_updated
@@ -91,7 +95,7 @@ class MixBoleto(object):
         try:
             # Se boleto está sincronizado
             self.sync_boleto = SyncBoleto.objects.get(
-                mix_boleto_id=self.id,
+                mix_boleto_id=self.boleto.pk,
             )
 
             # Se existe, vamos verificar a transação:
@@ -135,26 +139,29 @@ class MixBoleto(object):
             transaction = self._create_transaction(sub)
 
             self.sync_boleto = SyncBoleto.objects.create(
-                mix_boleto=self.id,
+                mix_boleto=self.boleto,
                 cgsy_transaction_id=transaction.pk,
             )
 
     def _create_transaction(self, subscription):
+
+        # form required prefix
         data = {
-            'transaction_type': Transaction.BOLETO,
-            'installments': self.installments,
-            'installment_part': self.installment_part,
-            'boleto_expiration_date': self.expiration_date,
-            'boleto_url': self.link_boleto,
-            'amount': self.amount,
-            'card_hash': None,
-            'lot_as_json': None,
+            'payment-transaction_type': Transaction.BOLETO,
+            'payment-installments': self.installments,
+            'payment-installment_part': self.installment_part,
+            'payment-boleto_expiration_date': self.expiration_date,
+            'payment-boleto_url': self.link_boleto,
+            'payment-amount': self.amount,
+            'payment-card_hash': None,
+            'payment-lot_as_json': None,
         }
 
         form = PaymentForm(
             subscription=subscription,
             selected_lot=subscription.lot,
-            data=data
+            data=data,
+            prefix='payment'
         )
         form.is_valid()
 
@@ -169,28 +176,36 @@ class MixBoleto(object):
 
             db.connection.begin()
 
-            register_id_caixa = False
+            if self.paid is True and not self.id_caixa:
+                sub_sql = 'INSERT INTO caixa'
+                sub_sql += ' (idinscricao, valorpago, pagamento, situacao,'
+                sub_sql += ' tipo, obs, tid, transacao)'
+                sub_sql += ' VALUES ('
+                sub_sql += '{}, {}, {}, 02, 01, "from Congressy", "", ""'
+                sub_sql += ' )'
+                sql = sub_sql.format(
+                    self.id,
+                    amount_as_decimal(self.amount),
+                    datetime.now().strftime("%Y%m%d")
+                )
+                print(sql)
 
-            if self.paid is True and not self.idcaixa:
-                sql = 'INSERT INTO caixa'
-                sql += ' (inscricao, pagamento, valorpago, sitaucao, tipo)'
-                sql += ' VALUES ({}, now(), {}, 02, 01)'
-                sql = sql.format(self.id, self.amount)
+                self.id_caixa = db.insert(sql)
 
-                db.insert(sql)
+            sub_sql = "UPDATE boleto SET link_boleto='{}'".format(
+                self.link_boleto
+            )
+            sql = sub_sql
 
-                self.idcaixa = db.connection.insert_id()
-                register_id_caixa = True
+            if self.id_caixa:
+                sub_sql = ", idcaixa={}".format(self.id_caixa)
+                sql += sub_sql
 
-            sql = "UPDATE boleto SET link_boleto='{}'"
-
-            if register_id_caixa is True:
-                sql += ", idcaixa={}".format(self.idcaixa)
-
-            sql += " WHERE idboleto={} AND idinscricao={}"
-            sql = sql.format(self.id, mix_insc_id)
+            sub_sql = " WHERE idboleto={} AND idinscricao={}"
+            sql += sub_sql.format(self.id, mix_insc_id)
 
             db.update(sql)
 
-        except DatabaseError:
+        except DatabaseError as e:
+            print(str(e))
             db.connection.rollback()
