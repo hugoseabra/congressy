@@ -1,4 +1,5 @@
 from datetime import datetime
+from pprint import pprint
 
 from django.db.transaction import atomic
 
@@ -80,6 +81,7 @@ class MixBoleto(object):
                 self.boleto = MixBoletoModel.objects.create(
                     sync_resource_id=db.sync_resource_id,
                     mix_boleto_id=self.id,
+                    mix_subscription_id=mix_subscription.mix_subscription_id,
                     cgsy_subscription_id=mix_subscription.cgsy_subscription.pk,
                     event_id=event_id,
                     amount=self.amount,
@@ -152,7 +154,6 @@ class MixBoleto(object):
 
             self.sync_boleto = SyncBoleto.objects.create(
                 mix_boleto=self.boleto,
-                mix_subscription_id=mix_subscription.mix_subscription_id,
                 cgsy_transaction_id=self.transaction.pk,
             )
 
@@ -179,7 +180,8 @@ class MixBoleto(object):
         valid = form.is_valid()
 
         if valid is False:
-            raise Exception('PaymentForm not valid.')
+            raise Exception('PaymentForm not valid. Errors: {}'.format(
+                pprint(form.errors)))
 
         return form.save()
 

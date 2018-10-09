@@ -12,16 +12,17 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         resource = SyncResource.objects.first().alias
 
-        event = Event.objects.create(
-            organization_id=741,
-            name='Event: Maroto',
-            date_start=datetime.now() + timedelta(days=15),
-            date_end=datetime.now() + timedelta(days=19),
-            category=Category.objects.first(),
-        )
-
-        event_pk = event.pk
-        # event_pk = 447
+        # event = Event.objects.create(
+        #     organization_id=741,
+        #     name='Event: Maroto',
+        #     date_start=datetime.now() + timedelta(days=15),
+        #     date_end=datetime.now() + timedelta(days=19),
+        #     category=Category.objects.first(),
+        # )
+        #
+        # event_pk = event.pk
+        event_pk = 206
+        print(event_pk)
 
         synchronizer = MixSync(
             resource_alias=resource,
