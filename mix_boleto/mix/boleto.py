@@ -1,8 +1,7 @@
 from datetime import datetime
-from pprint import pprint
 
 from django.db.transaction import atomic
-
+from pprint import pprint
 from hotsite.forms import PaymentForm
 from mix_boleto.models import MixBoleto as MixBoletoModel, SyncBoleto
 from payment.helpers.payment_helpers import amount_as_decimal
@@ -106,7 +105,6 @@ class MixBoleto(object):
             self.sync_boleto = SyncBoleto.objects.get(
                 mix_boleto_id=self.boleto.pk,
                 event_id=event_id,
-                mix_subscription_id=mix_subscription.mix_subscription_id,
             )
 
             # Se existe, vamos verificar a transação:
@@ -154,6 +152,7 @@ class MixBoleto(object):
 
             self.sync_boleto = SyncBoleto.objects.create(
                 mix_boleto=self.boleto,
+                event_id=event_id,
                 cgsy_transaction_id=self.transaction.pk,
             )
 
