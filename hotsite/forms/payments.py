@@ -216,6 +216,7 @@ class PaymentForm(forms.Form):
                         installments=self.cleaned_data.get('installments'),
                         card_hash=self.cleaned_data.get('card_hash'),
                     ),
+                    installments=self.cleaned_data.get('installments'),
                     installment_part=installment_part,
                 )
 
