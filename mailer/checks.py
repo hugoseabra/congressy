@@ -245,14 +245,14 @@ def _check_refunded_transaction(transaction):
     """ Verifica transações pagas e recusadas. """
     subscription = transaction.subscription
 
-    if subscription.status != subscription.CONFIRMED_STATUS:
+    if subscription.status != subscription.AWAITING_STATUS:
         raise exception.NotifcationError(
             "Notificação de inscrição com reembolso só poderá ser feita se"
-            " inscrição estiver confirmada. Esta inscrição não está"
-            " confirmada."
+            " inscrição estiver pendente. Esta inscrição não está"
+            " pendente."
         )
 
-    if transaction.status != transaction.PAID:
+    if transaction.status != transaction.REFUNDED:
         raise exception.NotifcationError(
             "Transação ainda não está paga. A notificação é somente para"
             " transação paga."

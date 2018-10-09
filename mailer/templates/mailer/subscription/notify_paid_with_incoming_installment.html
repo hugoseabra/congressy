@@ -1,0 +1,17 @@
+{% extends 'mailer/subscription/base_notification.html' %}
+{% load humanize %}
+
+{% block introduction %}
+    {% if is_new %}
+        {% include 'mailer/subscription/includes/new-subscription.html' %}
+    {% endif %}
+
+    {% include 'mailer/subscription/includes/paid-installment.html' %}
+    {% include 'mailer/subscription/includes/paid-with-incoming-installment.html' %}
+
+
+{% endblock %}
+
+{% block extra_content %}
+    {% include 'mailer/subscription/includes/account.html' %}
+{% endblock %}
