@@ -98,6 +98,11 @@ class MixBoleto(models.Model):
         on_delete=models.PROTECT,
     )
 
+    mix_subscription_id = models.SmallIntegerField(
+        verbose_name='ID de Inscrição (MixEvents)',
+        db_index=True,
+    )
+
     mix_boleto_id = models.PositiveSmallIntegerField(
         verbose_name='ID do Boleto (MixEvents)',
         db_index=True,
