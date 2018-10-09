@@ -62,10 +62,13 @@ class MixBoleto(object):
         MixBoleto;
         """
 
+        event_id = mix_subscription.mix_category.event_id
+
         with atomic():
             try:
                 self.boleto = MixBoletoModel.objects.get(
                     sync_resource_id=db.sync_resource_id,
+                    event_id=event_id,
                     mix_boleto_id=self.id,
                 )
 
@@ -78,6 +81,7 @@ class MixBoleto(object):
                     sync_resource_id=db.sync_resource_id,
                     mix_boleto_id=self.id,
                     cgsy_subscription_id=mix_subscription.cgsy_subscription.pk,
+                    event_id=event_id,
                     amount=self.amount,
                     installments=self.installments,
                     installment_part=self.installment_part,
@@ -93,10 +97,13 @@ class MixBoleto(object):
 
     def _sync_boleto(self, db: MixConnection, mix_subscription):
 
+        event_id = mix_subscription.mix_category.event_id
+
         try:
             # Se boleto está sincronizado
             self.sync_boleto = SyncBoleto.objects.get(
                 mix_boleto_id=self.boleto.pk,
+                event_id=event_id,
                 mix_subscription_id=mix_subscription.mix_subscription_id,
             )
 

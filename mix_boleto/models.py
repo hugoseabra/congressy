@@ -64,6 +64,11 @@ class SyncCategory(models.Model):
         db_index=True,
     )
 
+    event_id = models.PositiveSmallIntegerField(
+        verbose_name='ID do Evento',
+        db_index=True,
+    )
+
     cgsy_category_id = models.PositiveSmallIntegerField(
         verbose_name='ID da Categoria (Congressy)',
         db_index=True,
@@ -105,6 +110,11 @@ class MixBoleto(models.Model):
 
     mix_boleto_id = models.PositiveSmallIntegerField(
         verbose_name='ID do Boleto (MixEvents)',
+        db_index=True,
+    )
+
+    event_id = models.PositiveSmallIntegerField(
+        verbose_name='ID do Evento',
         db_index=True,
     )
 
@@ -172,6 +182,11 @@ class SyncBoleto(models.Model):
         db_index=True,
     )
 
+    event_id = models.PositiveSmallIntegerField(
+        verbose_name='ID do Evento',
+        db_index=True,
+    )
+
 
 class SyncSubscription(models.Model):
     """
@@ -201,6 +216,11 @@ class SyncSubscription(models.Model):
 
     cgsy_subscription_id = models.UUIDField(
         verbose_name='UUID de Inscrição (Congressy)',
+        db_index=True,
+    )
+
+    event_id = models.PositiveSmallIntegerField(
+        verbose_name='ID do Evento',
         db_index=True,
     )
 

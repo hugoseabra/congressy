@@ -97,6 +97,7 @@ class MixSubscription(object):
             try:
                 self.sync_subscription = SyncSubscription.objects.get(
                     mix_subscription_id=self.mix_subscription_id,
+                    event_id=self.mix_category.event_id,
                     sync_resource_id=db.sync_resource_id,
                 )
 
@@ -125,6 +126,7 @@ class MixSubscription(object):
                     sync_resource_id=db.sync_resource_id,
                     mix_subscription_id=self.mix_subscription_id,
                     cgsy_subscription_id=self.cgsy_subscription.pk,
+                    event_id=self.mix_category.event_id,
                     mix_created=self.created,
                     mix_updated=self.updated,
                 )

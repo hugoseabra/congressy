@@ -25,6 +25,7 @@ class MixLot(object):
             try:
                 self.lot = Lot.objects.get(
                     category_id=self.mix_category.cgsy_category.pk,
+                    event_id=self.mix_category.event_id,
                     name=self._get_name()
                 )
 

@@ -27,6 +27,7 @@ class MixCategory(object):
             try:
                 self.sync_category = SyncCategory.objects.get(
                     mix_category_id=self.mix_category_id,
+                    event_id=self.event_id,
                     sync_resource_id=db.sync_resource_id,
                 )
 
@@ -47,6 +48,7 @@ class MixCategory(object):
                     sync_resource_id=db.sync_resource_id,
                     mix_category_id=self.mix_category_id,
                     cgsy_category_id=self.cgsy_category.pk,
+                    event_id=self.event_id,
                     mix_created=self.created,
                     mix_updated=self.updated,
                 )
