@@ -12,8 +12,10 @@ class MixSync(object):
     def __init__(self, resource_alias: str, event_id: int, ) -> None:
         """
 
-        :param resource_alias:
-        :param event_id:
+            Construtor
+
+        :param resource_alias: string identificadora de recurso
+        :param event_id: um inteiro como chave primaria de um evento
         """
         self.event_id = event_id
         self.mix_subscriptions = list()
@@ -26,7 +28,13 @@ class MixSync(object):
             password=credentials.password,
         )
 
-    def prepare(self):
+    def prepare(self) -> None:
+        """
+            Responsavel por construir todos os artefatos necessarios para a
+            execução da sincronização
+
+        :return: None
+        """
         builder = MixSubscriptionCollectionBuilder(
             event_id=self.event_id,
             db=self.connection,
@@ -34,7 +42,12 @@ class MixSync(object):
 
         self.mix_subscriptions = builder.build()
 
-    def run(self):
+    def run(self) -> None:
+        """
+            Responsavel por executar a sincronização
+
+        :return: None
+        """
         for subscription in self.mix_subscriptions:
             subscription.sync_all()
 
