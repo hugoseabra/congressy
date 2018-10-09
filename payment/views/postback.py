@@ -13,9 +13,7 @@ from rest_framework.response import Response
 from core.helpers import sentry_log
 from payment.email_notifications import PaymentNotification
 from payment.forms import PaymentForm
-from payment.helpers import (
-    TransactionLog,
-)
+from payment.helpers import TransactionLog
 from payment.models import Transaction, TransactionStatus
 from payment.postback import Postback
 from payment.subscription_status_manager import SubscriptionStatusManager
