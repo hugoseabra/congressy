@@ -188,7 +188,6 @@ class MixBoleto(object):
                     amount_as_decimal(self.amount),
                     datetime.now().strftime("%Y%m%d")
                 )
-                print(sql)
 
                 self.id_caixa = db.insert(sql)
 
