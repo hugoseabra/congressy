@@ -43,6 +43,7 @@ class MixBoleto(object):
 
         self.paid = False
         self.payment_date = None
+        self.transaction = None
 
     def sync(self, db: MixConnection, mix_subscription):
 
@@ -100,35 +101,38 @@ class MixBoleto(object):
 
             # Se existe, vamos verificar a transação:
             try:
-                transaction = Transaction.objects.get(
+                self.transaction = Transaction.objects.get(
                     pk=self.sync_boleto.cgsy_transaction_id,
                 )
 
+                sync_to_mix = False
+
+                if self.transaction.boleto_url:
+                    self.link_boleto = self.transaction.boleto_url
+                    sync_to_mix = True
+
+                if self.transaction.status == Transaction.PAID and \
+                        not self.id_caixa:
+                    trans_status = TransactionStatus.objects.filter(
+                        transaction_id=self.transaction.pk,
+                        status=Transaction.PAID,
+                    ).last()
+
+                    self.payment_date = datetime.strptime(
+                        trans_status.date_created,
+                        "%Y-%m-%dT%H:%M:%S.%fZ"
+                    )
+
+                    self.paid = True
+                    sync_to_mix = True
+
+                if sync_to_mix is True:
+                    self._sync_to_mix(db, mix_subscription)
+
             except Transaction.DoesNotExist:
-                sub = mix_subscription.cgsy_subscription
-                transaction = self._create_transaction(sub)
-
-            sync_to_mix = False
-
-            if transaction.boleto_url:
-                self.link_boleto = transaction.boleto_url
-                sync_to_mix = True
-
-            if transaction.status == Transaction.PAID:
-                trans_status = TransactionStatus.objects.filter(
-                    transaction_id=transaction.pk,
-                ).last()
-
-                self.payment_date = datetime.strptime(
-                    trans_status.date_created,
-                    "%Y-%m-%dT%H:%M:%S.%fZ"
-                )
-
-                self.paid = True
-                sync_to_mix = True
-
-            if sync_to_mix is True:
-                self._sync_to_mix(db, mix_subscription)
+                # sub = mix_subscription.cgsy_subscription
+                # transaction = self._create_transaction(sub)
+                pass
 
         except SyncBoleto.DoesNotExist:
             # Não sincronizado. Vamos criar a sincronização:
@@ -136,11 +140,11 @@ class MixBoleto(object):
             # - Relacionar transação com MixBoleto através de SyncBoleto
 
             sub = mix_subscription.cgsy_subscription
-            transaction = self._create_transaction(sub)
+            self.transaction = self._create_transaction(sub)
 
             self.sync_boleto = SyncBoleto.objects.create(
                 mix_boleto=self.boleto,
-                cgsy_transaction_id=transaction.pk,
+                cgsy_transaction_id=self.transaction.pk,
             )
 
     def _create_transaction(self, subscription):
@@ -163,7 +167,10 @@ class MixBoleto(object):
             data=data,
             prefix='payment'
         )
-        form.is_valid()
+        valid = form.is_valid()
+
+        if valid is False:
+            raise Exception('PaymentForm not valid.')
 
         return form.save()
 
@@ -179,10 +186,10 @@ class MixBoleto(object):
             if self.paid is True and not self.id_caixa:
                 sub_sql = 'INSERT INTO caixa'
                 sub_sql += ' (idinscricao, valorpago, pagamento, situacao,'
-                sub_sql += ' tipo, obs, tid, transacao)'
+                sub_sql += ' tipo, obs, tid, transacao, _crdt)'
                 sub_sql += ' VALUES ('
-                sub_sql += '{}, {}, {}, 02, 01, "from Congressy", "", ""'
-                sub_sql += ' )'
+                sub_sql += '{}, {}, {}, 02, 01, "from Congressy", "", "", ' \
+                           'now())'
                 sql = sub_sql.format(
                     self.id,
                     amount_as_decimal(self.amount),
@@ -200,8 +207,8 @@ class MixBoleto(object):
                 sub_sql = ", idcaixa={}".format(self.id_caixa)
                 sql += sub_sql
 
-            sub_sql = " WHERE idboleto={} AND idinscricao={}"
-            sql += sub_sql.format(self.id, mix_insc_id)
+            sub_sql = " WHERE idboleto={} AND idinscricao={} AND parci = {}"
+            sql += sub_sql.format(self.id, mix_insc_id, self.installment_part)
 
             db.update(sql)
 

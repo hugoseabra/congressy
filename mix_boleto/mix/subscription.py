@@ -2,6 +2,7 @@ from django.db.models import Q
 from django.db.transaction import atomic
 from kanu_locations.models import City
 
+from core.util.string import clear_string
 from gatheros_event.models import Person
 from gatheros_subscription.models import Subscription
 from mix_boleto.models import SyncSubscription
@@ -51,7 +52,13 @@ class MixSubscription(object):
                         cnpj=None):
 
         if cnpj:
+            cnpj = clear_string(str(cnpj)).zfill(14)
+
+        if cnpj:
             name = '{} - {}'.format(name, cnpj)
+
+        if cpf:
+            cpf = clear_string(str(cpf)).zfill(11)
 
         self.person_data = {
             'name': name,
@@ -127,7 +134,15 @@ class MixSubscription(object):
 
     def sync_boletos(self, db: MixConnection):
         for mix_boleto in self.boletos:
-            mix_boleto.sync(db)
+            # se já foi pago
+            if mix_boleto.id_caixa:
+                continue
+
+            mix_boleto.sync(db, self)
+
+            transaction = mix_boleto.transaction
+            if transaction is not None and not transaction.paid:
+                break
 
     def _create_subscription(self):
         person = self._create_updated_person()

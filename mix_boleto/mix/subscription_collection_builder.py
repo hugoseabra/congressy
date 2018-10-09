@@ -42,7 +42,7 @@ class MixSubscriptionCollectionBuilder(object):
 
     def build(self) -> list:
         """
-            Responsavel por montar tudo
+            Responsavel por montar uma coleção de MixSubscription's
 
         :return: lista de MixSubscriptions
         """
@@ -53,14 +53,21 @@ class MixSubscriptionCollectionBuilder(object):
 
         for subscription in self.query:
             mix_subscription = self._build_subscription(subscription)
-            if subscription['idisncricao'] in boletos:
-                for boleto in boletos[subscription['idisncricao']]:
+            if subscription['idinscricao'] in boletos:
+                for boleto in boletos[subscription['idinscricao']]:
                     mix_subscription.add_boleto(boleto)
             mix_subscriptions.append(mix_subscription)
 
         return mix_subscriptions
 
-    def _build_subscription(self, subscription_data: dict):
+    def _build_subscription(self, subscription_data: dict) -> MixSubscription:
+        """
+            Responsavel por criar uma instancia de MixSubscription
+
+
+        :param subscription_data: dict de dados
+        :return: instancia de MixSubscription
+        """
         mix_subscription_id = subscription_data['idinscricao']
         category = self._build_category(subscription_data)
         lot = self._build_lot(subscription_data, category)
@@ -94,7 +101,7 @@ class MixSubscriptionCollectionBuilder(object):
 
         return sub
 
-    def _build_category(self, subscription_data: dict):
+    def _build_category(self, subscription_data: dict) -> MixCategory:
         """
             Responsavel por criar uma categoria
 
@@ -115,9 +122,11 @@ class MixSubscriptionCollectionBuilder(object):
         )
 
     # noinspection PyMethodMayBeStatic
-    def _build_lot(self, subscription_data: dict, category: MixCategory):
+    def _build_lot(self,
+                   subscription_data: dict,
+                   category: MixCategory) -> MixLot:
         """
-            Responsavel pela criação de lotes
+            Responsavel pela criação de lote
 
         :param subscription_data: dict de dados
         :param category: instancia de MixCategory
@@ -133,7 +142,13 @@ class MixSubscriptionCollectionBuilder(object):
         )
 
     # noinspection PyMethodMayBeStatic
-    def _build_boleto(self, boleto_data: dict):
+    def _build_boleto(self, boleto_data: dict) -> MixBoleto:
+        """
+            Responsavel pela criação de uma instancia de MixBoleto
+
+        :param boleto_data:
+        :return: instancia de MixBoleto
+        """
 
         return MixBoleto(
             id=boleto_data['idboleto'],
@@ -148,19 +163,28 @@ class MixSubscriptionCollectionBuilder(object):
             cancelled=False,
         )
 
-    def _build_boletos_collection(self):
+    def _build_boletos_collection(self) -> dict:
+        """
+
+            Responsavel pela criação de um dict com idinscricao como chave e
+            uma lista de boletos como valores
+
+        :return: dict de boletos com idinscricao como chave e lista de
+        boletos como valor
+        """
 
         boletos = dict()
 
         boletos_data = self.connection.fetch(
-            'SELECT * FROM boleto WHERE situacao = 1'
+            'SELECT * FROM boleto WHERE situacao = 1 ORDER BY parci'
         )
 
         for payload in boletos_data:
-            if boletos_data['idinscricao'] not in boletos:
-                boletos[boletos_data['idinscricao']] = list()
 
-            boletos[boletos_data['idinscricao']].append(
+            if payload['idinscricao'] not in boletos.keys():
+                boletos[payload['idinscricao']] = list()
+
+            boletos[payload['idinscricao']].append(
                 self._build_boleto(payload)
             )
 
