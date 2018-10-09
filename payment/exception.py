@@ -13,15 +13,14 @@ class PostbackError(Error):
 
     def __init__(self,
                  transaction_pk: str,
-                 message: str,
-                 *args: object, **kwargs: object) -> None:
+                 message: str) -> None:
         """
         :param message: message to be printed
         :param transaction_pk: the Transaction primary key as string
         """
         self.message = message
         self.transaction_pk = transaction_pk
-        super().__init__(*args, **kwargs)
+        super().__init__()
 
 
 # Receivers exception
@@ -210,7 +209,7 @@ class PostbackValueError(PostbackError):
         super().__init__(*args, **kwargs)
 
 
-class PostbackNotificationError(PostbackError, NotifcationError):
+class PostbackNotificationError(PostbackError):
     """
         Raised when send_mail fails during a Postback
     """

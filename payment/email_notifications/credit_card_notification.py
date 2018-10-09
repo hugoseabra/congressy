@@ -1,20 +1,10 @@
 from gatheros_subscription.models import Subscription
 from mailer.services import (
     notify_new_user_and_paid_subscription_credit_card_with_discrepancy,
-    notify_new_user_and_paid_subscription_credit_card,
     notify_chargedback_subscription,
-    notify_new_paid_subscription_credit_card,
-    notify_new_refused_subscription_boleto,
-    notify_new_refused_subscription_credit_card,
-    notify_new_unpaid_subscription_boleto,
-    notify_new_unpaid_subscription_credit_card,
-    notify_new_user_and_paid_subscription_boleto,
     notify_new_user_and_paid_subscription_credit_card,
-    notify_new_user_and_refused_subscription_boleto,
     notify_new_user_and_refused_subscription_credit_card,
-    notify_new_user_and_unpaid_subscription_boleto,
     notify_new_user_and_unpaid_subscription_credit_card,
-    notify_paid_subscription_boleto, notify_refunded_subscription_boleto,
     notify_pending_refund_subscription,
     notify_refunded_subscription_credit_card,
 )
@@ -33,13 +23,13 @@ class CreditCardPaymentNotification(object):
 
         if self.subscription.status == Subscription.AWAITING_STATUS:
             self._notify_pending_subscription()
-        elif self.subscription == Subscription.CONFIRMED_STATUS:
+        elif self.subscription.status == Subscription.CONFIRMED_STATUS:
             self._notify_confirmed_subscription()
         else:
             raise PostbackNotificationError(
                 transaction_pk=str(self.transaction.pk),
-                message="Status de inscrição desconhecido para notificar: {}"
-                        "".format(self.subscription.status)
+                message="Status de inscrição desconhecido para "
+                        "notificar: {}".format(self.subscription.status),
             )
 
     def _notify_pending_subscription(self):
@@ -88,10 +78,10 @@ class CreditCardPaymentNotification(object):
 
         else:
             raise PostbackNotificationError(
+                "Status de transação desconhecido para notificar "
+                "inscrição pendente: {}"
+                "".format(self.transaction.status),
                 transaction_pk=str(self.transaction.pk),
-                message="Status de transação desconhecido para notificar "
-                        "inscrição pendente: {}"
-                        "".format(self.transaction.status)
             )
 
     def _notify_confirmed_subscription(self):
