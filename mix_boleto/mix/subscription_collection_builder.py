@@ -19,15 +19,19 @@ class MixSubscriptionCollectionBuilder(object):
         - MixBoleto;
     """
 
-    def __init__(self, db: MixConnection, event_id: int) -> None:
+    def __init__(self,
+                 db: MixConnection,
+                 event_id: int,
+                 mix_subscription_id=None) -> None:
         """
             Construtor
-            
+
         :param db: Uma conexão com o banco de dados
         :param event_id: chave primaria de evento
         """
         self.event_pk = event_id
         self.connection = db
+        self.mix_subscription_id = mix_subscription_id
         self.query = self.connection.fetch(
             'SELECT * FROM inscricao '
             'INNER JOIN preco USING (idcategoria)'
