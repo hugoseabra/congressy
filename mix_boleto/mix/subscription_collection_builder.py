@@ -19,28 +19,17 @@ class MixSubscriptionCollectionBuilder(object):
         - MixBoleto;
     """
 
-    def __init__(self,
-                 db: MixConnection,
-                 event_id: int,
-                 mix_subscription_id=None) -> None:
+    def __init__(self, db: MixConnection, event_id: int,) -> None:
         """
-            Construtor
+        Construtor
 
         :param db: Uma conexão com o banco de dados
         :param event_id: chave primaria de evento
         """
         self.event_pk = event_id
         self.connection = db
-        self.mix_subscription_id = mix_subscription_id
-        self.query = self.connection.fetch(
-            'SELECT * FROM inscricao '
-            'INNER JOIN preco USING (idcategoria)'
-            'INNER JOIN categoria USING (idcategoria)'
-            'WHERE idinscricao IN (SELECT DISTINCT idinscricao FROM boleto '
-            'WHERE situacao = 1) GROUP BY idinscricao'
-        )
 
-    def build(self) -> list:
+    def build(self, mix_subscription_id=None) -> list:
         """
             Responsavel por montar uma coleção de MixSubscription's
 
@@ -51,7 +40,7 @@ class MixSubscriptionCollectionBuilder(object):
 
         boletos = self._build_boletos_collection()
 
-        for subscription in self.query:
+        for subscription in self._fetch_subscriptions(mix_subscription_id):
             mix_subscription = self._build_subscription(subscription)
             if subscription['idinscricao'] in boletos:
                 for boleto in boletos[subscription['idinscricao']]:
@@ -59,6 +48,24 @@ class MixSubscriptionCollectionBuilder(object):
             mix_subscriptions.append(mix_subscription)
 
         return mix_subscriptions
+
+    def _fetch_subscriptions(self, mix_subscription_id):
+        sql = "SELECT * FROM inscricao"
+        sql += " INNER JOIN preco USING (idcategoria)"
+        sql += " INNER JOIN categoria USING (idcategoria)"
+        sql += " WHERE idinscricao IN ("
+        sql += "    SELECT DISTINCT idinscricao FROM boleto WHERE situacao = 1"
+        sql += " )"
+
+        if mix_subscription_id:
+            sub_sql = " AND idinscricao={}".format(
+                int(mix_subscription_id)
+            )
+            sql += sub_sql
+
+        sql += " GROUP BY idinscricao"
+
+        return self.connection.fetch(sql)
 
     def _build_subscription(self, subscription_data: dict) -> MixSubscription:
         """

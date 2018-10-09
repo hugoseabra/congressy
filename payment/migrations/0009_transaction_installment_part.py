@@ -12,9 +12,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
+        migrations.AlterField(
             model_name='transaction',
             name='installment_part',
-            field=models.PositiveIntegerField(blank=True, default=0, null=True),
+            field=models.PositiveIntegerField(blank=True, default=1, null=True,
+                                              verbose_name='número de parcelas'),
         ),
     ]

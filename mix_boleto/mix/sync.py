@@ -28,7 +28,7 @@ class MixSync(object):
             password=credentials.password,
         )
 
-    def prepare(self) -> None:
+    def prepare(self, mix_subscription_id=None) -> None:
         """
             Responsavel por construir todos os artefatos necessarios para a
             execução da sincronização
@@ -40,7 +40,7 @@ class MixSync(object):
             db=self.connection,
         )
 
-        self.mix_subscriptions = builder.build()
+        self.mix_subscriptions = builder.build(mix_subscription_id)
 
     def run(self) -> None:
         """

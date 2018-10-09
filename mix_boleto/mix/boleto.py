@@ -97,6 +97,7 @@ class MixBoleto(object):
             # Se boleto está sincronizado
             self.sync_boleto = SyncBoleto.objects.get(
                 mix_boleto_id=self.boleto.pk,
+                mix_subscription_id=mix_subscription.mix_subscription_id,
             )
 
             # Se existe, vamos verificar a transação:
@@ -144,6 +145,7 @@ class MixBoleto(object):
 
             self.sync_boleto = SyncBoleto.objects.create(
                 mix_boleto=self.boleto,
+                mix_subscription_id=mix_subscription.mix_subscription_id,
                 cgsy_transaction_id=self.transaction.pk,
             )
 
