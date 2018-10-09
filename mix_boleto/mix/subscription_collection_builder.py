@@ -84,8 +84,8 @@ class MixSubscriptionCollectionBuilder(object):
             zip_code=subscription_data['cep'],
             city=subscription_data['cidade'],
             uf=subscription_data['uf'],
-            institution=subscription_data['instituicao']
-            # cnpj=subscription_data['cnpj'],
+            institution=subscription_data['instituicao'],
+            cnpj=subscription_data['cnpj'],
         )
 
         return sub
@@ -133,7 +133,7 @@ class MixSubscriptionCollectionBuilder(object):
 
         return MixBoleto(
             id=boleto_data['idboleto'],
-            idcaixa=boleto_data['idcaixa'],
+            id_caixa=boleto_data['idcaixa'],
             expiration_date=boleto_data['vencimento'],
             amount=decimal_processable_amount(boleto_data['valor']),
             installments=boleto_data['parcn'],
