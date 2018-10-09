@@ -5,6 +5,7 @@ from django.dispatch import receiver
 
 from mix_boleto.models import SyncBoleto
 from payment.models import Transaction
+from mix_boleto.mix.sync import MixSync
 
 
 @receiver(post_save, sender=Transaction)
@@ -19,7 +20,7 @@ def trigger_mix_congressy_synchronization(instance, created, raw, **_):
 
     proceed_sync = False
 
-    if instance.has_changed('boleto_url'):
+    if instance.has_changed('boleto_url') and instance.boleto_url:
         proceed_sync = True
 
     if instance.has_changed('status') and instance.status == Transaction.PAID:
@@ -32,7 +33,15 @@ def trigger_mix_congressy_synchronization(instance, created, raw, **_):
                 cgsy_transaction_id=instance.pk,
             )
 
-            
+            boleto = sync_boleto.mix_boleto
+
+            synchronizer = MixSync(
+                resource_alias=boleto.sync_resource.alias,
+                event_id=instance.subscription.event_id,
+            )
+
+            synchronizer.prepare(boleto.mix_subscription_id)
+            synchronizer.run()
 
         except SyncBoleto.DoesNotExist:
             pass
