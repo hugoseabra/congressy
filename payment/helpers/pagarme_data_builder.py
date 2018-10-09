@@ -255,11 +255,12 @@ class PagarmeDataBuilder:
                     )
                 )
 
-        if self.debt_amount > amount:
-            raise TransactionDataError(
-                'Valor de transações de pendências inseridas ultrapassa'
-                ' o montante principal a ser transacionado.'
-            )
+        # if self.debt_amount > amount:
+        #     raise TransactionDataError(
+        #         'Valor de transações de pendências inseridas ultrapassa'
+        #         ' o montante principal a ser transacionado. Débitos: {}.'
+        #         ' Transação: {}'.format(self.debt_amount, amount)
+        #     )
 
     def _create_split_rules(self, amount, installments=1):
         """
@@ -294,6 +295,9 @@ class PagarmeDataBuilder:
 
     @staticmethod
     def clear_string(string):
+        if not string:
+            return ''
+
         return string \
             .replace('.', '') \
             .replace('-', '') \

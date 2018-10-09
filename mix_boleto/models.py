@@ -108,7 +108,7 @@ class MixBoleto(models.Model):
         db_index=True,
     )
 
-    price = models.DecimalField(
+    amount = models.DecimalField(
         max_digits=8,
         null=True,
         blank=True,

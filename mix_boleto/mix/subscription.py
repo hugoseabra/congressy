@@ -1,3 +1,7 @@
+from django.db.models import Q
+from django.db.transaction import atomic
+from kanu_locations.models import City
+
 from gatheros_event.models import Person
 from gatheros_subscription.models import Subscription
 from mix_boleto.models import SyncSubscription
@@ -43,7 +47,11 @@ class MixSubscription(object):
                         zip_code=None,
                         city=None,
                         uf=None,
-                        institution=None):
+                        institution=None,
+                        cnpj=None):
+
+        if cnpj:
+            name = '{} - {}'.format(name, cnpj)
 
         self.person_data = {
             'name': name,
@@ -59,6 +67,7 @@ class MixSubscription(object):
             'city': city,
             'uf': uf,
             'institution': institution,
+            'institution_cnpj': cnpj,
         }
 
     def add_boleto(self, boleto: MixBoleto):
@@ -69,39 +78,49 @@ class MixSubscription(object):
 
     def sync_all(self, db: MixConnection):
         self.mix_category.sync(db)
-        self.mix_lot.sync(db)
-        self.sync_subscription(db)
+        self.mix_lot.sync()
+        self.sync(db)
         self.sync_boletos(db)
 
-    def sync_subscription(self, db: MixConnection):
+    def sync(self, db: MixConnection):
 
-        try:
-            self.sync_subscription = SyncSubscription.objects.get(
-                mix_subscription_id=self.mix_subscription_id,
-                sync_resource_id=db.sync_resource_id,
-            )
+        self._check_person_required_fields()
 
+        with atomic():
             try:
-                self.cgsy_subscription = Subscription.objects.get(
-                    pk=self.sync_subscription.cgsy_subscription_id,
+                self.sync_subscription = SyncSubscription.objects.get(
+                    mix_subscription_id=self.mix_subscription_id,
+                    sync_resource_id=db.sync_resource_id,
                 )
 
-            except Subscription.DoesNotExist:
+                try:
+                    self.cgsy_subscription = Subscription.objects.get(
+                        pk=self.sync_subscription.cgsy_subscription_id,
+                    )
+
+                except Subscription.DoesNotExist:
+                    self.cgsy_subscription = self._create_subscription()
+                    self.sync_subscription.cgsy_subscription_id = \
+                        self.cgsy_subscription.pk
+                    self.sync_subscription.save()
+
+                self.cgsy_subscription.person = self._create_updated_person()
+
+                if self.cgsy_subscription.lot != self.mix_lot.lot:
+                    self.cgsy_subscription.lot = self.mix_lot.lot
+
+                self.cgsy_subscription.save()
+
+            except SyncSubscription.DoesNotExist:
                 self.cgsy_subscription = self._create_subscription()
-                self.sync_subscription.cgsy_subscription_id = \
-                    self.cgsy_subscription.pk
-                self.sync_subscription.save()
 
-        except SyncSubscription.DoesNotExist:
-            self.cgsy_subscription = self._create_subscription()
-
-            self.sync_subscription = SyncSubscription.objects.create(
-                sync_resource_id=db.sync_resource_id,
-                mix_subscription_id=self.mix_subscription_id,
-                cgsy_subscription_id=self.cgsy_subscription.pk,
-                mix_created=self.created,
-                mix_updated=self.updated,
-            )
+                self.sync_subscription = SyncSubscription.objects.create(
+                    sync_resource_id=db.sync_resource_id,
+                    mix_subscription_id=self.mix_subscription_id,
+                    cgsy_subscription_id=self.cgsy_subscription.pk,
+                    mix_created=self.created,
+                    mix_updated=self.updated,
+                )
 
         self.created = self.sync_subscription.mix_created
         self.updated = self.sync_subscription.mix_updated
@@ -111,25 +130,99 @@ class MixSubscription(object):
             mix_boleto.sync(db)
 
     def _create_subscription(self):
-
-        person_qs = Person.objects.get_queryset()
-
-        if 'email' in self.person_data:
-            person_qs = person_qs.filter(cpf=self.person_data.get('email'))
-
-        if 'cpf' in self.person_data:
-            person_qs = person_qs.filter(cpf=self.person_data.get('cpf'))
-
-        try:
-            person = person_qs.get()
-
-        except Person.DoesNotExist:
-            person = Person.objects.create(**self.person_data)
+        person = self._create_updated_person()
+        lot = self.mix_lot.lot
 
         return Subscription.objects.create(
-            lot=self.mix_lot.lot,
+            event=lot.event,
+            lot=lot,
             person=person,
             created_by=1,
             completed=True,
             test_subscription=False,
         )
+
+    def _create_updated_person(self):
+
+        if not self.person_data:
+            raise Exception('Nenhum dado de pessoa informado.')
+
+        person_data = self.person_data.copy()
+
+        city_name = None
+        uf = None
+
+        if 'city' in person_data:
+            city_name = person_data.pop('city')
+
+        if 'uf' in person_data:
+            uf = person_data.pop('uf')
+
+        person_qs = Person.objects.get_queryset()
+
+        city = self._get_city(city_name=city_name, uf=uf)
+        if not city:
+            raise Exception('Cidade não encontrada: {}'.format(city_name))
+
+        person_qs = person_qs.filter(city=city)
+
+        if 'email' in person_data:
+            person_qs = person_qs.filter(email=person_data.get('email'))
+
+        if 'cpf' in person_data:
+            person_qs = person_qs.filter(cpf=person_data.get('cpf'))
+
+        try:
+            person = person_qs.get()
+
+            for key, value in person_data.items():
+                if not value:
+                    continue
+
+                setattr(person, key, value)
+
+            person.save()
+
+        except Person.DoesNotExist:
+            person_data['city'] = city
+            person = Person.objects.create(**person_data)
+
+        return person
+
+    def _get_city(self, city_name=None, uf=None):
+
+        if city_name:
+            try:
+                city_name = str(city_name).upper()
+                city_qs = City.objects.filter(
+                    Q(name=city_name) | Q(name_ascii=city_name)
+                )
+
+                if uf:
+                    city_qs = city_qs.filter(uf=uf)
+
+                return city_qs.get()
+
+            except City.DoesNotExist:
+                return None
+
+    def _check_person_required_fields(self):
+        required_fields = [
+            'cpf',
+            'phone',
+            'street',
+            'village',
+            'zip_code',
+            'city',
+            'uf'
+        ]
+
+        for field in required_fields:
+            if field not in self.person_data or not self.person_data[field]:
+                raise Exception(
+                    'Campo "{}" não informado. Os seguintes campos são'
+                    ' obrigatórios: {}'.format(
+                        field,
+                        ', '.join(required_fields)
+                    )
+                )
