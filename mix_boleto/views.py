@@ -1,5 +1,6 @@
 from django.http import HttpResponseBadRequest
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from core.helpers import sentry_log
 from gatheros_event.models import Event
@@ -45,3 +46,5 @@ def postback_url_view(request):
 
     synchronizer.prepare()
     synchronizer.run()
+
+    return Response(status=201)
