@@ -1,6 +1,6 @@
 from django.http import HttpResponseBadRequest
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 from core.helpers import sentry_log
 from gatheros_event.models import Event
@@ -9,7 +9,7 @@ from mix_boleto.models import SyncResource
 
 
 @api_view(['POST'])
-def postback_url_view(request):
+def synchronization_hook(request):
     data = request.data
 
     if not data:
@@ -23,8 +23,8 @@ def postback_url_view(request):
     resource_alias = data.get('resource_alias')
 
     if not event_id:
-        msg = 'Hook de sincronização entre MixEvents e Congressy - event_id' \
-              ' não encontrado.'
+        msg = 'Hook de sincronização entre MixEvents e' \
+              ' Congressy - event_id não encontrado.'
 
         sentry_log(message=msg, type='error', notify_admins=True)
         return HttpResponseBadRequest()
@@ -47,4 +47,4 @@ def postback_url_view(request):
     synchronizer.prepare()
     synchronizer.run()
 
-    return Response(status=201)
+    return Response(status=202)
