@@ -21,6 +21,11 @@ class ManualTransactionForm(forms.ModelForm):
             )
         }
 
+    paid = forms.BooleanField(
+        initial=True,
+        required=False,
+    )
+
     def __init__(self, subscription, *args, **kwargs):
         self.subscription = subscription
         super().__init__(*args, **kwargs)
@@ -37,12 +42,16 @@ class ManualTransactionForm(forms.ModelForm):
         self.instance.subscription = self.subscription
         self.instance.lot = self.subscription.lot
         self.instance.lot_price = self.subscription.lot.get_calculated_price()
-
         self.instance.manual = True
         self.instance.date_created = datetime.now()
-        self.instance.type = Transaction.MANUAL
-        self.instance.status = Transaction.PAID
         self.instance.liquid_amount = self.instance.amount
+
+        if self.cleaned_data['paid'] is True:
+            self.instance.type = Transaction.MANUAL_WAITING_PAYMENT
+            self.instance.status = Transaction.PAID
+        else:
+            self.instance.type = Transaction.MANUAL
+            self.instance.status = Transaction.WAITING_PAYMENT
 
         instance = super().save(commit=commit)
 
@@ -50,7 +59,8 @@ class ManualTransactionForm(forms.ModelForm):
             subscription=self.subscription
         )
 
-        if calculator.is_subscription_confirmed:
+        if calculator.is_subscription_confirmed and self.cleaned_data['paid'] \
+                is True:
             self.subscription.status = self.subscription.CONFIRMED_STATUS
         else:
             self.subscription.status = self.subscription.AWAITING_STATUS
