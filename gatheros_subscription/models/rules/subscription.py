@@ -52,7 +52,14 @@ def rule_5_inscricao_apos_data_final_lote(subscription, adding=False):
     """
     Inscrição após data final do lote não deve ser aceita.
     """
-    if adding and subscription.lot.date_end < datetime.now():
+    allowed_origins = [
+        subscription.DEVICE_ORIGIN_MANAGE,
+        subscription.DEVICE_ORIGIN_CSV_IMPORT,
+    ]
+
+    manual = subscription.origin in allowed_origins
+
+    if adding and subscription.lot.date_end < datetime.now() and not manual:
         raise IntegrityError(
             'O lote já foi encerrado e não pode mais ter inscrições.'
         )
@@ -62,7 +69,16 @@ def rule_6_inscricao_apos_data_final_evento(subscription, adding=False):
     """
     Inscrição após data final de evento não deve ser aceito.
     """
-    if adding and subscription.lot.event.date_end < datetime.now():
+
+    allowed_origins = [
+        subscription.DEVICE_ORIGIN_MANAGE,
+        subscription.DEVICE_ORIGIN_CSV_IMPORT,
+    ]
+
+    manual = subscription.origin in allowed_origins
+
+    if adding and subscription.lot.event.date_end < datetime.now() \
+            and not manual:
         raise IntegrityError(
             'O evento já foi encerrado e não pode mais ter inscrições.'
         )
