@@ -2,6 +2,8 @@
     Formulário usado para persistir as inscrições do hotsite
 """
 
+from datetime import datetime
+
 from django import forms
 
 from gatheros_subscription.models import Lot, Subscription
@@ -37,6 +39,10 @@ class SubscriptionForm(forms.Form):
         if lot.limit and subscriptions > lot.limit:
             raise forms.ValidationError('Lote está lotado e não permite novas '
                                         'inscrições')
+
+        if lot.date_end < datetime.now():
+            raise forms.ValidationError('Lote já está finalizado e não '
+                                        'permite novas inscrições.')
 
         return lot
 
