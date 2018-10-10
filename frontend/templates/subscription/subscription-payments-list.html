@@ -65,7 +65,7 @@
                                     <span class="text-danger">R$ {{ dividend_amount|intcomma }}</span>
                                     <i class="fas fa-exclamation-triangle text-warning animated shake" style="margin-left:20px"
                                        data-toggle="tooltip"
-                                       title="Participante com dívidas."
+                                       title="Participante com pendências."
                                     ></i>
                                 {% elif dividend_amount > 0 %}
                                     <span class="text-success">R$ {{ dividend_amount|intcomma }}</span>
@@ -77,7 +77,7 @@
                                     <span class="text-bold">R$ {{ dividend_amount|intcomma }}</span>
                                     <i class="fas fa-check text-success" style="margin-left:20px"
                                        data-toggle="tooltip"
-                                       title="Participante sem dívidas."
+                                       title="Participante sem pendências."
                                     ></i>
                                 {% endif %}
                             </td>
@@ -209,203 +209,208 @@
                             {% endif %}
 
                             {% for transaction in lot_transactions %}
-                                <tr>
-                                    <td class="table-row text-center">
-                                        {% if installment %}{{ forloop.counter|add:2 }}{% else %}{{ forloop.counter|add:2 }}{% endif %}</td>
-                                    <td class="table-row text-center">
-                                        <span>{{ transaction.date_created|date:"d/m/Y H\hi" }}</span>
-                                    </td>
-                                    <td class="table-row">
-                                        <div>
+
+                                {% if transaction.manual_payment_type != transaction.MANUAL_WAITING_PAYMENT and transaction.status != transaction.WAITING_PAYMENT %}
+
+                                    <tr>
+                                        <td class="table-row text-center">
+                                            {% if installment %}{{ forloop.counter|add:2 }}{% else %}{{ forloop.counter|add:2 }}{% endif %}</td>
+                                        <td class="table-row text-center">
+                                            <span>{{ transaction.date_created|date:"d/m/Y H\hi" }}</span>
+                                        </td>
+                                        <td class="table-row">
                                             <div>
-                                                {% if transaction.manual is True %}
-                                                    {% if transaction.manual_payment_type == transaction.MANUAL_PAYMENT_MONEY %}
-                                                        <div class="float-left hidden-sm hidden-xs">
-                                                            <i style="font-size:30px" class="far fa-money-bill-alt"></i>
-                                                        </div>
-                                                        <div class="float-left" style="margin:5px 0 0 5px">
-                                                            <span class="text-bold">Dinheiro</span>
-                                                            <small>(manual)</small>
-                                                        </div>
-                                                        {% if event.feature_configuration.feature_manual_payments %}
-                                                            <div class="float-right" style="margin-top:5px">
-                                                                <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
-                                                                    <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
-                                                                </a>
-                                                                <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
-                                                                    <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
-                                                                </a>
+                                                <div>
+                                                    {% if transaction.manual is True %}
+                                                        {% if transaction.manual_payment_type == transaction.MANUAL_PAYMENT_MONEY %}
+                                                            <div class="float-left hidden-sm hidden-xs">
+                                                                <i style="font-size:30px" class="far fa-money-bill-alt"></i>
                                                             </div>
-                                                        {% endif %}
-                                                    {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_PAYCHECK %}
-                                                        <div class="float-left hidden-sm hidden-xs">
-                                                            <i style="font-size:30px" class="fas fa-money-check-alt"></i>
-                                                        </div>
-                                                        <div class="float-left" style="margin:5px 0 0 5px">
-                                                            <span class="text-bold">Cheque</span>
-                                                            <small>(manual)</small>
-                                                        </div>
-                                                        {% if event.feature_configuration.feature_manual_payments %}
-                                                            <div class="float-right" style="margin-top:5px">
-                                                                <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
-                                                                    <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
-                                                                </a>
-                                                                <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
-                                                                    <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
-                                                                </a>
+                                                            <div class="float-left" style="margin:5px 0 0 5px">
+                                                                <span class="text-bold">Dinheiro</span>
+                                                                <small>(manual)</small>
                                                             </div>
-                                                        {% endif %}
-                                                    {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_DEBIT_CARD %}
-                                                        <div class="float-left hidden-sm hidden-xs">
-                                                            <i style="font-size:30px" class="far fa-credit-card"></i>
-                                                        </div>
-                                                        <div class="float-left" style="margin:5px 0 0 5px">
-                                                            <span class="text-bold">Cartão de Débito</span>
-                                                            <small>(manual)</small>
-                                                        </div>
-                                                        {% if event.feature_configuration.feature_manual_payments %}
-                                                            <div class="float-right" style="margin-top:5px">
-                                                                <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
-                                                                    <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
-                                                                </a>
-                                                                <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
-                                                                    <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
-                                                                </a>
+                                                            {% if event.feature_configuration.feature_manual_payments %}
+                                                                <div class="float-right" style="margin-top:5px">
+                                                                    <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
+                                                                        <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
+                                                                    </a>
+                                                                    <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
+                                                                        <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
+                                                                    </a>
+                                                                </div>
+                                                            {% endif %}
+                                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_PAYCHECK %}
+                                                            <div class="float-left hidden-sm hidden-xs">
+                                                                <i style="font-size:30px" class="fas fa-money-check-alt"></i>
                                                             </div>
-                                                        {% endif %}
-                                                    {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_CREDIT_CARD %}
-                                                        <div class="float-left hidden-sm hidden-xs">
-                                                            <i style="font-size:30px" class="far fa-credit-card"></i>
-                                                        </div>
-                                                        <div class="float-left" style="margin:5px 0 0 5px">
-                                                            <span class="text-bold">Cartão de Crédito</span>
-                                                            <small>(manual)</small>
-                                                        </div>
-                                                        {% if event.feature_configuration.feature_manual_payments %}
-                                                            <div class="float-right" style="margin-top:5px">
-                                                                <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
-                                                                    <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
-                                                                </a>
-                                                                <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
-                                                                    <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
-                                                                </a>
+                                                            <div class="float-left" style="margin:5px 0 0 5px">
+                                                                <span class="text-bold">Cheque</span>
+                                                                <small>(manual)</small>
                                                             </div>
-                                                        {% endif %}
-                                                    {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_BANK_DEPOSIT %}
-                                                        <div class="float-left hidden-sm hidden-xs">
-                                                            <i style="font-size:30px" class="fas fa-university"></i>
-                                                        </div>
-                                                        <div class="float-left" style="margin:5px 0 0 5px">
-                                                            <span class="text-bold">Depósito</span>
-                                                            <small>(manual)</small>
-                                                        </div>
-                                                        {% if event.feature_configuration.feature_manual_payments %}
-                                                            <div class="float-right" style="margin-top:5px">
-                                                                <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
-                                                                    <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
-                                                                </a>
-                                                                <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
-                                                                    <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
-                                                                </a>
+                                                            {% if event.feature_configuration.feature_manual_payments %}
+                                                                <div class="float-right" style="margin-top:5px">
+                                                                    <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
+                                                                        <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
+                                                                    </a>
+                                                                    <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
+                                                                        <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
+                                                                    </a>
+                                                                </div>
+                                                            {% endif %}
+                                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_DEBIT_CARD %}
+                                                            <div class="float-left hidden-sm hidden-xs">
+                                                                <i style="font-size:30px" class="far fa-credit-card"></i>
                                                             </div>
-                                                        {% endif %}
-                                                    {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_BANK_TRANSFER %}
-                                                        <div class="float-left hidden-sm hidden-xs">
-                                                            <i style="font-size:30px" class="fas fa-exchange-alt"></i>
-                                                        </div>
-                                                        <div class="float-left" style="margin:5px 0 0 5px">
-                                                            <span class="text-bold">Transferência bancária</span>
-                                                            <small>(manual)</small>
-                                                        </div>
-                                                        {% if event.feature_configuration.feature_manual_payments %}
-                                                            <div class="float-right" style="margin-top:5px">
-                                                                <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
-                                                                    <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
-                                                                </a>
-                                                                <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
-                                                                    <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
-                                                                </a>
+                                                            <div class="float-left" style="margin:5px 0 0 5px">
+                                                                <span class="text-bold">Cartão de Débito</span>
+                                                                <small>(manual)</small>
                                                             </div>
-                                                        {% endif %}
-                                                    {% endif %}
-                                                {% else %}
-                                                    {% if transaction.type == transaction.BOLETO %}
-                                                        <div class="float-left hidden-sm hidden-xs">
-                                                            <i style="font-size:30px" class="fas fa-barcode"></i>
-                                                        </div>
-                                                        <div class="float-left" style="margin:5px 0 0 5px">
-                                                            <span class="text-bold">Boleto</span>
-                                                            <small>(on-line)</small>
-                                                        </div>
-                                                    {% elif transaction.type == transaction.CREDIT_CARD %}
-                                                        <div class="float-left hidden-sm hidden-xs">
-                                                            <i style="font-size:30px" class="far fa-credit-card"></i>
-                                                        </div>
-                                                        <div class="float-left" style="margin-left: 5px">
-                                                            <div>
+                                                            {% if event.feature_configuration.feature_manual_payments %}
+                                                                <div class="float-right" style="margin-top:5px">
+                                                                    <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
+                                                                        <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
+                                                                    </a>
+                                                                    <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
+                                                                        <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
+                                                                    </a>
+                                                                </div>
+                                                            {% endif %}
+                                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_CREDIT_CARD %}
+                                                            <div class="float-left hidden-sm hidden-xs">
+                                                                <i style="font-size:30px" class="far fa-credit-card"></i>
+                                                            </div>
+                                                            <div class="float-left" style="margin:5px 0 0 5px">
                                                                 <span class="text-bold">Cartão de Crédito</span>
+                                                                <small>(manual)</small>
+                                                            </div>
+                                                            {% if event.feature_configuration.feature_manual_payments %}
+                                                                <div class="float-right" style="margin-top:5px">
+                                                                    <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
+                                                                        <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
+                                                                    </a>
+                                                                    <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
+                                                                        <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
+                                                                    </a>
+                                                                </div>
+                                                            {% endif %}
+                                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_BANK_DEPOSIT %}
+                                                            <div class="float-left hidden-sm hidden-xs">
+                                                                <i style="font-size:30px" class="fas fa-university"></i>
+                                                            </div>
+                                                            <div class="float-left" style="margin:5px 0 0 5px">
+                                                                <span class="text-bold">Depósito</span>
+                                                                <small>(manual)</small>
+                                                            </div>
+                                                            {% if event.feature_configuration.feature_manual_payments %}
+                                                                <div class="float-right" style="margin-top:5px">
+                                                                    <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
+                                                                        <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
+                                                                    </a>
+                                                                    <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
+                                                                        <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
+                                                                    </a>
+                                                                </div>
+                                                            {% endif %}
+                                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_BANK_TRANSFER %}
+                                                            <div class="float-left hidden-sm hidden-xs">
+                                                                <i style="font-size:30px" class="fas fa-exchange-alt"></i>
+                                                            </div>
+                                                            <div class="float-left" style="margin:5px 0 0 5px">
+                                                                <span class="text-bold">Transferência bancária</span>
+                                                                <small>(manual)</small>
+                                                            </div>
+                                                            {% if event.feature_configuration.feature_manual_payments %}
+                                                                <div class="float-right" style="margin-top:5px">
+                                                                    <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
+                                                                        <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
+                                                                    </a>
+                                                                    <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
+                                                                        <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
+                                                                    </a>
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if transaction.type == transaction.BOLETO %}
+                                                            <div class="float-left hidden-sm hidden-xs">
+                                                                <i style="font-size:30px" class="fas fa-barcode"></i>
+                                                            </div>
+                                                            <div class="float-left" style="margin:5px 0 0 5px">
+                                                                <span class="text-bold">Boleto</span>
                                                                 <small>(on-line)</small>
                                                             </div>
-                                                            <div>
-                                                                {% if transaction.credit_card_last_digits %}
-                                                                    <small class="text-muted text-bold">
-                                                                        *** {{ transaction.credit_card_last_digits }}
-                                                                    </small>
-                                                                {% endif %}
-                                                                {% if transaction.credit_card_holder %}
-                                                                    <small class="text-muted text-bold">
-                                                                        ({{ transaction.credit_card_holder|upper }})
-                                                                    </small>
-                                                                {% endif %}
+                                                        {% elif transaction.type == transaction.CREDIT_CARD %}
+                                                            <div class="float-left hidden-sm hidden-xs">
+                                                                <i style="font-size:30px" class="far fa-credit-card"></i>
                                                             </div>
-                                                        </div>
+                                                            <div class="float-left" style="margin-left: 5px">
+                                                                <div>
+                                                                    <span class="text-bold">Cartão de Crédito</span>
+                                                                    <small>(on-line)</small>
+                                                                </div>
+                                                                <div>
+                                                                    {% if transaction.credit_card_last_digits %}
+                                                                        <small class="text-muted text-bold">
+                                                                            *** {{ transaction.credit_card_last_digits }}
+                                                                        </small>
+                                                                    {% endif %}
+                                                                    {% if transaction.credit_card_holder %}
+                                                                        <small class="text-muted text-bold">
+                                                                            ({{ transaction.credit_card_holder|upper }})
+                                                                        </small>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
                                                     {% endif %}
-                                                {% endif %}
-                                                <div class="clearfix"></div>
-                                            </div>
-                                            {% if transaction.manual is False and transaction.type == transaction.BOLETO %}
-                                                <div>
-                                                    <small class="text-bold">Vencimento:</small>
-                                                    <small>{{ transaction.boleto_expiration_date }}</small>
-                                                    {% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}
-                                                        <small class="text-bold text-danger">(vencido)</small>
-                                                    {% endif %}
+                                                    <div class="clearfix"></div>
                                                 </div>
+                                                {% if transaction.manual is False and transaction.type == transaction.BOLETO %}
+                                                    <div>
+                                                        <small class="text-bold">Vencimento:</small>
+                                                        <small>{{ transaction.boleto_expiration_date }}</small>
+                                                        {% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                            <small class="text-bold text-danger">(vencido)</small>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td class="table-row text-center text-bold {% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}cancelled{% endif %}" data-toggle="tooltip" title="Crédito">
+                                            {% if transaction.status == transaction.PAID %}
+                                                <span class="text-success">C</span>
+                                            {% else %}
+                                                <span class="text-default">C</span>
                                             {% endif %}
-                                        </div>
-                                    </td>
-                                    <td class="table-row text-center text-bold {% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}cancelled{% endif %}" data-toggle="tooltip" title="Crédito">
-                                        {% if transaction.status == transaction.PAID %}
-                                            <span class="text-success">C</span>
-                                        {% else %}
-                                            <span class="text-default">C</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="table-row text-right {% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}cancelled{% endif %}">
-                                        {% if transaction.status == transaction.PAID %}
-                                            <span class="text-success">R$ {{ transaction.amount|intcomma }}</span>
-                                        {% else %}
-                                            <span class="text-default">R$ {{ transaction.amount|intcomma }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="table-row {% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}cancelled{% endif %}">
-                                        {% if transaction.status == transaction.PAID %}
-                                            <span class="text-success">{{ transaction.get_status_display }}</span>
-                                        {% else %}
-                                            <span class="text-default">{{ transaction.get_status_display }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="table-row text-center">
-                                        {% if transaction.manual is True %}
-                                            <i style="font-size:30px" class="fas fa-user-circle"
-                                               data-toggle="tooltip"
-                                               title="<div>Inserido manualmente por</div><div class='text-bold'>por {{ transaction.manual_author }}</div>"
-                                            ></i>
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td class="table-row text-right {% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}cancelled{% endif %}">
+                                            {% if transaction.status == transaction.PAID %}
+                                                <span class="text-success">R$ {{ transaction.amount|intcomma }}</span>
+                                            {% else %}
+                                                <span class="text-default">R$ {{ transaction.amount|intcomma }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="table-row {% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}cancelled{% endif %}">
+                                            {% if transaction.status == transaction.PAID %}
+                                                <span class="text-success">{{ transaction.get_status_display }}</span>
+                                            {% else %}
+                                                <span class="text-default">{{ transaction.get_status_display }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="table-row text-center">
+                                            {% if transaction.manual is True %}
+                                                <i style="font-size:30px" class="fas fa-user-circle"
+                                                   data-toggle="tooltip"
+                                                   title="<div>Inserido manualmente por</div><div class='text-bold'>por {{ transaction.manual_author }}</div>"
+                                                ></i>
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                {% endif %}
                             {% endfor %}
                             </tbody>
                             <tfoot>
@@ -425,7 +430,7 @@
                                     {% if full_price < 0 %}
                                         <i class="fas fa-exclamation-triangle text-warning animated shake"
                                            data-toggle="tooltip"
-                                           title="Participante com dívidas."
+                                           title="Participante com pendências."
                                         ></i>
                                     {% elif full_price > 0 %}
                                         <i class="fas fa-exclamation-triangle text-warning animated shake"
@@ -435,7 +440,7 @@
                                     {% elif full_price == 0 %}
                                         <i class="fas fa-check text-success"
                                            data-toggle="tooltip"
-                                           title="Participante sem dívidas."
+                                           title="Participante sem pendências."
                                         ></i>
                                     {% endif %}
                                 </td>

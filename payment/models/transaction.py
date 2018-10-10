@@ -48,6 +48,7 @@ class Transaction(models.Model):
     MANUAL_PAYMENT_CREDIT_CARD = 'credit_card'
     MANUAL_PAYMENT_BANK_DEPOSIT = 'bank_deposit'
     MANUAL_PAYMENT_BANK_TRANSFER = 'bank_transfer'
+    MANUAL_WAITING_PAYMENT = 'waiting_payment'
 
     MANUAL_PAYMENT_TYPES = (
         (MANUAL_PAYMENT_MONEY, 'Dinheiro'),
@@ -56,6 +57,7 @@ class Transaction(models.Model):
         (MANUAL_PAYMENT_CREDIT_CARD, 'Cartão de Crédito'),
         (MANUAL_PAYMENT_BANK_DEPOSIT, 'Depósito'),
         (MANUAL_PAYMENT_BANK_TRANSFER, 'Transferência bancária'),
+        (MANUAL_WAITING_PAYMENT, 'Aguardando pagamento'),
     )
 
     class Meta:
