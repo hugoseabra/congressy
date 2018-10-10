@@ -327,6 +327,22 @@ pipeline:
     when:
       branch: [ master ]
 
+  tranfer-stackfile-awsecr:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.38.91
+      - 172.31.40.208
+    port: 22
+    user: ec2-user
+    source: ./bin/env/prod/01_create-awsecr-container.sh
+    target: ~/awsecr/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
   transfer-previous-version-file:
     image: drillster/drone-rsync
     pull: true
@@ -336,6 +352,22 @@ pipeline:
     port: 22
     user: ec2-user
     source: ./bin/env/prod/previous_version
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  transfer-build-version-file:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.38.91
+      - 172.31.40.208
+    port: 22
+    user: ec2-user
+    source: ./version
     target: ~/cgsy/.
     secrets:
       - source: CONGRESSY_DEPLOY
@@ -410,8 +442,6 @@ pipeline:
       - ~/cgsy/scripts/prod/05_run_migration.sh
       - ~/cgsy/scripts/prod/06_run_volume.sh
       - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
-    when:
-      branch: [ master ]
 
   notify-sentry-release:
     image: docker

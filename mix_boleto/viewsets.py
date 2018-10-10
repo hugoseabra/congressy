@@ -21,6 +21,7 @@ def synchronization_hook(request):
 
     event_id = data.get('event_id')
     resource_alias = data.get('resource_alias')
+    mix_subscription_id = data.get('mix_subscription_id')
 
     if not event_id:
         msg = 'Hook de sincronização entre MixEvents e' \
@@ -36,6 +37,13 @@ def synchronization_hook(request):
         sentry_log(message=msg, type='error', notify_admins=True)
         return HttpResponseBadRequest()
 
+    if not mix_subscription_id:
+        msg = 'Hook de sincronização entre MixEvents e Congressy -' \
+              ' mix_subscription_id não encontrado.'
+
+        sentry_log(message=msg, type='error', notify_admins=True)
+        return HttpResponseBadRequest()
+
     event = Event.objects.get(pk=int(event_id))
     sync_resource = SyncResource.objects.get(alias=str(resource_alias))
 
@@ -44,7 +52,7 @@ def synchronization_hook(request):
         event_id=event.pk,
     )
 
-    synchronizer.prepare()
+    synchronizer.prepare(mix_subscription_id=mix_subscription_id)
     synchronizer.run()
 
     return Response(status=202)

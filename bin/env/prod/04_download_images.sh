@@ -24,7 +24,7 @@ if [ -f "$PREVIOUS_VERSION_FILE" ]; then
 fi
 
 if [ -f "$VERSION_FILE" ]; then
-    VERSION=$(cat ${VERSION_FILE})/
+    VERSION=$(cat ${VERSION_FILE})
 fi
 
 echo "Download versão '${VERSION}' sobre a versão '${PREVIOUS_VERSION}'..."
