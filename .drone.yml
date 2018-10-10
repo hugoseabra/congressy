@@ -230,7 +230,7 @@ pipeline:
     when:
       branch: [ master ]
 
-  prepare-production-server-1:
+  prepare-production-server1:
     image: appleboy/drone-ssh
     pull: true
     host:
@@ -326,7 +326,7 @@ pipeline:
     when:
       branch: [ master ]
 
-  transfer-previous-version-file-server-1:
+  transfer-previous-version-file-server1:
     image: drillster/drone-rsync
     pull: true
     hosts:
@@ -356,7 +356,7 @@ pipeline:
     when:
       branch: [ master ]
 
-  tranfer-stackfile-production-server-server-1:
+  tranfer-stackfile-production-server1:
     image: drillster/drone-rsync
     pull: true
     hosts:
@@ -371,7 +371,7 @@ pipeline:
     when:
       branch: [ master ]
 
-  tranfer-deploy-script-server-1:
+  tranfer-deploy-script-server1:
     image: drillster/drone-rsync
     pull: true
     hosts:
@@ -386,7 +386,7 @@ pipeline:
     when:
       branch: [ master ]
 
-  deploy-latest-version-server-1:
+  deploy-latest-version-server1:
     image: appleboy/drone-ssh
     pull: true
     host:
@@ -405,7 +405,7 @@ pipeline:
     when:
       branch: [ master ]
 
-  prepare-production-server-2:
+  prepare-production-server2:
     image: appleboy/drone-ssh
     pull: true
     host:
@@ -501,7 +501,7 @@ pipeline:
     when:
       branch: [ master ]
 
-  transfer-previous-version-file-server-2:
+  transfer-previous-version-file-server2:
     image: drillster/drone-rsync
     pull: true
     hosts:
@@ -531,7 +531,7 @@ pipeline:
     when:
       branch: [ master ]
 
-  tranfer-stackfile-production-server-server-2:
+  tranfer-stackfile-production-server-server2:
     image: drillster/drone-rsync
     pull: true
     hosts:
@@ -546,7 +546,7 @@ pipeline:
     when:
       branch: [ master ]
 
-  tranfer-deploy-script-server-2:
+  tranfer-deploy-script-server2:
     image: drillster/drone-rsync
     pull: true
     hosts:
@@ -561,7 +561,7 @@ pipeline:
     when:
       branch: [ master ]
 
-  deploy-latest-version-server-2:
+  deploy-latest-version-server2:
     image: appleboy/drone-ssh
     pull: true
     host:
