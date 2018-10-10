@@ -179,6 +179,7 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
 
                 if transaction.type == Transaction.BOLETO:
                     found_boleto = True
+
                 elif transaction.type == Transaction.CREDIT_CARD:
                     found_credit_card = True
 
@@ -189,9 +190,9 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
             return False
 
         if found_credit_card:
-            return 'boleto'
+            return Transaction.BOLETO
 
         if found_boleto:
-            return 'credit_card'
+            return Transaction.CREDIT_CARD
 
         return True
