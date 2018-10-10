@@ -44,14 +44,15 @@ class TransactionSubscriptionStatusIntegrator:
 
     cancelled_status = []
 
-    def __init__(self, transaction_state):
+    def __init__(self, transaction_state: str, transaction_pk: str) -> None:
         """
             Class constructor
 
-        :param transaction_state (string): String representing the
-            transaction state.
+        :param transaction_state: String representing the transaction state.
+        :param transaction_pk: the Transaction primary key as string
         """
         self.transaction_state = transaction_state
+        self.transaction_pk = transaction_pk
 
     def integrate(self):
         """
@@ -73,5 +74,10 @@ class TransactionSubscriptionStatusIntegrator:
         elif self.transaction_state in self.cancelled_status:
             return Subscription.CANCELED_STATUS
         else:
+
+            msg = 'Unknown status for {}'.format(self.transaction_state)
+
             raise TransactionStatusIntegratorError(
-                'Unknown status given.')
+                message=msg,
+                transaction_pk=self.transaction_pk,
+            )
