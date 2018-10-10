@@ -130,8 +130,8 @@ class ReceiverPublisher(object):
         if lot.transfer_tax is True:
             # Se há transferência, o organizador sempre receberá o valor
             # informado no lote.
-            # org_amount = lot.price
-            org_amount = self.amount
+            org_amount = lot.price
+            # org_amount = self.amount
         else:
             # Caso, ele assumirá o valor da Congressy e o montante a ser
             # transacionado já está com o valor sem as taxas da Congressy.
