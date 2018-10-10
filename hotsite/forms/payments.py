@@ -122,14 +122,16 @@ class PaymentForm(forms.Form):
     def clean_installment_part(self):
         part = self.cleaned_data.get('installment_part', 1)
 
-        if part:
-            if part < 1:
-                part = 1
+        if not part:
+            part = 1
 
-            if part > self.cleaned_data['installments']:
-                raise forms.ValidationError(
-                    'Número de parcela excede a quantidade parcelamento.'
-                )
+        if part < 1:
+            part = 1
+
+        if part > self.cleaned_data['installments']:
+            raise forms.ValidationError(
+                'Número de parcela excede a quantidade parcelamento.'
+            )
 
         return part
 
