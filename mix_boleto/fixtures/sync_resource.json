@@ -1,0 +1,13 @@
+[
+  {
+    "model": "mix_boleto.syncresource",
+    "pk": 1,
+    "fields": {
+      "alias": "democongressy",
+      "host": "localhost",
+      "user": "root",
+      "password": "123",
+      "db_name": "democongressy"
+    }
+  }
+]

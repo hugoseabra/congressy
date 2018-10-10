@@ -6,9 +6,11 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.utils import IntegrityError
 
+from core.model import track_data
 from gatheros_subscription.models import Lot, Subscription
 
 
+@track_data('status', 'boleto_url', )
 class Transaction(models.Model):
     PROCESSING = 'processing'
     AUTHORIZED = 'authorized'
@@ -119,16 +121,17 @@ class Transaction(models.Model):
         null=True,
     )
 
-    installment_amount = models.DecimalField(
-        decimal_places=2,
-        max_digits=11,
-        verbose_name='valor da parcelas',
+    installment_part = models.PositiveIntegerField(
+        default=1,
+        verbose_name='número de parcelas',
         blank=True,
         null=True,
     )
 
-    installment_part = models.PositiveIntegerField(
-        default=0,
+    installment_amount = models.DecimalField(
+        decimal_places=2,
+        max_digits=11,
+        verbose_name='valor da parcelas',
         blank=True,
         null=True,
     )

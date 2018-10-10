@@ -26,7 +26,10 @@ def __notify_error(message, extra_data=None):
 
 
 # @TODO create a mock of the response to use during testing
-def create_pagarme_transaction(subscription, data):
+def create_pagarme_transaction(subscription,
+                               data,
+                               installments=None,
+                               installment_part=None):
     try:
         trx = pagarme.transaction.create(data)
     except Exception as e:
@@ -50,16 +53,42 @@ def create_pagarme_transaction(subscription, data):
             'Algo deu errado com a comunicação com o provedor de pagamento.'
         )
 
+    """
+    Montante da transação pode ser:
+    
+    SE BOLETO:
+    - TOTAL: se parcelamento for igual a 1, pois não o pagamento é integral;
+    - PARCIAL: se parcelamento for mais do que 1, pois o montante transacionado
+    equivale apenas à parcela de pagamento;
+    
+    SE CARTÃO:
+    - TOTAL: independente do parcelamento, pois o parcelamento de cartão é
+    controlado pelo provedor de pagamento e, por sua vez, pela bandeira do
+    cartão;
+    """
+
     amount = payment_helpers.amount_as_decimal(str(trx['amount']))
     liquid_amount = payment_helpers.amount_as_decimal(
         str(data['liquid_amount'])
     )
 
+    if not installments:
+        installments = int(trx['installments'])
+
+    # por padrão
+    installment_amount = round((amount / installments), 2)
+
+    if trx['payment_method'] == Transaction.BOLETO and installments > 1:
+        # Se compra parcelada no boleto, vamos igualar amount e
+        # intallment_amount, pois no modelo atual, installment_amount registra
+        # o valor da parcela e o amount registra o conjunto de parcelas, o que
+        # não faz sentido quando há parcelamento de boleto, sendo o valor
+        # transacionado (amount) sempre o valor da parcela.
+        installment_amount = amount
+
     with atomic():
 
         # ============================ TRANSACTION ========================== #
-        installments = int(trx['installments'])
-
         transaction = Transaction(
             uuid=data['transaction_id'],
             subscription=subscription,
@@ -71,7 +100,8 @@ def create_pagarme_transaction(subscription, data):
             lot_price=subscription.lot.price,
             liquid_amount=liquid_amount,
             installments=installments,
-            installment_amount=round((amount / installments), 2),
+            installment_part=installment_part,
+            installment_amount=installment_amount,
         )
 
         if transaction.type == Transaction.BOLETO:
@@ -96,6 +126,8 @@ def create_pagarme_transaction(subscription, data):
             status=trx['status'],
             date_created=trx['date_created'],
         )
+
+        return transaction
 
 
 # @TODO create a mock of the response to use during testing

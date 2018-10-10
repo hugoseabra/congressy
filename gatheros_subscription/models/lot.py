@@ -127,7 +127,8 @@ class Lot(models.Model, GatherosModelMixin):
     )
     tax = models.DecimalField(
         max_digits=5,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         decimal_places=2,
         verbose_name='taxa'
     )
