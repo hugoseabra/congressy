@@ -467,6 +467,7 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
             request.user.get_full_name(),
             request.user.email,
         )
+        data['paid'] = True
         kwargs = {'data': data}
 
         transaction_id = data.get('transaction_id')
@@ -660,6 +661,8 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
                     return self.form_invalid(form)
 
                 self.subscription = subscription_form.save()
+
+                survey_form = None
                 if self.subscription.lot.event_survey:
 
                     survey = self.subscription.lot.event_survey.survey
@@ -673,11 +676,28 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
                     if survey_form.is_valid():
                         survey_form.save()
-                        return self.form_valid(form)
                     else:
                         return self.form_invalid(form, survey_form=survey_form)
-                else:
-                    return self.form_valid(form)
+
+                # Criação de Transaction caso seja pago
+                trans_type = Transaction.MANUAL_WAITING_PAYMENT
+                trans_form = forms.ManualTransactionForm(
+                    subscription=self.subscription,
+                    data={
+                        'manual_author': '{} ({})'.format(
+                            request.user.get_full_name(),
+                            request.user.email,
+                        ),
+                        'paid': False,
+                        'manual_payment_type': trans_type,
+                        'amount': self.subscription.lot.get_calculated_price()
+                    }
+                )
+                if not trans_form.is_valid():
+                    return self.form_invalid(form, survey_form=survey_form)
+
+                trans_form.save()
+                return self.form_valid(form)
         else:
             return self.form_invalid(form)
 
