@@ -10,7 +10,6 @@ from gatheros_subscription.models import Lot, Subscription
 
 
 class Transaction(models.Model):
-
     PROCESSING = 'processing'
     AUTHORIZED = 'authorized'
     PAID = 'paid'
@@ -124,6 +123,12 @@ class Transaction(models.Model):
         decimal_places=2,
         max_digits=11,
         verbose_name='valor da parcelas',
+        blank=True,
+        null=True,
+    )
+
+    installment_part = models.PositiveIntegerField(
+        default=0,
         blank=True,
         null=True,
     )
@@ -244,11 +249,6 @@ class Transaction(models.Model):
         :return: DecimalField
         """
         return self.liquid_amount + self.optional_liquid_amount
-
-
-
-
-
 
 # class Transaction(models.Model):
 #     class Meta:

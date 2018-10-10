@@ -40,8 +40,8 @@ class WorkConfigViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
 
-        date_start_0 = request.data['date_start_0']
-        date_start_1 = request.data['date_start_1']
+        date_start_0 = request.data.get('date_start_0')
+        date_start_1 = request.data.get('date_start_1')
 
         if date_start_0 and date_start_1:
             request.POST._mutable = True
@@ -49,8 +49,8 @@ class WorkConfigViewSet(viewsets.ModelViewSet):
             start = datetime.strptime(full_date, '%d/%m/%Y %H:%M')
             request.data['date_start'] = start
 
-        date_end_0 = request.data['date_end_0']
-        date_end_1 = request.data['date_end_1']
+        date_end_0 = request.data.get('date_end_0')
+        date_end_1 = request.data.get('date_end_1')
 
         if date_end_0 and date_end_1:
             request.POST._mutable = True

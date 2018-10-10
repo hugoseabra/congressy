@@ -2,8 +2,8 @@
     Main implantation of a director responsible for changing the Transaction
     State Machine Status
 """
-from payment.helpers import TransactionStateMachine
 from payment.exception import StateNotAllowedError
+from payment.helpers import TransactionStateMachine
 
 
 class TransactionDirector:
@@ -53,7 +53,10 @@ class TransactionDirector:
                 self.transaction_state_machine.pay()
             else:
                 raise StateNotAllowedError(
-                    message='State not allowed for processing')
+                    message='State not allowed for processing',
+                    old_state=self.old_status,
+                    new_state=self.status,
+                )
 
         elif self.old_status == "waiting_payment":
 
@@ -63,7 +66,10 @@ class TransactionDirector:
                 self.transaction_state_machine.awaiting_refused()
             else:
                 raise StateNotAllowedError(
-                    message='State not allowed for waiting_payment')
+                    message='State not allowed for waiting_payment',
+                    old_state=self.old_status,
+                    new_state=self.status,
+                )
 
         elif self.old_status == "paid":
 
@@ -75,7 +81,10 @@ class TransactionDirector:
                 self.transaction_state_machine.paid_refund()
             else:
                 raise StateNotAllowedError(
-                    message='State not allowed for paid')
+                    message='State not allowed for paid',
+                    old_state=self.old_status,
+                    new_state=self.status,
+                )
 
         elif self.old_status == "chargedback":
 
@@ -87,14 +96,20 @@ class TransactionDirector:
                 self.transaction_state_machine.delayed_refund()
             else:
                 raise StateNotAllowedError(
-                    message='State not allowed for chargeback')
+                    message='State not allowed for chargeback',
+                    old_state=self.old_status,
+                    new_state=self.status,
+                )
 
         elif self.old_status == "pending_refund":
             if self.status == 'refunded':
                 self.transaction_state_machine.refund_from_pending()
             else:
                 raise StateNotAllowedError(
-                    message='State not allowed for pending_refund')
+                    message='State not allowed for pending_refund',
+                    old_state=self.old_status,
+                    new_state=self.status,
+                )
 
         elif self.old_status == "refunded" or self.old_status == "refused":
             pass
