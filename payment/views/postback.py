@@ -13,9 +13,7 @@ from rest_framework.response import Response
 from core.helpers import sentry_log
 from payment.email_notifications import PaymentNotification
 from payment.forms import PaymentForm
-from payment.helpers import (
-    TransactionLog,
-)
+from payment.helpers import TransactionLog
 from payment.models import Transaction, TransactionStatus
 from payment.postback import Postback
 from payment.subscription_status_manager import SubscriptionStatusManager
@@ -60,13 +58,25 @@ def postback_url_view(request, uidb64):
 
     with atomic():
 
+        # ================= TRANSACTION STATUS =============================
+
+        # Registra status de transação.
+        TransactionStatus.objects.create(
+            transaction=transaction,
+            data=data,
+            date_created=datetime.now().strftime(
+                "%Y-%m-%dT%H:%M:%S.%fZ"
+            ),
+            status=data.get('current_status'),
+        )
+
+        # ==================================================================
+
         # ================= TRANSACTION ====================================
         new_status = post_back.get_new_status(payload=data)
 
         if transaction.status == new_status:
-            return Response(status=303, data={
-                'error': 'Tentativa de atualizar status já persistido.'
-            })
+            return Response(status=202)
 
         transaction.status = new_status
 
@@ -77,8 +87,6 @@ def postback_url_view(request, uidb64):
             transaction.boleto_url = boleto_url
 
         transaction.save()
-
-        # ==================================================================
 
         # ================= SUBSCRIPTION ===================================
 
@@ -116,23 +124,9 @@ def postback_url_view(request, uidb64):
 
         # ==================================================================
 
-        # ================= TRANSACTION STATUS =============================
-
-        # Registra status de transação.
-        TransactionStatus.objects.create(
-            transaction=transaction,
-            data=data,
-            date_created=datetime.now().strftime(
-                "%Y-%m-%dT%H:%M:%S.%fZ"
-            ),
-            status=data.get('current_status'),
-        )
-
-        # ==================================================================
-
         # ================= PAYMENT ========================================
 
-        if data.get('current_status') == Transaction.PAID:
+        if new_status == Transaction.PAID:
 
             try:
                 transaction.payment.paid = True
@@ -165,11 +159,14 @@ def postback_url_view(request, uidb64):
 
         # ================= NOTIFICATION ===================================
 
-        notification = PaymentNotification(
-            transaction=transaction,
-        )
+        person = subscription.person
 
-        notification.notify()
+        if hasattr(person, 'user') and person.user is not None:
+            notification = PaymentNotification(
+                transaction=transaction,
+            )
+
+            notification.notify()
 
         # Registra inscrição como notificada.
         subscription.notified = True
