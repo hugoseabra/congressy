@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'wkhtmltopdf',
     'formtools',
     'django_cron',
+    'corsheaders',
 
     # KANU_APPS
     'kanu_locations',
@@ -77,6 +78,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -115,6 +117,16 @@ WSGI_APPLICATION = 'project.wsgi.application'
 ALLOWED_HOSTS = ['*']
 X_FRAME_OPTIONS = 'ALLOWALL'
 XS_SHARING_ALLOWED_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
+
+# django-cors-headers
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+# CORS_ORIGIN_WHITELIST = (
+#     'localhost:3030',
+# )
+# CORS_ORIGIN_REGEX_WHITELIST = (
+#     'localhost:3030',
+# )
 
 # Name of cache backend to cache user agents. If it not specified default
 # cache alias will be used. Set to `None` to disable caching.

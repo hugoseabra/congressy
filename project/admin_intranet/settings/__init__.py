@@ -22,6 +22,7 @@ INSTALLED_APPS += [
     'attendance',
     'service_tags',
     'admin_intranet',
+    'mix_boleto',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'

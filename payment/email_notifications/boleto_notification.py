@@ -22,7 +22,7 @@ class BoletoPaymentNotification(object):
 
     def notify(self):
 
-        if self.subscription == Subscription.CONFIRMED_STATUS:
+        if self.subscription.status == Subscription.CONFIRMED_STATUS:
             self._notify_confirmed_subscription()
         elif self.subscription.status == Subscription.AWAITING_STATUS:
             self._notify_pending_subscription()

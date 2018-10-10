@@ -103,7 +103,8 @@ class ReceiverPublisher(object):
         # não de taxas. O valor é calculado em cima do preço informado pelo
         # organizador ao criar o lote.
         cgsy_percent = Decimal(float(event.congressy_percent) / 100)
-        cgsy_amount = lot.price * cgsy_percent
+        # cgsy_amount = lot.price * cgsy_percent
+        cgsy_amount = self.amount * cgsy_percent
 
         minimum_amount = Decimal(
             getattr(settings, 'CONGRESSY_MINIMUM_AMOUNT', 0)
@@ -129,11 +130,13 @@ class ReceiverPublisher(object):
         if lot.transfer_tax is True:
             # Se há transferência, o organizador sempre receberá o valor
             # informado no lote.
-            org_amount = lot.price
+            # org_amount = lot.price
+            org_amount = self.amount
         else:
             # Caso, ele assumirá o valor da Congressy e o montante a ser
             # transacionado já está com o valor sem as taxas da Congressy.
-            org_amount = lot.price - cgsy_amount
+            # org_amount = lot.price - cgsy_amount
+            org_amount = self.amount - cgsy_amount
 
         # Verifica se há atividades extras.
         for service in self.subscription.subscription_services.all():
@@ -180,7 +183,12 @@ class ReceiverPublisher(object):
         # Depois de todos os valores distribuídos, o valor entre a Congressy
         # e organizador tem de ser de acordo com o montante a ser
         # transacionado.
-        assert round(total_splitable_amount, 2) == round(self.amount, 2)
+        assert \
+            round(total_splitable_amount, 2) == round(self.amount, 2), \
+            "total splitable amount: {}. Amount: {}".format(
+                round(total_splitable_amount, 2),
+                round(self.amount, 2)
+            )
 
         # ==== RECEIVERS
         cgsy_receiver = receivers.CongressyReceiver(

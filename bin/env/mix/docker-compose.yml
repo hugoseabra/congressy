@@ -1,0 +1,38 @@
+version: '3.3'
+services:
+  mysql:
+      image: mysql:5.5
+      container_name: mysql
+      networks:
+        - backend
+      environment:
+          - MYSQL_ROOT_PASSWORD=123
+          - MYSQL_USER=dev
+          - MYSQL_PASSWORD=dev
+      ports:
+          - "3306:3306"
+      volumes:
+          - "/etc/localtime:/etc/localtime"
+          - "db_data:/var/lib/mysql"
+
+  phpmyadmin:
+      image: 'phpmyadmin/phpmyadmin'
+      container_name: phpmyadmin
+      networks:
+        - backend
+      ports:
+        - 8081:80
+      links:
+        - mysql:db
+      volumes:
+        - 'phpmyadmin_data:/bitnami'
+
+networks:
+  backend:
+
+volumes:
+  db_data:
+    driver: local
+  phpmyadmin_data:
+      driver: local
+

@@ -23,6 +23,7 @@ INSTALLED_APPS += [
     'importer',
     'attendance',
     'service_tags',
+    'mix_boleto',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'
