@@ -96,12 +96,8 @@ class OptionalProductAdmin(admin.ModelAdmin):
     )
 
 
-# admin.site.register(SubscriptionProduct)
-# admin.site.register(SubscriptionService)
-
 @admin.register(SubscriptionService)
 class OptionalSubscriptionServiceAdmin(admin.ModelAdmin):
-
     fields = (
         'optional',
     )
@@ -118,9 +114,28 @@ class OptionalSubscriptionServiceAdmin(admin.ModelAdmin):
         'get_theme',
     )
 
+    def render_change_form(self, request, context, *args, **kwargs):
+        subscription_service = kwargs.get('obj')
+        lot_category_id = subscription_service.optional.lot_category_id
+
+        context['adminform'].form.fields['optional'].queryset = \
+            Service.objects.filter(
+                published=True,
+                lot_category_id=lot_category_id,
+            )
+
+        response = super(OptionalSubscriptionServiceAdmin, self) \
+            .render_change_form(request, context, *args, **kwargs)
+
+        return response
+
 
 @admin.register(SubscriptionProduct)
 class OptionalSubscriptionProductAdmin(admin.ModelAdmin):
+    fields = (
+        'optional',
+    )
+
     search_fields = (
         'subscription__person__name',
         'subscription__person__email',
@@ -132,3 +147,18 @@ class OptionalSubscriptionProductAdmin(admin.ModelAdmin):
         'get_optional_name',
         'get_theme',
     )
+
+    def render_change_form(self, request, context, *args, **kwargs):
+        subscription_product = kwargs.get('obj')
+        lot_category_id = subscription_product.optional.lot_category_id
+
+        context['adminform'].form.fields['optional'].queryset = \
+            Product.objects.filter(
+                published=True,
+                lot_category_id=lot_category_id,
+            )
+
+        response = super(OptionalSubscriptionProductAdmin, self) \
+            .render_change_form(request, context, *args, **kwargs)
+
+        return response
