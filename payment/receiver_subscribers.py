@@ -113,7 +113,7 @@ class ReceiverPublisher(object):
             cgsy_amount = (lot.price/self.installments) * cgsy_percent
 
         else:
-            cgsy_amount = lot.porice * cgsy_percent
+            cgsy_amount = lot.price * cgsy_percent
 
         minimum_amount = Decimal(
             getattr(settings, 'CONGRESSY_MINIMUM_AMOUNT', 0)
