@@ -15,7 +15,6 @@ admin.site.register(OptionalServiceType)
 admin.site.register(OptionalProductType)
 
 
-
 @admin.register(Service)
 class OptionalServiceAdmin(admin.ModelAdmin):
     search_fields = (
@@ -115,6 +114,21 @@ class OptionalSubscriptionServiceAdmin(admin.ModelAdmin):
         'get_theme',
     )
 
+    def render_change_form(self, request, context, *args, **kwargs):
+        subscription_service = kwargs.get('obj')
+        event_id = subscription_service.optional.lot_category.event_id
+
+        context['adminform'].form.fields['optional'].queryset = \
+            Service.objects.filter(
+                published=True,
+                lot_category__event_id=event_id,
+            )
+
+        response = super(OptionalSubscriptionServiceAdmin, self) \
+            .render_change_form(request, context, *args, **kwargs)
+
+        return response
+
 
 @admin.register(SubscriptionProduct)
 class OptionalSubscriptionProductAdmin(admin.ModelAdmin):
@@ -133,3 +147,18 @@ class OptionalSubscriptionProductAdmin(admin.ModelAdmin):
         'get_optional_name',
         'get_theme',
     )
+
+    def render_change_form(self, request, context, *args, **kwargs):
+        subscription_product = kwargs.get('obj')
+        event_id = subscription_product.optional.lot_category.event_id
+
+        context['adminform'].form.fields['optional'].queryset = \
+            Product.objects.filter(
+                published=True,
+                lot_category__event_id=event_id,
+            )
+
+        response = super(OptionalSubscriptionProductAdmin, self) \
+            .render_change_form(request, context, *args, **kwargs)
+
+        return response
