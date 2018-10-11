@@ -87,6 +87,16 @@ class SubscriptionProduct(AbstractSubscriptionOptional):
             subscription__status='canceled'
         ).count()
 
+    def get_person_name(self):
+        return self.subscription.person.name
+
+    get_person_name.short_description = 'Participante'
+
+    def get_optional_name(self):
+        return self.optional.name
+
+    get_optional_name.short_description = 'Produto'
+
 
 class SubscriptionService(AbstractSubscriptionOptional):
     """
@@ -170,3 +180,13 @@ class SubscriptionService(AbstractSubscriptionOptional):
                 return sub_optional
 
         return None
+
+    def get_person_name(self):
+        return self.subscription.person.name
+
+    get_person_name.short_description = 'Participante'
+
+    def get_optional_name(self):
+        return self.optional.name
+
+    get_optional_name.short_description = 'Serviço'

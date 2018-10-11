@@ -96,5 +96,38 @@ class OptionalProductAdmin(admin.ModelAdmin):
     )
 
 
-admin.site.register(SubscriptionProduct)
-admin.site.register(SubscriptionService)
+# admin.site.register(SubscriptionProduct)
+# admin.site.register(SubscriptionService)
+
+@admin.register(SubscriptionService)
+class OptionalSubscriptionServiceAdmin(admin.ModelAdmin):
+
+    fields = (
+        'optional',
+    )
+
+    search_fields = (
+        'subscription__person__name',
+        'subscription__person__email',
+        'subscription__code',
+    )
+
+    list_display = (
+        'get_person_name',
+        'get_optional_name',
+    )
+
+
+@admin.register(SubscriptionProduct)
+class OptionalSubscriptionProductAdmin(admin.ModelAdmin):
+    search_fields = (
+        'subscription__person__name',
+        'subscription__person__email',
+        'subscription__code',
+    )
+
+    list_display = (
+        'get_person_name',
+        'get_optional_name',
+    )
+
