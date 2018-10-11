@@ -97,6 +97,11 @@ class SubscriptionProduct(AbstractSubscriptionOptional):
 
     get_optional_name.short_description = 'Produto'
 
+    def get_theme(self):
+        return self.optional.theme.name
+
+    get_theme.short_description = 'Áreas Temáticas'
+
 
 class SubscriptionService(AbstractSubscriptionOptional):
     """
@@ -190,3 +195,8 @@ class SubscriptionService(AbstractSubscriptionOptional):
         return self.optional.name
 
     get_optional_name.short_description = 'Serviço'
+
+    def get_theme(self):
+        return self.optional.theme.name
+
+    get_theme.short_description = 'Áreas Temáticas'
