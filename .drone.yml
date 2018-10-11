@@ -159,7 +159,6 @@ pipeline:
 
       *Commit:* {{ commit.link }}
 
-
     when:
       status: [ success, failure ]
       branch: [ hotfix/*, release/* ]
@@ -442,6 +441,8 @@ pipeline:
       - ~/cgsy/scripts/prod/05_run_migration.sh
       - ~/cgsy/scripts/prod/06_run_volume.sh
       - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
+    when:
+      branch: [ master ]
 
   notify-sentry-release:
     image: docker
