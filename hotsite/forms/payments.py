@@ -206,16 +206,15 @@ class PaymentForm(forms.Form):
                     prod_debt = debt_form.save()
                     builder.add_debt(prod_debt)
 
-                installment_part = self.cleaned_data.get('installment_part')
+                installment_part = self.cleaned_data.get('installment_part', 1)
+                trans_type = self.cleaned_data.get('transaction_type')
 
                 # Cria transação.
                 return create_pagarme_transaction(
                     subscription=self.subscription,
                     data=builder.build(
                         amount=self.cleaned_data.get('amount'),
-                        transaction_type=self.cleaned_data.get(
-                            'transaction_type'
-                        ),
+                        transaction_type=trans_type,
                         installments=self.cleaned_data.get('installments'),
                         card_hash=self.cleaned_data.get('card_hash'),
                     ),
