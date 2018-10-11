@@ -320,3 +320,6 @@ class Service(AbstractOptional):
             subscription__completed=True,
             subscription__test_subscription=False
         ).exclude(subscription__status=Subscription.CANCELED_STATUS).count()
+
+    def __str__(self):
+        return '{} - {}'.format(self.name, self.theme.name)
