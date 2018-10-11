@@ -15,8 +15,9 @@ def trigger_mix_congressy_synchronization(instance, created, raw, **_):
     if raw is True or created is True:
         return
 
-    if instance.installment_part > instance.installments:
-        return
+    if instance.installment_part:
+        if instance.installment_part > instance.installments:
+            return
 
     proceed_sync = \
         instance.boleto_url is not None or instance.status == Transaction.PAID
