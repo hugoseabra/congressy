@@ -115,6 +115,7 @@ class OptionalSubscriptionServiceAdmin(admin.ModelAdmin):
     list_display = (
         'get_person_name',
         'get_optional_name',
+        'get_theme',
     )
 
 
@@ -129,5 +130,5 @@ class OptionalSubscriptionProductAdmin(admin.ModelAdmin):
     list_display = (
         'get_person_name',
         'get_optional_name',
+        'get_theme',
     )
-
