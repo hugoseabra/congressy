@@ -366,3 +366,4 @@ class FeatureManagementAdmin(admin.ModelAdmin):
     """
     search_fields = ('event__name',)
     exclude = ('event',)
+
