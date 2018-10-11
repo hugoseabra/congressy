@@ -15,6 +15,7 @@ admin.site.register(OptionalServiceType)
 admin.site.register(OptionalProductType)
 
 
+
 @admin.register(Service)
 class OptionalServiceAdmin(admin.ModelAdmin):
     search_fields = (
