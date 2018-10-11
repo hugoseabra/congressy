@@ -102,7 +102,11 @@ class PagarmeDataBuilder:
             "installments": installments,
             "metadata": self.metadata_items,
             "items": [item for id, item in self.debt_items.items()],
-            "split_rules": self._create_split_rules(amount, installments),
+            "split_rules": self._create_split_rules(
+                amount,
+                transaction_type,
+                installments
+            ),
         }
 
         if transaction_type == Transaction.BOLETO:
@@ -262,7 +266,7 @@ class PagarmeDataBuilder:
         #         ' Transação: {}'.format(self.debt_amount, amount)
         #     )
 
-    def _create_split_rules(self, amount, installments=1):
+    def _create_split_rules(self, amount, transaction_type, installments=1):
         """
         Contsroi as regras de split da transação.
         :param amount:
@@ -274,6 +278,7 @@ class PagarmeDataBuilder:
         subscriber = ReceiverSubscriber(amount=amount)
         publisher = ReceiverPublisher(
             receiver_subscriber=subscriber,
+            transaction_type=transaction_type,
             subscription=self.subscription,
             amount=amount,
             installments=installments,

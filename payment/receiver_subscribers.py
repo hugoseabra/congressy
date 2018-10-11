@@ -65,10 +65,12 @@ class ReceiverPublisher(object):
 
     def __init__(self,
                  receiver_subscriber: ReceiverSubscriber,
+                 transaction_type: str,
                  subscription: Subscription,
                  amount: Decimal,
                  installments: int) -> None:
         self.receiver_subscriber = receiver_subscriber
+        self.transaction_type = transaction_type
         self.subscription = subscription
 
         assert isinstance(amount, Decimal)
@@ -103,8 +105,15 @@ class ReceiverPublisher(object):
         # não de taxas. O valor é calculado em cima do preço informado pelo
         # organizador ao criar o lote.
         cgsy_percent = Decimal(float(event.congressy_percent) / 100)
-        # cgsy_amount = lot.price * cgsy_percent
-        cgsy_amount = self.amount * cgsy_percent
+
+        if self.transaction_type == 'boleto' and self.installments > 1:
+            # Por causa do parcalamento de boletos, o valor chegando de fora
+            # pode ser menor do que o preço líquido do lote que a Congressy
+            # deve captar de acrodo com o percentual.
+            cgsy_amount = (lot.price/self.installments) * cgsy_percent
+
+        else:
+            cgsy_amount = lot.porice * cgsy_percent
 
         minimum_amount = Decimal(
             getattr(settings, 'CONGRESSY_MINIMUM_AMOUNT', 0)
