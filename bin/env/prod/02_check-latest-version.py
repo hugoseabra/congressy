@@ -70,7 +70,7 @@ with open(tagged_version_file, 'w+') as f:
     ))
 
     # 1 significa que os processos continuarão.
-    f.write(1)
+    f.write('1')
     f.close()
 
 previous_version_file = os.path.join(BASE, 'previous_version')
