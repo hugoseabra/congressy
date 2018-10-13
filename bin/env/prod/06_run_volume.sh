@@ -13,7 +13,7 @@ set -ex
 # retornar um erro caso a versão já exista.
 ###############################################################################
 
-BASE='~/cgsy'
+BASE=$(dirname $(dirname $(dirname "$0")))
 VERSION_FILE="$BASE/version"
 PREVIOUS_VERSION_FILE="$BASE/previous_version"
 PREVIOUS_VERSION="dev"

@@ -58,16 +58,19 @@ print("VERSION TO DEPLOY: {}".format(NEXT_VERSION))
 
 higher_version = semver.compare(CURRENT_VERSION, NEXT_VERSION) == -1
 
+if higher_version is False:
+    exit(1)
+
 tagged_version_file = os.path.join(BASE, 'tagged_version')
 
 with open(tagged_version_file, 'w+') as f:
-    value = '1' if higher_version is True else '0'
     print("Registrando versão a ser liberada '{}' em '{}'.".format(
         NEXT_VERSION,
         tagged_version_file
     ))
 
-    f.write(value)
+    # 1 significa que os processos continuarão.
+    f.write(1)
     f.close()
 
 previous_version_file = os.path.join(BASE, 'previous_version')

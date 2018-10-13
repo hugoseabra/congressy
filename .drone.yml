@@ -406,11 +406,11 @@ pipeline:
     when:
       branch: [ master ]
 
-  deploy-latest-version-server1:
+  deploy-latest-version-server2:
     image: appleboy/drone-ssh
     pull: true
     host:
-      - 172.31.38.91
+      - 172.31.40.208
     username: ec2-user
     port: 22
     secrets:
@@ -425,11 +425,11 @@ pipeline:
     when:
       branch: [ master ]
 
-  deploy-latest-version-server2:
+  deploy-latest-version-server1:
     image: appleboy/drone-ssh
     pull: true
     host:
-      - 172.31.40.208
+      - 172.31.38.91
     username: ec2-user
     port: 22
     secrets:
