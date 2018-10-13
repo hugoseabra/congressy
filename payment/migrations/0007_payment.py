@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             name='Payment',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('cash_type', models.CharField(choices=[('boleto', 'Boleto'), ('credit_card', 'Cartão de Crédito'), ('debit_card', 'Cartão de Débito'), ('paycheck', 'Cheque'), ('bank_deposit', 'Depósito'), ('money', 'Dinheiro'), ('bank_transfer', 'Transferência Bancária')], max_length=30)),
+                ('cash_type', models.CharField(choices=[('boleto', 'Boleto'), ('credit_card', 'Cartão de Crédito'), ('debit_card', 'Cartão de Débito'), ('paycheck', 'Cheque'), ('bank_deposit', 'Depósito'), ('money', 'Dinheiro'), ('bank_transfer', 'Transferência Bancária'), ('waiting_payment', 'Aguardando Pagamento')], max_length=30)),
                 ('manual', models.BooleanField(default=False, verbose_name='lançamento manual')),
                 ('manual_author', models.CharField(blank=True, max_length=255, null=True, verbose_name='author do lançamento manual')),
                 ('amount', models.DecimalField(blank=True, decimal_places=2, help_text='valor cobrado ao comprador', max_digits=11, null=True, verbose_name='valor')),

@@ -76,9 +76,9 @@ with open(tagged_version_file, 'w+') as f:
 previous_version_file = os.path.join(BASE, 'previous_version')
 
 with open(previous_version_file, 'w+') as f:
-    f.write(CURRENT_VERSION)
-    f.close()
     print("Registrando versão atual '{}' em '{}'.".format(
         CURRENT_VERSION,
         previous_version_file
     ))
+    f.write(CURRENT_VERSION)
+    f.close()

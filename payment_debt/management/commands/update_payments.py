@@ -207,4 +207,7 @@ class Command(BaseCommand):
             elif manual_type == Transaction.MANUAL_PAYMENT_BANK_TRANSFER:
                 cash_type = Payment.CASH_TYPE_TRANSFER
 
+            elif manual_type == Transaction.MANUAL_WAITING_PAYMENT:
+                cash_type = Payment.CASH_TYPE_WAITING_PAYMENT
+
         return cash_type

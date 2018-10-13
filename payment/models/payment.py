@@ -22,6 +22,7 @@ class Payment(models.Model):
     CASH_TYPE_BANK_DEPOSIT = 'bank_deposit'
     CASH_TYPE_MONEY = 'money'
     CASH_TYPE_TRANSFER = 'bank_transfer'
+    CASH_TYPE_WAITING_PAYMENT = 'waiting_payment'
 
     CASH_TYPES = (
         (CASH_TYPE_BOLETO, 'Boleto'),
@@ -31,6 +32,7 @@ class Payment(models.Model):
         (CASH_TYPE_BANK_DEPOSIT, 'Depósito'),
         (CASH_TYPE_MONEY, 'Dinheiro'),
         (CASH_TYPE_TRANSFER, 'Transferência Bancária'),
+        (CASH_TYPE_WAITING_PAYMENT, 'Aguardando Pagamento'),
     )
 
     lot = models.ForeignKey(
