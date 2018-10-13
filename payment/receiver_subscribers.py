@@ -123,6 +123,25 @@ class ReceiverPublisher(object):
         if minimum_amount and cgsy_amount < minimum_amount:
             cgsy_amount = minimum_amount
 
+        # ==== ORGANIZATION AMOUNT
+        # Se houve transferência de taxas, o valor da Congressy já está
+        # no montante da transação.
+        if lot.transfer_tax is True:
+            # Se há transferência, o organizador sempre receberá o valor
+            # informado no lote.
+            if self.transaction_type == 'boleto' and self.installments > 1:
+                org_amount = self.amount
+            else:
+                org_amount = lot.price
+
+        else:
+            # Caso, ele assumirá o valor da Congressy e o montante a ser
+            # transacionado já está com o valor sem as taxas da Congressy.
+            if self.transaction_type == 'boleto' and self.installments > 1:
+                org_amount = self.amount - cgsy_amount
+            else:
+                org_amount = lot.price - cgsy_amount
+
         # Verifica se há atividades extras.
         for service in self.subscription.subscription_services.all():
             price_diff = service.optional_price - service.optional_liquid_price
@@ -132,20 +151,6 @@ class ReceiverPublisher(object):
         for product in self.subscription.subscription_products.all():
             price_diff = product.optional_price - product.optional_liquid_price
             cgsy_amount += price_diff
-
-        # ==== ORGANIZATION AMOUNT
-        # Se houve transferência de taxas, o valor da Congressy já está
-        # no montante da transação.
-        if lot.transfer_tax is True:
-            # Se há transferência, o organizador sempre receberá o valor
-            # informado no lote.
-            org_amount = lot.price
-            # org_amount = self.amount
-        else:
-            # Caso, ele assumirá o valor da Congressy e o montante a ser
-            # transacionado já está com o valor sem as taxas da Congressy.
-            # org_amount = lot.price - cgsy_amount
-            org_amount = self.amount - cgsy_amount
 
         # Verifica se há atividades extras.
         for service in self.subscription.subscription_services.all():
