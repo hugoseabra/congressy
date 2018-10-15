@@ -3,8 +3,8 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 from django.views.generic import FormView, TemplateView
-from core.forms.cleaners import clear_string
 
+from core.forms.cleaners import clear_string
 from partner.forms import FullPartnerRegistrationForm
 
 
@@ -16,8 +16,12 @@ class RegistrationView(TemplateView, FormView):
     }
 
     def get_form(self, form_class=None):
+        kwargs = self.get_form_kwargs()
+        if 'instance' in kwargs:
+            kwargs.pop('instance')
+
         return FullPartnerRegistrationForm(
-            **self.get_form_kwargs()
+            **kwargs,
         )
 
     def form_valid(self, form):
@@ -28,7 +32,11 @@ class RegistrationView(TemplateView, FormView):
 
     def post(self, request, *args, **kwargs):
         request.POST = request.POST.copy()
-        request.POST.update({'document_number': clear_string(request.POST['document_number'])})
+        request.POST.update(
+            {
+                'document_number': clear_string(request.POST['document_number'])
+            }
+        )
         return super().post(request, *args, **kwargs)
 
 
