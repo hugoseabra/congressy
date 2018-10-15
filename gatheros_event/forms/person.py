@@ -16,32 +16,6 @@ from gatheros_event.locale.phone_choices import get_country_phone_code
 from core.forms.widgets import DateInputBootstrap
 
 
-# class InternationalTelephoneInput(forms.MultiWidget):
-#     template_name = 'forms/widgets/international_phone.html'
-#
-#     def __init__(self, attrs=None):
-#         if attrs is not None and isinstance(attrs, dict):
-#             ddi_attrs = attrs.get('ddi')
-#             phone_attrs = attrs.get('phone')
-#             country_attrs = attrs.get('country')
-#         else:
-#             ddi_attrs = None
-#             phone_attrs = None
-#             country_attrs = None
-#
-#         ddi = forms.TextInput(attrs=ddi_attrs)
-#         phone = TelephoneInput(attrs=phone_attrs)
-#         country = forms.TextInput(attrs=country_attrs)
-#
-#         super().__init__((ddi, phone, country), attrs)
-#
-#     def decompress(self, value):
-#         if not value:
-#             return [None, None, None]
-#
-#         return [value, value, value]
-
-
 class PersonForm(forms.ModelForm):
     """ Formulário de Person. """
 
