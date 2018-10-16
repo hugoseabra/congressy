@@ -54,10 +54,14 @@
           href="{% static 'hotsite/css/colors/blue.css' %}">
 
     <!-- Messenger -->
-    <link rel="stylesheet" href="{% static "assets/plugins/messenger/css/messenger.css" %}">
-    <link rel="stylesheet" href="{% static "assets/plugins/messenger/css/messenger-theme-flat.css" %}">
-    <link rel="stylesheet" href="{% static "assets/css/messenger-custom.css" %}">
-    <link rel="stylesheet" href="{% static "assets/plugins/messenger/css/location-sel.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/messenger/css/messenger.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/messenger/css/messenger-theme-flat.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/css/messenger-custom.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/messenger/css/location-sel.css" %}">
 
     <style>
         img.blurred {
@@ -84,7 +88,7 @@
 
     {% block content %}{% endblock %}
 
-{#    {% include 'hotsite/includes/7_footer.html' %}#}
+    {#    {% include 'hotsite/includes/7_footer.html' %}#}
 </div>
 
 <!-- LIBRARIES JS
@@ -119,6 +123,15 @@
     {{ form.media.js }}
 {% endif %}
 
+<script type="text/javascript">
+
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'pt-br',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        }, 'google_translate_element');
+    }
+</script>
 <script>
     $(document).ready(function () {
         window.setTimeout(function () {
@@ -127,11 +140,13 @@
         });
     });
 </script>
+<script type="text/javascript"
+        src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 {% block service_tag_scripts %}
-{% if custom_service_tag.tracking_script %}
-{% include 'service_tags/custom-script-tags.html' with script_tag_content=custom_service_tag.tracking_script %}
-{% endif %}
+    {% if custom_service_tag.tracking_script %}
+        {% include 'service_tags/custom-script-tags.html' with script_tag_content=custom_service_tag.tracking_script %}
+    {% endif %}
 {% endblock %}
 
 {% include 'sentry-javascript-sdk.html' %}
