@@ -349,9 +349,12 @@
             ddi_el.val(country.val());
             phone_el.unmask();
             phone_el.attr('onkeyup', 'this.value = this.value.replace(/\\D/g,\'\');');
+            phone_el.parent().parent().parent().find('label').css('margin-bottom', 0);
+            phone_el.closest('.form-group').css('margin-top', '20px');
 
             {% if config and config.cpf != config.CPF_HIDE %}
                 international_doc.parent().parent().show();
+                international_doc.closest('.form-group').css('margin-top', '20px');
                 cpf.parent().parent().hide();
 
                 cpf.removeAttr('required');
@@ -388,6 +391,7 @@
                 zip_code_intern_block_el.show();
                 zip_code_intern_block_el.removeAttr('required');
                 international_address.attr('required', 'required');
+                international_address.css('margin-top', '20px');
             {% endif %}
         }
 
@@ -414,13 +418,18 @@
             ddi_el.val(country.val());
             phone_el.mask("(99) 99999-9999");
             phone_el.removeAttr('onkeyup');
+            phone_el.parent().parent().parent().find('label').css('margin-bottom', 0);
+            phone_el.closest('.form-group').css('margin-top', '20px');
+
             cpf.parent().parent().show();
             international_doc.parent().parent().hide();
             cpf.removeAttr('required');
             international_doc.removeAttr('required');
+
             {% if config and config.cpf != config.CPF_HIDE %}
                 {% if config.cpf == config.CPF_REQUIRED %}
                     cpf.attr('required', 'required');
+                    cpf.closest('.form-group').css('margin-top', '20px');
                 {% endif %}
             {% endif %}
 
