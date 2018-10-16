@@ -31,6 +31,10 @@ class SubscriptionPersonForm(PersonForm):
         self.fields['name'].widget.attrs['disabled'] = 'disabled'
         self.fields['name'].disabled = True
 
+        self.fields['state_international'].label = "Estado/Província/Região"
+        self.fields['address_international'].label = "Endereço"
+
+
         if self.instance.pk:
             if self.instance.name:
                 self.fields['name'].disabled = True
@@ -89,7 +93,7 @@ class SubscriptionPersonForm(PersonForm):
                 required_fields.append('city')
             else:
                 required_fields.append('city_international')
-                required_fields.append('state_international')
+                required_fields.append('address_international')
 
         if not event_is_payable \
                 and not config.address_show \
@@ -99,13 +103,13 @@ class SubscriptionPersonForm(PersonForm):
                 required_fields.append('city')
             else:
                 required_fields.append('city_international')
+                required_fields.append('address_international')
 
         if event_is_payable or config.cpf_required:
             if country == 'BR':
                 required_fields.append('cpf')
             else:
                 required_fields.append('international_doc')
-                required_fields.append('state_international')
 
         if event_is_payable or config.birth_date_required:
             required_fields.append('birth_date')

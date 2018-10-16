@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from gatheros_subscription.models import Subscription
 from gatheros_subscription.serializers import CheckInSubscriptionSerializer
-from attendance.helpers.attendance import subscription_is_checked
+from attendance.helpers.attendance import subscription_has_certificate
 
 class SubscriptionSearchViewSet(generics.ListAPIView):
     """
@@ -20,7 +20,7 @@ class SubscriptionSearchViewSet(generics.ListAPIView):
 
         response = super().get(request, *args, **kwargs)
         for item in response.data['results']:
-            item['has_certificate'] = subscription_is_checked(item['pk'])
+            item['has_certificate'] = subscription_has_certificate(item['pk'])
 
         return response
 

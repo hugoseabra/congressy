@@ -112,6 +112,13 @@ class Person(models.Model, GatherosModelMixin):
         null=True,
         verbose_name='estado',
     )
+    address_international = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='endereco',
+    )
+
     country = models.CharField(
         choices=get_country_choices(),
         default=locales.BRASIL['codes']['digits_2'],

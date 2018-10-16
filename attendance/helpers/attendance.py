@@ -1,7 +1,8 @@
 from gatheros_subscription.models import Subscription
 from attendance.models import AttendanceService
 
-def subscription_is_checked(subscription_pk):
+
+def subscription_has_certificate(subscription_pk):
 
     try:
         subscription = Subscription.objects.get(pk=subscription_pk)
@@ -21,6 +22,26 @@ def subscription_is_checked(subscription_pk):
     checkin = subscription.checkins.filter(
         attendance_service__with_certificate=True
     ).last()
+
+    if not checkin:
+        return False
+
+    if checkin.attendance_service.checkout_enabled is False:
+        if hasattr(checkin, 'checkout') and checkin.checkout is not None:
+            return False
+
+    return True
+
+
+def subscription_is_checked(subscription_pk):
+
+    try:
+        subscription = Subscription.objects.get(pk=subscription_pk)
+
+    except Subscription.DoesNotExist:
+        return False
+
+    checkin = subscription.checkins.last()
 
     if not checkin:
         return False

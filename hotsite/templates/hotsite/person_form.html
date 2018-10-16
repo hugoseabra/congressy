@@ -20,7 +20,8 @@
                     {% include "hotsite/includes/greetings.html" %}
                     {% include "hotsite/includes/selected-lot.html" %}
 
-                    <form method="post" action="" id="person_form" onsubmit="next_page();">
+                    <form method="post" action="" id="person_form"
+                          onsubmit="next_page();">
 
                         {% csrf_token %}
                         {{ wizard.management_form }}
@@ -34,14 +35,17 @@
                         {% block messages %}
                             {% if messages %}
                                 <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                                {% for message in messages %}
-                                    <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                        {{ message|capfirst }}
-                                    </div>
-                                {% endfor %}
+                                    {% for message in messages %}
+                                        <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible"
+                                             role="alert">
+                                            <button type="button" class="close"
+                                                    data-dismiss="alert"
+                                                    aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            {{ message|capfirst }}
+                                        </div>
+                                    {% endfor %}
                                 </div>
                             {% endif %}
                         {% endblock %}
@@ -181,7 +185,14 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row address-row">
+                                        <div class="row"
+                                             id="address_international_block"
+                                             style="display:none">
+                                            <div class="col-md-12">
+                                                {% render_generic_field form.address_international required=True %}
+                                            </div>
+                                        </div>
+                                        <div class="row national-address address-row">
                                             <div class="col-md-9">
                                                 {% render_generic_field form.street %}
                                             </div>
@@ -193,8 +204,12 @@
                                             <div class="col-md-6 address-row">
                                                 {% render_generic_field form.complement %}
                                             </div>
-                                            <div class="col-md-6 address-row">
+                                            <div class="col-md-6 national-address address-row">
                                                 {% render_generic_field form.village %}
+                                            </div>
+                                            <div class="col-md-6"
+                                                 id="city_international_city_block">
+                                                {% render_generic_field form.city_international required=True %}
                                             </div>
                                         </div>
                                         <div class="row"
@@ -207,23 +222,20 @@
                                                 {% render_generic_field form.city_name required=True %}
                                             </div>
                                         </div>
-                                        <div class="row"
-                                             id="city_international_city_block"
-                                             style="display:none">
-                                            <div class="col-md-6">
-                                                {% render_generic_field form.city_international required=True %}
+                                        <div class="row">
+                                            <div class="col-md-6"
+                                                  style="display:none"
+                                                 id="state_international_block">
+                                                {% render_generic_field form.state_international %}
                                             </div>
-                                            <div class="col-md-6">
-                                                {% render_generic_field form.state_international required=True %}
+                                            <div class="col-md-6"
+                                                  style="display:none"
+                                                 id="zip_code_international_block">
+                                                {% render_generic_field form.zip_code_international %}
                                             </div>
+
                                         </div>
-                                        <div class="row"
-                                             id="zip_code_international_block"
-                                             style="display:none">
-                                            <div class="col-md-3">
-                                                {% render_generic_field form.zip_code_international required=True %}
-                                            </div>
-                                        </div>
+
                                     </div>
                                 </div>
                             {% endif %}
@@ -244,14 +256,17 @@
 
                                 <button type="submit"
                                         class="btn btn-primary pull-right">
-                                    {% if is_last %}Finalizar{% else %}Próximo{% endif %}
+                                    {% if is_last %}Finalizar{% else %}
+                                        Próximo{% endif %}
                                     <i class="fas fa-chevron-circle-right"></i>
                                 </button>
 
                             </div>
 
-                            <div class="wizard_next_loader text-center" style="display: none">
-                                <i class="fas info-color fa-circle-notch fa-spin fa-2x" style="color: #1F7BB6;"></i>
+                            <div class="wizard_next_loader text-center"
+                                 style="display: none">
+                                <i class="fas info-color fa-circle-notch fa-spin fa-2x"
+                                   style="color: #1F7BB6;"></i>
                             </div>
 
                         </div>
@@ -259,7 +274,8 @@
 
                 </div>
                 <div class="col-md-9 col-md-offset-2" style="margin-top: 10px">
-                    <div class="text-right cgsy-footer footer-wrapper text-muted" style="font-size:12px;color:lightgrey">
+                    <div class="text-right cgsy-footer footer-wrapper text-muted"
+                         style="font-size:12px;color:lightgrey">
                         {% include "base/footer.html" %}
                     </div>
                 </div>
@@ -312,11 +328,13 @@
             var cpf = $('#id_person-cpf');
             var international_doc = $('#id_person-international_doc');
             var city_block = $('#brazilian_city_block');
+            var state_international = $('#state_international_block');
             var city_intern_block = $('#city_international_city_block');
             var zip_code_el = $('#id_person-zip_code');
             var zip_code_block_el = $('#zip_code_block');
-            var zip_code_intern_el = $('#id_person-zip_code_international');
             var zip_code_intern_block_el = $('#zip_code_international_block');
+            var international_address = $('#address_international_block');
+            var national_address = $('.national-address');
 
             ddi_el.val(country.val());
             phone_el.unmask();
@@ -333,19 +351,19 @@
                     international_doc.attr('required', 'required');
                 {% endif %}
             {% endif %}
-
-
+            national_address.hide();
+            international_address.show();
+            state_international.show();
             city_block.hide();
             city_intern_block.show();
 
             $('#id_person-state').removeAttr('required');
             $('#id_person-city_name').removeAttr('required');
-            $('#id_person-city_international').removeAttr('required');
             $('#id_person-state_international').removeAttr('required');
+
 
             {% if config and config.city is True %}
                 $('#id_person-city_international').attr('required', 'required');
-                $('#id_person-state_international').attr('required', 'required');
             {% endif %}
 
             {% if config and config.address == config.ADDRESS_SHOW %}
@@ -354,7 +372,7 @@
                 zip_code_el.removeAttr('required');
                 zip_code_block_el.hide();
                 zip_code_intern_block_el.show();
-                zip_code_intern_el.attr('required', 'required');
+                international_address.attr('required', 'required');
             {% endif %}
         }
 
@@ -368,10 +386,14 @@
             var international_doc = $('#id_person-international_doc');
             var city_block = $('#brazilian_city_block');
             var city_intern_block = $('#city_international_city_block');
+            var state_international = $('#state_international_block');
+
             var zip_code_el = $('#id_person-zip_code');
             var zip_code_block_el = $('#zip_code_block');
             var zip_code_intern_el = $('#id_person-zip_code_international');
             var zip_code_intern_block_el = $('#zip_code_international_block');
+            var international_address = $('#address_international_block');
+            var national_address = $('.national-address');
 
             ddi_el.val(country.val());
             phone_el.mask("(99) 99999-9999");
@@ -388,6 +410,9 @@
 
             city_block.show();
             city_intern_block.hide();
+            state_international.hide();
+            international_address.hide();
+            national_address.show();
 
             $('#id_person-state').removeAttr('required');
             $('#id_person-city_name').removeAttr('required');
@@ -407,7 +432,7 @@
                 zip_code_el.mask("99999-999");
                 zip_code_el.attr('required', 'required');
 
-                zip_code_intern_el.removeAttr('required');
+                international_address.removeAttr('required');
                 zip_code_intern_block_el.hide();
             {% endif %}
         }

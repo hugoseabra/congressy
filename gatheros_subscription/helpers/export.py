@@ -7,6 +7,7 @@ from six import BytesIO
 from payment.models import Transaction
 from survey.models import Answer
 from gatheros_event.helpers.event_business import is_paid_event
+from attendance.helpers.attendance import subscription_is_checked
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
@@ -114,6 +115,7 @@ def _export_subscriptions(worksheet, subscriptions):
         'CATEGORIA DE PARTICIPANTE',
         'LOTE',
         'STATUS',
+        'ATENDIDO',
         'SEXO',
         'NOME',
         'CPF',
@@ -153,6 +155,12 @@ def _export_subscriptions(worksheet, subscriptions):
         collector[row_idx].append(get_object_value(sub.lot, 'name'))
 
         collector[row_idx].append(sub.get_status_display())
+        if subscription_is_checked(sub.pk):
+            is_checked = "Sim"
+        else:
+            is_checked = "Não"
+
+        collector[row_idx].append(is_checked)
         collector[row_idx].append(person.get_gender_display())
 
         collector[row_idx].append(get_object_value(person, 'name'))

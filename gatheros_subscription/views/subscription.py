@@ -11,7 +11,7 @@ from django.utils import six
 from django.utils.decorators import classonlymethod
 from django.views import generic
 
-from attendance.helpers.attendance import subscription_is_checked
+from attendance.helpers.attendance import subscription_has_certificate
 from core.forms.cleaners import clear_string
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.helpers.account import update_account
@@ -1079,7 +1079,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
         status_events = []
         subscription = self.get_queryset()
         for sub in subscription:
-            checked = subscription_is_checked(sub.pk)
+            checked = subscription_has_certificate(sub.pk)
             status_events.append({
                 'event_pk': sub.event.id,
                 'checked': checked
