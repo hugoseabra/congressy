@@ -39,7 +39,3 @@ MEDIA_URL = '/media/'
 FIXTURE_DIRS += [
     os.path.join(BASE_DIR, 'project', 'partner', 'fixtures'),
 ]
-# ========================== PARTNER ======================================== #
-# Valor maximo em que a soma de todos os parceiros do evento não deve
-# ultrapassar do rateamento do montante da Congressy
-PARTNER_MAX_PERCENTAGE_IN_EVENT = 20.00
