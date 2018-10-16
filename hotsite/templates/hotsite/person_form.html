@@ -359,6 +359,9 @@
 
             $('#id_person-state').removeAttr('required');
             $('#id_person-city_name').removeAttr('required');
+            $('#id_person-street').removeAttr('required');
+            $('#id_person-number').removeAttr('required');
+            $('#id_person-village').removeAttr('required');
             $('#id_person-state_international').removeAttr('required');
 
 
@@ -372,6 +375,7 @@
                 zip_code_el.removeAttr('required');
                 zip_code_block_el.hide();
                 zip_code_intern_block_el.show();
+                zip_code_intern_block_el.removeAttr('required');
                 international_address.attr('required', 'required');
             {% endif %}
         }
@@ -418,7 +422,9 @@
             $('#id_person-city_name').removeAttr('required');
             $('#id_person-city_international').removeAttr('required');
             $('#id_person-state_international').removeAttr('required');
-
+            $('#id_person-street').attr('required', 'required');
+            $('#id_person_village').attr('required', 'required');
+            zip_code_intern_block_el.removeAttr('required');
             {% if config and config.city is True %}
                 $('#id_person-state').attr('required', 'required');
                 $('#id_person-city_name').attr('required', 'required');
