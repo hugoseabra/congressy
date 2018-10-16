@@ -81,15 +81,10 @@ class SubscriptionPersonForm(PersonForm):
             required_fields.append('phone')
 
         if event_is_payable or config.address_show:
-            required_fields.append('street')
-            required_fields.append('village')
-
             if country == 'BR':
                 required_fields.append('zip_code')
-            else:
-                required_fields.append('zip_code_international')
-
-            if country == 'BR':
+                required_fields.append('street')
+                required_fields.append('village')
                 required_fields.append('city')
             else:
                 required_fields.append('city_international')

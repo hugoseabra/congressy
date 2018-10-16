@@ -123,15 +123,6 @@
     {{ form.media.js }}
 {% endif %}
 
-<script type="text/javascript">
-
-    function googleTranslateElementInit() {
-        new google.translate.TranslateElement({
-            pageLanguage: 'pt-br',
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-        }, 'google_translate_element');
-    }
-</script>
 <style>
     .goog-te-gadget-icon {
         display: none;
@@ -140,6 +131,13 @@
     .goog-te-gadget-simple {
         background-color: rgba(0, 0, 0, 0.1);
         border: 0;
+        font-size: 12px;
+        padding: 0;
+
+    }
+
+    .goog-te-menu-value:nth-child(3) {
+        display: none;
     }
 
     .goog-te-gadget-simple .goog-te-menu-value span {
@@ -147,7 +145,62 @@
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         color: #ccc;
     }
+
+    .goog-te-banner-frame.skiptranslate {
+        display: none !important;
+    }
+
+    .goog-te-menu-frame {
+        max-width: 100% !important;
+    }
+
+    .goog-te-menu2 {
+        max-width: 100% !important;
+        overflow-x: scroll !important;
+        box-sizing: border-box !important;
+        height: auto !important;
+    }
+
+
+    .iti-flag {
+        background-image: url("{% static '/assets/plugins/intl-tel-input-13.0.0/flags.png' %}");
+    }
+
+    @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+        .iti-flag {
+            background-image: url('{% static "/assets/plugins/intl-tel-input-13.0.0/flags@2x.png" %}');
+        ");
+        }
+    }
+
+    .intl-tel-input {
+        display: block;
+    }
 </style>
+
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'pt-br',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        }, 'google_translate_element');
+
+        function changeGoogleStyles() {
+            if ($('.goog-te-menu-frame').contents().find('.goog-te-menu2').length) {
+                $('.goog-te-menu-frame').contents().find('.goog-te-menu2').css({
+                    'max-width': '100%',
+                    'overflow-x': 'auto',
+                    'box-sizing': 'border-box',
+                    'height': 'auto'
+                });
+            } else {
+                setTimeout(changeGoogleStyles, 50);
+            }
+        }
+
+        changeGoogleStyles();
+    }
+</script>
 <script>
     $(document).ready(function () {
         window.setTimeout(function () {
