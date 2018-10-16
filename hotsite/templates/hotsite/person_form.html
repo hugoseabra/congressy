@@ -63,27 +63,20 @@
                                 <div class="panel-body">
                                     <div class="row">
                                         <div class="col-md-12">
-                                            {% render_generic_field form.country %}
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-9">
+
                                             {% render_generic_field form.name autofocus=True %}
-
-                                        </div>
-                                        <div class="col-md-3">
-                                            {% render_generic_field form.gender required=True %}
                                         </div>
                                     </div>
-
                                     <div class="row">
-                                        <div class="col-md-9">
-                                            {% if config %}
-                                                {% render_generic_field form.email config.email False %}
-                                            {% else %}
-                                                {% render_generic_field form.email %}
-                                            {% endif %}
+                                        <div class="col-md-6">
+                                            {% render_generic_field form.country %}
+
                                         </div>
+                                        <div class="col-md-3" id="doc-type"
+                                             style="display: none">
+                                            {% render_generic_field form.international_doc_type %}
+                                        </div>
+
                                         <div class="col-md-3">
                                             {% if config and config.cpf != config.CPF_HIDE %}
                                                 {% if config.cpf == config.CPF_REQUIRED %}
@@ -95,6 +88,23 @@
                                                 {% endif %}
                                             {% endif %}
                                         </div>
+
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            {% render_generic_field form.gender required=True %}
+                                        </div>
+                                        <div class="col-md-9">
+                                            {% if config %}
+                                                {% render_generic_field form.email config.email False %}
+                                            {% else %}
+                                                {% render_generic_field form.email %}
+                                            {% endif %}
+                                        </div>
+
+
                                     </div>
 
                                     <div class="row">
@@ -224,12 +234,12 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6"
-                                                  style="display:none"
+                                                 style="display:none"
                                                  id="state_international_block">
                                                 {% render_generic_field form.state_international %}
                                             </div>
                                             <div class="col-md-6"
-                                                  style="display:none"
+                                                 style="display:none"
                                                  id="zip_code_international_block">
                                                 {% render_generic_field form.zip_code_international %}
                                             </div>
@@ -335,7 +345,7 @@
             var zip_code_intern_block_el = $('#zip_code_international_block');
             var international_address = $('#address_international_block');
             var national_address = $('.national-address');
-
+            var doc_type = $('#doc-type');
             ddi_el.val(country.val());
             phone_el.unmask();
             phone_el.attr('onkeyup', 'this.value = this.value.replace(/\\D/g,\'\');');
@@ -353,6 +363,7 @@
             {% endif %}
             national_address.hide();
             international_address.show();
+            doc_type.show();
             state_international.show();
             city_block.hide();
             city_intern_block.show();
@@ -398,6 +409,7 @@
             var zip_code_intern_block_el = $('#zip_code_international_block');
             var international_address = $('#address_international_block');
             var national_address = $('.national-address');
+            var doc_type = $('#doc-type');
 
             ddi_el.val(country.val());
             phone_el.mask("(99) 99999-9999");
@@ -414,6 +426,7 @@
 
             city_block.show();
             city_intern_block.hide();
+            doc_type.hide();
             state_international.hide();
             international_address.hide();
             national_address.show();

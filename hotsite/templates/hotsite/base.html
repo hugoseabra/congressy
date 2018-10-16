@@ -124,6 +124,14 @@
 {% endif %}
 
 <style>
+    .goog-te-banner-frame.skiptranslate {
+        display: none !important;
+    }
+
+    body {
+        top: 0px !important;
+    }
+
     .goog-te-gadget-icon {
         display: none;
     }
@@ -160,7 +168,6 @@
         box-sizing: border-box !important;
         height: auto !important;
     }
-
 
     .iti-flag {
         background-image: url("{% static '/assets/plugins/intl-tel-input-13.0.0/flags.png' %}");
