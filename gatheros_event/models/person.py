@@ -34,6 +34,13 @@ class Person(models.Model, GatherosModelMixin):
         (GENDER_UNDEFINED, 'Prefiro não definir'),
     )
 
+    INTERNATIONAL_DOC_ID = 'ID'
+    INTERNATIONAL_DOC_PASSPORT = 'Passport'
+    INTERNATIONAL_DOC_TYPES = (
+        (INTERNATIONAL_DOC_ID, 'ID'),
+        (INTERNATIONAL_DOC_PASSPORT, 'Passaport'),
+    )
+
     uuid = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
@@ -116,7 +123,7 @@ class Person(models.Model, GatherosModelMixin):
         max_length=255,
         blank=True,
         null=True,
-        verbose_name='endereco',
+        verbose_name='endereço',
     )
 
     country = models.CharField(
@@ -162,6 +169,15 @@ class Person(models.Model, GatherosModelMixin):
         null=True,
         verbose_name='CPF',
         validators=[cpf_validator]
+    )
+    international_doc_type = models.CharField(
+        max_length=11,
+        blank=True,
+        null=True,
+        verbose_name='tipo de documento',
+        help_text='Informe o tipo de documento.',
+        choices=INTERNATIONAL_DOC_TYPES,
+        default=INTERNATIONAL_DOC_PASSPORT,
     )
     international_doc = models.CharField(
         max_length=11,
