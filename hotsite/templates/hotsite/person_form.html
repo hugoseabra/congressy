@@ -394,7 +394,7 @@
                 zip_code_block_el.hide();
                 zip_code_intern_block_el.show();
                 zip_code_intern_block_el.removeAttr('required');
-                international_address.attr('required', 'required');
+                $('#id_person-address_international').attr('required', 'required');
                 international_address.css('margin-top', '20px');
             {% endif %}
         }
@@ -445,7 +445,7 @@
             state_international.hide();
             international_address.hide();
             national_address.show();
-
+            $('#id_person-address_international').removeAttr('required');
             $('#id_person-state').removeAttr('required');
             $('#id_person-city_name').removeAttr('required');
             $('#id_person-city_international').removeAttr('required');
@@ -466,7 +466,6 @@
                 zip_code_el.mask("99999-999");
                 zip_code_el.attr('required', 'required');
 
-                international_address.removeAttr('required');
                 zip_code_intern_block_el.hide();
             {% endif %}
         }
