@@ -203,7 +203,7 @@ class PagarmeDataBuilder:
 
         else:
             billing_address.update({
-                "neighborhood": person.address_international or '',
+                "street": person.address_international or '',
                 "country": person.country.lower(),
                 "city": person.city_international.lower().capitalize(),
                 "state": person.state_international.lower().capitalize(),
