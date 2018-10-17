@@ -120,6 +120,7 @@
                                             </div>
                                         {% endif %}
                                         <div class="col-md-6">
+                                            <input type="tel" id="input-phone">
                                             {% if config %}
                                                 {% render_international_phone form.ddi form.phone required=config.phone use_required_field=False %}
                                             {% else %}
@@ -311,11 +312,24 @@
     <script src="{% static "assets/plugins/moment/moment.js" %}"></script>
 
     <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
+    <script src="{% static "frontend/static/assets/plugins/intl-tel-input-13.0.0/intlTelInput.js" %}"></script>
 
     <script src="{% static 'assets/js/date-time.js' %}"></script>
 
     <script>
         $(document).ready(function () {
+            var inputPhone =  document.querySelector('#input-phone');
+            var intTelEl = window.intlTelInput(inputPhone, {
+                initialCountry: "br",
+                preferredCountries: ['us', 'br'],
+                separateDialCode: true,
+                utilsScript: "{% static "/assets/plugins/intl-tel-input-13.0.0/utils.js" %}"
+            });
+            console.log(intTelEl);
+            inputPhone.on('change', function () {
+                var phone = intTelEl.getNumber();
+                $('#id_person-phone').val(phone);
+            });
             var dateInput = $('#id_person-birth_date');
             if (dateInput.length) {
                 dateInput.attr('autocomplete', 'off');
