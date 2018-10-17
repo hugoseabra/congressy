@@ -172,8 +172,6 @@ class Person(models.Model, GatherosModelMixin):
     )
     international_doc_type = models.CharField(
         max_length=11,
-        blank=True,
-        null=True,
         verbose_name='tipo de documento',
         help_text='Informe o tipo de documento.',
         choices=INTERNATIONAL_DOC_TYPES,
@@ -183,7 +181,7 @@ class Person(models.Model, GatherosModelMixin):
         max_length=11,
         blank=True,
         null=True,
-        verbose_name='ID/Passaport',
+        verbose_name='Núm. Documento',
         help_text='Número de documento utilizado fora do Brasil.'
     )
     birth_date = models.DateField(
