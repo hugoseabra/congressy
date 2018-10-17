@@ -12,6 +12,10 @@ set -ex
 # Ele irá verificar se a versão a ser publicada já está em produção e vai
 # retornar um erro caso a versão já exista.
 ###############################################################################
+echo "###########################################################"
+echo; echo "DOWNLOADING IMAGE TO PRODUCTION SERVER"; echo;
+echo "###########################################################"
+echo;
 
 BASE=$(dirname $(dirname $(dirname "$0")))
 VERSION_FILE="$BASE/version"
@@ -33,16 +37,26 @@ echo "Download versão '${VERSION}' sobre a versão '${PREVIOUS_VERSION}'..."
 # dos releases. Sendo assim, basta comparar
 if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
 
-    echo "Baixando não realizado '${VERSION}' ..."
+    echo "Baixando ${VERSION}' ..."
 
     docker exec -i awsecr pull cgsy:latest
     docker exec -i awsecr pull cgsy:${VERSION}
+
+    echo "###########################################################"
+    echo; echo "DOWNLOAD FINISHED"; echo;
+    echo "###########################################################"
+    echo;
 
     # Sucesso
     exit 0
 
 else
+    echo "###########################################################"
+    echo; echo "DOWNLOAD FAILED"; echo;
+    echo "###########################################################"
+    echo;
     echo "Download não realizado '${VERSION}' ==  '${PREVIOUS_VERSION}'"
+    echo;
 
     # Erro: versão já está publicada.
     exit 1

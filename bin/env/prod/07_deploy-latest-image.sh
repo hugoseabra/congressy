@@ -12,6 +12,10 @@ set -ex
 # Ele irá verificar se a versão a ser publicada já está em produção e vai
 # retornar um erro caso a versão já exista.
 ###############################################################################
+echo "###########################################################"
+echo; echo "DEPLOYING RECENT VERSION"; echo;
+echo "###########################################################"
+echo;
 
 # No servidor, este arquivo estará na pasta ~/cgsy/scrpits/prod e os arquivos
 # de versão na pasta raíz ~/cgsy
@@ -39,18 +43,63 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     echo ;
     docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
     echo ;
-    docker-compose -f ~/cgsy/docker-compose.yml logs redis
-    docker-compose -f ~/cgsy/docker-compose.yml logs wkhtmltopdf
-    docker-compose -f ~/cgsy/docker-compose.yml logs cron
-    docker-compose -f ~/cgsy/docker-compose.yml logs manage
-    docker-compose -f ~/cgsy/docker-compose.yml logs partner
-    docker-compose -f ~/cgsy/docker-compose.yml logs admin_intranet
-    echo ;
+
+    echo "==========================================================="
+    echo; echo "REDIS"; echo;
+    echo "==========================================================="
+    echo;
+    docker-compose -f ${BASE}/docker-compose.yml logs redis
+    echo;
+
+    echo "==========================================================="
+    echo; echo "WKHTMLTOPDF"; echo;
+    echo "==========================================================="
+    echo;
+    docker-compose -f ${BASE}/docker-compose.yml logs wkhtmltopdf
+    echo;
+
+    echo "==========================================================="
+    echo; echo "CRON"; echo;
+    echo "==========================================================="
+    echo;
+    docker-compose -f ${BASE}/docker-compose.yml logs cron
+
+    echo "==========================================================="
+    echo; echo "MANAGE"; echo;
+    echo "==========================================================="
+    echo;
+    docker-compose -f ${BASE}/docker-compose.yml logs manage
+    echo;
+
+    echo "==========================================================="
+    echo; echo "PARTNER"; echo;
+    echo "==========================================================="
+    echo;
+    docker-compose -f ${BASE}/docker-compose.yml logs partner
+    echo;
+
+    echo "==========================================================="
+    echo; echo "ADMIN INTRANET"; echo;
+    echo "==========================================================="
+    echo;
+    docker-compose -f ${BASE}/docker-compose.yml logs admin_intranet
+    echo;
+    echo;
+
+    echo "###########################################################"
+    echo; echo "DEPLOYING FINISHED"; echo;
+    echo "###########################################################"
+    echo;
 
     # Sucesso
     exit 0
 
 else
+    echo "###########################################################"
+    echo; echo "DEPLOYING FAILED"; echo;
+    echo "###########################################################"
+    echo;
+
     # Erro: versão já está publicada.
     exit 1
 fi
