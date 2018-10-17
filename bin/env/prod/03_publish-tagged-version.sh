@@ -16,7 +16,6 @@ echo "PUBLISHING NEW VERSION TO REPOSITORY"
 echo "###########################################################"
 echo;
 
-
 BASE=$(dirname "$0")
 echo "${BASE}/tagged_version"
 CHECKABLE_FILE=$(cat ${BASE}/tagged_version)
