@@ -73,7 +73,9 @@
                                                 <div class="col-md-12">
                                                     {% render_generic_field form.country %}
                                                 </div>
-                                                <div class="col-md-5" id="doc-type" style="display: none">
+                                                <div class="col-md-5"
+                                                     id="doc-type"
+                                                     style="display: none">
                                                     {% render_generic_field form.international_doc_type %}
                                                 </div>
                                             </div>
@@ -121,6 +123,11 @@
                                             </div>
                                         {% endif %}
                                         <div class="col-md-6">
+                                            <p id="invalid-tel-msg"
+                                               style="display: none;"></p>
+                                            <p id="valid-tel-msg"
+                                               style="display: none;">Número
+                                                Válido</p>
                                             <input type="tel" id="input-phone">
                                             {% if config %}
                                                 {% render_international_phone form.ddi form.phone required=config.phone use_required_field=False %}
@@ -300,10 +307,29 @@
 {% endblock %}
 
 {% block styles %}
+
     <link rel="stylesheet"
           href="https://unpkg.com/vue-form-wizard/dist/vue-form-wizard.min.css">
     <link rel="stylesheet"
+          href="{% static "/assets/plugins/intl-tel-input-14.0.3/css/intlTelInput.min.css" %}">
+    <link rel="stylesheet"
           href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
+    <style>
+        .iti-flag {
+            background-image: url("{% static '/assets/plugins/intl-tel-input-14.0.3/img/flags.png' %}");
+        }
+
+        @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+            .iti-flag {
+                background-image: url('{% static "/assets/plugins/intl-tel-input-14.0.3/img/flags@2x.png" %}');
+            ");
+            }
+        }
+
+        .intl-tel-input {
+            display: block;
+        }
+    </style>
 {% endblock %}
 
 {% block scripts %}
@@ -313,24 +339,44 @@
     <script src="{% static "assets/plugins/moment/moment.js" %}"></script>
 
     <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
-    <script src="{% static "frontend/static/assets/plugins/intl-tel-input-13.0.0/intlTelInput.js" %}"></script>
+    <script src="{% static "assets/plugins/intl-tel-input-14.0.3/js/intlTelInput.min.js" %}"></script>
 
     <script src="{% static 'assets/js/date-time.js' %}"></script>
 
     <script>
         $(document).ready(function () {
-            var inputPhone =  document.querySelector('#input-phone');
+            var inputPhone = document.querySelector('#input-phone');
+            var errorMsg = $("#invalid-tel-msg");
+            var validMsg = $("#valid-tel-msg");
+
+            var errorMap = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number"];
             var intTelEl = window.intlTelInput(inputPhone, {
                 initialCountry: "br",
                 preferredCountries: ['us', 'br'],
-                separateDialCode: true,
-                utilsScript: "{% static "/assets/plugins/intl-tel-input-13.0.0/utils.js" %}"
+                utilsScript: "{% static "/assets/plugins/intl-tel-input-14.0.3/js/utils.js" %}"
             });
-            console.log(intTelEl);
-            inputPhone.on('change', function () {
-                var phone = intTelEl.getNumber();
-                $('#id_person-phone').val(phone);
+
+            var reset = function () {
+                errorMsg.text(' ');
+                errorMsg.hide();
+                validMsg.hide();
+            };
+            var phone = $('#input-phone');
+            phone.on('blur', function () {
+                reset();
+                if (phone.val().trim()) {
+                    if (intTelEl.isValidNumber()) {
+                        console.log(intTelEl.getNumber())
+                    } else {
+                        var errorCode = intTelEl.getValidationError();
+                        errorMsg.text(errorMap[errorCode]);
+                        errorMsg.show();
+                    }
+                }
             });
+            phone.on('change',reset);
+            phone.on('keyup',reset);
+
             var dateInput = $('#id_person-birth_date');
             if (dateInput.length) {
                 dateInput.attr('autocomplete', 'off');
@@ -459,7 +505,7 @@
             state_international.hide();
             international_address.hide();
             national_address.show();
-
+            $('#id_person-address_international').removeAttr('required');
             $('#id_person-state').removeAttr('required');
             $('#id_person-city_name').removeAttr('required');
             $('#id_person-city_international').removeAttr('required');
@@ -480,7 +526,7 @@
                 zip_code_el.mask("99999-999");
                 zip_code_el.attr('required', 'required');
 
-                international_address.removeAttr('required');
+
                 zip_code_intern_block_el.hide();
             {% endif %}
         }
