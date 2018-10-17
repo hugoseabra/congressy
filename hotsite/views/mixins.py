@@ -97,6 +97,9 @@ class SubscriptionFormMixin(EventMixin):
 
         if not person:
             person = Person()
+            person.is_new = True
+        else:
+            person.is_new = False
 
         try:
             subscription = Subscription.objects.get(
