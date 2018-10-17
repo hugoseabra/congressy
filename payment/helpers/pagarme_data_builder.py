@@ -172,11 +172,13 @@ class PagarmeDataBuilder:
             })
 
         else:
+            doc_type = person.international_doc_type
+
             data['customer'].update({
                 'country': person.country.lower(),
                 'documents': [
                     {
-                        'type': 'ID/PASSPORT',
+                        'type': person.international_doc_type,
                         'number': person.international_doc,
                     }
                 ],
@@ -185,30 +187,33 @@ class PagarmeDataBuilder:
                 ],
             })
 
-        data['billing'] = {
-            "name": person.name,
-            "address": {
+
+        billing_address = dict()
+
+        if is_brazil is True:
+            billing_address.update({
+                "country": "br",
                 "neighborhood": person.village or '',
                 "street": person.street or '',
                 "street_number": person.number or 'S/N',
-            }
-        }
-
-        if is_brazil is True:
-            data['billing']['address'].update({
-                "country": "br",
                 "city": person.city.name.lower().capitalize(),
                 "state": person.city.uf.lower(),
                 "zipcode": person.zip_code,
             })
 
         else:
-            data['billing']['address'].update({
+            billing_address.update({
+                "neighborhood": person.address_international or '',
                 "country": person.country.lower(),
                 "city": person.city_international.lower().capitalize(),
                 "state": person.state_international.lower().capitalize(),
                 "zipcode": person.zip_code_international,
             })
+
+        data['billing'] = {
+            "name": person.name,
+            "address": billing_address,
+        }
 
         return data
 
