@@ -13,7 +13,7 @@ set -ex
 # retornar um erro caso a versão já exista.
 ###############################################################################
 echo "###########################################################"
-echo; echo "DEPLOYING RECENT VERSION"; echo;
+echo "DEPLOYING RECENT VERSION"
 echo "###########################################################"
 echo;
 
@@ -45,14 +45,14 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     echo ;
 
     echo "==========================================================="
-    echo; echo "REDIS"; echo;
+    echo "REDIS"
     echo "==========================================================="
     echo;
     docker-compose -f ${BASE}/docker-compose.yml logs redis
     echo;
 
     echo "==========================================================="
-    echo; echo "WKHTMLTOPDF"; echo;
+    echo "WKHTMLTOPDF"
     echo "==========================================================="
     echo;
     docker-compose -f ${BASE}/docker-compose.yml logs wkhtmltopdf
@@ -65,21 +65,21 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     docker-compose -f ${BASE}/docker-compose.yml logs cron
 
     echo "==========================================================="
-    echo; echo "MANAGE"; echo;
+    echo "MANAGE"
     echo "==========================================================="
     echo;
     docker-compose -f ${BASE}/docker-compose.yml logs manage
     echo;
 
     echo "==========================================================="
-    echo; echo "PARTNER"; echo;
+    echo "PARTNER"
     echo "==========================================================="
     echo;
     docker-compose -f ${BASE}/docker-compose.yml logs partner
     echo;
 
     echo "==========================================================="
-    echo; echo "ADMIN INTRANET"; echo;
+    echo "ADMIN INTRANET"
     echo "==========================================================="
     echo;
     docker-compose -f ${BASE}/docker-compose.yml logs admin_intranet
@@ -87,7 +87,7 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     echo;
 
     echo "###########################################################"
-    echo; echo "DEPLOYING FINISHED"; echo;
+    echo "DEPLOYING FINISHED"
     echo "###########################################################"
     echo;
 
@@ -96,7 +96,7 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
 
 else
     echo "###########################################################"
-    echo; echo "DEPLOYING FAILED"; echo;
+    echo "DEPLOYING FAILED"
     echo "###########################################################"
     echo;
 

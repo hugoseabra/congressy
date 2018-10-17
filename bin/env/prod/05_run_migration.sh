@@ -14,7 +14,7 @@ set -ex
 ###############################################################################
 
 echo "###########################################################"
-echo; echo "RUNNING MIGRATION"; echo;
+echo "RUNNING MIGRATION";
 echo "###########################################################"
 echo;
 
@@ -46,7 +46,7 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     echo ;
 
     echo "###########################################################"
-    echo; echo "MIGRATION FINISHED"; echo;
+    echo "MIGRATION FINISHED";
     echo "###########################################################"
     echo;
 
@@ -55,7 +55,7 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
 
 else
     echo "###########################################################"
-    echo; echo "ERROR ON MIGRATION"; echo;
+    echo "ERROR ON MIGRATION";
     echo "###########################################################"
     echo;
     # Erro: versão já está publicada.

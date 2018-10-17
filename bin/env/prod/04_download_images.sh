@@ -13,7 +13,7 @@ set -ex
 # retornar um erro caso a versão já exista.
 ###############################################################################
 echo "###########################################################"
-echo; echo "DOWNLOADING IMAGE TO PRODUCTION SERVER"; echo;
+echo "DOWNLOADING IMAGE TO PRODUCTION SERVER";
 echo "###########################################################"
 echo;
 
@@ -43,7 +43,7 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     docker exec -i awsecr pull cgsy:${VERSION}
 
     echo "###########################################################"
-    echo; echo "DOWNLOAD FINISHED"; echo;
+    echo "DOWNLOAD FINISHED";
     echo "###########################################################"
     echo;
 
@@ -52,7 +52,7 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
 
 else
     echo "###########################################################"
-    echo; echo "DOWNLOAD FAILED"; echo;
+    echo "DOWNLOAD FAILED";
     echo "###########################################################"
     echo;
     echo "Download não realizado '${VERSION}' ==  '${PREVIOUS_VERSION}'"

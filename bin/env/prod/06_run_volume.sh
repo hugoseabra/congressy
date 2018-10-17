@@ -13,7 +13,7 @@ set -ex
 # retornar um erro caso a versão já exista.
 ###############################################################################
 echo "###########################################################"
-echo; echo "SYNCHRONIZING VOLUME ARTIFACTS"; echo;
+echo "SYNCHRONIZING VOLUME ARTIFACTS"
 echo "###########################################################"
 echo;
 
@@ -47,7 +47,7 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     echo ;
 
     echo "###########################################################"
-    echo; echo "SYNCHRONIZATION FINISHED"; echo;
+    echo "SYNCHRONIZATION FINISHED"
     echo "###########################################################"
     echo;
 
@@ -56,7 +56,7 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
 
 else
     echo "###########################################################"
-    echo; echo "SYNCHRONIZATION FAILED"; echo;
+    echo "SYNCHRONIZATION FAILED"
     echo "###########################################################"
     echo;
 

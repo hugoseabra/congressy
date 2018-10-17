@@ -17,7 +17,7 @@ set -ex
 # - Se não ativo, ativa-o.
 ###############################################################################
 echo "###########################################################"
-echo; echo "MANAGING AWSECR CONTAINER"; echo;
+echo "MANAGING AWSECR CONTAINER";
 echo "###########################################################"
 echo;
 
@@ -52,6 +52,6 @@ else
 fi
 
 echo "###########################################################"
-echo; echo "MANAGING AWSECR FINISHED"; echo;
+echo "MANAGING AWSECR FINISHED";
 echo "###########################################################"
 echo;
