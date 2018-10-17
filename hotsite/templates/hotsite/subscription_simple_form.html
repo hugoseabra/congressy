@@ -196,17 +196,15 @@
             </div>
 
         {% else %}
-            {% if not person or not person.email or not person.name %}
-                <p class="text-muted">
-                    Preencha os dados seguintes para inicar sua inscrição.
-                </p>
-            {% endif %}
+            <p class="text-muted">
+                Preencha os dados seguintes para inicar sua inscrição.
+            </p>
 
-            {% if not person or person and not person.name %}
+            {% if not person %}
                 {% render_generic_field form.name autofocus=True %}
             {% endif %}
 
-            {% if not person or person and user and not user.email %}
+            {% if not person %}
                 {% render_generic_field form.email required=True %}
             {% endif %}
 
