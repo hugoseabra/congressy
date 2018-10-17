@@ -90,7 +90,8 @@
         <!--logo start-->
         <div class="brand">
             <a href="{% url 'event:event-list' %}">
-                <img class="img base_logo" src="{% static "assets/img/header-logo_black.png" %}"/>
+                <img class="img base_logo"
+                     src="{% static "assets/img/header-logo_black.png" %}"/>
             </a>
         </div>
         <!--logo end-->
@@ -98,6 +99,9 @@
         {% block navbar %}
             {% if user %}
                 <ul class="nav navbar-nav navbar-right hidden-xs">
+                    <li>
+{#                         <div id="google_translate_element"></div>#}
+                    </li>
                     <li style="padding-top: 5px">
                         <span class="meta ">
                             <button type="button" onclick="location.href=
@@ -129,7 +133,8 @@
 
                         {% endif %}
                         {% if has_events %}
-                            <ul class="dropdown-menu animated fadeInRight" role="menu">
+                            <ul class="dropdown-menu animated fadeInRight"
+                                role="menu">
                                 <li style="padding-left:
                                  5px; padding-right: 5px;">
                                     <a href="{% url 'event:organization-edit' organization.pk %}">
@@ -241,7 +246,7 @@
                 <!--main content start-->
 
                 {% if selected_event and not selected_event.published %}
-                        
+
                     {% if is_event_publishable %}
 
                         <div class="alert alert-info text-center" role="alert">
@@ -252,7 +257,8 @@
 
                     {% else %}
 
-                        <div class="alert alert-warning text-center" role="alert">
+                        <div class="alert alert-warning text-center"
+                             role="alert">
 
                             <div>
 
@@ -266,8 +272,11 @@
                             </div>
 
                             <div>
-                                <a onclick="$('#unpublishable_modal').modal('show');" href="javascript:void(0);">
-                                    Seu evento possui pendencias que impeçam que ele seja publicado, click para maiores informações!
+                                <a onclick="$('#unpublishable_modal').modal('show');"
+                                   href="javascript:void(0);">
+                                    Seu evento possui pendencias que impeçam
+                                    que ele seja publicado, click para maiores
+                                    informações!
                                 </a>
                             </div>
 
@@ -353,6 +362,87 @@
 <script src="{% static "assets/js/src/app.js" %}"></script>
 <script src="{% static "assets/js/cgsy.js" %}"></script>
 <script src="{% static "assets/js/ajax.js" %}"></script>
+
+<style>
+    .goog-te-gadget-icon {
+        display: none;
+    }
+
+    .goog-te-gadget-simple {
+        background-color: rgba(0, 0, 0, 0.1);
+        border: 0;
+        font-size: 12px;
+        padding: 0;
+
+    }
+
+    .goog-te-menu-value:nth-child(3) {
+        display: none;
+    }
+
+    .goog-te-gadget-simple .goog-te-menu-value span {
+        font-size: 12px;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: #ccc;
+    }
+
+    .goog-te-banner-frame.skiptranslate {
+        display: none !important;
+    }
+
+    .goog-te-menu-frame {
+        max-width: 100% !important;
+    }
+
+    .goog-te-menu2 {
+        max-width: 100% !important;
+        overflow-x: scroll !important;
+        box-sizing: border-box !important;
+        height: auto !important;
+    }
+
+    .iti-flag {
+        background-image: url("{% static '/assets/plugins/intl-tel-input-13.0.0/flags.png' %}");
+    }
+
+    @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+        .iti-flag {
+            background-image: url('{% static "/assets/plugins/intl-tel-input-13.0.0/flags@2x.png" %}');
+        ");
+        }
+    }
+
+    .intl-tel-input {
+        display: block;
+    }
+</style>
+
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'pt-br',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        }, 'google_translate_element');
+
+        function changeGoogleStyles() {
+            if ($('.goog-te-menu-frame').contents().find('.goog-te-menu2').length) {
+                $('.goog-te-menu-frame').contents().find('.goog-te-menu2').css({
+                    'max-width': '100%',
+                    'overflow-x': 'auto',
+                    'box-sizing': 'border-box',
+                    'height': 'auto'
+                });
+            } else {
+                setTimeout(changeGoogleStyles, 50);
+            }
+        }
+
+        changeGoogleStyles();
+    }
+</script>
+
+<script type="text/javascript"
+        src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 {% if form %}
     {{ form.media.js }}

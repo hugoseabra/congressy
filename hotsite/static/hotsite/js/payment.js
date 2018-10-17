@@ -59,10 +59,8 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
 
         this.set_max_installments = function(num) {
             num = parseInt(num);
-            debugger;
             if (num > MAX_INSTALLMENTS) { num = MAX_INSTALLMENTS; }
             max_installments = num;
-            debugger;
         };
 
         this.set_free_rate_installments = function (num) {

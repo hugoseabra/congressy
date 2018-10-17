@@ -308,3 +308,7 @@ BITLY_API_KEY = 'R_90819c7eac3f4c039e5f9c37f6786dda'
 BITLY_ACCESS_TOKEN = '5e9398fb6cc39e8dee301f9c0192959563b8bd02'
 # Tempo em que o relatório de cada link irá renovar os dados.
 BITLY_TIMEOUT_STATS = 30
+# ========================== PARTNER ======================================== #
+# Valor maximo em que a soma de todos os parceiros do evento não deve
+# ultrapassar do rateamento do montante da Congressy
+PARTNER_MAX_PERCENTAGE_IN_EVENT = 20.00

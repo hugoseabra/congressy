@@ -12,7 +12,7 @@ from django.views import generic
 
 from core.util import represents_int
 from core.views.mixins import TemplateNameableMixin
-from gatheros_event.views.mixins import EventViewMixin, AccountMixin
+from gatheros_event.views.mixins import EventViewMixin
 from gatheros_subscription.forms import EventSurveyForm
 from gatheros_subscription.models import EventSurvey, Lot
 from survey.api import SurveySerializer
@@ -32,10 +32,20 @@ class SurveyEditView(SurveyFeatureFlagMixin,
 
     def dispatch(self, request, *args, **kwargs):
         self.event = self.get_event()
-        self.event_survey = EventSurvey.objects.get(
-            pk=self.kwargs.get('survey_pk'),
-            event=self.event,
-        )
+
+        try:
+            self.event_survey = EventSurvey.objects.get(
+                pk=self.kwargs.get('survey_pk'),
+                event=self.event,
+            )
+        except EventSurvey.DoesNotExist:
+            msg = "Formulário não existe!"
+            messages.error(request, msg)
+            return redirect(reverse('subscription:form-config',
+                                    kwargs={'event_pk': self.event.pk}
+                                    )
+                            )
+
         self.survey = self.event_survey.survey
 
         return super().dispatch(request, *args, **kwargs)

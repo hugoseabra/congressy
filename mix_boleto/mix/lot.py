@@ -31,7 +31,9 @@ class MixLot(object):
 
                 if self.price:
                     self.lot.price = self.price
-                    self.lot.save()
+
+                self.lot.date_end = self.date_limit,
+                self.lot.save()
 
             except Lot.DoesNotExist:
                 self.lot = Lot.objects.create(
