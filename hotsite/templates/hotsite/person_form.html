@@ -123,17 +123,15 @@
                                             </div>
                                         {% endif %}
                                         <div class="col-md-6">
-                                            <p id="invalid-tel-msg"
-                                               style="display: none;"></p>
-                                            <p id="valid-tel-msg"
-                                               style="display: none;">Número
-                                                Válido</p>
-                                            <input type="tel" id="input-phone">
-                                            {% if config %}
-                                                {% render_international_phone form.ddi form.phone required=config.phone use_required_field=False %}
-                                            {% else %}
-                                                {% render_international_phone form.ddi form.phone %}
-                                            {% endif %}
+                                           {% render_generic_field form.phone  required=config.phone use_required_field=False %}
+
+                                            <div style="display: none;">
+                                                {% if config %}
+                                                    {% render_generic_field form.ddi  required=config.phone use_required_field=False %}
+                                                {% else %}
+                                                    {% render_generic_field form.ddi  %}
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
 
@@ -310,8 +308,7 @@
 
     <link rel="stylesheet"
           href="https://unpkg.com/vue-form-wizard/dist/vue-form-wizard.min.css">
-    <link rel="stylesheet"
-          href="{% static "/assets/plugins/intl-tel-input-14.0.3/css/intlTelInput.min.css" %}">
+
     <link rel="stylesheet"
           href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
     <style>
@@ -325,11 +322,13 @@
             ");
             }
         }
-
         .intl-tel-input {
+            width: 100%;
             display: block;
         }
     </style>
+
+
 {% endblock %}
 
 {% block scripts %}
@@ -339,43 +338,12 @@
     <script src="{% static "assets/plugins/moment/moment.js" %}"></script>
 
     <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
-    <script src="{% static "assets/plugins/intl-tel-input-14.0.3/js/intlTelInput.min.js" %}"></script>
 
     <script src="{% static 'assets/js/date-time.js' %}"></script>
 
     <script>
         $(document).ready(function () {
-            var inputPhone = document.querySelector('#input-phone');
-            var errorMsg = $("#invalid-tel-msg");
-            var validMsg = $("#valid-tel-msg");
-
-            var errorMap = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number"];
-            var intTelEl = window.intlTelInput(inputPhone, {
-                initialCountry: "br",
-                preferredCountries: ['us', 'br'],
-                utilsScript: "{% static "/assets/plugins/intl-tel-input-14.0.3/js/utils.js" %}"
-            });
-
-            var reset = function () {
-                errorMsg.text(' ');
-                errorMsg.hide();
-                validMsg.hide();
-            };
-            var phone = $('#input-phone');
-            phone.on('blur', function () {
-                reset();
-                if (phone.val().trim()) {
-                    if (intTelEl.isValidNumber()) {
-                        console.log(intTelEl.getNumber())
-                    } else {
-                        var errorCode = intTelEl.getValidationError();
-                        errorMsg.text(errorMap[errorCode]);
-                        errorMsg.show();
-                    }
-                }
-            });
-            phone.on('change',reset);
-            phone.on('keyup',reset);
+         createPhoneInput("{% static "/assets/plugins/intl-tel-input-14.0.3/js/utils.js" %}");
 
             var dateInput = $('#id_person-birth_date');
             if (dateInput.length) {
@@ -388,6 +356,7 @@
                     birthDate.data("DateTimePicker").date(datePerson);
                 }
             }
+
         });
 
         function set_form_as_international() {

@@ -97,6 +97,17 @@ class PersonForm(forms.ModelForm):
             ),
         }
 
+    class Media:
+        js = (
+            'assets/plugins/intl-tel-input-14.0.3/js/intlTelInput.min.js',
+            'assets/plugins/intl-tel-input-14.0.3/js/setIntlTel.js',
+        )
+
+        css = {
+            'all': 'assets/plugins/intl-tel-input-14.0.3/css/intlTelInput.min.css'
+        }
+
+
     def __init__(self, is_chrome=False, **kwargs):
 
         uf = None

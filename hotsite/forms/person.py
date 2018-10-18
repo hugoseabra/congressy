@@ -2,7 +2,7 @@
     Formulário usado para pegar os dados da pessoa durante inscrições no
     hotsite
 """
-
+from django import forms
 from gatheros_event.forms import PersonForm
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Person
@@ -27,7 +27,7 @@ class SubscriptionPersonForm(PersonForm):
 
         self.fields['email'].widget.attrs['disabled'] = 'disabled'
         self.fields['email'].disabled = True
-
+        self.fields['ddi'].widget = forms.widgets.TextInput()
         self.fields['name'].widget.attrs['disabled'] = 'disabled'
         self.fields['name'].disabled = True
 
@@ -120,6 +120,7 @@ class SubscriptionPersonForm(PersonForm):
 
         for field_name in required_fields:
             self.setAsRequired(field_name)
+
 
     def save(self, commit=True):
         self.instance.user = self.user
