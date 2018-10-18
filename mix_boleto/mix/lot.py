@@ -32,7 +32,7 @@ class MixLot(object):
                 if self.price:
                     self.lot.price = self.price
 
-                self.lot.date_end = self.date_limit,
+                self.lot.date_end = self.date_limit
                 self.lot.save()
 
             except Lot.DoesNotExist:
