@@ -64,7 +64,9 @@
             var dateInput = $('#id_person-birth_date');
             if (dateInput.length) {
                 var birthDate = createDatePicker(dateInput);
+                var maxDate = moment("01-01-2005", "DD-MM-YYYY");
                 birthDate.data("DateTimePicker").minDate(false);
+                birthDate.data("DateTimePicker").maxDate(maxDate);
                 birthDate.data("DateTimePicker").useCurrent(false);
                 var datePerson = dateInput.attr('value');
                 if (datePerson) {

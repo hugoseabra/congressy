@@ -10,6 +10,7 @@ from core.forms.widgets import (
     DateInput,
     TelephoneInput,
 )
+from datetime import datetime
 from core.util import create_years_list
 from gatheros_event.models import Occupation, Person
 from gatheros_event.locale.phone_choices import get_country_phone_code
@@ -191,6 +192,18 @@ class PersonForm(forms.ModelForm):
 
     def clean_occupation(self):
         return Occupation.objects.get(pk=self.data['occupation'])
+
+    def clean_birth_date(self):
+        birth_date = self.cleaned_data['birth_date']
+        min_date = datetime.now()
+        min_date = min_date.replace(min_date.year-13)
+
+        if birth_date > min_date.date():
+            raise forms.ValidationError(
+                'Inscrito deve ter no mínimo 13 anos'
+            )
+        else:
+            return self.cleaned_data['birth_date']
 
     def fill_blank_data_when_user(self):
         """
