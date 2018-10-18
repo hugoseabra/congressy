@@ -16,6 +16,10 @@ set -ex
 # - Se não existe, cria-o.
 # - Se não ativo, ativa-o.
 ###############################################################################
+echo "###########################################################"
+echo "MANAGING AWSECR CONTAINER";
+echo "###########################################################"
+echo;
 
 BASE=$(dirname "$0")
 
@@ -46,3 +50,8 @@ if [ -z "$CONTAINER_ACTIVE" ]; then
 else
     echo "Container '${CONTAINER_NAME}' está ativo."
 fi
+
+echo "###########################################################"
+echo "MANAGING AWSECR FINISHED";
+echo "###########################################################"
+echo;

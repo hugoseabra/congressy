@@ -196,17 +196,17 @@
             </div>
 
         {% else %}
-            {% if not person or not person.email or not person.name %}
+            {% if not person or person and person.is_new is True %}
                 <p class="text-muted">
                     Preencha os dados seguintes para inicar sua inscrição.
                 </p>
             {% endif %}
 
-            {% if not person or person and not person.name %}
+            {% if not person or person and person.is_new is True %}
                 {% render_generic_field form.name autofocus=True %}
             {% endif %}
 
-            {% if not person or person and user and not user.email %}
+            {% if not person or person and person.is_new is True %}
                 {% render_generic_field form.email required=True %}
             {% endif %}
 
@@ -238,7 +238,7 @@
                     </a>
                 {% endif %}
             </div>
-            {% if person %}
+            {% if person and person.is_new is False %}
                 <div class="form-group">
                     <div class="text-center">
                         <a href="{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}" style="font-weight: bold;color:#eea236;">

@@ -12,6 +12,10 @@ set -ex
 # Ele irá verificar se a versão a ser publicada já está em produção e vai
 # retornar um erro caso a versão já exista.
 ###############################################################################
+echo "###########################################################"
+echo "SYNCHRONIZING VOLUME ARTIFACTS"
+echo "###########################################################"
+echo;
 
 BASE=$(dirname $(dirname $(dirname "$0")))
 VERSION_FILE="$BASE/version"
@@ -31,19 +35,31 @@ fi
 # dos releases. Sendo assim, basta comparar
 if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
 
+    echo "Running volume synchronization for version ${VERSION}' ..."
+
     docker run --rm \
-        --env-file=env-file \
+        --env-file=${BASE}/env-file \
         -v /etc/localtime:/etc/localtime \
-        -v ./shared-volume/media:/var/www/cgsy/media \
-        -v ./shared-volume/logs:/var/www/cgsy/logs \
+        -v ${BASE}/shared-volume/media:/var/www/cgsy/media \
+        -v ${BASE}/shared-volume/logs:/var/www/cgsy/logs \
         871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest /services/volume/container-entry.sh
 
     echo ;
+
+    echo "###########################################################"
+    echo "SYNCHRONIZATION FINISHED"
+    echo "###########################################################"
+    echo;
 
     # Sucesso
     exit 0
 
 else
+    echo "###########################################################"
+    echo "SYNCHRONIZATION FAILED"
+    echo "###########################################################"
+    echo;
+
     # Erro: versão já está publicada.
     exit 1
 fi

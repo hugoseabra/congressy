@@ -379,5 +379,6 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
 
         return False
 
+
 class UnpublishHotsiteView(generic.TemplateView):
     template_name = 'hotsite/unpublished.html'

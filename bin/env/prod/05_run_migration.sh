@@ -13,6 +13,11 @@ set -ex
 # retornar um erro caso a versão já exista.
 ###############################################################################
 
+echo "###########################################################"
+echo "RUNNING MIGRATION";
+echo "###########################################################"
+echo;
+
 BASE=$(dirname $(dirname $(dirname "$0")))
 VERSION_FILE="$BASE/version"
 PREVIOUS_VERSION_FILE="$BASE/previous_version"
@@ -31,17 +36,30 @@ fi
 # dos releases. Sendo assim, basta comparar
 if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
 
+    echo "Running migration for version ${VERSION}' ..."
+
     docker run --rm \
-        --env-file=env-file \
+        --env-file=${BASE}/env-file \
         -v /etc/localtime:/etc/localtime \
         871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest /services/migration/container-entry.sh
 
     echo ;
 
+    echo "###########################################################"
+    echo "MIGRATION FINISHED";
+    echo "###########################################################"
+    echo;
+
     # Sucesso
     exit 0
 
 else
+    echo "###########################################################"
+    echo "ERROR ON MIGRATION";
+    echo "###########################################################"
+    echo;
     # Erro: versão já está publicada.
     exit 1
 fi
+
+

@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='person',
             name='international_doc_type',
-            field=models.CharField(choices=[('ID', 'ID'), ('Passport', 'Passaport')], default='Passport', help_text='Informe o tipo de documento.', max_length=11, verbose_name='tipo de documento'),
+            field=models.CharField(blank=True, choices=[('ID', 'ID'), ('Passport', 'Passaport')], default='Passport', help_text='Informe o tipo de documento.', max_length=11, verbose_name='tipo de documento'),
         ),
         migrations.AlterField(
             model_name='person',
