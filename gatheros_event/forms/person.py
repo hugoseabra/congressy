@@ -89,6 +89,7 @@ class PersonForm(forms.ModelForm):
                 'style': 'text-transform:lowercase'
             }),
             'phone': TelephoneInput,
+            'ddi': forms.TextInput(),
             'zip_code': TelephoneInput,
             'city': forms.HiddenInput(),
             'birth_date': DateInputBootstrap,
@@ -99,12 +100,14 @@ class PersonForm(forms.ModelForm):
 
     class Media:
         js = (
+            'assets/js/international-form.js',
+            'assets/js/international-form.js',
             'assets/plugins/intl-tel-input-14.0.3/js/intlTelInput.min.js',
-            'assets/plugins/intl-tel-input-14.0.3/js/setIntlTel.js',
+            'assets/plugins/intl-tel-input-14.0.3/js/setInlTel.js',
         )
 
         css = {
-            'all': 'assets/plugins/intl-tel-input-14.0.3/css/intlTelInput.min.css'
+            'all': ('assets/plugins/intl-tel-input-14.0.3/css/intlTelInput.min.css',)
         }
 
 
@@ -170,10 +173,9 @@ class PersonForm(forms.ModelForm):
         return cnpj
 
     def clean_phone(self):
-        country = self.cleaned_data.get('country')
+        country = self.cleaned_data.get('ddi')
         phone = self.cleaned_data.get('phone')
         if country and phone:
-            country = self.cleaned_data.get('country')
             prefix = get_country_phone_code(country)
             phone_cleaner('{}{}'.format(prefix, phone), country)
 

@@ -343,7 +343,7 @@
 
     <script>
         $(document).ready(function () {
-         createPhoneInput("{% static "/assets/plugins/intl-tel-input-14.0.3/js/utils.js" %}");
+         createPhoneInput('#id_person-phone', $('#id_person-ddi'), "{% static "/assets/plugins/intl-tel-input-14.0.3/js/utils.js" %}");
 
             var dateInput = $('#id_person-birth_date');
             if (dateInput.length) {
@@ -371,6 +371,7 @@
             var state_international = $('#state_international_block');
             var city_intern_block = $('#city_international_city_block');
             var zip_code_el = $('#id_person-zip_code');
+            var zip_intern_el = $('#id_person-zip_code_international');
             var zip_code_block_el = $('#zip_code_block');
             var zip_code_intern_block_el = $('#zip_code_international_block');
             var international_address = $('#address_international_block');
@@ -379,7 +380,6 @@
 
             country.parent().parent().parent().removeClass('col-md-12').addClass('col-md-7');
 
-            ddi_el.val(country.val());
             phone_el.unmask();
             phone_el.attr('onkeyup', 'this.value = this.value.replace(/\\D/g,\'\');');
             phone_el.parent().parent().parent().find('label').css('margin-bottom', 0);
@@ -410,8 +410,8 @@
             $('#id_person-number').removeAttr('required');
             $('#id_person-village').removeAttr('required');
             $('#id_person-state_international').removeAttr('required');
-
-
+            zip_code_el.removeAttr('required');
+            zip_intern_el.removeAttr('required');
             {% if config and config.city is True %}
                 $('#id_person-city_international').attr('required', 'required');
             {% endif %}
@@ -422,7 +422,6 @@
                 zip_code_el.removeAttr('required');
                 zip_code_block_el.hide();
                 zip_code_intern_block_el.show();
-                zip_code_intern_block_el.removeAttr('required');
                 $('#id_person-address_international').attr('required', 'required');
                 international_address.css('margin-top', '20px');
             {% endif %}
@@ -450,7 +449,6 @@
 
             country.parent().parent().parent().removeClass('col-md-7').addClass('col-md-12');
 
-            ddi_el.val(country.val());
             phone_el.mask("(99) 99999-9999");
             phone_el.removeAttr('onkeyup');
             phone_el.parent().parent().parent().find('label').css('margin-bottom', 0);

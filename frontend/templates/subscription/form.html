@@ -52,7 +52,15 @@
             $('#id_subscription-lot').on('change', function () {
                 $('#loader-person').show();
             });
+            $('#id_person-country').on('change', function () {
+                set_if_international();
+            });
 
+            set_if_international();
+
+            {% if selected_lot %}
+                createPhoneInput('#id_person-phone', $('#id_person-ddi'), "{% static "/assets/plugins/intl-tel-input-14.0.3/js/utils.js" %}");
+            {% endif %}
             var dateInput = $('#id_person-birth_date');
             if (dateInput.length) {
                 var birthDate = createDatePicker(dateInput);
@@ -93,7 +101,7 @@
                 {% endif %}
             }, 300);
 
-            $('#id_person-phone').mask("(99) 99999-9999");
+
             zip_code_el.mask("99999-999");
 
             $(uf_el).change(function () {
@@ -101,7 +109,7 @@
                 city_el.html($('<option>').text('Carregando...'));
                 submit.prop('disabled', true);
                 var disableButton = function () {
-                     var submit = $('form').find(':submit');
+                    var submit = $('form').find(':submit');
                     submit.prop('disabled', false);
                 };
                 var that = $(this);
@@ -125,6 +133,154 @@
             });
 
         });
+
+        function set_form_as_international() {
+            console.log('setting form as international.');
+
+            var country = $('#id_person-country');
+            var ddi_el = $('#id_person-ddi');
+            var phone_el = $('#id_person-phone');
+            var cpf = $('#id_person-cpf');
+            var international_doc = $('#id_person-international_doc');
+            var city_block = $('#brazilian_city_block');
+            var state_international = $('#state_international_block');
+            var city_intern_block = $('#city_international_city_block');
+            var zip_code_el = $('#id_person-zip_code');
+            var zip_intern_el = $('#id_person-zip_code_international');
+            var zip_code_block_el = $('#zip_code_block');
+            var zip_code_intern_block_el = $('#zip_code_international_block');
+            var international_address = $('#address_international_block');
+            var national_address = $('.national-address');
+            var doc_type = $('#doc-type');
+
+            country.parent().parent().parent().removeClass('col-md-12').addClass('col-md-7');
+
+            phone_el.unmask();
+            phone_el.attr('onkeyup', 'this.value = this.value.replace(/\\D/g,\'\');');
+            phone_el.parent().parent().parent().find('label').css('margin-bottom', 0);
+            phone_el.closest('.form-group').css('margin-top', '20px');
+
+            {% if config and config.cpf != config.CPF_HIDE %}
+                international_doc.parent().parent().show();
+                international_doc.closest('.form-group').css('margin-top', '20px');
+                cpf.parent().parent().hide();
+
+                cpf.removeAttr('required');
+                international_doc.removeAttr('required');
+
+                {% if config.cpf == config.CPF_REQUIRED %}
+                    international_doc.attr('required', 'required');
+                {% endif %}
+            {% endif %}
+            national_address.hide();
+            international_address.show();
+            doc_type.show();
+            state_international.show();
+            city_block.hide();
+            city_intern_block.show();
+
+            $('#id_person-state').removeAttr('required');
+            $('#id_person-city_name').removeAttr('required');
+            $('#id_person-street').removeAttr('required');
+            $('#id_person-number').removeAttr('required');
+            $('#id_person-village').removeAttr('required');
+            $('#id_person-state_international').removeAttr('required');
+            zip_code_el.removeAttr('required');
+            zip_intern_el.removeAttr('required');
+            {% if config and config.city is True %}
+                $('#id_person-city_international').attr('required', 'required');
+            {% endif %}
+
+            {% if config and config.address == config.ADDRESS_SHOW %}
+                zip_code_el.unbind('keyup');
+                zip_code_el.unmask();
+                zip_code_el.removeAttr('required');
+                zip_code_block_el.hide();
+                zip_code_intern_block_el.show();
+                $('#id_person-address_international').attr('required', 'required');
+                international_address.css('margin-top', '20px');
+            {% endif %}
+        }
+
+        function set_form_as_national() {
+            console.log('setting form as national.');
+
+            var country = $('#id_person-country');
+            var ddi_el = $('#id_person-ddi');
+            var phone_el = $('#id_person-phone');
+            var cpf = $('#id_person-cpf');
+            var international_doc = $('#id_person-international_doc');
+            var city_block = $('#brazilian_city_block');
+            var city_intern_block = $('#city_international_city_block');
+            var state_international = $('#state_international_block');
+
+            var zip_code_el = $('#id_person-zip_code');
+            var zip_code_block_el = $('#zip_code_block');
+            var zip_code_intern_el = $('#id_person-zip_code_international');
+            var zip_code_intern_block_el = $('#zip_code_international_block');
+            var international_address = $('#address_international_block');
+            var national_address = $('.national-address');
+            var doc_type = $('#doc-type');
+
+            country.parent().parent().parent().removeClass('col-md-7').addClass('col-md-12');
+
+            phone_el.mask("(99) 99999-9999");
+            phone_el.removeAttr('onkeyup');
+            phone_el.parent().parent().parent().find('label').css('margin-bottom', 0);
+            phone_el.closest('.form-group').css('margin-top', '20px');
+
+            cpf.parent().parent().show();
+            international_doc.parent().parent().hide();
+            cpf.removeAttr('required');
+            international_doc.removeAttr('required');
+
+            {% if config and config.cpf != config.CPF_HIDE %}
+                {% if config.cpf == config.CPF_REQUIRED %}
+                    cpf.attr('required', 'required');
+                    cpf.closest('.form-group').css('margin-top', '20px');
+                {% endif %}
+            {% endif %}
+
+            city_block.show();
+            city_intern_block.hide();
+            doc_type.hide();
+            state_international.hide();
+            international_address.hide();
+            national_address.show();
+            $('#id_person-address_international').removeAttr('required');
+            $('#id_person-state').removeAttr('required');
+            $('#id_person-city_name').removeAttr('required');
+            $('#id_person-city_international').removeAttr('required');
+            $('#id_person-state_international').removeAttr('required');
+            $('#id_person-street').attr('required', 'required');
+            $('#id_person_village').attr('required', 'required');
+            zip_code_intern_block_el.removeAttr('required');
+            {% if config and config.city is True %}
+                $('#id_person-state').attr('required', 'required');
+                $('#id_person-city_name').attr('required', 'required');
+            {% endif %}
+
+            {% if config and config.address == config.ADDRESS_SHOW %}
+                zip_code_block_el.show();
+                zip_code_el.on('keyup', function () {
+                    hotsiteSearchByCep();
+                });
+                zip_code_el.mask("99999-999");
+                zip_code_el.attr('required', 'required');
+
+                international_address.removeAttr('required');
+                zip_code_intern_block_el.hide();
+            {% endif %}
+        }
+
+        function set_if_international() {
+            var country = $('#id_person-country');
+            if (country.val() == 'BR') {
+                set_form_as_national();
+                return;
+            }
+            set_form_as_international();
+        }
 
     </script>
 
@@ -189,7 +345,10 @@
                                         required="required"
                                         onchange="window.location.href=window.location.pathname+'?lot='+$(this).val()">
                                     {% if not selected_lot %}
-                                        <option value="" disabled="disabled" selected="selected">- Selecione -</option>
+                                        <option value="" disabled="disabled"
+                                                selected="selected">- Selecione
+                                            -
+                                        </option>
                                     {% endif %}
 
                                     {% if stopped_lots %}
@@ -197,9 +356,12 @@
                                             {% for lot in stopped_lots %}
                                                 <option value="{{ lot.pk }}"
                                                         {% if selected_lot and selected_lot == lot.pk %}selected="selected"{% endif %}>
-                                                    {{ lot.display_publicly|truncatechars:60 }} - até: {{ lot.date_end|date:'d/m/Y H\hi' }}
+                                                    {{ lot.display_publicly|truncatechars:60 }}
+                                                    -
+                                                    até: {{ lot.date_end|date:'d/m/Y H\hi' }}
                                                     {% if lot.private %}
-                                                        <small>(privado)</small>
+                                                        <small>(privado)
+                                                        </small>
                                                     {% endif %}
                                                 </option>
                                             {% endfor %}
@@ -211,8 +373,12 @@
                                             {% for lot in running_lots %}
                                                 <option value="{{ lot.pk }}"
                                                         {% if selected_lot and selected_lot == lot.pk %}selected="selected"{% endif %}>
-                                                    {{ lot.display_publicly|truncatechars:60 }} - até: {{ lot.date_end|date:'d/m/Y H\hi' }}
-                                                    {% if lot.private %}<small>(privado)</small>{% endif %}
+                                                    {{ lot.display_publicly|truncatechars:60 }}
+                                                    -
+                                                    até: {{ lot.date_end|date:'d/m/Y H\hi' }}
+                                                    {% if lot.private %}
+                                                        <small>(privado)
+                                                        </small>{% endif %}
                                                 </option>
                                             {% endfor %}
                                         </optgroup>
@@ -223,8 +389,12 @@
                                             {% for lot in future_lots %}
                                                 <option value="{{ lot.pk }}"
                                                         {% if selected_lot and selected_lot == lot.pk %}selected="selected"{% endif %}>
-                                                    {{ lot.display_publicly|truncatechars:60 }} - até: {{ lot.date_end|date:'d/m/Y H\hi' }}
-                                                    {% if lot.private %}<small>(privado)</small>{% endif %}
+                                                    {{ lot.display_publicly|truncatechars:60 }}
+                                                    -
+                                                    até: {{ lot.date_end|date:'d/m/Y H\hi' }}
+                                                    {% if lot.private %}
+                                                        <small>(privado)
+                                                        </small>{% endif %}
                                                 </option>
                                             {% endfor %}
                                         </optgroup>
@@ -258,20 +428,42 @@
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-md-12">
-                                    {% render_generic_field form.country %}
+
+                                    {% render_generic_field form.name autofocus=True %}
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-9">
-                                    {% render_generic_field form.name autofocus=True %}
-
+                                <div class="col-md-8">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% render_generic_field form.country %}
+                                        </div>
+                                        <div class="col-md-5"
+                                             id="doc-type"
+                                             style="display: none">
+                                            {% render_generic_field form.international_doc_type %}
+                                        </div>
+                                    </div>
                                 </div>
+                                <div class="col-md-4">
+                                    {% if config and config.cpf != config.CPF_HIDE %}
+                                        {% if config.cpf == config.CPF_REQUIRED %}
+                                            {% render_generic_field form.cpf required=True hide=True %}
+                                            {% render_generic_field form.international_doc required=True hide=True %}
+                                        {% else %}
+                                            {% render_generic_field form.cpf %}
+                                            {% render_generic_field form.international_doc %}
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+
+
+                            </div>
+
+                            <div class="row">
                                 <div class="col-md-3">
                                     {% render_generic_field form.gender required=True %}
                                 </div>
-                            </div>
-
-                            <div class="row">
                                 <div class="col-md-9">
                                     {% if config %}
                                         {% render_generic_field form.email config.email False %}
@@ -279,19 +471,14 @@
                                         {% render_generic_field form.email %}
                                     {% endif %}
                                 </div>
-                                <div class="col-md-3">
-                                    {% if config and config.cpf != config.CPF_HIDE %}
-                                        {% if config.cpf == config.CPF_REQUIRED %}
-                                            {% render_generic_field form.cpf required=True %}
-                                        {% else %}
-                                            {% render_generic_field form.cpf %}
-                                        {% endif %}
-                                    {% endif %}
-                                </div>
+
+
                             </div>
 
                             <div class="row">
+
                                 {% if config and config.birth_date != config.BIRTH_DATE_HIDE %}
+
                                     <div class="col-md-6">
                                         {% if config.birth_date == config.BIRTH_DATE_REQUIRED %}
                                             {% render_generic_field form.birth_date required=True %}
@@ -301,23 +488,39 @@
                                     </div>
                                 {% endif %}
                                 <div class="col-md-6">
-                                    {% if config %}
-                                        {% render_generic_field form.phone config.phone False %}
-                                    {% else %}
-                                        {% render_generic_field form.phone %}
-                                    {% endif %}
+                                    {% render_generic_field form.phone required=config.phone use_required_field=False %}
+
+                                    <div style="display: none;">
+                                        {% if config %}
+                                            {% render_generic_field form.ddi required=config.phone use_required_field=False %}
+                                        {% else %}
+                                            {% render_generic_field form.ddi %}
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-12">
                                     {% if config and config.address == config.ADDRESS_HIDE %}
-                                        <div class="row">
+                                        <div class="row"
+                                             id="brazilian_city_block"
+                                             style="display:none">
                                             <div class="col-md-3 address-row">
                                                 {% render_generic_field form.state required=config.city %}
                                             </div>
                                             <div class="col-md-9 address-row">
                                                 {% render_generic_field form.city_name required=config.city %}
+                                            </div>
+                                        </div>
+                                        <div class="row"
+                                             id="city_international_city_block"
+                                             style="display:none">
+                                            <div class="col-md-6">
+                                                {% render_generic_field form.city_international required=True %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {% render_generic_field form.state_international required=True %}
                                             </div>
                                         </div>
                                     {% endif %}
@@ -352,17 +555,24 @@
                                 </div>
                             </div>
                             <div class="panel-body">
-                                <div class="row">
+                                <div class="row" id="zip_code_block">
                                     <div class="col-md-3">
-                                        {% render_generic_field form.zip_code %}
+                                        {% render_generic_field form.zip_code required=True %}
                                         <div id="cep_loader"
-                                             class="cep-loader-profile"
+                                             class="cep-loader-hotsite"
                                         >
                                             <img src="{% static 'assets/img/loader.gif' %}"/>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row address-row">
+                                <div class="row"
+                                     id="address_international_block"
+                                     style="display:none">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.address_international required=True %}
+                                    </div>
+                                </div>
+                                <div class="row national-address address-row">
                                     <div class="col-md-9">
                                         {% render_generic_field form.street %}
                                     </div>
@@ -374,11 +584,17 @@
                                     <div class="col-md-6 address-row">
                                         {% render_generic_field form.complement %}
                                     </div>
-                                    <div class="col-md-6 address-row">
+                                    <div class="col-md-6 national-address address-row">
                                         {% render_generic_field form.village %}
                                     </div>
+                                    <div class="col-md-6"
+                                         id="city_international_city_block">
+                                        {% render_generic_field form.city_international required=True %}
+                                    </div>
                                 </div>
-                                <div class="row">
+                                <div class="row"
+                                     id="brazilian_city_block"
+                                     style="display:none">
                                     <div class="col-md-3 address-row">
                                         {% render_generic_field form.state required=True %}
                                     </div>
@@ -386,6 +602,20 @@
                                         {% render_generic_field form.city_name required=True %}
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-md-6"
+                                         style="display:none"
+                                         id="state_international_block">
+                                        {% render_generic_field form.state_international %}
+                                    </div>
+                                    <div class="col-md-6"
+                                         style="display:none"
+                                         id="zip_code_international_block">
+                                        {% render_generic_field form.zip_code_international %}
+                                    </div>
+
+                                </div>
+
                             </div>
                         </div>
                     {% endif %}
@@ -404,7 +634,8 @@
                             <div class="panel-body">
 
                                 <div class="row">
-                                    <div class="col-md-12" id="survey_questions_block">
+                                    <div class="col-md-12"
+                                         id="survey_questions_block">
                                         {% for field in survey_form.visible_fields %}
                                             {% render_generic_field field %}
                                         {% endfor %}
