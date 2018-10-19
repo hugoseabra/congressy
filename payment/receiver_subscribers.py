@@ -45,7 +45,7 @@ class ReceiverSubscriber(object):
 
         self.added_amount += receiver.amount
 
-        if self.added_amount > self.amount:
+        if round(self.added_amount, 2) > round(self.amount, 2):
             raise exception.ReceiverTotalAmountExceeded(
                 'O valor dos recebedores já ultrapassa o valor a ser'
                 ' transacionado. Valor da transação: {0:.2f}. Valor somado'
