@@ -275,22 +275,22 @@
                                 else {
                                     if ($.inArray('sublocality_level_1', component.types) != -1) {
                                         $('#id_address_international').val(
-                                            $('#id_address_international').val()+
+                                            $('#id_address_international').val() +
                                             component.short_name + ' ');
                                     }
                                     if ($.inArray('street_number', component.types) != -1) {
-                                         $('#id_address_international').val(
-                                            $('#id_address_international').val()+
+                                        $('#id_address_international').val(
+                                            $('#id_address_international').val() +
                                             component.short_name + ' ');
                                     }
                                     if ($.inArray('route', component.types) != -1) {
-                                         $('#id_address_international').val(
-                                            $('#id_address_international').val()+
+                                        $('#id_address_international').val(
+                                            $('#id_address_international').val() +
                                             component.short_name + ' ');
                                     }
                                     if ($.inArray('neighborhood', component.types) != -1) {
-                                         $('#id_address_international').val(
-                                            $('#id_address_international').val()+
+                                        $('#id_address_international').val(
+                                            $('#id_address_international').val() +
                                             component.short_name + ' ');
                                     }
 
@@ -303,7 +303,7 @@
                                         $('#id_state_international').val(component.short_name)
                                     }
                                 }
-                                if ($.inArray('administrative_area_level_2', component.types) != -1) {
+                                if ($.inArray('locality', component.types) != -1) {
                                     if (country === 'BR') {
                                         city = component.short_name.toUpperCase();
                                     }
@@ -522,6 +522,10 @@
                     $('#id_complement').val('');
                     $('#id_village').val('');
                     $('#id_state').val('');
+                    $('#id_zip_code_international').val('');
+                    $('#id_address_international').val('');
+                    $('#id_state_international').val(' ');
+                    $('#id_city_international').val('');
                     {#$('#id_city_name').prop('disabled', true);#}
 
                     map_reload_timer = window.setTimeout(function () {

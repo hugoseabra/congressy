@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
@@ -26,7 +24,6 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
 
     def dispatch(self, request, *args, **kwargs):
         self.pre_dispatch()
-
         is_anonymous = self.request.user.is_anonymous
         is_in_org = False
         person = None
@@ -61,7 +58,6 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
                 pass
 
         response = super().dispatch(request, *args, **kwargs)
-
         return response
 
     def get_context_data(self, **kwargs):
