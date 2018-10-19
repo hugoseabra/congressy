@@ -205,7 +205,8 @@
                                         <small class="text-muted">
                                             {{ item.created|date:"d/m/Y H\hi" }}
                                         </small>
-
+                                        <p style="display: none;">{{ item.event.place.name }}</p>
+                                        <p style="display: none;">{{ item.event.place.city.name }}</p>
                                     </td>
 
                                     <td>

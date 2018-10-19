@@ -98,137 +98,221 @@
         var croppie_obj = undefined;
 
 
-            console.log(!$('#id_show_location').is(':checked'));
-            (function ($, window) {
+        console.log(!$('#id_show_location').is(':checked'));
+        (function ($, window) {
 
-                window.cgsy.maps.retrieveAddress = function () {
-                    console.log("Foi3");
-                    var name = $('#id_name');
-                    var street = $('#id_street');
-                    var city = $('#id_city_name :selected');
-                    var state = $('#id_state :selected');
-                    var zip_code = $('#id_zip_code');
+            window.cgsy.maps.retrieveAddress = function () {
+                var name = $('#id_name');
+                var country = $('#id_country');
+                var street = $('#id_street');
+                var city = $('#id_city_name :selected');
+                var state = $('#id_state :selected');
+                var zip_code = $('#id_zip_code');
 
-                    var address = name.val();
-                    {#                    address += ', ' + street.val();#}
-                    {#                    address += ', ' + city.text();#}
-                    {#                    address += ', ' + state.text();#}
-                    {#                    address += '. ' + zip_code.val();#}
+                var address = name.val();
+                {#                    address += ', ' + street.val();#}
+                {#                    address += ', ' + city.text();#}
+                {#                    address += ', ' + state.text();#}
+                {#                    address += '. ' + zip_code.val();#}
 
-                    var map = new window.google.maps.Map(
-                        document.getElementById("map"),
-                        {
-                            zoom: 18,
-                            center: {lat: 40.731, lng: -73.997}
-                        }
-                    );
+                var map = new window.google.maps.Map(
+                    document.getElementById("map"),
+                    {
+                        zoom: 18,
+                        center: {lat: 40.731, lng: -73.997}
+                    }
+                );
 
-                    window.cgsy.maps.searchByAddress(map, address);
-                };
+                window.cgsy.maps.searchByAddress(map, address);
+            };
 
-                window.cgsy.maps.hideMap = function () {
-                    $('#map').hide();
-                    $('#map_banner').show();
-                };
+            window.cgsy.maps.hideMap = function () {
+                $('#map').hide();
+                $('#map_banner').show();
+            };
 
-                window.cgsy.maps.showMap = function () {
-                    $('#map').show();
-                    $('#map_banner').hide();
-                };
+            window.cgsy.maps.showMap = function () {
+                $('#map').show();
+                $('#map_banner').hide();
+            };
 
-                window.cgsy.maps.init = function (lat, long, zoom) {
+            window.cgsy.maps.set_if_international = function () {
+                var country = $('#id_country');
+                if (country.val() === 'BR') {
+                    window.cgsy.maps.set_form_as_national();
+                    return;
+                }
+                window.cgsy.maps.set_form_as_international();
+            };
+            window.cgsy.maps.set_form_as_national = function () {
+                $('#zip-code-block').show();
+                $('#zip-code-international-block').hide();
+                $('#international-address-block').hide();
+                $('#street-block').show();
+                $('#national-address-block').show();
+                $('#village-block').show();
+                $('#national-state-block').show();
+                $('#international-state-block').hide();
+                $('#national-city-block').show();
+                $('#international-city-block').hide();
+
+            };
+
+            window.cgsy.maps.set_form_as_international = function () {
+                $('#zip-code-block').hide();
+                $('#zip-code-international-block').show();
+                $('#international-address-block').show();
+                $('#street-block').hide();
+                $('#national-address-block').hide();
+                $('#village-block').hide();
+                $('#national-state-block').hide();
+                $('#international-state-block').show();
+                $('#national-city-block').hide();
+                $('#international-city-block').show();
+
+            };
+
+            window.cgsy.maps.init = function (lat, long, zoom) {
+                $('#map-loader').show();
+                $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
+
+                var map = new window.google.maps.Map(
+                    document.getElementById("map"),
+                    {
+                        center: {
+                            lat: parseFloat(lat),
+                            lng: parseFloat(long)
+                        },
+                        zoom: parseInt(zoom) || 18
+                    }
+                );
+                window.cgsy.maps.addMarker(
+                    map,
+                    {lat: parseFloat(lat), lng: parseFloat(long)}
+                );
+            };
+
+            window.cgsy.maps.setCenter = function (map, location) {
+                map.setCenter(location);
+            };
+
+            window.cgsy.maps.addMarker = function (map, location) {
+                window.cgsy.maps.showMap();
+
+                window.cgsy.maps.setCenter(map, location);
+
+                var marker = new window.google.maps.Marker({
+                    position: location,
+                    map: map,
+                    draggable: true
+                });
+
+                var lat_el = $('#id_lat');
+                var lng_el = $('#id_long');
+                var zoom_el = $('#id_zoom');
+
+                lat_el.val(marker.position.lat());
+                lng_el.val(marker.position.lng());
+                zoom_el.val(map.getZoom());
+
+                window.google.maps.event.addListener(marker, 'dragend', function () {
+                    lat_el.val(marker.position.lat());
+                    lng_el.val(marker.position.lng());
+                });
+
+                window.google.maps.event.addListener(map, 'zoom_changed', function () {
+                    zoom_el.val(map.getZoom());
+                });
+
+                $('#map-loader').hide();
+                $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
+            };
+
+            window.cgsy.maps.searchByAddress = function (map, address) {
+                if ($('#id_show_location').is(':checked') === true) {
                     $('#map-loader').show();
                     $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
 
-                    var map = new window.google.maps.Map(
-                        document.getElementById("map"),
-                        {
-                            center: {
-                                lat: parseFloat(lat),
-                                lng: parseFloat(long)
-                            },
-                            zoom: parseInt(zoom) || 18
+                    var geocoder = new window.google.maps.Geocoder;
+                    geocoder.geocode({'address': address}, function (results, status) {
+                        if (status !== 'OK') {
+                            $('#map-loader').hide();
+                            $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
+                            $('#error-maps').show();
+                            $('#id_city_name').prop('disabled', false);
+                            return;
                         }
-                    );
-                    window.cgsy.maps.addMarker(
-                        map,
-                        {lat: parseFloat(lat), lng: parseFloat(long)}
-                    );
-                };
-
-                window.cgsy.maps.setCenter = function (map, location) {
-                    map.setCenter(location);
-                };
-
-                window.cgsy.maps.addMarker = function (map, location) {
-                    window.cgsy.maps.showMap();
-
-                    window.cgsy.maps.setCenter(map, location);
-
-                    var marker = new window.google.maps.Marker({
-                        position: location,
-                        map: map,
-                        draggable: true
-                    });
-
-                    var lat_el = $('#id_lat');
-                    var lng_el = $('#id_long');
-                    var zoom_el = $('#id_zoom');
-
-                    lat_el.val(marker.position.lat());
-                    lng_el.val(marker.position.lng());
-                    zoom_el.val(map.getZoom());
-
-                    window.google.maps.event.addListener(marker, 'dragend', function () {
-                        lat_el.val(marker.position.lat());
-                        lng_el.val(marker.position.lng());
-                    });
-
-                    window.google.maps.event.addListener(map, 'zoom_changed', function () {
-                        zoom_el.val(map.getZoom());
-                    });
-
-                    $('#map-loader').hide();
-                    $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
-                };
-
-                window.cgsy.maps.searchByAddress = function (map, address) {
-                    if ($('#id_show_location').is(':checked') === true) {
-                        $('#map-loader').show();
-                        $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
-
-                        var geocoder = new window.google.maps.Geocoder;
-                        geocoder.geocode({'address': address}, function (results, status) {
-                            if (status !== 'OK') {
-                                $('#map-loader').hide();
-                                $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
-                                $('#error-maps').show();
-                                $('#id_city_name').prop('disabled', false);
-                                return;
-                            }
-                            var components = results[0].address_components;
-                            if (components.length) {
-                                $('#error-maps').hide();
-                                var uf, city;
-                                $.each(components, function (i, component) {
-                                    if ($.inArray('postal_code', component.types) != -1) {
+                        var components = results[0].address_components;
+                        if (components.length) {
+                            $('#error-maps').hide();
+                            var uf, city;
+                            $.each(components, function (i, component) {
+                                if ($.inArray('country', component.types) != -1) {
+                                    $('#id_country').val(component.short_name);
+                                }
+                            });
+                            var country = $('#id_country').val();
+                            window.cgsy.maps.set_if_international();
+                            $('#id_address_international').val('');
+                            $.each(components, function (i, component) {
+                                if ($.inArray('postal_code', component.types) != -1) {
+                                    if (country === 'BR') {
                                         $('#id_zip_code').val(component.short_name);
                                         searchByCep();
                                     }
+                                    else {
+                                        $('#id_zip_code_international').val(component.short_name);
+                                    }
+                                }
+                                if (country === 'BR') {
                                     if ($.inArray('sublocality_level_1', component.types) != -1) {
                                         $('#id_street').val(component.short_name);
                                     }
                                     if ($.inArray('street_number', component.types) != -1) {
                                         $('#id_number').val(component.short_name);
                                     }
-                                    if ($.inArray('administrative_area_level_1', component.types) != -1) {
+                                }
+                                else {
+                                    if ($.inArray('sublocality_level_1', component.types) != -1) {
+                                        $('#id_address_international').val(
+                                            $('#id_address_international').val()+
+                                            component.short_name + ' ');
+                                    }
+                                    if ($.inArray('street_number', component.types) != -1) {
+                                         $('#id_address_international').val(
+                                            $('#id_address_international').val()+
+                                            component.short_name + ' ');
+                                    }
+                                    if ($.inArray('route', component.types) != -1) {
+                                         $('#id_address_international').val(
+                                            $('#id_address_international').val()+
+                                            component.short_name + ' ');
+                                    }
+                                    if ($.inArray('neighborhood', component.types) != -1) {
+                                         $('#id_address_international').val(
+                                            $('#id_address_international').val()+
+                                            component.short_name + ' ');
+                                    }
+
+                                }
+                                if ($.inArray('administrative_area_level_1', component.types) != -1) {
+                                    if (country === 'BR') {
                                         uf = component.short_name;
                                     }
-                                    if ($.inArray('administrative_area_level_2', component.types) != -1) {
+                                    else {
+                                        $('#id_state_international').val(component.short_name)
+                                    }
+                                }
+                                if ($.inArray('administrative_area_level_2', component.types) != -1) {
+                                    if (country === 'BR') {
                                         city = component.short_name.toUpperCase();
                                     }
-                                });
-
+                                    else {
+                                        $('#id_city_international').val(component.short_name);
+                                    }
+                                }
+                            });
+                            if ($('#id_country').val() === 'BR') {
                                 if (uf) {
                                     $('#id_state').val(uf);
 
@@ -252,13 +336,14 @@
                                     }
                                 }
                             }
+                        }
 
-                            var location = results[0].geometry.location;
-                            window.cgsy.maps.addMarker(map, location);
-                        });
-                    }
+                        var location = results[0].geometry.location;
+                        window.cgsy.maps.addMarker(map, location);
+                    });
                 }
-            })(jQuery, window);
+            }
+        })(jQuery, window);
 
 
         function resize_status_block() {
@@ -423,6 +508,7 @@
 
             (function ($) {
                 var map_reload_timer = null;
+                window.cgsy.maps.set_if_international();
 
                 function reloadMap() {
                     $('#map-loader').show();
@@ -447,6 +533,9 @@
                     if (e.which === 13) {
                         reloadMap();
                     }
+                });
+                $('#id_country').on('change', function () {
+                    window.cgsy.maps.set_if_international();
                 });
                 $('#reload-map-button').on('click', function () {
                     reloadMap();
@@ -764,20 +853,34 @@
                                         </div>
                                     </div>
                                     <div class="row address-row">
-                                        <div class="col-md-6 col-xl-4">
-                                            {% render_generic_field form.zip_code help_text='Informe o CEP para encontrar o endereço.' %}
-                                            <div id="cep_loader" style="width: 22px;position: absolute;
+                                        <div class="col-md-6 col-xl-6">
+                                            <div id="zip-code-block">
+                                                {% render_generic_field form.zip_code help_text='Informe o CEP para encontrar o endereço.' %}
+                                                <div id="cep_loader" style="width: 22px;position: absolute;
                                              top: 33px;right: 33px;">
-                                                <img src="{% static 'assets/img/loader.gif' %}"/>
+                                                    <img src="{% static 'assets/img/loader.gif' %}"/>
+                                                </div>
                                             </div>
+                                            <div id="zip-code-international-block">
+                                                {% render_generic_field form.zip_code_international %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xl-6">
+                                            {% render_generic_field form.country %}
                                         </div>
                                     </div>
                                     <div class="row address-row">
                                         <div class="col-md-12">
-                                            {% render_generic_field form.street %}
+                                            <div id="street-block">
+                                                {% render_generic_field form.street %}
+                                            </div>
+                                            <div id="international-address-block">
+                                                {% render_generic_field form.address_international %}
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="row address-row">
+                                    <div id="national-address-block"
+                                         class="row address-row">
                                         <div class="col-md-6">
                                             {% render_generic_field form.number %}
                                         </div>
@@ -785,17 +888,28 @@
                                             {% render_generic_field form.complement %}
                                         </div>
                                     </div>
-                                    <div class="row address-row">
+                                    <div id="village-block"
+                                         class="row address-row">
                                         <div class="col-md-12">
                                             {% render_generic_field form.village %}
                                         </div>
                                     </div>
                                     <div class="row address-row">
                                         <div class="col-md-4 address-row">
-                                            {% render_generic_field form.state %}
+                                            <div id="national-state-block">
+                                                {% render_generic_field form.state %}
+                                            </div>
+                                            <div id="international-state-block">
+                                                {% render_generic_field form.state_international %}
+                                            </div>
                                         </div>
                                         <div class="col-md-8 address-row">
-                                            {% render_generic_field form.city_name %}
+                                            <div id="national-city-block">
+                                                {% render_generic_field form.city_name %}
+                                            </div>
+                                            <div id="international-city-block">
+                                                {% render_generic_field form.city_international %}
+                                            </div>
                                         </div>
                                     </div>
                                     <hr/>

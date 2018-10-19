@@ -158,7 +158,7 @@
                                     <th>Nome</th>
                                     <th>Categoria
                                     </th>
-                                    <th>Tipo</th>
+                                    <th>Cidade</th>
                                     <th># Insc.</th>
                                     <th></th>
                                 </tr>
@@ -196,9 +196,9 @@
                                         <td>{{ event.category.name }}</td>
 
                                         <td>
-                                            {% if event.is_scientific %}
-                                                Científico
-                                            {% endif %}
+                                            <p style="display: none">{{ event.place.name }}</p>
+                                            {{ event.place.city.name|lower|capfirst }}
+
                                         </td>
                                     
                                         <td>
