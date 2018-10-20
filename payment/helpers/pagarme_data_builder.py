@@ -203,8 +203,8 @@ class PagarmeDataBuilder:
                 "street": person.address_international,
                 "country": person.country.lower(),
                 "city": person.city_international,
-                "state": person.state_international or '',
-                "zipcode": person.zip_code_international or '',
+                "state": person.state_international,
+                "zipcode": person.zip_code_international or '000',
             })
 
         data['billing'] = {
