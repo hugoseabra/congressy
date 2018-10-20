@@ -99,6 +99,7 @@ class SubscriptionPersonForm(PersonForm):
             else:
                 required_fields.append('city_international')
                 required_fields.append('address_international')
+                required_fields.append('state_international')
 
         if event_is_payable or config.cpf_required:
             if country == 'BR':
