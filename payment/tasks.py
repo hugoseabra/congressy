@@ -1,6 +1,7 @@
 import json
 import logging
 from datetime import datetime
+from pprint import pprint
 
 import pagarme
 from django.conf import settings
@@ -33,6 +34,10 @@ def create_pagarme_transaction(subscription,
     try:
         trx = pagarme.transaction.create(data)
     except Exception as e:
+
+        pprint(e)
+        pprint(data)
+
         errors_msg = []
         if hasattr(e, 'args'):
             errors = [errs for errs in e.args]
