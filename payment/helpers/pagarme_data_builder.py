@@ -203,9 +203,13 @@ class PagarmeDataBuilder:
                 "street": person.address_international,
                 "country": person.country.lower(),
                 "city": person.city_international,
-                "state": person.state_international or '',
-                "zipcode": person.zip_code_international or '',
+                "state": person.state_international,
             })
+
+            if person.zip_code:
+                billing_address.update({
+                    "zipcode": person.zip_code_international,
+                })
 
         data['billing'] = {
             "name": person.name,
