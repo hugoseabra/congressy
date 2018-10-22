@@ -45,13 +45,13 @@ class ReceiverSubscriber(object):
 
         self.added_amount += receiver.amount
 
-        if self.added_amount > self.amount:
+        if round(self.added_amount, 2) > round(self.amount, 2):
             raise exception.ReceiverTotalAmountExceeded(
                 'O valor dos recebedores já ultrapassa o valor a ser'
-                ' transacionado. Valor da transação: {0:.2f}. Valor somado'
-                ' dos recebedores: {0:.2f}.'.format(
-                    self.amount,
-                    self.added_amount,
+                ' transacionado. Valor da transação: {}. Valor somado'
+                ' dos recebedores: {}.'.format(
+                    round(self.amount, 2),
+                    round(self.added_amount, 2),
                 )
             )
 
@@ -163,7 +163,7 @@ class ReceiverPublisher(object):
         # Soma do montante distribuído entre as partes.
         total_splitable_amount = round(org_amount + cgsy_amount, 2)
 
-        if self.amount > total_splitable_amount:
+        if round(self.amount, 2) > round(total_splitable_amount, 2):
             # A diferença que há no montante a ser transacionado irá para a
             # Congressy, por já estar embutidas taxas e juros de parcelamento,
             # se houver.
@@ -213,8 +213,6 @@ class ReceiverPublisher(object):
             processing_fee_responsible=True,
         )
 
-        self.receiver_subscriber.publish(cgsy_receiver)
-
         # Parceiros irão participar do rateamento de inscrições
         partner_receivers = \
             cgsy_receiver.create_and_publish_partners(self.subscription)
@@ -222,6 +220,8 @@ class ReceiverPublisher(object):
         if partner_receivers:
             for partner_receiver in partner_receivers:
                 self.receiver_subscriber.publish(partner_receiver)
+
+        self.receiver_subscriber.publish(cgsy_receiver)
 
         org_receiver = receivers.OrganizerReceiver(
             type=RECEIVER_TYPE_SUBSCRIPTION,
