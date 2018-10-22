@@ -397,9 +397,8 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
                     self.clear_session_exhibition_code()
                     return redirect('public:hotsite', slug=self.event.slug)
 
-            if self.event.is_scientific:
-                if not self.event.work_config or not \
-                        self.event.work_config.is_configured:
+            if self.event.is_scientific and hasattr(self.event, 'work_config'):
+                if not self.event.work_config.is_configured:
                     return redirect('public:hotsite', slug=self.event.slug)
 
             return super().dispatch(request, *args, **kwargs)
