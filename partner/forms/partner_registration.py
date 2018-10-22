@@ -107,20 +107,20 @@ class PartnerRegistrationForm(PersonForm):
     def clean_email(self):
         return self.data.get('email').lower()
 
-    def clean(self):
-
-        cleaned_data = super(PartnerRegistrationForm, self).clean()
-
-        email = cleaned_data.get('email')
-
-        try:
-            self.user = User.objects.get(username=email)
-            raise forms.ValidationError(
-                "Esse email já existe em nosso sistema. Tente novamente.")
-        except User.DoesNotExist:
-            pass
-
-        return cleaned_data
+    # def clean(self):
+    #
+    #     cleaned_data = super(PartnerRegistrationForm, self).clean()
+    #
+    #     email = cleaned_data.get('email')
+    #
+    #     try:
+    #         self.user = User.objects.get(username=email)
+    #         raise forms.ValidationError(
+    #             "Esse email já existe em nosso sistema. Tente novamente.")
+    #     except User.DoesNotExist:
+    #         pass
+    #
+    #     return cleaned_data
 
 
 class FullPartnerRegistrationForm(CombinedFormBase):
