@@ -32,6 +32,12 @@ class PartnerRegistrationForm(PersonForm):
         }
 
     def __init__(self, *args, **kwargs):
+
+        instance = kwargs.get('instance')
+        if instance:
+            if hasattr(instance, 'person'):
+                kwargs['instance'] = instance.person
+
         super(PartnerRegistrationForm, self).__init__(*args, **kwargs)
         self.fields['phone'].required = True
         self.fields['email'].required = True
