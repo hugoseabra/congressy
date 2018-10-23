@@ -32,7 +32,6 @@ class TransactionStatus(models.Model):
     class Meta:
         verbose_name = 'Status de Transação'
         verbose_name_plural = 'Status de Transações'
-        ordering = ['date_created']
 
     def __str__(self):
         return self.transaction.subscription.person.name + ' - ' \
