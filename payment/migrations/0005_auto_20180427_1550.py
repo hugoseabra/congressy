@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='transactionstatus',
-            options={'ordering': ['date_created'], 'verbose_name': 'Status de Transação', 'verbose_name_plural': 'Status de Transações'},
+            options={'verbose_name': 'Status de Transação', 'verbose_name_plural': 'Status de Transações'},
         ),
         migrations.AlterField(
             model_name='bankaccount',
