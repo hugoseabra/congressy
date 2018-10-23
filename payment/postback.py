@@ -1,7 +1,9 @@
 from decimal import Decimal
 
-from payment.exception import PostbackValueError, PostbackAmountDiscrepancyError
+from payment.exception import PostbackValueError, \
+    PostbackAmountDiscrepancyError
 from payment.helpers import TransactionDirector
+from payment.transaction_status_collection import TransactionStatusCollection
 from .models import Transaction
 
 
@@ -17,12 +19,14 @@ class Postback(object):
                  transaction_pk: str,
                  transaction_status: str,
                  transaction_type: str,
-                 transaction_amount: Decimal) -> None:
+                 transaction_amount: Decimal,
+                 transaction_hitsory: TransactionStatusCollection) -> None:
 
         self.transaction_pk = transaction_pk
         self.transaction_status = transaction_status
         self.transaction_amount = transaction_amount
         self.transaction_type = transaction_type
+        self.transaction_history = transaction_hitsory
 
         super().__init__()
 
@@ -32,6 +36,7 @@ class Postback(object):
         self._validate(payload)
 
         new_status = payload.get('current_status')
+
         # Se não irá mudar o status de transação, não há o que processar.
         if self.transaction_status == new_status:
             return self.transaction_status
@@ -42,9 +47,34 @@ class Postback(object):
             old_status=self.transaction_status,
         ).direct()
 
+        # Verifica se o status realmente mudou.
+        if self.transaction_status == status:
+            # Em caso de ser o mesmo status, vamos verificar se o ID de
+            # transação no pagar.me é a mesma. Caso tenha mudado, significa que
+            # houve um pedido de transação interna que o pagar.me reprocessou e
+            # mudou o status que pode não ser conforme a máquina de estado
+            # de status de transação.
+            last_status = self.transaction_history.last()
+            saved_payload_id = last_status['data']['id']
+            payload_id = payload.get('id')
+
+            if saved_payload_id != payload_id:
+                # reseta regras de máquinas de status, ignorando a verificação.
+                status = new_status
+
         return status
 
     def _validate(self, payload: dict):
+
+        key = 'id'
+        if not payload.get(key):
+            msg = "No transaction ID in payload data"
+            raise PostbackValueError(
+                transaction_pk=self.transaction_pk,
+                message=msg,
+                payload=payload,
+                missing_key_name=key,
+            )
 
         # Garantindo que temos o novo status no payload
         key = 'current_status'

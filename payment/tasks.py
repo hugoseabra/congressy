@@ -234,3 +234,12 @@ def create_pagarme_recipient(recipient_dict):
         raise RecipientError(message='Unknown API error')
 
     return recipient
+
+
+def fetch_transaction(pagarme_transaction_id) -> dict:
+    try:
+        return pagarme.transaction.find_by_id(pagarme_transaction_id)
+
+    except Exception as e:
+        print(e)
+        return dict()
