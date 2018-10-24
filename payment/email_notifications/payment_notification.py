@@ -8,7 +8,6 @@ class PaymentNotification(object):
 
     def __init__(self, transaction: Transaction) -> None:
         self.transaction = transaction
-        super().__init__()
 
     def notify(self):
 

@@ -78,9 +78,9 @@ class CreditCardPaymentNotification(object):
 
         else:
             raise PostbackNotificationError(
-                "Status de transação desconhecido para notificar "
-                "inscrição pendente: {}"
-                "".format(self.transaction.status),
+                message="Status de transação desconhecido para notificar "
+                        "inscrição pendente: {}"
+                        "".format(self.transaction.status),
                 transaction_pk=str(self.transaction.pk),
             )
 
