@@ -29,6 +29,9 @@ class Command(BaseCommand):
                 # Mantem referência no objeto
                 transaction.subscription = subscription
 
+                if subscription.notified is False:
+                    notifiers.append(PaymentNotification(transaction))
+
                 self._print_subscription(subscription)
 
             self.stdout.write(self.style.SUCCESS('Enviando vouchers ...'))
@@ -41,11 +44,14 @@ class Command(BaseCommand):
     def _print_subscription(self, subscription: Subscription):
         self.stdout.write(self.style.SUCCESS(
             " Atualizando inscrição PK: {}\n"
-            "    Evento: {}({})\n"
-            "    Nome do Participante: {}\n".format(
-                str(subscription.pk),
+            "    Evento: {} ({})\n"
+            "    Nome do Participante: {} (ID: {})\n"
+            "    E-mail do Participante: {}\n".format(
+                subscription.pk,
                 subscription.event.name,
                 subscription.event.pk,
                 subscription.person.name,
+                subscription.person.pk,
+                subscription.person.email,
             )
         ))
