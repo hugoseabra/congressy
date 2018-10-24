@@ -36,8 +36,12 @@ class PagarmeDataBuilder:
         self.liquid_amount = Decimal(0)
         self.has_expiration_date = False
 
+        event = subscription.event
+
         lot = subscription.lot
         self.metadata_items = {
+            'organização': event.organization.name,
+            'evento': event.name,
             'lote': '{} ({})'.format(lot.display_publicly, lot.pk),
             'código': subscription.code,
         }
