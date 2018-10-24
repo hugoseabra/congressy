@@ -23,7 +23,6 @@ class Command(BaseCommand):
             notifiers = list()
             for transaction in transactions:
                 subscription = transaction.subscription
-                notifiers.append(PaymentNotification(transaction))
 
                 subscription.status = Subscription.CONFIRMED_STATUS
                 subscription.save()
