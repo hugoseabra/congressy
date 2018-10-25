@@ -1,7 +1,7 @@
 import abc
 import json
 import locale
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 from csv import DictReader
 
 from openpyxl import Workbook, styles
@@ -170,16 +170,20 @@ class XLSLotExamplePersister(XLSPersister):
         self.bold = styles.Font(bold=True)
         super().__init__()
 
-    def _get_header(self) -> dict:
+    def _get_header(self) -> list:
 
-        headers_map = dict()
+        headers = list()
+        Header = namedtuple('Header',
+                            ['title', 'required', 'possible_options', ])
 
         form_config = self.lot.event.formconfig
         keys_mapping_list = get_keys_mapping_dict(form_config=form_config)
         for item in keys_mapping_list:
-            header = item['mapping']['csv_keys'][0]
-            required = item['required']
-            headers_map.update({header: required})
+            headers.append(Header(
+                title=item['mapping']['csv_keys'][0],
+                required=item['required'],
+                possible_options=list()
+            ))
 
         survey = None
         if self.lot.event_survey:
@@ -193,13 +197,23 @@ class XLSLotExamplePersister(XLSPersister):
             for question in questions:
                 cleaned_label = question.label.lower().strip().replace('?', '')
                 required = question.required
-                headers_map.update({cleaned_label: required})
 
-        return headers_map
+                options = question.options.all()
+                options_list = list()
+                for option in options:
+                    options_list.append(option.name)
+
+                headers.append(Header(
+                    title=cleaned_label,
+                    required=required,
+                    possible_options=options_list
+                ))
+
+        return headers
 
     def make(self) -> bytes:
 
-        headers = self._get_header()
+        headers_list = self._get_header()
 
         stream = BytesIO()
 
@@ -212,16 +226,33 @@ class XLSLotExamplePersister(XLSPersister):
         ws1.title = 'Planilha de exemplo -  {}'.format(self.lot.name)
 
         i = 1
-        for item in headers.items():
+        for header in headers_list:
             letter = self.colnum_string(i)
             cell = letter.upper() + str(1)
+            ws1[cell] = header.title
 
-            header = item[0].upper()
-            required = item[1]
-            ws1[cell] = header
-            if required:
+            comment = None
+            if header.required and len(header.possible_options) > 0:
+                msg = 'Pergunta obrigatória\n'
+                msg += 'Possiveis respostas\n\n'
+                for opt in header.possible_options:
+                    msg += opt + "\n"
+                comment = Comment(msg, 'Congressy')
+                comment.width = 300
                 ws1[cell].font = self.bold
-                ws1[cell].comment = Comment("Obrigatório", 'Congressy')
+            elif header.required:
+                comment = Comment('Pergunta obrigatória', 'Congressy')
+                ws1[cell].font = self.bold
+            elif len(header.possible_options) > 0:
+                msg = 'Possiveis respostas\n\n'
+                for opt in header.possible_options:
+                    msg += opt + "\n"
+
+                comment.width = 300 
+                comment = Comment(msg, 'Congressy')
+
+            if comment:
+                ws1[cell].comment = comment
 
             i += 1
 
