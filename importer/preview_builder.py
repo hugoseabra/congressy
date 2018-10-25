@@ -6,8 +6,7 @@ from importer.line_data import LineDataCollection
 
 class PreviewBuilder(object):
     """
-        Essa classe serve como helper para as view que a usa para gerar preview 
-        dos dados passados para essa factory. 
+        Essa classe serve como helper para as view que a usa para gerar preview  
     """
 
     def __init__(self, ldc: LineDataCollection, lot: Lot):
