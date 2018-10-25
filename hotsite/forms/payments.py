@@ -72,14 +72,14 @@ class PaymentForm(forms.Form):
         self.person = subscription.person
         self.lot_instance = selected_lot
 
+        self.subscription_debt_form = None
+        self.product_debt_forms = list()
+        self.service_debt_forms = list()
+
         # Caso a inscrição exista e o lote for diferente, altera o lote.
         self.subscription.lot = self.lot_instance
 
         super().__init__(**kwargs)
-
-        self.subscription_debt_form = self._create_subscription_debt_form()
-        self.product_debt_forms = self._create_product_debt_forms()
-        self.service_debt_forms = self._create_service_debt_forms()
 
         lot = copy(self.lot_instance)
         lot.price = lot.get_calculated_price()
@@ -152,6 +152,8 @@ class PaymentForm(forms.Form):
         #         ' gratuitas.'
         #     )
 
+        self.subscription_debt_form = self._create_subscription_debt_form()
+
         if not self.subscription_debt_form.is_valid():
             error_msgs = []
             for field, errs in self.subscription_debt_form.errors.items():
@@ -160,6 +162,8 @@ class PaymentForm(forms.Form):
             raise forms.ValidationError(
                 'Dados de pendência inválidos: {}'.format("".join(error_msgs))
             )
+
+        self.product_debt_forms = self._create_product_debt_forms()
 
         for debt_form in self.product_debt_forms:
             if not debt_form.is_valid():
@@ -171,6 +175,8 @@ class PaymentForm(forms.Form):
                     'Dados de pendência de opcionais inválidos:'
                     ' {}'.format("".join(error_msgs))
                 )
+
+        self.service_debt_forms = self._create_service_debt_forms()
 
         for debt_form in self.service_debt_forms:
             if not debt_form.is_valid():
@@ -229,8 +235,8 @@ class PaymentForm(forms.Form):
                 )
                 raise TransactionError(
                     'Erro interno ao realizar transação. A equipe técnica já'
-                    ' foi informa e este erro será resolvido dentro de alguns'
-                    ' minutos.'
+                    ' foi informada e este erro será resolvido dentro de'
+                    ' alguns minutos.'
                 )
 
             except TransactionMisconfiguredError as e:
@@ -268,8 +274,6 @@ class PaymentForm(forms.Form):
     def _create_subscription_debt_form(self):
         """ Cria formulário de pendência financeira de inscrição. """
 
-        installments = self.data.get('payment-installments', 1) or 1
-
         debt_kwargs = {
             'subscription': self.subscription,
             'data': {
@@ -279,7 +283,7 @@ class PaymentForm(forms.Form):
                 ),
                 'item_id': str(self.subscription.pk),
                 'amount': self.subscription.lot.get_calculated_price(),
-                'installments': installments,
+                'installments': self.cleaned_data.get('installments'),
                 'status': Debt.DEBT_STATUS_DEBT,
                 'type': Debt.DEBT_TYPE_SUBSCRIPTION,
             }
@@ -329,8 +333,7 @@ class PaymentForm(forms.Form):
                     ),
                     'item_id': str(service.optional.pk),
                     'amount': service.optional.price,
-                    # parcelamento sempre 1
-                    'installments': 1,
+                    'installments': self.cleaned_data.get('installments'),
                     'status': Debt.DEBT_STATUS_DEBT,
                     'type': Debt.DEBT_TYPE_SERVICE,
                 }
@@ -370,8 +373,7 @@ class PaymentForm(forms.Form):
                     ),
                     'item_id': str(product.optional.pk),
                     'amount': product.optional.price,
-                    # parcelamento sempre 1
-                    'installments': 1,
+                    'installments': self.cleaned_data.get('installments'),
                     'status': Debt.DEBT_STATUS_DEBT,
                     'type': Debt.DEBT_TYPE_PRODUCT,
                 }
