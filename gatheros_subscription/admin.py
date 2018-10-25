@@ -111,17 +111,21 @@ class SubscriptionAdmin(admin.ModelAdmin):
         'person__uuid',
         'person__name',
         'person__email',
+        'person__cpf',
         'created',
         'event__name',
     )
-    list_display = ('person', 'count', 'lot', 'code',)
+    list_display = ('person', 'event_count', 'lot', 'code', 'completed',)
     list_filter = ('completed',)
     readonly_fields = [
         'event',
         'code',
         'count',
-        'completed',
+        'event_count',
         'synchronized',
+        'attended',
+        'completed',
+        'created_by',
         'congressy_percent',
     ]
     ordering = ('lot', 'count', 'person',)
