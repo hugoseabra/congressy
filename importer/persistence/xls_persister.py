@@ -195,7 +195,7 @@ class XLSLotExamplePersister(XLSPersister):
             ).order_by('order')
 
             for question in questions:
-                cleaned_label = question.label.lower().strip().replace('?', '')
+                cleaned_label = question.label.lower().strip()
                 required = question.required
 
                 options = question.options.all()
