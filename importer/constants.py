@@ -134,3 +134,14 @@ KEY_MAP = {
 REQUIRED_KEYS = [
     'name',
 ]
+
+
+def extract_key_by_verbose_name(verbose_key):
+    for key, item in KEY_MAP.items():
+
+        verbose_name = item['verbose_name']
+
+        if verbose_key == verbose_name:
+            return key
+
+    return None

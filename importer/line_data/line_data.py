@@ -150,6 +150,9 @@ class LineData(object):
             if not i[0].startswith('_'):
                 yield i
 
+    def get(self, key):
+        return self.__dict__.get(key)
+
     def get_invalid_keys(self, survey: Survey = None):
 
         invalid_keys = list()

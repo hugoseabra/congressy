@@ -28,7 +28,7 @@ from importer.persistence import (
     CSVCorrectionPersister,
     CSVCityCorrectionPersister,
 )
-from importer.preview_renderer import PreviewRenderer
+from importer.preview_builder import PreviewBuilder
 from importer.question_mapping import QuestionMapping
 from .mixins import CSVViewMixin, CSVProcessedViewMixin
 
@@ -241,22 +241,29 @@ class CSVPrepareView(CSVProcessedViewMixin):
 
     def get_html_preview_table(self) -> str:
 
-        line_data_collection = self.get_data_collection(size=25)
+        previewer = PreviewBuilder(
+            ldc=self.get_data_collection(size=25),
+            audience_lot=self.object.audience_lot,
+        )
 
-        preview_table = PreviewRenderer(
-            line_data_collection).render_html_table()
-
-        return preview_table
+        return previewer.render_html_table()
 
     def get_invalid_keys(self):
         line_data_collection = self.get_data_collection(size=1)
+        invalid = list()
 
-        survey = None
+        if len(line_data_collection) > 0:
+
+            survey = None
 
         if self.object.lot.event_survey:
             survey = self.object.lot.event_survey.survey
+            if self.object.audience_lot.audience_category.event_survey:
+                survey = self.object.audience_lot.audience_category.event_survey.survey
 
-        return line_data_collection[0].get_invalid_keys(survey)
+            invalid = line_data_collection[0].get_invalid_keys(survey)
+
+        return invalid
 
 
 class CSVErrorXLSView(CSVViewMixin):
