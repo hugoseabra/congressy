@@ -150,14 +150,21 @@ class MixSubscription(object):
         person = self._create_updated_person()
         lot = self.mix_lot.lot
 
-        return Subscription.objects.create(
-            event=lot.event,
-            lot=lot,
-            person=person,
-            created_by=1,
-            completed=True,
-            test_subscription=False,
-        )
+        try:
+            return Subscription.objects.get(
+                event=lot.event,
+                person=person,
+            )
+
+        except Subscription.DoesNotExist:
+            return Subscription.objects.create(
+                event=lot.event,
+                lot=lot,
+                person=person,
+                created_by=1,
+                completed=True,
+                test_subscription=False,
+            )
 
     def _create_updated_person(self):
 

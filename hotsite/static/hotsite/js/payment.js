@@ -39,7 +39,7 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
         var enable_boleto = false;
 
         var _amount_as_payment = function(amount) {
-            var split = String(amount).split('.');
+            var split = String(amount.toFixed(2)).split('.');
             var cents = String(split[1]);
             if (split.length === 1) {
                 cents = '00';

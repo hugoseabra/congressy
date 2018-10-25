@@ -32,14 +32,6 @@ class Receiver(object):
         self.processing_fee_responsible = processing_fee_responsible
 
     @property
-    def amount(self) -> Decimal:
-        return self.__amount
-
-    @amount.setter
-    def amount(self, amount: Decimal) -> None:
-        self.__amount = round(amount, 2)
-
-    @property
     def chargeback_responsible(self) -> bool:
         return self.__chargeback_responsible
 

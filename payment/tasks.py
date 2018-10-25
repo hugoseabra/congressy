@@ -1,6 +1,7 @@
 import json
 import logging
 from datetime import datetime
+from pprint import pprint
 
 import pagarme
 from django.conf import settings
@@ -33,6 +34,10 @@ def create_pagarme_transaction(subscription,
     try:
         trx = pagarme.transaction.create(data)
     except Exception as e:
+
+        pprint(e)
+        pprint(data)
+
         errors_msg = []
         if hasattr(e, 'args'):
             errors = [errs for errs in e.args]
@@ -187,7 +192,7 @@ def create_pagarme_organizer_recipient(organization=None):
 
 def create_pagarme_recipient(recipient_dict):
     params = {
-        'anticipatable_volume_percentage': '80',
+        'anticipatable_volume_percentage': '100',
         'automatic_anticipation_enabled': 'false',
         'transfer_day': '5',
         'transfer_enabled': 'true',
@@ -229,3 +234,12 @@ def create_pagarme_recipient(recipient_dict):
         raise RecipientError(message='Unknown API error')
 
     return recipient
+
+
+def fetch_transaction(pagarme_transaction_id) -> dict:
+    try:
+        return pagarme.transaction.find_by_id(pagarme_transaction_id)
+
+    except Exception as e:
+        print(e)
+        return dict()

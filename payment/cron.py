@@ -39,13 +39,15 @@ class SubscriptionStatusIrregularityTestJob(CronJobBase):
                 sub_txt += "    - Subscription pk: {} \n" \
                            "    - Transaction pk: {}\n" \
                            "    - Event: {}(ID: {})\n" \
-                           "    - Person: {}(ID: {})\n\n".format(
+                           "    - Person: {}(ID: {})\n" \
+                           "    - E-mail: {}\n\n".format(
                     sub.pk,
                     sub.transactions.first().pk,
                     sub.event.name,
                     sub.event.pk,
                     sub.person.name,
                     sub.person.pk,
+                    sub.person.email,
                 )
 
             msg1 = 'Inscrições pagas e não confirmadas: {}'.format(

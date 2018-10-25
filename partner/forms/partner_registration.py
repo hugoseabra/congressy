@@ -32,6 +32,12 @@ class PartnerRegistrationForm(PersonForm):
         }
 
     def __init__(self, *args, **kwargs):
+
+        instance = kwargs.get('instance')
+        if instance:
+            if hasattr(instance, 'person'):
+                kwargs['instance'] = instance.person
+
         super(PartnerRegistrationForm, self).__init__(*args, **kwargs)
         self.fields['phone'].required = True
         self.fields['email'].required = True
@@ -64,7 +70,9 @@ class PartnerRegistrationForm(PersonForm):
         person.user = self.user
         person.save()
 
-        self.instance = Partner.objects.create(person=person)
+        self.instance = Partner.objects.create(
+            person=person,
+        )
 
         # Criando Organização.
         org = Organization(internal=False, name=person.name)
@@ -99,20 +107,20 @@ class PartnerRegistrationForm(PersonForm):
     def clean_email(self):
         return self.data.get('email').lower()
 
-    def clean(self):
-
-        cleaned_data = super(PartnerRegistrationForm, self).clean()
-
-        email = cleaned_data.get('email')
-
-        try:
-            self.user = User.objects.get(username=email)
-            raise forms.ValidationError(
-                "Esse email já existe em nosso sistema. Tente novamente.")
-        except User.DoesNotExist:
-            pass
-
-        return cleaned_data
+    # def clean(self):
+    #
+    #     cleaned_data = super(PartnerRegistrationForm, self).clean()
+    #
+    #     email = cleaned_data.get('email')
+    #
+    #     try:
+    #         self.user = User.objects.get(username=email)
+    #         raise forms.ValidationError(
+    #             "Esse email já existe em nosso sistema. Tente novamente.")
+    #     except User.DoesNotExist:
+    #         pass
+    #
+    #     return cleaned_data
 
 
 class FullPartnerRegistrationForm(CombinedFormBase):
@@ -125,11 +133,15 @@ class FullPartnerRegistrationForm(CombinedFormBase):
         instances = super().save(commit)
         partner = instances.get('partner')
         bank_account = instances.get('bank_account')
+        
+        person = partner.person
 
         if bank_account.document_type == 'cpf':
-            person = partner.person
             person.cpf = bank_account.document_number
-            person.save()
+        elif bank_account.document_type == 'cnpj':
+            person.institution_cnpj = bank_account.document_number
+
+        person.save()
 
         partner.bank_account = bank_account
         partner.save()

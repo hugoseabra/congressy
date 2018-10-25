@@ -34,7 +34,6 @@ class SubscriptionPersonForm(PersonForm):
         self.fields['state_international'].label = "Estado/Província/Região"
         self.fields['address_international'].label = "Endereço"
 
-
         if self.instance.pk:
             if self.instance.name:
                 self.fields['name'].disabled = True
@@ -89,6 +88,7 @@ class SubscriptionPersonForm(PersonForm):
             else:
                 required_fields.append('city_international')
                 required_fields.append('address_international')
+                required_fields.append('state_international')
 
         if not event_is_payable \
                 and not config.address_show \
@@ -99,6 +99,7 @@ class SubscriptionPersonForm(PersonForm):
             else:
                 required_fields.append('city_international')
                 required_fields.append('address_international')
+                required_fields.append('state_international')
 
         if event_is_payable or config.cpf_required:
             if country == 'BR':

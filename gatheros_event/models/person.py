@@ -176,6 +176,7 @@ class Person(models.Model, GatherosModelMixin):
         help_text='Informe o tipo de documento.',
         choices=INTERNATIONAL_DOC_TYPES,
         default=INTERNATIONAL_DOC_PASSPORT,
+        null=True,
         blank=True,
     )
     international_doc = models.CharField(

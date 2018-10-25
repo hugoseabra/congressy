@@ -36,8 +36,12 @@ class PagarmeDataBuilder:
         self.liquid_amount = Decimal(0)
         self.has_expiration_date = False
 
+        event = subscription.event
+
         lot = subscription.lot
         self.metadata_items = {
+            'organização': event.organization.name,
+            'evento': event.name,
             'lote': '{} ({})'.format(lot.display_publicly, lot.pk),
             'código': subscription.code,
         }
@@ -113,8 +117,8 @@ class PagarmeDataBuilder:
             # TOTAL: 255 caracteres
             # Instrução 1: 111 caracteres
             instructions = 'Após o vencimento não há garantia de que o' \
-                            ' Lote estará disponível. Isso pode mudar o' \
-                            ' preço de sua inscrição.'
+                           ' Lote estará disponível. Isso pode mudar o' \
+                           ' preço de sua inscrição.'
 
             # Instrução 2: 97 caracteres
             instructions += ' IMPORTANTE: após 3 dias de vencimento do' \
@@ -125,7 +129,7 @@ class PagarmeDataBuilder:
             instructions += 'Ev.: {}. Lote: {}. Insc.: {}.'.format(
                 self.subscription.event.name[:8],
                 self.subscription.lot.name[:8],
-                self.subscription.code, # 8 caracteres
+                self.subscription.code,  # 8 caracteres
             )
 
             data['boleto_instructions'] = instructions
@@ -172,8 +176,6 @@ class PagarmeDataBuilder:
             })
 
         else:
-            doc_type = person.international_doc_type
-
             data['customer'].update({
                 'country': person.country.lower(),
                 'documents': [
@@ -186,7 +188,6 @@ class PagarmeDataBuilder:
                     self.clear_string(person.get_phone_display())
                 ],
             })
-
 
         billing_address = dict()
 
@@ -203,11 +204,11 @@ class PagarmeDataBuilder:
 
         else:
             billing_address.update({
-                "street": person.address_international or '',
+                "street": person.address_international,
                 "country": person.country.lower(),
-                "city": person.city_international.lower().capitalize(),
-                "state": person.state_international.lower().capitalize(),
-                "zipcode": person.zip_code_international,
+                "city": person.city_international,
+                "state": person.state_international,
+                "zipcode": person.zip_code_international or '000',
             })
 
         data['billing'] = {

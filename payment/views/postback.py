@@ -17,6 +17,7 @@ from payment.helpers import TransactionLog
 from payment.models import Transaction, TransactionStatus
 from payment.postback import Postback
 from payment.subscription_status_manager import SubscriptionStatusManager
+from payment.transaction_status_collection import TransactionStatusCollection
 from .helpers import notify_admins_postback
 
 
@@ -42,21 +43,41 @@ def postback_url_view(request, uidb64):
 
         transaction_log.add_message(msg, save=True)
 
-        sentry_log(message=msg, type='warning', notify_admins=True, extra_data={
-            'uuid': uidb64,
-            'transaction': transaction.pk,
-            'send_data': data,
-        })
+        sentry_log(
+            message=msg,
+            type='warning',
+            notify_admins=True,
+            extra_data={
+                'uuid': uidb64,
+                'transaction': transaction.pk,
+                'send_data': data,
+            }
+        )
         return HttpResponseBadRequest()
+
+    # status history
+    history = TransactionStatusCollection()
+    for status in transaction.statuses.all().order_by('pk'):
+        created = datetime.strptime(
+            status.date_created,
+            "%Y-%m-%dT%H:%M:%S.%fZ"
+        )
+        history.add(created_on=created, status=status.status, data=status.data)
 
     post_back = Postback(
         transaction_pk=str(transaction.pk),
         transaction_amount=transaction.amount,
         transaction_status=transaction.status,
         transaction_type=transaction.type,
+        transaction_hitsory=history
     )
 
     with atomic():
+        # ================= TRANSACTION ====================================
+        new_status = post_back.get_new_status(payload=data)
+
+        if transaction.status == new_status:
+            return Response(status=202)
 
         # ================= TRANSACTION STATUS =============================
 
@@ -71,12 +92,6 @@ def postback_url_view(request, uidb64):
         )
 
         # ==================================================================
-
-        # ================= TRANSACTION ====================================
-        new_status = post_back.get_new_status(payload=data)
-
-        if transaction.status == new_status:
-            return Response(status=202)
 
         transaction.status = new_status
 
@@ -156,10 +171,13 @@ def postback_url_view(request, uidb64):
                 payment_form.save()
 
         # ==================================================================
-
-        # ================= NOTIFICATION ===================================
+        # Registra inscrição como notificada.
+        subscription.notified = True
+        subscription.save()
 
         person = subscription.person
+
+        # ================= NOTIFICATION ===================================
 
         if hasattr(person, 'user') and person.user is not None:
             notification = PaymentNotification(
@@ -167,10 +185,6 @@ def postback_url_view(request, uidb64):
             )
 
             notification.notify()
-
-        # Registra inscrição como notificada.
-        subscription.notified = True
-        subscription.save()
 
         notify_admins_postback(transaction, data)
 

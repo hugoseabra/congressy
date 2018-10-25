@@ -129,7 +129,6 @@ class DebtForm(forms.ModelForm):
         self.liquid_amount = round(self.liquid_amount, 2)
         self.original_amount = round(self.original_amount, 2)
 
-
     def _set_installments_amount(self):
         """ Seta montante por parcela. """
         amount = self.cleaned_data.get('amount')

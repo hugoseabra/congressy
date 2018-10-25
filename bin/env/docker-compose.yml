@@ -28,6 +28,7 @@ services:
     networks:
       - postgres
     volumes:
+      - /etc/localtime:/etc/localtime
       - /tmp/bkp:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
