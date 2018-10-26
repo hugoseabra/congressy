@@ -534,7 +534,7 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
             lot = self.get_lot()
 
             kwargs.update({
-                'user': self.request.user,
+                'subscription': self.current_subscription.subscription,
                 'event_survey': lot.event_survey,
             })
 

@@ -3,15 +3,15 @@
     'survey' neste módulo de hotsite.
 """
 import os
+
 import absoluteuri
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 
 from gatheros_event.models import Event
 from gatheros_subscription.models import EventSurvey
 from survey.forms import SurveyAnswerForm, ActiveSurveyAnswerForm
 from survey.models import Author, Answer
-
-from django.conf import settings
-from django.core.files.storage import FileSystemStorage
 
 
 class InitialStorage(object):
@@ -169,7 +169,8 @@ class SurveyDirector(object):
             author=author,
         )
 
-    def get_active_form(self, survey, author=None, data=None, files=None, update=False) -> ActiveSurveyAnswerForm:
+    def get_active_form(self, survey, author=None, data=None, files=None,
+                        update=False) -> ActiveSurveyAnswerForm:
         """
 
         Este método é responsável por retornar um objeto do tipo
@@ -193,7 +194,10 @@ class SurveyDirector(object):
 
         if author is None:
             try:
-                author = Author.objects.get(survey=survey, user=self.user)
+                author = Author.objects.get(
+                    survey=survey,
+                    user=self.user,
+                )
             except Author.DoesNotExist:
                 pass
 

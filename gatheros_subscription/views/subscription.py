@@ -760,13 +760,15 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
         context = super().get_context_data(**kwargs)
 
         if self.subscription.lot.event_survey:
-            if survey_form:
+            if survey_form is not None:
                 context['survey_form'] = survey_form
             else:
                 survey = self.subscription.lot.event_survey.survey
-                form = self.get_survey_form(survey,
-                                            subscription=self.subscription)
-                context['survey_form'] = form
+
+                context['survey_form'] = self.get_survey_form(
+                    survey,
+                    subscription=self.subscription
+                )
 
         context['stopped_lots'] = [
             lot

@@ -65,8 +65,7 @@ class SurveyField(object):
         FIELD_RADIO_GROUP
     ]
 
-    def __init__(self, question, field_type, initial=None, required=True,
-                 label=None,
+    def __init__(self, question, field_type, required=True, label=None,
                  **kwargs):
 
         self.question = question
@@ -83,10 +82,13 @@ class SurveyField(object):
         options = []
 
         if question.has_options:
-            options = [(opt.value, opt.name) for opt in
-                       question.options.all().order_by('pk')]
+            options = [
+                (opt.value, opt.name)
+                for opt in
+                question.options.all().order_by('pk')
+            ]
 
-        self.initial = initial
+        self.initial = kwargs.get('initial', dict())
         self.required = required
         self.can_edit = True
         self.is_active = question.active

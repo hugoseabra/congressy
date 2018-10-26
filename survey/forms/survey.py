@@ -34,16 +34,26 @@ class SurveyBaseForm(forms.Form):
         )
 
         super(SurveyBaseForm, self).__init__(*args, **kwargs)
-        self.create_questions()
+        self.create_questions(**kwargs)
 
     def get_questions(self):
         return self.survey.questions.all()
 
-    def create_questions(self):
+    def create_questions(self, **kwargs):
+
+        kw_initial = kwargs.get('initial')
+
         for question in self.get_questions().order_by('order'):
+
+            iv = None
+
+            if kw_initial and question.name in kw_initial:
+                iv = kw_initial[question.name]
+
             self.create_field(name=question.name,
                               field_type=question.type,
                               label=question.label,
+                              initial=iv,
                               required=question.required,
                               help_text=question.help_text,
                               intro=question.intro,
@@ -51,7 +61,7 @@ class SurveyBaseForm(forms.Form):
 
     def create_field(self, question, name, field_type, initial=None,
                      required=False, help_text=None, intro=False,
-                     label=None, **kwargs):
+                     label=None):
         """
         Cria um campo para o formulário conforme interface django field:
         field e widget.
@@ -64,12 +74,16 @@ class SurveyBaseForm(forms.Form):
         :param initial: valor inicial
         :param required: se obrigatório
         :param label: valor do rótulo
-        :param kwargs: outros valores
         :rtype: DjangoField
         """
 
-        field = SurveyField(question, field_type, initial, required, label,
-                            help_text=help_text, select_intro=intro, **kwargs)
+        field = SurveyField(question=question,
+                            field_type=field_type,
+                            initial=initial,
+                            required=required,
+                            label=label,
+                            help_text=help_text,
+                            select_intro=intro,)
         self.fields[name] = field.get_django_field()
 
     def clean(self):
@@ -102,10 +116,10 @@ class SurveyAnswerForm(SurveyBaseForm):
     """ Formulário Dinâmico. """
 
     def __init__(self, name=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.name = name
         self.answer_service_list = []
         self.previous_file_paths = {}
-        self.name = name
-        super().__init__(*args, **kwargs)
 
     def clean(self):
         clean_data = super().clean()

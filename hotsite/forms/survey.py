@@ -5,19 +5,21 @@
 
 from django import forms
 
-from survey.directors import SurveyDirector
+from gatheros_subscription.directors import SubscriptionSurveyDirector
 
 
 class SurveyForm(forms.Form):
 
-    def __init__(self, user, event_survey, **kwargs):
-        self.event_survey = event_survey
-        self.event = event_survey.event
-        self.user = user
+    def __init__(self, subscription, event_survey, **kwargs):
 
-        survey_director = SurveyDirector(event=self.event, user=self.user)
+        survey_director = SubscriptionSurveyDirector(
+            subscription=subscription,
+        )
 
-        instance = survey_director.get_active_form(survey=self.event_survey.survey)
+        instance = survey_director.get_active_form(
+            survey=event_survey.survey
+        )
+        
         super().__init__(**kwargs)
         self.initial = instance.initial
         self.fields = instance.fields
