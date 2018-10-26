@@ -85,6 +85,11 @@ class PlaceForm(forms.ModelForm):
             'complement',
             'number',
             'village',
+            'country',
+            'state_international',
+            'city_international',
+            'address_international',
+            'zip_code_international',
             'city',
             'reference',
 

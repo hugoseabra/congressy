@@ -260,6 +260,7 @@ class ProfileForm(forms.ModelForm):
             'birth_date',
             'zip_code',
             'phone',
+            'ddi',
             'city',
             'cpf',
             'street',
@@ -280,6 +281,7 @@ class ProfileForm(forms.ModelForm):
                 'style': 'text-transform:lowercase'
             }),
             'phone': TelephoneInput(attrs={'placeholder': '(00) 00000-0000'}),
+            'ddi': forms.TextInput(),
             'zip_code': TelephoneInput(),
             # 'city': forms.HiddenInput(),
             'birth_date': forms.SelectDateWidget(
@@ -287,6 +289,17 @@ class ProfileForm(forms.ModelForm):
                 years=create_years_list(), ),
             'avatar': forms.HiddenInput(),
         }
+
+    class Media:
+        js = (
+            'assets/plugins/intl-tel-input-14.0.3/js/intlTelInput.min.js',
+            'assets/plugins/intl-tel-input-14.0.3/js/setInlTel.js',
+        )
+
+        css = {
+            'all': ('assets/plugins/intl-tel-input-14.0.3/css/intlTelInput.min.css',)
+        }
+
 
     def __init__(self, user, password_required=True, *args, **kwargs):
         if hasattr(user, 'person'):

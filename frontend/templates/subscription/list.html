@@ -130,7 +130,8 @@
 
                 <div class="float-right">
                     {% if event.feature_configuration.feature_import_via_csv %}
-                        <a href="{% url 'importer:csv-list' event.pk %}" class="btn btn-primary">
+                        <a href="{% url 'importer:csv-list' event.pk %}"
+                           class="btn btn-primary">
                             <i class="fas fa-file-excel"></i>
                             Importar via CSV
                         </a>
@@ -175,10 +176,14 @@
 
                                     <th width="18%">Lote</th>
 
-                                    <th width="10%" class="text-center"># Insc.</th>
+                                    <th width="10%" class="text-center">#
+                                        Insc.
+                                    </th>
 
                                     {% if event.is_scientific %}
-                                        <th width="20%" class="text-center">Trabalhos Científicos</th>
+                                        <th width="20%" class="text-center">
+                                            Trabalhos Científicos
+                                        </th>
                                     {% endif %}
 
                                     <th class="text-center" width="5%"></th>
@@ -266,9 +271,19 @@
 
                                         <td>
                                             {{ item.code }}
+                                            <div style="display: none">
+                                                <p>{{ item.person.email }}</p>
+                                                <p>{{ item.person.cpf }}</p>
+                                                <p>{{ item.person.city.name }}</p>
+                                                <p>{{ item.person.city.uf }}</p>
+                                                <p>{{ item.person.phone }}</p>
+                                                <p>{{ item.person.city_international }}</p>
+                                                <p>{{ item.person.international_doc }}</p>
+                                            </div>
                                         </td>
 
-                                        <td data-toggle="tooltip" title="{% if item.lot.category_id %}{{ item.lot.category.name }} - {% endif %}{{ item.lot.name }}">
+                                        <td data-toggle="tooltip" title="
+                                                {% if item.lot.category_id %}{{ item.lot.category.name }} - {% endif %}{{ item.lot.name }}">
                                             {{ item.lot.name|truncatechars:40 }}
                                         </td>
 

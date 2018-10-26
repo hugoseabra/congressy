@@ -12,6 +12,7 @@ from kanu_locations.models import City
 
 from core.model import track_data
 from core.model.validator import cpf_validator
+from core.util.phone import format_phone_number, get_country_code_by_region
 from gatheros_event.locale import locales
 from gatheros_event.locale.country_choices import get_country_choices
 from gatheros_event.locale.phone_choices import get_phone_choices
@@ -85,7 +86,7 @@ class Person(models.Model, GatherosModelMixin):
         max_length=50,
         blank=True,
         null=True,
-        verbose_name='CEP'
+        verbose_name='CEP/Caixa Postal'
     )
     street = models.CharField(
         max_length=255,
@@ -338,16 +339,10 @@ class Person(models.Model, GatherosModelMixin):
         if not phone:
             return ''
 
-        if self.country == 'BR':
-            return '{0} ({1}) {2} {3}-{4}'.format(
-                self.get_ddi_display(),
-                phone[0:2],
-                phone[2],
-                phone[3:7],
-                phone[7:11]
-            )
-        else:
-            return '{}{}'.format(self.get_ddi_display(), phone)
+        return format_phone_number(
+            get_country_code_by_region(self.ddi),
+            self.phone,
+        )
 
     def get_zip_code_display(self):
         """
@@ -355,9 +350,16 @@ class Person(models.Model, GatherosModelMixin):
 
         :return: string
         """
+        if self.ddi != 'BR':
+            if not self.zip_code_international:
+                return ''
+
+            return self.zip_code_international
+
         zip_code = str(self.zip_code)
         if not zip_code:
             return ''
+
         return '{0}{1}-{2}'.format(
             zip_code[0:1],
             zip_code[1:5],

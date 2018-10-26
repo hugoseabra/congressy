@@ -118,7 +118,8 @@ def _export_subscriptions(worksheet, subscriptions):
         'ATENDIDO',
         'SEXO',
         'NOME',
-        'CPF',
+        'TIPO DE DOCUMENTO',
+        'NÚMERO DO DOCUMENTO',
         'DATA NASC',
         'IDADE',
         'EMAIL',
@@ -130,6 +131,7 @@ def _export_subscriptions(worksheet, subscriptions):
         'CEP',
         'CIDADE',
         'UF',
+        'PAÍS',
         'INSTITUICAO/EMPRESA',
         'CNPJ',
         'FUNÇÃO/CARGO',
@@ -164,7 +166,16 @@ def _export_subscriptions(worksheet, subscriptions):
         collector[row_idx].append(person.get_gender_display())
 
         collector[row_idx].append(get_object_value(person, 'name'))
-        collector[row_idx].append(get_object_value(person, 'cpf'))
+        country = get_object_value(person, 'country')
+        if country == 'BR':
+            doc_type = 'CPF'
+            doc_num = get_object_value(person, 'cpf')
+        else:
+            doc_type = get_object_value(person, 'international_doc_type')
+            doc_num = get_object_value(person, 'international_doc')
+
+        collector[row_idx].append(doc_type)
+        collector[row_idx].append(doc_num)
 
         if person.birth_date:
             collector[row_idx].append(person.birth_date.strftime('%d/%m/%Y'))
@@ -175,13 +186,30 @@ def _export_subscriptions(worksheet, subscriptions):
 
         collector[row_idx].append(get_object_value(person, 'email'))
         collector[row_idx].append(get_object_value(person, 'phone'))
-        collector[row_idx].append(get_object_value(person, 'street'))
+        if country == 'BR':
+            street = get_object_value(person, 'street')
+            number = get_object_value(person, 'number')
+            village = get_object_value(person, 'village')
+            zip_code = get_object_value(person, 'zip_code')
+            city_name = get_object_value(city, 'name')
+            uf = get_object_value(city, 'uf')
+
+        else:
+            street = get_object_value(person, 'address_international')
+            number = ''
+            village = ''
+            zip_code = get_object_value(person, 'zip_code_international')
+            city_name = get_object_value(person, 'city_international')
+            uf = get_object_value(person, 'state_international')
+
+        collector[row_idx].append(street)
         collector[row_idx].append(get_object_value(person, 'complement'))
-        collector[row_idx].append(get_object_value(person, 'number'))
-        collector[row_idx].append(get_object_value(person, 'village'))
-        collector[row_idx].append(get_object_value(person, 'zip_code'))
-        collector[row_idx].append(get_object_value(city, 'name'))
-        collector[row_idx].append(get_object_value(city, 'uf'))
+        collector[row_idx].append(number)
+        collector[row_idx].append(village)
+        collector[row_idx].append(zip_code)
+        collector[row_idx].append(city_name)
+        collector[row_idx].append(uf)
+        collector[row_idx].append(country)
         collector[row_idx].append(get_object_value(person, 'institution'))
         collector[row_idx].append(get_object_value(person, 'institution_cnpj'))
         collector[row_idx].append(get_object_value(person, 'function'))
