@@ -188,20 +188,24 @@ def _export_subscriptions(worksheet, subscriptions):
         collector[row_idx].append(get_object_value(person, 'phone'))
         if country == 'BR':
             street = get_object_value(person, 'street')
+            number = get_object_value(person, 'number')
+            village = get_object_value(person, 'village')
             zip_code = get_object_value(person, 'zip_code')
             city_name = get_object_value(city, 'name')
             uf = get_object_value(city, 'uf')
 
         else:
             street = get_object_value(person, 'address_international')
+            number = ''
+            village = ''
             zip_code = get_object_value(person, 'zip_code_international')
             city_name = get_object_value(person, 'city_international')
             uf = get_object_value(person, 'state_international')
 
         collector[row_idx].append(street)
         collector[row_idx].append(get_object_value(person, 'complement'))
-        collector[row_idx].append(get_object_value(person, 'number'))
-        collector[row_idx].append(get_object_value(person, 'village'))
+        collector[row_idx].append(number)
+        collector[row_idx].append(village)
         collector[row_idx].append(zip_code)
         collector[row_idx].append(city_name)
         collector[row_idx].append(uf)

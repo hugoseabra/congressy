@@ -101,16 +101,16 @@ class PersonForm(forms.ModelForm):
 
     class Media:
         js = (
-            'assets/js/international-form.js',
-            'assets/js/international-form.js',
             'assets/plugins/intl-tel-input-14.0.3/js/intlTelInput.min.js',
             'assets/plugins/intl-tel-input-14.0.3/js/setInlTel.js',
         )
 
         css = {
-            'all': ('assets/plugins/intl-tel-input-14.0.3/css/intlTelInput.min.css',)
+            'all': (
+                'assets/plugins/intl-tel-input-14.0.3/css/'
+                'intlTelInput.min.css',
+            )
         }
-
 
     def __init__(self, is_chrome=False, **kwargs):
 
@@ -196,9 +196,9 @@ class PersonForm(forms.ModelForm):
     def clean_birth_date(self):
         birth_date = self.cleaned_data['birth_date']
         min_date = datetime.now()
-        min_date = min_date.replace(min_date.year-13)
+        min_date = min_date.replace(min_date.year - 13)
 
-        if birth_date > min_date.date():
+        if birth_date and birth_date > min_date.date():
             raise forms.ValidationError(
                 'Inscrito deve ter no mínimo 13 anos'
             )
