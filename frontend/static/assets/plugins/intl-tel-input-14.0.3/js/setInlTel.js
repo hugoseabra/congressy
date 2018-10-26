@@ -1,15 +1,33 @@
+function maskFromPlaceholder(placeholder) {
+    if (!placeholder) {
+        return null;
+    }
+    var mask = '';
+    $.each(placeholder.split(''), function(i, n) {
+        if (/^-?[\d.]+(?:e-?\d+)?$/.test(n)){ n = '9'; }
+        mask += n;
+    });
+    return mask;
+}
+
 function createPhoneInput(phoneIdEl, ddiEl, pathUtils) {
     ddiEl = $(ddiEl);
     var phone = $(phoneIdEl);
     var inputPhone = document.querySelector(phoneIdEl);
-    var initialDdi;
+    var initialDdi, placeholder;
     if (ddiEl.val() === '') {
         initialDdi = 'br';
         phone.mask("(99) 99999-9999");
     }
     else {
-        initialDdi = ddiEl.val().toLowerCase()
+        initialDdi = ddiEl.val().toLowerCase();
         phone.unmask();
+
+        placeholder = phone.attr('placeholder');
+        console.log(placeholder);
+        if (placeholder) {
+            phone.mask(maskFromPlaceholder(placeholder));
+        }
     }
 
 
@@ -21,11 +39,16 @@ function createPhoneInput(phoneIdEl, ddiEl, pathUtils) {
 
     phone.on("countrychange", function () {
         var ddi = intTelEl.getSelectedCountryData()['iso2'];
+            phone.unmask();
+
         if (ddi === 'br') {
             phone.mask("(99) 99999-9999");
-        }
-        else {
-            phone.unmask();
+        } else {
+            placeholder = phone.attr('placeholder');
+            if (placeholder) {
+                var mask = maskFromPlaceholder(placeholder);
+                phone.mask(mask);
+            }
         }
 
     });
