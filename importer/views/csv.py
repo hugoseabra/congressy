@@ -243,7 +243,7 @@ class CSVPrepareView(CSVProcessedViewMixin):
 
         previewer = PreviewBuilder(
             ldc=self.get_data_collection(size=25),
-            audience_lot=self.object.audience_lot,
+            lot=self.object.lot,
         )
 
         return previewer.render_html_table()

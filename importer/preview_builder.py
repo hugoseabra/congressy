@@ -1,5 +1,5 @@
-from audience.models import Lot as AudienceLot
 from core.util.collection import merge_lists_ignore_duplicates
+from gatheros_subscription.models import Lot
 from importer.constants import KEY_MAP, extract_key_by_verbose_name
 from importer.line_data import LineDataCollection
 
@@ -10,9 +10,9 @@ class PreviewBuilder(object):
         dos dados passados para essa factory. 
     """
 
-    def __init__(self, ldc: LineDataCollection, audience_lot: AudienceLot):
+    def __init__(self, ldc: LineDataCollection, lot: Lot):
         self.line_data_collection = ldc
-        self.audience_lot = audience_lot
+        self.lot = lot
 
     def _get_header(self, survey=None) -> list:
         headers = list()
@@ -40,8 +40,8 @@ class PreviewBuilder(object):
         header = list()
         survey = None
 
-        if self.audience_lot.audience_category.event_survey:
-            survey = self.audience_lot.audience_category.event_survey.survey
+        if self.lot.event_survey:
+            survey = self.lot.event_survey.survey
 
         if len(self.line_data_collection) > 1:
             header = self._get_header(survey=survey)
