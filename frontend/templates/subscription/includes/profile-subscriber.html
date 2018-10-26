@@ -528,13 +528,24 @@
                                 <div class="profile-info-value">{{ object.person.email }}</div>
                             {% endif %}
                         </div>
-                        {% if config.cpf and object.person.cpf %}
-                            <div class="profile-info col-lg-3 col-md-6">
-                                <div class="profile-info-label">
-                                    CPF:
+                        {% if object.person.ddi == 'BR' %}
+                            {% if config.cpf and object.person.cpf %}
+                                <div class="profile-info col-lg-3 col-md-6">
+                                    <div class="profile-info-label">
+                                        CPF:
+                                    </div>
+                                    <div class="profile-info-value">{{ object.person.get_cpf_display }}</div>
                                 </div>
-                                <div class="profile-info-value">{{ object.person.get_cpf_display }}</div>
-                            </div>
+                            {% endif %}
+                        {% else %}
+                            {% if object.person.international_doc %}
+                                <div class="profile-info col-lg-3 col-md-6">
+                                    <div class="profile-info-label">
+                                        {{ object.person.get_international_doc_type_display|default:'ID' }}:
+                                    </div>
+                                    <div class="profile-info-value">{{ object.person.international_doc }}</div>
+                                </div>
+                            {% endif %}
                         {% endif %}
                         {% if config.phone and object.person.phone %}
                             <div class="profile-info col-lg-3 col-md-6">
@@ -544,13 +555,25 @@
                                 <div class="profile-info-value">{{ object.person.get_phone_display }}</div>
                             </div>
                         {% endif %}
-                        {% if object.person.city.name %}
-                            <div class="profile-info col-lg-3 col-md-6">
-                                <div class="profile-info-label">Cidade-UF:
+                        {% if object.person.ddi == 'BR' %}
+                            {% if object.person.city.name %}
+                                <div class="profile-info col-lg-3 col-md-6">
+                                    <div class="profile-info-label">Cidade-UF:</div>
+                                    <div class="profile-info-value">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
                                 </div>
-                                <div class="profile-info-value">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
-                            </div>
+                            {% endif %}
+                        {% else %}
+                            {% if object.person.city_international or object.person.state_international %}
+                                <div class="profile-info col-lg-3 col-md-6">
+                                    <div class="profile-info-label">Cidade-UF:</div>
+                                    <div class="profile-info-value">
+                                        {{ object.person.city_international|default:'' }}{% if object.person.city_international and object.person.state_international %},{% endif %}
+                                        {{ object.person.state_international|default:'' }}
+                                    </div>
+                                </div>
+                            {% endif %}
                         {% endif %}
+
                         {% if config.city and object.person.birth_date %}
                             <div class="profile-info col-lg-3 col-md-6">
                                 <div class="profile-info-label">Dt. de
@@ -645,41 +668,62 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label>Logradouro (Rua/Av.):</label>
-                                        <div class="well well-sm profile-info-padding">{{ object.person.street|default:'-' }}</div>
+                                        <div class="well well-sm profile-info-padding">
+                                            {% if object.person.ddi == 'BR' %}
+                                                {{ object.person.street|default:'-' }}
+                                            {% else %}
+                                                {{ object.person.address_international|default:'-' }}
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
+                                {% if object.person.ddi == 'BR' %}
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Número:</label>
                                         <div class="well well-sm profile-info-padding">{{ object.person.number|default:'-' }}</div>
                                     </div>
                                 </div>
-                                <div class="col-md-8">
+                                {% endif %}
+                                <div class="{% if object.person.ddi == 'BR' %}col-md-8{% else %}col-md-12{% endif %}">
                                     <div class="form-group">
                                         <label>Complemento:</label>
-                                        <div class="well well-sm profile-info-padding">{{ object.person.complemento|default:'-' }}</div>
+                                        <div class="well well-sm profile-info-padding">
+                                            {{ object.person.complemento|default:'-' }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
+                                {% if object.person.ddi == 'BR' %}
                                 <div class="col-md-12 col-xl-4">
                                     <div class="form-group">
                                         <label>Bairro:</label>
                                         <div class="well well-sm profile-info-padding">{{ object.person.village|default:'-' }}</div>
                                     </div>
                                 </div>
-                                <div class="col-md-12 col-xl-8">
+                                {% endif %}
+                                <div class="col-md-12 {% if object.person.ddi == 'BR' %}col-xl-8{% else %}col-xl-12{% endif %}">
                                     <div class="form-group">
                                         <label>Cidade:</label>
-                                        <div class="well well-sm profile-info-padding">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
+                                        <div class="well well-sm profile-info-padding">
+                                            {% if object.person.ddi == 'BR' %}
+                                                {{ object.person.city.name }}-{{ object.person.city.uf }}
+                                            {% else %}
+                                                {{ object.person.city_international|default:'' }}{% if object.person.city_international and object.person.state_international %},{% endif %}
+                                                {{ object.person.state_international|default:'' }}
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>CEP:</label>
-                                        <div class="well well-sm profile-info-padding">{{ object.person.get_zip_code_display }}</div>
+                                        <label>CEP{% if object.person.ddi != 'BR' %} / Caixa Postal{% endif %}:</label>
+                                        <div class="well well-sm profile-info-padding">
+                                            {{ object.person.get_zip_code_display }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

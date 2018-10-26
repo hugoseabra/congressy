@@ -19,6 +19,20 @@
 
     <link rel="stylesheet"
           href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
+
+    <style>
+        .cep-loader {
+            width: 24px;
+            position: absolute;
+            top: 48px;
+            right: 34px;
+        }
+        @media ( max-width: 991px ) {
+            .cep-loader{
+                top: 28px;
+          }
+        }
+    </style>
 {% endblock %}
 
 {{% block title %}
@@ -157,8 +171,8 @@
 
             country.parent().parent().parent().removeClass('col-md-12').addClass('col-md-7');
 
-            phone_el.unmask();
-            phone_el.attr('onkeyup', 'this.value = this.value.replace(/\\D/g,\'\');');
+            // phone_el.unmask();
+            // phone_el.attr('onkeyup', 'this.value = this.value.replace(/\\D/g,\'\');');
             phone_el.parent().parent().parent().find('label').css('margin-bottom', 0);
             phone_el.closest('.form-group').css('margin-top', '20px');
 
@@ -335,7 +349,7 @@
                     </div>
                     <div class="panel-body">
                         <div class="form-group">
-                            <label for="id_person-city_name">
+                            <label for="id_subscription-lot">
                                 Lote:
                                 <small style="color:#C9302C">*</small>
                             </label>
@@ -560,9 +574,7 @@
                                 <div class="row" id="zip_code_block">
                                     <div class="col-md-3">
                                         {% render_generic_field form.zip_code required=True %}
-                                        <div id="cep_loader"
-                                             class="cep-loader-hotsite"
-                                        >
+                                        <div id="cep_loader" class="cep-loader">
                                             <img src="{% static 'assets/img/loader.gif' %}"/>
                                         </div>
                                     </div>

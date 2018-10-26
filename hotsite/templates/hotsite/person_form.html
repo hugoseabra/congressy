@@ -382,7 +382,7 @@
 
             country.parent().parent().parent().removeClass('col-md-12').addClass('col-md-7');
 
-            phone_el.unmask();
+            // phone_el.unmask();
             phone_el.attr('onkeyup', 'this.value = this.value.replace(/\\D/g,\'\');');
             phone_el.parent().parent().parent().find('label').css('margin-bottom', 0);
             phone_el.closest('.form-group').css('margin-top', '20px');
