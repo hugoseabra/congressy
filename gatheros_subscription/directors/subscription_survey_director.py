@@ -4,7 +4,7 @@ import absoluteuri
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
-from gatheros_subscription.models import Subscription
+from gatheros_subscription.models import Subscription, Lot
 from survey.forms import SurveyAnswerForm, SurveyBaseForm, \
     ActiveSurveyAnswerForm
 from survey.models import Author, Answer, Survey, Question
@@ -25,7 +25,8 @@ class SubscriptionSurveyDirector(object):
         serve como interface a Survey, o SubscriptionAuthor
     """
 
-    def __init__(self, subscription: Subscription = None) -> None:
+    def __init__(self, subscription: Subscription = None,
+                 lot: Lot = None) -> None:
         """
 
         Este construtor tem como intenção buscar todos os objetos de survey
@@ -35,6 +36,7 @@ class SubscriptionSurveyDirector(object):
         """
 
         self.subscription = subscription
+        self.lot = lot
 
         if subscription is not None:
             if not isinstance(subscription, Subscription):
@@ -42,10 +44,12 @@ class SubscriptionSurveyDirector(object):
                     subscription.__class__.__name__)
                 raise ValueError(msg)
 
-            if self.subscription.lot.event_survey is None:
-                raise Exception('Lot não possui event_survey')
+            if self.lot is None and self.subscription.lot.event_survey:
+                self.lot = self.subscription.lot
 
-            survey = self.subscription.lot.event_survey.survey
+            assert isinstance(self.lot, Lot)
+
+            survey = self.lot.event_survey.survey
             user = None
             if self.subscription.person.user:
                 user = self.subscription.person.user
