@@ -5,6 +5,7 @@
 {% block styles %}
     <link href="{% static "assets/plugins/croppie/croppie.css" %}"
           rel="stylesheet">
+
 {% endblock %}
 
 {% block title %}Editar Perfil | Congressy{% endblock %}
@@ -94,6 +95,8 @@
         }
 
         $(document).ready(function () {
+            createPhoneInput('#id_phone', $('#id_ddi'),"{% static "/assets/plugins/intl-tel-input-14.0.3/js/utils.js" %}");
+
             var uf_el = $('#id_state');
             var city_el = $('#id_city_name');
             var submit = $('form').find(':submit');
@@ -108,7 +111,6 @@
             cpf_el.mask("999.999.999-99");
             cnpj_el.mask("99.999.999/9999-99");
             zip_el.mask("99999-999");
-            phone.mask("(99) 99999-9999");
 
             showHideCepLoader();
 
@@ -132,7 +134,7 @@
                     submit.prop('disabled', false);
                 };
                 window.setTimeout(function () {
-                    fetch_cities($(that), city_el, null, null, disableButton );
+                    fetch_cities($(that), city_el, null, null, disableButton);
 
                 }, 500);
 
@@ -294,6 +296,11 @@
 
                                 {% render_generic_field form.phone %}
 
+                                <div style="display: none;">
+
+                                    {% render_generic_field form.ddi %}
+                                </div>
+
                             </div>
 
                         </div>
@@ -330,7 +337,7 @@
                             <div class="col-md-3">
                                 {% render_generic_field form.zip_code %}
                                 <div id="cep_loader" class="cep-loader-profile"
-                                     >
+                                >
                                     <img src="{% static 'assets/img/loader.gif' %}"/>
                                 </div>
                             </div>

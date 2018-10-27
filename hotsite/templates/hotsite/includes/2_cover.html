@@ -27,22 +27,20 @@
                      data-animation="fadeIn">
                     <div class="col-md-10 col-md-offset-1">
 
-                        <h1 class="hero-title">
+                        <h1 class="hero-title notranslate">
                             {{ event.name }}
                         </h1>
 
-                        <p class="hero-tagline">
+                        <div class="hero-tagline">
                             <i class="fa fa-calendar"></i>
                             {{ event.get_period }}
-                        </p>
-
-                        {% if event.place and event.place.name %}
-                            <p class="hero-tagline">
+                            {% if event.place and event.place.name %}
+                            <div class="hero-tagline notranslate">
                                 <i class="fa fa-map-marker"></i>
                                 {{ event.place.name|default_if_none:'' }}
-                            </p>
-                        {% endif %}
-
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
 

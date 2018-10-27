@@ -10,6 +10,8 @@ from django.db import models
 from kanu_locations.models import City
 from . import Event
 from .mixins import GatherosModelMixin
+from gatheros_event.locale import locales
+from gatheros_event.locale.country_choices import get_country_choices
 
 
 def get_image_path(_, filename):
@@ -113,6 +115,44 @@ class Place(models.Model, GatherosModelMixin):
         null=True,
         help_text="Alguma informação para ajudar a chegar ao local."
     )
+
+    country = models.CharField(
+        choices=get_country_choices(),
+        default=locales.BRASIL['codes']['digits_2'],
+        max_length=10,
+        blank=True,
+        null=True,
+        verbose_name='país',
+    )
+
+    state_international = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='estado',
+    )
+    city_international = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='Cidade (Fora do Brasil)',
+        help_text='Informe a cidade',
+    )
+
+    address_international = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='endereço',
+    )
+    zip_code_international = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        verbose_name='CEP'
+    )
+
+
 
     # google_streetview_link = models.URLField(
     #     verbose_name='Link do Google StreetView',

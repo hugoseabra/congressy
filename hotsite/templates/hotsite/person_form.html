@@ -73,7 +73,9 @@
                                                 <div class="col-md-12">
                                                     {% render_generic_field form.country %}
                                                 </div>
-                                                <div class="col-md-5" id="doc-type" style="display: none">
+                                                <div class="col-md-5"
+                                                     id="doc-type"
+                                                     style="display: none">
                                                     {% render_generic_field form.international_doc_type %}
                                                 </div>
                                             </div>
@@ -121,11 +123,15 @@
                                             </div>
                                         {% endif %}
                                         <div class="col-md-6">
-                                            {% if config %}
-                                                {% render_international_phone form.ddi form.phone required=config.phone use_required_field=False %}
-                                            {% else %}
-                                                {% render_international_phone form.ddi form.phone %}
-                                            {% endif %}
+                                           {% render_generic_field form.phone  required=config.phone use_required_field=False %}
+
+                                            <div style="display: none;">
+                                                {% if config %}
+                                                    {% render_generic_field form.ddi  required=config.phone use_required_field=False %}
+                                                {% else %}
+                                                    {% render_generic_field form.ddi  %}
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
 
@@ -299,10 +305,30 @@
 {% endblock %}
 
 {% block styles %}
+
     <link rel="stylesheet"
           href="https://unpkg.com/vue-form-wizard/dist/vue-form-wizard.min.css">
+
     <link rel="stylesheet"
           href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
+    <style>
+        .iti-flag {
+            background-image: url("{% static '/assets/plugins/intl-tel-input-14.0.3/img/flags.png' %}");
+        }
+
+        @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+            .iti-flag {
+                background-image: url('{% static "/assets/plugins/intl-tel-input-14.0.3/img/flags@2x.png" %}');
+            ");
+            }
+        }
+        .intl-tel-input {
+            width: 100%;
+            display: block;
+        }
+    </style>
+
+
 {% endblock %}
 
 {% block scripts %}
@@ -317,17 +343,22 @@
 
     <script>
         $(document).ready(function () {
+         createPhoneInput('#id_person-phone', $('#id_person-ddi'), "{% static "/assets/plugins/intl-tel-input-14.0.3/js/utils.js" %}");
+
             var dateInput = $('#id_person-birth_date');
             if (dateInput.length) {
                 dateInput.attr('autocomplete', 'off');
                 var birthDate = createDatePicker(dateInput);
+                var maxDate = moment("01-01-2005", "DD-MM-YYYY");
                 birthDate.data("DateTimePicker").minDate(false);
+                birthDate.data("DateTimePicker").maxDate(maxDate);
                 birthDate.data("DateTimePicker").useCurrent(false);
                 var datePerson = dateInput.attr('value');
                 if (datePerson) {
                     birthDate.data("DateTimePicker").date(datePerson);
                 }
             }
+
         });
 
         function set_form_as_international() {
@@ -342,6 +373,7 @@
             var state_international = $('#state_international_block');
             var city_intern_block = $('#city_international_city_block');
             var zip_code_el = $('#id_person-zip_code');
+            var zip_intern_el = $('#id_person-zip_code_international');
             var zip_code_block_el = $('#zip_code_block');
             var zip_code_intern_block_el = $('#zip_code_international_block');
             var international_address = $('#address_international_block');
@@ -350,8 +382,7 @@
 
             country.parent().parent().parent().removeClass('col-md-12').addClass('col-md-7');
 
-            ddi_el.val(country.val());
-            phone_el.unmask();
+            // phone_el.unmask();
             phone_el.attr('onkeyup', 'this.value = this.value.replace(/\\D/g,\'\');');
             phone_el.parent().parent().parent().find('label').css('margin-bottom', 0);
             phone_el.closest('.form-group').css('margin-top', '20px');
@@ -381,8 +412,8 @@
             $('#id_person-number').removeAttr('required');
             $('#id_person-village').removeAttr('required');
             $('#id_person-state_international').removeAttr('required');
-
-
+            zip_code_el.removeAttr('required');
+            zip_intern_el.removeAttr('required');
             {% if config and config.city is True %}
                 $('#id_person-city_international').attr('required', 'required');
             {% endif %}
@@ -393,7 +424,6 @@
                 zip_code_el.removeAttr('required');
                 zip_code_block_el.hide();
                 zip_code_intern_block_el.show();
-                zip_code_intern_block_el.removeAttr('required');
                 $('#id_person-address_international').attr('required', 'required');
                 international_address.css('margin-top', '20px');
             {% endif %}
@@ -421,7 +451,6 @@
 
             country.parent().parent().parent().removeClass('col-md-7').addClass('col-md-12');
 
-            ddi_el.val(country.val());
             phone_el.mask("(99) 99999-9999");
             phone_el.removeAttr('onkeyup');
             phone_el.parent().parent().parent().find('label').css('margin-bottom', 0);
@@ -466,6 +495,7 @@
                 zip_code_el.mask("99999-999");
                 zip_code_el.attr('required', 'required');
 
+                international_address.removeAttr('required');
                 zip_code_intern_block_el.hide();
             {% endif %}
         }

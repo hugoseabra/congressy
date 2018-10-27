@@ -13,10 +13,10 @@
 {% block content %}
     {% include 'attendance/includes/top-menu.html' with title='Atendidos' %}
     <div class="row">
-    <div class="col-md-2 col-sm-12">
+        <div class="col-md-2 col-sm-12">
 
-        {% include 'attendance/includes/attendance-menu.html' with active='credenciados' %}
-    </div>
+            {% include 'attendance/includes/attendance-menu.html' with active='credenciados' %}
+        </div>
         <div class="col-md-10">
 
             <div class="panel panel-primary">
@@ -45,6 +45,15 @@
                             <tr>
                                 <td>
                                     {{ att.subscription.person.name }}
+                                    <div style="display: none">
+                                        <p>{{ att.subscription.person.email }}</p>
+                                        <p>{{ att.subscription.person.cpf }}</p>
+                                        <p>{{ att.subscription.person.city.name }}</p>
+                                        <p>{{ att.subscription.person.city.uf }}</p>
+                                        <p>{{ att.subscription.person.phone }}</p>
+                                        <p>{{ att.subscription.person.city_international }}</p>
+                                        <p>{{ att.subscription.person.international_doc }}</p>
+                                    </div>
                                     <br>
                                     <small class="text-muted">
                                         {{ att.person.person.email }}

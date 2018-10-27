@@ -10,6 +10,7 @@ from core.forms.widgets import (
     DateInput,
     TelephoneInput,
 )
+from datetime import datetime
 from core.util import create_years_list
 from gatheros_event.models import Occupation, Person
 from gatheros_event.locale.phone_choices import get_country_phone_code
@@ -89,12 +90,26 @@ class PersonForm(forms.ModelForm):
                 'style': 'text-transform:lowercase'
             }),
             'phone': TelephoneInput,
+            'ddi': forms.TextInput(),
             'zip_code': TelephoneInput,
             'city': forms.HiddenInput(),
             'birth_date': DateInputBootstrap,
             'institution_cnpj': forms.TextInput(
                 attrs={'placeholder': '99.999.999/0001-99'}
             ),
+        }
+
+    class Media:
+        js = (
+            'assets/plugins/intl-tel-input-14.0.3/js/intlTelInput.min.js',
+            'assets/plugins/intl-tel-input-14.0.3/js/setInlTel.js',
+        )
+
+        css = {
+            'all': (
+                'assets/plugins/intl-tel-input-14.0.3/css/'
+                'intlTelInput.min.css',
+            )
         }
 
     def __init__(self, is_chrome=False, **kwargs):
@@ -159,10 +174,9 @@ class PersonForm(forms.ModelForm):
         return cnpj
 
     def clean_phone(self):
-        country = self.cleaned_data.get('country')
+        country = self.cleaned_data.get('ddi')
         phone = self.cleaned_data.get('phone')
         if country and phone:
-            country = self.cleaned_data.get('country')
             prefix = get_country_phone_code(country)
             phone_cleaner('{}{}'.format(prefix, phone), country)
 
@@ -178,6 +192,18 @@ class PersonForm(forms.ModelForm):
 
     def clean_occupation(self):
         return Occupation.objects.get(pk=self.data['occupation'])
+
+    def clean_birth_date(self):
+        birth_date = self.cleaned_data['birth_date']
+        min_date = datetime.now()
+        min_date = min_date.replace(min_date.year - 13)
+
+        if birth_date and birth_date > min_date.date():
+            raise forms.ValidationError(
+                'Inscrito deve ter no mínimo 13 anos'
+            )
+        else:
+            return self.cleaned_data['birth_date']
 
     def fill_blank_data_when_user(self):
         """

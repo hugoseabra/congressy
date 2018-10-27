@@ -2,7 +2,7 @@
     <h4 class="form-heading"
         style="font-weight: bold;float:left">
         {% if user.is_authenticated %}
-            Olá, {{ user.first_name }}
+            Olá, <span class="notranslate">{{ user.first_name }}</span>
         {% else %}
             Inscreva-se agora!
         {% endif %}
