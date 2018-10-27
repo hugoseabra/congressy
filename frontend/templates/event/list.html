@@ -176,7 +176,7 @@
                                                     <td class="text-right" width="1%" style="padding: 5px">
                                                         {% if event.date_start > now %}
                                                             <span class="badge badge-info">A iniciar</span>
-                                                        {% elif event.date_start <= now < event.date_end %}
+                                                        {% elif event.date_start <= now and now < event.date_end %}
                                                             <span class="badge badge-success">Andamento</span>
                                                         {% elif event.date_end < now %}
                                                             <span class="badge badge-warning">Encerrado</span>
