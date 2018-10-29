@@ -142,7 +142,7 @@ def create_pagarme_organizer_recipient(organization=None):
 
     params = {
         'anticipatable_volume_percentage': '100',
-        'automatic_anticipation_enabled': 'true',
+        'automatic_anticipation_enabled': 'false',
         'transfer_day': '5',
         'transfer_enabled': 'true',
         'transfer_interval': 'weekly',
