@@ -109,7 +109,7 @@ class SubscriptionViewMixin(TemplateNameableMixin,
     def get_lots(self):
         return self.get_event().lots.filter(
             internal=False,
-        ).order_by('date_end', 'name')
+        ).order_by('name', 'date_end')
 
     def get_num_lots(self):
         """ Recupera número de lotes a serem usados nas inscrições. """
@@ -841,7 +841,7 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
                 if not subscription_form.is_valid():
 
                     for name, error in subscription_form.errors.items():
-                        form.add_error(field='__all__', error=error[0])
+                        form.add_error(field=None, error=error[0])
 
                     return self.form_invalid(form)
 
