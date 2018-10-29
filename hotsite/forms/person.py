@@ -122,7 +122,6 @@ class SubscriptionPersonForm(PersonForm):
         for field_name in required_fields:
             self.setAsRequired(field_name)
 
-
     def save(self, commit=True):
         self.instance.user = self.user
         return super().save(commit=commit)

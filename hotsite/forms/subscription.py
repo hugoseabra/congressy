@@ -23,48 +23,57 @@ class SubscriptionForm(forms.Form):
         max_length=60,
     )
 
-    def clean_lot(self):
-        try:
-            lot = Lot.objects.get(pk=self.cleaned_data['lot'],
-                                  event_id=self.cleaned_data['event'])
-        except Lot.DoesNotExist:
-            raise forms.ValidationError('Lote não pertence a este evento.')
+    def __init__(self, *args, **kwargs):
+        self.subscription = None
+        super().__init__(*args, **kwargs)
 
-        subscriptions = Subscription.objects.filter(
-            lot_id=lot.pk,
-            test_subscription=False,
-            completed=True,
-        ).count()
+    def clean(self):
+        cleaned_data = super().clean()
 
-        if lot.limit and subscriptions > lot.limit:
-            raise forms.ValidationError('Lote está lotado e não permite novas '
-                                        'inscrições')
-
-        if lot.date_end < datetime.now():
-            raise forms.ValidationError('Lote já está finalizado e não '
-                                        'permite novas inscrições.')
-
-        return lot
-
-    def save(self):
-
-        person = self.cleaned_data['person']
         event = self.cleaned_data['event']
-        lot = self.cleaned_data['lot']
+        lot_pk = self.cleaned_data['lot']
+        person = self.cleaned_data['person']
 
         try:
-            subscription = Subscription.objects.get(
+            self.subscription = Subscription.objects.get(
                 person=person,
                 event=event
             )
+
         except Subscription.DoesNotExist:
-            subscription = Subscription(
+            self.subscription = Subscription(
                 person=person,
                 event=event,
                 created_by=person.user.pk,
                 origin=Subscription.DEVICE_ORIGIN_HOTSITE,
             )
 
-        subscription.lot = lot
+        if self.subscription.lot_id == lot_pk:
+            # Lote não mudou
+            return cleaned_data
 
-        return subscription.save()
+        try:
+            lot = Lot.objects.get(pk=lot_pk, event_id=event)
+        except Lot.DoesNotExist:
+            raise forms.ValidationError('Lote não pertence a este evento.')
+
+        if datetime.now() >= lot.date_end:
+            raise forms.ValidationError('Lote já está finalizado e não '
+                                        'permite novas inscrições.')
+
+        num_subs = Subscription.objects.filter(
+            lot_id=lot.pk,
+            test_subscription=False,
+            completed=True,
+        ).exclude(status=Subscription.CANCELED_STATUS).count()
+
+        if num_subs and lot.limit and num_subs >= lot.limit:
+            raise forms.ValidationError('Lote está lotado e não permite novas '
+                                        'inscrições')
+
+        self.subscription.lot = lot
+
+        return cleaned_data
+
+    def save(self):
+        return self.subscription.save()

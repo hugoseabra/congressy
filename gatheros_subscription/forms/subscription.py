@@ -80,7 +80,6 @@ class SubscriptionForm(forms.ModelForm):
             'person',
             'origin',
             'created_by',
-            # 'completed',
         )
 
     allow_lot_edit = True
@@ -94,26 +93,29 @@ class SubscriptionForm(forms.ModelForm):
 
         origin = self.data.get('origin')
 
-        self.fields['lot'].queryset = event.lots.all()
+        # self.fields['lot'].queryset = event.lots.all()
         if is_new is False and origin != Subscription.DEVICE_ORIGIN_MANAGE:
             self.fields['lot'].disabled = True
             self.allow_lot_edit = False
 
     def clean_lot(self):
-        try:
-            lot = Lot.objects.get(pk=self.data['lot'], event=self.event)
-        except Lot.DoesNotExist:
-            raise forms.ValidationError('Lote não pertence a este evento.')
+        lot = self.cleaned_data.get('lot')
+        if not lot:
+            return lot
 
-        subscriptions = Subscription.objects.filter(
-            lot_id=lot.pk,
+        if self.instance and self.instance.lot_id \
+                and self.instance.lot_id == lot.pk:
+            return lot
+
+        num_subs = lot.subscriptions.filter(
             test_subscription=False,
             completed=True,
-        ).count()
+        ).exclude(status=Subscription.CANCELED_STATUS).count()
 
-        if lot.limit and subscriptions > lot.limit:
-            raise forms.ValidationError('Lote está lotado e não permite novas '
-                                        'inscrições')
+        if num_subs and lot.limit and num_subs >= lot.limit:
+            raise forms.ValidationError(
+                'Lote está lotado e não permite novas inscrições'
+            )
 
         return lot
 
