@@ -3,7 +3,6 @@ import uuid
 from datetime import timedelta
 from decimal import Decimal
 
-import absoluteuri
 from django.conf import settings
 
 from payment.exception import (
@@ -15,6 +14,7 @@ from payment.helpers.payment_helpers import (
     get_opened_boleto_transactions,
     is_boleto_allowed,
 )
+from payment.helpers.postback_url import get_postback_url
 from payment.models import Transaction
 from payment.receiver_subscribers import (
     ReceiverPublisher,
@@ -88,15 +88,10 @@ class PagarmeDataBuilder:
 
         transaction_id = str(uuid.uuid4())
 
-        postback_url = absoluteuri.reverse(
-            'api:payment:payment_postback_url',
-            kwargs={'uidb64': transaction_id}
-        )
-
         data = {
             'api_key': settings.PAGARME_API_KEY,
             'transaction_id': transaction_id,
-            'postback_url': postback_url,
+            'postback_url': get_postback_url(transaction_id),
             # 13 caracteres
             'soft_descriptor': lot.event.organization.name[:13],
             'amount': self.as_payment_format(amount),
