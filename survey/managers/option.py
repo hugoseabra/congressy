@@ -38,7 +38,8 @@ class OptionManager(Manager):
         return question
 
     def save(self, commit=True):
-        self.instance.value = self._create_slug()
+        if not self.instance.value:
+            self.instance.value = self._create_slug()
         return super().save(commit)
 
     def _create_slug(self):
@@ -50,25 +51,22 @@ class OptionManager(Manager):
         question = self.cleaned_data.get('question')
 
         original_slug = slugify(name)
+        exists = Option.objects.filter(
+            question=question,
+            value=original_slug,
+        ).exists()
 
         slug = original_slug
+        counter = 1
 
-        existing_options = Option.objects.filter(
-            question=question,
-            value=slug,
-        )
-
-        if existing_options.count() >= 1:
-            counter = 1
-            for option in existing_options:
-
-                query_set = Option.objects.filter(
-                    value=option.value,
-                    question=question
-                )
-
-                if query_set.exists():
-                    slug = original_slug + '-' + str(counter)
-                    counter += 1
+        while exists is True:
+            query_set = Option.objects.filter(
+                question=question,
+                value=slug,
+            )
+            exists = query_set.exists()
+            if exists:
+                slug = original_slug + '-' + str(counter)
+                counter += 1
 
         return slug
