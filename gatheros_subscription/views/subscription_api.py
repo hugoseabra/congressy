@@ -6,6 +6,7 @@ from gatheros_subscription.models import Subscription
 from gatheros_subscription.serializers import CheckInSubscriptionSerializer
 from attendance.helpers.attendance import subscription_has_certificate
 
+
 class SubscriptionSearchViewSet(generics.ListAPIView):
     """
         API endpoint that allows Subscriptions to be viewed.

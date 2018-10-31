@@ -174,20 +174,37 @@ class SurveyEditView(SurveyFeatureFlagMixin,
                     survey=self.survey
                 )
 
+                options = []
+                if question.has_options:
+                    options = question.options.all().order_by('pk')
+
                 with atomic():
-                    options = question.options.all().order_by('pk') \
-                        if question.has_options \
-                        else []
+                    question_data = {
+                        'survey': question.survey.pk,
+                        'type': question.type,
+                        'active': question.active,
+                        'name': 'Cópia - {}'.format(question.label),
+                        'label': 'Cópia - {}'.format(question.label),
+                        'help_text': question.help_text,
+                        'intro': question.intro,
+                        'options': [o.name for o in options]
+                    }
 
-                    question.pk = None
-                    question.label = 'Cópia - {}'.format(question.label)
-                    question.name = slugify(question.label)
-                    question.save()
+                    question_form = QuestionForm(survey=self.survey,
+                                                 data=question_data)
 
-                    for option in options:
-                        option.pk = None
-                        option.question = question
-                        option.save()
+                    if question_form.is_valid():
+                        question_form.save()
+                        messages.success(
+                            self.request,
+                            "Pergunta duplicada com sucesso!"
+                        )
+                    else:
+                        for key, err in question_form.errors.items():
+                            messages.error(
+                                self.request,
+                                err[0]
+                            )
 
                 return HttpResponse(status=200)
 
