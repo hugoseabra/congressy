@@ -5,16 +5,9 @@ from django.utils import six
 from localflavor.br.forms import BRCPFField, BRCNPJField
 
 from core.forms.cleaners import clear_string, clean_cellphone as phone_cleaner
-from core.forms.widgets import (
-    AjaxChoiceField,
-    DateInput,
-    TelephoneInput,
-)
-from datetime import datetime
-from core.util import create_years_list
-from gatheros_event.models import Occupation, Person
+from core.forms.widgets import AjaxChoiceField, DateInput, TelephoneInput, DateInputBootstrap
 from gatheros_event.locale.phone_choices import get_country_phone_code
-from core.forms.widgets import DateInputBootstrap
+from gatheros_event.models import Occupation, Person
 
 
 class PersonForm(forms.ModelForm):
@@ -22,7 +15,7 @@ class PersonForm(forms.ModelForm):
 
     states = (
         ('', '----'),
-        # replace the value '----' with whatever you want, it won't matter
+            # replace the value '----' with whatever you want, it won't matter
         ("AC", "AC"),
         ("AL", "AL"),
         ("AP", "AP"),
@@ -192,18 +185,6 @@ class PersonForm(forms.ModelForm):
 
     def clean_occupation(self):
         return Occupation.objects.get(pk=self.data['occupation'])
-
-    def clean_birth_date(self):
-        birth_date = self.cleaned_data['birth_date']
-        min_date = datetime.now()
-        min_date = min_date.replace(min_date.year - 13)
-
-        if birth_date and birth_date > min_date.date():
-            raise forms.ValidationError(
-                'Inscrito deve ter no mínimo 13 anos'
-            )
-        else:
-            return self.cleaned_data['birth_date']
 
     def fill_blank_data_when_user(self):
         """
