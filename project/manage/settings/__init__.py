@@ -66,4 +66,9 @@ CONGRESSY_MINIMUM_AMOUNT = 4.99
 
 # Taxas de juros de parcelamento de valores da Congressy.
 CONGRESSY_INSTALLMENT_INTERESTS_RATE = 2.29
+
+# Valor minimo para permitir parcelamentos
+CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS = 25
+
+# ============================ GOOGLE RECAPTCHA ============================= #
 GOOGLE_RECAPTCHA_SECRET_KEY = '6Lerw18UAAAAAGJyU5G_3CZN6Et4ZTcIhLiUhawX'

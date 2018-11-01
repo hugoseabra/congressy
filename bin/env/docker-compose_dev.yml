@@ -1,0 +1,53 @@
+version: '3.5'
+services:
+  postgres:
+    image: postgres:9.6-alpine
+    container_name: cgsy-postgres
+    networks:
+      - postgres
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /tmp/bkp:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=cgsyplatform
+      - POSTGRES_USER=congressy
+      - POSTGRES_PASSWORD=congressy
+
+  mailhog:
+    image: blueimp/mailhog
+    container_name: mailhog
+    networks:
+      - mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+                    
+  wkhtmltopdf:
+    image: openlabs/docker-wkhtmltopdf-aas
+    container_name: wkhtmltopdf
+    networks:
+      - wkhtmltopdf
+    ports:
+      - "5010:80"
+
+  ngrok:
+    image: hugoseabra19/ngrok-tunnel
+    container_name: ngrok
+    environment:
+    - TARGET_HOST=172.17.0.1
+    - TARGET_PORT=8000
+    volumes:
+    - /tmp/ngrok:/tmp/bkp
+    ports:
+    - "4040:4040"
+
+networks:
+  postgres:
+    name: local_postgres
+  mailhog:
+    name: local_mailhog
+  wkhtmltopdf:
+    name: local_wkhtmltopdf
+

@@ -28,7 +28,10 @@ class QuestionManager(Manager):
         survey = self.cleaned_data.get('survey')
 
         original_slug = slugify(name)
-        exists = True
+        exists = Question.objects.filter(
+            name=original_slug,
+            survey=survey
+        ).exists()
 
         slug = original_slug
         counter = 1
