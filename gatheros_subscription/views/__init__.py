@@ -15,8 +15,9 @@ from .lot import (
 from .lot_api import (
     LotChangeSurveyAPIView,
 )
+from .mixins import SubscriptionViewMixin, SubscriptionFormMixin
 from .payment import PaymentDeleteView
-from .subscription import (
+from .subscription_views import (
     MySubscriptionsListView,
     SubscriptionAddFormView,
     SubscriptionCancelView,
