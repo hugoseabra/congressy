@@ -268,7 +268,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
             # Override anonymous user
             user = User.objects.get(email=email)
 
-            if not hasattr(user, 'person') and user.person:
+        if not hasattr(user, 'person') or user.person is None:
                 # Garante que usuário sempre terá pessoa.
                 form = get_person_form(user)
 
