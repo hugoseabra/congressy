@@ -52,13 +52,26 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             " Atualizando inscrição PK: {}\n"
             "    Evento: {} ({})\n"
+            "    Lote: {} ({})\n"
             "    Nome do Participante: {} (ID: {})\n"
+            "    Horario de criação da inscrição: {}\n"
+            "    Horario de modificação da inscrição: {}\n"
+            "    Origem: {}\n"            
+            "    Completed: {}\n"            
+            "    Notificado: {}\n"            
             "    E-mail do Participante: {}\n".format(
                 subscription.pk,
                 subscription.event.name,
+                subscription.lot.name,
+                subscription.lot.pk,
                 subscription.event.pk,
                 subscription.person.name,
                 subscription.person.pk,
+                subscription.created,
+                subscription.modified,
+                subscription.get_origin_display(),
+                subscription.completed,
+                subscription.notified,
                 subscription.person.email,
             )
         ))
