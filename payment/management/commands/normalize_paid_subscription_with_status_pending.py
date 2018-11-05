@@ -10,9 +10,16 @@ class Command(BaseCommand):
     help = 'Atualiza as inscrições pagas mas que ainda constam como pendentes.'
 
     def handle(self, *args, **options):
+
+        types = [
+            Transaction.BOLETO,
+            Transaction.CREDIT_CARD,
+        ]
+
         transactions = Transaction.objects.filter(
             subscription__status=Subscription.AWAITING_STATUS,
             status=Transaction.PAID,
+            type__in=types
         )
 
         self.stdout.write(self.style.SUCCESS(
