@@ -1,12 +1,21 @@
-from django.core.exceptions import PermissionDenied
+from django.contrib import messages
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views import generic
 
+from core.forms.cleaners import clear_string
+from core.views.mixins import TemplateNameableMixin
+from gatheros_event.helpers.account import update_account
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
+from gatheros_event.views.mixins import EventDraftStateMixin, \
+    AccountMixin, PermissionDenied
+from gatheros_subscription.forms import (
+    SubscriptionPersonForm,
+    SubscriptionForm,
+)
+from gatheros_subscription.models import FormConfig, Lot, Subscription
 
 
 class FeatureFlagMixinBaseMixin(AccountMixin, generic.View,
@@ -52,3 +61,226 @@ class SurveyFeatureFlagMixin(FeatureFlagMixinBaseMixin):
                 return HttpResponse(status=403)
             raise PermissionDenied(self.get_permission_denied_message())
         return response
+
+
+class SubscriptionViewMixin(TemplateNameableMixin,
+                            AccountMixin, EventDraftStateMixin):
+    """ Mixin de view para vincular com informações de event.
+        @TODO add ContextMixin
+    """
+
+    def __init__(self, **initargs):
+        super().__init__(**initargs)
+        self.event = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.event = self.get_event()
+
+        update_account(
+            request=self.request,
+            organization=self.event.organization,
+            force=True
+        )
+
+        self.permission_denied_url = reverse('event:event-list')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # noinspection PyUnresolvedReferences
+        event = self.get_event()
+
+        context = super().get_context_data(**kwargs)
+
+        context['event'] = event
+        context['is_paid_event'] = is_paid_event(event)
+
+        context.update(self.get_event_state_context_data(event))
+
+        try:
+            config = FormConfig.objects.get(event=event)
+        except FormConfig.DoesNotExist:
+            config = FormConfig()
+            config.event = event
+
+        if is_paid_event(event):
+            config.email = True
+            config.phone = True
+            config.city = True
+
+            config.cpf = config.CPF_REQUIRED
+            config.birth_date = config.BIRTH_DATE_REQUIRED
+            config.address = config.ADDRESS_SHOW
+
+        context['config'] = config
+
+        return context
+
+    def get_event(self):
+        """ Resgata organização do contexto da view. """
+
+        if self.event:
+            return self.event
+
+        self.event = get_object_or_404(
+            Event,
+            pk=self.kwargs.get('event_pk')
+        )
+        return self.event
+
+    def is_by_lots(self):
+        return self.event.subscription_type == Event.SUBSCRIPTION_BY_LOTS
+
+    def get_lots(self):
+        return self.get_event().lots.filter(
+            internal=False,
+        ).order_by('name', 'date_end')
+
+    def get_num_lots(self):
+        """ Recupera número de lotes a serem usados nas inscrições. """
+        lot_qs = self.get_lots()
+        return lot_qs.count() if lot_qs else 0
+
+    def can_access(self):
+        if not self.event:
+            return False
+
+        return self.event.organization == self.organization
+
+
+class SubscriptionFormMixin(SubscriptionViewMixin, generic.FormView):
+    template_name = 'subscription/form.html'
+    form_class = SubscriptionPersonForm
+    success_message = None
+    subscription = None
+    object = None
+    allow_edit_lot = True
+    error_url = None
+
+    def get_error_url(self):
+        return self.error_url
+
+    def pre_dispatch(self, request):
+        self.event = self.get_event()
+
+        if self.event.allow_internal_subscription is False:
+            self.permission_denied_url = reverse(
+                'subscription:subscription-list', kwargs={
+                    'event_pk': self.event.pk,
+                }
+            )
+            raise PermissionDenied('Você não pode realizar esta ação.')
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.kwargs.get('pk'):
+            self.subscription = get_object_or_404(
+                Subscription,
+                pk=self.kwargs.get('pk')
+            )
+            self.object = self.subscription.person
+
+            origin = self.subscription.origin
+            self.allow_edit_lot = \
+                origin == self.subscription.DEVICE_ORIGIN_MANAGE
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['prefix'] = 'person'
+
+        if self.object:
+            kwargs['instance'] = self.object
+
+        return kwargs
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+
+        lot_pk = self.request.GET.get('lot', 0)
+
+        if not lot_pk and self.subscription:
+            form.check_requirements(lot=self.subscription.lot)
+
+        else:
+            try:
+                lot = self.event.lots.get(pk=int(lot_pk) if lot_pk else 0)
+                form.check_requirements(lot=lot)
+
+            except Lot.DoesNotExist:
+                pass
+
+        return form
+
+    def get_subscription_form(self, person, lot_pk):
+        data = {
+            'person': person.pk,
+            'lot': lot_pk,
+            'created_by': self.request.user.pk,
+        }
+
+        kwargs = {}
+
+        if self.subscription:
+            kwargs['instance'] = self.subscription
+
+            if self.subscription.origin:
+                data['origin'] = self.subscription.origin
+            else:
+                data['origin'] = Subscription.DEVICE_ORIGIN_MANAGE
+        else:
+            data['origin'] = Subscription.DEVICE_ORIGIN_MANAGE
+
+        kwargs.update({'data': data})
+
+        return SubscriptionForm(self.event, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['has_inside_bar'] = True
+        context['active'] = 'inscricoes'
+
+        context['object'] = self.object
+        context['allow_edit_lot'] = self.allow_edit_lot
+
+        context['lots'] = [
+            lot
+            for lot in self.get_lots()
+            if lot.status == lot.LOT_STATUS_RUNNING
+               or (self.subscription and self.subscription.lot == lot)
+        ]
+
+        context['subscription'] = self.subscription
+
+        lot_pk = self.request.GET.get('lot', 0)
+        if not lot_pk and self.subscription:
+            context['selected_lot'] = self.subscription.lot.pk
+
+        else:
+            context['selected_lot'] = int(lot_pk) if lot_pk else 0
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if self.allow_edit_lot and 'subscription-lot' not in request.POST:
+            messages.warning(request, 'Você deve informar um lote.')
+            return redirect(self.get_error_url())
+
+        request.POST = request.POST.copy()
+
+        to_be_pre_cleaned = [
+            'person-cpf',
+            'person-phone',
+            'person-zip_code',
+            'person-institution_cnpj'
+        ]
+
+        for field in to_be_pre_cleaned:
+            if field in request.POST:
+                request.POST[field] = clear_string(request.POST[field])
+
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+
+        return super().form_valid(form)

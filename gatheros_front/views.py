@@ -17,7 +17,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.views.generic import TemplateView, View
 
 from gatheros_front.forms import AuthenticationForm
-from gatheros_subscription.views.subscription import MySubscriptionsListView
+from gatheros_subscription.views import MySubscriptionsListView
 from mailer.services import notify_set_password
 
 LOGIN_SUPERUSER_ONLY = getattr(settings, 'LOGIN_SUPERUSER_ONLY', False)
