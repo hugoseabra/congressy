@@ -31,6 +31,8 @@ class InstallmentPart(EntityMixin, models.Model):
 
     amount = models.DecimalField(
         verbose_name="valor",
+        decimal_places=2,
+        max_digits=11,
         # Required
         blank=False,
         null=False,

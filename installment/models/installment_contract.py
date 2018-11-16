@@ -41,6 +41,8 @@ class InstallmentContract(EntityMixin, models.Model):
 
     liquid_amount = models.DecimalField(
         verbose_name="total líquido a pagar",
+        decimal_places=2,
+        max_digits=11,
         # Required
         blank=False,
         null=False,
@@ -48,6 +50,8 @@ class InstallmentContract(EntityMixin, models.Model):
 
     amount = models.DecimalField(
         verbose_name="total a pagar",
+        decimal_places=2,
+        max_digits=11,
         # Required
         blank=False,
         null=False,
@@ -85,6 +89,8 @@ class InstallmentContract(EntityMixin, models.Model):
 
     minimum_amount = models.DecimalField(
         verbose_name="valor mínimo de parcelamento",
+        decimal_places=2,
+        max_digits=11,
         # Required
         blank=False,
         null=False,
@@ -92,6 +98,8 @@ class InstallmentContract(EntityMixin, models.Model):
 
     minimum_installment_amount = models.DecimalField(
         verbose_name="valor mínimo de parcela",
+        decimal_places=2,
+        max_digits=11,
         # Required
         blank=False,
         null=False,
@@ -101,6 +109,7 @@ class InstallmentContract(EntityMixin, models.Model):
         verbose_name="status",
         choices=STATUS,
         default=OPEN_STATUS,
+        max_length=20,
         # Required
         blank=False,
         null=False,
