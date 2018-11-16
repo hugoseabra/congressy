@@ -1,1 +1,2 @@
 from .installment_contract import InstallmentContractManager
+from .installment_part import InstallmentPartManager
