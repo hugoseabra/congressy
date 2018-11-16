@@ -1,1 +1,2 @@
 from .installment_contract import InstallmentContractService
+from .installment_part import InstallmentPartService
