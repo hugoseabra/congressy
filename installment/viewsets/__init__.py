@@ -1,0 +1,1 @@
+from .installment_contract import InstallmentContractViewSet
