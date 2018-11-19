@@ -18,7 +18,9 @@ class Command(BaseCommand):
 
         transactions = Transaction.objects.filter(
             subscription__status=Subscription.AWAITING_STATUS,
+            subscription__origin=Subscription.DEVICE_ORIGIN_HOTSITE,
             status=Transaction.PAID,
+            manual=False,
             type__in=types
         )
 
