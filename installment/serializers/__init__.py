@@ -1,2 +1,2 @@
-from .installment_contract import InstallmentContractSerializer
-from .installment_part import InstallmentPartSerializer
+from .contract import ContractSerializer
+from .part import PartSerializer

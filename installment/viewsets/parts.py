@@ -3,37 +3,37 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from installment.models import InstallmentPart, InstallmentContract
-from installment.serializers import InstallmentPartSerializer
+from installment.models import Part, Contract
+from installment.serializers import PartSerializer
 from .mixins import RestrictionViewMixin
 
 
-class InstallmentPartsList(RestrictionViewMixin, ListAPIView):
-    serializer_class = InstallmentPartSerializer
+class PartsList(RestrictionViewMixin, ListAPIView):
+    serializer_class = PartSerializer
 
     def get_queryset(self):
 
         installment_contract_pk = self.kwargs.get('pk')
         assert installment_contract_pk is not None
 
-        parts = InstallmentPart.objects.filter(
+        parts = Part.objects.filter(
             contract__pk=installment_contract_pk,
         )
 
         try:
             installment_contract = \
-                InstallmentContract.objects.get(pk=installment_contract_pk)
-        except InstallmentContract.DoesNotExist:
-            return InstallmentPart.objects.none()
+                Contract.objects.get(pk=installment_contract_pk)
+        except Contract.DoesNotExist:
+            return Part.objects.none()
 
         user = self.request.user
 
         if not hasattr(user, 'person'):
-            return InstallmentPart.objects.none()
+            return Part.objects.none()
 
         person = user.person
 
-        participante_contracts = InstallmentContract.objects.filter(
+        participante_contracts = Contract.objects.filter(
             subscription__person_id=str(person.pk)
         )
 
@@ -45,18 +45,18 @@ class InstallmentPartsList(RestrictionViewMixin, ListAPIView):
             for m in user.person.members.filter(active=True)
         ]
 
-        organization_contracts = InstallmentContract.objects.filter(
+        organization_contracts = Contract.objects.filter(
             subscription__event__organization__in=org_pks
         )
 
         if installment_contract not in organization_contracts:
-            return InstallmentPart.objects.none()
+            return Part.objects.none()
 
         return parts
 
 
-class InstallmentPartViewSet(RestrictionViewMixin, ModelViewSet):
-    serializer_class = InstallmentPartSerializer
+class PartViewSet(RestrictionViewMixin, ModelViewSet):
+    serializer_class = PartSerializer
 
     def list(self, request, *args, **kwargs):
         content = {
@@ -67,7 +67,7 @@ class InstallmentPartViewSet(RestrictionViewMixin, ModelViewSet):
 
     def get_queryset(self):
         installment_contract_pk = self.request.query_params.get('pk')
-        return InstallmentPart.objects.filter(
+        return Part.objects.filter(
             contract_pk=installment_contract_pk,
         )
 
@@ -79,7 +79,7 @@ class InstallmentPartViewSet(RestrictionViewMixin, ModelViewSet):
 
         person = user.person
 
-        participante_contracts = InstallmentContract.objects.filter(
+        participante_contracts = Contract.objects.filter(
             subscription__person_id=str(person.pk)
         )
 
@@ -88,7 +88,7 @@ class InstallmentPartViewSet(RestrictionViewMixin, ModelViewSet):
             for m in user.person.members.filter(active=True)
         ]
 
-        organization_contracts = InstallmentContract.objects.filter(
+        organization_contracts = Contract.objects.filter(
             subscription__event__organization__in=org_pks
         )
 

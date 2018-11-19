@@ -3,13 +3,13 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from installment.models import InstallmentContract
-from installment.serializers import InstallmentContractSerializer
+from installment.models import Contract
+from installment.serializers import ContractSerializer
 from .mixins import RestrictionViewMixin
 
 
-class InstallmentContractViewSet(RestrictionViewMixin, ModelViewSet):
-    serializer_class = InstallmentContractSerializer
+class ContractViewSet(RestrictionViewMixin, ModelViewSet):
+    serializer_class = ContractSerializer
 
     def get_queryset(self):
 
@@ -24,16 +24,16 @@ class InstallmentContractViewSet(RestrictionViewMixin, ModelViewSet):
                     for m in user.person.members.filter(active=True)
                 ]
 
-                return InstallmentContract.objects.filter(
+                return Contract.objects.filter(
                     subscription__event__organization__in=org_pks
                 )
 
         if not hasattr(user, 'person'):
-            return InstallmentContract.objects.none()
+            return Contract.objects.none()
 
         person = self.request.user.person
 
-        return InstallmentContract.objects.filter(
+        return Contract.objects.filter(
             subscription__person_id=str(person.pk)
         )
 
@@ -46,7 +46,7 @@ class InstallmentContractViewSet(RestrictionViewMixin, ModelViewSet):
             for m in user.person.members.filter(active=True)
         ]
 
-        queryset = InstallmentContract.objects.filter(
+        queryset = Contract.objects.filter(
             subscription__event__organization__in=org_pks
         )
 
@@ -67,7 +67,7 @@ class InstallmentContractViewSet(RestrictionViewMixin, ModelViewSet):
             for m in user.person.members.filter(active=True)
         ]
 
-        queryset = InstallmentContract.objects.filter(
+        queryset = Contract.objects.filter(
             subscription__event__organization__in=org_pks
         )
 

@@ -1,11 +1,11 @@
 from base import managers
-from installment.models import InstallmentContract
+from installment.models import Contract
 
 
-class InstallmentContractManager(managers.Manager):
+class ContractManager(managers.Manager):
 
     class Meta:
-        model = InstallmentContract
+        model = Contract
         fields = '__all__'
         exclude = [
             'status',

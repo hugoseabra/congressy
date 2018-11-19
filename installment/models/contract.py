@@ -10,17 +10,18 @@ class MinimumAmountCreationWriteOnce(RuleChecker):
 
     def check(self, model_instance, *args, **kwargs):
 
-        if model_instance.minimum_amount and model_instance.minimum_amount_creation is None:
-            model_instance.minimum_amount_creation = datetime.now().date()
+        if model_instance.minimum_amount and \
+                model_instance.minimum_amount_creation is None:
+            model_instance.minimum_amount_creation = \
+                model_instance.minimum_amount
 
-        elif model_instance.minimum_amount_creation is not None and \
-                model_instance.minimum_amount_creation != \
+        elif model_instance.minimum_amount_creation != \
                 model_instance.__original_minimum_amount_creation:
             raise RuleIntegrityError('O campo \'minimum_amount_creation\' não é'
                                      ' editavel')
 
 
-class InstallmentContract(EntityMixin, models.Model):
+class Contract(EntityMixin, models.Model):
 
     rule_instances = [
         MinimumAmountCreationWriteOnce
@@ -106,15 +107,8 @@ class InstallmentContract(EntityMixin, models.Model):
         null=False,
     )
 
-    minimum_amount_creation = models.DateField(
-        verbose_name="montante mínimo para parcelamento",
-        # Required
-        blank=False,
-        null=False,
-    )
-
-    minimum_amount = models.DecimalField(
-        verbose_name="valor mínimo de parcelamento",
+    minimum_amount_creation = models.DecimalField(
+        verbose_name="montante mínimo para parcelamento na data de criação",
         decimal_places=2,
         max_digits=11,
         # Required
@@ -122,8 +116,8 @@ class InstallmentContract(EntityMixin, models.Model):
         null=False,
     )
 
-    minimum_installment_amount = models.DecimalField(
-        verbose_name="valor mínimo de parcela",
+    minimum_amount = models.DecimalField(
+        verbose_name="valor mínimo de parcelamento",
         decimal_places=2,
         max_digits=11,
         # Required

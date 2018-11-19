@@ -4,7 +4,7 @@ from django.db import models
 from base.models import EntityMixin
 
 
-class InstallmentPart(EntityMixin, models.Model):
+class Part(EntityMixin, models.Model):
     class Meta:
         verbose_name = 'Parcela de Contrato'
         verbose_name_plural = 'Parcelas de Contrato'
@@ -20,7 +20,7 @@ class InstallmentPart(EntityMixin, models.Model):
     )
 
     contract = models.ForeignKey(
-        'installment.InstallmentContract',
+        'installment.Contract',
         on_delete=models.CASCADE,
         verbose_name='parcela de inscrição',
         related_name='installment_parts',

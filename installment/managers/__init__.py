@@ -1,2 +1,2 @@
-from .installment_contract import InstallmentContractManager
-from .installment_part import InstallmentPartManager
+from .contract import ContractManager
+from .part import PartManager

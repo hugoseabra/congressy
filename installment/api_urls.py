@@ -7,19 +7,19 @@ router = routers.DefaultRouter()
 
 router.register(
     r'installment/contracts',
-    viewsets.InstallmentContractViewSet,
+    viewsets.ContractViewSet,
     base_name="installment_contract",
 )
 
 router.register(
     r'installment/parts',
-    viewsets.InstallmentPartViewSet,
+    viewsets.PartViewSet,
     base_name="installment_part",
 )
 
 single_endpoints = [
     url(r'^installment/contracts/(?P<pk>[\d]+)/parts',
-        viewsets.InstallmentPartsList.as_view(),
+        viewsets.PartsList.as_view(),
         name='installment_contract-parts-list'),
 ]
 

@@ -1,2 +1,2 @@
-from .installment_contract import InstallmentContract
-from .installment_part import InstallmentPart
+from .contract import Contract
+from .part import Part
