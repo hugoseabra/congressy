@@ -1,10 +1,31 @@
+from datetime import datetime
+
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from base.models import EntityMixin
+from base.models import EntityMixin, RuleChecker, RuleIntegrityError
+
+
+class MinimumAmountCreationWriteOnce(RuleChecker):
+
+    def check(self, model_instance, *args, **kwargs):
+
+        if model_instance.minimum_amount and model_instance.minimum_amount_creation is None:
+            model_instance.minimum_amount_creation = datetime.now().date()
+
+        elif model_instance.minimum_amount_creation is not None and \
+                model_instance.minimum_amount_creation != \
+                model_instance.__original_minimum_amount_creation:
+            raise RuleIntegrityError('O campo \'minimum_amount_creation\' não é'
+                                     ' editavel')
 
 
 class InstallmentContract(EntityMixin, models.Model):
+
+    rule_instances = [
+        MinimumAmountCreationWriteOnce
+    ]
+
     OPEN_STATUS = 'open'
     CANCELLED_STATUS = 'cancelled'
     FULLY_PAID_STATUS = 'fully_paid'
@@ -14,6 +35,12 @@ class InstallmentContract(EntityMixin, models.Model):
         (CANCELLED_STATUS, "cancelado"),
         (FULLY_PAID_STATUS, "quitado"),
     )
+
+    __original_minimum_amount_creation = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_minimum_amount_creation = self.minimum_amount_creation
 
     class Meta:
         verbose_name = 'Contrato de Parcelamento'
@@ -84,7 +111,6 @@ class InstallmentContract(EntityMixin, models.Model):
         # Required
         blank=False,
         null=False,
-        editable=False
     )
 
     minimum_amount = models.DecimalField(
