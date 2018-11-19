@@ -238,8 +238,8 @@
                                                         <small>(manual)</small>
                                                     </div>
                                                 {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_WAITING_PAYMENT %}
-                                                    <div class="float-left">    
-                                                    <i style="font-size: 40px" class="fas fa-hourglass-start"></i>
+                                                    <div class="float-left">
+                                                        <i style="font-size: 40px" class="fas fa-hourglass-start"></i>
                                                     </div>
                                                     <div class="float-left"
                                                          style="margin-left:10px">
@@ -567,7 +567,8 @@
                                 <div class="profile-info col-lg-3 col-md-6">
                                     <div class="profile-info-label">Cidade-UF:</div>
                                     <div class="profile-info-value">
-                                        {{ object.person.city_international|default:'' }}{% if object.person.city_international and object.person.state_international %},{% endif %}
+                                        {{ object.person.city_international|default:'' }}
+                                                {% if object.person.city_international and object.person.state_international %},{% endif %}
                                         {{ object.person.state_international|default:'' }}
                                     </div>
                                 </div>
@@ -590,7 +591,6 @@
                         <div class="connect social">
                             <ul>
                                 {% if is_free is False %}
-
                                     <li>
                                         <button type="button"
                                                 class="btn btn-info btn-trans"
@@ -599,6 +599,21 @@
                                                 onclick="window.location.href='{% url 'subscription:subscription-payments' event.pk object.pk %}'">
                                             <span class="far fa-money-bill-alt"></span>
                                             Ver Painel Financeiro
+                                        </button>
+                                    </li>
+                                {% endif %}
+
+
+                                {% if event.feature_configuration.feature_manual_payments is True %}
+                                    <li>
+                                        <button type="button"
+                                                class="btn btn-success btn-trans"
+                                                style="display: none;"
+                                                data-toggle="tooltip"
+                                                title="Criar novo contrato de parcelamento"
+                                                onclick="console.log('hi')">
+                                            <span class="far fa-money-bill-alt"></span>
+                                            Novo parcelamento
                                         </button>
                                     </li>
                                 {% endif %}
@@ -680,12 +695,12 @@
                             </div>
                             <div class="row">
                                 {% if object.person.ddi == 'BR' %}
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Número:</label>
-                                        <div class="well well-sm profile-info-padding">{{ object.person.number|default:'-' }}</div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Número:</label>
+                                            <div class="well well-sm profile-info-padding">{{ object.person.number|default:'-' }}</div>
+                                        </div>
                                     </div>
-                                </div>
                                 {% endif %}
                                 <div class="{% if object.person.ddi == 'BR' %}col-md-8{% else %}col-md-12{% endif %}">
                                     <div class="form-group">
@@ -698,12 +713,12 @@
                             </div>
                             <div class="row">
                                 {% if object.person.ddi == 'BR' %}
-                                <div class="col-md-12 col-xl-4">
-                                    <div class="form-group">
-                                        <label>Bairro:</label>
-                                        <div class="well well-sm profile-info-padding">{{ object.person.village|default:'-' }}</div>
+                                    <div class="col-md-12 col-xl-4">
+                                        <div class="form-group">
+                                            <label>Bairro:</label>
+                                            <div class="well well-sm profile-info-padding">{{ object.person.village|default:'-' }}</div>
+                                        </div>
                                     </div>
-                                </div>
                                 {% endif %}
                                 <div class="col-md-12 {% if object.person.ddi == 'BR' %}col-xl-8{% else %}col-xl-12{% endif %}">
                                     <div class="form-group">
@@ -712,7 +727,8 @@
                                             {% if object.person.ddi == 'BR' %}
                                                 {{ object.person.city.name }}-{{ object.person.city.uf }}
                                             {% else %}
-                                                {{ object.person.city_international|default:'' }}{% if object.person.city_international and object.person.state_international %},{% endif %}
+                                                {{ object.person.city_international|default:'' }}
+                                                        {% if object.person.city_international and object.person.state_international %},{% endif %}
                                                 {{ object.person.state_international|default:'' }}
                                             {% endif %}
                                         </div>
@@ -720,7 +736,8 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>CEP{% if object.person.ddi != 'BR' %} / Caixa Postal{% endif %}:</label>
+                                        <label>CEP
+                                            {% if object.person.ddi != 'BR' %} / Caixa Postal{% endif %}:</label>
                                         <div class="well well-sm profile-info-padding">
                                             {{ object.person.get_zip_code_display }}
                                         </div>
