@@ -24,12 +24,12 @@ class InstallmentPartsList(RestrictionViewMixin, ListAPIView):
             installment_contract = \
                 InstallmentContract.objects.get(pk=installment_contract_pk)
         except InstallmentContract.DoesNotExist:
-            return InstallmentPart.objects.get_queryset()
+            return InstallmentPart.objects.none()
 
         user = self.request.user
 
         if not hasattr(user, 'person'):
-            return InstallmentPart.objects.get_queryset()
+            return InstallmentPart.objects.none()
 
         person = user.person
 
@@ -50,7 +50,7 @@ class InstallmentPartsList(RestrictionViewMixin, ListAPIView):
         )
 
         if installment_contract not in organization_contracts:
-            return InstallmentPart.objects.get_queryset()
+            return InstallmentPart.objects.none()
 
         return parts
 

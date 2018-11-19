@@ -29,7 +29,7 @@ class InstallmentContractViewSet(RestrictionViewMixin, ModelViewSet):
                 )
 
         if not hasattr(user, 'person'):
-            return InstallmentContract.objects.get_queryset()
+            return InstallmentContract.objects.none()
 
         person = self.request.user.person
 
