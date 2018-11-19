@@ -1,2 +1,2 @@
 from .installment_contract import InstallmentContractViewSet
-from .installment_parts import InstallmentPartsList
+from .installment_parts import InstallmentPartsList, InstallmentPartViewSet

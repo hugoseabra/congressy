@@ -11,6 +11,12 @@ router.register(
     base_name="installment_contract",
 )
 
+router.register(
+    r'installment/parts',
+    viewsets.InstallmentPartViewSet,
+    base_name="installment_part",
+)
+
 single_endpoints = [
     url(r'^installment/contracts/(?P<pk>[\d]+)/parts',
         viewsets.InstallmentPartsList.as_view(),

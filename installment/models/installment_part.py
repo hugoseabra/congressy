@@ -40,6 +40,7 @@ class InstallmentPart(EntityMixin, models.Model):
 
     expiration_day = models.PositiveIntegerField(
         verbose_name="vencimento",
+        validators=[MaxValueValidator(31), MinValueValidator(1)],
         # Required
         blank=False,
         null=False,
