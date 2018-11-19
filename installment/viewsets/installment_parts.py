@@ -55,7 +55,7 @@ class InstallmentPartsList(RestrictionViewMixin, ListAPIView):
         return parts
 
 
-class InstallmentPartViewSet(ModelViewSet):
+class InstallmentPartViewSet(RestrictionViewMixin, ModelViewSet):
     serializer_class = InstallmentPartSerializer
 
     def list(self, request, *args, **kwargs):
