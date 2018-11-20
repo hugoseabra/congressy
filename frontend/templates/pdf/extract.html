@@ -1,0 +1,52 @@
+{% load static l10n humanize %}
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>Voucher</title>
+    <link rel="stylesheet"
+          href="{{ base_url }}assets/plugins/bootstrap/css/bootstrap.min.css">
+
+    <style>
+        .table.no-border tr td, .table.no-border tr th {
+            border-width: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <img src="data:image/png;base64,{{ logo }}"
+                 style="margin-top: 15px;" alt="Congressy">
+        </div>
+    </div>
+    <div class="row" align="center">
+        <h1>Extrato do Pedido | Ingresso</h1>
+        <div style="font-weight: bold;font-size:18px">{{ subscription.code }}</div>
+        <div style="font-size:14px">{{ subscription.created }}</div>
+    </div>
+    <hr/>
+    <br>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="text-center"
+                style="font-weight: bold;">{{ event.name|upper }}</h3>
+            <br/>
+            <p style="margin-top: 5px; font-size: 25px">{{ person.name|upper }}</p>
+            
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
+
+
