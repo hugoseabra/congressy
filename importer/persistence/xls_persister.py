@@ -248,8 +248,8 @@ class XLSLotExamplePersister(XLSPersister):
                 for opt in header.possible_options:
                     msg += opt + "\n"
 
-                comment.width = 300 
                 comment = Comment(msg, 'Congressy')
+                comment.width = 300
 
             if comment:
                 ws1[cell].comment = comment
