@@ -1,11 +1,12 @@
-{% load static l10n humanize %}
+{% load i18n static base_tags queryset_filter payment_report l10n humanize %}
+{% now "Y-m-d" as today %}
 <html>
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
-    <title>Voucher</title>
+    <title>Extrato</title>
     <link rel="stylesheet"
           href="{{ base_url }}assets/plugins/bootstrap/css/bootstrap.min.css">
 
@@ -33,15 +34,89 @@
     <br>
 
 
-    <div class="row">
-        <div class="col-md-12">
-            <h3 class="text-center"
-                style="font-weight: bold;">{{ event.name|upper }}</h3>
-            <br/>
-            <p style="margin-top: 5px; font-size: 25px">{{ person.name|upper }}</p>
-            
+    <div>
 
-        </div>
+        <h2 class="text-center" style="font-weight: bold;">
+            {{ event.name|upper }}
+        </h2>
+
+
+    </div>
+
+    <div style="margin-top: 20px">
+
+        <h3 style="font-weight: bold;">
+            Pessoais
+        </h3>
+
+        <table class="table no-border" style="border-width: 0;margin-top: 20px">
+            <tbody style="border-width: 0;">
+
+            <tr style="border-width: 0;">
+                <td class="col-sm-2" style="border-width: 0;">
+                    <strong>
+                        Nome completo
+                    </strong>
+                </td>
+                <td class="col-sm-2">
+                    {{ person.name|title }}
+                </td>
+            </tr>
+
+            <tr style="border-width: 0;">
+                <td class="col-sm-2" style="border-width: 0;">
+                    <strong>
+                        Email
+                    </strong>
+                </td>
+                <td class="col-sm-2">
+                    {{ person.email|lower }}
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div>
+
+        <h3 style="font-weight: bold;">
+            Inscrição
+        </h3>
+
+        <table class="table no-border" style="border-width: 0;margin-top: 20px">
+            <tbody style="border-width: 0;">
+
+            <tr style="border-width: 0;">
+                <td class="col-sm-2" style="border-width: 0;">
+                    <strong>
+                        Lote
+                    </strong>
+                </td>
+                <td class="col-sm-2">
+                    {{ lot.name }}
+                </td>
+            </tr>
+
+            {% if lot.price and lot.price > 0 %}
+                <tr style="border-width: 0;">
+                    <td class="col-sm-2" style="border-width: 0;">
+                        <strong>
+                            Valor
+                        </strong>
+                    </td>
+                    <td class="col-sm-2">
+                        R$ {{ lot.get_calculated_price }}
+                    </td>
+                </tr>
+            {% endif %}
+
+            </tbody>
+
+        </table>
+
     </div>
 
 </div>

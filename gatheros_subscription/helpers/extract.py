@@ -10,6 +10,8 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
 
+from gatheros_subscription.helpers.report_payment import PaymentReportCalculator
+
 
 def get_logo():
     uri = staticfiles_storage.url('assets/img/logo_v3.png')
@@ -31,6 +33,9 @@ def get_context(subscription):
     """
 
     event = subscription.event
+
+    calculator = PaymentReportCalculator(subscription=subscription)
+
     context = {
         'base_url': absoluteuri.build_absolute_uri(settings.STATIC_URL),
         'logo': get_logo(),
@@ -39,6 +44,12 @@ def get_context(subscription):
         'lot': subscription.lot,
         'organization': event.organization,
         'subscription': subscription,
+        'lots': calculator.lots,
+        'transactions': calculator.transactions,
+        'has_manual': calculator.has_manual,
+        'installments':  calculator.installments,
+        'full_prices': calculator.full_prices,
+        'object': subscription,
     }
 
     return context
