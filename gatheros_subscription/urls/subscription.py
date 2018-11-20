@@ -44,6 +44,11 @@ urls = [
         name='subscription-voucher'
     ),
     url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/extract/$',
+        views.ExtractSubscriptionPDFView.as_view(),
+        name='subscription-voucher'
+    ),
+    url(
         r'^(?P<pk>[0-9A-Fa-f-]+)/',
         views.SubscriptionViewFormView.as_view(),
         name='subscription-view'
