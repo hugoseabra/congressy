@@ -147,6 +147,20 @@
                     window.location.href = window.location.href;
                 }, 7500);
             {% endif %}
+
+
+            {% if event.feature_configuration.feature_manual_payments is True %}
+
+
+                var has_contracts = true;
+
+                if (has_contracts) {
+                    $('#new-contract-btn').show();
+                }
+
+            {% endif %}
+
+
         });
     </script>
 {% endblock %}
@@ -240,7 +254,7 @@
                 </div>
             </div>
         {% endif %}
-    
+
     </div>
 
     <div id="checkout_form_block" style="display:none">
@@ -259,8 +273,15 @@
     </form>
 
 {% endblock %}
+
 {% block modals %}
+
     {% include 'subscription/includes/modal-manual-payment-form.html' with form=manual_payment_form %}
+
     {% include 'subscription/includes/modal-delete-manual-payment-form.html' with form=manual_payment_form %}
+
+    {% if event.feature_configuration.feature_manual_payments is True %}
+        {% include 'subscription/includes/modal-add-contract-form.html' %}
+    {% endif %}
 
 {% endblock %}
