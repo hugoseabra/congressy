@@ -12,33 +12,6 @@ class ContractViewSet(RestrictionViewMixin, ModelViewSet):
     serializer_class = ContractSerializer
 
     def get_queryset(self):
-
-        user = self.request.user
-
-        if 'mode' in self.request.query_params:
-            mode = self.request.query_params.get('mode')
-
-            if mode == 'organizer':
-                org_pks = [
-                    m.organization.pk
-                    for m in user.person.members.filter(active=True)
-                ]
-
-                return Contract.objects.filter(
-                    subscription__event__organization__in=org_pks
-                )
-
-        if not hasattr(user, 'person'):
-            return Contract.objects.none()
-
-        person = self.request.user.person
-
-        return Contract.objects.filter(
-            subscription__person_id=str(person.pk)
-        )
-
-    def list(self, request, *args, **kwargs):
-
         user = self.request.user
 
         org_pks = [
@@ -46,30 +19,31 @@ class ContractViewSet(RestrictionViewMixin, ModelViewSet):
             for m in user.person.members.filter(active=True)
         ]
 
-        queryset = Contract.objects.filter(
+        qs = Contract.objects.filter(
             subscription__event__organization__in=org_pks
         )
 
-        page = self.paginate_queryset(queryset)
+        if 'event' in self.request.query_params:
+            event_pk = self.request.query_params.get('event')
+            return qs.filter(subscription__event_id=event_pk)
+
+        return qs
+
+    def list(self, request, *args, **kwargs):
+
+        qs = self.get_queryset()
+
+        page = self.paginate_queryset(qs)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
 
-        user = self.request.user
-
-        org_pks = [
-            m.organization.pk
-            for m in user.person.members.filter(active=True)
-        ]
-
-        queryset = Contract.objects.filter(
-            subscription__event__organization__in=org_pks
-        )
+        queryset = self.get_queryset()
 
         # Perform the lookup filtering.
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
