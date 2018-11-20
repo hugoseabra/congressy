@@ -1,4 +1,4 @@
-{% load form_config_tags %}
+{% load humanize %}
 
 <div class="modal" id="contract-form-modal" role="dialog" data-backdrop="true">
     <div class="modal-dialog " role="document">
@@ -14,15 +14,74 @@
                     Novo contrato de parcelamento
                 </h4>
             </div>
-            <div class="modal-body">
-                <div class="row">
-                    <p>Form goes here</p>
+            <form class="form-inline" onsubmit="return false;">
+                <div class="modal-body">
+                    <div style="margin-left: 10px">
+
+                        <table class="table borderless">
+                            <tbody>
+                            <tr>
+                                <td style="font-size: larger">
+                                    Valor:
+                                </td>
+                                <td style="font-size: larger; font-weight: bold">
+                                    R$ {{ last_transaction.amount|intcomma }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="font-size: larger">
+                                        Quantidade de Parcelas:
+                                    </div>
+                                    <small class="text-muted">
+                                        Devido a data limite de parcelamento e o valor da inscrição, serão permitidos no maximo 4 parcelas
+                                    </small>
+                                </td>
+                                <td style="font-size: large;">
+                                    <select>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="3">4</option>
+                                    </select>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <div style="font-size: larger">
+                                        Data base de parcelamento:
+                                    </div>
+                                </td>
+                                <td style="font-size: large;">
+                                    <input type="number" min="1" max="31">
+                                </td>
+                            </tr>
+
+
+                            <tr>
+                                <td style=" padding-top: 3em;">
+                                    <div style="font-size: larger">
+                                        Valor de cada parcela ao parcelar em 1x:
+                                    </div>
+                                </td>
+                                <td style="font-size: x-large; color: darkgreen;padding-top: 3em;">
+                                    R$ 75,50
+                                </td>
+                            </tr>
+
+
+                            </tbody>
+                        </table>
+
+
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
-                <button type="submit" class="btn btn-success">Salvar</button>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                </div>
+            </form>
 
         </div>
     </div>
