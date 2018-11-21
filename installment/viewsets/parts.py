@@ -16,10 +16,6 @@ class PartsList(RestrictionViewMixin, ListAPIView):
         installment_contract_pk = self.kwargs.get('pk')
         assert installment_contract_pk is not None
 
-        parts = Part.objects.filter(
-            contract__pk=installment_contract_pk,
-        )
-
         try:
             installment_contract = \
                 Contract.objects.get(pk=installment_contract_pk)
@@ -30,15 +26,6 @@ class PartsList(RestrictionViewMixin, ListAPIView):
 
         if not hasattr(user, 'person'):
             return Part.objects.none()
-
-        person = user.person
-
-        participante_contracts = Contract.objects.filter(
-            subscription__person_id=str(person.pk)
-        )
-
-        if installment_contract in participante_contracts:
-            return parts
 
         org_pks = [
             m.organization.pk
@@ -51,6 +38,10 @@ class PartsList(RestrictionViewMixin, ListAPIView):
 
         if installment_contract not in organization_contracts:
             return Part.objects.none()
+
+        parts = Part.objects.filter(
+            contract__pk=installment_contract_pk,
+        )
 
         return parts
 

@@ -30,6 +30,10 @@ class ContractViewSet(RestrictionViewMixin, ModelViewSet):
             event_pk = self.request.query_params.get('event')
             return qs.filter(subscription__event_id=event_pk)
 
+        if 'status' in self.request.query_params:
+            statuses = self.request.query_params.get('status').split(',')
+            return qs.filter(status__in=statuses)
+
         return qs
 
     def destroy(self, request, *args, **kwargs):
