@@ -20,6 +20,10 @@ class ContractViewSet(RestrictionViewMixin, ModelViewSet):
             subscription__event__organization__in=org_pks
         )
 
+        if 'subscription' in self.request.query_params:
+            subscription_pk = self.request.query_params.get('subscription')
+            return qs.filter(subscription_id=subscription_pk)
+
         if 'event' in self.request.query_params:
             event_pk = self.request.query_params.get('event')
             return qs.filter(subscription__event_id=event_pk)
