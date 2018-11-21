@@ -75,7 +75,7 @@ class Contract(EntityMixin, models.Model):
         decimal_places=2,
         max_digits=11,
         # Required
-        blank=False,
+        blank=True,
         null=False,
     )
 
