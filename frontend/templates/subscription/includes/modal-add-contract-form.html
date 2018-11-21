@@ -28,6 +28,18 @@
                                     R$ {{ last_transaction.amount|intcomma }}
                                 </td>
                             </tr>
+
+                            <tr>
+                                <td>
+                                    <div style="font-size: larger">
+                                        Data base de parcelamento:
+                                    </div>
+                                </td>
+                                <td style="font-size: large;">
+                                    <input type="number" min="1" max="31">
+                                </td>
+                            </tr>
+
                             <tr>
                                 <td>
                                     <div style="font-size: larger">
@@ -48,25 +60,32 @@
                             </tr>
 
                             <tr>
-                                <td>
-                                    <div style="font-size: larger">
-                                        Data base de parcelamento:
-                                    </div>
-                                </td>
-                                <td style="font-size: large;">
-                                    <input type="number" min="1" max="31">
-                                </td>
-                            </tr>
 
+                                <td colspan="2">
 
-                            <tr>
-                                <td style=" padding-top: 3em;">
                                     <div style="font-size: larger">
-                                        Valor de cada parcela ao parcelar em 1x:
+                                        Parcelas:
                                     </div>
-                                </td>
-                                <td style="font-size: x-large; color: darkgreen;padding-top: 3em;">
-                                    R$ 75,50
+
+                                    <div class="text-center">
+
+                                        <div class="form-group" style="padding-top: 1em">
+                                            1x<input class="form-control" type="text">
+                                            <strong>R$ 50.00</strong>
+                                        </div>
+                                        <div class="form-group">
+                                            2x<input class="form-control" type="text">
+                                            <strong>R$ 50.00</strong>
+                                        </div>
+                                        <div class="form-group">
+                                            3x<input class="form-control" type="text">
+                                            <strong>R$ 50.00</strong>
+                                        </div>
+                                        <div class="form-group">
+                                            4x<input class="form-control" type="text">
+                                            <strong>R$ 50.00</strong>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
 
