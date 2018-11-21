@@ -108,7 +108,7 @@ class Contract(EntityMixin, models.Model):
     )
 
     minimum_amount_creation = models.DecimalField(
-        verbose_name="montante mínimo para parcelamento na data de criação",
+        verbose_name="valor mínimo para habilitar parcelamento",
         decimal_places=2,
         max_digits=11,
         # Required
@@ -116,8 +116,8 @@ class Contract(EntityMixin, models.Model):
         null=False,
     )
 
-    minimum_amount = models.DecimalField(
-        verbose_name="valor mínimo de parcelamento",
+    minimum_amount_part = models.DecimalField(
+        verbose_name="valor mínimo por parcela",
         decimal_places=2,
         max_digits=11,
         # Required
