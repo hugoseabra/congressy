@@ -14,8 +14,9 @@ class MinimumAmountWriteOnce(RuleChecker):
         if model_instance.__original_minimum_amount_creation and \
                 model_instance.minimum_amount_creation != \
                 model_instance.__original_minimum_amount_creation:
-            raise RuleIntegrityError('O campo \'minimum_amount_creation\' não é'
-                                     ' editavel')
+            raise RuleIntegrityError(
+                'O campo \'minimum_amount_creation\' não é'
+                ' editavel')
 
         if model_instance.__original_minimum_amount and \
                 model_instance.minimum_amount != \
@@ -24,9 +25,26 @@ class MinimumAmountWriteOnce(RuleChecker):
                                      ' editavel')
 
 
+class OnlyOneOpenContract(RuleChecker):
+    def check(self, model_instance, *args, **kwargs):
+        sub = model_instance.subscription
+
+        if model_instance.is_new is False:
+            return
+
+        contract_qs = \
+            sub.installment_contracts.filter(status=Contract.OPEN_STATUS)
+
+        if contract_qs.count() > 0:
+            raise RuleIntegrityError(
+                'Não é possível criar mais de um contrato ativo.'
+            )
+
+
 class Contract(EntityMixin, models.Model):
     rule_instances = [
-        MinimumAmountWriteOnce
+        MinimumAmountWriteOnce,
+        OnlyOneOpenContract
     ]
 
     OPEN_STATUS = 'open'
@@ -137,6 +155,10 @@ class Contract(EntityMixin, models.Model):
         blank=False,
         null=False,
     )
+
+    @property
+    def is_new(self):
+        return self._meta.adding is True
 
     def save(self, **kwargs):
 
