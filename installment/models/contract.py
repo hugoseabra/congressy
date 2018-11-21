@@ -119,7 +119,7 @@ class Contract(EntityMixin, models.Model):
         null=False,
     )
 
-    minimum_amount_part = models.DecimalField(
+    minimum_amount = models.DecimalField(
         verbose_name="valor mínimo por parcela",
         decimal_places=2,
         max_digits=11,
