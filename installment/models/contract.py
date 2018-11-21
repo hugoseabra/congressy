@@ -1,30 +1,32 @@
-from datetime import datetime
+from datetime import timedelta
 
+from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from base.models import EntityMixin, RuleChecker, RuleIntegrityError
 
 
-class MinimumAmountCreationWriteOnce(RuleChecker):
+class MinimumAmountWriteOnce(RuleChecker):
 
     def check(self, model_instance, *args, **kwargs):
 
-        if model_instance.minimum_amount and \
-                model_instance.minimum_amount_creation is None:
-            model_instance.minimum_amount_creation = \
-                model_instance.minimum_amount
-
-        elif model_instance.minimum_amount_creation != \
+        if model_instance.__original_minimum_amount_creation and \
+                model_instance.minimum_amount_creation != \
                 model_instance.__original_minimum_amount_creation:
             raise RuleIntegrityError('O campo \'minimum_amount_creation\' não é'
                                      ' editavel')
 
+        if model_instance.__original_minimum_amount and \
+                model_instance.minimum_amount != \
+                model_instance.__original_minimum_amount:
+            raise RuleIntegrityError('O campo \'minimum_amount\' não é'
+                                     ' editavel')
+
 
 class Contract(EntityMixin, models.Model):
-
     rule_instances = [
-        MinimumAmountCreationWriteOnce
+        MinimumAmountWriteOnce
     ]
 
     OPEN_STATUS = 'open'
@@ -42,6 +44,7 @@ class Contract(EntityMixin, models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__original_minimum_amount_creation = self.minimum_amount_creation
+        self.__original_minimum_amount = self.minimum_amount
 
     class Meta:
         verbose_name = 'Contrato de Parcelamento'
@@ -103,7 +106,7 @@ class Contract(EntityMixin, models.Model):
     limit_date = models.DateField(
         verbose_name="data limite de parcelamento",
         # Required
-        blank=False,
+        blank=True,
         null=False,
     )
 
@@ -112,7 +115,7 @@ class Contract(EntityMixin, models.Model):
         decimal_places=2,
         max_digits=11,
         # Required
-        blank=False,
+        blank=True,
         null=False,
     )
 
@@ -121,7 +124,7 @@ class Contract(EntityMixin, models.Model):
         decimal_places=2,
         max_digits=11,
         # Required
-        blank=False,
+        blank=True,
         null=False,
     )
 
@@ -134,3 +137,19 @@ class Contract(EntityMixin, models.Model):
         blank=False,
         null=False,
     )
+
+    def save(self, **kwargs):
+
+        if self.minimum_amount_creation is None:
+            self.minimum_amount_creation = \
+                settings.CONGRESSY_MINIMUM_AMOUNT_TO_ALLOW_INSTALLMENTS
+
+        if self.minimum_amount is None:
+            self.minimum_amount_creation = \
+                settings.CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS
+
+        if self.limit_date is None:
+            self.limit_date = self.subscription.event.date_start - timedelta(
+                days=2)
+
+        super().save(kwargs)

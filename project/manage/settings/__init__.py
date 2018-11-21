@@ -69,6 +69,9 @@ CONGRESSY_MINIMUM_AMOUNT = 4.99
 CONGRESSY_INSTALLMENT_INTERESTS_RATE = 2.29
 
 # Valor minimo para permitir parcelamentos
+CONGRESSY_MINIMUM_AMOUNT_TO_ALLOW_INSTALLMENTS = 200
+
+# Valor minimo para cada parcela
 CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS = 25
 
 # ============================ GOOGLE RECAPTCHA ============================= #
