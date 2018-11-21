@@ -1,3 +1,5 @@
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from installment.models import Contract
@@ -20,8 +22,19 @@ class ContractViewSet(RestrictionViewMixin, ModelViewSet):
             subscription__event__organization__in=org_pks
         )
 
+        if 'subscription' in self.request.query_params:
+            subscription_pk = self.request.query_params.get('subscription')
+            return qs.filter(subscription_id=subscription_pk)
+
         if 'event' in self.request.query_params:
             event_pk = self.request.query_params.get('event')
             return qs.filter(subscription__event_id=event_pk)
 
         return qs
+
+    def destroy(self, request, *args, **kwargs):
+        content = {
+            'detail': 'method not allowed'
+        }
+
+        return Response(content, status=status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -38,11 +38,10 @@ class Part(EntityMixin, models.Model):
         null=False,
     )
 
-    expiration_day = models.PositiveIntegerField(
+    expiration_date = models.DateField(
         verbose_name="vencimento",
-        validators=[MaxValueValidator(31), MinValueValidator(1)],
         # Required
-        blank=False,
+        blank=True,
         null=False,
     )
 
