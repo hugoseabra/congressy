@@ -30,7 +30,7 @@ window.cgsy.installment.collection = window.cgsy.installment.collection || {};
 
         // Fields
         this.fields = {
-            'constract': {
+            'contract': {
                 'required': true,
                 'type': 'integer',
                 'submittable': true,
@@ -52,12 +52,18 @@ window.cgsy.installment.collection = window.cgsy.installment.collection || {};
                 'label': 'Data de vencimento',
                 'message': 'Você deve a data de vencimento'
             },
-            'installment_numbner': {
+            'installment_number': {
                 'required': true,
                 'type': 'integer',
                 'submittable': true,
                 'label': 'Número da parcela',
                 'message': 'Você deve o número da parcela'
+            },
+            'paid': {
+                'required': false,
+                'type': 'boolean',
+                'submittable': true,
+                'label': 'Pago'
             }
         };
     };
@@ -73,14 +79,37 @@ window.cgsy.installment.collection = window.cgsy.installment.collection || {};
      */
     installment.collections.PartCollection = function(contract_pk) {
         abstracts.domain.Collection.call(this);
+        var self = this;
 
         if (!contract_pk) {
             console.warn('Nenhum ID de contrato informada.')
         }
 
-        this.model_class = installment.models.Contract;
+        this.model_class = installment.models.Part;
         this.uri_manager = uri_manager;
         this.uri = '/contracts/'+contract_pk+'/parts/';
+
+        this._post_add = function () {
+            _sort();
+        };
+
+        this._post_remove = function () {
+            _sort();
+        };
+
+        var _sort = function () {
+            function compare(a, b) {
+                var comparison = 0;
+                if (a.get('expiration_date') > b.get('expiration_date')) {
+                    comparison = 1;
+                }
+                else if (a.get('expiration_date') < b.get('expiration_date')) {
+                    comparison = -1;
+                }
+                return comparison;
+            }
+            self.items.sort(compare);
+        };
     };
     installment.collections.PartCollection.prototype = Object.create(abstracts.domain.Collection.prototype);
     installment.collections.PartCollection.prototype.constructor = installment.collections.PartCollection;

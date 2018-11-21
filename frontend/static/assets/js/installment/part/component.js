@@ -14,14 +14,14 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
         abstracts.element.list.Table.call(this, parent_el);
         var self = this;
 
-        this.createHeader('#', '#', null, '10%');
-        this.createHeader('amount', 'Valor (R$)', 'text-center', null);
-        this.createHeader('exp_date', 'Vencimento', 'text-center', null);
-        this.createHeader('status', 'Status', 'text-center', null);
+        self.addHeader('#', '#', 'text-center', '5%');
+        self.addHeader('exp_date', 'Vencimento', 'text-center', null);
+        self.addHeader('amount', 'Valor (R$)', 'text-center', '20%');
+        self.addHeader('status', 'Status', 'text-center', '10%');
 
-        this.createActionButton('Pagar', 'fa fa-check', function() {
-            alert('pagou nada não');
-        });
+        // self.addActionButton('Pagar', 'fas fa-money', function() {
+        //     alert('pagou nada não');
+        // });
     };
     installment.component.ContractFormModal.prototype = Object.create(abstracts.element.list.Table.prototype);
     installment.component.ContractFormModal.prototype.constructor = installment.component.ContractFormModal;

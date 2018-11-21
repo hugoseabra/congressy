@@ -82,7 +82,7 @@ window.cgsy.installment = window.cgsy.installment || {};
                 return undefined;
             }
             self.part_collection = new installment.collections.PartCollection(self.pk);
-            self.part_collection.error_handler = self.handler;
+            self.part_collection.error_handler = self.error_handler;
 
             return self.part_collection;
         };
@@ -135,6 +135,10 @@ window.cgsy.installment = window.cgsy.installment || {};
         this.model_class = installment.models.Contract;
         this.uri_manager = uri_manager;
         this.uri = '/contracts/?subscription=' + subscription_pk;
+
+        this.addUriFilter = function(key, value) {
+            self.uri += '&{}={}'.format(key, value);
+        };
     };
     installment.collections.ContractCollection.prototype = Object.create(abstracts.domain.Collection.prototype);
     installment.collections.ContractCollection.prototype.constructor = installment.collections.ContractCollection;
