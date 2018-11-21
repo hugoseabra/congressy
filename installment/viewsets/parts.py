@@ -58,13 +58,6 @@ class PartsList(RestrictionViewMixin, ListAPIView):
 class PartViewSet(RestrictionViewMixin, ModelViewSet):
     serializer_class = PartSerializer
 
-    def list(self, request, *args, **kwargs):
-        content = {
-            'detail': 'method not allowed'
-        }
-
-        return Response(content, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
     def get_queryset(self):
         installment_contract_pk = self.request.query_params.get('pk')
         return Part.objects.filter(
@@ -97,3 +90,17 @@ class PartViewSet(RestrictionViewMixin, ModelViewSet):
             raise exceptions.PermissionDenied()
 
         return obj
+
+    def list(self, request, *args, **kwargs):
+        content = {
+            'detail': 'method not allowed'
+        }
+
+        return Response(content, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def destroy(self, request, *args, **kwargs):
+        content = {
+            'detail': 'method not allowed'
+        }
+
+        return Response(content, status=status.HTTP_405_METHOD_NOT_ALLOWED)
