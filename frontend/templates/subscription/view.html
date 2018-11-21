@@ -304,6 +304,7 @@
         <input type="hidden" name="next_url" value=""/>
     </form>
 
+    {% include 'subscription/includes/form-installment-contract.html' %}
 {% endblock %}
 
 {% block modals %}
@@ -313,7 +314,7 @@
     {% include 'subscription/includes/modal-delete-manual-payment-form.html' with form=manual_payment_form %}
 
     {% if event.feature_configuration.feature_manual_payments is True %}
-        {% include 'subscription/includes/modal-add-contract-form.html' %}
+
     {% endif %}
 
 {% endblock %}
