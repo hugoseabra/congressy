@@ -10,4 +10,6 @@ class ContractManager(managers.Manager):
         exclude = [
             'status',
             'minimum_amount_creation',
+            'minimum_amount',
+            'liquid_amount',
         ]
