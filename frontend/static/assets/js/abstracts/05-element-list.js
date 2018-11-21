@@ -254,11 +254,14 @@ window.cgsy.abstracts.element.list = window.cgsy.abstracts.element.list || {};
                 return;
             }
 
+            self.preRender();
+
             var table_el = self.getTableEl();
                 table_el.hide();
 
             self.getLoaderEl().fadeOut(function() {
                 table_el.fadeIn(function() {
+                    self.postRender();
                     self.after_render_callback();
                 });
             });
@@ -274,7 +277,7 @@ window.cgsy.abstracts.element.list = window.cgsy.abstracts.element.list || {};
             }
 
             self.table_el = $('<table>').addClass('table table-striped table-bordered');
-            self.parent_el.append(self.table_el);
+            self.parent_el.html(self.table_el);
 
             if (self.items.length === 0) {
                 self.table_el.append($('<tbody>').append($('<tr>').append(
@@ -311,6 +314,9 @@ window.cgsy.abstracts.element.list = window.cgsy.abstracts.element.list || {};
             main_div.show();
             return main_div;
         };
+
+        this.preRender = function() {};
+        this.postRender = function() {};
 
         /**
          * Cria elementos de cabeçalho

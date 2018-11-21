@@ -11,13 +11,31 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
      * @constructor
      */
     installment.component.PartTable = function(parent_el) {
+        abstracts.dom.Component.call(this);
         abstracts.element.list.Table.call(this, parent_el);
         var self = this;
+
+        self.dom_manager.domElements['cancel-button'] = null;
+
+        this.preRender = function() {
+            var button_el = self.getEl('cancel-button');
+            if (button_el && button_el.length) {
+                self.getEl('cancel-button').hide();
+            }
+        };
+
+        this.postRender = function() {
+            var button_el = self.getEl('cancel-button');
+            if (button_el && button_el.length) {
+                self.getEl('cancel-button').show();
+            }
+        };
 
         self.addHeader('#', '# Parcela', 'text-center', '12%');
         self.addHeader('exp_date', 'Vencimento', 'text-center', null);
         self.addHeader('amount', 'Valor (R$)', 'text-center', '25%');
         self.addHeader('status', 'Status', 'text-center', '10%');
+
 
         // self.hideHeaders();
         // self.addActionButton('Pagar', 'fas fa-money', function() {

@@ -41,24 +41,15 @@ function renderPartsList(contract, parent_el) {
     parent_el = $(parent_el);
 
     var table = new window.cgsy.installment.component.PartTable(parent_el);
+        table.setEl('cancel-button', $('#cancel-installment-contract'));
 
     getContractParts(contract).then(function (parts) {
-        var counter = 0;
         parts.forEach(function (part) {
             table.addItem(part);
-            // table.addItem({
-            //     '#': part.get('installment_number'),
-            //     'amount': 'R$ ' + as_currency(part.get('amount')),
-            //     'exp_date': part.get('expiration_date').format('DD/MM/YYYYY'),
-            //     'paid': part.get('paid') === true,
-            //     'next-part': part.get('paid') === false && counter === 0
-            // });
-            // if (part.get('paid') === false) {
-            //     counter++;
-            // }
         });
 
         table.render();
+
     }).catch(function(reason) {
         console.error(reason);
     });
@@ -73,11 +64,11 @@ $(document).ready(function () {
         if (opens.length === 0) {
             return;
         }
-
         var open_contract = opens[0];
 
         renderPartsList(open_contract, $('#constract-parts-list'));
-    }).catch(function() {
-        console.error('Erro ao buscar contratos.');
+
+    }).catch(function(reason) {
+        console.error('Erro ao buscar contratos.', reason);
     })
 });

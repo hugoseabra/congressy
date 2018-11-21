@@ -13,12 +13,14 @@
                 <div style="margin-left: 10px; margin-right: 10px">
                     
                     <div class="row">
-                        <div class="col-md-12" id="constract-parts-list"></div>
+                        <div class="col-md-12" id="constract-parts-list">
+                            <div class="list-loader" style="text-align: center"><span class="fas fa-circle-notch fa-spin fa-3x"></span><div>carregando</div></div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="text-right danger-color">
-                                <a href="javascript:void(0)" onclick="alert('Excluir contrato sob confirmação')" style="color:darkred">Cancelar contrato</a>
+                            <div class="text-right">
+                                <a id="cancel-installment-contract" href="javascript:void(0)" onclick="alert('Excluir contrato sob confirmação')" style="color:darkred;display:none">Cancelar contrato</a>
                             </div>
                         </div>
                     </div>
