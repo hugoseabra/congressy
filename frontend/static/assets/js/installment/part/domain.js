@@ -24,6 +24,12 @@ window.cgsy.installment.collection = window.cgsy.installment.collection || {};
         this.verbose_name = 'parcela';
         this.verbose_name_plural = 'parcelas';
 
+        /**
+         * Próxima parcela a ser paga.
+         * @type {boolean}
+         */
+        this.next = false;
+
         this.uri_manager = uri_manager;
         this.creation_uri = '/parts/';
         this.uri = '/parts/{{pk}}/';
@@ -91,10 +97,29 @@ window.cgsy.installment.collection = window.cgsy.installment.collection || {};
 
         this._post_add = function () {
             _sort();
+            _setNextPart();
         };
 
         this._post_remove = function () {
             _sort();
+            _setNextPart();
+        };
+
+        var _setNextPart = function() {
+            self.items.forEach(function(item) {
+                item.next = false;
+            });
+
+            var unpaids = self.items.filter(function(item) {
+                return item.get('paid') === false;
+            });
+
+            if (unpaids.length === 0) {
+                return;
+            }
+
+            var part = unpaids[0];
+            part.next = true;
         };
 
         var _sort = function () {

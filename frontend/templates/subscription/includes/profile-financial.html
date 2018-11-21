@@ -347,6 +347,7 @@
                                         </button>
                                     </li>
 
+                                    {% if has_open_installment_contract is False %}
                                     <li>
                                         <button type="button"
                                                 class="btn btn-success btn-trans"
@@ -358,6 +359,7 @@
                                             Novo parcelamento
                                         </button>
                                     </li>
+                                    {% endif %}
 
                                 {% endif %}
                                 <li>
@@ -398,4 +400,3 @@
 
 {% include 'subscription/subscription-payments-list.html' %}
 
-{% include 'subscription/installment-parts-list.html' %}

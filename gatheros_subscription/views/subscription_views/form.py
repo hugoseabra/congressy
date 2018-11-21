@@ -117,6 +117,9 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
         ctx['encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
         ctx['services'] = self.get_services()
         ctx['products'] = self.get_products()
+        ctx['has_installments'] = self.has_installments()
+        ctx['has_open_installment_contract'] = self.has_open_installment_contract()
+
         ctx['new_boleto_allowed'] = payment_helpers.is_boleto_allowed(
             self.event
         )
@@ -263,3 +266,13 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
                 })
 
         return survey_answers
+
+    def has_installments(self):
+
+        return self.object.installment_contracts.count() > 0
+
+    def has_open_installment_contract(self):
+        if self.has_installments() is False:
+            return False
+
+        return self.object.installment_contracts.filter(status='open').count() > 0

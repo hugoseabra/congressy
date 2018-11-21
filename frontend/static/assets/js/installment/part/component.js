@@ -2,7 +2,7 @@ window.cgsy = window.cgsy || {};
 window.cgsy.installment = window.cgsy.installment || {};
 window.cgsy.installment.component = window.cgsy.installment.component || {};
 
-(function (abstracts, installment) {
+(function (abstracts, installment, as_currency) {
     'use strict';
 
     /**
@@ -14,16 +14,86 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
         abstracts.element.list.Table.call(this, parent_el);
         var self = this;
 
-        self.addHeader('#', '#', 'text-center', '5%');
+        self.addHeader('#', '# Parcela', 'text-center', '12%');
         self.addHeader('exp_date', 'Vencimento', 'text-center', null);
-        self.addHeader('amount', 'Valor (R$)', 'text-center', '20%');
+        self.addHeader('amount', 'Valor (R$)', 'text-center', '25%');
         self.addHeader('status', 'Status', 'text-center', '10%');
 
+        // self.hideHeaders();
         // self.addActionButton('Pagar', 'fas fa-money', function() {
         //     alert('pagou nada não');
         // });
+
+        self.addColumnHandler('#', function(item) {
+            var paid = item.get('paid') === true;
+            var next_part = item.next === true;
+            var value = item.get('installment_number');
+
+            return _getColumnContent(paid, next_part, value);
+        });
+
+        self.addColumnHandler('exp_date', function(item) {
+            var paid = item.get('paid') === true;
+            var next_part = item.next === true;
+            var value = item.get('expiration_date').format('DD/MM/YYYY');
+
+            return _getColumnContent(paid, next_part, value);
+        });
+
+        self.addColumnHandler('amount', function(item) {
+            var paid = item.get('paid') === true;
+            var next_part = item.next === true;
+            var value = 'R$ ' + as_currency(item.get('amount'));
+
+            return _getColumnContent(paid, next_part, value);
+        });
+
+        self.addColumnHandler('status', function(item) {
+            var paid = item.get('paid') === true;
+            var next_part = item.next === true;
+
+            var button = $('<button>').addClass('btn btn-sm btn-block');
+
+            if (paid === true) {
+                button.addClass('btn-success')
+                    .attr('disabled', '')
+                    .text('Pago');
+
+            } else if (paid === false && next_part === true) {
+                button.addClass('btn-primary')
+                    .attr('data-toggle', 'tooltip')
+                    .attr('title', 'Registrar o pagamento')
+                    .html($('<span>').addClass('far fa-money-bill-alt'));
+
+                button.on('click', function() {
+                    alert('registrar pagamento que tenha uma maneira de se conectar a esta parcela.');
+                });
+
+            } else if (paid === false && next_part === false) {
+                // Manter estética da linha.
+                button.addClass('btn-default invisible').text('-');
+            }
+
+            return button;
+        });
+
+        /**
+         * @param {boolean} paid
+         * @param {boolean} next_part
+         * @param {string} value
+         * @private
+         */
+        var _getColumnContent = function(paid, next_part, value) {
+            var content = $('<span>').text(value);
+            if (paid === true) {
+                content.addClass('text-muted text-line-through');
+            } else if (next_part === true) {
+                content.addClass('text-bold danger-color');
+            }
+            return content;
+        };
     };
     installment.component.ContractFormModal.prototype = Object.create(abstracts.element.list.Table.prototype);
     installment.component.ContractFormModal.prototype.constructor = installment.component.ContractFormModal;
 
-})(window.cgsy.abstracts, window.cgsy.installment);
+})(window.cgsy.abstracts, window.cgsy.installment, as_currency);

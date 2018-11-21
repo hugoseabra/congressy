@@ -43,13 +43,19 @@ function renderPartsList(contract, parent_el) {
     var table = new window.cgsy.installment.component.PartTable(parent_el);
 
     getContractParts(contract).then(function (parts) {
+        var counter = 0;
         parts.forEach(function (part) {
-            table.addItem({
-                '#': part.get('installment_number'),
-                'amount': 'R$ ' + as_currency(part.get('amount')),
-                'exp_date': part.get('expiration_date').format('DD/MM/YYYYY'),
-                'status': part.get('paid') ? 'Pago' : '-'
-            });
+            table.addItem(part);
+            // table.addItem({
+            //     '#': part.get('installment_number'),
+            //     'amount': 'R$ ' + as_currency(part.get('amount')),
+            //     'exp_date': part.get('expiration_date').format('DD/MM/YYYYY'),
+            //     'paid': part.get('paid') === true,
+            //     'next-part': part.get('paid') === false && counter === 0
+            // });
+            // if (part.get('paid') === false) {
+            //     counter++;
+            // }
         });
 
         table.render();
@@ -72,6 +78,6 @@ $(document).ready(function () {
 
         renderPartsList(open_contract, $('#constract-parts-list'));
     }).catch(function() {
-        alert(arguments);
+        console.error('Erro ao buscar contratos.');
     })
 });
