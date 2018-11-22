@@ -26,8 +26,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         with atomic():
-            # event_pk = input("Event PK: ")
-            event_pk = 206
+            
+            event_pk = input("Event PK: ")
             assert event_pk is not None and event_pk is not ''
 
             # =========== ERASE ALL ============================================
