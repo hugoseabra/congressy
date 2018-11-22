@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 from django.db.transaction import atomic
-from gatheros_event.models import Event
 
 from offline import (
     MixBoletoOffline,
