@@ -34,8 +34,9 @@ class Command(BaseCommand):
         with atomic():
             self.stdout.write(
                 self.style.ERROR(
-                    '\n\n\t ATENÇÃO: Esse script não deve ser usado em produção'
-                    '. Digite SIM para confirmar a isolação do banco de dados.'
+                    '\n\n\t ATENÇÃO: Esse script não deve ser usado em'
+                    ' produção. Digite SIM para confirmar a isolação do banco'
+                    ' de dados.'
                 )
             )
 
@@ -50,24 +51,28 @@ class Command(BaseCommand):
             event_pk = input("Event PK: ")
             assert event_pk is not None and event_pk is not ''
 
-            # =========== ERASE ALL ============================================
+            # =========== ERASE ALL ===========================================
             MixBoletoOffline(stdout=self.stdout, style=self.style).erase_all()
             ScientificWorkOffline(stdout=self.stdout,
                                   style=self.style).erase_all()
             PartnerOffline(stdout=self.stdout, style=self.style).erase_all()
-            ServiceTagsOffline(stdout=self.stdout, style=self.style).erase_all()
+            ServiceTagsOffline(stdout=self.stdout,
+                               style=self.style).erase_all()
             ImporterOffline(stdout=self.stdout, style=self.style).erase_all()
-            CertificateOffline(stdout=self.stdout, style=self.style).erase_all()
-            CertificateOffline(stdout=self.stdout, style=self.style).erase_all()
+            CertificateOffline(stdout=self.stdout,
+                               style=self.style).erase_all()
+            CertificateOffline(stdout=self.stdout,
+                               style=self.style).erase_all()
             AssociateOffline(stdout=self.stdout, style=self.style).erase_all()
             DjangoCronOffline(stdout=self.stdout, style=self.style).erase_all()
 
-            # =========== FILTERS ==============================================
+            # =========== FILTERS =============================================
             SurveyOffline(stdout=self.stdout, style=self.style) \
                 .filter(event_pk)
             AttendanceOffline(stdout=self.stdout, style=self.style) \
                 .filter(event_pk)
-            RaffleOffline(stdout=self.stdout, style=self.style).filter(event_pk)
+            RaffleOffline(stdout=self.stdout, style=self.style).filter(
+                event_pk)
             PaymentOffline(stdout=self.stdout, style=self.style) \
                 .erase_all() \
                 .filter(event_pk)
