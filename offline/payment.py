@@ -6,10 +6,10 @@ class PaymentOffline(OfflineBase, EraserMixin, FilterMixin):
         'payment.BankAccount',
     ]
 
-    filter_dict = {
-        'payment.Transaction': 'subscription__event_id',
-        'payment.TransactionStatus': 'transaction__subscription__event_id',
-        'payment.Payment': 'transaction__subscription__event_id',
-        'payment_debt.Debt': 'subscription__event_id',
-        'payment_debt.DebtConfig': 'debt__subscription__event_id',
-    }
+    filter_dict = (
+        ('payment.Transaction', 'subscription__event_id'),
+        ('payment.TransactionStatus', 'transaction__subscription__event_id'),
+        ('payment.Payment', 'transaction__subscription__event_id'),
+        ('payment_debt.Debt', 'subscription__event_id'),
+        ('payment_debt.DebtConfig', 'debt__subscription__event_id'),
+    )
