@@ -14,6 +14,7 @@ from offline import (
     AttendanceOffline,
     RaffleOffline,
     DjangoCronOffline,
+    AddonOffline,
 )
 
 
@@ -47,6 +48,7 @@ class Command(BaseCommand):
             PaymentOffline(stdout=self.stdout, style=self.style) \
                 .erase_all() \
                 .filter(event_pk)
+            AddonOffline(stdout=self.stdout, style=self.style).filter(event_pk)
 
 
             # SubscriptionOffline(stdout=self.stdout, style=self.style).filter(

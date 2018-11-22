@@ -12,6 +12,7 @@ from .survey import SurveyOffline
 from .subscription import SubscriptionOffline
 from .attendance import AttendanceOffline
 from .raffel import RaffleOffline
+from .addon import AddonOffline
 
 
 
