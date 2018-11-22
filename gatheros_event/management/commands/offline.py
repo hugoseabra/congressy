@@ -13,6 +13,7 @@ from offline import (
     DjangoCronOffline,
     EventOffline,
     SurveyOffline,
+    SubscriptionOffline,
 )
 
 
@@ -37,6 +38,7 @@ class Command(BaseCommand):
             PaymentOffline(stdout=self.stdout, style=self.style).erase_all()
             DjangoCronOffline(stdout=self.stdout, style=self.style).erase_all()
             EventOffline(stdout=self.stdout, style=self.style).erase_all()
+            SubscriptionOffline(stdout=self.stdout, style=self.style).filter(event_pk)
             SurveyOffline(stdout=self.stdout, style=self.style).filter(event_pk)
 
             raise Exception('rollback')

@@ -9,6 +9,7 @@ from .payment import PaymentOffline
 from .django_cron import DjangoCronOffline
 from .event import EventOffline
 from .survey import SurveyOffline
+from .subscription import SubscriptionOffline
 
 
 
