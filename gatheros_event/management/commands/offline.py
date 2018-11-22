@@ -14,6 +14,8 @@ from offline import (
     EventOffline,
     SurveyOffline,
     SubscriptionOffline,
+    AttendanceOffline,
+    RaffleOffline,
 )
 
 
@@ -26,6 +28,7 @@ class Command(BaseCommand):
             event_pk = 206
             assert event_pk is not None and event_pk is not ''
 
+            # =========== ERASE ALL ============================================
             MixBoletoOffline(stdout=self.stdout, style=self.style).erase_all()
             ScientificWorkOffline(stdout=self.stdout,
                                   style=self.style).erase_all()
@@ -35,10 +38,24 @@ class Command(BaseCommand):
             CertificateOffline(stdout=self.stdout, style=self.style).erase_all()
             CertificateOffline(stdout=self.stdout, style=self.style).erase_all()
             AssociateOffline(stdout=self.stdout, style=self.style).erase_all()
-            PaymentOffline(stdout=self.stdout, style=self.style).erase_all()
-            DjangoCronOffline(stdout=self.stdout, style=self.style).erase_all()
-            EventOffline(stdout=self.stdout, style=self.style).erase_all()
-            SubscriptionOffline(stdout=self.stdout, style=self.style).filter(event_pk)
+            
+            # =========== FILTERS ==============================================
             SurveyOffline(stdout=self.stdout, style=self.style).filter(event_pk)
+
+
+
+
+
+            # PaymentOffline(stdout=self.stdout,
+            #                style=self.style).erase_all().filter(event_pk)
+            # DjangoCronOffline(stdout=self.stdout, style=self.style).erase_all()
+            # SubscriptionOffline(stdout=self.stdout, style=self.style).filter(
+            #     event_pk)
+            # EventOffline(stdout=self.stdout,
+            #              style=self.style).erase_all().filter(event_pk)
+
+            # AttendanceOffline(stdout=self.stdout, style=self.style).filter(
+            #     event_pk)
+            # RaffleOffline(stdout=self.stdout, style=self.style).filter(event_pk)
 
             raise Exception('rollback')
