@@ -13,6 +13,7 @@ from .subscription import SubscriptionOffline
 from .attendance import AttendanceOffline
 from .raffel import RaffleOffline
 from .addon import AddonOffline
+from .django_contrib import DjangoContribOffline
 
 
 

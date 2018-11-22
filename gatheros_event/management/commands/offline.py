@@ -17,6 +17,7 @@ from offline import (
     AddonOffline,
     SubscriptionOffline,
     EventOffline,
+    DjangoContribOffline,
 )
 
 
@@ -55,6 +56,8 @@ class Command(BaseCommand):
                 .filter(event_pk)
             EventOffline(stdout=self.stdout, style=self.style)\
                 .erase_all()\
+                .filter(event_pk)
+            DjangoContribOffline(stdout=self.stdout, style=self.style)\
                 .filter(event_pk)
 
             raise Exception('rollback')
