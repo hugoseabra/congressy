@@ -13,6 +13,7 @@ from offline import (
     SurveyOffline,
     AttendanceOffline,
     RaffleOffline,
+    DjangoCronOffline,
 )
 
 
@@ -35,6 +36,7 @@ class Command(BaseCommand):
             CertificateOffline(stdout=self.stdout, style=self.style).erase_all()
             CertificateOffline(stdout=self.stdout, style=self.style).erase_all()
             AssociateOffline(stdout=self.stdout, style=self.style).erase_all()
+            DjangoCronOffline(stdout=self.stdout, style=self.style).erase_all()
 
             # =========== FILTERS ==============================================
             SurveyOffline(stdout=self.stdout, style=self.style) \
@@ -46,7 +48,7 @@ class Command(BaseCommand):
                 .erase_all() \
                 .filter(event_pk)
 
-            # DjangoCronOffline(stdout=self.stdout, style=self.style).erase_all()
+
             # SubscriptionOffline(stdout=self.stdout, style=self.style).filter(
             #     event_pk)
             # EventOffline(stdout=self.stdout,
