@@ -252,15 +252,8 @@ class CSVPrepareView(CSVProcessedViewMixin):
         line_data_collection = self.get_data_collection(size=1)
         invalid = list()
 
-        if len(line_data_collection) > 0:
-
-            survey = None
-
         if self.object.lot.event_survey:
             survey = self.object.lot.event_survey.survey
-            if self.object.audience_lot.audience_category.event_survey:
-                survey = self.object.audience_lot.audience_category.event_survey.survey
-
             invalid = line_data_collection[0].get_invalid_keys(survey)
 
         return invalid
