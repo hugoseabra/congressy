@@ -1,5 +1,6 @@
 from core.util.collection import merge_lists_ignore_duplicates
 from gatheros_event.models import Person, Member
+from django.contrib.auth.models import User
 from .base import OfflineBase
 
 
@@ -22,6 +23,18 @@ class PersonOffline(OfflineBase):
         ids = merge_lists_ignore_duplicates(members, subscribed_people)
 
         qs = Person.objects.all().exclude(pk__in=ids)
+
+        uqs = User.objects.all().exclude(person__pk_in=ids)
+
+        msg = 'Deleting {} from {}'.format(uqs.count(),
+                                           User._meta.label)
+
+        if self.stdout and self.style:
+            self.stdout.write(self.style.SUCCESS(
+                msg
+            ))
+        else:
+            print(msg)
 
         msg = 'Deleting {} from {}'.format(qs.count(),
                                            Person._meta.label)
