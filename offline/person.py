@@ -24,7 +24,7 @@ class PersonOffline(OfflineBase):
 
         qs = Person.objects.all().exclude(pk__in=ids)
 
-        uqs = User.objects.all().exclude(person__pk_in=ids)
+        uqs = User.objects.all().exclude(person__pk__in=ids)
 
         msg = 'Deleting {} from {}'.format(uqs.count(),
                                            User._meta.label)
