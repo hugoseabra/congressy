@@ -45,12 +45,10 @@ class Command(BaseCommand):
             AttendanceOffline(stdout=self.stdout, style=self.style)\
                 .filter(event_pk)
             RaffleOffline(stdout=self.stdout, style=self.style).filter(event_pk)
+            PaymentOffline(stdout=self.stdout,style=self.style)\
+                .erase_all()\
+                .filter(event_pk)
 
-
-
-
-            # PaymentOffline(stdout=self.stdout,
-            #                style=self.style).erase_all().filter(event_pk)
             # DjangoCronOffline(stdout=self.stdout, style=self.style).erase_all()
             # SubscriptionOffline(stdout=self.stdout, style=self.style).filter(
             #     event_pk)
