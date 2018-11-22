@@ -10,10 +10,7 @@ from offline import (
     CertificateOffline,
     AssociateOffline,
     PaymentOffline,
-    DjangoCronOffline,
-    EventOffline,
     SurveyOffline,
-    SubscriptionOffline,
     AttendanceOffline,
     RaffleOffline,
 )
@@ -38,15 +35,15 @@ class Command(BaseCommand):
             CertificateOffline(stdout=self.stdout, style=self.style).erase_all()
             CertificateOffline(stdout=self.stdout, style=self.style).erase_all()
             AssociateOffline(stdout=self.stdout, style=self.style).erase_all()
-            
+
             # =========== FILTERS ==============================================
-            SurveyOffline(stdout=self.stdout, style=self.style)\
+            SurveyOffline(stdout=self.stdout, style=self.style) \
                 .filter(event_pk)
-            AttendanceOffline(stdout=self.stdout, style=self.style)\
+            AttendanceOffline(stdout=self.stdout, style=self.style) \
                 .filter(event_pk)
             RaffleOffline(stdout=self.stdout, style=self.style).filter(event_pk)
-            PaymentOffline(stdout=self.stdout,style=self.style)\
-                .erase_all()\
+            PaymentOffline(stdout=self.stdout, style=self.style) \
+                .erase_all() \
                 .filter(event_pk)
 
             # DjangoCronOffline(stdout=self.stdout, style=self.style).erase_all()
@@ -57,6 +54,5 @@ class Command(BaseCommand):
 
             # AttendanceOffline(stdout=self.stdout, style=self.style).filter(
             #     event_pk)
-
 
             raise Exception('rollback')
