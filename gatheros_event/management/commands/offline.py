@@ -44,6 +44,7 @@ class Command(BaseCommand):
                 .filter(event_pk)
             AttendanceOffline(stdout=self.stdout, style=self.style)\
                 .filter(event_pk)
+            RaffleOffline(stdout=self.stdout, style=self.style).filter(event_pk)
 
 
 
@@ -58,6 +59,6 @@ class Command(BaseCommand):
 
             # AttendanceOffline(stdout=self.stdout, style=self.style).filter(
             #     event_pk)
-            # RaffleOffline(stdout=self.stdout, style=self.style).filter(event_pk)
+
 
             raise Exception('rollback')
