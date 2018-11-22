@@ -15,6 +15,7 @@ from offline import (
     RaffleOffline,
     DjangoCronOffline,
     AddonOffline,
+    SubscriptionOffline,
 )
 
 
@@ -49,14 +50,11 @@ class Command(BaseCommand):
                 .erase_all() \
                 .filter(event_pk)
             AddonOffline(stdout=self.stdout, style=self.style).filter(event_pk)
+            SubscriptionOffline(stdout=self.stdout, style=self.style)\
+                .filter(event_pk)
 
 
-            # SubscriptionOffline(stdout=self.stdout, style=self.style).filter(
-            #     event_pk)
             # EventOffline(stdout=self.stdout,
             #              style=self.style).erase_all().filter(event_pk)
-
-            # AttendanceOffline(stdout=self.stdout, style=self.style).filter(
-            #     event_pk)
 
             raise Exception('rollback')
