@@ -72,7 +72,9 @@ class FilterMixin:
     def filter(self, event_pk):
         assert self.filter_dict is not None
 
-        for label, criteria in self.filter_dict.items():
+        for item_filter in self.filter_dict:
+            label = item_filter[0]
+            criteria = item_filter[1]
             model = self.get_model(label)
 
             exclude = {criteria: event_pk}
