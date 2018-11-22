@@ -40,8 +40,10 @@ class Command(BaseCommand):
             AssociateOffline(stdout=self.stdout, style=self.style).erase_all()
             
             # =========== FILTERS ==============================================
-            SurveyOffline(stdout=self.stdout, style=self.style).filter(event_pk)
-
+            SurveyOffline(stdout=self.stdout, style=self.style)\
+                .filter(event_pk)
+            AttendanceOffline(stdout=self.stdout, style=self.style)\
+                .filter(event_pk)
 
 
 
