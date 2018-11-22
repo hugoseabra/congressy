@@ -17,7 +17,7 @@ from offline import (
     AddonOffline,
     SubscriptionOffline,
     EventOffline,
-    DjangoContribOffline,
+    PersonOffline,
 )
 
 
@@ -82,8 +82,8 @@ class Command(BaseCommand):
             EventOffline(stdout=self.stdout, style=self.style) \
                 .erase_all() \
                 .filter(event_pk)
-            DjangoContribOffline(stdout=self.stdout, style=self.style) \
-                .filter(event_pk)
+            
+            PersonOffline(stdout=self.stdout, style=self.style).erase(event_pk)
 
             if debug:
                 raise Exception('rollback')

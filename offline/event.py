@@ -14,5 +14,4 @@ class EventOffline(OfflineBase, EraserMixin, FilterMixin):
         ('gatheros_event.Info', 'event_id',),
         ('gatheros_event.FeatureConfiguration', 'event_id',),
         ('gatheros_event.FeatureManagement', 'event_id',),
-        ('gatheros_event.Person', 'subscriptions__lot__event_id',),
     )
