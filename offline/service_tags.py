@@ -1,7 +1,7 @@
-from .base import Base, EraserMixin
+from .base import OfflineBase, EraserMixin
 
 
-class ServiceTagsOffline(Base, EraserMixin):
+class ServiceTagsOffline(OfflineBase, EraserMixin):
     erase_list = [
         'service_tags.CustomServiceTag',
     ]

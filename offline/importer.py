@@ -1,7 +1,7 @@
-from .base import Base, EraserMixin
+from .base import OfflineBase, EraserMixin
 
 
-class ImporterOffline(Base, EraserMixin):
+class ImporterOffline(OfflineBase, EraserMixin):
     erase_list = [
         'importer.CSVFileConfig',
     ]

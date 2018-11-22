@@ -1,7 +1,7 @@
-from .base import Base, EraserMixin
+from .base import OfflineBase, EraserMixin
 
 
-class AssociateOffline(Base, EraserMixin):
+class AssociateOffline(OfflineBase, EraserMixin):
     erase_list = [
         'associate.Associate',
     ]

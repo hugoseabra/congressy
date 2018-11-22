@@ -1,7 +1,7 @@
-from .base import Base, EraserMixin
+from .base import OfflineBase, EraserMixin
 
 
-class PartnerOffline(Base, EraserMixin):
+class PartnerOffline(OfflineBase, EraserMixin):
     erase_list = [
         'partner.Partner',
         'partner.PartnerPlan',

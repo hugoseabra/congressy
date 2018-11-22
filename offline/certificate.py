@@ -1,7 +1,7 @@
-from .base import Base, EraserMixin
+from .base import OfflineBase, EraserMixin
 
 
-class CertificateOffline(Base, EraserMixin):
+class CertificateOffline(OfflineBase, EraserMixin):
     erase_list = [
         'certificate.Certificate',
     ]

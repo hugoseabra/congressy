@@ -2,7 +2,7 @@ import django.apps
 
 
 # noinspection PyProtectedMember,PyProtectedMember
-class Base(object):
+class OfflineBase(object):
     models = None
     stdout = None
     style = None
@@ -27,12 +27,12 @@ class Base(object):
             if model_label == label:
                 m = model
 
-        assert m is not None
+        assert m is not None, "m is None for label {}".format(label)
 
         nl = str(m._meta.label)
         assert nl == label
 
-        assert m is not None
+        assert m is not None, "m is None for label {}".format(label)
 
         return m
 

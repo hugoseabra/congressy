@@ -1,7 +1,7 @@
-from .base import Base, EraserMixin
+from .base import OfflineBase, EraserMixin
 
 
-class DjangoCronOffline(Base, EraserMixin):
+class DjangoCronOffline(OfflineBase, EraserMixin):
     erase_list = [
         'django_cron.CronJobLog',
     ]
