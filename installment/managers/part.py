@@ -6,3 +6,7 @@ class PartManager(managers.Manager):
     class Meta:
         model = Part
         fields = '__all__'
+        exclude = [
+            'paid'
+        ]
+
