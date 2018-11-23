@@ -11,16 +11,16 @@ class MinimumAmountWriteOnce(RuleChecker):
 
     def check(self, model_instance, *args, **kwargs):
 
-        if model_instance.__original_minimum_amount_creation and \
+        if model_instance.minimum_amount_creation and \
                 model_instance.minimum_amount_creation != \
-                model_instance.__original_minimum_amount_creation:
+                model_instance._original_minimum_amount_creation:
             raise RuleIntegrityError(
                 'O campo \'minimum_amount_creation\' não é'
                 ' editavel')
 
-        if model_instance.__original_minimum_amount and \
+        if model_instance.minimum_amount and \
                 model_instance.minimum_amount != \
-                model_instance.__original_minimum_amount:
+                model_instance._original_minimum_amount:
             raise RuleIntegrityError('O campo \'minimum_amount\' não é'
                                      ' editavel')
 
@@ -57,12 +57,13 @@ class Contract(EntityMixin, models.Model):
         (FULLY_PAID_STATUS, "quitado"),
     )
 
-    __original_minimum_amount_creation = None
+    _original_minimum_amount_creation = None
+    _original_minimum_amount = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.__original_minimum_amount_creation = self.minimum_amount_creation
-        self.__original_minimum_amount = self.minimum_amount
+        self._original_minimum_amount_creation = self.minimum_amount_creation
+        self._original_minimum_amount = self.minimum_amount
 
     class Meta:
         verbose_name = 'Contrato de Parcelamento'
@@ -158,7 +159,7 @@ class Contract(EntityMixin, models.Model):
 
     @property
     def is_new(self):
-        return self._meta.adding is True
+        return self._state.adding is True
 
     def save(self, **kwargs):
 
@@ -167,8 +168,11 @@ class Contract(EntityMixin, models.Model):
                 settings.CONGRESSY_MINIMUM_AMOUNT_TO_ALLOW_INSTALLMENTS
 
         if self.minimum_amount is None:
-            self.minimum_amount_creation = \
+            self.minimum_amount = \
                 settings.CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS
+
+        if self.liquid_amount is None:
+            self.liquid_amount = self.amount
 
         if self.limit_date is None:
             self.limit_date = self.subscription.event.date_start - timedelta(
