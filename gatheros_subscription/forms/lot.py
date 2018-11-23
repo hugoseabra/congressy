@@ -143,7 +143,10 @@ class LotForm(forms.ModelForm):
         if code:
             code = ''.join(code.split()).upper()
 
-        queryset = Lot.objects.filter(exhibition_code=code)
+        queryset = Lot.objects.filter(
+            exhibition_code=code,
+            event=self.event,
+        )
         if self.instance.pk is not None:
             queryset = queryset.exclude(pk=self.instance.pk)
 

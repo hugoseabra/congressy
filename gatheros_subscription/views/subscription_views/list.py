@@ -15,7 +15,11 @@ class SubscriptionListView(SubscriptionViewMixin, generic.ListView):
     has_filter = False
 
     def get_queryset(self):
-        query_set = super(SubscriptionListView, self).get_queryset()
+
+        event = self.get_event()
+        query_set = Subscription.objects.filter(
+            event=event, completed=True,
+        )
 
         lots = self.request.GET.getlist('lots', [])
         if lots:
@@ -27,9 +31,7 @@ class SubscriptionListView(SubscriptionViewMixin, generic.ListView):
             query_set = query_set.filter(person__user__isnull=False)
             self.has_filter = True
 
-        event = self.get_event()
-
-        return query_set.filter(event=event, completed=True)
+        return query_set
 
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
