@@ -13,8 +13,8 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.ERROR(
-                '\n\n\tWARNING: Esse script Ã© pra uso apenas de'
-                ' desenvolvimento e irÃ¡ resetar todas as senhas de usuarios no'
+                '\n\n\tWARNING: Esse script é pra uso apenas de'
+                ' desenvolvimento e irá resetar todas as senhas de usuarios no'
                 ' banco de dados para 123.\n\n'
             )
         )
