@@ -12,5 +12,5 @@ class ContractSerializer(FormSerializerMixin,
         form = ContractService
         model = Contract
         # noinspection PyProtectedMember
-        exclude = ContractService().manager._meta.exclude
+        exclude = ContractService.manager_class.Meta.exclude
 
