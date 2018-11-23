@@ -175,7 +175,7 @@ class Contract(EntityMixin, models.Model):
             self.liquid_amount = self.amount
 
         if self.limit_date is None:
-            self.limit_date = self.subscription.event.date_start - timedelta(
-                days=2)
+            limit_date = self.subscription.event.date_start - timedelta(days=2)
+            self.limit_date = limit_date.date()
 
         super().save(kwargs)
