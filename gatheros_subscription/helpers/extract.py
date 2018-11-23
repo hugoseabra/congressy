@@ -11,6 +11,7 @@ from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
 
 from gatheros_subscription.helpers.report_payment import PaymentReportCalculator
+from installment.models import Contract
 
 
 def get_logo():
@@ -47,9 +48,12 @@ def get_context(subscription):
         'lots': calculator.lots,
         'transactions': calculator.transactions,
         'has_manual': calculator.has_manual,
-        'installments':  calculator.installments,
+        'installments': calculator.installments,
         'full_prices': calculator.full_prices,
         'object': subscription,
+        'contracts': Contract.objects.filter(
+            subscription=subscription
+        )
     }
 
     return context

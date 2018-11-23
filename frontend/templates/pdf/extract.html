@@ -162,7 +162,7 @@
                         <span>Pendente</span>
                     </td>
                 </tr>
-                
+
                 {% filter_lookup transactions lot.pk as lot_transactions %}
                 {% if installment %}
                     <tr>
@@ -374,9 +374,17 @@
                 {% endfor %}
                 </tbody>
             </table>
-        
 
         </div>
+
+        {% if contracts.count > 0 %}
+
+            
+
+
+        {% endif %}
+
+
     {% endif %}
 
 </div>

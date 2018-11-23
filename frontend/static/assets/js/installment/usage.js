@@ -4,7 +4,7 @@
  * @param {string} subscription_pk
  * @returns {Promise}
  */
-function getContracts(subscription_pk) {
+function fetchContracts(subscription_pk) {
     var collection = new window.cgsy.installment.collections.ContractCollection(subscription_pk);
 
     return new Promise(function (resolve, reject) {
@@ -13,7 +13,7 @@ function getContracts(subscription_pk) {
                 return reject('Erro ao resgatar contratos.');
             }
             resolve(collection);
-        }).catch(function(reason) {
+        }).catch(function (reason) {
             console.error(reason);
             reject(reason);
         });
@@ -41,7 +41,7 @@ function renderPartsList(contract, parent_el) {
     parent_el = $(parent_el);
 
     var table = new window.cgsy.installment.component.PartTable(parent_el);
-        table.setEl('cancel-button', $('#cancel-installment-contract'));
+    table.setEl('cancel-button', $('#cancel-installment-contract'));
 
     getContractParts(contract).then(function (parts) {
         parts.forEach(function (part) {
@@ -50,14 +50,13 @@ function renderPartsList(contract, parent_el) {
 
         table.render();
 
-    }).catch(function(reason) {
+    }).catch(function (reason) {
         console.error(reason);
     });
 }
 
-
-$(document).ready(function () {
-    getContracts('4198685d-fb60-40c5-b740-81127ed76828').then(function (contracts) {
+function getContracts(sub_pk) {
+    fetchContracts(sub_pk).then(function (contracts) {
         var opens = contracts.items.filter(function (item) {
             return item.get('status') === 'open';
         });
@@ -68,7 +67,7 @@ $(document).ready(function () {
 
         renderPartsList(open_contract, $('#constract-parts-list'));
 
-    }).catch(function(reason) {
+    }).catch(function (reason) {
         console.error('Erro ao buscar contratos.', reason);
     })
-});
+}
