@@ -1,10 +1,10 @@
 from core.util.collection import merge_lists_ignore_duplicates
 from gatheros_event.models import Person, Member
 from django.contrib.auth.models import User
-from .base import OfflineBase
+from .base import DataCleanerBase
 
 
-class PersonOffline(OfflineBase):
+class PersonDataCleaner(DataCleanerBase):
 
     # noinspection PyMethodMayBeStatic
     def erase(self, event_pk):

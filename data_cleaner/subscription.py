@@ -1,7 +1,7 @@
-from .base import OfflineBase, FilterMixin
+from .base import DataCleanerBase, FilterMixin
 
 
-class SubscriptionOffline(OfflineBase, FilterMixin):
+class SubscriptionDataCleaner(DataCleanerBase, FilterMixin):
     filter_dict = (
         ('gatheros_subscription.Subscription', 'event_id'),
         ('gatheros_subscription.EventSurvey', 'event_id'),

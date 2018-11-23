@@ -1,7 +1,7 @@
-from .base import OfflineBase, EraserMixin, FilterMixin
+from .base import DataCleanerBase, EraserMixin, FilterMixin
 
 
-class PaymentOffline(OfflineBase, EraserMixin, FilterMixin):
+class PaymentDataCleaner(DataCleanerBase, EraserMixin, FilterMixin):
     erase_list = [
         'payment.BankAccount',
     ]

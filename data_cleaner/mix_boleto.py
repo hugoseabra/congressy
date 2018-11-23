@@ -1,7 +1,7 @@
-from .base import OfflineBase, EraserMixin
+from .base import DataCleanerBase, EraserMixin
 
 
-class MixBoletoOffline(OfflineBase, EraserMixin):
+class MixBoletoDataCleaner(DataCleanerBase, EraserMixin):
 
     erase_list = [
         'mix_boleto.SyncSubscription',

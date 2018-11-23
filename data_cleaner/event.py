@@ -1,7 +1,7 @@
-from .base import OfflineBase, EraserMixin, FilterMixin
+from .base import DataCleanerBase, EraserMixin, FilterMixin
 
 
-class EventOffline(OfflineBase, EraserMixin, FilterMixin):
+class EventDataCleaner(DataCleanerBase, EraserMixin, FilterMixin):
     erase_list = [
         'gatheros_event.Invitation',
     ]

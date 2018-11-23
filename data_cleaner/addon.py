@@ -1,7 +1,7 @@
-from .base import OfflineBase, FilterMixin
+from .base import DataCleanerBase, FilterMixin
 
 
-class AddonOffline(OfflineBase, FilterMixin):
+class AddonDataCleaner(DataCleanerBase, FilterMixin):
     filter_dict = (
         ('addon.SubscriptionProduct', 'optional__lot_category__event_id',),
         ('addon.SubscriptionService', 'optional__lot_category__event_id',),

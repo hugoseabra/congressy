@@ -2,7 +2,7 @@ import django.apps
 
 
 # noinspection PyProtectedMember,PyProtectedMember
-class OfflineBase(object):
+class DataCleanerBase(object):
     models = None
     stdout = None
     style = None

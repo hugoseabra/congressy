@@ -1,7 +1,7 @@
-from .base import OfflineBase, EraserMixin
+from .base import DataCleanerBase, EraserMixin
 
 
-class ScientificWorkOffline(OfflineBase, EraserMixin):
+class ScientificWorkDataCleaner(DataCleanerBase, EraserMixin):
     erase_list = [
         'scientific_work.Work',
         'scientific_work.WorkConfig',
