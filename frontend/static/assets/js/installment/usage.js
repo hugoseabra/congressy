@@ -47,7 +47,6 @@ function renderPartsList(contract, parent_el) {
         parts.forEach(function (part) {
             table.addItem(part);
         });
-
         table.render();
 
     }).catch(function (reason) {
@@ -56,16 +55,20 @@ function renderPartsList(contract, parent_el) {
 }
 
 function getContracts(sub_pk) {
-    fetchContracts(sub_pk).then(function (contracts) {
-        var opens = contracts.items.filter(function (item) {
+    fetchContracts(sub_pk).then(function (contract_collection) {
+        var opens = contract_collection.items.filter(function (item) {
             return item.get('status') === 'open';
         });
+
+        var list_parent_el = $('#constract-parts-list');
         if (opens.length === 0) {
+            var table = new window.cgsy.installment.component.PartTable(list_parent_el);
+                table.render();
             return;
         }
         var open_contract = opens[0];
 
-        renderPartsList(open_contract, $('#constract-parts-list'));
+        renderPartsList(open_contract, list_parent_el);
 
     }).catch(function (reason) {
         console.error('Erro ao buscar contratos.', reason);
