@@ -333,6 +333,7 @@ pipeline:
       - 172.31.38.91
       - 172.31.40.208
       - 172.31.38.120
+      - 172.31.35.124
     port: 22
     user: ec2-user
     source: ./bin/env/prod/01_create-awsecr-container.sh
@@ -350,6 +351,7 @@ pipeline:
       - 172.31.38.91
       - 172.31.40.208
       - 172.31.38.120
+      - 172.31.35.124
     port: 22
     user: ec2-user
     source: ./bin/env/prod/previous_version
@@ -367,6 +369,7 @@ pipeline:
       - 172.31.38.91
       - 172.31.40.208
       - 172.31.38.120
+      - 172.31.35.124
     port: 22
     user: ec2-user
     source: ./version
@@ -384,6 +387,7 @@ pipeline:
       - 172.31.38.91
       - 172.31.40.208
       - 172.31.38.120
+      - 172.31.35.124
     port: 22
     user: ec2-user
     source: ./conf/deploy/docker-compose.yml
@@ -401,6 +405,7 @@ pipeline:
       - 172.31.38.91
       - 172.31.40.208
       - 172.31.38.120
+      - 172.31.35.124
     port: 22
     user: ec2-user
     source: ./bin/env/prod
@@ -456,6 +461,26 @@ pipeline:
     pull: true
     host:
       - 172.31.38.120
+    username: ec2-user
+    port: 22
+    command_timeout: 300
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: ssh_key
+    script:
+      - ~/awsecr/01_create-awsecr-container.sh
+      - ~/cgsy/scripts/prod/04_download_images.sh
+      - ~/cgsy/scripts/prod/05_run_migration.sh
+      - ~/cgsy/scripts/prod/06_run_volume.sh
+      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
+    when:
+      branch: [ master ]
+
+  deploy-latest-version-server4:
+    image: appleboy/drone-ssh
+    pull: true
+    host:
+      - 172.31.35.124
     username: ec2-user
     port: 22
     command_timeout: 300
