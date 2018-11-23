@@ -332,6 +332,7 @@ pipeline:
     hosts:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.38.120
     port: 22
     user: ec2-user
     source: ./bin/env/prod/01_create-awsecr-container.sh
@@ -348,6 +349,7 @@ pipeline:
     hosts:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.38.120
     port: 22
     user: ec2-user
     source: ./bin/env/prod/previous_version
@@ -364,6 +366,7 @@ pipeline:
     hosts:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.38.120
     port: 22
     user: ec2-user
     source: ./version
@@ -380,6 +383,7 @@ pipeline:
     hosts:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.38.120
     port: 22
     user: ec2-user
     source: ./conf/deploy/docker-compose.yml
@@ -396,6 +400,7 @@ pipeline:
     hosts:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.38.120
     port: 22
     user: ec2-user
     source: ./bin/env/prod
