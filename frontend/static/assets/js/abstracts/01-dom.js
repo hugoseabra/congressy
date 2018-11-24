@@ -53,13 +53,20 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
                 console.error('Element "'+key+'" não é um instância de jQuery.');
                 return;
             }
+
+            if (element.length === 0) {
+                console.warn('Nenhum elemento DOM encontrado para ' + key);
+                console.log(element);
+                return;
+            }
+
             self.domElements[key] = element;
         };
 
         /**
          * Resgata um elemento jQuery atrealada à chave informada.
          * @param {string} key
-         * @returns {jQuery}
+         * @returns {jQuery|undefined}
          */
         this.getEl = function (key) {
             if (!this.domElements.hasOwnProperty(key)) {
@@ -70,8 +77,12 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
                 }
                 return null;
             }
+            var el = self.domElements[key];
+            if (!el || el.length === 0) {
+                return undefined;
+            }
 
-            return self.domElements[key];
+            return el;
         };
 
         /**

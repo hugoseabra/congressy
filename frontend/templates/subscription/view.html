@@ -45,7 +45,7 @@
         <script src="{% static "assets/js/installment/contract/form.js" %}"></script>
         <script src="{% static "assets/js/installment/contract/component.js" %}"></script>
         <script src="{% static "assets/js/installment/part/domain.js" %}"></script>
-        <script src="{% static "assets/js/installment/part/application.js" %}"></script>
+        <script src="{% static "assets/js/installment/part/service.js" %}"></script>
         <script src="{% static "assets/js/installment/part/component.js" %}"></script>
 
         <!--INSTALLMENT - USAGE-->
@@ -321,8 +321,11 @@
 
     {% include 'subscription/includes/modal-delete-manual-payment-form.html' with form=manual_payment_form %}
 
+    {% include 'abstracts/modal.html' %}
+
     {% if event.feature_configuration.feature_manual_payments is True %}
 
     {% endif %}
+
 
 {% endblock %}

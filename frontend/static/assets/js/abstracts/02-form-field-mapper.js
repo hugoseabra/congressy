@@ -224,6 +224,7 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
             if (self.isIgnored(name)) {
                 return;
             }
+            self.data[name] = value;
             self.dom_mapper.insertValue(name, value, false);
         };
 
@@ -270,6 +271,7 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
             self.dom_mapper.setElement(name, fields);
         });
         self.dom_mapper.setAsStrictKeys();
+        self.syncDataAndDom();
     };
 
 })(jQuery, window.cgsy.abstracts);

@@ -50,6 +50,18 @@ window.cgsy.abstracts.form = window.cgsy.abstracts.form || {};
         this.save_and_remain = false;
 
         /**
+         * Texto a ser exibido no botão de salvar.
+         * @type {string}
+         */
+        this.button_text = 'Salvar';
+
+        /**
+         * Mensagem de sucesso após salvar.
+         * @type {string}
+         */
+        this.success_message = 'Dados salvos com sucesso.';
+
+        /**
          * Element jQurey do formulário.
          * @type {jQuery}
          */
@@ -65,6 +77,9 @@ window.cgsy.abstracts.form = window.cgsy.abstracts.form || {};
          * @type {abstracts.form.FieldMapper}
          */
         this.fields_mapper = new abstracts.form.FieldMapper(self.form_el);
+
+        this.preSaveCallbacks = [];
+        this.postSaveCallbacks = [];
 
         /**
          * Ignora campo informado.
@@ -102,6 +117,24 @@ window.cgsy.abstracts.form = window.cgsy.abstracts.form || {};
         };
 
         /**
+         * Resgata valor do campo de acordo com o nome do campo.
+         * @param {string} name
+         * @returns {string|Array|boolean|number|*}
+         */
+        this.get = function(name) {
+            return self.fields_mapper.get(name);
+        };
+
+        /**
+         * Seta valor em campo através do nome do campo.
+         * @param {string} name
+         * @param {string} value
+         */
+        this.set = function(name, value) {
+            return self.fields_mapper.set(name, value);
+        };
+
+        /**
          * Preenche os campos do formulário e dados da instância.
          * @param {Object} data
          */
@@ -110,50 +143,114 @@ window.cgsy.abstracts.form = window.cgsy.abstracts.form || {};
             this.fields_mapper.populate(data);
         };
 
+        /**
+         * Desabilita botão de sumissão.
+         */
         this.disableSubmitButton = function() {
             var button = self.getEl('button');
-            if (button && button.length) {
+            if (button) {
                 button.attr('disabled', '').text('aguarde ...');
             }
         };
 
+        /**
+         * Habilita botão de submissão
+         */
         this.enableSubmitButton = function() {
             var button = self.getEl('button');
-            if (button && button.length) {
+            if (button) {
                 button.removeAttr('disabled');
-                button.text('Salvar');
+                button.text(self.button_text);
             }
         };
 
         this.save = function() {
-            self.processing = true;
+            // VERIFICAR SUPORTE A USAR ESTE SWITCH COMO OPCIONAL.
+            // var remain_switch = self.getEl('close-after-save-switch');
+            // if (remain_switch && remain_switch.length) {
+            //     self.save_and_remain = remain_switch.prop('checked') === false;
+            // }
 
-            var remain_switch = self.getEl('close-after-save-switch');
-            if (remain_switch && remain_switch.length) {
-                self.save_and_remain = remain_switch.prop('checked') === false;
-            }
-
-            return new Promise(function(resolve) {
+            return new Promise(function(resolve, reject) {
                 if (self.processing === true) {
-                    resolve(self.getData());
-                    return;
+                    return reject('Ainda processando...');
                 }
 
                 self.processing = true;
-                self.enableSubmitButton();
 
-                self.alerter.clear();
-                self.alerter.renderSuccess('Dados salvos com sucesso.');
-                self.processing = false;
-                self.save_and_remain = false;
-                resolve(self.getData());
+                self.syncDataAndDom().then(function() {
+
+                    self.alerter.clear();
+
+                    self.preSave();
+                    self.preSaveCallbacks.forEach(function(callback) {
+                        callback();
+                    });
+
+                    self.saveHandler().then(function() {
+                        self.save_and_remain = false;
+                        self.processing = false;
+                        self.enableSubmitButton();
+
+                        self.alerter.renderSuccess(self.success_message);
+
+                        self.postSave();
+                        self.postSaveCallbacks.forEach(function(callback) {
+                            callback();
+                        });
+
+                        resolve(self.getData());
+
+                    }, function(reason) {
+                        reject(reason);
+                    });
+
+                }, function(reason) {
+                    self.alerter.clear();
+                    self.save_and_remain = false;
+                    self.processing = false;
+                    self.enableSubmitButton();
+
+                    reject(reason);
+                });
+            });
+        };
+
+        this.preSave = function() {};
+        this.postSave = function() {};
+
+        this.addPreSaveCallback = function(callback) {
+            if (typeof callback !== 'function') {
+                return;
+            }
+
+            self.preSaveCallbacks.push(callback);
+        };
+
+        this.addPostSaveCallback = function(callback) {
+            if (typeof callback !== 'function') {
+                return;
+            }
+
+            self.postSaveCallbacks.push(callback);
+        };
+
+        /**
+         * Callback para tratar da estratégia de salvar.
+         * @returns {Promise}
+         */
+        this.saveHandler = function() {
+            return new Promise(function(resolve, reject) {
+                console.warn('<form>.saveHandler() not implemented.');
+                resolve();
             });
         };
 
         var _initialized = false;
         var _init = function() {
             var button = self.getEl('button');
-            if (button && button.length) {
+            if (button) {
+                self.enableSubmitButton();
                 button.unbind('click');
                 button.on('click', function(e) {
                     e.preventDefault();
@@ -179,6 +276,9 @@ window.cgsy.abstracts.form = window.cgsy.abstracts.form || {};
             _initialized = true;
         };
 
+        window.setTimeout(function () {
+            _init()
+        }, 10);
     };
     abstracts.form.Form.prototype = Object.create(abstracts.dom.Component.prototype);
     abstracts.form.Form.prototype.constructor = abstracts.form.Form;
