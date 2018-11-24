@@ -20,7 +20,8 @@ class ExtractSubscriptionPDFView(AccountMixin):
         return super().pre_dispatch(request)
 
     def get(self, request, *args, **kwargs):
-        pdf = create_extract(subscription=self.subscription)
+        pdf = create_extract(subscription=self.subscription,
+                             user=self.request.user)
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = 'inline; filename="{}"'.format(
             get_extract_file_name(subscription=self.subscription)

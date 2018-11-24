@@ -153,7 +153,7 @@ class Contract(EntityMixin, models.Model):
         default=OPEN_STATUS,
         max_length=20,
         # Required
-        blank=False,
+        blank=True,
         null=False,
     )
 

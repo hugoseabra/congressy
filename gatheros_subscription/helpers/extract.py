@@ -2,6 +2,7 @@
 
 import base64
 import json
+from datetime import datetime
 
 import absoluteuri
 import requests
@@ -28,7 +29,7 @@ def get_template_path():
     return 'pdf/extract.html'
 
 
-def get_context(subscription):
+def get_context(subscription, user):
     """
     Resgata contexto adequado para o template de voucher
     """
@@ -41,6 +42,8 @@ def get_context(subscription):
         'base_url': absoluteuri.build_absolute_uri(settings.STATIC_URL),
         'logo': get_logo(),
         'event': event,
+        'now': datetime.now(),
+        'by': user.person.name,
         'person': subscription.person,
         'lot': subscription.lot,
         'organization': event.organization,
@@ -59,12 +62,12 @@ def get_context(subscription):
     return context
 
 
-def create_extract(subscription):
+def create_extract(subscription, user):
     wkhtml_ws_url = settings.WKHTMLTOPDF_WS_URL
 
     html = render_to_string(
         template_name='pdf/extract.html',
-        context=get_context(subscription)
+        context=get_context(subscription, user)
     )
 
     encoded = base64.b64encode(html.encode()).decode()

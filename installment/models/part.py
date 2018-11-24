@@ -6,6 +6,7 @@ from base.models import EntityMixin
 
 class Part(EntityMixin, models.Model):
     class Meta:
+        ordering = ['expiration_date']
         verbose_name = 'Parcela de Contrato'
         verbose_name_plural = 'Parcelas de Contrato'
 

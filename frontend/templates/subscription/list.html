@@ -351,7 +351,7 @@
                                                             Visualizar
                                                         </a>
                                                     </li>
-                                                    {% if event.allow_internal_subscription %}
+                                                    {% if evenInst.allow_internal_subscription %}
                                                         <li>
                                                             <a href="{% url 'subscription:subscription-edit' event.pk item.pk %}">
                                                                 <i class="fas fa-pencil-alt"></i>

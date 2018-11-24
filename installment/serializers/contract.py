@@ -13,5 +13,4 @@ class ContractSerializer(FormSerializerMixin,
         model = Contract
         # noinspection PyProtectedMember
         exclude = ContractService().manager._meta.exclude
-        read_only_fields = ('status',)
 
