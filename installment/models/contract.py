@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
@@ -142,6 +143,10 @@ class Contract(EntityMixin, models.Model):
         return self._state.adding is True
 
     def save(self, **kwargs):
+
+        if self.minimum_amount is None:
+            self.minimum_amount = \
+                settings.CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS
 
         if self.liquid_amount is None:
             self.liquid_amount = self.amount
