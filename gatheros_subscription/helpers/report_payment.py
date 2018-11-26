@@ -11,6 +11,7 @@ class PaymentReportCalculator(object):
     def __init__(self, subscription):
         self.queryset = Transaction.objects.filter(subscription=subscription)
         self.subscription = subscription
+        self.current_lot = subscription.lot
 
         self.lots = {}
         self.transactions = {}
@@ -31,58 +32,88 @@ class PaymentReportCalculator(object):
 
     def _fetch_lots(self):
         """
-        Os lotes que existem nas transações são as inscriçõs que o usuário
+        Os lotes que existem nas transações são as inscrições que o usuário
         fez eventualmente na plataforma e criou transações com elas.
         """
-        for trans in self.queryset.order_by(
-                'lot__name',
-                'subscription__created'):
+        if self.queryset.count():
+            for trans in self.queryset.order_by(
+                    'lot__name',
+                    'subscription__created'):
 
-            lot = trans.lot
-            # if not lot.price and not trans.amount:
-            #     continue
+                lot = trans.lot
+                self.lots[lot.pk] = lot
 
-            price = trans.amount
+                if trans.status != Transaction.WAITING_PAYMENT:
+                    price = trans.amount
 
-            self.lots[lot.pk] = lot
-            # Calculo reverso para refletir o fluxo de caixa:
-            # O valor de inscrição é um DÉBITO do fluxo.
-            self.full_prices[lot.pk] = -price
+                    # Calculo reverso para refletir o fluxo de caixa:
+                    # O valor de inscrição é um DÉBITO do fluxo.
+                    self.full_prices[lot.pk] = -price
 
-            if trans.installments > 1:
-                parts_amount = round((trans.amount / trans.installments), 2)
-                interests_amount = round((trans.amount - price), 2)
-                self.installments[lot.pk] = {
-                    'interests_amount': interests_amount,
-                    'amount': parts_amount,
-                    'num': trans.installments
-                }
+                    if trans.installments > 1:
+                        parts_amount = \
+                            round((trans.amount / trans.installments), 2)
+                        interests_amount = round((trans.amount - price), 2)
+                        self.installments[lot.pk] = {
+                            'interests_amount': interests_amount,
+                            'amount': parts_amount,
+                            'num': trans.installments
+                        }
 
-            if trans.manual is True and lot.pk not in self.has_manual:
-                self.has_manual[lot.pk] = True
+                    if trans.manual is True and lot.pk not in self.has_manual:
+                        self.has_manual[lot.pk] = True
 
-        for lot_pk, installment in self.installments.items():
-            self.full_prices[lot.pk] -= installment['interests_amount']
+                    for lot_pk, installment in self.installments.items():
+                        self.full_prices[lot.pk] -= \
+                            installment['interests_amount']
+
+                else:
+                    # Calculo reverso para refletir o fluxo de caixa:
+                    # O valor de inscrição é um DÉBITO do fluxo.
+                    self.full_prices[lot.pk] = -(lot.get_calculated_price())
+
+        if self.current_lot.pk not in self.lots:
+            self.lots[self.current_lot.pk] = self.current_lot
+
+        if self.current_lot.pk not in self.full_prices:
+            self.full_prices[self.current_lot.pk] = \
+                -(self.current_lot.get_calculated_price())
 
     def _fetch_transactions(self):
         transactions = {}
-        for pk, lot in self.lots.items():
+        for pk in self.lots.keys():
             # if not lot.price:
             #     continue
-            transactions[lot.pk] = []
+            transactions[pk] = []
 
         queryset = self.queryset.order_by(
             'date_created',
             'subscription__created',
         )
 
+        if not queryset.count():
+            self.full_prices[self.current_lot.pk] = \
+                -(self.current_lot.get_calculated_price())
+            return
+
         for trans in queryset:
+
+            manual = trans.manual is True
+            waiting_payment = trans.status == Transaction.WAITING_PAYMENT
+            manual_waiting = \
+                trans.manual_payment_type == Transaction.MANUAL_WAITING_PAYMENT
+
+            is_waiting = waiting_payment and manual is False
+
             transactions[trans.lot.pk].append(trans)
 
-            if trans.status == trans.PAID:
+            if is_waiting is False and manual and manual_waiting:
+                continue
+
+            if is_waiting is False and trans.status == Transaction.PAID:
                 # Calculo reverso para refletir o fluxo de caixa:
                 # O pagamento é um CRÉDITO do fluxo.
-                self.full_prices[trans.lot.pk] += trans.amount
+                self.full_prices[trans.lot_id] += trans.amount
                 self.total_paid += trans.amount
 
         self.transactions = transactions

@@ -8,7 +8,7 @@ window.cgsy.installment = window.cgsy.installment || {};
 
     installment.models = {};
 
-    var uri = new abstracts.uri.APIBaseUrl('', 'http://localhost:8000/api/');
+    var uri = new abstracts.uri.APIBaseUrl('/api/', '/api/');
     var uri_manager = new abstracts.uri.URIManager(uri,  '/installment');
 
     /**

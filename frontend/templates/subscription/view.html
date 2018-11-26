@@ -40,26 +40,28 @@
     <script src="{% static "assets/js/abstracts/04-model-form.js" %}"></script>
     <script src="{% static "assets/js/abstracts/05-element-list.js" %}"></script>
     <script src="{% static "assets/js/abstracts/05-modal.js" %}"></script>
-    {% if event.feature_configuration.feature_manual_payments %}
-        <!--INSTALLMENT - LIB-->
-        <script src="{% static "assets/js/installment/contract/domain.js" %}"></script>
-        <script src="{% static "assets/js/installment/contract/form.js" %}"></script>
-        <script src="{% static "assets/js/installment/contract/component.js" %}"></script>
-        <script src="{% static "assets/js/installment/part/domain.js" %}"></script>
-        <script src="{% static "assets/js/installment/part/service.js" %}"></script>
-        <script src="{% static "assets/js/installment/part/component.js" %}"></script>
-        <!--INSTALLMENT - USAGE-->
-        <script src="{% static "assets/js/installment/usage.js" %}"></script>
-    {% endif %}
+        {% if event.feature_configuration.feature_manual_payments %}
+            <!--INSTALLMENT - LIB-->
+            <script src="{% static "assets/js/installment/contract/domain.js" %}"></script>
+            <script src="{% static "assets/js/installment/contract/form.js" %}"></script>
+            <script src="{% static "assets/js/installment/contract/component.js" %}"></script>
+            <script src="{% static "assets/js/installment/part/domain.js" %}"></script>
+            <script src="{% static "assets/js/installment/part/service.js" %}"></script>
+            <script src="{% static "assets/js/installment/part/component.js" %}"></script>
+            <!--INSTALLMENT - USAGE-->
+            <script src="{% static "assets/js/installment/usage.js" %}"></script>
+        {% endif %}
     {% else %}
         <script src="{% static "assets/js/abstracts/cgsy-abstracts.js" %}"></script>
+        {% if event.feature_configuration.feature_manual_payments %}
         <script src="{% static "assets/js/installment/cgsy-installment.js" %}"></script>
+        <script>
+            $(document).ready(function () {
+                getContracts('{{ object.pk }}');
+            });
+        </script>
+        {% endif %}
     {% endif %}
-    <script>
-        $(document).ready(function () {
-            getContracts('{{ object.pk }}');
-        });
-    </script>
 
     <script>
         $(document).ready(function () {
