@@ -136,6 +136,7 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
             var is_boolean = typeof v === 'boolean';
             var is_string = typeof v === 'string';
             var is_list = v instanceof Array;
+            var is_date = v instanceof Date;
             var is_required = self.required === true;
 
             self.has_error = false;
@@ -159,7 +160,7 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
                     }
                     break;
                 case 'boolean':
-                    if (is_required && (!is_boolean && !is_string) || ( !is_null && !is_boolean && !is_string)) {
+                    if (is_required && !is_boolean && !is_string) {
                         self.has_error = true;
                         value = undefined;
                     } else {
@@ -175,19 +176,31 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
                     }
                     break;
                 case 'date':
-                    if ((is_required && !is_string) || !is_null && !is_string || !moment(v, 'YYYY-MM-DD', true).isValid()) {
+                    if ((is_required && !is_string && !is_date) || (!is_string && !is_date) || !moment(v, 'YYYY-MM-DD', true).isValid()) {
                         self.has_error = true;
                         value = undefined;
                     } else {
-                        value = (!v) ? v : moment(v, 'YYYY-MM-DD');
+                        if (!v) {
+                            value = v;
+                        } else if (is_date) {
+                            value = moment(v);
+                        } else {
+                            value = (!v) ? v : moment(v, 'YYYY-MM-DD');
+                        }
                     }
                     break;
                 case 'datetime':
-                    if ((is_required && !is_string) || !is_null && !is_string || !moment(v, 'YYYY-MM-DD HH:mm:ss', true).isValid()) {
+                    if ((is_required && !is_string && !is_date) || (!is_string && !is_date) || !moment(v, 'YYYY-MM-DD HH:mm:ss', true).isValid()) {
                         self.has_error = true;
                         value = undefined;
                     } else {
-                        value = (!v) ? v : moment(v, 'YYYY-MM-DD HH:mm:ss');
+                        if (!v) {
+                            value = v;
+                        } else if (is_date) {
+                            value = moment(v);
+                        } else {
+                            value = (!v) ? v : moment(v, 'YYYY-MM-DD HH:mm:ss');
+                        }
                     }
                     break;
                 case 'string':
@@ -884,6 +897,8 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
                 if (self.isNew()) {
                     self._create().then(function () {
                         resolve();
+                    }, function(reason) {
+                        reject(reason);
                     });
                     return;
                 }

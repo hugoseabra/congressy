@@ -13,3 +13,10 @@ class ContractManager(managers.Manager):
             'minimum_amount',
             'liquid_amount',
         ]
+
+    def clean_status(self):
+        status = self.cleaned_data.get('status', Contract.OPEN_STATUS)
+        if not status:
+            status = Contract.OPEN_STATUS
+
+        return status

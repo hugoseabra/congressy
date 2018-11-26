@@ -86,6 +86,20 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
         };
 
         /**
+         * Habilita mode estrito de campos.
+         */
+        this.enableStrictMode = function () {
+            self.dom_mapper.setAsStrictKeys();
+        };
+
+        /**
+         * Desabilita modo estrito de campos.
+         */
+        this.disableStrictMode = function () {
+            self.dom_mapper.setAsNotStrictKeys();
+        };
+
+        /**
          * Sincroniza informações do formulário para a instância e da instância
          * para o formulário.
          */

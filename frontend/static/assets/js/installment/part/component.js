@@ -8,9 +8,10 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
     /**
      * Modal de formulário de contrato.
      * @param {jQuery|string} parent_el
+     * @param {installment.models.Contract} contract
      * @constructor
      */
-    installment.component.PartTable = function (parent_el) {
+    installment.component.PartTable = function(parent_el, contract) {
         abstracts.dom.Component.call(this);
         abstracts.element.list.Table.call(this, parent_el);
         var self = this;
@@ -20,14 +21,32 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
         this.preRender = function () {
             var button_el = self.getEl('cancel-button');
             if (button_el && button_el.length) {
-                self.getEl('cancel-button').hide();
+                button_el.hide();
             }
         };
 
         this.postRender = function () {
             var button_el = self.getEl('cancel-button');
             if (button_el && button_el.length) {
-                self.getEl('cancel-button').show();
+                button_el.show();
+
+                button_el.unbind('click');
+                button_el.on('click', function() {
+                    if(confirm('Tem certeza que deseja cancelar este contrato?')) {
+                        var messenger = new abstracts.messenger.Messenger('deleting-contract');
+                        messenger.notifyLoader();
+
+                        contract.set('status', 'cancelled');
+                        contract.save().then(function() {
+                            messenger.notifySuccess('Contrato cancelado com sucesso.');
+                            messenger.id = null;
+                            messenger.notifyLoader();
+                            // window.location.reload(true);
+                        }, function() {
+                            messenger.notifyError('Houve um erro ao cancelar contrato.');
+                        });
+                    }
+                });
             }
         };
 
@@ -36,13 +55,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
         self.addHeader('amount', 'Valor (R$)', 'text-center', '25%');
         self.addHeader('status', 'Status', 'text-center', '10%');
 
-
-        // self.hideHeaders();
-        // self.addActionButton('Pagar', 'fas fa-money', function() {
-        //     alert('pagou nada não');
-        // });
-
-        self.addColumnHandler('#', function (item) {
+        self.addColumnHandler('#', function(item) {
             var paid = item.get('paid') === true;
             var next_part = item.next === true;
             var value = item.get('installment_number');
@@ -50,7 +63,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
             return _getColumnContent(paid, next_part, value);
         });
 
-        self.addColumnHandler('exp_date', function (item) {
+        self.addColumnHandler('exp_date', function(item) {
             var paid = item.get('paid') === true;
             var next_part = item.next === true;
             var value = item.get('expiration_date').format('DD/MM/YYYY');
@@ -66,7 +79,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
             return _getColumnContent(paid, next_part, value);
         });
 
-        self.addColumnHandler('status', function (item) {
+        self.addColumnHandler('status', function(item) {
             var paid = item.get('paid') === true;
             var next_part = item.next === true;
 
@@ -88,7 +101,6 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
                     $('#manual-payment-parts-form-modal').modal('show');
                 });
 
-
             } else if (paid === false && next_part === false) {
                 // Manter estética da linha.
                 button.addClass('btn-default invisible').text('-');
@@ -103,7 +115,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
          * @param {string} value
          * @private
          */
-        var _getColumnContent = function (paid, next_part, value) {
+        var _getColumnContent = function(paid, next_part, value) {
             var content = $('<span>').text(value);
             if (paid === true) {
                 content.addClass('text-muted text-line-through');

@@ -91,6 +91,14 @@ window.cgsy.abstracts.form = window.cgsy.abstracts.form || {};
             self.fields_mapper.ignore(field_name, warn);
         };
 
+        this.strictModeOn = function() {
+            self.fields_mapper.enableStrictMode();
+        };
+
+        this.strictModeOff = function() {
+            self.fields_mapper.disableStrictMode();
+        };
+
         /**
          * Sincroniza informações do formulário para a instância e da instância
          * para o formulário.
