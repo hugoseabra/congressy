@@ -15,8 +15,18 @@ class MinimumAmount(RuleChecker):
             )
 
 
-class Part(EntityMixin, models.Model):
+class TransactionBelongsToSubscription(RuleChecker):
 
+    def check(self, model_instance, *args, **kwargs):
+        if model_instance.transaction.subscription != \
+                model_instance.contract.subscription:
+            raise RuleIntegrityError(
+                'Essa transação não pertence a mesma inscrição do contrato de '
+                'parcelamento'
+            )
+
+
+class Part(EntityMixin, models.Model):
     rule_instances = [
         MinimumAmount,
     ]
