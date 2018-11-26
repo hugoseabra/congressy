@@ -5,23 +5,25 @@ from payment.models import Transaction
 
 
 @receiver(post_save, sender=Transaction)
-def set_part_paid_flag(instance, created, raw, **_):
+def set_part_paid_flag(instance, **kwargs):
     # Disable when loaded by fixtures
-    if raw is True or created is True:
+    if kwargs.get('raw', False):
         return
 
-    if instance.installment_part and created:
-        instance.installment_part.paid = \
-            instance.amount >= instance.installment_part.amount
-        instance.installment_part.save()
+    if instance.part_transaction and kwargs.get('created', False):
+        instance.part_transaction.paid = \
+            instance.amount >= instance.part_transaction.amount
+        instance.part_transaction.save()
 
 
 @receiver(post_delete, sender=Transaction)
-def set_part_unpaid_flag(instance, created, raw, **_):
+def set_part_unpaid_flag(instance, **kwargs):
     # Disable when loaded by fixtures
-    if raw is True or created is True:
+    if kwargs.get('raw', False):
         return
 
-    if instance.installment_part:
-        instance.installment_part.paid = False
-        instance.installment_part.save()
+    if instance.part_transaction:
+        part = instance.part_transaction
+        part.paid = False
+        part.transaction = None
+        part.save()

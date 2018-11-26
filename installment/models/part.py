@@ -1,10 +1,26 @@
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.conf import settings
 from django.db import models
 
-from base.models import EntityMixin
+from base.models import EntityMixin, RuleChecker, RuleIntegrityError
+
+
+class MinimumAmount(RuleChecker):
+
+    def check(self, model_instance, *args, **kwargs):
+        if model_instance.amount \
+                < settings.CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS:
+            raise RuleIntegrityError(
+                'Valor da parcela abaixo do mínimo para '
+                'permitir parcelamento de inscrição '
+            )
 
 
 class Part(EntityMixin, models.Model):
+
+    rule_instances = [
+        MinimumAmount,
+    ]
+
     class Meta:
         ordering = ['expiration_date']
         verbose_name = 'Parcela de Contrato'
@@ -30,9 +46,9 @@ class Part(EntityMixin, models.Model):
         null=False,
     )
 
-    transaction = models.ForeignKey(
+    transaction = models.OneToOneField(
         'payment.Transaction',
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
         verbose_name='transação da parcela',
         related_name='part_transaction',
         # Not required

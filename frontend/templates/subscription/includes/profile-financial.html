@@ -348,18 +348,30 @@
                                         </button>
                                     </li>
 
-                                    {% if has_open_installment_contract is False and remaining_price and remaining_price < 0 %}
+                                    {% if event.feature_configuration.feature_manual_payments is True and has_open_installment_contract is False and remaining_price and remaining_price < 0 %}
                                         <li>
                                             <button type="button"
                                                     class="btn btn-success btn-trans"
                                                     style="display: none;"
                                                     title="Criar novo contrato de parcelamento"
                                                     id="new-contract-btn"
-                                                    onclick="getContractForm('{{ object.pk }}', '{{installment_limit_date}}', parseInt({{base_expiration_day}}), parseFloat('{{ remaining_price|unlocalize }}'))">
+                                                    onclick="getContractForm('{{ object.pk }}', '{{ installment_limit_date }}', parseInt({{ base_expiration_day }}), parseFloat('{{ remaining_price|unlocalize }}'))">
                                                 <span class="fas fa-file-contract"></span>
                                                 Novo parcelamento
                                             </button>
                                         </li>
+
+
+                                        <li>
+                                            <button type="button"
+                                                    class="btn btn-success btn-trans"
+                                                    onclick="$('#id_part').val(2);$('#manual-payment-parts-form-modal').modal('show');">
+                                                <span class="fas fa-file-contract"></span>
+                                                Novo pagamento de parcela
+                                            </button>
+                                        </li>
+
+
                                     {% endif %}
 
                                 {% endif %}

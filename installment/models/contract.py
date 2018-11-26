@@ -13,16 +13,27 @@ class MinimumAmountWriteOnce(RuleChecker):
 
         if model_instance.minimum_amount_creation and \
                 model_instance.minimum_amount_creation != \
-                model_instance._original_minimum_amount_creation:
+                model_instance.original_minimum_amount_creation:
             raise RuleIntegrityError(
                 'O campo \'minimum_amount_creation\' não é'
                 ' editavel')
 
         if model_instance.minimum_amount and \
                 model_instance.minimum_amount != \
-                model_instance._original_minimum_amount:
+                model_instance.original_minimum_amount:
             raise RuleIntegrityError('O campo \'minimum_amount\' não é'
                                      ' editavel')
+
+
+class MinimumAmount(RuleChecker):
+
+    def check(self, model_instance, *args, **kwargs):
+        if model_instance.amount \
+                < settings.CONGRESSY_MINIMUM_AMOUNT_TO_ALLOW_INSTALLMENTS:
+            raise RuleIntegrityError(
+                'Valor do contrato abaixo do mínimo para '
+                'ativar parcelamento de inscrição '
+            )
 
 
 class OnlyOneOpenContract(RuleChecker):
@@ -43,6 +54,7 @@ class OnlyOneOpenContract(RuleChecker):
 
 class Contract(EntityMixin, models.Model):
     rule_instances = [
+        MinimumAmount,
         MinimumAmountWriteOnce,
         OnlyOneOpenContract
     ]
@@ -161,6 +173,14 @@ class Contract(EntityMixin, models.Model):
     def is_new(self):
         return self._state.adding is True
 
+    @property
+    def original_minimum_amount_creation(self):
+        return self._original_minimum_amount_creation
+
+    @property
+    def original_minimum_amount(self):
+        return self._original_minimum_amount
+
     def save(self, **kwargs):
 
         if self.minimum_amount_creation is None:
@@ -175,7 +195,7 @@ class Contract(EntityMixin, models.Model):
             self.liquid_amount = self.amount
 
         if self.limit_date is None:
-            limit_date = self.subscription.event.date_start - timedelta(days=2)
+            limit_date = self.subscription.event.date_start - timedelta(days=3)
             self.limit_date = limit_date.date()
 
         super().save(kwargs)

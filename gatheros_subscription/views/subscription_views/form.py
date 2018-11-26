@@ -127,6 +127,7 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
         ctx['financial'] = self.financial
         ctx['last_transaction'] = self.last_transaction
         ctx['form'] = self.get_checkout_form()
+        ctx['manual_form'] = forms.PartManualTransactionForm(self.object)
         ctx['encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
         ctx['services'] = self.get_services()
         ctx['products'] = self.get_products()
@@ -198,6 +199,22 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
         if transaction_id:
             instance = get_object_or_404(Transaction, pk=transaction_id)
             kwargs.update({'instance': instance})
+
+        if action == 'manual-part':
+            if not self.event.feature_configuration.feature_manual_payments:
+                self.permission_denied_url = reverse(
+                    'subscription:subscription-list', kwargs={
+                        'event_pk': self.event.pk,
+                    }
+                )
+                raise PermissionDenied('Você não pode realizar esta ação.')
+            form = forms.PartManualTransactionForm(self.object, data=data)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Recebimento criado com sucesso.')
+                return redirect(url + '?details=1')
+            else:
+                return self.render_to_response(self.get_context_data())
 
         form = self.get_form(**kwargs)
 
@@ -291,7 +308,8 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
         if self.has_installments() is False:
             return False
 
-        return self.object.installment_contracts.filter(status='open').count() > 0
+        return self.object.installment_contracts.filter(
+            status='open').count() > 0
 
     def get_installment_limit_date(self):
         date = self.event.date_start - timedelta(days=2)

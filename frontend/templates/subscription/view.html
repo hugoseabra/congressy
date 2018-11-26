@@ -53,7 +53,7 @@
 
         <script>
             $(document).ready(function () {
-               getContracts('{{ object.pk }}');
+                getContracts('{{ object.pk }}');
             });
         </script>
 
@@ -184,14 +184,9 @@
 
 
             {% if event.feature_configuration.feature_manual_payments is True %}
-
-
-                var has_contracts = true;
-
-                if (has_contracts) {
-                    $('#new-contract-btn').show();
-                }
-
+                $('#new-contract-btn').show();
+            {% else %}
+                console.log('new_contract not enabled');
             {% endif %}
 
 
@@ -314,6 +309,8 @@
     {% include 'subscription/includes/modal-manual-payment-form.html' with form=manual_payment_form %}
 
     {% include 'subscription/includes/modal-delete-manual-payment-form.html' with form=manual_payment_form %}
+
+    {% include 'subscription/includes/modal-part-transaction.html' with manual_form=manual_form%}
 
     {% include 'abstracts/modal.html' %}
 
