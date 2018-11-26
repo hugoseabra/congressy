@@ -765,6 +765,9 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
                     case 'string':
                         data[field_name] = (value) ? value : '';
                         break;
+                    case 'float':
+                        data[field_name] = (value) ? parseFloat(value.toFixed(2)) : '';
+                        break;
                     default:
                         data[field_name] = value;
                 }

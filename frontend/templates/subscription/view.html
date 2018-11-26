@@ -50,6 +50,11 @@
             <script src="{% static "assets/js/installment/part/component.js" %}"></script>
             <!--INSTALLMENT - USAGE-->
             <script src="{% static "assets/js/installment/usage.js" %}"></script>
+            <script>
+                $(document).ready(function () {
+                    getContracts('{{ object.pk }}');
+                });
+            </script>
         {% endif %}
     {% else %}
         <script src="{% static "assets/js/abstracts/cgsy-abstracts.js" %}"></script>

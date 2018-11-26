@@ -9,10 +9,3 @@ class PartManager(managers.Manager):
         exclude = [
             'paid',
         ]
-
-    def clean_amount(self):
-        amount = self.cleaned_data.get('amount')
-        if not amount:
-            return amount
-
-        return round(amount, 2)

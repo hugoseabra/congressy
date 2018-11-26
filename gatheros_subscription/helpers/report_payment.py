@@ -40,7 +40,11 @@ class PaymentReportCalculator(object):
                     'lot__name',
                     'subscription__created'):
 
+                if trans.lot_id == self.current_lot.pk:
+                    continue
+
                 lot = trans.lot
+
                 self.lots[lot.pk] = lot
 
                 if trans.status != Transaction.WAITING_PAYMENT:

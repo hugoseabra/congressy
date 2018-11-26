@@ -2,7 +2,7 @@
 {% now "Y-m-d" as today %}
 {% is_subscription_free object as is_free %}
 {% filter_lookup full_prices object.lot_id as remaining_price %}
-
+{{ full_prices }}
 <div class="row tooltip-wrapper">
     <div class="col-xl-11 col-lg-11 col-md-12">
         <div class="buttonbar">

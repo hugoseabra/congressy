@@ -352,7 +352,7 @@
                                             {% else %}
                                                 <span class="title">Valor inscrição</span>
                                                 <strong class="text-danger">
-                                                    R$ {{ last_transaction.amount|intcomma }}
+                                                    R$ {{ object.lot.get_calculated_price|intcomma }}
                                                 </strong>
                                             {% endif %}
                                         </div>
