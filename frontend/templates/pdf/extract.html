@@ -194,7 +194,8 @@
                                                     </div>
                                                     <div class="float-left" style="margin:5px 0 0 5px">
                                                         <span class="text-bold">Dinheiro</span>
-                                                        <small>(manual)</small>
+                                                        <br/>
+                                                        <small>(lançamento manual feito por {{ transaction.manual_author }})</small>
                                                     </div>
                                                 {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_PAYCHECK %}
                                                     <div class="float-left hidden-sm hidden-xs">
@@ -202,7 +203,8 @@
                                                     </div>
                                                     <div class="float-left" style="margin:5px 0 0 5px">
                                                         <span class="text-bold">Cheque</span>
-                                                        <small>(manual)</small>
+                                                        <br/>
+                                                        <small>(lançamento manual feito por {{ transaction.manual_author }})</small>
                                                     </div>
                                                 {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_DEBIT_CARD %}
                                                     <div class="float-left hidden-sm hidden-xs">
@@ -210,7 +212,8 @@
                                                     </div>
                                                     <div class="float-left" style="margin:5px 0 0 5px">
                                                         <span class="text-bold">Cartão de Débito</span>
-                                                        <small>(manual)</small>
+                                                        <br/>
+                                                        <small>(lançamento manual feito por {{ transaction.manual_author }})</small>
                                                     </div>
                                                 {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_CREDIT_CARD %}
                                                     <div class="float-left hidden-sm hidden-xs">
@@ -218,7 +221,8 @@
                                                     </div>
                                                     <div class="float-left" style="margin:5px 0 0 5px">
                                                         <span class="text-bold">Cartão de Crédito</span>
-                                                        <small>(manual)</small>
+                                                        <br/>
+                                                        <small>(lançamento manual feito por {{ transaction.manual_author }})</small>
                                                     </div>
                                                 {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_BANK_DEPOSIT %}
                                                     <div class="float-left hidden-sm hidden-xs">
@@ -226,7 +230,8 @@
                                                     </div>
                                                     <div class="float-left" style="margin:5px 0 0 5px">
                                                         <span class="text-bold">Depósito</span>
-                                                        <small>(manual)</small>
+                                                        <br/>
+                                                        <small>(lançamento manual feito por {{ transaction.manual_author }})</small>
                                                     </div>
                                                 {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_BANK_TRANSFER %}
                                                     <div class="float-left hidden-sm hidden-xs">
@@ -234,7 +239,8 @@
                                                     </div>
                                                     <div class="float-left" style="margin:5px 0 0 5px">
                                                         <span class="text-bold">Transferência bancária</span>
-                                                        <small>(manual)</small>
+                                                        <br/>
+                                                        <small>(lançamento manual feito por {{ transaction.manual_author }})</small>
                                                     </div>
                                                 {% endif %}
                                             {% else %}
