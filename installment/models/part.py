@@ -30,9 +30,9 @@ class Part(EntityMixin, models.Model):
         null=False,
     )
 
-    transaction = models.ForeignKey(
+    transaction = models.OneToOneField(
         'payment.Transaction',
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
         verbose_name='transação da parcela',
         related_name='part_transaction',
         # Not required
