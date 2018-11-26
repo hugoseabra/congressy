@@ -356,7 +356,7 @@
                                         </button>
                                     </li>
 
-                                    {% if event.feature_configuration.feature_manual_payments is True and has_open_installment_contract is False and remaining_price and remaining_price < 0 %}
+                                    {% if has_open_installment_contract is False and remaining_price and remaining_price < 0 %}
                                         <li>
                                             <button type="button"
                                                     class="btn btn-success btn-trans"

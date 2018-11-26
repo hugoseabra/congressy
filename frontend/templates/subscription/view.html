@@ -21,10 +21,12 @@
 
 {% block scripts %}
     <!--ABSTRACTS DEPENDENCIES-->
+    <script src="{% static "assets/js/messenger.js" %}"></script>
     <script src="{% static "assets/js/vendor/moment.js" %}"></script>
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
 
     <!--ABSTRACTS-->
+    {% if DEBUG is True and STAGING_MODE is False %}
     <script src="{% static "assets/js/abstracts/01-dom.js" %}"></script>
     <script src="{% static "assets/js/abstracts/01-error.js" %}"></script>
     <script src="{% static "assets/js/abstracts/01-messenger.js" %}"></script>
@@ -38,7 +40,6 @@
     <script src="{% static "assets/js/abstracts/04-model-form.js" %}"></script>
     <script src="{% static "assets/js/abstracts/05-element-list.js" %}"></script>
     <script src="{% static "assets/js/abstracts/05-modal.js" %}"></script>
-
     {% if event.feature_configuration.feature_manual_payments %}
         <!--INSTALLMENT - LIB-->
         <script src="{% static "assets/js/installment/contract/domain.js" %}"></script>
@@ -47,20 +48,19 @@
         <script src="{% static "assets/js/installment/part/domain.js" %}"></script>
         <script src="{% static "assets/js/installment/part/service.js" %}"></script>
         <script src="{% static "assets/js/installment/part/component.js" %}"></script>
-
         <!--INSTALLMENT - USAGE-->
         <script src="{% static "assets/js/installment/usage.js" %}"></script>
-
-        <script>
-            $(document).ready(function () {
-                getContracts('{{ object.pk }}');
-            });
-        </script>
-
-
     {% endif %}
+    {% else %}
+        <script src="{% static "assets/js/abstracts/cgsy-abstracts.js" %}"></script>
+        <script src="{% static "assets/js/installment/cgsy-installment.js" %}"></script>
+    {% endif %}
+    <script>
+        $(document).ready(function () {
+            getContracts('{{ object.pk }}');
+        });
+    </script>
 
-    <script src="{% static "assets/js/messenger.js" %}"></script>
     <script>
         $(document).ready(function () {
             $('#test-sub').on('change', function () {
