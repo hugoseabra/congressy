@@ -56,16 +56,6 @@ class Part(EntityMixin, models.Model):
         null=False,
     )
 
-    transaction = models.OneToOneField(
-        'payment.Transaction',
-        on_delete=models.DO_NOTHING,
-        verbose_name='transação da parcela',
-        related_name='part_transaction',
-        # Not required
-        blank=True,
-        null=True,
-    )
-
     amount = models.DecimalField(
         verbose_name="valor",
         decimal_places=2,
