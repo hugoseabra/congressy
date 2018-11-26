@@ -32,8 +32,9 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
 
                 button_el.unbind('click');
                 button_el.on('click', function() {
+                    var messenger = new abstracts.messenger.Messenger('deleting-contract');
+
                     if(confirm('Tem certeza que deseja cancelar este contrato?')) {
-                        var messenger = new abstracts.messenger.Messenger('deleting-contract');
                         messenger.notifyLoader();
 
                         contract.set('status', 'cancelled');
@@ -41,7 +42,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
                             messenger.notifySuccess('Contrato cancelado com sucesso.');
                             messenger.id = null;
                             messenger.notifyLoader();
-                            // window.location.reload(true);
+                            window.location.reload(true);
                         }, function() {
                             messenger.notifyError('Houve um erro ao cancelar contrato.');
                         });
@@ -99,7 +100,6 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
                 button.on('click', function () {
                     $('#id_part').val(item.pk);
                     var amount = item.get('amount');
-                    debugger;
 
                     $("#manual-payment-parts-form-modal").find("#id_amount").val(amount.toFixed(2));
                     $('#manual-payment-parts-form-modal').modal('show');

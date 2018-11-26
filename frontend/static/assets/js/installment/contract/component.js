@@ -89,15 +89,15 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
 
             _prepareList(
                 part_list,
-                2,
+                1,
                 limit_date,
                 parseInt(data['expiration_day']),
                 data['amount'],
                 data['minimum_amount']
             );
 
-            for (var a = 2; a < part_list.items.length+2; a++) {
-                num_installments_field.append($('<option>').attr('value', a).text(a));
+            for (var a = 1; a <= part_list.items.length; a++) {
+                num_installments_field.append($('<option>').attr('value', a).text(a + 'x'));
             }
 
             part_list.render();
@@ -186,9 +186,9 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
         /**
          * Renderiza componente
          */
-        this.render = function(num_show) {
+        this.render = function(num_parts) {
 
-            num_show = num_show || 2;
+            num_parts = num_parts || 1;
 
             var table = $('<table>').addClass('table borderless');
             var header = $('<tr>');
@@ -210,13 +210,13 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
                     .append($('<small>').text('Vencimento'))
             );
 
-            var counter = 2;
+            var counter = 1;
             self.items.forEach(function(item) {
                 table.append(_createRow(
                     counter,
                     item['amount'],
                     item['expiration_date_str'],
-                    counter <= num_show
+                    counter <= num_parts
                 ));
                 counter++;
             });

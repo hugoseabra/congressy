@@ -1,6 +1,6 @@
 {% load i18n humanize static base_tags queryset_filter payment_report %}
 
-{% if event.feature_configuration.feature_manual_payments and has_installments %}
+{% if event.feature_configuration.feature_manual_payments and has_open_installment_contract %}
 <div class="row tooltip-wrapper">
     <div class="col-xl-11 col-lg-11 col-md-12">
         <section class="panel panel-primary">

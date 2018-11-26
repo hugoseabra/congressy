@@ -21,16 +21,6 @@
                     Participante</h3>
             </div>
             <div class="float-right">
-
-
-                <button onclick='window.open("{% url 'subscription:subscription-extract' event.pk object.pk %}", "_blank")'
-                        class="btn btn-success btn-trans"
-                        data-toggle="tooltip"
-                        title="Extrato">
-                    <i class="fas fa-file-download"></i> Extrato Financeiro
-                </button>
-
-
                 {% if event.allow_internal_subscription %}
                     <button onclick="window.location.href='{% url 'subscription:subscription-edit' event.pk object.pk %}'"
                             class="btn btn-info btn-trans"

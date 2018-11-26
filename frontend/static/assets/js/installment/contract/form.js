@@ -50,7 +50,7 @@ window.cgsy.installment.form = window.cgsy.installment.form || {};
                 // Extrair dados das parcelas.
                 var data = self.getData();
                 var part_exp_dates = [];
-                for (var part = 2; part <= data['num_installments']; part++ ) {
+                for (var part = 1; part <= data['num_installments']; part++ ) {
                     var f_name = 'exp_date' + part;
                     part_exp_dates.push(data[f_name]);
                     delete data[f_name];
@@ -90,6 +90,6 @@ window.cgsy.installment.form = window.cgsy.installment.form || {};
         };
     };
     installment.form.ContractForm.prototype = Object.create(abstracts.form.Form.prototype);
-    installment.form.ContractForm.prototype.constructor = Object.create(installment.form.ContractForm);
+    installment.form.ContractForm.prototype.constructor = installment.form.ContractForm;
 
 })(window.cgsy.abstracts, window.cgsy.installment);

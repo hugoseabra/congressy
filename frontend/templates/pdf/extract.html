@@ -32,6 +32,10 @@
             font-size: .65em;
         }
 
+        table.cancelled-contract-table span {
+            text-decoration: line-through;
+            color: #DDD;
+        }
     </style>
 </head>
 <body>
@@ -44,22 +48,19 @@
         </div>
     </div>
     <div class="row" align="center">
-        <h4>Extrato do Pedido | Ingresso</h4>
+        <h3 style="font-weight: bold;">
+            {{ event.name|upper|truncatechars:80 }}
+        </h3>
+    </div>
+    <div class="row" align="center">
+        <h4 style="font-weight: bold">EXTRATO DE INSCRIÇÃO</h4>
         <small class="text-muted">Gerado ás {{ now|date:"d/m/Y H\hi" }} por {{ by }}</small>
     </div>
     <hr class="hr"/>
 
-
-    <h5 class="text-center" style="font-weight: bold;">
-        {{ event.name|upper }}
-    </h5>
-
-
     <div style="margin-top: 20px">
 
-        <h5 style="font-weight: bold;">
-            Pessoais
-        </h5>
+        <h5 style="font-weight: bold;">Pessoais</h5>
 
         <table class="table no-border" style="border-width: 0;margin-top: 20px">
             <tbody style="border-width: 0;">
@@ -92,9 +93,7 @@
 
     <div>
 
-        <h5 style="font-weight: bold;">
-            Inscrição
-        </h5>
+        <h5 style="font-weight: bold;">Inscrição</h5>
 
         <table class="table no-border" style="border-width: 0;margin-top: 20px">
             <tbody style="border-width: 0;">
@@ -129,9 +128,7 @@
 
     {% if lot.price and lot.price > 0 %}
         <div>
-            <h5 style="font-weight: bold;">
-                Financeiro
-            </h5>
+            <h5 style="font-weight: bold;">Financeiro</h5>
 
             {% now "Y-m-d" as today %}
             {% for lot_pk, lot in lots.items %}
@@ -350,62 +347,51 @@
 
         {% if contracts.count > 0 %}
 
-
+            <hr class="hr" />
             <div>
-
-                <h5 style="font-weight: bold;">
-                    Contratos de Parcelamento
-                </h5>
-
+                <div class="text-center">
+                    <h4 style="font-weight: bold;margin:0 auto">Contratos de Parcelamento</h4>
+                </div>
                 {% for contract in contracts %}
-                    <h6 style="margin-top: 3px">
-                        Contrato(ID: {{ contract.pk }}) criado dia:
-                        <span class="text-muted">
-                               {{ contract.created|date:"d/m/Y H\hi" }}
-                        </span>
-                    </h6>
-                    <table class="table no-border" style="border-width: 0;">
+                    <br />
+                    <div style="font-size:12px">
+                        <strong>Contrato (ID: {{ contract.pk }})</strong>:
+                        {{ contract.created|date:"d/m/Y H\hi" }}
+                        {% if contract.status == 'cancelled' %}
+                            <strong class="text-danger"> CANCELADO</strong>
+                        {% endif %}
+                    </div>
+                    <table class="table borderless {% if contract.status == 'cancelled' %}cancelled-contract-table{% endif %}">
                         <thead>
                         <tr>
                             <th width="5%">Parcela</th>
                             <th width="12%">Vencimento</th>
                             <th class="text-center" width="15%">Valor (R$)</th>
-                            <th width="15%">Status</th>
+                            <th class="text-center" width="10%">Status</th>
                         </tr>
                         </thead>
 
                         <tbody>
 
                         {% for part in contract.installment_parts.all %}
-
                             <tr>
                                 <td class="table-row text-center">
-                                    <span>{{ part.installment_number }}</span>
+                                    <span class="value">{{ part.installment_number }}</span>
                                 </td>
                                 <td class="table-row text-center">
-                                    <span>{{ part.created|date:"d/m/Y H\hi" }}</span>
+                                    <span class="value">{{ part.created|date:"d/m/Y H\hi" }}</span>
                                 </td>
                                 <td class="table-row text-right">
-
-                                    {% if part.paid %}
-                                        <span class="text-success">
-                                    {% else %}
-                                        <span class="text-danger">
-                                    {% endif %}
-
-                                    R$ {{ part.amount|intcomma }}</span>
-                                </td>
-                                <td class="table-row">
-
-                                    <span>
-                                        {% if part.paid %}
-                                            Pago
-                                        {% else %}
-                                            Aguardando
-                                        {% endif %}
+                                    <span class="{% if part.paid %}text-success{% else %}text-danger{% endif %} value">
+                                        R$ {{ part.amount|intcomma }}
                                     </span>
-
-
+                                </td>
+                                <td class="table-row text-center">
+                                    {% if part.paid %}
+                                    <span class="value text-success">pago</span>
+                                    {% else %}
+                                    <span class="value text-danger">aguardando</span>
+                                    {% endif %}
                                 </td>
                             </tr>
 

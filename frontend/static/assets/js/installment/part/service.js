@@ -37,7 +37,7 @@ window.cgsy.installment.service = window.cgsy.installment.part || {};
             }
 
             if (self.num_parts > 0) {
-                for (var a = 2; a < self.num_parts+2; a++) {
+                for (var a = 1; a <= self.num_parts; a++) {
                     var amount_part = self.amount / a;
                     if (amount_part >= self.minimum_amount) {
                         self.installment_amounts[a] = amount_part;
@@ -178,7 +178,7 @@ window.cgsy.installment.service = window.cgsy.installment.part || {};
             return new Promise(function(resolve, reject) {
                 var collection = contract.createPartCollection();
 
-                var num_installment = 2;
+                var num_installment = 1;
                 expiration_dates.forEach(function(exp_date_str) {
                     var split = exp_date_str.split('/');
                     var data = {
