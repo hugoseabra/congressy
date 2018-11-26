@@ -28,7 +28,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
         self.form.addPostSaveCallback(function() {
             var messenger = new abstracts.messenger.Messenger();
                 messenger.notifyLoader();
-            // window.location.reload(true);
+            window.location.reload(true);
         });
 
         self.loadElement(form_el);
@@ -275,7 +275,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
                     .attr('value', expiration_date_str)
                     .attr('readonly', '');
 
-            // input.mask('99/99/9999');
+            input.mask('99/99/9999');
 
             input_group.append(input);
 

@@ -73,7 +73,7 @@ function getContractForm(subscription_pk, limit_date_str, base_day, amount) {
 function renderPartsList(contract, parent_el) {
     parent_el = $(parent_el);
 
-    var table = new window.cgsy.installment.component.PartTable(parent_el);
+    var table = new window.cgsy.installment.component.PartTable(parent_el, contract);
     table.setEl('cancel-button', $('#cancel-installment-contract'));
 
     fetchContractParts(contract).then(function (parts) {

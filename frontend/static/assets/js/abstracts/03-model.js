@@ -160,7 +160,7 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
                     }
                     break;
                 case 'boolean':
-                    if (is_required && (!is_boolean && !is_string) || ( !is_null && !is_boolean && !is_string)) {
+                    if (is_required && !is_boolean && !is_string) {
                         self.has_error = true;
                         value = undefined;
                     } else {

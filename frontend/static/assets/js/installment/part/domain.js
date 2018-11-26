@@ -115,6 +115,7 @@ window.cgsy.installment.collection = window.cgsy.installment.collection || {};
             });
 
             if (unpaids.length === 0) {
+                self.items[0].next = true;
                 return;
             }
 
