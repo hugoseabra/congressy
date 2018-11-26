@@ -98,7 +98,11 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
                     .html($('<span>').addClass('far fa-money-bill-alt'));
 
                 button.on('click', function () {
+                    $('#id_part').val(item.pk);
+                    var amount = item.get('amount');
 
+                    $("#manual-payment-parts-form-modal").find("#id_amount").val(amount.toFixed(2));
+                    $('#manual-payment-parts-form-modal').modal('show');
                 });
 
             } else if (paid === false && next_part === false) {
