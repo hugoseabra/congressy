@@ -1,13 +1,12 @@
+from django.conf import settings
 from django.db import models
 
-from django.conf import settings
 from base.models import EntityMixin, RuleChecker, RuleIntegrityError
 
 
 class MinimumAmount(RuleChecker):
 
     def check(self, model_instance, *args, **kwargs):
-
         if model_instance.amount \
                 < settings.CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS:
             raise RuleIntegrityError(
@@ -17,6 +16,11 @@ class MinimumAmount(RuleChecker):
 
 
 class Part(EntityMixin, models.Model):
+
+    rule_instances = [
+        MinimumAmount,
+    ]
+
     class Meta:
         ordering = ['expiration_date']
         verbose_name = 'Parcela de Contrato'

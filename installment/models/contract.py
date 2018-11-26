@@ -55,6 +55,7 @@ class OnlyOneOpenContract(RuleChecker):
 
 class Contract(EntityMixin, models.Model):
     rule_instances = [
+        MinimumAmount,
         MinimumAmountWriteOnce,
         OnlyOneOpenContract
     ]
