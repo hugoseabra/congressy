@@ -10,21 +10,21 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
      * @param {jQuery|string} parent_el
      * @constructor
      */
-    installment.component.PartTable = function(parent_el) {
+    installment.component.PartTable = function (parent_el) {
         abstracts.dom.Component.call(this);
         abstracts.element.list.Table.call(this, parent_el);
         var self = this;
 
         self.dom_manager.domElements['cancel-button'] = null;
 
-        this.preRender = function() {
+        this.preRender = function () {
             var button_el = self.getEl('cancel-button');
             if (button_el && button_el.length) {
                 self.getEl('cancel-button').hide();
             }
         };
 
-        this.postRender = function() {
+        this.postRender = function () {
             var button_el = self.getEl('cancel-button');
             if (button_el && button_el.length) {
                 self.getEl('cancel-button').show();
@@ -42,7 +42,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
         //     alert('pagou nada não');
         // });
 
-        self.addColumnHandler('#', function(item) {
+        self.addColumnHandler('#', function (item) {
             var paid = item.get('paid') === true;
             var next_part = item.next === true;
             var value = item.get('installment_number');
@@ -50,7 +50,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
             return _getColumnContent(paid, next_part, value);
         });
 
-        self.addColumnHandler('exp_date', function(item) {
+        self.addColumnHandler('exp_date', function (item) {
             var paid = item.get('paid') === true;
             var next_part = item.next === true;
             var value = item.get('expiration_date').format('DD/MM/YYYY');
@@ -66,7 +66,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
             return _getColumnContent(paid, next_part, value);
         });
 
-        self.addColumnHandler('status', function(item) {
+        self.addColumnHandler('status', function (item) {
             var paid = item.get('paid') === true;
             var next_part = item.next === true;
 
@@ -83,9 +83,11 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
                     .attr('title', 'Registrar o pagamento')
                     .html($('<span>').addClass('far fa-money-bill-alt'));
 
-                button.on('click', function() {
-                    alert('registrar pagamento que tenha uma maneira de se conectar a esta parcela.');
+                button.on('click', function () {
+                    $('#id_part').val(item.pk);
+                    $('#manual-payment-parts-form-modal').modal('show');
                 });
+
 
             } else if (paid === false && next_part === false) {
                 // Manter estética da linha.
@@ -101,7 +103,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
          * @param {string} value
          * @private
          */
-        var _getColumnContent = function(paid, next_part, value) {
+        var _getColumnContent = function (paid, next_part, value) {
             var content = $('<span>').text(value);
             if (paid === true) {
                 content.addClass('text-muted text-line-through');
