@@ -8,6 +8,5 @@ class PartManager(managers.Manager):
         fields = '__all__'
         exclude = [
             'paid',
-            'transaction',
         ]
 

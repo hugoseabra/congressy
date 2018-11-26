@@ -113,10 +113,7 @@ class PartManualTransactionForm(forms.ModelForm):
 
         self.instance.subscription = self.subscription
 
-        part = Part.objects.get(pk=self.cleaned_data['part'])
-
-        self.instance.part_transaction = part
-
+        self.instance.part = Part.objects.get(pk=self.cleaned_data['part'])
         self.instance.lot = self.subscription.lot
         self.instance.lot_price = self.subscription.lot.get_calculated_price()
         self.instance.manual = True
@@ -132,7 +129,6 @@ class PartManualTransactionForm(forms.ModelForm):
             self.instance.status = Transaction.WAITING_PAYMENT
 
         instance = super().save(commit=commit)
-        self.instance.part_transaction.save()
 
         calculator = report_payment.PaymentReportCalculator(
             subscription=self.subscription
