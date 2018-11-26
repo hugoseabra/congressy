@@ -89,24 +89,14 @@
         </section>
     </div>
 </div>
+
+{% include 'subscription/installment-parts-list.html' %}
+
 <div class="row tooltip-wrapper">
     <div class="col-xl-11 col-lg-11 col-md-12">
-        <section class="panel" id="report_detail_visible" {% if show_details %}style="display: none"{% endif %}>
+        <section class="panel panel-primary" id="report_detail_hidden">
             <div class="panel-heading">
-                <h3 class="panel-title">
-                    Detalhamentos Financeiros <a href="javascript:void(0)"
-                                                 onclick="$(this).parent().parent().parent().hide();$('#report_detail_hidden').show();"
-                                                 style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a>
-                </h3>
-            </div>
-        </section>
-        <section class="panel panel-primary" id="report_detail_hidden" {% if not show_details %}style="display: none"{% endif %}>
-            <div class="panel-heading">
-                <h3 class="panel-title">
-                    Detalhamentos Financeiros <a href="javascript:void(0)"
-                                                 onclick="$(this).parent().parent().parent().hide();$('#report_detail_visible').show();"
-                                                 style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(esconder)</a>
-                </h3>
+                <h3 class="panel-title">Detalhamentos Financeiros</h3>
             </div>
             <div class="panel-body">
                 <div class="table-responsive">
@@ -127,7 +117,7 @@
                         <table class="table table-hover table-striped table-bordered transaction-list">
                             <thead>
                             <tr>
-                                <th class="text-center hidden-sm hidden-xs" width="3%">#</th>
+                                <th class="text-center" width="3%">#</th>
                                 <th width="12%">Data/hora</th>
                                 <th>Descrição</th>
                                 <th class="text-center" width="2%">
@@ -135,7 +125,7 @@
                                 </th>
                                 <th class="text-center" width="15%">Valor (R$)</th>
                                 <th width="15%">Status</th>
-                                <th class="text-center" width="2%">
+                                <th class="text-center hidden-sm hidden-xs" width="2%">
                                     <i style="font-size:30px" class="fas fa-hand-paper"
                                        data-toggle="tooltip"
                                        title="Lançamento manual"
@@ -173,7 +163,7 @@
                                 <td class="table-row">
                                     <span>Pendente</span>
                                 </td>
-                                <td class="table-row text-center">-</td>
+                                <td class="table-row text-center hidden-sm hidden-xs">-</td>
                             </tr>
 
                             {% filter_lookup installments lot.pk as installment %}
@@ -232,9 +222,6 @@
                                                             </div>
                                                             {% if event.feature_configuration.feature_manual_payments %}
                                                                 <div class="float-right" style="margin-top:5px">
-                                                                    <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
-                                                                        <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
-                                                                    </a>
                                                                     <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
                                                                         <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
                                                                     </a>
@@ -250,9 +237,6 @@
                                                             </div>
                                                             {% if event.feature_configuration.feature_manual_payments %}
                                                                 <div class="float-right" style="margin-top:5px">
-                                                                    <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
-                                                                        <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
-                                                                    </a>
                                                                     <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
                                                                         <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
                                                                     </a>
@@ -268,9 +252,6 @@
                                                             </div>
                                                             {% if event.feature_configuration.feature_manual_payments %}
                                                                 <div class="float-right" style="margin-top:5px">
-                                                                    <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
-                                                                        <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
-                                                                    </a>
                                                                     <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
                                                                         <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
                                                                     </a>
@@ -286,9 +267,6 @@
                                                             </div>
                                                             {% if event.feature_configuration.feature_manual_payments %}
                                                                 <div class="float-right" style="margin-top:5px">
-                                                                    <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
-                                                                        <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
-                                                                    </a>
                                                                     <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
                                                                         <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
                                                                     </a>
@@ -304,9 +282,6 @@
                                                             </div>
                                                             {% if event.feature_configuration.feature_manual_payments %}
                                                                 <div class="float-right" style="margin-top:5px">
-                                                                    <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
-                                                                        <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
-                                                                    </a>
                                                                     <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
                                                                         <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
                                                                     </a>
@@ -322,14 +297,26 @@
                                                             </div>
                                                             {% if event.feature_configuration.feature_manual_payments %}
                                                                 <div class="float-right" style="margin-top:5px">
-                                                                    <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
-                                                                        <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
-                                                                    </a>
                                                                     <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
                                                                         <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
                                                                     </a>
                                                                 </div>
                                                             {% endif %}
+                                                        {% endif %}
+                                                        <class class="clearfix"></class>
+                                                        {% if transaction.part_id %}
+                                                        <div>
+                                                            <div>Parcela relacionada:
+                                                                <strong>{{ transaction.part.installment_number }}x</strong> -
+                                                                <small><strong>CONTRATO ID:</strong> {{ transaction.part.contract_id }}</small>
+                                                                {% if transaction.part.contract.status == 'cancelled' %}
+                                                                    <span class="text-danger"> CANCELADO</span>
+                                                                {% endif %}
+                                                            </div>
+                                                            <small class="text-muted">
+                                                                <strong>Criado:</strong> {{ transaction.part.contract.created|date:"d/m/Y H\hi" }}
+                                                            </small>
+                                                        </div>
                                                         {% endif %}
                                                     {% else %}
                                                         {% if transaction.type == transaction.BOLETO %}
