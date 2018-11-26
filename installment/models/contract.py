@@ -13,14 +13,14 @@ class MinimumAmountWriteOnce(RuleChecker):
 
         if model_instance.minimum_amount_creation and \
                 model_instance.minimum_amount_creation != \
-                model_instance._original_minimum_amount_creation:
+                model_instance.original_minimum_amount_creation:
             raise RuleIntegrityError(
                 'O campo \'minimum_amount_creation\' não é'
                 ' editavel')
 
         if model_instance.minimum_amount and \
                 model_instance.minimum_amount != \
-                model_instance._original_minimum_amount:
+                model_instance.original_minimum_amount:
             raise RuleIntegrityError('O campo \'minimum_amount\' não é'
                                      ' editavel')
 
@@ -28,7 +28,6 @@ class MinimumAmountWriteOnce(RuleChecker):
 class MinimumAmount(RuleChecker):
 
     def check(self, model_instance, *args, **kwargs):
-
         if model_instance.amount \
                 < settings.CONGRESSY_MINIMUM_AMOUNT_TO_ALLOW_INSTALLMENTS:
             raise RuleIntegrityError(
@@ -173,6 +172,14 @@ class Contract(EntityMixin, models.Model):
     @property
     def is_new(self):
         return self._state.adding is True
+
+    @property
+    def original_minimum_amount_creation(self):
+        return self._original_minimum_amount_creation
+
+    @property
+    def original_minimum_amount(self):
+        return self._original_minimum_amount
 
     def save(self, **kwargs):
 
