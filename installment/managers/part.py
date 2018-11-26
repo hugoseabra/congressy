@@ -7,6 +7,7 @@ class PartManager(managers.Manager):
         model = Part
         fields = '__all__'
         exclude = [
-            'paid'
+            'paid',
+            'transaction',
         ]
 

@@ -9,8 +9,6 @@ class ContractManager(managers.Manager):
         fields = '__all__'
         exclude = [
             'limit_date',
-            'minimum_amount_creation',
-            'minimum_amount',
             'liquid_amount',
         ]
 

@@ -16,5 +16,5 @@ class PartSerializer(FormSerializerMixin,
     class Meta:
         form = PartService
         model = Part
-        # noinspection PyProtectedMember
-        exclude = PartService.manager_class.Meta.exclude
+        fields = '__all__'
+        read_only = PartService.manager_class.Meta.exclude
