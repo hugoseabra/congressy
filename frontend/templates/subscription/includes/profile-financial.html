@@ -1,6 +1,7 @@
-{% load static humanize subscription_tags %}
+{% load static humanize l10n base_tags subscription_tags %}
 {% now "Y-m-d" as today %}
 {% is_subscription_free object as is_free %}
+{% filter_lookup full_prices object.lot_id as remaining_price %}
 
 <div class="row tooltip-wrapper">
     <div class="col-xl-11 col-lg-11 col-md-12">
@@ -127,7 +128,7 @@
                                         <div class="float-left">
                                             <span class="title">Valor inscrição</span>
                                             <strong class="text-info">
-                                                R$ {{ last_transaction.amount|intcomma }}
+                                                R$ {{ object.lot.get_calculated_price|intcomma }}
                                             </strong>
                                         </div>
                                         <div class="clearfix"></div>
@@ -347,18 +348,18 @@
                                         </button>
                                     </li>
 
-                                    {% if has_open_installment_contract is False %}
-                                    <li>
-                                        <button type="button"
-                                                class="btn btn-success btn-trans"
-                                                style="display: none;"
-                                                title="Criar novo contrato de parcelamento"
-                                                id="new-contract-btn"
-                                                data-toggle="modal" data-target="#contract-form-modal">
-                                            <span class="fas fa-file-contract"></span>
-                                            Novo parcelamento
-                                        </button>
-                                    </li>
+                                    {% if has_open_installment_contract is False and remaining_price and remaining_price < 0 %}
+                                        <li>
+                                            <button type="button"
+                                                    class="btn btn-success btn-trans"
+                                                    style="display: none;"
+                                                    title="Criar novo contrato de parcelamento"
+                                                    id="new-contract-btn"
+                                                    onclick="getContractForm('{{ object.pk }}', '{{installment_limit_date}}', parseInt({{base_expiration_day}}), parseFloat('{{ remaining_price|unlocalize }}'))">
+                                                <span class="fas fa-file-contract"></span>
+                                                Novo parcelamento
+                                            </button>
+                                        </li>
                                     {% endif %}
 
                                 {% endif %}

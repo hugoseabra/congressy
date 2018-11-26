@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
@@ -56,6 +58,17 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
         self.object = self.get_object()
 
         response = super().dispatch(request, *args, **kwargs)
+
+        if self.object.event_id != self.event.pk:
+            messages.warning(
+                request,
+                'Inscrição inválida para este evento..'
+            )
+
+            return redirect(
+                'subscription:subscription-list',
+                event_pk=self.event.pk,
+            )
 
         if self.financial is True:
             has_payable_products = self.object.subscription_products.filter(
@@ -118,7 +131,10 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
         ctx['services'] = self.get_services()
         ctx['products'] = self.get_products()
         ctx['has_installments'] = self.has_installments()
-        ctx['has_open_installment_contract'] = self.has_open_installment_contract()
+        ctx['has_open_installment_contract'] = \
+            self.has_open_installment_contract()
+        ctx['base_expiration_day'] = self.get_base_expiration_day()
+        ctx['installment_limit_date'] = self.get_installment_limit_date()
 
         ctx['new_boleto_allowed'] = payment_helpers.is_boleto_allowed(
             self.event
@@ -276,3 +292,11 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
             return False
 
         return self.object.installment_contracts.filter(status='open').count() > 0
+
+    def get_installment_limit_date(self):
+        date = self.event.date_start - timedelta(days=2)
+        return date.strftime('%Y-%m-%d')
+
+    def get_base_expiration_day(self):
+        date = self.event.date_start - timedelta(days=2)
+        return date.strftime('%d')

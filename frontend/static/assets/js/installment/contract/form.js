@@ -5,8 +5,11 @@ window.cgsy.installment.form = window.cgsy.installment.form || {};
 (function (abstracts, installment) {
     'use strict';
 
-    installment.form.ContractForm = function(form_el) {
+    installment.form.ContractForm = function(subscription_pk, form_el) {
         abstracts.form.Form.call(this, form_el);
+        var self = this;
+
+        this.subscription_pk = subscription_pk;
 
         /**
          * Engatilhado após salvar.
@@ -21,73 +24,64 @@ window.cgsy.installment.form = window.cgsy.installment.form || {};
             self.afterSaveCallback = callback;
         };
 
-        this.save = function() {
-            self.processing = true;
+        this.postSave = function() {
+            window.setTimeout(function() {
+                self.disableSubmitButton();
+            }, 100);
+        };
 
-            var remain_switch = self.getEl('close-after-save-switch');
-            if (remain_switch && remain_switch.length) {
-                self.save_and_remain = remain_switch.prop('checked') === false;
-            }
-
+        /**
+         * Callback para tratar da estratégia de salvar.
+         * @returns {Promise}
+         */
+        this.saveHandler = function() {
             return new Promise(function(resolve, reject) {
-                if (self.processing === true) {
-                    reject('Processando');
-                    return;
-                }
-
-                self.processing = true;
 
                 var contract = new installment.models.Contract();
+                    contract.set('subscription', self.subscription_pk);
+
                 var error_alerter = new abstracts.form.FormErrorAlerter(
                     self.alerter_el,
                     contract.error_handler
                 );
 
-                self.sync().then(function() {
-                    self.alerter.clear();
+                contract.populate(self.getData());
 
-                    contract.populate(self.getData());
+                if (!contract.isValid()) {
+                    error_alerter.notify();
+                    return reject();
+                }
 
-                    // Error handler de PartCollection e de Contract são os mesmos.
-                    // Se PartCollection for inválido, Contract também será.
-                    contract.part_collection.isValid();
+                contract.save().then(function() {
 
                     if (!contract.isValid()) {
-                        return Promise.reject();
+                        error_alerter.notify();
+                        return reject();
                     }
 
-                    contract.save().then(function() {
-                        self.alerter.clear();
+                    // // Error handler de PartCollection e de Contract são os mesmos.
+                    // // Se PartCollection for inválido, Contract também será.
+                    // contract.part_collection.isValid();
+                    //
+                    // if (!contract.isValid()) {
+                    //     return reject();
+                    // }
 
-                        if (!contract.isValid()) {
-                            return Promise.reject();
-                        }
+                    // self.saveParts(contract).then(function() {
+                    //     self.alerter.clear();
+                    //     self.alerter.renderSuccess('Contrato criado com sucesso.');
+                    //
+                    //     if (self.save_and_remain === false && typeof self.afterSaveCallback === 'function') {
+                    //         self.afterSaveCallback();
+                    //     }
+                    // }, function(reason) {
+                    //     error_alerter.notify();
+                    //     return reject(reason);
+                    // });
 
-                        self.saveParts(contract).then(function() {
-                            self.alerter.clear();
-                            self.alerter.renderSuccess('Contrato criado com sucesso.');
-
-                            if (self.save_and_remain === false && typeof self.afterSaveCallback === 'function') {
-                                self.afterSaveCallback();
-                            }
-                        }).catch(function(error_handler) {
-                            return Promise.reject();
-                        });
-
-                        self.save_and_remain = false;
-                        self.processing = false;
-                        self.enableSubmitButton();
-                        resolve(self.getData());
-                    });
-
-                }).catch(function(reason) {
-                    contract.delete();
-
-                    error_alerter.notify();
-                    self.save_and_remain = false;
-                    self.processing = false;
-                    self.enableSubmitButton();
-                    reject(reason);
+                    resolve();
+                }, function(reasons) {
+                    reject(reasons);
                 });
             });
         };

@@ -25,7 +25,7 @@ window.cgsy.installment = window.cgsy.installment || {};
         this.verbose_name_plural = 'contratos de parcelamento';
 
         this.uri_manager = uri_manager;
-        this.creation_uri = '/constracts/';
+        this.creation_uri = '/contracts/';
         this.uri = '/contracts/{{pk}}/';
 
         /**

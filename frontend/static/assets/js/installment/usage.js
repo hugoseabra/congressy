@@ -25,7 +25,7 @@ function fetchContracts(subscription_pk) {
  * @param {cgsy.installment.models.Contract} contract
  * @returns {Promise}
  */
-function getContractParts(contract) {
+function fetchContractParts(contract) {
     return new Promise(function (resolve, reject) {
         contract.fetchParts().then(function () {
             resolve(contract.part_collection.items);
@@ -36,6 +36,39 @@ function getContractParts(contract) {
     });
 }
 
+function getContractForm(subscription_pk, limit_date_str, base_day, amount) {
+    var form_el = $('#contract-form').clone();
+        form_el.removeAttr('id');
+
+    var modal_el = $('#generic-modal').clone();
+        modal_el.removeAttr('id');
+
+    var button_el = $('.submit-button', modal_el);
+    var num_parts_field_el = $('[name=num_installments]', form_el);
+    var expiration_day_field_el = $('[name=expiration_day]', form_el);
+
+    var parts_list_el = $('.contract-part-table', form_el);
+
+    var form_modal = new window.cgsy.installment.component.ContractFormModal(
+        subscription_pk,
+        modal_el,
+        form_el,
+        button_el
+    );
+    form_modal.setEl('expiration-day-field', expiration_day_field_el);
+    form_modal.setEl('num-installments-field', num_parts_field_el);
+    form_modal.setEl('part-table-list', parts_list_el);
+
+    form_modal.populate({
+        'expiration_day': parseInt(base_day),
+        'amount': (amount < 0) ? -(amount) : amount,
+        'minimum_amount': 25,
+        'limit_date_str': limit_date_str
+    });
+
+    form_modal.open();
+}
+
 //================================ DOM ========================================
 function renderPartsList(contract, parent_el) {
     parent_el = $(parent_el);
@@ -43,7 +76,7 @@ function renderPartsList(contract, parent_el) {
     var table = new window.cgsy.installment.component.PartTable(parent_el);
     table.setEl('cancel-button', $('#cancel-installment-contract'));
 
-    getContractParts(contract).then(function (parts) {
+    fetchContractParts(contract).then(function (parts) {
         parts.forEach(function (part) {
             table.addItem(part);
         });

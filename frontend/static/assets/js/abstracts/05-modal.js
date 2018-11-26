@@ -8,10 +8,10 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
 
     /**
      * Componente de modal.
-     * @param {jQuery|string} model_el
+     * @param {jQuery|string} modal_el
      * @constructor
      */
-    abstracts.modal.Modal = function (model_el) {
+    abstracts.modal.Modal = function (modal_el) {
         abstracts.dom.Component.call(this);
         var self = this;
         self.strict();
@@ -20,18 +20,39 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
          * Element principal.
          * @type {jQuery}
          */
-        this.modal_el = $(model_el);
+        this.modal_el = $(modal_el);
 
-        self.dom_manager.domElements = {
-            'loader': null
-        };
+        this.loader_message = 'aguarde...';
 
         /**
          * Resgata elemento de loader do modal.
          * @returns {jQuery|*}
          */
         this.getLoaderEl = function() {
-            return self.getEl('loader');
+            var el = $('.modal-loader', self.modal_el);
+
+            if (el.length === 0) {
+                el = $('<div>').css({
+                    'width': '100%',
+                    'height': '200px',
+                    'display': 'none'
+                }).addClass('modal-loader');
+
+                var loader_in = $('<div>').css({
+                    'width': '82px',
+                    'margin': '100px auto',
+                    'text-align': 'center'
+                });
+                loader_in.append($('<span>').addClass('fas fa-circle-notch fa-spin fa-3x'));
+                loader_in.append($('<span>').text(self.loader_message));
+
+                el.append(loader_in);
+                el.append($('<div>').addClass('clearfix'));
+
+                $('.modal-content', self.modal_el).prepend(el);
+            }
+
+            return el;
         };
 
         /**
@@ -179,7 +200,7 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
      * @param {abstracts.form.ModelForm} form
      * @constructor
      */
-    abstracts.modal.Form = function (model_el, form) {
+    abstracts.modal.ModelForm = function (model_el, form) {
         abstracts.modal.Modal.call(this, model_el);
         var self = this;
 
@@ -233,8 +254,8 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
             self.setTitle(title);
         }, 350);
     };
-    abstracts.modal.Form.prototype = Object.create(abstracts.modal.Modal.prototype);
-    abstracts.modal.Form.prototype.constructor = abstracts.modal.Form;
+    abstracts.modal.ModelForm.prototype = Object.create(abstracts.modal.Modal.prototype);
+    abstracts.modal.ModelForm.prototype.constructor = abstracts.modal.ModelForm;
 
     abstracts.modal.Delete = function (model_instance) {
         abstracts.modal.LoadableBaseModal.call(this);
