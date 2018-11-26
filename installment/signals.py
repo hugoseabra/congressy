@@ -1,6 +1,7 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
+from installment.models import Part
 from payment.models import Transaction
 
 
@@ -22,8 +23,9 @@ def set_part_unpaid_flag(instance, **kwargs):
     if kwargs.get('raw', False):
         return
 
-    if instance.part_transaction:
-        part = instance.part_transaction
-        part.paid = False
-        part.transaction = None
-        part.save()
+    if Part.objects.filter(transaction=instance).exists():
+        
+        for part in Part.objects.filter(transaction=instance):
+            part.paid = False
+            part.transaction = None
+            part.save()
