@@ -142,6 +142,10 @@ class Contract(EntityMixin, models.Model):
     def is_new(self):
         return self._state.adding is True
 
+    @property
+    def original_minimum_amount(self):
+        return self._original_minimum_amount
+
     def save(self, **kwargs):
 
         if self.minimum_amount is None:
