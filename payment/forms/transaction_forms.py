@@ -99,6 +99,8 @@ class PartManualTransactionForm(forms.ModelForm):
     def __init__(self, subscription, *args, **kwargs):
         self.subscription = subscription
         super().__init__(*args, **kwargs)
+        self.fields['manual_payment_type'].choices = \
+            Transaction.MANUAL_PAYMENT_TYPES[:-1]
 
     def clean_amount(self):
         amount = self.cleaned_data.get('amount')

@@ -1,10 +1,20 @@
 from datetime import timedelta
 
-from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from base.models import EntityMixin, RuleChecker, RuleIntegrityError
+
+
+class MinimumAmountWriteOnce(RuleChecker):
+
+    def check(self, model_instance, *args, **kwargs):
+        if model_instance.minimum_amount and \
+                model_instance.minimum_amount != \
+                model_instance.original_minimum_amount:
+            raise RuleIntegrityError('O campo \'minimum_amount\' não é'
+                                     ' editavel')
+
 
 class OnlyOneOpenContract(RuleChecker):
     def check(self, model_instance, *args, **kwargs):
@@ -24,6 +34,7 @@ class OnlyOneOpenContract(RuleChecker):
 
 class Contract(EntityMixin, models.Model):
     rule_instances = [
+        MinimumAmountWriteOnce,
         OnlyOneOpenContract
     ]
 
@@ -37,10 +48,10 @@ class Contract(EntityMixin, models.Model):
         (FULLY_PAID_STATUS, "quitado"),
     )
 
+    _original_minimum_amount = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._original_minimum_amount_creation = self.minimum_amount_creation
         self._original_minimum_amount = self.minimum_amount
 
     class Meta:
@@ -102,6 +113,15 @@ class Contract(EntityMixin, models.Model):
 
     limit_date = models.DateField(
         verbose_name="data limite de parcelamento",
+        # Required
+        blank=True,
+        null=False,
+    )
+
+    minimum_amount = models.DecimalField(
+        verbose_name="valor mínimo por parcela",
+        decimal_places=2,
+        max_digits=11,
         # Required
         blank=True,
         null=False,
