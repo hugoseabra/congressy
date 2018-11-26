@@ -9,6 +9,8 @@ window.cgsy.installment.form = window.cgsy.installment.form || {};
         abstracts.form.Form.call(this, form_el);
         var self = this;
 
+        self.strictModeOff();
+
         this.subscription_pk = subscription_pk;
 
         /**
@@ -45,7 +47,22 @@ window.cgsy.installment.form = window.cgsy.installment.form || {};
                     contract.error_handler
                 );
 
-                contract.populate(self.getData());
+                // Extrair dados das parcelas.
+                var data = self.getData();
+                var part_exp_dates = [];
+                for (var part = 2; part <= data['num_installments']; part++ ) {
+                    var f_name = 'exp_date' + part;
+                    part_exp_dates.push(data[f_name]);
+                    delete data[f_name];
+                }
+
+                var part_amount = data['part_amount'];
+                var split_amount = part_amount.split(',');
+                part_amount = parseFloat(split_amount.join('.'));
+
+                delete data['part_amount'];
+
+                contract.populate(data);
 
                 if (!contract.isValid()) {
                     error_alerter.notify();
@@ -59,53 +76,17 @@ window.cgsy.installment.form = window.cgsy.installment.form || {};
                         return reject();
                     }
 
-                    // // Error handler de PartCollection e de Contract são os mesmos.
-                    // // Se PartCollection for inválido, Contract também será.
-                    // contract.part_collection.isValid();
-                    //
-                    // if (!contract.isValid()) {
-                    //     return reject();
-                    // }
+                    var factory = new installment.service.PartCollectionFactory(contract);
+                    factory.create(part_exp_dates, part_amount).then(function() {
+                        resolve();
+                    }, function(reasons) {
+                        reject(reasons);
+                    });
 
-                    // self.saveParts(contract).then(function() {
-                    //     self.alerter.clear();
-                    //     self.alerter.renderSuccess('Contrato criado com sucesso.');
-                    //
-                    //     if (self.save_and_remain === false && typeof self.afterSaveCallback === 'function') {
-                    //         self.afterSaveCallback();
-                    //     }
-                    // }, function(reason) {
-                    //     error_alerter.notify();
-                    //     return reject(reason);
-                    // });
-
-                    resolve();
                 }, function(reasons) {
                     reject(reasons);
                 });
             });
-        };
-
-        this.saveParts = function(contract) {
-            return new Promise(function(resolve, reject) {
-                if (!contract.isValid()) {
-                    reject(contract.error_handler);
-                    return;
-                }
-                var parts = contract.part_collection.items;
-                if (parts.length) {
-                    parts.forEach(function(part) {
-                        part.save().then(function() {
-                            if (!part.isValid()) {
-                                reject(part.error_handler);
-                            }
-                        });
-                    });
-                }
-
-                resolve();
-            });
-
         };
     };
     installment.form.ContractForm.prototype = Object.create(abstracts.form.Form.prototype);

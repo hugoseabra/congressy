@@ -10,6 +10,7 @@ class PartSerializer(FormSerializerMixin,
     
     expiration_date = serializers.DateField(input_formats=[
         '%d/%m/%Y',
+        '%Y-%m-%d',
     ])
 
     class Meta:

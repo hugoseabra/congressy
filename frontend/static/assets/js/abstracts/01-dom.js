@@ -44,6 +44,13 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
         };
 
         /**
+         * Seta como não-estrito
+         */
+        this.setAsNotStrictKeys = function () {
+            strictKeys = false;
+        };
+
+        /**
          * Seta um elemento jQuery atrelada a uma chave.
          * @param {string} key
          * @param {jQuery} element - Element jQuery

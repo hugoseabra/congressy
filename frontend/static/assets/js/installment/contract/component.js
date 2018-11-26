@@ -15,7 +15,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
      */
     installment.component.ContractFormModal = function(subscription_pk, modal_el, form_el, button_el) {
         abstracts.modal.Modal.call(this, modal_el);
-        self = this;
+        var self = this;
 
         self.dom_manager.domElements['num-installments-field'] = null;
         self.dom_manager.domElements['expiration-day-field'] = null;
@@ -28,7 +28,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
         self.form.addPostSaveCallback(function() {
             var messenger = new abstracts.messenger.Messenger();
                 messenger.notifyLoader();
-            window.location.reload(true);
+            // window.location.reload(true);
         });
 
         self.loadElement(form_el);
@@ -45,66 +45,110 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
             self.form.set('expiration_day', parseInt(data['expiration_day']));
             self.form.set('amount', as_currency(data['amount']));
 
-            var part_list = _getPartsList(
+            var part_list = new installment.component.ContractPartsList(self.getEl('part-table-list'));
+
+            var exp_day_field_el = self.getEl('expiration-day-field');
+
+            var num_installments_field = self.getEl('num-installments-field');
+                num_installments_field.empty();
+                num_installments_field.unbind('change');
+                num_installments_field.on('change', function() {
+                    _prepareList(
+                        part_list,
+                        $(this).val(),
+                        limit_date,
+                        exp_day_field_el.val(),
+                        data['amount'],
+                        data['minimum_amount']
+                    );
+                    part_list.render($(this).val());
+
+                    self.form.syncDataAndDom();
+                });
+
+            exp_day_field_el.unbind('change');
+            exp_day_field_el.on('change', function() {
+                var v = $(this).val();
+                if (v < 1 || v > 31) {
+                    return;
+                }
+
+                _prepareList(
+                    part_list,
+                    num_installments_field.val(),
+                    limit_date,
+                    v,
+                    data['amount'],
+                    data['minimum_amount']
+                );
+
+                part_list.render(num_installments_field.val());
+
+                self.form.syncDataAndDom();
+            });
+
+            _prepareList(
+                part_list,
+                2,
                 limit_date,
                 parseInt(data['expiration_day']),
                 data['amount'],
                 data['minimum_amount']
             );
 
-            var num_installments_field = self.getEl('num-installments-field');
-                num_installments_field.empty();
-                num_installments_field.unbind('change');
-                num_installments_field.on('change', function() {
-                    part_list.render($(this).val());
-                });
-
-            for (var a = 2; a <= part_list.items.length+1; a++) {
+            for (var a = 2; a < part_list.items.length+2; a++) {
                 num_installments_field.append($('<option>').attr('value', a).text(a));
             }
 
             part_list.render();
         };
 
-        var _getPartsList = function(limit_date, expiration_day, amount, minimum_amount) {
+
+        var _prepareList = function(part_list, num_installment, limit_date, expiration_day, full_amount, minimum_amount) {
+            part_list.reset();
+
+            var dates = _getExpirationDates(limit_date, expiration_day);
+            if (!dates.length) {
+                return;
+            }
+
+            var num_parts = dates.length;
+
+            var amounts = _getAmounts(num_parts, full_amount, minimum_amount);
+            num_parts = Object.keys(amounts).length;
+
+            var part_amount = _getAmount(num_installment, amounts);
+            self.form.set('part_amount', part_amount);
+
+            var counter = 0;
+            dates.forEach(function(exp_date) {
+                if (counter < num_parts) {
+                    part_list.addItem(exp_date, as_currency(part_amount));
+                }
+                counter++;
+            });
+        };
+
+        var _getExpirationDates = function(limit_date, expiration_day) {
             var exp_date_generator = new installment.service.ExpirationDateGenerator(
                 limit_date,
                 expiration_day
             );
-            var num_parts = exp_date_generator.getNumParts();
-
-            if (!num_parts > 0) {
-                return;
-            }
-
-            var calc = new installment.service.PriceCalculator(num_parts, amount, minimum_amount);
-            var amounts = calc.getAmounts();
-            var exp_dates = exp_date_generator.getDates('DD/MM/YYYY');
-
-            num_parts = amounts.length;
-
-            var part_list = new installment.component.ContractPartsList(self.getEl('part-table-list'));
-
-            var counter = 0;
-            for (var a = 2; a <= num_parts; a++) {
-                part_list.addItem(exp_dates[counter], as_currency(amounts[counter]));
-                counter++;
-            }
-
-            var exp_day_field_el = self.getEl('expiration-day-field');
-                exp_day_field_el.unbind('keyup');
-                exp_day_field_el.on('keyup', function() {
-                    var v = $(this).val();
-                    if (v > 31) {
-                        return;
-                    };
-                    var part_list = _getPartsList(limit_date, v, amount, minimum_amount);
-                    part_list.render(self.getEl('num-installments-field').val());
-                });
-
-            return part_list;
+            return exp_date_generator.getDates('DD/MM/YYYY');
         };
 
+        var _getAmounts = function(num_parts, full_amount, minimum_amount) {
+            var calc = new installment.service.PriceCalculator(num_parts, full_amount, minimum_amount);
+            return calc.getAmounts();
+        };
+
+        var _getAmount = function(num_installment, part_amounts) {
+            if (!part_amounts.hasOwnProperty(num_installment)) {
+                return null;
+            }
+
+            return part_amounts[num_installment];
+        };
 
         window.setTimeout(function() {
             $('[name=expiration_day]', form_el  ).focus();
@@ -142,9 +186,9 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
         /**
          * Renderiza componente
          */
-        this.render = function(show) {
+        this.render = function(num_show) {
 
-            show = show || 2;
+            num_show = num_show || 2;
 
             var table = $('<table>').addClass('table borderless');
             var header = $('<tr>');
@@ -172,7 +216,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
                     counter,
                     item['amount'],
                     item['expiration_date_str'],
-                    counter <= show
+                    counter <= num_show
                 ));
                 counter++;
             });
@@ -197,15 +241,15 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
 
             var col1 = $('<td>').addClass('text-right').append(
                 $('<label>')
-                    .attr('for', 'amount' + num)
+                    .attr('for', 'exp_date' + num)
                     .addClass('label-control')
                     .css('margin-bottom', 0)
-                    .text(num + 'x')
+                    .text(num)
             );
 
             var col2 = $('<td>').addClass('text-center').append(
                 $('<label>')
-                    .attr('for', 'amount' + num)
+                    .attr('for', 'exp_date' + num)
                     .addClass('label-control')
                     .css('margin-bottom', 0)
                     .text('R$ ' + amount)
@@ -226,8 +270,8 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
             var input = $('<input>')
                     .addClass('form-control')
                     .attr('type', 'tel')
-                    .attr('name', 'amount' + num)
-                    .attr('id', 'amount' + num)
+                    .attr('name', 'exp_date' + num)
+                    .attr('id', 'exp_date' + num)
                     .attr('value', expiration_date_str)
                     .attr('readonly', '');
 
