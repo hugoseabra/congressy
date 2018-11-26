@@ -9,4 +9,3 @@ class PartManager(managers.Manager):
         exclude = [
             'paid',
         ]
-

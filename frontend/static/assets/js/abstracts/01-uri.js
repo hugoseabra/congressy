@@ -7,6 +7,8 @@
 window.cgsy = window.cgsy || {};
 window.cgsy.abstracts = window.cgsy.abstracts || {};
 
+window.cgsy.URI_DEBUG_MODE = false;
+
 //========================= URI MANAGER =======================================
 (function (abstracts) {
     'use strict';
@@ -24,7 +26,7 @@ window.cgsy.abstracts = window.cgsy.abstracts || {};
          * Modo de desenvolvimento.
          * @type {boolean}
          */
-        var DEV_MODE = true;
+        var DEV_MODE = window.cgsy.URI_DEBUG_MODE === true;
 
         /**
          * Token de autenticação.
