@@ -1,9 +1,36 @@
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
-from installment.models import Part
+from installment.models import Contract, Part
 from payment.models import Transaction
 
+
+@receiver(post_save, sender=Part)
+def set_contract_status(instance, raw, created, **_):
+    # Disable when loaded by fixtures
+    if raw is True or created is True:
+        return
+
+    contract = instance.contract
+
+    if contract.status == Contract.CANCELLED_STATUS:
+        return
+
+    if instance.has_changed('paid') is False:
+        return
+
+    has_all_paid = True
+
+    for part in contract.parts.all():
+        if part.paid is False:
+            has_all_paid = False
+
+    if has_all_paid is True:
+        contract.status = Contract.FULLY_PAID_STATUS
+    else:
+        contract.status = Contract.OPEN_STATUS
+
+    contract.save()
 
 @receiver(post_save, sender=Transaction)
 def set_part_paid_flag(instance, **kwargs):

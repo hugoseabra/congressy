@@ -3,6 +3,8 @@ from django.db import models
 
 from base.models import EntityMixin, RuleChecker, RuleIntegrityError
 
+from core.model import track_data
+
 
 class MinimumAmount(RuleChecker):
 
@@ -26,6 +28,7 @@ class TransactionBelongsToSubscription(RuleChecker):
             )
 
 
+@track_data('paid')
 class Part(EntityMixin, models.Model):
     rule_instances = [
         MinimumAmount,
@@ -50,7 +53,7 @@ class Part(EntityMixin, models.Model):
         'installment.Contract',
         on_delete=models.CASCADE,
         verbose_name='parcela de inscrição',
-        related_name='installment_parts',
+        related_name='parts',
         # Required
         blank=False,
         null=False,

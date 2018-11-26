@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
                 ('expiration_date', models.DateField(blank=True, verbose_name='vencimento')),
                 ('installment_number', models.PositiveIntegerField(verbose_name='número da parcela')),
                 ('paid', models.BooleanField(default=False, verbose_name='pago')),
-                ('contract', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='installment_parts', to='installment.Contract', verbose_name='parcela de inscrição')),
+                ('contract', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='parts', to='installment.Contract', verbose_name='parcela de inscrição')),
             ],
             options={
                 'verbose_name': 'Parcela de Contrato',
