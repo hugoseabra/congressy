@@ -90,7 +90,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
                     .attr('disabled', '')
                     .text('Pago');
 
-            } else if (paid === false && next_part === true) {
+            } else if (paid === false && next_part === true) {         
                 button.addClass('btn-primary')
                     .attr('data-toggle', 'tooltip')
                     .attr('title', 'Registrar o pagamento')
