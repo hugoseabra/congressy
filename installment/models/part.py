@@ -1,7 +1,19 @@
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from base.models import EntityMixin
+from django.conf import settings
+from base.models import EntityMixin, RuleChecker, RuleIntegrityError
+
+
+class MinimumAmount(RuleChecker):
+
+    def check(self, model_instance, *args, **kwargs):
+
+        if model_instance.amount \
+                < settings.CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS:
+            raise RuleIntegrityError(
+                'Valor da parcela abaixo do mínimo para '
+                'permitir parcelamento de inscrição '
+            )
 
 
 class Part(EntityMixin, models.Model):

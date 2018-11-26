@@ -25,6 +25,18 @@ class MinimumAmountWriteOnce(RuleChecker):
                                      ' editavel')
 
 
+class MinimumAmount(RuleChecker):
+
+    def check(self, model_instance, *args, **kwargs):
+
+        if model_instance.amount \
+                < settings.CONGRESSY_MINIMUM_AMOUNT_TO_ALLOW_INSTALLMENTS:
+            raise RuleIntegrityError(
+                'Valor do contrato abaixo do mínimo para '
+                'ativar parcelamento de inscrição '
+            )
+
+
 class OnlyOneOpenContract(RuleChecker):
     def check(self, model_instance, *args, **kwargs):
         sub = model_instance.subscription
@@ -175,7 +187,7 @@ class Contract(EntityMixin, models.Model):
             self.liquid_amount = self.amount
 
         if self.limit_date is None:
-            limit_date = self.subscription.event.date_start - timedelta(days=2)
+            limit_date = self.subscription.event.date_start - timedelta(days=3)
             self.limit_date = limit_date.date()
 
         super().save(kwargs)
