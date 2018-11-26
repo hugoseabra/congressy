@@ -81,9 +81,7 @@ class PartManualTransactionForm(forms.ModelForm):
             'manual_author',
         )
         widgets = {
-            'amount': PriceInput(
-                attrs={'data-mask': '#.##0,00', 'data-mask-reverse': 'true'}
-            )
+            'amount': forms.HiddenInput(),
         }
 
     paid = forms.BooleanField(

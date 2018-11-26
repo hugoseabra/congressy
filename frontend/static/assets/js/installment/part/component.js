@@ -98,6 +98,10 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
 
                 button.on('click', function () {
                     $('#id_part').val(item.pk);
+                    var amount = item.get('amount');
+                    debugger;
+
+                    $("#manual-payment-parts-form-modal").find("#id_amount").val(amount.toFixed(2));
                     $('#manual-payment-parts-form-modal').modal('show');
                 });
 
