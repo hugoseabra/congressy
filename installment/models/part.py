@@ -30,6 +30,16 @@ class Part(EntityMixin, models.Model):
         null=False,
     )
 
+    transaction = models.ForeignKey(
+        'payment.Transaction',
+        on_delete=models.CASCADE,
+        verbose_name='transação da parcela',
+        related_name='part_transaction',
+        # Not required
+        blank=True,
+        null=True,
+    )
+
     amount = models.DecimalField(
         verbose_name="valor",
         decimal_places=2,
