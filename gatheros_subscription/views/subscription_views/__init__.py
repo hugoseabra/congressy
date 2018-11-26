@@ -8,3 +8,4 @@ from .list import SubscriptionListView
 from .my_subscriptions import MySubscriptionsListView
 from .switch import SwitchSubscriptionTestView
 from .voucher import VoucherSubscriptionPDFView
+from .extract import ExtractSubscriptionPDFView

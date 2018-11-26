@@ -20,6 +20,46 @@
 {% endblock %}
 
 {% block scripts %}
+    <!--ABSTRACTS DEPENDENCIES-->
+    <script src="{% static "assets/js/vendor/moment.js" %}"></script>
+    <script src="{% static "assets/js/price-format.min.js" %}"></script>
+
+    <!--ABSTRACTS-->
+    <script src="{% static "assets/js/abstracts/01-dom.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/01-error.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/01-messenger.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/01-uri.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/02-alerter.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/02-form-field-mapper.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/02-http.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/03-form.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/03-model.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/04-collection.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/04-model-form.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/05-element-list.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/05-modal.js" %}"></script>
+
+    {% if event.feature_configuration.feature_manual_payments %}
+        <!--INSTALLMENT - LIB-->
+        <script src="{% static "assets/js/installment/contract/domain.js" %}"></script>
+        <script src="{% static "assets/js/installment/contract/form.js" %}"></script>
+        <script src="{% static "assets/js/installment/contract/component.js" %}"></script>
+        <script src="{% static "assets/js/installment/part/domain.js" %}"></script>
+        <script src="{% static "assets/js/installment/part/service.js" %}"></script>
+        <script src="{% static "assets/js/installment/part/component.js" %}"></script>
+
+        <!--INSTALLMENT - USAGE-->
+        <script src="{% static "assets/js/installment/usage.js" %}"></script>
+
+        <script>
+            $(document).ready(function () {
+                getContracts('{{ object.pk }}');
+            });
+        </script>
+
+
+    {% endif %}
+
     <script src="{% static "assets/js/messenger.js" %}"></script>
     <script>
         $(document).ready(function () {
@@ -48,12 +88,6 @@
             el_to_hide.hide();
         }
 
-        function edit_payment(transaction_id, type, amount) {
-            $('#manual-payment-form-modal').modal();
-            $('#edit-transaction-id').val(transaction_id);
-            $('#id_manual_payment_type').val(type);
-            $('#id_amount').val(amount);
-        }
 
         function delete_payment(transaction_id, amount) {
             var message = "Tem certeza que deseja deletar o lançamento de R$ " + amount + " ?";
@@ -147,6 +181,15 @@
                     window.location.href = window.location.href;
                 }, 7500);
             {% endif %}
+
+
+            {% if event.feature_configuration.feature_manual_payments is True %}
+                $('#new-contract-btn').show();
+            {% else %}
+                console.log('new_contract not enabled');
+            {% endif %}
+
+
         });
     </script>
 {% endblock %}
@@ -240,7 +283,7 @@
                 </div>
             </div>
         {% endif %}
-    
+
     </div>
 
     <div id="checkout_form_block" style="display:none">
@@ -258,9 +301,22 @@
         <input type="hidden" name="next_url" value=""/>
     </form>
 
+    {% include 'subscription/includes/form-installment-contract.html' %}
 {% endblock %}
+
 {% block modals %}
+
     {% include 'subscription/includes/modal-manual-payment-form.html' with form=manual_payment_form %}
+
     {% include 'subscription/includes/modal-delete-manual-payment-form.html' with form=manual_payment_form %}
+
+    {% include 'subscription/includes/modal-part-transaction.html' with manual_form=manual_form%}
+
+    {% include 'abstracts/modal.html' %}
+
+    {% if event.feature_configuration.feature_manual_payments is True %}
+
+    {% endif %}
+
 
 {% endblock %}
