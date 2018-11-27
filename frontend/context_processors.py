@@ -24,6 +24,8 @@ def is_debug_mode(request):
     return {
         'debug': settings.DEBUG is True,
         'DEBUG': settings.DEBUG is True,
+        'STAGING_MODE': \
+            '.settings.staging' in os.getenv('DJANGO_SETTINGS_MODULE'),
     }
 
 

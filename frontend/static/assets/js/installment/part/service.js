@@ -23,15 +23,11 @@ window.cgsy.installment.service = window.cgsy.installment.part || {};
         this.amount = amount;
         this.minimum_amount = minimum_amount;
 
-        this.installment_amount = null;
+        this.installment_amounts = {};
 
         this.getAmounts = function() {
             _init();
-            var amounts = [];
-            for (var a = 0; a < self.num_parts; a++) {
-                amounts.push(self.installment_amount);
-            }
-            return amounts;
+            return self.installment_amounts;
         };
 
         var _initialized = false;
@@ -41,12 +37,11 @@ window.cgsy.installment.service = window.cgsy.installment.part || {};
             }
 
             if (self.num_parts > 0) {
-                self.installment_amount = self.amount / self.num_parts;
-
-                if (self.installment_amount <= self.minimum_amount) {
-                    self.num_parts = self.num_parts - 1;
-                    _init();
-                    return;
+                for (var a = 1; a <= self.num_parts; a++) {
+                    var amount_part = self.amount / a;
+                    if (amount_part >= self.minimum_amount) {
+                        self.installment_amounts[a] = amount_part;
+                    }
                 }
             }
 
@@ -57,21 +52,6 @@ window.cgsy.installment.service = window.cgsy.installment.part || {};
 
     /**
      * Gera lista de datas de vencimento de parcela.
-     * CRITÉRIOS:
-     * 1. Sempre haverá uma data limite até onde as parcelas podem ir;
-     * 2. Se dia-base não for informado, o dia-base será o mesmo dia da data
-     *    limite informada;
-     * 3. Se dia-base for antes de hoje, a primeiro vencimento será 2 dias a
-     *    partir de hoje, sendo os próximos vencimentos no dia-base;
-     * 4. Se dia da data limite for posterior ao dia-base, o último vencimento
-     *    será na data limite;
-     * 5. Se vencimento cair em um dia inválido do mês, como 29 de fev. ou 31
-     *    de mês que vai até 30:
-     *    a. se não for última parcela, adicionar 1 dia a mais na data de
-     *       vencimento;
-     *    b. se for última parcela e a data for a data limite, subtrair um dia
-     *       a menos;
-     *
      * @param {Date} limit_date
      * @param {number|undefined} base_day
      * @constructor
@@ -131,15 +111,10 @@ window.cgsy.installment.service = window.cgsy.installment.part || {};
                 return;
             }
 
-
-
-
             if (self.current_date.isBefore(self.limit, 'month')) {
-                // console.log('antes', self.current_date.format('DD/MM/YYYY'));
-                // Se o dia de hoje é maior do que o dia base de vencimento
                 if (self.current_date.date() >= self.base_day && self.dates.length === 0) {
                     // console.log('- 2 dias após hoje');
-                    self.dates.push();
+                    self.dates.push(moment([self.current_date.year(), self.current_date.month(), self.current_date.date()+2]));
                 } else {
                     // console.log('- dia base');
                     self.dates.push(moment([self.current_date.year(), self.current_date.month(), self.base_day]))
@@ -149,71 +124,28 @@ window.cgsy.installment.service = window.cgsy.installment.part || {};
                 return;
             }
 
-            // console.log('mesmo mês', self.current_date.format('DD/MM/YYYY'));
+            if (self.current_date.isSame(self.limit, 'month')) {
+                var day_today = self.current_date.date();
+                var two_days_after = self.current_date.clone().add(2, 'days');
 
-            // Se agora é antes da data limite.
-            if (self.current_date.isBefore(self.limit)) {
-                // console.log('- dia antes');
-                self.dates.push(moment([self.current_date.year(), self.current_date.month(), self.base_day]));
+                if (day_today > self.base_day) {
 
-            // Se a data limite vence hoje.
-            } else if (self.current_date.isSame(self.limit, 'day')) {
-                // console.log('- limite é hoje');
-                if (self.limit.date() > self.base_day) {
-                    self.dates.push(moment([self.current_date.year(), self.current_date.month(), self.base_day]));
+                    if (day_today <= two_days_after) {
+                        self.dates.push(moment([self.current_date.year(), self.current_date.month(), day_today+2]));
+                    } else {
+                        self.dates.push(moment([self.current_date.year(), self.current_date.month(), day_today]));
+                    }
+
                 } else {
-                    self.dates.push(self.current_date);
+                    self.dates.push(moment([self.current_date.year(), self.current_date.month(), self.base_day]));
                 }
             }
-
-            /**
-             * Resgata próximo mês à data informada.
-             * @param date
-             * @returns {*}
-             * @private
-             */
-            var _getNextMonthDate = function(date) {
-                var next_month = date.clone().add(1, 'month');
-
-                // Próximo mês inválido por cair em um dia inválido do mês.
-                if (!next_month.isValid()) {
-                    // Se não é último mês, adicionar um dia
-                    if (_isLastMonth(date) === false) {
-                        next_month = next_month.add(1, 'day');
-                    } else if (date.isSame(self.limit)) {
-                        next_month = next_month.subtract(1, 'day');
-                    }
-                }
-                return next_month;
-            };
-
-            /**
-             * Verifica se data informado está no mesmo mês do que o limite.
-             * @param date
-             * @returns {boolean|*}
-             * @private
-             */
-            var _isLastMonth = function(date) {
-                return date.isSame(self.limit, 'month');
-            };
-
-            /**
-             * Retorna se dia-base de vencimento é depois do dia da data limite
-             * de parcelamento.
-             * @returns {boolean}
-             * @private
-             */
-            var _isBaseDayAfterLimitDay = function() {
-                return self.base_day > self.limit.date();
-            };
 
             // console.log('---');
 
             // Já atingimos a data limite e nao podemos gerar mais datas.
             _initialized = true;
         };
-
-
 
         window.setTimeout(function(){ _init(); }, 50);
     };
@@ -225,6 +157,10 @@ window.cgsy.installment.service = window.cgsy.installment.part || {};
      */
     installment.service.PartCollectionFactory = function(contract) {
 
+        if (contract.isNew()) {
+            throw "Contratos sem identificador não podem criar parcelas."
+        }
+
         /**
          * Contrato de parcelamento.
          * @type {installment.models.Contract}
@@ -234,24 +170,46 @@ window.cgsy.installment.service = window.cgsy.installment.part || {};
         /**
          * Cria coleção de parcelas populando com os dados de acordo com
          * informações fornecidas.
-         * @param {Date} limit_date
-         * @param {integer} base_day
-         * @param {number} minimum_price
-         * @returns {installment.collections.PartCollection|*}
+         * @param {Array} expiration_dates
+         * @param {number} amount
+         * @returns {Promise}
          */
-        this.get = function(limit_date, base_day, minimum_price) {
+        this.create = function(expiration_dates, amount) {
+            return new Promise(function(resolve, reject) {
+                var collection = contract.createPartCollection();
 
-            if (contract.isNew()) {
-                return null;
-            }
+                var num_installment = 1;
+                expiration_dates.forEach(function(exp_date_str) {
+                    var split = exp_date_str.split('/');
+                    var data = {
+                        'contract': contract.pk,
+                        'amount': amount,
+                        'expiration_date': new Date(split[2], split[1], split[0]),
+                        'installment_number': num_installment
+                    };
 
-            var collection = new installment.collections.PartCollection(contract.pk);
-                collection.error_handler = contract.error_handler;
-            contract.part_collection = collection;
+                    var part = new installment.models.Part();
+                        part.populate(data);
 
-            // CRIAR PARTS E INSERIR NO COLLECTION
+                    if (!part.isValid()) {
+                        return reject('Erro ao criar parcela');
+                    }
 
-            return collection;
+                    part.save().then(function() {
+                        if (!part.isValid()) {
+                            return reject('Erro ao salvar parcela.');
+                        }
+                        collection.add(part);
+                    }, function(reason) {
+                        reject(reason);
+                    });
+
+                    num_installment++;
+                });
+
+                resolve();
+            });
+
         };
     };
 
