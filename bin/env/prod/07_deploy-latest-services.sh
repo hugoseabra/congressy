@@ -13,10 +13,12 @@ set -ex
 # retornar um erro caso a versão já exista.
 ###############################################################################
 echo "###########################################################"
-echo "DOWNLOADING IMAGE TO PRODUCTION SERVER";
+echo "DEPLOYING RECENT VERSION"
 echo "###########################################################"
 echo;
 
+# No servidor, este arquivo estará na pasta ~/cgsy/scrpits/prod e os arquivos
+# de versão na pasta raíz ~/cgsy
 BASE=$(dirname $(dirname $(dirname "$0")))
 VERSION_FILE="$BASE/version"
 PREVIOUS_VERSION_FILE="$BASE/previous_version"
@@ -31,19 +33,39 @@ if [[ -f "$VERSION_FILE" ]]; then
     VERSION=$(cat ${VERSION_FILE})
 fi
 
-echo "Download versão '${VERSION}' sobre a versão '${PREVIOUS_VERSION}'..."
-
 # A versão nunca será a anterior a atual devido ao CI controlar a continuidade
 # dos releases. Sendo assim, basta comparar
 if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
 
-    echo "Baixando ${VERSION}' ..."
+    docker-compose -f ~/cgsy/docker-compose_services.yml up -d --remove-orphans --force
+    sleep 30
 
-    docker exec -i awsecr pull cgsy:latest
-    docker exec -i awsecr pull cgsy:${VERSION}
+    echo ;
+    docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
+    echo ;
+
+    echo "==========================================================="
+    echo "REDIS"
+    echo "==========================================================="
+    echo;
+    docker-compose -f ${BASE}/docker-compose.yml logs redis
+    echo;
+
+    echo "==========================================================="
+    echo "WKHTMLTOPDF"
+    echo "==========================================================="
+    echo;
+    docker-compose -f ${BASE}/docker-compose.yml logs wkhtmltopdf
+    echo;
+
+    echo "==========================================================="
+    echo; echo "CRON"; echo;
+    echo "==========================================================="
+    echo;
+    docker-compose -f ${BASE}/docker-compose.yml logs cron
 
     echo "###########################################################"
-    echo "DOWNLOAD FINISHED";
+    echo "DEPLOYING FINISHED"
     echo "###########################################################"
     echo;
 
@@ -52,10 +74,8 @@ if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
 
 else
     echo "###########################################################"
-    echo "DOWNLOAD FAILED";
+    echo "DEPLOYING FAILED"
     echo "###########################################################"
-    echo;
-    echo "Download não realizado '${VERSION}' ==  '${PREVIOUS_VERSION}'"
     echo;
 
     # Erro: versão já está publicada.

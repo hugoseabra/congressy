@@ -30,12 +30,12 @@ CONTAINER_ACTIVE=$(docker ps -qf name=${CONTAINER_NAME})
 
 docker pull ${IMAGE_NAME}
 
-if [ -z "$CONTAINER_ACTIVE" ]; then
+if [[ -z "$CONTAINER_ACTIVE" ]]; then
 
     # Verificar nos containers desativados.
     CONTAINER_EXISTS=$(docker ps -aqf name=${CONTAINER_NAME})
 
-    if [ -z "$CONTAINER_EXISTS" ]; then
+    if [[ -z "$CONTAINER_EXISTS" ]]; then
         docker run -tid \
             -v /var/run/docker.sock:/var/run/docker.sock \
             --name ${CONTAINER_NAME} \
