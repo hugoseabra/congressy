@@ -3,8 +3,6 @@ from .mixins import (
     EventCompositeSpecificationMixin,
 )
 from .payable import EventPayable, OrganizationHasBanking
-from .subscribable import EventSubscribable
-from datetime import datetime
 
 
 class EventPublishable(EventCompositeSpecificationMixin):
