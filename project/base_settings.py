@@ -77,6 +77,8 @@ FORMAT_MODULE_PATH = [
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # Middleware para saber de qual host que veio a resposta do Django
+    'project.manage.middleware.OriginMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
