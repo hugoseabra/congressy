@@ -1,0 +1,33 @@
+version: "3.5"
+services:
+  redis:
+    image: redis:4-alpine
+    restart: always
+    networks:
+      - redis
+    volumes:
+      - ./shared-volume/redis:/data
+
+  wkhtmltopdf:
+    image: openlabs/docker-wkhtmltopdf-aas
+    networks:
+      - wkhtmltopdf
+
+  cron:
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    depends_on:
+      - redis
+      - wkhtmltopdf
+    entrypoint:
+      - /services/cron/container-entry.sh
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./shared-volume/media:/var/www/cgsy/media
+      - ./shared-volume/logs:/var/www/cgsy/logs
+    env_file: ./env-file
+    networks:
+      - wkhtmltopdf
+
+networks:
+  redis:
+  wkhtmltopdf:
