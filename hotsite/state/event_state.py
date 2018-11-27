@@ -111,7 +111,7 @@ class CurrentEventState(object):
     def has_coupon(self):
         """ Retorna se possui cupom, seja qual for. """
         for lot in self.get_private_lots():
-            # código de exibição
+            # cÃ³digo de exibiÃ§Ã£o
             if lot.private and lot.exhibition_code:
                 return True
 
@@ -131,7 +131,7 @@ class CurrentEventState(object):
         return True
 
     def is_private_event(self):
-        """ Verifica se evento é privado possuindo apenas lotes privados. """
+        """ Verifica se evento Ã© privado possuindo apenas lotes privados. """
         public_lots = self.get_public_lots()
         private_lots = self.get_private_lots()
         return len(public_lots) == 0 and len(private_lots) > 0

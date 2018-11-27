@@ -235,6 +235,10 @@ pipeline:
     host:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.38.120
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
     username: ec2-user
     port: 22
     secrets:
@@ -332,6 +336,10 @@ pipeline:
     hosts:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.38.120
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
     port: 22
     user: ec2-user
     source: ./bin/env/prod/01_create-awsecr-container.sh
@@ -348,6 +356,10 @@ pipeline:
     hosts:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.38.120
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
     port: 22
     user: ec2-user
     source: ./bin/env/prod/previous_version
@@ -358,12 +370,16 @@ pipeline:
     when:
       branch: [ master ]
 
-  transfer-build-version-file:
+  transfer-version-file:
     image: drillster/drone-rsync
     pull: true
     hosts:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.38.120
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
     port: 22
     user: ec2-user
     source: ./version
@@ -374,12 +390,16 @@ pipeline:
     when:
       branch: [ master ]
 
-  tranfer-stackfile-production:
+  tranfer-stackfile:
     image: drillster/drone-rsync
     pull: true
     hosts:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.38.120
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
     port: 22
     user: ec2-user
     source: ./conf/deploy/docker-compose.yml
@@ -390,12 +410,36 @@ pipeline:
     when:
       branch: [ master ]
 
-  tranfer-deploy-script:
+  tranfer-service-stackfile:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+    - 172.31.38.91
+    - 172.31.40.208
+    - 172.31.38.120
+    - 172.31.35.124
+    - 172.31.47.46
+    - 172.31.35.111
+    port: 22
+    user: ec2-user
+    source: ./conf/deploy/docker-compose_services.yml
+    target: ~/cgsy/.
+    secrets:
+    - source: CONGRESSY_DEPLOY
+      target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  tranfer-scripts:
     image: drillster/drone-rsync
     pull: true
     hosts:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.38.120
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
     port: 22
     user: ec2-user
     source: ./bin/env/prod
@@ -406,7 +450,7 @@ pipeline:
     when:
       branch: [ master ]
 
-  deploy-latest-version-server1:
+  deploy-server1:
     image: appleboy/drone-ssh
     pull: true
     host:
@@ -426,7 +470,7 @@ pipeline:
     when:
       branch: [ master ]
 
-  deploy-latest-version-server2:
+  deploy-server2:
     image: appleboy/drone-ssh
     pull: true
     host:
@@ -440,9 +484,79 @@ pipeline:
     script:
       - ~/awsecr/01_create-awsecr-container.sh
       - ~/cgsy/scripts/prod/04_download_images.sh
-      - ~/cgsy/scripts/prod/05_run_migration.sh
-      - ~/cgsy/scripts/prod/06_run_volume.sh
       - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
+    when:
+      branch: [ master ]
+
+  deploy-server3:
+    image: appleboy/drone-ssh
+    pull: true
+    host:
+      - 172.31.38.120
+    username: ec2-user
+    port: 22
+    command_timeout: 300
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: ssh_key
+    script:
+      - ~/awsecr/01_create-awsecr-container.sh
+      - ~/cgsy/scripts/prod/04_download_images.sh
+      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
+    when:
+      branch: [ master ]
+
+  deploy-server4:
+    image: appleboy/drone-ssh
+    pull: true
+    host:
+      - 172.31.35.124
+    username: ec2-user
+    port: 22
+    command_timeout: 300
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: ssh_key
+    script:
+      - ~/awsecr/01_create-awsecr-container.sh
+      - ~/cgsy/scripts/prod/04_download_images.sh
+      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
+    when:
+      branch: [ master ]
+
+  deploy-server5:
+    image: appleboy/drone-ssh
+    pull: true
+    host:
+    - 172.31.47.46
+    username: ec2-user
+    port: 22
+    command_timeout: 300
+    secrets:
+    - source: CONGRESSY_DEPLOY
+      target: ssh_key
+    script:
+    - ~/awsecr/01_create-awsecr-container.sh
+    - ~/cgsy/scripts/prod/04_download_images.sh
+    - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
+    when:
+      branch: [ master ]
+
+  deploy-services:
+    image: appleboy/drone-ssh
+    pull: true
+    host:
+    - 172.31.35.111
+    username: ec2-user
+    port: 22
+    command_timeout: 300
+    secrets:
+    - source: CONGRESSY_DEPLOY
+      target: ssh_key
+    script:
+    - ~/awsecr/01_create-awsecr-container.sh
+    - ~/cgsy/scripts/prod/04_download_images.sh
+    - ~/cgsy/scripts/prod/07_deploy-latest-services.sh
     when:
       branch: [ master ]
 

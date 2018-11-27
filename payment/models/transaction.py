@@ -109,6 +109,16 @@ class Transaction(models.Model):
         blank=True,
     )
 
+    part = models.ForeignKey(
+        'installment.Part',
+        on_delete=models.DO_NOTHING,
+        verbose_name='transação da parcela',
+        related_name='transactions',
+        # Not required
+        blank=True,
+        null=True,
+    )
+
     lot_price = models.DecimalField(
         decimal_places=2,
         max_digits=11,

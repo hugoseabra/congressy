@@ -5,7 +5,7 @@
     <div class="modal-dialog " role="document">
         <div class="modal-content">
             <form action="{% url 'subscription:payment-delete' event.pk object.pk %}"
-          method="post" id="payment-delete-form"  class="form-horizontal" role="form">
+          method="post" id="payment-delete-form"  class="form-horizontal" role="form" onsubmit="$('button[type=submit]', $(this)).attr('disabled', '').text('aguarde...')">
                 <div class="modal-header">
                     <button type="button" class="close"
                             data-dismiss="modal"
@@ -26,18 +26,12 @@
                         fa-1x"></i>
                     </h2>
                     <br>
-                    <h2 style="margin-top: 5px" id="delete-message">
-                    </h2>
+                    <div style="margin-top: 5px" id="delete-message"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Confirmar
-                    </button>
-                    <button type="button" class="btn btn-danger"
-                            data-dismiss="modal">Fechar
-                    </button>
-
-                    <input type="hidden" name="transaction_id" id="transaction_id"
-               value=""/>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-success">Confirmar</button>
+                    <input type="hidden" name="transaction_id" id="transaction_id" value=""/>
                 </div>
             </form>
         </div>

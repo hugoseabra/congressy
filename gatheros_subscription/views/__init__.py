@@ -1,3 +1,4 @@
+from .mixins import SubscriptionViewMixin, SubscriptionFormMixin
 from .form_config import FormConfigView
 from .lotcategory import (
     LotCategoryAddView,
@@ -16,7 +17,7 @@ from .lot_api import (
     LotChangeSurveyAPIView,
 )
 from .payment import PaymentDeleteView
-from .subscription import (
+from .subscription_views import (
     MySubscriptionsListView,
     SubscriptionAddFormView,
     SubscriptionCancelView,
@@ -25,6 +26,7 @@ from .subscription import (
     SubscriptionListView,
     SubscriptionViewFormView,
     VoucherSubscriptionPDFView,
+    ExtractSubscriptionPDFView,
     SwitchSubscriptionTestView,
 )
 from .subscription_api import (

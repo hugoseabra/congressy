@@ -13,20 +13,6 @@ services:
     networks:
       - wkhtmltopdf
 
-  cron:
-    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
-    depends_on:
-      - wkhtmltopdf
-    entrypoint:
-      - /services/cron/container-entry.sh
-    volumes:
-      - /etc/localtime:/etc/localtime
-      - ./shared-volume/media:/var/www/cgsy/media
-      - ./shared-volume/logs:/var/www/cgsy/logs
-    env_file: ./env-file
-    networks:
-      - wkhtmltopdf
-
   manage:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
@@ -67,26 +53,26 @@ services:
       - ./env-file
       - ./env-partner-file
 
-  admin_intranet:
-    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
-    restart: unless-stopped
-    depends_on:
-      - redis
-      - wkhtmltopdf
-    networks:
-      - redis
-      - wkhtmltopdf
-    ports:
-      - "8002:80"
-    entrypoint:
-      - /services/web/admin_intranet/container-entry.sh
-    volumes:
-      - /etc/localtime:/etc/localtime
-      - ./shared-volume/media:/var/www/cgsy/media
-      - ./shared-volume/logs:/var/www/cgsy/logs
-    env_file:
-      - ./env-file
-      - ./env-admin_intranet-file
+#  admin_intranet:
+#    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+#    restart: unless-stopped
+#    depends_on:
+#      - redis
+#      - wkhtmltopdf
+#    networks:
+#      - redis
+#      - wkhtmltopdf
+#    ports:
+#      - "8002:80"
+#    entrypoint:
+#      - /services/web/admin_intranet/container-entry.sh
+#    volumes:
+#      - /etc/localtime:/etc/localtime
+#      - ./shared-volume/media:/var/www/cgsy/media
+#      - ./shared-volume/logs:/var/www/cgsy/logs
+#    env_file:
+#      - ./env-file
+#      - ./env-admin_intranet-file
 
 networks:
   redis:

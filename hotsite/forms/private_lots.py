@@ -24,7 +24,10 @@ class PrivateLotForm(forms.Form):
 
         if code:
             try:
-                lot = Lot.objects.get(exhibition_code=code.upper())
+                lot = Lot.objects.get(
+                    exhibition_code=code.upper(),
+                    event=self.event,
+                )
             except Lot.DoesNotExist:
                 pass
 

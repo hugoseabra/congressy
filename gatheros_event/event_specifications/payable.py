@@ -93,7 +93,8 @@ class LotPayable(LotCompositeSpecificationMixin):
             if ServicePayable().is_satisfied_by(service):
                 paid_service_or_product_flag = True
 
-        if not paid_service_or_product_flag and not lot.price or lot.price == 0:
+        if not paid_service_or_product_flag and (
+                not lot.price or lot.price == 0):
             return False
 
         return True

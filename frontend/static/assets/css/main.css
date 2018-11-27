@@ -3972,7 +3972,7 @@ label.valid {
 }
 .borderless td,
 .borderless th {
-  border: none;
+  border: none !important;
 }
 @media (max-width: 991px) {
   .text-right.left-when-small {
