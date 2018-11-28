@@ -1,13 +1,17 @@
-from datetime import datetime, timedelta
-from django.core.management.base import BaseCommand
-from django.db.models import Count, Q
+from datetime import timedelta
 
-from gatheros_event.models import Event
+from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Count
+
 from attendance.models import AttendanceService, Checkin
 from core.util.commands import progress_bar
+from gatheros_event.models import Event
+from gatheros_subscription.models import Subscription
+
 
 class Command(BaseCommand):
-    help = 'Faz checkin de todos os inscritos a partir da data inicial do evento.'
+    help = 'Faz checkin de todos os inscritos a partir da data inicial do' \
+           ' evento.'
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
@@ -67,6 +71,7 @@ class Command(BaseCommand):
         subs_qs = event.subscriptions.filter(
             completed=True,
             test_subscription=False,
+            origin=Subscription.DEVICE_ORIGIN_MANAGE,
         )
 
         if subs_qs.count() == 0:
@@ -77,12 +82,12 @@ class Command(BaseCommand):
             return
 
         if interact:
-            self.report('Insrições', subs_qs.count())
+            self.report('Inscrições', subs_qs.count())
 
         in_loco_sub_qs = subs_qs.annotate(
             num_checkins=Count('checkins')
         ).filter(
-            created__gte=event.date_start - timedelta(minutes=30),
+            created__gte=event.date_start - timedelta(minutes=45),
             num_checkins=0,
             checkins__checkout__isnull=True,
         )
@@ -110,7 +115,6 @@ class Command(BaseCommand):
         if interact:
             self.report('Serviços de atendimento', services_qs.count())
 
-        checkins = []
         for serv in services_qs:
             if interact:
                 self.report(
@@ -122,7 +126,7 @@ class Command(BaseCommand):
 
         service = self._get_service(event, **options)
 
-        checkins_qs = serv.checkins.filter(
+        checkins_qs = service.checkins.filter(
             checkout__isnull=True,
         )
 
@@ -135,7 +139,6 @@ class Command(BaseCommand):
                     "\nTodas as inscrições in-loco já foram confirmadas."
                 ))
             return
-
 
         if interact:
             self.report('Inscrições confirmadas', checkins_qs.count())
@@ -294,5 +297,6 @@ class Command(BaseCommand):
             raise Exception()
 
     def report(self, key, value, separator=': ', topic='- '):
-        self.stdout.write('{}{}{} '.format(topic, key, separator), ending=False)
+        self.stdout.write('{}{}{} '.format(topic, key, separator),
+                          ending=False)
         self.stdout.write(str(value), style_func=self.style.SUCCESS)
