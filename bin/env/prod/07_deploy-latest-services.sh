@@ -48,21 +48,21 @@ if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
     echo "REDIS"
     echo "==========================================================="
     echo;
-    docker-compose -f ${BASE}/docker-compose.yml logs redis
+    docker-compose -f ${BASE}/docker-compose_services.yml logs redis
     echo;
 
     echo "==========================================================="
     echo "WKHTMLTOPDF"
     echo "==========================================================="
     echo;
-    docker-compose -f ${BASE}/docker-compose.yml logs wkhtmltopdf
+    docker-compose -f ${BASE}/docker-compose_services.yml logs wkhtmltopdf
     echo;
 
     echo "==========================================================="
     echo; echo "CRON"; echo;
     echo "==========================================================="
     echo;
-    docker-compose -f ${BASE}/docker-compose.yml logs cron
+    docker-compose -f ${BASE}/docker-compose_services.yml logs cron
 
     echo "###########################################################"
     echo "DEPLOYING FINISHED"
