@@ -34,7 +34,9 @@ class RegistrationView(TemplateView, FormView):
         request.POST = request.POST.copy()
         request.POST.update(
             {
-                'document_number': clear_string(request.POST['document_number'])
+                'document_number': clear_string(
+                    request.POST['document_number']
+                )
             }
         )
         return super().post(request, *args, **kwargs)

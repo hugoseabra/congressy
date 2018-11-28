@@ -51,41 +51,44 @@ class BankAccountForm(forms.ModelForm):
 
         cleaned_data = super().clean()
 
-        recipient_dict = {
-            'agencia': cleaned_data.get('agency'),
-            'agencia_dv': cleaned_data.get('agency_dv'),
-            'bank_code': cleaned_data.get('bank_code'),
-            'conta': cleaned_data.get('account'),
-            'conta_dv': cleaned_data.get('account_dv'),
-            'document_number': cleaned_data.get('document_number'),
-            'legal_name': cleaned_data.get('legal_name'),
-            'type': cleaned_data.get('account_type'),
-        }
-
-        for value in self.banking_required_fields:
-
-            if value is None:
-                raise forms.ValidationError("O valor {} é "
-                                            "obrigatorio.".format(value))
-
-        try:
-            recipient = create_pagarme_recipient(recipient_dict=recipient_dict)
-
-            self.bank_account_id = recipient['bank_account']['id']
-            self.document_type = recipient['bank_account']['document_type']
-            self.recipient_id = recipient['id']
-            self.date_created = recipient['bank_account']['date_created']
-
-        except PaymentExceptions.RecipientError as e:
-            error_dict = {
-                "Unknown API error": "Problema ao criar conta. Tente "
-                                     "novamente depois."
+        if not self.instance.pk:
+            recipient_dict = {
+                'agencia': cleaned_data.get('agency'),
+                'agencia_dv': cleaned_data.get('agency_dv'),
+                'bank_code': cleaned_data.get('bank_code'),
+                'conta': cleaned_data.get('account'),
+                'conta_dv': cleaned_data.get('account_dv'),
+                'document_number': cleaned_data.get('document_number'),
+                'legal_name': cleaned_data.get('legal_name'),
+                'type': cleaned_data.get('account_type'),
             }
 
-            if e.message in error_dict:
-                e.message = error_dict[e.message]
+            for value in self.banking_required_fields:
 
-            raise forms.ValidationError(e.message)
+                if value is None:
+                    raise forms.ValidationError("O valor {} é "
+                                                "obrigatorio.".format(value))
+
+            try:
+                recipient = create_pagarme_recipient(
+                    recipient_dict=recipient_dict
+                )
+
+                self.bank_account_id = recipient['bank_account']['id']
+                self.document_type = recipient['bank_account']['document_type']
+                self.recipient_id = recipient['id']
+                self.date_created = recipient['bank_account']['date_created']
+
+            except PaymentExceptions.RecipientError as e:
+                error_dict = {
+                    "Unknown API error": "Problema ao criar conta. Tente "
+                                         "novamente depois."
+                }
+
+                if e.message in error_dict:
+                    e.message = error_dict[e.message]
+
+                raise forms.ValidationError(e.message)
 
         return cleaned_data
 

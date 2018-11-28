@@ -13,12 +13,11 @@ from mailer.services import notify_new_partner, notify_new_partner_internal
 from partner.models import Partner
 from payment.forms import BankAccountForm
 
-
 # @TODO make this a form.Form
-class PartnerRegistrationForm(PersonForm):
-    partner = None
-    user = None
+from payment.models import BankAccount
 
+
+class PartnerRegistrationForm(PersonForm):
     class Meta:
         """ Meta """
         model = Person
@@ -34,14 +33,45 @@ class PartnerRegistrationForm(PersonForm):
     def __init__(self, *args, **kwargs):
 
         instance = kwargs.get('instance')
-        if instance:
+        if instance and isinstance(instance, Partner):
             if hasattr(instance, 'person'):
                 kwargs['instance'] = instance.person
+        else:
+            data = kwargs.get('data')
+            if data and 'email' in data:
+                try:
+                    kwargs['instance'] = Person.objects.get(
+                        email=data['email'],
+                        user_id__isnull=False
+                    )
+
+                except Person.DoesNotExist:
+                    pass
 
         super(PartnerRegistrationForm, self).__init__(*args, **kwargs)
         self.fields['phone'].required = True
         self.fields['email'].required = True
         self.fields['name'].required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        try:
+            user = User.objects.get(email=cleaned_data['email'])
+            if hasattr(user, 'person'):
+                person = user.person
+                if person.pk != self.instance.pk:
+                    raise forms.ValidationError(
+                        'Já existe um usuário com este e-mail. Se este e-mail'
+                        ' é realmente seu, entre em contato conosco.'
+                    )
+            else:
+                self.instance.user_id = user.pk
+
+        except User.DoesNotExist:
+            pass
+
+        return cleaned_data
 
     def save(self, domain_override=None, request=None,
              commit=True,
@@ -54,73 +84,62 @@ class PartnerRegistrationForm(PersonForm):
 
         super(PersonForm, self).save(commit=True)
 
-        # Criando usuário
-        if not self.user:
-            self.user = User.objects.create_user(
-                username=self.cleaned_data["email"],
-                email=self.cleaned_data["email"],
-                password=str(uuid4())
-            )
-
-            self.user.save()
-
-        person = self.instance
-
-        # Vinculando usuário ao perfil
-        person.user = self.user
-        person.save()
-
-        self.instance = Partner.objects.create(
-            person=person,
+        partner, created = Partner.objects.get_or_create(
+            person=self.instance,
         )
 
-        # Criando Organização.
-        org = Organization(internal=False, name=person.name)
+        if created is False:
+            self.notify_partner(request)
+            return partner
 
-        for attr, value in six.iteritems(person.get_profile_data()):
+        # Criando Organização.
+        org = Organization(internal=False, name=self.instance.name)
+
+        for attr, value in six.iteritems(self.instance.get_profile_data()):
             setattr(org, attr, value)
 
         org.save()
 
         Member.objects.create(
             organization=org,
-            person=person,
+            person=self.instance,
             group=Member.ADMIN
         )
 
+        self.notify_partner(request)
+        self.notify_partner_internal(request)
+        return self.instance
+
+    def clean_email(self):
+        return self.data.get('email').lower()
+
+    def notify_partner(self, request=None):
         email = self.cleaned_data["email"]
         phone = self.cleaned_data["phone"]
 
         context = {
-            'partner_name': self.user.get_full_name(),
-            'nome': self.user.first_name,
+            'partner_name': self.instance.name,
+            'nome': self.instance.user.first_name,
             'partner_email': email,
             'partner_phone': phone,
             'site_name': get_current_site(request)
         }
 
         notify_new_partner(context)
+
+    def notify_partner_internal(self, request=None):
+        email = self.cleaned_data["email"]
+        phone = self.cleaned_data["phone"]
+
+        context = {
+            'partner_name': self.instance.name,
+            'nome': self.instance.user.first_name,
+            'partner_email': email,
+            'partner_phone': phone,
+            'site_name': get_current_site(request)
+        }
+
         notify_new_partner_internal(context)
-
-        return self.instance
-
-    def clean_email(self):
-        return self.data.get('email').lower()
-
-    # def clean(self):
-    #
-    #     cleaned_data = super(PartnerRegistrationForm, self).clean()
-    #
-    #     email = cleaned_data.get('email')
-    #
-    #     try:
-    #         self.user = User.objects.get(username=email)
-    #         raise forms.ValidationError(
-    #             "Esse email já existe em nosso sistema. Tente novamente.")
-    #     except User.DoesNotExist:
-    #         pass
-    #
-    #     return cleaned_data
 
 
 class FullPartnerRegistrationForm(CombinedFormBase):
@@ -129,11 +148,48 @@ class FullPartnerRegistrationForm(CombinedFormBase):
         'bank_account': BankAccountForm
     }
 
+    def __init__(self, **kwargs):
+
+        data = kwargs.get('data')
+        instances = {}
+        if data:
+            if 'email' in data:
+                try:
+                    person = Person.objects.get(
+                        email=data['email'],
+                        user_id__isnull=False
+                    )
+                    instances['partner'] = person
+
+                except Person.DoesNotExist:
+                    pass
+
+            try:
+                account = BankAccount.objects.get(
+                    bank_code=data['bank_code'],
+                    agency=data['agency'],
+                    agency_dv=data['agency_dv'],
+                    account=data['account'],
+                    account_dv=data['account_dv'],
+                    legal_name=data['legal_name'],
+                    account_type=data['account_type'],
+                    document_number=data['document_number'],
+                )
+                instances['bank_account'] = account
+
+            except BankAccount.DoesNotExist:
+                pass
+
+            if instances:
+                kwargs['instances'] = instances
+
+        super().__init__(**kwargs)
+
     def save(self, commit=True):
         instances = super().save(commit)
         partner = instances.get('partner')
         bank_account = instances.get('bank_account')
-        
+
         person = partner.person
 
         if bank_account.document_type == 'cpf':
