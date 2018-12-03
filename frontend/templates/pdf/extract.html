@@ -95,7 +95,7 @@
 
         <h5 style="font-weight: bold;">Inscrição</h5>
 
-        <table class="table no-border" style="border-width: 0;margin-top: 20px">
+        <table class="table no-border" style="width:100%;border-width: 0;margin-top: 20px">
             <tbody style="border-width: 0;">
 
             <tr style="border-width: 0;">
@@ -135,7 +135,7 @@
                 {% filter_lookup transactions lot.pk as lot_transactions %}
                 {% filter_lookup has_manual lot.pk as has_manual %}
 
-                <table class="table no-border">
+                <table class="table no-border" style="width:100%">
                     <thead>
                     <tr>
                         <th width="25%">Data/hora</th>
@@ -361,7 +361,7 @@
                             <strong class="text-danger"> CANCELADO</strong>
                         {% endif %}
                     </div>
-                    <table class="table borderless {% if contract.status == 'cancelled' %}cancelled-contract-table{% endif %}">
+                    <table class="table borderless {% if contract.status == 'cancelled' %}cancelled-contract-table{% endif %}" style="width:100%">
                         <thead>
                         <tr>
                             <th width="5%">Parcela</th>
@@ -379,7 +379,7 @@
                                     <span class="value">{{ part.installment_number }}</span>
                                 </td>
                                 <td class="table-row text-center">
-                                    <span class="value">{{ part.created|date:"d/m/Y H\hi" }}</span>
+                                    <span class="value">{{ part.expiration_date|date:"d/m/Y" }}</span>
                                 </td>
                                 <td class="table-row text-right">
                                     <span class="{% if part.paid %}text-success{% else %}text-danger{% endif %} value">
