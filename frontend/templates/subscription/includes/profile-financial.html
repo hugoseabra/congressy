@@ -16,6 +16,7 @@
                     Inscrições
                 </button>
             </div>
+            {% if object.lot.price > 0 %}
             <div class="float-right">
                 <button onclick='window.open("{% url 'subscription:subscription-extract' event.pk object.pk %}", "_blank")'
                         class="btn btn-success btn-trans"
@@ -24,6 +25,7 @@
                     <i class="fas fa-file-download"></i> Extrato Financeiro
                 </button>
             </div>
+            {% endif %}
             <div class="float-left">
                 <h3 class="text-bold" style="margin: 8px 0 0 20px;font-size:22px">Painel Financeiro do Participante</h3>
             </div>
