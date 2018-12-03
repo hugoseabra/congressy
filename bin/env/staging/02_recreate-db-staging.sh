@@ -33,7 +33,7 @@ function update_postgres_service() {
     sleep 10
 
     local RUNNING=$(docker inspect -f {{.State.Running}} cgsy-postgres)
-    if [ "$RUNNING" == "false" ]; then
+    if [[ "$RUNNING" == "false" ]]; then
         error_msg "Container não subiu."
         exit 1
     fi
@@ -51,13 +51,13 @@ RECREATE=$(cat ${BKP_DUMP_DIR}/recreate.txt)
 # "não recriar", temos de vamos garantir que o serviço esteja ativo.
 
 # Se não há container ativo, verificar se existe.
-if [ -z "$CONTAINER_ACTIVE" ]; then
+if [[ -z "$CONTAINER_ACTIVE" ]]; then
 
     # Verificar nos containers desativados.
     CONTAINER_EXISTS=$(docker ps -aqf name=${CONTAINER_NAME})
 
-    if [ -z "$CONTAINER_EXISTS" ]; then
-        if [ "$RECREATE" == "0" ]; then
+    if [[ -z "$CONTAINER_EXISTS" ]]; then
+        if [[ "$RECREATE" == "0" ]]; then
             echo "Container '${CONTAINER_NAME}' não existe. Criando ..."
             update_postgres_service
         fi
@@ -72,7 +72,7 @@ else
 fi
 
 # Se será recriado, tudo certo.
-if [ "$RECREATE" == "1" ]; then
+if [[ "$RECREATE" == "1" ]]; then
     echo "Recriando banco de dados."
 
     # o docker-compose do staging pode depender de um env-file que pode não
