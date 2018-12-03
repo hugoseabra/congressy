@@ -91,6 +91,7 @@ window.cgsy.installment.service = window.cgsy.installment.part || {};
         this.dates = [];
 
         // console.log('limit', self.limit.format('DD/MM/YYYY'));
+        // console.log('base_day', this.base_day);
 
         this.getDates = function(format) {
             _init();
@@ -111,40 +112,41 @@ window.cgsy.installment.service = window.cgsy.installment.part || {};
                 return;
             }
 
-            if (self.current_date.isBefore(self.limit, 'month')) {
-                if (self.current_date.date() >= self.base_day && self.dates.length === 0) {
-                    // console.log('- 2 dias após hoje');
-                    self.dates.push(moment([self.current_date.year(), self.current_date.month(), self.current_date.date()+2]));
-                } else {
-                    // console.log('- dia base');
-                    self.dates.push(moment([self.current_date.year(), self.current_date.month(), self.base_day]))
-                }
-                self.current_date = self.current_date.clone().add(1, 'month');
-                _init();
-                return;
+            var num_months = Math.floor(moment.duration(self.limit - self.current_date).asMonths());
+
+            // ============================== FIRST MONTH =====================
+
+            for (var a = 0; a <= num_months; a++) {
+                self.dates.push(_getDate());
+                self.current_date = self.current_date.clone().add(1, 'months');
             }
-
-            if (self.current_date.isSame(self.limit, 'month')) {
-                var day_today = self.current_date.date();
-                var two_days_after = self.current_date.clone().add(2, 'days');
-
-                if (day_today > self.base_day) {
-
-                    if (day_today <= two_days_after) {
-                        self.dates.push(moment([self.current_date.year(), self.current_date.month(), day_today+2]));
-                    } else {
-                        self.dates.push(moment([self.current_date.year(), self.current_date.month(), day_today]));
-                    }
-
-                } else {
-                    self.dates.push(moment([self.current_date.year(), self.current_date.month(), self.base_day]));
-                }
-            }
-
-            // console.log('---');
 
             // Já atingimos a data limite e nao podemos gerar mais datas.
             _initialized = true;
+        };
+
+        var _getDate = function() {
+            var day_today = self.current_date.date();
+            var exp_day = self.base_day;
+            var limit_day = self.limit.date();
+
+            if (self.dates.length === 0 && day_today >= self.base_day) {
+                // Se primeiro vencimento e hoje é maior do que dia-base,
+                // vamos adicionar o X dias no primeiro vencimento a partir
+                // de hoje.
+                exp_day = self.current_date.clone().add(self.default_days, 'days').date();
+            }
+
+            if (self.current_date.isSame(self.limit, 'month') && self.base_day > limit_day) {
+                exp_day = limit_day;
+            }
+
+            var last_month_day = self.current_date.endOf('month').date();
+            if (exp_day > last_month_day) {
+                exp_day = last_month_day;
+            }
+
+            return moment([self.current_date.year(), self.current_date.month(), exp_day]);
         };
 
         window.setTimeout(function(){ _init(); }, 50);

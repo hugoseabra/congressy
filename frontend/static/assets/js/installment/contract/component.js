@@ -20,6 +20,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
         self.dom_manager.domElements['num-installments-field'] = null;
         self.dom_manager.domElements['expiration-day-field'] = null;
         self.dom_manager.domElements['part-table-list'] = null;
+        self.dom_manager.domElements['limit_date_field'] = null;
 
         this.form = new window.cgsy.installment.form.ContractForm(subscription_pk, form_el);
         this.form.setEl('button', $(button_el));
@@ -40,7 +41,12 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
                 throw "Data limite inválida: " + limit_date;
             }
             limit_date = limit_date.split('-');
-            limit_date = new Date(limit_date[0], limit_date[1], limit_date[2]);
+            limit_date = new Date(limit_date[0], limit_date[1]-1, limit_date[2]);
+
+            // data['amount'] = 800.0;
+            // limit_date = new Date(2019, 5, 12);
+
+            self.getEl('limit_date_field').text(moment(limit_date).format('DD/MM/YYYY'));
 
             self.form.set('expiration_day', parseInt(data['expiration_day']));
             self.form.set('amount', as_currency(data['amount']));
@@ -57,7 +63,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
                         part_list,
                         $(this).val(),
                         limit_date,
-                        exp_day_field_el.val(),
+                        parseInt(exp_day_field_el.val()),
                         data['amount'],
                         data['minimum_amount']
                     );
@@ -77,7 +83,7 @@ window.cgsy.installment.component = window.cgsy.installment.component || {};
                     part_list,
                     num_installments_field.val(),
                     limit_date,
-                    v,
+                    parseInt(v),
                     data['amount'],
                     data['minimum_amount']
                 );

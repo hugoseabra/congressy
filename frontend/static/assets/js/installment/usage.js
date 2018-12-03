@@ -46,6 +46,7 @@ function getContractForm(subscription_pk, limit_date_str, base_day, amount) {
     var button_el = $('.submit-button', modal_el);
     var num_parts_field_el = $('[name=num_installments]', form_el);
     var expiration_day_field_el = $('[name=expiration_day]', form_el);
+    var limit_date_field_el = $('.limit_date_field', form_el);
 
     var parts_list_el = $('.contract-part-table', form_el);
 
@@ -58,6 +59,7 @@ function getContractForm(subscription_pk, limit_date_str, base_day, amount) {
     form_modal.setEl('expiration-day-field', expiration_day_field_el);
     form_modal.setEl('num-installments-field', num_parts_field_el);
     form_modal.setEl('part-table-list', parts_list_el);
+    form_modal.setEl('limit_date_field', limit_date_field_el);
 
     form_modal.populate({
         'expiration_day': parseInt(base_day),
