@@ -1,12 +1,13 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 
 from gatheros_event.views.mixins import AccountMixin
-from gatheros_subscription.helpers.extract import create_extract, \
-    get_extract_file_name
-from gatheros_subscription.models import (
-    Subscription,
+from gatheros_subscription.helpers.extract import (
+    create_extract,
+    get_extract_file_name,
 )
+from gatheros_subscription.models import Subscription
 
 
 class ExtractSubscriptionPDFView(AccountMixin):
@@ -19,6 +20,13 @@ class ExtractSubscriptionPDFView(AccountMixin):
 
         return super().pre_dispatch(request)
 
+    def get_permission_denied_url(self):
+        """ Resgata url quando permissão negada. """
+        return reverse('subscription:subscription-view', kwargs={
+            'event_pk': self.kwargs.get('event_pk'),
+            'pk': self.kwargs.get('pk'),
+        })
+
     def get(self, request, *args, **kwargs):
         pdf = create_extract(subscription=self.subscription,
                              user=self.request.user)
@@ -28,3 +36,6 @@ class ExtractSubscriptionPDFView(AccountMixin):
         )
 
         return response
+
+    def can_access(self):
+        return self.subscription.lot.price > 0
