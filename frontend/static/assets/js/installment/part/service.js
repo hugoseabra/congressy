@@ -186,7 +186,7 @@ window.cgsy.installment.service = window.cgsy.installment.part || {};
                     var data = {
                         'contract': contract.pk,
                         'amount': amount,
-                        'expiration_date': new Date(split[2], split[1], split[0]),
+                        'expiration_date': new Date(split[2], split[1]-1, split[0]),
                         'installment_number': num_installment
                     };
 

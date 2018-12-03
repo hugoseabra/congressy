@@ -50,7 +50,7 @@ window.cgsy.installment.form = window.cgsy.installment.form || {};
                 // Extrair dados das parcelas.
                 var data = self.getData();
                 var part_exp_dates = [];
-                for (var part = 1; part <= data['num_installments']; part++ ) {
+                for (var part = 1; part <= data['num_installments']; part++) {
                     var f_name = 'exp_date' + part;
                     part_exp_dates.push(data[f_name]);
                     delete data[f_name];
