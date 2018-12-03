@@ -40,7 +40,7 @@ mkdir -p ${BKP_DUMP_DIR}
 BKP_FILE_NAME="backup-`date +'%Y-%m-%d'`"
 BKP_FILE_PATH="$BKP_DUMP_DIR/$BKP_FILE_NAME.sql"
 
-if [ ! -f "$BKP_FILE_PATH" ]; then
+if [[ ! -f "$BKP_FILE_PATH" ]]; then
     # Dump do DB
     PGPASSWORD=${DBPASS} pg_dump \
       --host ${DBHOST} \
