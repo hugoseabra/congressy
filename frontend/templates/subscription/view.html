@@ -57,9 +57,9 @@
             </script>
         {% endif %}
     {% else %}
-        <script src="{% static "assets/js/abstracts/cgsy-abstracts.js?v=2" %}"></script>
+        <script src="{% static "assets/js/abstracts/cgsy-abstracts.js" %}?v=1"></script>
         {% if event.feature_configuration.feature_manual_payments %}
-        <script src="{% static "assets/js/installment/cgsy-installment.js?v=2" %}"></script>
+        <script src="{% static "assets/js/installment/cgsy-installment.js" %}?v=2"></script>
         <script>
             $(document).ready(function () {
                 getContracts('{{ object.pk }}');
