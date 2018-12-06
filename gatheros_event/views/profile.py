@@ -21,6 +21,9 @@ ALLOW_ACCOUNT_REGISTRATION = getattr(settings, 'ACCOUNT_REGISTRATION', False)
 
 
 class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    post_reset_login = True
+    post_reset_login_backend = 'django.contrib.auth.backends.ModelBackend'
+
     @auth_views.method_decorator(auth_views.sensitive_post_parameters())
     @auth_views.method_decorator(auth_views.never_cache)
     def dispatch(self, *args, **kwargs):
@@ -149,12 +152,15 @@ class ProfileCreateView(TemplateView, FormView):
 
     def get_success_url(self):
 
-        redirect_to = reverse_lazy('public:remarketing-redirect')
-        marketing_type = '?marketing_type=adwords'
-        page_type = '&page_type=new_account'
-        next_page = '&next=' + super().get_success_url()
+        if settings.DEBUG is False:
+            redirect_to = reverse_lazy('public:remarketing-redirect')
+            marketing_type = '?marketing_type=adwords'
+            page_type = '&page_type=new_account'
+            next_page = '&next=' + super().get_success_url()
 
-        return redirect_to + marketing_type + page_type + next_page
+            return redirect_to + marketing_type + page_type + next_page
+
+        return super().get_success_url()
 
 
 class PasswordResetView(auth_views.PasswordResetView):
