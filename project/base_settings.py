@@ -314,3 +314,18 @@ BITLY_TIMEOUT_STATS = 30
 # Valor maximo em que a soma de todos os parceiros do evento não deve
 # ultrapassar do rateamento do montante da Congressy
 PARTNER_MAX_PERCENTAGE_IN_EVENT = 20.00
+
+# ============================= PAYMENT ===================================== #
+# Planos da congressy, contemplam percentuais de recebimento em cima das
+# transações
+
+# Valor mínimo que a congrssy deve receber por transação. Se o valor do recebi
+# devido for menor do que este, o valor da transaçaõ da parte da congressy será
+# este valor.
+CONGRESSY_MINIMUM_AMOUNT = 4.99
+
+# Taxas de juros de parcelamento de valores da Congressy.
+CONGRESSY_INSTALLMENT_INTERESTS_RATE = 2.29
+
+# Valor minimo para cada parcela
+CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS = 10
