@@ -9,7 +9,10 @@ class PaymentReportCalculator(object):
     """
 
     def __init__(self, subscription):
-        self.queryset = Transaction.objects.filter(subscription=subscription)
+        self.queryset = Transaction.objects.filter(
+            subscription=subscription,
+            lot_id=subscription.lot_id
+        )
         self.subscription = subscription
         self.current_lot = subscription.lot
 
