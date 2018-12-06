@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='transaction',
             name='manual_payment_type',
-            field=models.CharField(blank=True, choices=[('money', 'Dinheiro'), ('paycheck', 'Cheque'), ('debit_card', 'Cartão de Débito'), ('credit_card', 'Cartão de Crédito'), ('bank_deposit', 'Depósito'), ('bank_transfer', 'Transferência bancária')], max_length=30, null=True, verbose_name='tipo de recebimento manual'),
+            field=models.CharField(blank=True, choices=[('money', 'Dinheiro'), ('paycheck', 'Cheque'), ('debit_card', 'Cartão de Débito'), ('credit_card', 'Cartão de Crédito'), ('bank_deposit', 'Depósito'), ('bank_transfer', 'Transferência bancária'), ('waiting_payment', 'Aguardando pagamento')], max_length=30, null=True, verbose_name='tipo de recebimento manual'),
         ),
         migrations.AlterField(
             model_name='transaction',

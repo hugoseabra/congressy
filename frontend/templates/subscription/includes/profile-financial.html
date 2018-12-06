@@ -365,7 +365,7 @@
                                                     style="display: none;"
                                                     title="Criar novo contrato de parcelamento"
                                                     id="new-contract-btn"
-                                                    onclick="getContractForm('{{ object.pk }}', '{{ installment_limit_date }}', parseInt({{ base_expiration_day }}), parseFloat('{{ remaining_price|unlocalize }}'))">
+                                                    onclick="getContractForm('{{ object.pk }}', '{{ installment_limit_date }}', parseInt({{ base_expiration_day }}), parseFloat('{{ remaining_price|unlocalize }}'), parseFloat('{{ minimum_amount }}'))">
                                                 <span class="fas fa-file-contract"></span>
                                                 Novo parcelamento
                                             </button>

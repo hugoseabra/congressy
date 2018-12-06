@@ -135,6 +135,7 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
             self.has_open_installment_contract()
         ctx['base_expiration_day'] = self.get_base_expiration_day()
         ctx['installment_limit_date'] = self.get_installment_limit_date()
+        ctx['minimum_amount'] = self.get_minimum_amount()
 
         ctx['new_boleto_allowed'] = payment_helpers.is_boleto_allowed(
             self.event
@@ -310,3 +311,6 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
     def get_base_expiration_day(self):
         date = self.event.date_start - timedelta(days=2)
         return date.strftime('%d')
+
+    def get_minimum_amount(self):
+        return settings.CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS
