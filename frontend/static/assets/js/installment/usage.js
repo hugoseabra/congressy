@@ -61,7 +61,6 @@ function getContractForm(subscription_pk, limit_date_str, base_day, amount, mini
     form_modal.setEl('part-table-list', parts_list_el);
     form_modal.setEl('limit_date_field', limit_date_field_el);
 
-    alert(minimum_amount);
     form_modal.populate({
         'expiration_day': parseInt(base_day),
         'amount': (amount < 0) ? -(amount) : amount,
