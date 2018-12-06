@@ -51,7 +51,6 @@ user-agents==1.1.0
 six==1.11.0
 timestring==1.6.2
 tolerance==0.1.2
-uglipyjs==0.2.5
 Unidecode==1.0.22
 urllib3==1.22
 pyBarcode==0.7

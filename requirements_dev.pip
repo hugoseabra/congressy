@@ -3,3 +3,4 @@ django-debug-toolbar
 django-extensions
 django-bootstrap-datepicker-plus
 Faker==0.8.12
+uglipyjs==0.2.5
