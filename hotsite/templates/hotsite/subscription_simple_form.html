@@ -29,10 +29,13 @@
                 Definir minha senha
             </button>
             {% if event.is_scientific and is_subscribed and event.work_config and event.work_config.is_submittable %}
-                <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
-                   class="btn btn-primary" style="margin-top: 15px">
-                    Deseja submeter seu artigo cientifico?
-                </a>
+                <div><strong>Científico:</strong></div>
+                <div>
+                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
+                       class="btn btn-success btn-block" style="margin-top: 15px">
+                        Enviar Resumo
+                    </a>
+                </div>
             {% endif %}
 
         </div>
@@ -97,10 +100,13 @@
                         {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                     </div>
                     {% if event.is_scientific and is_subscribed  and event.work_config and event.work_config.is_submittable %}
-                        <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
-                           class="btn btn-success" style="margin-top: 15px">
-                            Deseja submeter seu artigo cientifico?
-                        </a>
+                        <div style="margin-top: 15px;text-align: center">TRABALHOS CIENTÍFICOS</div>
+                        <div>
+                            <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
+                               class="btn btn-success btn-block">
+                                Enviar Resumo
+                            </a>
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -154,10 +160,13 @@
                     {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                 </div>
                 {% if event.is_scientific and is_subscribed and event.work_config and event.work_config.is_submittable %}
-                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
-                       class="btn btn-success" style="margin-top: 15px">
-                        Deseja submeter seu artigo cientifico?
-                    </a>
+                    <div style="margin-top: 15px;text-align: center">TRABALHOS CIENTÍFICOS</div>
+                    <div>
+                        <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
+                           class="btn btn-success btn-block">
+                            Enviar Resumo
+                        </a>
+                    </div>
                 {% endif %}
             </div>
         {% elif is_subscribed and has_private_subscription and not lot_still_available %}
@@ -188,10 +197,13 @@
                     {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                 </div>
                 {% if event.is_scientific and is_subscribed %}
-                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
-                       class="btn btn-success" style="margin-top: 15px">
-                        Deseja submeter seu artigo cientifico?
-                    </a>
+                    <div><strong>Científico:</strong></div>
+                    <div>
+                        <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
+                           class="btn btn-success btn-block" style="margin-top: 15px">
+                            Enviar Resumo
+                        </a>
+                    </div>
                 {% endif %}
             </div>
 
@@ -232,10 +244,13 @@
                     {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                 </div>
                 {% if event.is_scientific and is_subscribed %}
-                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
-                       class="btn btn-success" style="margin-top: 15px">
-                        Deseja submeter seu artigo cientifico?
-                    </a>
+                    <div style="margin-top: 15px;text-align: center">TRABALHOS CIENTÍFICOS</div>
+                    <div>
+                        <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
+                           class="btn btn-success btn-block">
+                            Enviar Resumo
+                        </a>
+                    </div>
                 {% endif %}
             </div>
             {% if person and person.is_new is False %}
