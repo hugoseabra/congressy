@@ -44,24 +44,6 @@ class SubscriptionSurveyDirector(object):
                     subscription.__class__.__name__)
                 raise ValueError(msg)
 
-            if self.lot is None and self.subscription.lot.event_survey:
-                self.lot = self.subscription.lot
-
-            assert isinstance(self.lot, Lot)
-
-            survey = self.lot.event_survey.survey
-            user = None
-            if self.subscription.person.user:
-                user = self.subscription.person.user
-
-            if self.subscription.author is None:
-                self.subscription.author = Author.objects.create(
-                    name=self.subscription.person.name,
-                    survey=survey,
-                    user=user,
-                )
-                self.subscription.save()
-
         super().__init__()
 
     def get_form(self, survey: Survey, data=None) -> SurveyAnswerForm:
@@ -80,6 +62,18 @@ class SubscriptionSurveyDirector(object):
 
         :return SurveyAnswerForm: um objeto de SurveyAnswerForm
         """
+
+        user = None
+        if self.subscription.person.user:
+            user = self.subscription.person.user
+
+        self.subscription.author, _ = Author.objects.get_or_create(
+            name=self.subscription.person.name,
+            survey=survey,
+            user=user,
+        )
+        self.subscription.save()
+
         # Caso não seja passado uma inscrição, resgatar apenas um
         # SurveyAnswerForm vazio
         if self.subscription is None or self.subscription.author is None:
@@ -144,6 +138,18 @@ class SubscriptionSurveyDirector(object):
 
         :return SurveyAnswerForm: um objeto de SurveyAnswerForm
         """
+
+        user = None
+        if self.subscription.person.user:
+            user = self.subscription.person.user
+
+        self.subscription.author, _ = Author.objects.get_or_create(
+            name=self.subscription.person.name,
+            survey=survey,
+            user=user,
+        )
+        self.subscription.save()
+
         # Caso não seja passado uma inscrição, resgatar apenas um
         # SurveyAnswerForm vazio
         if self.subscription is None or self.subscription.author is None:
