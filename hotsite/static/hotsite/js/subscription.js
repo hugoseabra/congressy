@@ -213,10 +213,13 @@ function load_coupon() {
     if (!coupon) {
         return;
     }
-    coupon = coupon.val();
-    if (!coupon) {
+
+    var coupon_value = coupon.val();
+    if (!coupon_value) {
         return;
     }
+
+    var coupon_block = $('.coupon-block');
 
     var button = $('#button_coupon');
     button.addClass('disabled').attr('disabled', 'disabled').text('Aguarde...');
@@ -228,7 +231,7 @@ function load_coupon() {
     send(
         url,
         'POST',
-        {'coupon': coupon},
+        {'coupon': coupon_value},
         function (response) {
 
             response = JSON.parse(response);
@@ -236,28 +239,39 @@ function load_coupon() {
             var lot = response.lot;
             var lot_select = $('#id_lot-lots');
 
-            lot_select.append(lot.option);
-            lot_select.val(lot.id);
-            lot_select.attr("style", "pointer-events: none;");
-            $('#lot_display_publicly').text(lot.public_display + lot.is_free);
-            $('#lot_exhibition_code').text(lot.exhibition_code);
+            console.log(response);
 
-            lot_fields.show();
+            button.removeClass('disabled').removeAttr('disabled').text('Aplicar');
+            coupon_block.fadeOut(function() {
+                lot_select.append(lot.option);
+                lot_select.val(lot.id);
+                lot_select.css("pointer-events", "none");
+                $('#lot_display_publicly').text(lot.public_display + lot.is_free);
+                $('#lot_exhibition_code').text(lot.exhibition_code);
 
-            window.setTimeout(function () {
-                start_popover();
-            }, 300);
+                lot_fields.show();
+            });
+
+
+
+            // window.setTimeout(function () {
+            //     start_popover();
+            // }, 300);
         },
         function () {
 
-            $('#id_coupon').val('');
+            coupon.val('');
 
             alert('Cupom inválido.');
-            hide_coupon();
+            // hide_coupon();
 
-            window.setTimeout(function () {
-                start_popover();
-            }, 300);
+            coupon.focus();
+            button.removeClass('disabled').removeAttr('disabled').text('Aplicar');
+            coupon_block.fadeIn();
+
+            // window.setTimeout(function () {
+                // start_popover();
+            // }, 300);
         }
     );
 
@@ -268,9 +282,21 @@ function hide_coupon() {
 
     var lot_fields = $('#lots-field');
     var original_lots_field = $('#original-lots-field');
+    var coupon_block = $('.coupon-block');
 
     lot_fields.hide();
     original_lots_field.show();
+    coupon_block.fadeIn();
+    $('#id_coupon').val('');
+
+    $.each($('option', '#id_lot-lots'), function() {
+        var el = $(this);
+        if (el.attr('value'), el.data('coupon-type')) {
+            el.remove();
+        }
+    });
+
+    $('#id_lot-lots').removeAttr('style');
 }
 
 function start_popover() {
