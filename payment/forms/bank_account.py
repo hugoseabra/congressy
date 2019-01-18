@@ -31,8 +31,7 @@ class BankAccountForm(forms.ModelForm):
         self.date_created = None
         self.recipient_id = None
 
-        super(BankAccountForm, self).__init__(data=data, *args,
-                                              **kwargs)
+        super(BankAccountForm, self).__init__(data=data, *args, **kwargs)
 
         self.banking_required_fields = [
             'bank_code',
@@ -106,11 +105,9 @@ class BankAccountForm(forms.ModelForm):
         return document_number
 
     def save(self, commit=True):
-        self.instance = super().save(commit)
-
         self.instance.bank_account_id = self.bank_account_id
         self.instance.document_type = self.document_type
         self.instance.recipient_id = self.recipient_id
         self.instance.date_created = self.date_created
-        self.instance.save()
-        return self.instance
+
+        return super().save(commit)

@@ -141,11 +141,14 @@ def create_pagarme_organizer_recipient(organization=None):
         return
 
     params = {
-        'anticipatable_volume_percentage': '100',
-        'automatic_anticipation_enabled': 'false',
-        'transfer_day': '5',
         'transfer_enabled': 'true',
+        'automatic_anticipation_enabled': 'true',
         'transfer_interval': 'weekly',
+        'anticipatable_volume_percentage': '100',
+        'transfer_day': '5',
+        'automatic_anticipation_type': '1025',
+        'automatic_anticipation_days': '[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]',
+        'automatic_anticipation_1025_delay': '29',
         'bank_account': {
             'agencia': organization.agency,
             'bank_code': organization.bank_code,
@@ -192,11 +195,14 @@ def create_pagarme_organizer_recipient(organization=None):
 
 def create_pagarme_recipient(recipient_dict):
     params = {
-        'anticipatable_volume_percentage': '100',
-        'automatic_anticipation_enabled': 'false',
-        'transfer_day': '5',
         'transfer_enabled': 'true',
+        'automatic_anticipation_enabled': 'true',
         'transfer_interval': 'weekly',
+        'anticipatable_volume_percentage': '100',
+        'transfer_day': '5',
+        'automatic_anticipation_type': '1025',
+        'automatic_anticipation_days': '[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]',
+        'automatic_anticipation_1025_delay': '29',
         'bank_account': {
             'agencia': recipient_dict['agencia'],
             'bank_code': recipient_dict['bank_code'],
