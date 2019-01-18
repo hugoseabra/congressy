@@ -313,7 +313,10 @@ BITLY_TIMEOUT_STATS = 30
 # ========================== PARTNER ======================================== #
 # Valor maximo em que a soma de todos os parceiros do evento não deve
 # ultrapassar do rateamento do montante da Congressy
-PARTNER_MAX_PERCENTAGE_IN_EVENT = 20.00
+# PARTNER_MAX_PERCENTAGE_IN_EVENT = 20.00
+
+# @TODO remover. INserido provisionariamente - GYM Brasil
+PARTNER_MAX_PERCENTAGE_IN_EVENT = 60.00
 
 # ============================= PAYMENT ===================================== #
 # Planos da congressy, contemplam percentuais de recebimento em cima das
