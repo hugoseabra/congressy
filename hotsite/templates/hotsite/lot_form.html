@@ -56,20 +56,9 @@
                                                     {% render_generic_field form.lots %}
 
                                                     {% if has_coupon %}
-                                                        <div class="text-right small"
-                                                             style="margin-top: 8px;">
-                                                            <a id="coupon_link"
-                                                               href="javascript:void(0)"
-                                                               data-toggle="popover"
-                                                               title="<strong>Informe o código</strong>"
-                                                               data-html="true"
-                                                               data-container="body"
-                                                               data-content="{% include 'hotsite/includes/coupon.html' %}">
-                                                                Possui
-                                                                cupom?
-                                                            </a>
+                                                        <div class="text-right small" style="margin-top: 8px;">
+                                                            {% include 'hotsite/includes/coupon_explicit.html' %}
                                                         </div>
-
                                                     {% endif %}
                                                 {% endif %}
                                             </div>
@@ -78,11 +67,7 @@
                                                 <h4 style="font-weight: bold;padding-bottom:0;margin-bottom:0">CUPOM VÁLIDO</h4>
                                                 <div class="text-muted" style="padding-right:20px" id="lot_exhibition_code"></div>
                                                 <div class="small" style="margin-top: 10px;">
-                                                    <a onclick='hide_coupon()'
-                                                       style='margin-top:2px'>
-                                                        Retirar
-                                                        cupom
-                                                    </a>
+                                                    <a href="javascript:void(0)" onclick='hide_coupon()' style='margin-top:2px'> Retirar cupom</a>
                                                 </div>
                                                 <div>
                                                     <span style="color:darkgreen;font-weight: bold;" id="lot_display_publicly"></span>

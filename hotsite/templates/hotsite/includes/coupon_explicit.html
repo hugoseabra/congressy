@@ -1,0 +1,13 @@
+<div class="row coupon-block">
+    <div class="col-md-4 text-left">
+        <label style="font-weight: normal;" for="id_coupon">CUPOM / GRUPO:</label>
+        <div class="input-group">
+            <input name='coupon' id='id_coupon' class='form-control' value='' onkeyup="$(this).val($(this).val().toUpperCase())" placeholder="Informe o código">
+            <span class="input-group-btn">
+                <button type='button' id='button_coupon' onclick='load_coupon()' class='btn btn-block btn-primary'>Aplicar</button>
+            </span>
+            <input type='hidden' name='coupon_url' id='id_coupon_url' value='{% url 'public:hotsite-coupon' event.slug %}'/>
+        </div>
+    </div>
+</div>
+

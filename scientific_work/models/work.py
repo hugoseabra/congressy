@@ -15,9 +15,9 @@ class Work(models.Model):
     SUMMARY = 'resumo'
 
     MODALITY_CHOICES = (
-        (ARTICLE, 'Artigo'),
-        (BANNER, 'Banner'),
-        (SUMMARY, 'Resumo'),
+        (ARTICLE, 'Resumo - Abstract'),
+        (BANNER, 'Poster'),
+        # (SUMMARY, 'Resumo'),
     )
 
     subscription = models.ForeignKey(
