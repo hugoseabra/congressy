@@ -45,7 +45,10 @@ class ReceiverSubscriber(object):
 
         self.added_amount += receiver.amount
 
-        if round(self.added_amount, 2) > round(self.amount, 2):
+        diff_amount = self.added_amount - self.amount
+        diff_amount = round(diff_amount, 2)
+
+        if diff_amount > 0.02:
             raise exception.ReceiverTotalAmountExceeded(
                 'O valor dos recebedores já ultrapassa o valor a ser'
                 ' transacionado. Valor da transação: {}. Valor somado'
@@ -197,8 +200,9 @@ class ReceiverPublisher(object):
         # Depois de todos os valores distribuídos, o valor entre a Congressy
         # e organizador tem de ser de acordo com o montante a ser
         # transacionado.
-        assert \
-            round(total_splitable_amount, 2) == round(self.amount, 2), \
+        diff_amount = round(total_splitable_amount, 2) - round(self.amount, 2)
+        diff_amount = round(diff_amount, 2)
+        assert diff_amount > 0.02 or diff_amount < 0.02, \
             "total splitable amount: {}. Amount: {}".format(
                 round(total_splitable_amount, 2),
                 round(self.amount, 2)
