@@ -92,6 +92,25 @@ class PartnerRegistrationForm(PersonForm):
             self.notify_partner(request)
             return partner
 
+        if self.instance.user_id is None:
+            split_name = self.instance.name.split(' ')
+            if len(split_name) == 1:
+                first_name = self.instance.name
+                last_name = None
+            else:
+                first_name = split_name[0]
+                last_name = split_name[-1]
+
+            user, _ = User.objects.get_or_create(
+                first_name=first_name,
+                last_name=last_name,
+                email=self.instance.email,
+                username=self.instance.email,
+                password=uuid4(),
+            )
+            self.instance.user = user
+            self.instance.save()
+
         # Criando Organização.
         org = Organization(internal=False, name=self.instance.name)
 
@@ -108,7 +127,7 @@ class PartnerRegistrationForm(PersonForm):
 
         self.notify_partner(request)
         self.notify_partner_internal(request)
-        return self.instance
+        return partner
 
     def clean_email(self):
         return self.data.get('email').lower()

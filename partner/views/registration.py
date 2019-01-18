@@ -20,14 +20,13 @@ class RegistrationView(TemplateView, FormView):
         if 'instance' in kwargs:
             kwargs.pop('instance')
 
-        return FullPartnerRegistrationForm(
-            **kwargs,
-        )
+        return FullPartnerRegistrationForm(**kwargs,)
 
     def form_valid(self, form):
         form.save()
         messages.success(self.request, self.messages['success'].format(
-            form.cleaned_data.get('email')))
+            form.cleaned_data.get('email')
+        ))
         return redirect(self.success_url)
 
     def post(self, request, *args, **kwargs):
