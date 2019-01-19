@@ -139,6 +139,15 @@ class SubscriptionSurveyDirector(object):
         :return SurveyAnswerForm: um objeto de SurveyAnswerForm
         """
 
+        # Caso não seja passado uma inscrição, resgatar apenas um
+        # SurveyAnswerForm vazio
+        if self.subscription is None:
+            return ActiveSurveyAnswerForm(
+                survey=survey,
+                data=data,
+                files=files,
+            )
+
         user = None
         if self.subscription.person.user:
             user = self.subscription.person.user
@@ -149,15 +158,6 @@ class SubscriptionSurveyDirector(object):
             user=user,
         )
         self.subscription.save()
-
-        # Caso não seja passado uma inscrição, resgatar apenas um
-        # SurveyAnswerForm vazio
-        if self.subscription is None or self.subscription.author is None:
-            return ActiveSurveyAnswerForm(
-                survey=survey,
-                data=data,
-                files=files,
-            )
 
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
         author = self.subscription.author
