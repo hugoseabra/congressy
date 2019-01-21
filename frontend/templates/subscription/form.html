@@ -149,6 +149,12 @@
                 width: 'resolve'
             });
 
+            // Prevent double click
+            $('#subscription_form').submit(function () {
+                $(this).find(':submit').attr('disabled', 'disabled');
+            })
+
+
         });
 
         function set_form_as_international() {
@@ -305,7 +311,7 @@
 
 {% block content %}
     <form action="" method="post" class="skip-submition-check"
-          name="subscription_form" enctype="multipart/form-data">
+          name="subscription_form" id="subscription_form" enctype="multipart/form-data">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
