@@ -257,11 +257,15 @@
                                                          style="margin-left:10px">
                                                         <span class="title">Método</span>
                                                         Boleto
-                                                        {% if last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                        {% if last_transaction.status != last_transaction.REFUSED %}
+                                                            <strong class="text-warning">(recusado)</strong>
+                                                        {% elif last_transaction.status != last_transaction.REFUNDED %}
+                                                            <strong class="text-warning">(estonado)</strong>
+                                                        {% elif last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
                                                             <strong class="text-warning">(vencido)</strong>
                                                         {% endif %}
                                                     </div>
-                                                    {% if last_transaction.status != last_transaction.PAID and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                    {% if last_transaction.status == last_transaction.WAITING_PAYMENT and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
                                                         <div class="float-right">
                                                             <button type="button"
                                                                     data-toggle="tooltip"
@@ -283,16 +287,24 @@
                                                             {% endif %}
                                                         </div>
                                                     {% endif %}
-                                                    {% if new_boleto_allowed and last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
-                                                        <div class="float-right">
-                                                            <button type="button"
-                                                                    data-toggle="tooltip"
-                                                                    title="Abrir documento"
-                                                                    class="btn btn-info btn-sm btn-trans"
-                                                                    onclick="open_checkout()">
-                                                                novo boleto
-                                                            </button>
-                                                        </div>
+                                                    {% if new_boleto_allowed %}
+                                                    {% if last_transaction.status == last_transaction.REFUSED or last_transaction.status == last_transaction.REFUNDED %}
+                                                        <button type="button"
+                                                                data-toggle="tooltip"
+                                                                title="Abrir documento"
+                                                                class="btn btn-info btn-sm btn-trans"
+                                                                onclick="open_checkout()">
+                                                            novo boleto
+                                                        </button>
+                                                    {% elif last_transaction.status == last_transaction.WAITING_PAYMENT and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                        <button type="button"
+                                                                data-toggle="tooltip"
+                                                                title="Abrir documento"
+                                                                class="btn btn-info btn-sm btn-trans"
+                                                                onclick="open_checkout()">
+                                                            novo boleto
+                                                        </button>
+                                                    {% endif %}
                                                     {% endif %}
                                                 {% elif new_boleto_allowed and last_transaction.type == last_transaction.CREDIT_CARD %}
                                                     <div class="float-left">
