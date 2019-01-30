@@ -239,7 +239,7 @@
                                                         </div>
                                                     {% endif %}
                                                 {% else %}
-                                                    {% if last_transaction.type == last_transaction.BOLETO and (last_transaction.status != last_transaction.REFUSED and last_transaction.status != last_transaction.REFUNDED) %}
+                                                    {% if last_transaction.type == last_transaction.BOLETO and last_transaction.status != last_transaction.REFUSED and last_transaction.status != last_transaction.REFUNDED %}
                                                         <div class="float-left">
                                                             <i style="font-size: 40px" class="fas fa-barcode"></i>
                                                         </div>

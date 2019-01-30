@@ -183,7 +183,7 @@
                 {% endfor %}
             {% endif %}
 
-            {% if (last_transaction and last_transaction.type == last_transaction.BOLETO and last_transaction.status == last_transaction.WAITING_PAYMENT) and not last_transaction.boleto_url %}
+            {% if last_transaction and last_transaction.type == last_transaction.BOLETO and last_transaction.status == last_transaction.WAITING_PAYMENT and not last_transaction.boleto_url %}
                 window.setTimeout(function () {
                     window.location.href = window.location.href;
                 }, 7500);
