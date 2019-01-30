@@ -257,11 +257,11 @@
                                                          style="margin-left:10px">
                                                         <span class="title">Método</span>
                                                         Boleto
-                                                        {% if last_transaction.status != last_transaction.REFUSED %}
+                                                        {% if last_transaction.status == last_transaction.REFUSED %}
                                                             <strong class="text-warning">(recusado)</strong>
-                                                        {% elif last_transaction.status != last_transaction.REFUNDED %}
+                                                        {% elif last_transaction.status == last_transaction.REFUNDED %}
                                                             <strong class="text-warning">(estonado)</strong>
-                                                        {% elif last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                        {% elif last_transaction.status == last_transaction.WAITING_PAYMENT and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
                                                             <strong class="text-warning">(vencido)</strong>
                                                         {% endif %}
                                                     </div>

@@ -15,7 +15,11 @@ def get_opened_boleto_transactions(subscription):
         type=Transaction.BOLETO,
         boleto_expiration_date__gt=now.date(),
     ).exclude(
-        status__in=[Transaction.PAID, Transaction.PROCESSING],
+        status__in=[
+            Transaction.PAID,
+            Transaction.REFUNDED,
+            Transaction.REFUSED,
+        ],
     )
 
 
