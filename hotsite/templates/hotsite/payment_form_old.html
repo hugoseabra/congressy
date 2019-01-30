@@ -210,18 +210,18 @@
                 });
 
                 var lot_price = parseFloat('{{ lot.price|intcomma|unlocalize }}');
-                window.cgsy.pagarme.add_items_list({{ lot.id }}, '{{ lot.event.name }}', lot_price, 1, false);
+                window.cgsy.pagarme.add_items_list({{ lot.id }}, '{{ lot.event.name|escapejs }}', lot_price, 1, false);
 
                 {% for product in products %}
                     //id, name, price, quantity, tangible
                     var price = parseFloat('{{ product.optional_liquid_price|intcomma|unlocalize }}');
-                    window.cgsy.pagarme.add_items_list({{ product.optional.id }}, '{{ product.optional.name }}', price, 1, true);
+                    window.cgsy.pagarme.add_items_list({{ product.optional.id }}, '{{ product.optional.name|escapejs }}', price, 1, true);
                 {% endfor %}
 
                 {% for service in services %}
                     //id, name, price, quantity, tangible
                     var price = parseFloat('{{service.optional_liquid_price|intcomma|unlocalize }}');
-                    window.cgsy.pagarme.add_items_list({{ service.optional.id }}, '{{ service.optional.name }}', price, 1, false);
+                    window.cgsy.pagarme.add_items_list({{ service.optional.id }}, '{{ service.optional.name|escapejs }}', price, 1, false);
                 {% endfor %}
 
                 var lot = {

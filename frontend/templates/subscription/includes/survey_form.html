@@ -94,7 +94,7 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0)" onclick="duplicateSurvey('{{ event.pk }}', '{{ item.event_survey.survey.name }}', '{{ item.event_survey.pk }}')">
+                                            <a href="javascript:void(0)" onclick="duplicateSurvey('{{ event.pk }}', '{{ item.event_survey.survey.name|escapejs }}', '{{ item.event_survey.pk }}')">
                                                 <i class="far fa-clone"></i>
                                                 Duplicar
                                             </a>

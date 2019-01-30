@@ -39,7 +39,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            configure_input('{{ search_by }}');
+            configure_input('{{ search_by|escapejs }}');
 
             {% if search_by == 'code' and result %}
                 window.setTimeout(function () {
@@ -140,7 +140,7 @@
             sender.send('POST', {
                 subscription: subscription_pk,
                 attendance_service: '{{ attendance_list.pk  }}',
-                attended_by: '{{ request.user.get_full_name }}'
+                attended_by: '{{ request.user.get_full_name|escapejs }}'
             });
         }
 

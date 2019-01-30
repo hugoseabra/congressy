@@ -18,6 +18,7 @@
             </ul>
             <div class="tab-content">
                 {% for cat in categories %}
+
                     <div class="tab-pane {% if forloop.counter0 == 0 %}active{% endif %}"
                          id="cat-{{ cat.pk }}">
                         <h3 class="well well-sm"
@@ -133,7 +134,7 @@
                                                                 class="btn btn-sm btn-info btn-block {% if not lot.event_survey %}btn-trans{% endif %}"
                                                                 data-toggle="modal"
                                                                 data-backdrop="static"
-                                                                onclick="$('#survey-lot_id').val('{{ lot.pk }}');$('#survey-lot-name').text('{{ lot.name }}');$('#lot-survey').val('{{ lot.event_survey_id|default_if_none:'' }}')"
+                                                                onclick="$('#survey-lot_id').val('{{ lot.pk }}');$('#survey-lot-name').text('{{ lot.name|escapejs }}');$('#lot-survey').val('{{ lot.event_survey_id|default_if_none:'' }}')"
                                                                 data-target="#survey-lot-form">
                                                             <i class="fas fa-list"></i>
                                                             <span class="hidden-md">Formulário</span>
@@ -148,7 +149,7 @@
                                                                 class="btn btn-sm btn-info btn-block {% if not lot.limit %}btn-trans{% endif %}"
                                                                 data-toggle="modal"
                                                                 data-backdrop="static"
-                                                                onclick="$('#lot-limit-lot_id').val('{{ lot.pk }}');$('#lot-limit-name').text('{{ lot.name }}');$('#lot-limit').val('{{ lot.limit|default_if_none:0 }}')"
+                                                                onclick="$('#lot-limit-lot_id').val('{{ lot.pk }}');$('#lot-limit-name').text('{{ lot.name|escapejs }}');$('#lot-limit').val('{{ lot.limit|default_if_none:0 }}')"
                                                                 data-target="#lot-limit-form">
                                                             <i class="fas fa-users"></i>
                                                             <span class="hidden-md">Vagas</span>
@@ -164,7 +165,7 @@
                                                                     class="btn btn-sm btn-info btn-block {% if not lot.private %}btn-trans{% endif %}"
                                                                     data-toggle="modal"
                                                                     data-backdrop="static"
-                                                                    onclick="$('#lot-privacy-lot_id').val('{{ lot.pk }}');$('#lot-privacy_name').text('{{ lot.name }}');app.setSwitchery('#lot-privacy_private', {% if lot.private %}true{% else %}false{% endif %});$('#lot-privacy_exhibition-code').val('{{ lot.exhibition_code|default_if_none:exhibition_code }}')"
+                                                                    onclick="$('#lot-privacy-lot_id').val('{{ lot.pk }}');$('#lot-privacy_name').text('{{ lot.name|escapejs }}');app.setSwitchery('#lot-privacy_private', {% if lot.private %}true{% else %}false{% endif %});$('#lot-privacy_exhibition-code').val('{{ lot.exhibition_code|default_if_none:exhibition_code|escapejs }}')"
                                                                     data-target="#lot-privacy_form">
                                                                 <i class="fas fa-lock"></i>
                                                                 <span class="hidden-md">Privacidade</span>
@@ -336,7 +337,7 @@
                                                                 class="btn btn-sm btn-info btn-block {% if not lot.event_survey %}btn-trans{% endif %}"
                                                                 data-toggle="modal"
                                                                 data-backdrop="static"
-                                                                onclick="$('#survey-lot_id').val('{{ lot.pk }}');$('#survey-lot-name').text('{{ lot.name }}');$('#lot-survey').val('{{ lot.event_survey_id|default_if_none:'' }}')"
+                                                                onclick="$('#survey-lot_id').val('{{ lot.pk }}');$('#survey-lot-name').text('{{ lot.name|escapejs }}');$('#lot-survey').val('{{ lot.event_survey_id|default_if_none:''|escapejs }}')"
                                                                 data-target="#survey-lot-form">
                                                             <i class="fas fa-list"></i>
                                                             <span class="hidden-md">Formulário</span>
@@ -351,7 +352,7 @@
                                                                 class="btn btn-sm btn-info btn-block {% if not lot.limit %}btn-trans{% endif %}"
                                                                 data-toggle="modal"
                                                                 data-backdrop="static"
-                                                                onclick="$('#lot-limit-lot_id').val('{{ lot.pk }}');$('#lot-limit-name').text('{{ lot.name }}');$('#lot-limit').val('{{ lot.limit|default_if_none:0 }}')"
+                                                                onclick="$('#lot-limit-lot_id').val('{{ lot.pk }}');$('#lot-limit-name').text('{{ lot.name|escapejs }}');$('#lot-limit').val('{{ lot.limit|default_if_none:0 }}')"
                                                                 data-target="#lot-limit-form">
                                                             <i class="fas fa-users"></i>
                                                             <span class="hidden-md">Vagas</span>
@@ -367,7 +368,7 @@
                                                                     class="btn btn-sm btn-info btn-block {% if not lot.private %}btn-trans{% endif %}"
                                                                     data-toggle="modal"
                                                                     data-backdrop="static"
-                                                                    onclick="$('#lot-privacy-lot_id').val('{{ lot.pk }}');$('#lot-privacy_name').text('{{ lot.name }}');app.setSwitchery('#lot-privacy_private', {% if lot.private %}true{% else %}false{% endif %});$('#lot-privacy_exhibition-code').val('{{ lot.exhibition_code|default_if_none:exhibition_code }}')"
+                                                                    onclick="$('#lot-privacy-lot_id').val('{{ lot.pk }}');$('#lot-privacy_name').text('{{ lot.name|escapejs }}');app.setSwitchery('#lot-privacy_private', {% if lot.private %}true{% else %}false{% endif %});$('#lot-privacy_exhibition-code').val('{{ lot.exhibition_code|default_if_none:exhibition_code|escapejs }}')"
                                                                     data-target="#lot-privacy_form">
                                                                 <i class="fas fa-lock"></i>
                                                                 <span class="hidden-md">Privacidade</span>
