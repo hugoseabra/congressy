@@ -28,7 +28,7 @@ if [[ -f "$PREVIOUS_VERSION_FILE" ]]; then
     PREVIOUS_VERSION=$(cat ${PREVIOUS_VERSION_FILE})
 fi
 
-if [[ -f "$VERSION_FILE" ]; then
+if [[ -f "$VERSION_FILE" ]]; then
     VERSION=$(cat ${VERSION_FILE})
 fi
 

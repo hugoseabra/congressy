@@ -239,7 +239,7 @@
                                                         </div>
                                                     {% endif %}
                                                 {% else %}
-                                                    {% if last_transaction.type == last_transaction.BOLETO and (last_transaction.status != last_transaction.REFUSED and last_transaction.status != last_transaction.REFUNDED) %}
+                                                    {% if last_transaction.type == last_transaction.BOLETO %}
                                                         <div class="float-left">
                                                             <i style="font-size: 40px" class="fas fa-barcode"></i>
                                                         </div>
@@ -248,12 +248,16 @@
                                                             <span class="title">Método</span>
                                                             <div>
                                                                 Boleto
-                                                                {% if last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                                {% if last_transaction.status == last_transaction.REFUSED %}
+                                                                    <strong class="text-warning">(recusado)</strong>
+                                                                {% elif last_transaction.status == last_transaction.REFUNDED %}
+                                                                    <strong class="text-warning">(estonado)</strong>
+                                                                {% elif last_transaction.status == last_transaction.WAITING_PAYMENT and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
                                                                     <strong class="text-warning">(vencido)</strong>
                                                                 {% endif %}
                                                             </div>
                                                             <div style="margin-top:5px;">
-                                                                {% if last_transaction.status != last_transaction.PAID and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                                {% if last_transaction.status == last_transaction.WAITING_PAYMENT and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
                                                                     <button type="button"
                                                                             data-toggle="tooltip"
                                                                             title="{% if last_transaction.boleto_url %}Abrir boleto{% else %}Aguardando processamento{% endif %}"
@@ -262,7 +266,7 @@
                                                                         <i class="far fa-file-alt"></i>
                                                                         {% if last_transaction.boleto_url %}abrir{% else %}aguarde ...{% endif %}
                                                                     </button>
-                                                                    {% if last_transaction.boleto_url and object.person.email %}
+                                                                    {% if last_transaction.boleto_url and object.person.email and object.origin == object.DEVICE_ORIGIN_HOTSITE %}
                                                                         <button type="button"
                                                                                 data-toggle="tooltip"
                                                                                 title="Enviar boleto para o participante"
@@ -273,7 +277,8 @@
                                                                         </button>
                                                                     {% endif %}
                                                                 {% endif %}
-                                                                {% if new_boleto_allowed and last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                                {% if new_boleto_allowed %}
+                                                                {% if last_transaction.status == last_transaction.REFUSED or last_transaction.status == last_transaction.REFUNDED %}
                                                                     <button type="button"
                                                                             data-toggle="tooltip"
                                                                             title="Abrir documento"
@@ -281,6 +286,15 @@
                                                                             onclick="open_checkout()">
                                                                         novo boleto
                                                                     </button>
+                                                                {% elif last_transaction.status == last_transaction.WAITING_PAYMENT and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                                    <button type="button"
+                                                                            data-toggle="tooltip"
+                                                                            title="Abrir documento"
+                                                                            class="btn btn-info btn-sm btn-trans"
+                                                                            onclick="open_checkout()">
+                                                                        novo boleto
+                                                                    </button>
+                                                                {% endif %}
                                                                 {% endif %}
                                                             </div>
                                                         </div>

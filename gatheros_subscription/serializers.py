@@ -69,7 +69,7 @@ class LotSerializer(serializers.ModelSerializer):
         existing = Lot.objects.filter(
             event_id=event,
             exhibition_code=value.upper(),
-        )
+        ).exclude(pk=self.instance.pk)
 
         if existing.count() > 0:
             msg = "Cupom com esse código já existe no evento!"
