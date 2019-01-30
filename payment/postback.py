@@ -98,13 +98,14 @@ class Postback(object):
             raise e
 
         # Garantindo que temos link de boleto no payload
-        try:
-            boleto_url = payload.get('transaction[boleto_url]')
-            self._validate_boleto_url(boleto_url)
-        except PostbackValueError as e:
-            e.payload = payload
-            e.missing_key_name = 'transaction[boleto_url]'
-            raise e
+        if self.transaction_status == Transaction.WAITING_PAYMENT:
+            try:
+                boleto_url = payload.get('transaction[boleto_url]')
+                self._validate_boleto_url(boleto_url)
+            except PostbackValueError as e:
+                e.payload = payload
+                e.missing_key_name = 'transaction[boleto_url]'
+                raise e
 
     # noinspection PyMethodMayBeStatic
     def _validate_status(self, new_status):
@@ -117,7 +118,8 @@ class Postback(object):
 
     def _validate_boleto_url(self, boleto_url):
 
-        if self.transaction_type == Transaction.BOLETO:
+        if self.transaction_type == Transaction.BOLETO \
+                and self.transaction_status == Transaction.WAITING_PAYMENT:
 
             if not boleto_url:
                 msg = "No value for payload boleto_url: {}".format(boleto_url)
