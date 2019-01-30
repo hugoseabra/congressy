@@ -248,7 +248,7 @@
                                                     </div>
                                                 {% endif %}
                                             {% else %}
-                                                {% if last_transaction.type == last_transaction.BOLETO %}
+                                                {% if last_transaction.type == last_transaction.BOLETO and (last_transaction.status != last_transaction.REFUSED and last_transaction.status != last_transaction.REFUNDED) %}
                                                     <div class="float-left">
                                                         <i style="font-size: 40px"
                                                            class="fas fa-barcode"></i>
@@ -269,10 +269,7 @@
                                                                     class="btn btn-success btn-sm btn-trans {% if not last_transaction.boleto_url %}disabled{% endif %}"
                                                                     onclick="window.open('{{ last_transaction.boleto_url }}')">
                                                                 <i class="far fa-file-alt"></i>
-                                                                {% if last_transaction.boleto_url %}
-                                                                    abrir{% else %}
-                                                                    aguarde
-                                                                    ...{% endif %}
+                                                                {% if last_transaction.boleto_url %}abrir{% else %}aguarde...{% endif %}
                                                             </button>
                                                             {% if last_transaction.boleto_url and object.person.email %}
                                                                 <button type="button"
