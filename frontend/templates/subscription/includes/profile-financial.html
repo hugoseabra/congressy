@@ -264,7 +264,7 @@
                                                                             class="btn btn-success btn-sm btn-trans {% if not last_transaction.boleto_url %}disabled{% endif %}"
                                                                             onclick="window.open('{{ last_transaction.boleto_url }}')">
                                                                         <i class="far fa-file-alt"></i>
-                                                                        {% if last_transaction.boleto_url %}abrir{% else %}aguarde ...{% endif %}
+                                                                        abrir
                                                                     </button>
                                                                     {% if last_transaction.boleto_url and object.person.email and object.origin == object.DEVICE_ORIGIN_HOTSITE %}
                                                                         <button type="button"
@@ -276,6 +276,15 @@
                                                                             enviar
                                                                         </button>
                                                                     {% endif %}
+                                                                {% endif %}
+                                                                {% if last_transaction.status == last_transaction.WAITING_PAYMENT  %}
+                                                                    <button type="button"
+                                                                            data-toggle="tooltip"
+                                                                            title="{% if last_transaction.boleto_url %}Abrir boleto{% else %}Aguardando processamento{% endif %}"
+                                                                            class="btn btn-success btn-sm btn-trans disabled">
+                                                                        <i class="far fa-file-alt"></i>
+                                                                        aguarde...
+                                                                    </button>
                                                                 {% endif %}
                                                                 {% if new_boleto_allowed %}
                                                                 {% if last_transaction.status == last_transaction.REFUSED or last_transaction.status == last_transaction.REFUNDED %}

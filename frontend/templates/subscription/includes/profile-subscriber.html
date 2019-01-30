@@ -248,7 +248,7 @@
                                                     </div>
                                                 {% endif %}
                                             {% else %}
-                                                {% if last_transaction.type == last_transaction.BOLETO and last_transaction.status != last_transaction.REFUSED and last_transaction.status != last_transaction.REFUNDED %}
+                                                {% if last_transaction.type == last_transaction.BOLETO %}
                                                     <div class="float-left">
                                                         <i style="font-size: 40px"
                                                            class="fas fa-barcode"></i>
@@ -273,7 +273,7 @@
                                                                     class="btn btn-success btn-sm btn-trans {% if not last_transaction.boleto_url %}disabled{% endif %}"
                                                                     onclick="window.open('{{ last_transaction.boleto_url }}')">
                                                                 <i class="far fa-file-alt"></i>
-                                                                {% if last_transaction.boleto_url %}abrir{% else %}aguarde...{% endif %}
+                                                                abrir
                                                             </button>
                                                             {% if last_transaction.boleto_url and object.person.email %}
                                                                 <button type="button"
@@ -287,24 +287,37 @@
                                                             {% endif %}
                                                         </div>
                                                     {% endif %}
-                                                    {% if new_boleto_allowed %}
-                                                    {% if last_transaction.status == last_transaction.REFUSED or last_transaction.status == last_transaction.REFUNDED %}
+                                                    {% if last_transaction.status == last_transaction.WAITING_PAYMENT  %}
+                                                    <div class="float-right">
                                                         <button type="button"
                                                                 data-toggle="tooltip"
-                                                                title="Abrir documento"
-                                                                class="btn btn-info btn-sm btn-trans"
-                                                                onclick="open_checkout()">
-                                                            novo boleto
+                                                                title="{% if last_transaction.boleto_url %}Abrir boleto{% else %}Aguardando processamento{% endif %}"
+                                                                class="btn btn-success btn-sm btn-trans disabled">
+                                                            <i class="far fa-file-alt"></i>
+                                                            aguarde...
                                                         </button>
-                                                    {% elif last_transaction.status == last_transaction.WAITING_PAYMENT and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
-                                                        <button type="button"
-                                                                data-toggle="tooltip"
-                                                                title="Abrir documento"
-                                                                class="btn btn-info btn-sm btn-trans"
-                                                                onclick="open_checkout()">
-                                                            novo boleto
-                                                        </button>
+                                                    </div>
                                                     {% endif %}
+                                                    {% if new_boleto_allowed %}
+                                                    <div class="float-right">
+                                                        {% if last_transaction.status == last_transaction.REFUSED or last_transaction.status == last_transaction.REFUNDED %}
+                                                            <button type="button"
+                                                                    data-toggle="tooltip"
+                                                                    title="Abrir documento"
+                                                                    class="btn btn-info btn-sm btn-trans"
+                                                                    onclick="open_checkout()">
+                                                                novo boleto
+                                                            </button>
+                                                        {% elif last_transaction.status == last_transaction.WAITING_PAYMENT and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                            <button type="button"
+                                                                    data-toggle="tooltip"
+                                                                    title="Abrir documento"
+                                                                    class="btn btn-info btn-sm btn-trans"
+                                                                    onclick="open_checkout()">
+                                                                novo boleto
+                                                            </button>
+                                                        {% endif %}
+                                                    </div>
                                                     {% endif %}
                                                 {% elif new_boleto_allowed and last_transaction.type == last_transaction.CREDIT_CARD %}
                                                     <div class="float-left">
