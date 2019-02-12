@@ -332,3 +332,5 @@ CONGRESSY_INSTALLMENT_INTERESTS_RATE = 2.29
 
 # Valor minimo para cada parcela
 CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS = 10
+# ============================= MIXPANEL ==================================== #
+MIX_PANEL_TOKEN = '6930058ef43195b9bd99257a41701d92'

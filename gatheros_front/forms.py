@@ -3,6 +3,8 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm as AuthForm
 
+from cgsy_mixpanel.mix_panel import create_mixpanel
+
 LOGIN_SUPERUSER_ONLY = getattr(settings, 'LOGIN_SUPERUSER_ONLY', False)
 
 
@@ -24,3 +26,6 @@ class AuthenticationForm(AuthForm):
                 " ambiente.",
                 code='not-superuser',
             )
+
+        mixpanel = create_mixpanel(user)
+        mixpanel.track('Login')
