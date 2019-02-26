@@ -18,6 +18,7 @@ class Receiver(object):
     comercializados.
     """
     level = None
+    congressy_receiver = False
 
     def __init__(self,
                  type: str,
@@ -66,6 +67,7 @@ class CongressyReceiver(Receiver):
     comercializado.
     """
     level = RECEIVER_LEVEL0
+    congressy_receiver = True
 
     def create_and_publish_partners(self, subscription) -> list:
         """
