@@ -289,7 +289,7 @@ class PagarmeDataBuilder:
         publisher.create_and_publish_subscription()
 
         total_receivers_amount = Decimal(0)
-        for receiver in subscriber.receivers.items():
+        for _, receiver in subscriber.receivers.items():
             total_receivers_amount += round(receiver.amount, 2)
 
         # Verifica se a soma do rateamento é diferente do split. Se sim,
@@ -298,14 +298,14 @@ class PagarmeDataBuilder:
             total_receivers_amount - round(amount, 2)
 
         split_rules = []
-        for id, receiver in subscriber.receivers.items():
+        for _, receiver in subscriber.receivers.items():
 
             r_amount = receiver.amount
             if diff != 0 and receiver.congressy_receiver is True:
                 amount -= diff
 
             split_rules.append({
-                "recipient_id": id,
+                "recipient_id": receiver.id,
                 "amount": self.as_payment_format(r_amount),
                 "liable": receiver.chargeback_responsible,
                 "charge_processing_fee": receiver.processing_fee_responsible
