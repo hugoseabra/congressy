@@ -302,7 +302,7 @@ class PagarmeDataBuilder:
 
             r_amount = receiver.amount
             if diff != 0 and receiver.congressy_receiver is True:
-                amount -= diff
+                r_amount -= diff
 
             split_rules.append({
                 "recipient_id": receiver.id,
