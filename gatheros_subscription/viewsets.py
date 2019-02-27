@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework.authentication import (
     BasicAuthentication,
     SessionAuthentication,
@@ -6,13 +6,15 @@ from rest_framework.authentication import (
 from rest_framework.permissions import IsAuthenticated
 
 from gatheros_subscription.lot_api_permissions import MultiLotsAllowed
+from gatheros_subscription.models import Subscription
 from gatheros_subscription.serializers import (
     Lot,
     LotSerializer,
+    SubscriptionSerializer,
 )
 
 
-class RestrictionViewMixin(object):
+class RestrictionViewMixin:
     authentication_classes = (SessionAuthentication, BasicAuthentication)
 
 
@@ -53,3 +55,19 @@ class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
                 self.permission_denied(
                     request, message=getattr(permission, 'message', None)
                 )
+
+
+class SubscriptionListViewSet(RestrictionViewMixin,
+                              generics.ListAPIView):
+    """
+    API endpoint for the subscription list view
+    """
+    serializer_class = SubscriptionSerializer
+
+    def get_queryset(self):
+        event_pk = self.kwargs['event_pk']
+
+        queryset = Subscription.objects.filter(
+            event_id=event_pk, completed=True,
+        )
+        return queryset

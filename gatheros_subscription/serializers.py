@@ -1,3 +1,4 @@
+from django.urls import reverse
 from kanu_locations.models import City
 from rest_framework import serializers
 
@@ -64,7 +65,6 @@ class LotSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_exhibition_code(self, value):
-
         event = self.instance.event.pk
         existing = Lot.objects.filter(
             event_id=event,
@@ -130,3 +130,36 @@ class CheckInSubscriptionSerializer(serializers.ModelSerializer):
             'status',
             'event_count',
         ]
+
+
+class SubscriptionSerializer(serializers.BaseSerializer):
+    def to_representation(self, obj):
+        return {
+            'person': obj.person.name,
+            'origin': obj.origin,
+            'code': obj.code,
+            'lot': obj.lot.name,
+            'event_count': obj.event_count,
+            'test_subscription': obj.test_subscription,
+            'status': obj.status,
+            'created': obj.created,
+            'link': reverse(
+                'subscription:subscription-view', kwargs={
+                    'event_pk': obj.event.pk,
+                    'pk': obj.pk,
+                }
+            )
+
+        }
+
+    # class Meta:
+    #     model = Subscription
+    #     fields = [
+    #         'pk',
+    #         'code',
+    #         'person',
+    #         'lot',
+    #         'status',
+    #         'origin',
+    #         'event_count',
+    #     ]
