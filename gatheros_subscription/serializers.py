@@ -136,22 +136,22 @@ class SubscriptionSerializer(serializers.BaseSerializer):
 
     def to_representation(self, obj):
         rep = {
-            'person.name': obj.person.name,
-            'person.email': obj.person.email,
-            'person.cpf': obj.person.cpf,
-            'person.city': obj.person.city.name,
-            'person.uf': obj.person.city.uf,
-            'person.phone': obj.person.phone,
-            'person.city_international': obj.person.city_international,
-            'person.international_doc': obj.person.international_doc,
+            'person_name': obj.person.name,
+            'person_email': obj.person.email,
+            'person_cpf': obj.person.cpf,
+            'person_city': None,
+            'person_uf': None,
+            'person_phone': obj.person.phone,
+            'person_city_international': obj.person.city_international,
+            'person_international_doc': obj.person.international_doc,
             'origin': obj.origin,
             'code': obj.code,
-            'lot.name': obj.lot.name,
+            'lot_name': obj.lot.name,
             'event_count': obj.event_count,
             'test_subscription': obj.test_subscription,
             'status': obj.status,
             'created': obj.created,
-            'category.name': None,
+            'category_name': None,
             'link': reverse(
                 'subscription:subscription-view', kwargs={
                     'event_pk': obj.event.pk,
@@ -177,29 +177,10 @@ class SubscriptionSerializer(serializers.BaseSerializer):
                 }),
 
         if obj.lot.category:
-            rep['category.name'] = obj.lot.category.name
+            rep['category_name'] = obj.lot.category.name
+
+        if obj.person.city:
+            rep['person_city'] = obj.person.city.name
+            rep['person_uf'] = obj.person.city.uf
 
         return rep
-
-    class Meta:
-
-        datatables_always_serialize = (
-            'person.name',
-            'person.cpf',
-            'person.city',
-            'person.uf',
-            'person.phone',
-            'person.city_international',
-            'person.international_doc',
-            'origin',
-            'code',
-            'lot.name',
-            'event_count',
-            'test_subscription',
-            'status',
-            'created',
-            'category.name',
-            'link',
-            'edit_link',
-            'voucher_link',
-        )

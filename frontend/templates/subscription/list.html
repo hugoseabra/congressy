@@ -169,12 +169,12 @@
             tag.hide();
 
             var f = [
-                'person.cpf',
-                'person.city',
-                'person.uf',
-                'person.phone',
-                'person.city_international',
-                'person.international_doc',
+                'person_cpf',
+                'person_city',
+                'person_uf',
+                'person_phone',
+                'person_city_international',
+                'person_international_doc',
             ];
 
 
@@ -198,7 +198,7 @@
         $(document).ready(function () {
             customCheckbox();
 
-            var url = '{% url 'api:subscription:subscription-list-api' event.pk %}' + '?format=datatables';
+            var url = '{% url 'api:subscription:subscription-list-api' event.pk %}';
 
             $('#subscription_table').DataTable({
                 "processing": true,
@@ -207,19 +207,20 @@
                 "pageLength": 10,
                 "ajax": {
                     url: url,
+                    dataSrc: "results",
                 },
                 "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
 
 
-                    if (aData['category']) {
-                        $("td:eq(2)", nRow).attr("data-toggle", "tooltip").attr("title", aData['category.name']);
+                    if (aData['category_name']) {
+                        $("td:eq(2)", nRow).attr("data-toggle", "tooltip").attr("title", aData['category_name']);
                     }
 
                 },
                 // constract columns
                 columns: [
                     {
-                        data: 'person.name', "render": function (data, type, row, meta) {
+                        data: 'person_name', "render": function (data, type, row, meta) {
                             var statusBall = get_status_el(data, row);
                             var nameWithLink = get_name_as_link_el(data, row);
                             var dateCreated = get_date_el(row);
@@ -238,7 +239,7 @@
                             return data + hidden
                         }
                     },
-                    {data: 'lot.name'},
+                    {data: 'lot_name'},
                     {data: 'event_count'},
                     {
                         data: 'link', "render": function (data, type, row, meta) {
