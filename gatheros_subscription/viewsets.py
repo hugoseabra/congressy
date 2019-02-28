@@ -15,6 +15,7 @@ from gatheros_subscription.serializers import (
     LotSerializer,
     SubscriptionSerializer,
 )
+from .permissions import OrganizerOnly
 
 
 class RestrictionViewMixin:
@@ -82,6 +83,8 @@ class SubscriptionListViewSet(RestrictionViewMixin,
     """
     serializer_class = SubscriptionSerializer
     pagination_class = DatatablePagination
+
+    permission_classes = (IsAuthenticated, OrganizerOnly)
 
     def get_queryset(self):
         event_pk = self.kwargs['event_pk']
