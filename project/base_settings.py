@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'formtools',
     'django_cron',
     'corsheaders',
+    'rest_framework_datatables',
 
     # KANU_APPS
     'kanu_locations',
@@ -103,9 +104,16 @@ REST_FRAMEWORK = {
         # 'rest_framework.authentication.SessionAuthentication',
     ),
     'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S",
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework_datatables.renderers.DatatablesRenderer',),
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework_datatables.filters.DatatablesFilterBackend',),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework_datatables.pagination.DatatablesLimitOffsetPagination',
+    'PAGE_SIZE': 50,
 }
+
 # ============================ VALIDATORS =================================== #
 AUTH_PASSWORD_VALIDATORS = [
     {

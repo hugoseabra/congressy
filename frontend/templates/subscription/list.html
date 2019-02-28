@@ -141,12 +141,112 @@
             return ''
         };
 
+        var get_dropdown_btn = function (row) {
+
+            var main = $('#drop_down_btn').clone();
+            main.remove("id");
+
+
+            main.find("#link").attr("href", row['link']).remove("id");
+            var edit_link = main.find("#edit_link");
+            edit_link.attr("href", row['edit_link']).remove("id");
+
+
+            if (row['status'] === 'confirmed') {
+                var voucher_link = main.find("#voucher_link");
+                voucher_link.attr("href", row['voucher_link']).show().remove("id");
+            }
+
+            main.show();
+            return main.prop('outerHTML');
+        };
+
+        var get_hidden_person = function (row) {
+
+            var tag = document.createElement("div");
+
+            tag = $(tag);
+            tag.hide();
+
+            var f = [
+                'person.cpf',
+                'person.city',
+                'person.uf',
+                'person.phone',
+                'person.city_international',
+                'person.international_doc',
+            ];
+
+
+            var i;
+
+            for (i = 0; i < f.length; i++) {
+
+                var p = document.createElement("p");
+                p = $(p);
+                p.append(row[f[i]]);
+
+                tag.append(p)
+            }
+
+
+            return tag.prop('outerHTML');
+
+
+        };
+
         $(document).ready(function () {
             customCheckbox();
 
-            var url = '{% url 'api:subscription:subscription-list-api' event.pk %}';
+            var url = '{% url 'api:subscription:subscription-list-api' event.pk %}' + '?format=datatables';
 
             $('#subscription_table').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                "pageLength": 10,
+                "ajax": {
+                    url: url,
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+
+                    if (aData['category']) {
+                        $("td:eq(2)", nRow).attr("data-toggle", "tooltip").attr("title", aData['category.name']);
+                    }
+
+                },
+                // constract columns
+                columns: [
+                    {
+                        data: 'person.name', "render": function (data, type, row, meta) {
+                            var statusBall = get_status_el(data, row);
+                            var nameWithLink = get_name_as_link_el(data, row);
+                            var dateCreated = get_date_el(row);
+                            var testBage = get_test_badge_el(row);
+                            var badge = get_badge_el(row);
+
+                            return statusBall + '&nbsp;' + nameWithLink + testBage + badge + dateCreated;
+                        }
+                    },
+                    {
+                        data: 'code', "render": function (data, type, row, meta) {
+
+
+                            var hidden = get_hidden_person(row);
+
+                            return data + hidden
+                        }
+                    },
+                    {data: 'lot.name'},
+                    {data: 'event_count'},
+                    {
+                        data: 'link', "render": function (data, type, row, meta) {
+                            return get_dropdown_btn(row);
+
+                        }
+                    }
+                ],
                 "language": {
                     sEmptyTable: "Nenhum registro encontrado",
                     sInfo: "Mostrando de _START_ até _END_ de _TOTAL_ registros",
@@ -190,56 +290,6 @@
                 // Default order
                 "order": [[0, 'asc']],
                 responsive: true,
-                "processing": true,
-                "serverSide": true,
-                "ajax": {
-                    url: url, //Django way of getting url of drf endpoint
-                    "data": function (d) {
-
-                        d.limit = d.length; // converting drf response to datatable expected response
-                        d.offset = d.start * d.length; // converting drf response to datatable expected response
-                        var ordering = '';
-                        $.each(d.order, function (k, v) {
-                            if (v.dir === 'desc') {
-                                ordering = '-';
-                            }
-                            ordering += d.columns[v.column].data
-
-                        });
-                        d.ordering = ordering;
-                        d.search = d.search.value;
-                    },
-                    dataFilter: function (data) {
-                        var json = jQuery.parseJSON(data);
-                        json.recordsTotal = json.count;
-                        json.recordsFiltered = json.count;
-                        json.data = json.results;
-
-                        return JSON.stringify(json); // return JSON string
-                    },
-                },
-                // constract columns
-                columns: [
-                    {
-                        data: 'person', "render": function (data, type, row, meta) {
-                            var statusBall = get_status_el(data, row);
-                            var nameWithLink = get_name_as_link_el(data, row);
-                            var dateCreated = get_date_el(row);
-                            var testBage = get_test_badge_el(row);
-                            var badge = get_badge_el(row);
-
-                            return statusBall + '&nbsp;' + nameWithLink + testBage + badge + dateCreated;
-                        }
-                    },
-                    {data: 'code'},
-                    {data: 'lot'},
-                    {data: 'event_count'},
-                    {
-                        data: 'link', "render": function (data, type, row, meta) {
-                            return '.'
-                        }
-                    }
-                ]
             });
 
 
@@ -266,6 +316,44 @@
        data-original-title="Status: cancelado"
        aria-hidden="true"
        style="color: #d9534f;display: none;"></i>
+
+
+    <div id="drop_down_btn" class="btn-group" style="display:none;">
+        <button
+                type="button"
+                class="btn btn-primary btn-trans btn-sm dropdown-toggle"
+                data-toggle="dropdown"
+                aria-expanded="false">
+            <span class="fas fa-cog"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right"
+            role="menu">
+            <li>
+                <a id="link">
+                    <i class="fa fa-eye"></i>
+                    Visualizar
+                </a>
+            </li>
+            {% if event.allow_internal_subscription %}
+                <li>
+                    <a id="edit_link">
+                        <i class="fas fa-pencil-alt"></i>
+                        Editar
+                    </a>
+                </li>
+            {% endif %}
+
+            <li>
+                <a id="voucher_link" style="display: none">
+                    <i class="fas fa-file-pdf"></i>
+                    Voucher
+                </a>
+            </li>
+
+        </ul>
+    </div>
+
+
 
     <div class="row">
         <div class="col-md-12">

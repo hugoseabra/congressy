@@ -67,7 +67,9 @@ class SubscriptionListViewSet(RestrictionViewMixin,
     def get_queryset(self):
         event_pk = self.kwargs['event_pk']
 
-        queryset = Subscription.objects.filter(
-            event_id=event_pk, completed=True,
+        return Subscription.objects.filter(
+            event_id=event_pk,
+            completed=True,
         )
-        return queryset
+
+

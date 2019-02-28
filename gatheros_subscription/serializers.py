@@ -133,33 +133,73 @@ class CheckInSubscriptionSerializer(serializers.ModelSerializer):
 
 
 class SubscriptionSerializer(serializers.BaseSerializer):
+
     def to_representation(self, obj):
-        return {
-            'person': obj.person.name,
+        rep = {
+            'person.name': obj.person.name,
+            'person.email': obj.person.email,
+            'person.cpf': obj.person.cpf,
+            'person.city': obj.person.city.name,
+            'person.uf': obj.person.city.uf,
+            'person.phone': obj.person.phone,
+            'person.city_international': obj.person.city_international,
+            'person.international_doc': obj.person.international_doc,
             'origin': obj.origin,
             'code': obj.code,
-            'lot': obj.lot.name,
+            'lot.name': obj.lot.name,
             'event_count': obj.event_count,
             'test_subscription': obj.test_subscription,
             'status': obj.status,
             'created': obj.created,
+            'category.name': None,
             'link': reverse(
                 'subscription:subscription-view', kwargs={
                     'event_pk': obj.event.pk,
                     'pk': obj.pk,
                 }
-            )
-
+            ),
+            'edit_link': None,
+            'voucher_link': None,
         }
 
-    # class Meta:
-    #     model = Subscription
-    #     fields = [
-    #         'pk',
-    #         'code',
-    #         'person',
-    #         'lot',
-    #         'status',
-    #         'origin',
-    #         'event_count',
-    #     ]
+        if obj.confirmed:
+            rep['voucher_link'] = reverse(
+                'subscription:subscription-voucher', kwargs={
+                    'event_pk': obj.event.pk,
+                    'pk': obj.pk,
+                }),
+
+        if obj.event.allow_internal_subscription:
+            rep['edit_link'] = reverse(
+                'subscription:subscription-edit', kwargs={
+                    'event_pk': obj.event.pk,
+                    'pk': obj.pk,
+                }),
+
+        if obj.lot.category:
+            rep['category.name'] = obj.lot.category.name
+
+        return rep
+
+    class Meta:
+
+        datatables_always_serialize = (
+            'person.name',
+            'person.cpf',
+            'person.city',
+            'person.uf',
+            'person.phone',
+            'person.city_international',
+            'person.international_doc',
+            'origin',
+            'code',
+            'lot.name',
+            'event_count',
+            'test_subscription',
+            'status',
+            'created',
+            'category.name',
+            'link',
+            'edit_link',
+            'voucher_link',
+        )

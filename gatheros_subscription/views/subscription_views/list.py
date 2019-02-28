@@ -7,31 +7,12 @@ from gatheros_subscription.models import (
 from gatheros_subscription.views import SubscriptionViewMixin
 
 
-class SubscriptionListView(SubscriptionViewMixin, generic.ListView):
+class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
     """ Lista de inscrições """
 
     model = Subscription
     template_name = 'subscription/list.html'
     has_filter = False
-
-    def get_queryset(self):
-
-        event = self.get_event()
-        query_set = Subscription.objects.filter(
-            event=event, completed=True,
-        )
-
-        lots = self.request.GET.getlist('lots', [])
-        if lots:
-            query_set = query_set.filter(lot_id__in=lots)
-            self.has_filter = True
-
-        has_profile = self.request.GET.get('has_profile')
-        if has_profile:
-            query_set = query_set.filter(person__user__isnull=False)
-            self.has_filter = True
-
-        return query_set
 
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
