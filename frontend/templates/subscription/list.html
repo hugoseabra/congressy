@@ -206,16 +206,23 @@
                 "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
                 "pageLength": 10,
                 "ajax": function (data, callback, settings) {
-                    $.get(url, {
-                        limit: data.length,
-                        offset: data.start,
-                    }, function (res) {
-                        callback({
-                            recordsTotal: res.recordsTotal,
-                            recordsFiltered: res.recordsFiltered,
-                            data: res.data
-                        });
+
+                    console.log(settings);
+
+                    $.ajax({
+                        url: url,
+                        data: {
+                            limit: data.length,
+                            offset: data.start,
+                            filter_by: settings.aaSorting[0][0],
+                            dir: settings.aaSorting[0][1],
+                        },
+                        success: function (res) {
+                            callback(res);
+                        },
                     });
+
+
                 },
                 "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
 

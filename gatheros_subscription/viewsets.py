@@ -108,8 +108,8 @@ class SubscriptionListViewSet(RestrictionViewMixin,
     def get_order_by(self, request, queryset):
 
         required = [
-            'order[0][dir]',
-            'order[0][column]',
+            'filter_by',
+            'dir',
         ]
 
         has_required = True
@@ -121,8 +121,8 @@ class SubscriptionListViewSet(RestrictionViewMixin,
         if has_required is False:
             return queryset
 
-        column = request.query_params.get('order[0][column]')
-        direction = request.query_params.get('order[0][dir]')
+        column = request.query_params.get('filter_by')
+        direction = request.query_params.get('dir')
 
         if column == "0":
             field = 'person__name'
