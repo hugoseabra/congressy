@@ -1,4 +1,4 @@
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, pagination
 from rest_framework.authentication import (
     BasicAuthentication,
     SessionAuthentication,
@@ -59,12 +59,28 @@ class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
                 )
 
 
+class DatatablePagination(pagination.LimitOffsetPagination):
+    page_size = 10
+
+    def get_paginated_response(self, data):
+        return Response({
+            'links': {
+                'next': self.get_next_link(),
+                'previous': self.get_previous_link()
+            },
+            'recordsTotal': self.count,
+            'recordsFiltered': self.count,
+            'data': data
+        })
+
+
 class SubscriptionListViewSet(RestrictionViewMixin,
                               generics.GenericAPIView):
     """
     API endpoint for the subscription list view
     """
     serializer_class = SubscriptionSerializer
+    pagination_class = DatatablePagination
 
     def get_queryset(self):
         event_pk = self.kwargs['event_pk']
@@ -78,8 +94,7 @@ class SubscriptionListViewSet(RestrictionViewMixin,
         return self.list(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
+        queryset = self.get_queryset()
         queryset = self.get_order_by(request, queryset)
 
         page = self.paginate_queryset(queryset)
@@ -91,8 +106,6 @@ class SubscriptionListViewSet(RestrictionViewMixin,
         return Response(serializer.data)
 
     def get_order_by(self, request, queryset):
-
-        queryset = self.get_queryset()
 
         required = [
             'order[0][dir]',

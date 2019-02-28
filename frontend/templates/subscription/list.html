@@ -205,12 +205,19 @@
                 "serverSide": true,
                 "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
                 "pageLength": 10,
-                "ajax": {
-                    url: url,
-                    dataSrc: "results",
+                "ajax": function (data, callback, settings) {
+                    $.get(url, {
+                        limit: data.length,
+                        offset: data.start,
+                    }, function (res) {
+                        callback({
+                            recordsTotal: res.recordsTotal,
+                            recordsFiltered: res.recordsFiltered,
+                            data: res.data
+                        });
+                    });
                 },
                 "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-
 
                     if (aData['category_name']) {
                         $("td:eq(2)", nRow).attr("data-toggle", "tooltip").attr("title", aData['category_name']);

@@ -18,8 +18,7 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
         cxt = super().get_context_data(**kwargs)
 
         cxt.update({
-            'can_add_subscription': self.can_add_subscription(),
-            'lots': self.get_lots(),
+            'lots': None,
             'has_filter': self.has_filter,
             'event_is_paid': is_paid_event(self.event),
             'has_inside_bar': True,
@@ -32,11 +31,3 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
             'gatheros_event.can_manage_subscriptions',
             self.get_event()
         )
-
-    def can_add_subscription(self):
-        event = self.get_event()
-        if event.subscription_type == event.SUBSCRIPTION_SIMPLE:
-            return True
-
-        num_lots = self.get_num_lots()
-        return num_lots > 0
