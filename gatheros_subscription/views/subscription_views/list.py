@@ -19,6 +19,11 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
 
         cxt.update({
             'lots': None,
+            'has_subs': Subscription.objects.filter(
+                event_id=self.event.id,
+                completed=True,
+                test_subscription=False,
+            ).count() > 0,
             'has_filter': self.has_filter,
             'event_is_paid': is_paid_event(self.event),
             'has_inside_bar': True,
