@@ -205,9 +205,8 @@
                 "serverSide": true,
                 "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
                 "pageLength": 10,
+                "searchDelay": 500,
                 "ajax": function (data, callback, settings) {
-
-                    console.log(settings);
 
                     $.ajax({
                         url: url,
@@ -216,6 +215,7 @@
                             offset: data.start,
                             filter_by: settings.aaSorting[0][0],
                             dir: settings.aaSorting[0][1],
+                            search: data.search['value'],
                         },
                         success: function (res) {
                             callback(res);

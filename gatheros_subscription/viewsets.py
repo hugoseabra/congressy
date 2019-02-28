@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import viewsets, generics, pagination
 from rest_framework.authentication import (
     BasicAuthentication,
@@ -94,7 +95,7 @@ class SubscriptionListViewSet(RestrictionViewMixin,
         return self.list(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        queryset = self.filter(request, self.get_queryset())
         queryset = self.get_order_by(request, queryset)
 
         page = self.paginate_queryset(queryset)
@@ -138,3 +139,23 @@ class SubscriptionListViewSet(RestrictionViewMixin,
             order = "-"
 
         return queryset.order_by(order + field)
+
+    def filter(self, request, queryset):
+
+        search_param = request.query_params.get("search")
+
+        if search_param is None or search_param == '':
+            return queryset
+
+        return queryset.filter(
+            Q(person__name__icontains=search_param, ) |
+            Q(person__email__icontains=search_param, ) |
+            Q(person__phone__icontains=search_param, ) |
+            Q(person__international_doc__icontains=search_param, ) |
+            Q(person__city__name__icontains=search_param, ) |
+            Q(person__city__name_ascii__icontains=search_param, ) |
+            Q(person__city__uf__icontains=search_param, ) |
+            Q(person__city_international__icontains=search_param, ) |
+            Q(person__cpf__icontains=search_param, ) |
+            Q(person__institution_cnpj__icontains=search_param, )
+        )
