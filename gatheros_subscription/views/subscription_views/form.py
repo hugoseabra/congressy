@@ -191,7 +191,10 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
             request.user.get_full_name(),
             request.user.email,
         )
-        data['paid'] = True
+
+        manual_type = data.get('manual_payment_type')
+
+        data['paid'] = manual_type != Transaction.MANUAL_WAITING_PAYMENT
         kwargs = {'data': data}
 
         transaction_id = data.get('transaction_id')
@@ -208,7 +211,9 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
                     }
                 )
                 raise PermissionDenied('Você não pode realizar esta ação.')
+
             form = forms.PartManualTransactionForm(self.object, data=data)
+
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Recebimento criado com sucesso.')

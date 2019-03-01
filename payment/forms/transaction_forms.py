@@ -47,7 +47,7 @@ class ManualTransactionForm(forms.ModelForm):
         self.instance.date_created = datetime.now()
         self.instance.liquid_amount = self.instance.amount
 
-        self.instance.type = Transaction.MANUAL_WAITING_PAYMENT
+        self.instance.type = Transaction.MANUAL
 
         if self.cleaned_data['paid'] is True:
             self.instance.status = Transaction.PAID

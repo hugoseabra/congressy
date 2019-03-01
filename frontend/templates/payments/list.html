@@ -43,153 +43,105 @@
         <div class="col-md-12">
             <div class="panel panel-primary">
                 <div class="panel-body">
-                    {% if object_list %}
+                    {% if subscriptions %}
                         <table class="table no-footer"
                                cellspacing="0"
                                width="100%"
                                style="border-collapse: separate;empty-cells: hide;">
                             <tbody>
                             <tr>
-                                <td class="text-muted"
-                                    style="border:none;text-align: right">
-                                    <strong>Total:</strong></td>
-                                <td width="15%" style="border:none;">
-                                    <strong style="font-size:16px">
-                                        R$ {{ totals.total|money_divide|intcomma }}
-                                    </strong>
-                                </td>
-                            </tr>
-                            <tr>
                                 <td class="text-muted text-right"
                                     style="border:none;">
-                                    <strong>Total (aguardando):</strong>
+                                    <strong>Inscrições não-pagas:</strong>
                                 </td>
-                                <td style="border:none;">
+                                <td width="25%" style="border:none;">
                                     <strong class="text-muted"
                                             style="font-size:16px">
-                                        R$ {{ totals.pending|money_divide|intcomma }}
+                                        R$ {{ totals.pending|intcomma }}
                                     </strong>
+                                    <i class="fa fa-info-circle"
+                                           data-toggle="tooltip"
+                                           title="Inscrições pendentes de pagamento por parte do participante."></i>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="text-muted text-right"
-                                    style="border:none;"><strong>Total
-                                    (recebível):</strong></td>
+                                    style="border:none;"><strong>Inscrições pagas:</strong></td>
                                 <td style="border:none;">
                                     <strong style="font-size:16px;color:blue">
-                                        R$ {{ totals.paid|money_divide|intcomma }}
+                                        R$ {{ totals.paid|intcomma }}
                                     </strong>
+                                    <button type="button" class="btn btn-sm btn-info" onclick="$('#modal-payments-paid-subscriptions').modal()">Saiba mais</button>
                                 </td>
                             </tr>
                             </tbody>
-
                         </table>
                         <hr/>
 
                         <table id="payments_table"
-                               class="table table-striped dataTable no-footer
-                               nowrap"
-                               cellspacing="0"
-                               width="100%"
-                               style="border-collapse: separate;empty-cells: hide;">
+                               class="table table-striped">
                             <thead>
                             <tr>
-                                <th class="hidden-xs nowrap">Lote</th>
-                                <th>Nome</th>
+                                <th>Participante</th>
+                                <th>Lote</th>
                                 <th width="5%" class="text-center">Tipo</th>
-                                <th width="25%" class="hidden-xs">Status</th>
                                 <th width="15%">Valor</th>
                             </tr>
                             </thead>
 
                             <tbody>
-
-                            {% for transaction in object_list %}
+                            {% for _, sub in subscriptions.items %}
+                            {% for item in sub.transactions %}
                                 <tr>
-                                    <td class="hidden-xs nowrap">
-                                        {{ transaction.subscription.lot.name }}
-                                    </td>
-                                    <td class="nowrap">
-                                        {{ transaction.subscription.person.name }}
-                                    </td>
-                                    <td class="text-center"
-                                        style="font-size: 22px;">
-                                        {% if transaction.type == transaction.BOLETO %}
-                                            <i class="fas fa-barcode"
-                                               title="{{ transaction.get_type_display }}"></i>
-                                        {% elif transaction.type == transaction.CREDIT_CARD %}
-                                            <i class="far fa-credit-card"
-                                               title="{{ transaction.get_type_display }}"></i>
-                                        {% else %}
-                                            {{ transaction.get_type_display }}
-                                        {% endif %}
-                                    </td>
-                                    <td class="hidden-xs nowrap">
-                                        {% if transaction.statuses.all %}
-                                            <div data-toggle="popover"
-                                                 title="Histórico"
-                                                 data-html="true"
-                                                 data-content='
-                                            {% for status in transaction.statuses.all|dictsort:"pk" %}
-                                                {% if status.status == status.AUTHORIZED or status.status == status.PAID %}
-                                                    <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
-                                                {% elif status.status == status.PROCESSING or status.status == status.WAITING_PAYMENT or status.status == status.PENDING_REFUND or status.status == status.CHARGEDBACK %}
-                                                    <i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i>
-                                                {% elif status.status == status.REFUNDED %}
-                                                   <i class="fa fa-circle" aria-hidden="true" style="color: #8977B6"></i>
-                                                {% elif status.status == status.REFUSED %}
-                                                    <i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i>
-                                                {% else %}
-                                                    <i class="fa fa-circle" aria-hidden="true"></i>
-                                                {% endif %}
-                                                <strong>{{ status.get_status_display }}</strong>
-                                                - {{ status.date_created|date:"M d, Y -  H\hi" }}
-                                                <br />
-                                            {% endfor %}'>
-                                        {% else %}
-                                            <div data-toggle="popover"
-                                                 title="Histórico"
-                                                 data-content="Nenhum dado até o momento.">
-                                        {% endif %}
-                                        {% if transaction.status == transaction.AUTHORIZED or transaction.status == transaction.PAID %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"
-                                               style="color:#5cb85c"></i>
-                                        {% elif transaction.status == transaction.PROCESSING or transaction.status == transaction.WAITING_PAYMENT or transaction.status == transaction.PENDING_REFUND or transaction.status == transaction.CHARGEDBACK %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"
-                                               style="color: #f0ad4e"></i>
-                                        {% elif transaction.status == transaction.REFUNDED %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"
-                                               style="color: #8977B6"></i>
-                                        {% elif transaction.status == transaction.REFUSED %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"
-                                               style="color: #d9534f"></i>
-                                        {% else %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"></i>
-                                        {% endif %}
-                                        <strong>{{ transaction.get_status_display }}</strong>
-                                        <div style="text-indent: 18px;font-weight: bold"
-                                             class="text-muted">
-                                            {% if transaction.statuses.last.date_created %}
-                                                {{ transaction.statuses.last.date_created|date:"M d, Y -  H\hi" }}
-                                            {% else %}
-                                                {{ transaction.date_created|date:"M d, Y -  H\hi" }}
-                                            {% endif %}
-                                        </div>
+                                    <td>
+                                        <a href="{% url 'subscription:subscription-payments' event.pk sub.pk %}" target="_blank">
+                                            {{ sub.name }}
+                                        </a>
                                     </td>
                                     <td>
-                                        {% if transaction.status == transaction.REFUSED or transaction.status == transaction.REFUNDED %}
-                                            -
-                                        {% else %}
-                                            R$
-                                            {{ transaction.liquid_amount|default_if_none:'-'|unlocalize|intcomma }}
+                                        <div data-toggle="tooltip" title="{{sub.lot_name}}" style="cursor: default">
+                                            {{ sub.lot_name|truncatechars:30 }}
+                                        </div>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        {% if item.is_boleto %}
+                                            <i class="fas fa-barcode"
+                                               data-toggle="tooltip"
+                                               title="{{ item.type_name }}"></i>
+                                        {% elif item.is_cc %}
+                                            <i class="fas fa-credit-card"
+                                               data-toggle="tooltip"
+                                               title="{{ item.type_name }}"></i>
+                                        {% elif item.is_manual %}
+                                            <i class="fas fa-hand-holding-usd"
+                                               data-toggle="tooltip"
+                                               title="Recebido manualmente"></i>
+                                        {% endif %}
+                                        {% if item.is_part %}
+                                        <i class="fas fa-file-contract"
+                                           data-toggle="tooltip"
+                                           title="Contrato de parcelamento"></i>
                                         {% endif %}
                                     </td>
+                                    <td>
+                                        {% if item.is_paid %}
+                                            <i class="fa fa-circle" style="color: green"
+                                               data-toggle="tooltip"
+                                               title="{{ item.status_name }}"></i>
+                                        {% elif item.is_refused %}
+                                            <i class="fa fa-circle" style="color: darkred"
+                                               data-toggle="tooltip"
+                                               title="{{ item.status_name }}"></i>
+                                        {% elif item.is_pending %}
+                                            <i class="fa fa-circle" style="color: goldenrod"
+                                               data-toggle="tooltip"
+                                               title="{{ item.status_name }}"></i>
+                                        {% endif %}
+
+                                        R$ {{ item.liquid_amount }}
+                                    </td>
                                 </tr>
+                            {% endfor %}
                             {% endfor %}
                             </tbody>
                         </table>
@@ -202,10 +154,10 @@
                             <tr>
                                 <td class="text-muted"
                                     style="border:none;text-align: right">
-                                    <strong>Total:</strong></td>
+                                    <strong>Transacionado:</strong></td>
                                 <td width="15%" style="border:none;">
                                     <strong style="font-size:16px">
-                                        R$ {{ totals.total|money_divide|intcomma }}
+                                        R$ {{ totals.total|intcomma }}
                                     </strong>
                                 </td>
                             </tr>
@@ -217,18 +169,20 @@
                                 <td style="border:none;">
                                     <strong class="text-muted"
                                             style="font-size:16px">
-                                        R$ {{ totals.pending|money_divide|intcomma }}
+                                        R$ {{ totals.pending|intcomma }}
                                     </strong>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="text-muted text-right"
-                                    style="border:none;"><strong>Total
-                                    (recebível):</strong></td>
+                                    style="border:none;"><strong>Total (pago):</strong></td>
                                 <td style="border:none;">
                                     <strong style="font-size:16px;color:blue">
-                                        R$ {{ totals.paid|money_divide|intcomma }}
+                                        R$ {{ totals.paid|intcomma }}
                                     </strong>
+                                    <i class="fa fa-info-circle"
+                                           data-toggle="tooltip"
+                                           title="O valor pago torna-se recebível de acordo com o tipo de pagamento."></i>
                                 </td>
                             </tr>
                             </tbody>
@@ -242,6 +196,54 @@
             </div>
         </div>
     </div>
+
+{% endblock %}
+
+{% block modals %}
+<div class="modal" id="modal-payments-paid-subscriptions" role="dialog" data-backdrop="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal"
+                        aria-label="Close"><span
+                        aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-bold">INSCRIÇÕES PAGAS PELOS PARTICIPANTES</h4>
+            </div>
+            <div class="modal-body" style="padding: 30px">
+                <div class="row">
+                    <div class="well text-justify">
+                        <div style="text-indent: 20px">
+                            As transferências da Congressy referente aos valores pagos pelos
+                            participantes são realizadas de acordo com os prazos de processamento
+                            dos boletos e cartões de crédito.
+                        </div>
+                        <br />
+                        <div style="text-indent: 20px">
+                            O saldo estará liberado em 2 dias úteis para boletos, e 30 dias corridos
+                            para cartões de crédito.
+                        </div>
+                        <br />
+                        <div style="text-indent: 20px">
+                            As transferências bancárias são feitas por TED automático
+                            semanalmente, toda sexta-feira.
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button type="button" class="btn btn-primary" onclick="window.open('https://www.congressy.com/faq', '_blank')">
+                            Dúvidas
+                        </button>
+                    </div>
+                    <div class="text-center">
+                        Ou fale conosco pelo chat ou enviando e-mail para
+                        <a href="mailto:congressy@congressy.com?Subject=Dúvidas%20sobre%20inscrições%20pagas" target="_top">congressy@congressy.com</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
 
