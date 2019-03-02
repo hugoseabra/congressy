@@ -7,38 +7,23 @@ from gatheros_subscription.models import (
 from gatheros_subscription.views import SubscriptionViewMixin
 
 
-class SubscriptionListView(SubscriptionViewMixin, generic.ListView):
+class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
     """ Lista de inscrições """
 
     model = Subscription
     template_name = 'subscription/list.html'
     has_filter = False
 
-    def get_queryset(self):
-
-        event = self.get_event()
-        query_set = Subscription.objects.filter(
-            event=event, completed=True,
-        )
-
-        lots = self.request.GET.getlist('lots', [])
-        if lots:
-            query_set = query_set.filter(lot_id__in=lots)
-            self.has_filter = True
-
-        has_profile = self.request.GET.get('has_profile')
-        if has_profile:
-            query_set = query_set.filter(person__user__isnull=False)
-            self.has_filter = True
-
-        return query_set
-
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
 
         cxt.update({
-            'can_add_subscription': self.can_add_subscription(),
-            'lots': self.get_lots(),
+            'lots': None,
+            'has_subs': Subscription.objects.filter(
+                event_id=self.event.id,
+                completed=True,
+                test_subscription=False,
+            ).count() > 0,
             'has_filter': self.has_filter,
             'event_is_paid': is_paid_event(self.event),
             'has_inside_bar': True,
@@ -51,11 +36,3 @@ class SubscriptionListView(SubscriptionViewMixin, generic.ListView):
             'gatheros_event.can_manage_subscriptions',
             self.get_event()
         )
-
-    def can_add_subscription(self):
-        event = self.get_event()
-        if event.subscription_type == event.SUBSCRIPTION_SIMPLE:
-            return True
-
-        num_lots = self.get_num_lots()
-        return num_lots > 0
