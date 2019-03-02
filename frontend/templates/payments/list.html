@@ -41,157 +41,118 @@
 
     <div class="row">
         <div class="col-md-12">
-            <div class="panel panel-primary">
+            <div class="panel panel-default">
                 <div class="panel-body">
-                    {% if subscriptions %}
-                        <table class="table no-footer"
-                               cellspacing="0"
-                               width="100%"
-                               style="border-collapse: separate;empty-cells: hide;">
-                            <tbody>
-                            <tr>
-                                <td class="text-muted text-right"
-                                    style="border:none;">
-                                    <strong>Inscrições não-pagas:</strong>
-                                </td>
-                                <td width="25%" style="border:none;">
-                                    <strong class="text-muted"
-                                            style="font-size:16px">
-                                        R$ {{ totals.pending|intcomma }}
-                                    </strong>
-                                    <i class="fa fa-info-circle"
-                                           data-toggle="tooltip"
-                                           title="Inscrições pendentes de pagamento por parte do participante."></i>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted text-right"
-                                    style="border:none;"><strong>Inscrições pagas:</strong></td>
-                                <td style="border:none;">
-                                    <strong style="font-size:16px;color:blue">
-                                        R$ {{ totals.paid|intcomma }}
-                                    </strong>
-                                    <button type="button" class="btn btn-sm btn-info" onclick="$('#modal-payments-paid-subscriptions').modal()">Saiba mais</button>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        <hr/>
+                    <table class="table no-footer"
+                           cellspacing="0"
+                           width="100%"
+                           style="border-collapse: separate;empty-cells: hide;">
+                        <tbody>
+                        <tr>
+                            <td class="text-muted text-right"
+                                style="border:none;">
+                                <strong>Inscrições não-pagas:</strong>
+                            </td>
+                            <td width="25%" style="border:none;">
+                                <strong class="text-muted"
+                                        style="font-size:16px">
+                                    R$ {{ totals.pending|intcomma }}
+                                </strong>
+                                <i class="fa fa-info-circle"
+                                       data-toggle="tooltip"
+                                       title="Inscrições pendentes de pagamento por parte do participante."></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted text-right"
+                                style="border:none;"><strong>Inscrições pagas:</strong></td>
+                            <td style="border:none;">
+                                <strong style="font-size:16px;color:blue">
+                                    R$ {{ totals.paid|intcomma }}
+                                </strong>
+                                <button type="button" class="btn btn-sm btn-info" onclick="$('#modal-payments-paid-subscriptions').modal()">Saiba mais</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
 
-                        <table id="payments_table"
-                               class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th>Participante</th>
-                                <th>Lote</th>
-                                <th width="5%" class="text-center">Tipo</th>
-                                <th width="15%">Valor</th>
-                            </tr>
-                            </thead>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="tab-wrapper tab-primary">
+                        <ul class="nav nav-tabs">
+                            <li id="super-payments-paid" class="active">
+                                <a href="#payments-paid" onclick="select('paid')" data-toggle="tab">Pagos</a>
+                            </li>
+                            <li id="super-payments-pending">
+                                <a href="#payments-pending" onclick="select('pending')" data-toggle="tab">Pendentes</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="payments-paid">
+                                <div id="payments-paid-loader" style="text-align: center;padding: 40px">
+                                    <span class="fas fa-circle-notch fa-spin fa-3x"></span>
+                                    <div>carregando</div>
+                                </div>
+                                <div id="payments-paid-field" style="display: none"></div>
+                            </div>
+                            <div class="tab-pane" id="payments-pending">
 
-                            <tbody>
-                            {% for _, sub in subscriptions.items %}
-                            {% for item in sub.transactions %}
-                                <tr>
-                                    <td>
-                                        <a href="{% url 'subscription:subscription-payments' event.pk sub.pk %}" target="_blank">
-                                            {{ sub.name }}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <div data-toggle="tooltip" title="{{sub.lot_name}}" style="cursor: default">
-                                            {{ sub.lot_name|truncatechars:30 }}
-                                        </div>
-                                    </td>
-                                    <td style="text-align: center;">
-                                        {% if item.is_boleto %}
-                                            <i class="fas fa-barcode"
-                                               data-toggle="tooltip"
-                                               title="{{ item.type_name }}"></i>
-                                        {% elif item.is_cc %}
-                                            <i class="fas fa-credit-card"
-                                               data-toggle="tooltip"
-                                               title="{{ item.type_name }}"></i>
-                                        {% elif item.is_manual %}
-                                            <i class="fas fa-hand-holding-usd"
-                                               data-toggle="tooltip"
-                                               title="Recebido manualmente"></i>
-                                        {% endif %}
-                                        {% if item.is_part %}
-                                        <i class="fas fa-file-contract"
-                                           data-toggle="tooltip"
-                                           title="Contrato de parcelamento"></i>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if item.is_paid %}
-                                            <i class="fa fa-circle" style="color: green"
-                                               data-toggle="tooltip"
-                                               title="{{ item.status_name }}"></i>
-                                        {% elif item.is_refused %}
-                                            <i class="fa fa-circle" style="color: darkred"
-                                               data-toggle="tooltip"
-                                               title="{{ item.status_name }}"></i>
-                                        {% elif item.is_pending %}
-                                            <i class="fa fa-circle" style="color: goldenrod"
-                                               data-toggle="tooltip"
-                                               title="{{ item.status_name }}"></i>
-                                        {% endif %}
+                                <div id="payments-pending-loader" style="text-align: center;padding: 40px">
+                                    <span class="fas fa-circle-notch fa-spin fa-3x"></span>
+                                    <div>carregando</div>
+                                </div>
+                                <div id="payments-pending-field" style="display: none"></div>
 
-                                        R$ {{ item.liquid_amount }}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                        <hr/>
-                        <table class="table no-footer"
-                               cellspacing="0"
-                               width="100%"
-                               style="border-collapse: separate;empty-cells: hide;">
-                            <tbody>
-                            <tr>
-                                <td class="text-muted"
-                                    style="border:none;text-align: right">
-                                    <strong>Transacionado:</strong></td>
-                                <td width="15%" style="border:none;">
-                                    <strong style="font-size:16px">
-                                        R$ {{ totals.total|intcomma }}
-                                    </strong>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted text-right"
-                                    style="border:none;">
-                                    <strong>Total (aguardando):</strong>
-                                </td>
-                                <td style="border:none;">
-                                    <strong class="text-muted"
-                                            style="font-size:16px">
-                                        R$ {{ totals.pending|intcomma }}
-                                    </strong>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted text-right"
-                                    style="border:none;"><strong>Total (pago):</strong></td>
-                                <td style="border:none;">
-                                    <strong style="font-size:16px;color:blue">
-                                        R$ {{ totals.paid|intcomma }}
-                                    </strong>
-                                    <i class="fa fa-info-circle"
-                                           data-toggle="tooltip"
-                                           title="O valor pago torna-se recebível de acordo com o tipo de pagamento."></i>
-                                </td>
-                            </tr>
-                            </tbody>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                        </table>
-
-                    {% else %}
-                        <h3>Nenhum dado.</h3>
-                    {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <table class="table no-footer"
+                           cellspacing="0"
+                           width="100%"
+                           style="border-collapse: separate;empty-cells: hide;">
+                        <tbody>
+                        <tr>
+                            <td class="text-muted text-right"
+                                style="border:none;">
+                                <strong>Inscrições não-pagas:</strong>
+                            </td>
+                            <td width="25%" style="border:none;">
+                                <strong class="text-muted"
+                                        style="font-size:16px">
+                                    R$ {{ totals.pending|intcomma }}
+                                </strong>
+                                <i class="fa fa-info-circle"
+                                       data-toggle="tooltip"
+                                       title="Inscrições pendentes de pagamento por parte do participante."></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted text-right"
+                                style="border:none;"><strong>Inscrições pagas:</strong></td>
+                            <td style="border:none;">
+                                <strong style="font-size:16px;color:blue">
+                                    R$ {{ totals.paid|intcomma }}
+                                </strong>
+                                <button type="button" class="btn btn-sm btn-info" onclick="$('#modal-payments-paid-subscriptions').modal()">Saiba mais</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -249,12 +210,99 @@
 
 {% block scripts %}
     <script>
+        var paid_payments_fetched = false;
+        function fetchPaidPayments() {
+            if (paid_payments_fetched) {
+                return;
+            }
+
+            var loader = $('#payments-paid-loader');
+            var main_field = $('#payments-paid-field');
+
+            main_field.fadeOut(function() {
+                main_field.html('');
+                loader.fadeIn();
+            });
+
+            var url = window.location.origin + window.location.pathname + '?template_name=payments/paid';
+            var sender = new window.cgsy.AjaxSender(url);
+            sender.setSuccessCallback(function(response) {
+                main_field.html(response);
+                loader.fadeOut(function() {
+                    main_field.fadeIn();
+                });
+                paid_payments_fetched = true;
+            });
+            sender.setFailCallback(function() {
+                console.error('fail');
+            });
+            sender.get();
+        }
+
+        var pending_payments_fetched = false;
+        function fetchPendingPayments() {
+            if (pending_payments_fetched) {
+                return;
+            }
+
+            var loader = $('#payments-pending-loader');
+            var main_field = $('#payments-pending-field');
+
+            main_field.fadeOut(function() {
+                main_field.html('');
+                loader.fadeIn();
+            });
+
+            var url = window.location.origin + window.location.pathname + '?template_name=payments/pending';
+
+            var sender = new window.cgsy.AjaxSender(url);
+            sender.setSuccessCallback(function(response) {
+                main_field.html(response);
+                loader.fadeOut(function() {
+                    main_field.fadeIn();
+                });
+{#                pending_payments_fetched = true;#}
+            });
+            sender.setFailCallback(function() {
+                console.error('fail');
+            });
+            sender.get();
+        }
+
+        function selectFromHash() {
+            var hash = window.location.hash.substring(1);
+            var tab_type = hash.replace('tab=', '');
+            if (tab_type) {
+                select(tab_type);
+            }
+        }
+
+        function select(tab_type) {
+            $('li', '.nav-tabs').removeClass('active');
+            $('.tab-pane').removeClass('active');
+
+            $('#super-payments-' + tab_type).addClass('active');
+            $('#payments-' + tab_type).addClass('active');
+            window.location.hash = '#tab=' + tab_type;
+
+            switch (tab_type) {
+                case 'pending':
+                    fetchPendingPayments();
+                    break;
+                case 'paid':
+                default:
+                    fetchPaidPayments();
+            }
+        }
+
         $(document).ready(function () {
             $('[data-toggle="popover"]').popover({
                 placement: 'bottom',
                 container: 'body',
                 trigger: 'hover'
             });
+
+            selectFromHash();
         });
     </script>
 {% endblock %}
