@@ -58,15 +58,26 @@
                                     </div>
                                 {% endif %}
                             {% endblock messages %}
-                                <div id="status-table">
-                                    {% if transactions %}
-                                        {% include 'hotsite/includes/status-table.html' %}
-                                    {% else %}
-                                        <div>
-                                            Você não possui transações.
-                                        </div>
-                                    {% endif %}
+                            <div id="status-table">
+                                {% if transactions %}
+                                    {% include 'hotsite/includes/status-table.html' %}
+                                {% else %}
+                                    <div>
+                                        Você não possui transações.
+                                    </div>
+                                {% endif %}
+                            </div>
+
+
+                            {% if has_available_optionals %}
+                                <div>
+                                    <a class="btn btn-primary" style="margin-top: 15px"
+                                       href="{% url 'public:hotsite-subscription-optionals'  event.slug subscription.pk %}">
+                                        Alterar produtos/serviços
+                                    </a>
                                 </div>
+                            {% endif %}
+
                         </div>
                     </div>
                 </div>

@@ -6,17 +6,6 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404, redirect
-from django.views import generic
-
-from gatheros_event.models import Event
-from gatheros_subscription.models import Subscription
-from hotsite.views import SubscriptionFormMixin
-from payment.models import Transaction
-from django.conf import settings
-from django.contrib import messages
-from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.views import generic
 
@@ -134,6 +123,9 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
             context['lot_is_still_valid'] = True
             self.request.session['exhibition_code'] = sub_lot.exhibition_code
 
+        context['has_available_optionals'] = self._has_products(sub_lot) or \
+                                             self._has_services(sub_lot)
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -196,3 +188,27 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
             return Transaction.CREDIT_CARD
 
         return True
+
+    # noinspection PyMethodMayBeStatic
+    def _has_services(self, lot):
+        try:
+            optionals = lot.category.service_optionals
+            return optionals.filter(
+                published=True,
+                date_end_sub__gte=datetime.now(),
+            ).count() > 0 and lot.event.feature_configuration.feature_services
+
+        except AttributeError:
+            return False
+
+    # noinspection PyMethodMayBeStatic
+    def _has_products(self, lot):
+        try:
+            optionals = lot.category.product_optionals
+            return optionals.filter(
+                published=True,
+                date_end_sub__gte=datetime.now(),
+            ).count() > 0
+
+        except AttributeError:
+            return False

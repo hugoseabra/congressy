@@ -1,6 +1,7 @@
 """ Urls do hotsite """
 from django.conf.urls import include, url
 
+from hotsite.views.optional_wizard import FORMS as OPTIONAL_FORMS
 from hotsite.views.subscription_form_wizard import FORMS
 from . import views
 
@@ -11,6 +12,11 @@ public_hotsite_urls = [
         name='unpublished-hotsite'
     ),
     url(r'^(?P<slug>[\w-]+)/$', views.HotsiteView.as_view(), name='hotsite'),
+    url(
+        r'^(?P<slug>[\w-]+)/subscription/(?P<subscription_pk>[0-9A-Fa-f-]+)/optionals/$',
+        views.OptionalWizardView.as_view(OPTIONAL_FORMS),
+        name='hotsite-subscription-optionals'
+    ),
     url(
         r'^(?P<slug>[\w-]+)/subscription/$',
         views.SubscriptionWizardView.as_view(FORMS),
