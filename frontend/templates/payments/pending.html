@@ -1,6 +1,11 @@
 {% load humanize l10n %}
 <div class="row">
     <div class="col-md-12">
+        {% if not subscriptions %}
+            <div style="border:1px solid darkgray;padding: 30px">
+                Sem pagamentos
+            </div>
+        {% else %}
 
         <table id="payments_table" class="table table-striped">
             <thead>
@@ -30,6 +35,10 @@
                             <a href="{% url 'subscription:subscription-payments' event.pk sub.pk %}" target="_blank">
                                 {{ sub.name }}
                             </a>
+                            {% if item.is_part and item.part_info %}
+                                ({{ item.part_info }})
+                            {% endif %}
+
                         </div>
                         <small class="text-muted hidden-md hidden-lg hidden-xl" data-toggle="tooltip" title="{{sub.lot_name}}" style="cursor: default">
                             {{ sub.lot_name|truncatechars:30 }}
@@ -53,6 +62,10 @@
                             <i class="fas fa-hand-holding-usd"
                                data-toggle="tooltip"
                                title="Recebido manualmente"></i>
+                        {% else %}
+                            <i class="fas fa-sticky-note"
+                               data-toggle="tooltip"
+                               title="Sem tipo"></i>
                         {% endif %}
                         {% if item.is_part %}
                         <i class="fas fa-file-contract"
@@ -70,6 +83,6 @@
             {% endfor %}
             </tbody>
         </table>
-
+        {% endif %}
     </div>
 </div>

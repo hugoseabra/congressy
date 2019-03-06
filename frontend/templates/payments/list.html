@@ -86,18 +86,21 @@
                 <div class="panel-body">
                     <div class="tab-wrapper tab-primary">
                         <ul class="nav nav-tabs">
-                            <li id="super-payments-paid" class="active">
+                            <li id="super-payments-paid">
                                 <a href="#payments-paid" onclick="select('paid')" data-toggle="tab">Pagos</a>
                             </li>
                             <li id="super-payments-pending">
                                 <a href="#payments-pending" onclick="select('pending')" data-toggle="tab">Pendentes</a>
+                            </li>
+                            <li id="super-payments-paid" class="active">
+                                <a href="#payments-details" onclick="select('details')" data-toggle="tab">Detalhamento</a>
                             </li>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane active" id="payments-paid">
                                 <div id="payments-paid-loader" style="text-align: center;padding: 40px">
                                     <span class="fas fa-circle-notch fa-spin fa-3x"></span>
-                                    <div>carregando</div>
+                                    <div>carregando pagos</div>
                                 </div>
                                 <div id="payments-paid-field" style="display: none"></div>
                             </div>
@@ -105,9 +108,18 @@
 
                                 <div id="payments-pending-loader" style="text-align: center;padding: 40px">
                                     <span class="fas fa-circle-notch fa-spin fa-3x"></span>
-                                    <div>carregando</div>
+                                    <div>carregando pendentes</div>
                                 </div>
                                 <div id="payments-pending-field" style="display: none"></div>
+
+                            </div>
+                            <div class="tab-pane" id="payments-details">
+
+                                <div id="payments-pending-loader" style="text-align: center;padding: 40px">
+                                    <span class="fas fa-circle-notch fa-spin fa-3x"></span>
+                                    <div>carregando detalhamento</div>
+                                </div>
+                                <div id="payments-details-field" style="display: none"></div>
 
                             </div>
                         </div>
@@ -210,9 +222,16 @@
 
 {% block scripts %}
     <script>
+        var fetch_paid_in_process = false;
         var paid_payments_fetched = false;
-        function fetchPaidPayments() {
-            if (paid_payments_fetched) {
+        function fetchPaidPayments(force) {
+            force = force === true;
+
+            if (paid_payments_fetched && force === false) {
+                return;
+            }
+
+            if (fetch_paid_in_process) {
                 return;
             }
 
@@ -232,18 +251,28 @@
                     main_field.fadeIn();
                 });
                 paid_payments_fetched = true;
+                fetch_paid_in_process = false;
             });
             sender.setFailCallback(function() {
+                fetch_paid_in_process = false;
                 console.error('fail');
             });
             sender.get();
         }
 
+        var fetch_pending_in_process = false;
         var pending_payments_fetched = false;
-        function fetchPendingPayments() {
-            if (pending_payments_fetched) {
+        function fetchPendingPayments(force) {
+            force = force === true;
+            if (pending_payments_fetched && force === false) {
                 return;
             }
+
+            if (fetch_pending_in_process) {
+                return;
+            }
+
+            fetch_pending_in_process = true;
 
             var loader = $('#payments-pending-loader');
             var main_field = $('#payments-pending-field');
@@ -261,9 +290,11 @@
                 loader.fadeOut(function() {
                     main_field.fadeIn();
                 });
-{#                pending_payments_fetched = true;#}
+                fetch_pending_in_process = false;
+                pending_payments_fetched = true;
             });
             sender.setFailCallback(function() {
+                fetch_pending_in_process = false;
                 console.error('fail');
             });
             sender.get();
@@ -290,8 +321,10 @@
                     fetchPendingPayments();
                     break;
                 case 'paid':
-                default:
                     fetchPaidPayments();
+                    break;
+                case 'details':
+                    break;
             }
         }
 

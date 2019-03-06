@@ -2,6 +2,8 @@ import locale
 from collections import OrderedDict
 from decimal import Decimal
 
+from django.db.models import Sum, Count, Q
+from django.db.models.functions import Lower
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic.base import TemplateView
@@ -12,6 +14,7 @@ from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
 from gatheros_subscription.models import Subscription
+from installment.models import Contract
 from payment.models import Transaction
 
 
@@ -57,7 +60,10 @@ class EventPaymentView(AccountMixin,
             data_type = 'paid' if template == 'payments/paid' else 'pending'
             context['subscriptions'] = self.get_subscriptions(data_type)
         else:
-            context['totals'] = self._get_payables()
+            context['totals'] = {
+                'pending': self._get_pending_total_amount(),
+                'paid': 0,
+            }
 
 
         context.update(self.get_event_state_context_data(self.event))
@@ -66,26 +72,14 @@ class EventPaymentView(AccountMixin,
 
     def get_subscriptions(self, data_type):
 
-        sub_filter = {
-            'event_id': self.event.pk,
-            'test_subscription': False,
-            'completed': True,
-            'lot__price__gt': 0,
-            'status':
-                Subscription.CONFIRMED_STATUS
-                if data_type == 'paid' else Subscription.AWAITING_STATUS,
-        }
-
-        trans_filter = {
-            'status': Transaction.PAID
-            if data_type == 'paid' else Transaction.WAITING_PAYMENT,
-        }
-
-        trans_filter_exclude = {
-            'type': Transaction.WAITING_PAYMENT,
-        }
+        sub_filter = self._get_subscriptions_filters(data_type)
 
         subs = Subscription.objects.filter(**sub_filter)
+        subs = subs.order_by(Lower('person__name'))
+
+        trans_filters = self._get_transactions_filters(data_type)
+
+        print(trans_filters)
 
         subscriptions = OrderedDict()
 
@@ -93,9 +87,19 @@ class EventPaymentView(AccountMixin,
 
         for sub in subs:
 
+            contracts = sub.installment_contracts.filter(
+                status__in=[
+                    Contract.OPEN_STATUS,
+                    Contract.FULLY_PAID_STATUS,
+                ]
+            )
+
+            if contracts.count():
+                continue
+
             sub_pk = str(sub.pk)
 
-            transactions_qs = sub.transactions
+            transactions_qs = sub.transactions.filter(**trans_filters)
 
             if sub_pk not in subscriptions:
                 subscriptions[sub_pk] = OrderedDict()
@@ -105,31 +109,33 @@ class EventPaymentView(AccountMixin,
                 subscriptions[sub_pk]['transactions'] = list()
 
             if transactions_qs.count() == 0:
-                subscriptions[sub_pk]['transactions'].append({
-                    'is_boleto': False,
-                    'is_cc': False,
-                    'is_manual': False,
-                    'type_name': 'Sem tipo',
-                    'is_paid': False,
-                    'is_part': False,
-                    'is_pending': True,
-                    'status_name': 'Aguardando pagamento',
-                    'liquid_amount': sub.lot.get_calculated_price(),
-                })
-                a += trans.liquid_amount
+                if data_type == 'pending':
+                    price = sub.lot.get_calculated_price()
+                    print('- {} = {} - {}'.format(sub.person.name, price, transactions_qs.count()))
+                    subscriptions[sub_pk]['transactions'].append({
+                        'is_boleto': False,
+                        'is_cc': False,
+                        'is_manual': False,
+                        'type_name': 'Sem tipo',
+                        'is_paid': False,
+                        'is_part': False,
+                        'is_pending': True,
+                        'status_name': 'Aguardando pagamento',
+                        'liquid_amount': price,
+                    })
+                    a += price
                 continue
 
-            for trans in transactions_qs \
-                    .filter(**trans_filter):
+            for trans in transactions_qs:
 
                 subscriptions[sub_pk]['transactions'].append({
                     'is_boleto': trans.type == Transaction.BOLETO,
                     'is_cc': trans.type == Transaction.CREDIT_CARD,
-                    'is_manual': trans.type == Transaction.MANUAL or
-                        trans.type == Transaction.WAITING_PAYMENT,
+                    'is_manual': trans.type == Transaction.MANUAL,
                     'type_name': trans.get_type_display(),
                     'is_paid': trans.paid is True,
                     'is_part': trans.part_id is not None,
+                    'part_info': None,
                     'is_pending': trans.status == Transaction.WAITING_PAYMENT,
                     'status_name': trans.get_status_display(),
                     'liquid_amount': trans.liquid_amount,
@@ -140,7 +146,10 @@ class EventPaymentView(AccountMixin,
         # contracts = Contract.objects.filter(
         #     status__in=[Contract.OPEN_STATUS, Contract.FULLY_PAID_STATUS],
         #     subscription__event_id=self.event.pk,
-        # ).order_by(Lower('subscription__person__name'),)[:10]
+        #     parts__paid=data_type == 'paid',
+        # ).order_by(
+        #     Lower('subscription__person__name'),
+        # )
         #
         # for contract in contracts:
         #     sub_pk = str(contract.subscription_id)
@@ -153,7 +162,17 @@ class EventPaymentView(AccountMixin,
         #         subscriptions[sub_pk]['name'] = sub.person.name.upper()
         #         subscriptions[sub_pk]['transactions'] = list()
         #
-        #     for part in contract.parts.filter(paid=False):
+        #     parts_qs = contract.parts
+        #
+        #     for part in parts_qs.filter(paid=data_type == 'paid').order_by(
+        #             'installment_number'
+        #     ):
+        #         if part.paid and data_type == 'pending':
+        #             continue
+        #
+        #         if part.paid is False and data_type == 'paid':
+        #             continue
+        #
         #         subscriptions[sub_pk]['transactions'].append({
         #             'is_boleto': False,
         #             'is_cc': False,
@@ -163,12 +182,15 @@ class EventPaymentView(AccountMixin,
         #             'is_refused': False,
         #             'is_pending': part.paid is False,
         #             'is_part': True,
+        #             'part_info': 'parcela {}/{}'.format(
+        #                 part.installment_number,
+        #                 contract.num_installments,
+        #             ),
         #             'status_name': 'Pago' if part.paid else 'Pendente',
-        #             'liquid_amount': localize(part.amount),
+        #             'liquid_amount': part.amount,
         #         })
         #
-        #         if part.paid is False:
-        #             a += part.amount
+        #         a += part.amount
 
         print(a)
 
@@ -204,45 +226,62 @@ class EventPaymentView(AccountMixin,
 
         return sorted_subscriptions
 
-    def _get_payables(self):
+    def _get_pending_total_amount(self):
 
-        totals = {
-            'total': Decimal(0.00),
-            'pending': Decimal(0.00),
-            'paid': Decimal(0.00),
+        sub_filters = self._get_subscriptions_filters('pending')
+
+        subs = Subscription.objects.filter(**sub_filters)
+
+        trans_filters = self._get_transactions_filters('pending')
+
+        trans_filters.update({
+            'subscription_id__in': [str(sub.pk) for sub in subs],
+        })
+
+        trans_qs_pending = Transaction.objects.filter(**trans_filters)
+        trans_qs_pending = trans_qs_pending.exclude(
+            subscription__installment_contracts__status__in=[
+                Contract.OPEN_STATUS,
+                Contract.FULLY_PAID_STATUS,
+            ]
+        )
+        trans_qs_pending = trans_qs_pending.aggregate(
+            pending=Sum('liquid_amount')
+        )
+
+        total_pending = trans_qs_pending['pending'] or Decimal(0)
+
+        no_trans_subs = subs.annotate(num=Count('transactions'))
+        no_trans_subs = no_trans_subs.filter(num=0)
+
+        for sub in no_trans_subs:
+            price = sub.lot.get_calculated_price()
+            print('- {} = {} - {}'.format(sub.person.name, price, sub.transactions.count()))
+            total_pending += price
+
+        print(total_pending)
+
+        return total_pending
+
+    def _get_subscriptions_filters(self, data_type):
+        # Inscrições sem contrato e com lotes com preço.
+        sub_filter = {
+            'event_id': self.event.pk,
+            'test_subscription': False,
+            'completed': True,
+            'lot__price__gt': 0,
+            'status':
+                Subscription.CONFIRMED_STATUS
+                if data_type == 'paid' else Subscription.AWAITING_STATUS,
         }
 
-        # transactions = Transaction.objects.filter(
-        #     subscription__event_id=self.event.pk,
-        #     status__in=[
-        #         Transaction.PAID,
-        #         Transaction.WAITING_PAYMENT,
-        #     ]
-        # )
-        #
-        # for transaction in transactions:
-        #     if transaction.status == Transaction.WAITING_PAYMENT \
-        #             and transaction.manual:
-        #         continue
-        #
-        #     totals['total'] += transaction.liquid_amount or Decimal(0.00)
-        #
-        #     if transaction.status == Transaction.PAID:
-        #         totals['paid'] += transaction.liquid_amount or Decimal(0.00)
-        #
-        #     if transaction.status == Transaction.WAITING_PAYMENT:
-        #         totals['pending'] += transaction.liquid_amount or Decimal(0.00)
-        #
-        # contracts = Contract.objects.filter(
-        #     status__in=[Contract.OPEN_STATUS, Contract.FULLY_PAID_STATUS],
-        #     subscription__event_id=self.event.pk,
-        # )
-        #
-        # for contract in contracts:
-        #     for part in contract.parts.filter(paid=False):
-        #         totals['total'] += part.amount or Decimal(0.00)
-        #
-        #         if part.paid is False:
-        #             totals['pending'] += part.amount or Decimal(0.00)
+        return sub_filter
 
-        return totals
+    def _get_transactions_filters(self, data_type):
+        trans_filter = {
+            'part_id__isnull': True,
+            'status': Transaction.PAID
+            if data_type == 'paid' else Transaction.WAITING_PAYMENT,
+        }
+
+        return trans_filter
