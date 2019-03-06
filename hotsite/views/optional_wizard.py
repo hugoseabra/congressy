@@ -233,8 +233,8 @@ class OptionalWizardView(SessionWizardView, SelectLotMixin):
         if not _has_services(lot) and not _has_products(lot):
             messages.warning(
                 request,
-                "Seu lote não possui nenhum produto ou serviço disponivel no "
-                "momento"
+                "Seu lote não possui atividades extras e/ou opcionais "
+                "disponíveis no momento."
             )
             return redirect('public:hotsite', slug=self.event.slug)
 
