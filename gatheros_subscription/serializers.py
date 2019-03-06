@@ -1,3 +1,4 @@
+from django.urls import reverse
 from kanu_locations.models import City
 from rest_framework import serializers
 
@@ -64,7 +65,6 @@ class LotSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_exhibition_code(self, value):
-
         event = self.instance.event.pk
         existing = Lot.objects.filter(
             event_id=event,
@@ -130,3 +130,57 @@ class CheckInSubscriptionSerializer(serializers.ModelSerializer):
             'status',
             'event_count',
         ]
+
+
+class SubscriptionSerializer(serializers.BaseSerializer):
+
+    def to_representation(self, obj):
+        rep = {
+            'person_name': obj.person.name,
+            'person_email': obj.person.email,
+            'person_cpf': obj.person.cpf,
+            'person_city': None,
+            'person_uf': None,
+            'person_phone': obj.person.phone,
+            'person_city_international': obj.person.city_international,
+            'person_international_doc': obj.person.international_doc,
+            'origin': obj.origin,
+            'code': obj.code,
+            'lot_name': obj.lot.name,
+            'event_count': obj.event_count,
+            'test_subscription': obj.test_subscription,
+            'status': obj.status,
+            'created': obj.created,
+            'category_name': None,
+            'link': reverse(
+                'subscription:subscription-view', kwargs={
+                    'event_pk': obj.event.pk,
+                    'pk': obj.pk,
+                }
+            ),
+            'edit_link': None,
+            'voucher_link': None,
+        }
+
+        if obj.confirmed:
+            rep['voucher_link'] = reverse(
+                'subscription:subscription-voucher', kwargs={
+                    'event_pk': obj.event.pk,
+                    'pk': obj.pk,
+                }),
+
+        if obj.event.allow_internal_subscription:
+            rep['edit_link'] = reverse(
+                'subscription:subscription-edit', kwargs={
+                    'event_pk': obj.event.pk,
+                    'pk': obj.pk,
+                }),
+
+        if obj.lot.category:
+            rep['category_name'] = obj.lot.category.name
+
+        if obj.person.city:
+            rep['person_city'] = obj.person.city.name
+            rep['person_uf'] = obj.person.city.uf
+
+        return rep
