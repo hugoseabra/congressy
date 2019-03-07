@@ -10,11 +10,13 @@ services:
 
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas
+    restart: always
     networks:
       - wkhtmltopdf
 
   cron:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    restart: unless-stopped
     depends_on:
       - redis
       - wkhtmltopdf
