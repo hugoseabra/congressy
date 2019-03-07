@@ -443,6 +443,9 @@ class Lot(models.Model, GatherosModelMixin):
         if not self.price:
             return Decimal(0.00)
 
+        if self.transfer_tax is False:
+            return round(self.price, 2)
+
         minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
         congressy_plan_percent = \
             Decimal(self.event.congressy_percent) / 100
@@ -451,7 +454,25 @@ class Lot(models.Model, GatherosModelMixin):
         if congressy_amount < minimum:
             congressy_amount = minimum
 
-        if self.transfer_tax is True:
-            return round(self.price + congressy_amount, 2)
+        return round(self.price + congressy_amount, 2)
 
-        return round(self.price, 2)
+    def get_liquid_price(self):
+        """
+        Resgata o valor calculado do preço do lote de acordo com as regras
+        da Congressy.
+        """
+        if not self.price:
+            return Decimal(0.00)
+
+        if self.transfer_tax is True:
+            return self.price
+
+        minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
+        congressy_plan_percent = \
+            Decimal(self.event.congressy_percent) / 100
+
+        congressy_amount = self.price * congressy_plan_percent
+        if congressy_amount < minimum:
+            congressy_amount = minimum
+
+        return round(self.price - congressy_amount, 2)
