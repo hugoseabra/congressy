@@ -25,6 +25,7 @@ class Command(BaseCommand):
             self.stderr.write(
                 'Evento com ID "{}" não encontrado.'.format(event_id)
             )
+            return
 
         self.stdout.write(self.style.SUCCESS(
             'Evento: {}'.format(event.name)
@@ -46,6 +47,8 @@ class Command(BaseCommand):
 
         subs = Subscription.objects.filter(
             event_id=event.pk,
+            completed=True,
+            test_subscription=False,
             origin=Subscription.DEVICE_ORIGIN_HOTSITE,
         )
 
@@ -100,7 +103,12 @@ class Command(BaseCommand):
 
         subs = Subscription.objects.filter(
             event_id=event.pk,
-            origin=Subscription.DEVICE_ORIGIN_MANAGE,
+            completed=True,
+            test_subscription=False,
+            origin__in=[
+                Subscription.DEVICE_ORIGIN_MANAGE,
+                Subscription.DEVICE_ORIGIN_CSV_IMPORT,
+            ]
         )
 
         free = 0
@@ -121,8 +129,10 @@ class Command(BaseCommand):
                     paid_pending += 1
 
         transactions = Transaction.objects.filter(
-            subscription__event_id=event.pk,
             manual=True,
+            subscription__event_id=event.pk,
+            subscription__completed=True,
+            subscription__test_subscription=False,
             subscription__origin=Subscription.DEVICE_ORIGIN_MANAGE,
             subscription__status=Subscription.CONFIRMED_STATUS,
         )
@@ -152,6 +162,11 @@ class Command(BaseCommand):
         print('-   Pendentes (Gratuitas x Pagas): ', end='')
         self.stdout.write(self.style.SUCCESS(
             '{} x {}'.format(free_pending, paid_pending)
+        ))
+
+        print('-      Totais (Gratuitas x Pagas): ', end='')
+        self.stdout.write(self.style.SUCCESS(
+            '{} x {}'.format(free + free_pending, paid + paid_pending)
         ))
 
         print('-        Pag. Manuais s/ Contrato: ', end='')
@@ -272,11 +287,13 @@ class Command(BaseCommand):
         subs_qs = Subscription.objects.filter(
             event_id=event.pk,
             status=Subscription.AWAITING_STATUS,
+            completed=True,
+            test_subscription=False,
             lot__price__gt=0,
         )
 
         for sub in subs_qs:
-            price = sub.lot.get_calculated_price()
+            price = sub.lot.get_liquid_price()
 
             total_pending.append(price)
 
@@ -314,15 +331,12 @@ class Command(BaseCommand):
 
     def _show_cc_reports(self, event):
 
-        print()
-        title = 'SOBRE CARTÕES DE CRÉDITO'
-        print(title)
-        print('=' * 45)
-
         transactions = Transaction.objects.filter(
-            subscription__event_id=event.pk,
             type=Transaction.CREDIT_CARD,
             manual=False,
+            subscription__event_id=event.pk,
+            subscription__completed=True,
+            subscription__test_subscription=False,
         ).exclude(
             status=Transaction.WAITING_PAYMENT,
         )
@@ -352,6 +366,11 @@ class Command(BaseCommand):
         refused_perc = round((sum(refused) * 100) / total, 2)
         refunded_perc = round((sum(refunded) * 100) / total, 2)
         chargedback_perc = round((sum(chargedback) * 100) / total, 2)
+
+        print()
+        title = 'SOBRE CARTÕES DE CRÉDITO'
+        print(title)
+        print('=' * 45)
 
         print('- Pagos: ', end='')
         self.stdout.write(self.style.SUCCESS(
@@ -394,6 +413,8 @@ class Command(BaseCommand):
 
         transactions = Transaction.objects.filter(
             subscription__event_id=event.pk,
+            subscription__completed=True,
+            subscription__test_subscription=False,
             type=Transaction.BOLETO,
             manual=False,
         ).exclude(

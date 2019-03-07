@@ -2,7 +2,6 @@ import locale
 from collections import OrderedDict
 from decimal import Decimal
 
-from django.db.models import Sum, Count, Q
 from django.db.models.functions import Lower
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -61,10 +60,9 @@ class EventPaymentView(AccountMixin,
             context['subscriptions'] = self.get_subscriptions(data_type)
         else:
             context['totals'] = {
-                'pending': self._get_pending_total_amount(),
-                'paid': 0,
+                'pending': self._get_pending_reports(),
+                'paid': self._get_paid_reports(),
             }
-
 
         context.update(self.get_event_state_context_data(self.event))
 
@@ -111,7 +109,8 @@ class EventPaymentView(AccountMixin,
             if transactions_qs.count() == 0:
                 if data_type == 'pending':
                     price = sub.lot.get_calculated_price()
-                    print('- {} = {} - {}'.format(sub.person.name, price, transactions_qs.count()))
+                    print('- {} = {} - {}'.format(sub.person.name, price,
+                                                  transactions_qs.count()))
                     subscriptions[sub_pk]['transactions'].append({
                         'is_boleto': False,
                         'is_cc': False,
@@ -127,7 +126,6 @@ class EventPaymentView(AccountMixin,
                 continue
 
             for trans in transactions_qs:
-
                 subscriptions[sub_pk]['transactions'].append({
                     'is_boleto': trans.type == Transaction.BOLETO,
                     'is_cc': trans.type == Transaction.CREDIT_CARD,
@@ -226,62 +224,244 @@ class EventPaymentView(AccountMixin,
 
         return sorted_subscriptions
 
-    def _get_pending_total_amount(self):
-
-        sub_filters = self._get_subscriptions_filters('pending')
-
-        subs = Subscription.objects.filter(**sub_filters)
-
-        trans_filters = self._get_transactions_filters('pending')
-
-        trans_filters.update({
-            'subscription_id__in': [str(sub.pk) for sub in subs],
-        })
-
-        trans_qs_pending = Transaction.objects.filter(**trans_filters)
-        trans_qs_pending = trans_qs_pending.exclude(
-            subscription__installment_contracts__status__in=[
-                Contract.OPEN_STATUS,
-                Contract.FULLY_PAID_STATUS,
-            ]
-        )
-        trans_qs_pending = trans_qs_pending.aggregate(
-            pending=Sum('liquid_amount')
-        )
-
-        total_pending = trans_qs_pending['pending'] or Decimal(0)
-
-        no_trans_subs = subs.annotate(num=Count('transactions'))
-        no_trans_subs = no_trans_subs.filter(num=0)
-
-        for sub in no_trans_subs:
-            price = sub.lot.get_calculated_price()
-            print('- {} = {} - {}'.format(sub.person.name, price, sub.transactions.count()))
-            total_pending += price
-
-        print(total_pending)
-
-        return total_pending
-
-    def _get_subscriptions_filters(self, data_type):
-        # Inscrições sem contrato e com lotes com preço.
-        sub_filter = {
+    def _get_pending_reports(self):
+        sub_filters = {
             'event_id': self.event.pk,
             'test_subscription': False,
             'completed': True,
+        }
+
+        total = Subscription.objects.filter(**sub_filters).count()
+
+        sub_filters.update({'lot__price__gt': 0})
+        paid_total = Subscription.objects.filter(**sub_filters).count()
+
+        sub_filters.update({'status': Subscription.AWAITING_STATUS})
+
+        subs_qs = Subscription.objects.filter(**sub_filters)
+        total_pending = subs_qs.count()
+
+        total_amount = list()
+        pending_subs = list()
+        pending_part = list()
+        origin_internal_amount = list()
+        origin_hotsite_amount = list()
+
+        for sub in subs_qs:
+            price = sub.lot.get_liquid_price()
+            total_amount.append(price)
+
+            if sub.origin in [
+                sub.DEVICE_ORIGIN_MANAGE,
+                sub.DEVICE_ORIGIN_CSV_IMPORT,
+            ]:
+                origin_internal_amount.append(price)
+
+            elif sub.origin == sub.DEVICE_ORIGIN_HOTSITE:
+                origin_hotsite_amount.append(price)
+
+            contracts_qs = sub.installment_contracts.filter(
+                status=Contract.OPEN_STATUS,
+            )
+
+            if contracts_qs.count() == 0:
+                pending_subs.append(price)
+
+            else:
+                pending_part.append(price)
+
+        return {
+            'amount': sum(total_amount),
+            'total': total_pending,
+
+            'total_general': total,
+            'total_payable': paid_total,
+            'general_proportion': round((total_pending * 100) / total, 2),
+            'payable_proportion': round((total_pending * 100) / paid_total, 2),
+
+            'total_origin_internal': len(origin_internal_amount),
+            'total_origin_internal_amount': sum(origin_internal_amount),
+            'origin_internal_proportion': round(
+                (len(origin_internal_amount) * 100) / total_pending,
+                2
+            ),
+            'total_origin_hotsite': len(origin_hotsite_amount),
+            'total_origin_hotsite_amount': sum(origin_internal_amount),
+            'origin_hotsite_proportion': round(
+                (len(origin_hotsite_amount) * 100) / total_pending,
+                2
+            ),
+
+            'with_installment': len(pending_part),
+            'with_installment_amount': sum(pending_part),
+            'with_installment_proportion': round(
+                (len(pending_part) * 100) / total_pending,
+                2
+            ),
+            'without_installment_amount': sum(pending_subs),
+            'without_installment': len(pending_subs),
+            'without_installment_proportion': round(
+                (len(pending_subs) * 100) / total_pending,
+                2
+            ),
+        }
+
+    def _get_paid_reports(self):
+
+        sub_filters = {
+            'event_id': self.event.pk,
+            'test_subscription': False,
+            'completed': True,
+        }
+        total = Subscription.objects.filter(**sub_filters).count()
+
+        sub_filters.update({
             'lot__price__gt': 0,
-            'status':
-                Subscription.CONFIRMED_STATUS
-                if data_type == 'paid' else Subscription.AWAITING_STATUS,
+        })
+
+        subs_qs = Subscription.objects.filter(**sub_filters)
+        total_payable = subs_qs.count()
+
+        paid_amounts = list()
+
+        hotsite_amounts = list()
+        internal_amounts = list()
+
+        cc_amounts = list()
+        boleto_amounts = list()
+        manual_amounts = list()
+        manual_part_amounts = list()
+
+        method_gateway_amounts = list()
+        method_internal_amounts = list()
+
+        installment_cc_amounts = list()
+        installment_boletos_amounts = list()
+        no_installment_amounts = list()
+
+        transactions_qs = Transaction.objects.filter(
+            subscription__event_id=self.event.pk,
+        )
+
+        for trans in transactions_qs.filter(status=Transaction.PAID, ):
+            amount = trans.liquid_amount
+            paid_amounts.append(amount)
+
+            if trans.manual is True:
+                if trans.part_id:
+                    manual_part_amounts.append(amount)
+                else:
+                    manual_amounts.append(amount)
+
+                method_internal_amounts.append(amount)
+
+            elif trans.type == Transaction.CREDIT_CARD:
+                cc_amounts.append(amount)
+                method_gateway_amounts.append(amount)
+            elif trans.type == Transaction.BOLETO:
+                boleto_amounts.append(amount)
+                method_gateway_amounts.append(amount)
+
+            if trans.installments > 1 and trans.type == trans.CREDIT_CARD:
+                installment_cc_amounts.append(amount)
+            elif trans.part_id:
+                installment_boletos_amounts.append(amount)
+            else:
+                no_installment_amounts.append(amount)
+
+            sub = trans.subscription
+
+            if sub.origin == Subscription.DEVICE_ORIGIN_HOTSITE:
+                hotsite_amounts.append(amount)
+            elif sub.origin in [
+                Subscription.DEVICE_ORIGIN_CSV_IMPORT,
+                Subscription.DEVICE_ORIGIN_MANAGE,
+            ]:
+                internal_amounts.append(amount)
+
+        return {
+            'amount': sum(paid_amounts),
+
+            'total': len(paid_amounts),
+            'total_general': total,
+            'total_payable': total_payable,
+            'payable': total_payable,
+            'general_proportion': round(
+                (len(paid_amounts) * 100) / total,
+                2
+            ),
+            'payable_proportion': round(
+                (len(paid_amounts) * 100) / total_payable,
+                2
+            ),
+
+            'total_origin_internal': len(internal_amounts),
+            'origin_internal_amount': sum(internal_amounts),
+            'origin_internal_proportion': round(
+                (len(internal_amounts) * 100) / len(paid_amounts),
+                2
+            ),
+            'total_origin_hotsite': len(hotsite_amounts),
+            'origin_hotsite_amount': sum(hotsite_amounts),
+            'origin_hotsite_proportion': round(
+                (len(hotsite_amounts) * 100) / len(paid_amounts),
+                2
+            ),
+
+            'cc_total': len(cc_amounts),
+            'cc_amount': sum(cc_amounts),
+            'cc_proportion': round(
+                (len(cc_amounts) * 100) / len(paid_amounts),
+                2
+            ),
+            'boleto_total': len(boleto_amounts),
+            'boleto_amount': sum(boleto_amounts),
+            'boleto_proportion': round(
+                (len(boleto_amounts) * 100) / len(paid_amounts),
+                2
+            ),
+            'manual_installment_total': len(manual_part_amounts),
+            'manual_installment_amount': sum(manual_part_amounts),
+            'manual_installment_proportion': round(
+                (len(manual_part_amounts) * 100) / len(paid_amounts),
+                2
+            ),
+            'manual_no_installment_total': len(manual_amounts),
+            'manual_no_installment_amount': sum(manual_amounts),
+            'manual_no_installment_proportion': round(
+                (len(manual_amounts) * 100) / len(paid_amounts),
+                2
+            ),
+
+            'gateway_method_total': len(method_gateway_amounts),
+            'gateway_method_amount': sum(method_gateway_amounts),
+            'gateway_method_proportion': round(
+                (len(method_gateway_amounts) * 100) / len(paid_amounts),
+                2
+            ),
+            'manual_method_total': len(method_internal_amounts),
+            'manual_method_amount': sum(method_internal_amounts),
+            'manual_method_proportion': round(
+                (len(method_internal_amounts) * 100) / len(paid_amounts),
+                2
+            ),
+
+            'with_installment_boleto': len(installment_boletos_amounts),
+            'with_installment_boleto_amount': sum(installment_boletos_amounts),
+            'with_installment_boleto_proportion': round(
+                (len(installment_boletos_amounts) * 100) / len(paid_amounts),
+                2
+            ),
+            'with_installment_cc': len(installment_cc_amounts),
+            'with_installment_cc_amount': sum(installment_cc_amounts),
+            'with_installment_cc_proportion': round(
+                (len(installment_cc_amounts) * 100) / len(paid_amounts),
+                2
+            ),
+            'without_installment': len(no_installment_amounts),
+            'without_installment_amount': sum(no_installment_amounts),
+            'without_installment_proportion': round(
+                (len(no_installment_amounts) * 100) / len(paid_amounts),
+                2
+            ),
         }
-
-        return sub_filter
-
-    def _get_transactions_filters(self, data_type):
-        trans_filter = {
-            'part_id__isnull': True,
-            'status': Transaction.PAID
-            if data_type == 'paid' else Transaction.WAITING_PAYMENT,
-        }
-
-        return trans_filter
