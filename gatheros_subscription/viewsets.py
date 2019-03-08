@@ -152,7 +152,6 @@ class SubscriptionListViewSet(RestrictionViewMixin,
             return queryset
 
         return queryset.filter(
-            Q(uuid=search_param, ) |
             Q(code=search_param, ) |
             Q(lot__name__icontains=search_param, ) |
             Q(lot__category__name__icontains=search_param, ) |
