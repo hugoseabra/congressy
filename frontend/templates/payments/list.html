@@ -56,9 +56,8 @@
                                 <strong style="font-size:16px;color:darkorange">
                                     R$ {{ totals.pending.amount|intcomma }}
                                 </strong>
+                                <i class="fa fa-info-circle" data-toggle="tooltip" title="Inscrições pendentes de pagamento por parte do participante."></i>
                                 <br />
-                                <!--<i class="fa fa-info-circle" data-toggle="tooltip"-->
-                                       <!--title="Inscrições pendentes de pagamento por parte do participante."></i>-->
                                 <a href="javascript:void(0)" class="btn btn-link" style="padding:0;margin:0;font-size: 10px;" onclick="$('#modal-payments-pending-details').modal()">
                                     Detalhamento
                                 </a>
@@ -70,6 +69,7 @@
                                 <strong style="font-size:16px;color:blue">
                                     R$ {{ totals.paid.amount|intcomma }}
                                 </strong>
+                                <i class="fa fa-info-circle" data-toggle="tooltip" title="Inscrições pagas pelo participante e que estão em processo de prazo de transferência."></i>
                                 <br />
                                 <a href="javascript:void(0)" class="btn btn-link" style="padding:0;margin:0;font-size: 10px;" onclick="$('#modal-payments-paid-details').modal()">
                                     Detalhamento
@@ -108,9 +108,6 @@
                             <li id="super-payments-pending">
                                 <a href="#payments-pending" onclick="select('pending')" data-toggle="tab">Pendentes</a>
                             </li>
-                            <li id="super-payments-details">
-                                <a href="#payments-details" onclick="select('details')" data-toggle="tab">Detalhamento</a>
-                            </li>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane active" id="payments-paid">
@@ -127,16 +124,6 @@
                                     <div>carregando pendentes</div>
                                 </div>
                                 <div id="payments-pending-field" style="display: none"></div>
-
-                            </div>
-                            <div class="tab-pane" id="payments-details">
-
-                                <div id="payments-pending-details" style="text-align: center;padding: 40px">
-                                    <span class="fas fa-circle-notch fa-spin fa-3x"></span>
-                                    <div>carregando detalhamento</div>
-                                </div>
-                                <div id="payments-details-field" style="display: none"></div>
-
                             </div>
                         </div>
                     </div>
@@ -149,34 +136,50 @@
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <table class="table no-footer"
-                           cellspacing="0"
+                    <table class="table borderless"
+                           border="0"
                            width="100%"
-                           style="border-collapse: separate;empty-cells: hide;">
+                           style="border-collapse: separate;empty-cells: hide; margin-bottom:0">
                         <tbody>
                         <tr>
-                            <td class="text-muted text-right"
-                                style="border:none;">
+                            <td width="25%" class="text-muted text-right">
                                 <strong>Inscrições não-pagas:</strong>
                             </td>
-                            <td width="25%" style="border:none;">
-                                <strong class="text-muted"
-                                        style="font-size:16px">
-                                    R$ {{ totals.pending|intcomma }}
+                            <td>
+                                <strong style="font-size:16px;color:darkorange">
+                                    R$ {{ totals.pending.amount|intcomma }}
                                 </strong>
-                                <i class="fa fa-info-circle"
-                                       data-toggle="tooltip"
-                                       title="Inscrições pendentes de pagamento por parte do participante."></i>
+                                <i class="fa fa-info-circle" data-toggle="tooltip" title="Inscrições pendentes de pagamento por parte do participante."></i>
+                                <br />
+                                <a href="javascript:void(0)" class="btn btn-link" style="padding:0;margin:0;font-size: 10px;" onclick="$('#modal-payments-pending-details').modal()">
+                                    Detalhamento
+                                </a>
                             </td>
                         </tr>
                         <tr>
-                            <td class="text-muted text-right"
-                                style="border:none;"><strong>Inscrições pagas:</strong></td>
-                            <td style="border:none;">
+                            <td class="text-muted text-right"><strong>Inscrições pagas:</strong></td>
+                            <td>
                                 <strong style="font-size:16px;color:blue">
-                                    R$ {{ totals.paid|intcomma }}
+                                    R$ {{ totals.paid.amount|intcomma }}
                                 </strong>
-                                <button type="button" class="btn btn-sm btn-info" onclick="$('#modal-payments-paid-subscriptions').modal()">Saiba mais</button>
+                                <i class="fa fa-info-circle" data-toggle="tooltip" title="Inscrições pagas pelo participante e que estão em processo de prazo de transferência."></i>
+                                <br />
+                                <a href="javascript:void(0)" class="btn btn-link" style="padding:0;margin:0;font-size: 10px;" onclick="$('#modal-payments-paid-details').modal()">
+                                    Detalhamento
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted text-right" colspan="2" style="padding:0">
+                                <a href="javascript:void(0)"
+                                   class="btn btn-link"
+                                   style="padding:0;margin:0;font-size: 12px"
+                                   onclick="$('#modal-payments-paid-subscriptions').modal()"
+                                   data-toggle="tooltip"
+                                   title="Dúvidas sobre Recebimento?">
+                                    <i class="fa fa-question-circle" style="padding:0"></i>
+                                    Recebimento e Prazos
+                                </a>
                             </td>
                         </tr>
                         </tbody>
@@ -632,7 +635,7 @@
                 trigger: 'hover'
             });
 
-            // selectFromHash();
+            selectFromHash();
         });
     </script>
 {% endblock %}

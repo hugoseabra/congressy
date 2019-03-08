@@ -1,6 +1,7 @@
 import locale
 from collections import OrderedDict
 from decimal import Decimal
+from functools import cmp_to_key
 
 from django.db.models.functions import Lower
 from django.shortcuts import get_object_or_404
@@ -13,7 +14,7 @@ from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin, EventDraftStateMixin
 from gatheros_subscription.models import Subscription
-from installment.models import Contract
+from installment.models import Contract, Part
 from payment.models import Transaction
 
 
@@ -56,8 +57,10 @@ class EventPaymentView(AccountMixin,
 
         template = self.request.GET.get('template_name')
         if template:
-            data_type = 'paid' if template == 'payments/paid' else 'pending'
-            context['subscriptions'] = self.get_subscriptions(data_type)
+            if template == 'payments/paid':
+                context['subscriptions'] = self.get_payments()
+            else:
+                context['subscriptions'] = self.get_pending_subscriptions()
         else:
             context['totals'] = {
                 'pending': self._get_pending_reports(),
@@ -68,157 +71,106 @@ class EventPaymentView(AccountMixin,
 
         return context
 
-    def get_subscriptions(self, data_type):
+    def get_payments(self):
+        transactions = Transaction.objects.filter(
+            subscription__event_id=self.event.pk,
+            status=Transaction.PAID,
+        )
 
-        sub_filter = self._get_subscriptions_filters(data_type)
+        subs_dict = OrderedDict()
 
-        subs = Subscription.objects.filter(**sub_filter)
-        subs = subs.order_by(Lower('person__name'))
+        for trans in transactions:
 
-        trans_filters = self._get_transactions_filters(data_type)
+            sub_pk = str(trans.subscription_id)
 
-        print(trans_filters)
+            if sub_pk not in subs_dict:
+                sub = trans.subscription
 
-        subscriptions = OrderedDict()
+                subs_dict[sub_pk] = OrderedDict()
+                subs_dict[sub_pk]['pk'] = sub_pk
+                subs_dict[sub_pk]['lot_name'] = sub.lot.name
+                subs_dict[sub_pk]['name'] = sub.person.name.upper()
+                subs_dict[sub_pk]['transactions'] = list()
 
-        a = Decimal(0)
+            trans_data = {
+                'is_boleto': trans.type == Transaction.BOLETO,
+                'is_cc': trans.type == Transaction.CREDIT_CARD,
+                'is_manual': trans.type == Transaction.MANUAL,
+                'type_name': trans.get_type_display(),
+                'is_paid': trans.paid is True,
+                'is_part': trans.part_id is not None,
+                'is_pending': trans.status == Transaction.WAITING_PAYMENT,
+                'status_name': trans.get_status_display(),
+                'liquid_amount': trans.liquid_amount,
+                'part_info': None,
+            }
 
-        for sub in subs:
+            if trans.part_id:
+                part = trans.part
 
-            contracts = sub.installment_contracts.filter(
-                status__in=[
-                    Contract.OPEN_STATUS,
-                    Contract.FULLY_PAID_STATUS,
-                ]
-            )
+                trans_data['part_info'] = \
+                    'parcela {}/{}'.format(
+                        part.installment_number,
+                        part.contract.num_installments,
+                    )
 
-            if contracts.count():
-                continue
+            subs_dict[sub_pk]['transactions'].append(trans_data)
 
-            sub_pk = str(sub.pk)
-
-            transactions_qs = sub.transactions.filter(**trans_filters)
-
-            if sub_pk not in subscriptions:
-                subscriptions[sub_pk] = OrderedDict()
-                subscriptions[sub_pk]['pk'] = sub.pk
-                subscriptions[sub_pk]['lot_name'] = sub.lot.name
-                subscriptions[sub_pk]['name'] = sub.person.name.upper()
-                subscriptions[sub_pk]['transactions'] = list()
-
-            if transactions_qs.count() == 0:
-                if data_type == 'pending':
-                    price = sub.lot.get_calculated_price()
-                    print('- {} = {} - {}'.format(sub.person.name, price,
-                                                  transactions_qs.count()))
-                    subscriptions[sub_pk]['transactions'].append({
-                        'is_boleto': False,
-                        'is_cc': False,
-                        'is_manual': False,
-                        'type_name': 'Sem tipo',
-                        'is_paid': False,
-                        'is_part': False,
-                        'is_pending': True,
-                        'status_name': 'Aguardando pagamento',
-                        'liquid_amount': price,
-                    })
-                    a += price
-                continue
-
-            for trans in transactions_qs:
-                subscriptions[sub_pk]['transactions'].append({
-                    'is_boleto': trans.type == Transaction.BOLETO,
-                    'is_cc': trans.type == Transaction.CREDIT_CARD,
-                    'is_manual': trans.type == Transaction.MANUAL,
-                    'type_name': trans.get_type_display(),
-                    'is_paid': trans.paid is True,
-                    'is_part': trans.part_id is not None,
-                    'part_info': None,
-                    'is_pending': trans.status == Transaction.WAITING_PAYMENT,
-                    'status_name': trans.get_status_display(),
-                    'liquid_amount': trans.liquid_amount,
-                })
-
-                a += trans.liquid_amount
-
-        # contracts = Contract.objects.filter(
-        #     status__in=[Contract.OPEN_STATUS, Contract.FULLY_PAID_STATUS],
-        #     subscription__event_id=self.event.pk,
-        #     parts__paid=data_type == 'paid',
-        # ).order_by(
-        #     Lower('subscription__person__name'),
-        # )
-        #
-        # for contract in contracts:
-        #     sub_pk = str(contract.subscription_id)
-        #
-        #     if sub_pk not in subscriptions:
-        #         sub = contract.subscription
-        #         subscriptions[sub_pk] = OrderedDict()
-        #         subscriptions[sub_pk]['pk'] = sub.pk
-        #         subscriptions[sub_pk]['lot_name'] = sub.lot.name
-        #         subscriptions[sub_pk]['name'] = sub.person.name.upper()
-        #         subscriptions[sub_pk]['transactions'] = list()
-        #
-        #     parts_qs = contract.parts
-        #
-        #     for part in parts_qs.filter(paid=data_type == 'paid').order_by(
-        #             'installment_number'
-        #     ):
-        #         if part.paid and data_type == 'pending':
-        #             continue
-        #
-        #         if part.paid is False and data_type == 'paid':
-        #             continue
-        #
-        #         subscriptions[sub_pk]['transactions'].append({
-        #             'is_boleto': False,
-        #             'is_cc': False,
-        #             'is_manual': True,
-        #             'type_name': 'Manual',
-        #             'is_paid': part.paid is True,
-        #             'is_refused': False,
-        #             'is_pending': part.paid is False,
-        #             'is_part': True,
-        #             'part_info': 'parcela {}/{}'.format(
-        #                 part.installment_number,
-        #                 contract.num_installments,
-        #             ),
-        #             'status_name': 'Pago' if part.paid else 'Pendente',
-        #             'liquid_amount': part.amount,
-        #         })
-        #
-        #         a += part.amount
-
-        print(a)
-
-        # Vamos considerar apenas pagamentos finais:
-        # Se paga, ignorar outras; ou
-        # Se recusado, ignorar outras; ou
-        # Se pendente, exibir
-
-        sub_names = list()
-        for _, sub in subscriptions.items():
-            paid_transactions = list()
-            pending_transactions = list()
-
-            sub_names.append(sub['name'])
-
-            for trans in sub['transactions']:
-                if trans['is_paid']:
-                    paid_transactions.append(trans)
-                elif trans['is_pending']:
-                    pending_transactions.append(trans)
-
-            if paid_transactions:
-                subscriptions[_]['transactions'] = paid_transactions
-            elif pending_transactions:
-                subscriptions[_]['transactions'] = pending_transactions
+        sub_names = [sub['name'] for _, sub in subs_dict.items()]
 
         sorted_subscriptions = OrderedDict()
 
-        for name in sorted(sub_names):
-            for _, sub in subscriptions.items():
+        for name in sorted(sub_names, key=cmp_to_key(locale.strcoll)):
+            for _, sub in subs_dict.items():
+                if sub['name'] == name:
+                    sorted_subscriptions[_] = sub
+
+        return sorted_subscriptions
+
+    def get_pending_subscriptions(self):
+        sub_filters = {
+            'event_id': self.event.pk,
+            'test_subscription': False,
+            'completed': True,
+            'status': Subscription.AWAITING_STATUS,
+            'lot__price__gt': 0,
+        }
+
+        subs_dict = OrderedDict()
+
+        subs_qs = Subscription.objects.filter(**sub_filters)
+
+        for sub in subs_qs.order_by(Lower('person__name')):
+            contracts_qs = sub.installment_contracts.filter(
+                status=Contract.OPEN_STATUS,
+            )
+
+            sub_pk = str(sub.pk)
+            price = sub.lot.get_liquid_price()
+
+            subs_dict[sub_pk] = {
+                'pk': sub.pk,
+                'lot_name': sub.lot.name,
+                'name': sub.person.name.upper(),
+                'liquid_amount': price,
+                'part_info': None,
+            }
+
+            if contracts_qs.count() > 0:
+                contract = contracts_qs.last()
+                part = contract.parts.filter(paid=False).first()
+
+                subs_dict[sub_pk]['part_info'] = {
+                    'num': contract.num_installments,
+                    'part_amount': part.amount,
+                }
+
+        sub_names = [sub['name'] for _, sub in subs_dict.items()]
+
+        sorted_subscriptions = OrderedDict()
+
+        for name in sorted(sub_names, key=cmp_to_key(locale.strcoll)):
+            for _, sub in subs_dict.items():
                 if sub['name'] == name:
                     sorted_subscriptions[_] = sub
 
@@ -322,6 +274,11 @@ class EventPaymentView(AccountMixin,
         subs_qs = Subscription.objects.filter(**sub_filters)
         total_payable = subs_qs.count()
 
+        sub_filters.update({
+            'status': Subscription.CONFIRMED_STATUS,
+        })
+        total_paid = Subscription.objects.filter(**sub_filters).count()
+
         paid_amounts = list()
 
         hotsite_amounts = list()
@@ -382,16 +339,16 @@ class EventPaymentView(AccountMixin,
         return {
             'amount': sum(paid_amounts),
 
-            'total': len(paid_amounts),
+            'total': total_paid,
             'total_general': total,
             'total_payable': total_payable,
             'payable': total_payable,
             'general_proportion': round(
-                (len(paid_amounts) * 100) / total,
+                (total_paid * 100) / total,
                 2
             ),
             'payable_proportion': round(
-                (len(paid_amounts) * 100) / total_payable,
+                (total_paid * 100) / total_payable,
                 2
             ),
 

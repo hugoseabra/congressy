@@ -39,7 +39,7 @@
                                 ({{ item.part_info }})
                             {% endif %}
                         </div>
-                        <small class="text-muted hidden-md hidden-lg hidden-xl" data-toggle="tooltip" title="{{sub.lot_name}}" style="cursor: default">
+                        <small class="text-muted hidden-md hidden-lg hidden-xl" {% if sub.lot_name|length > 30 %}data-toggle="tooltip" title="{{sub.lot_name}}"{% endif %}} style="cursor: default">
                             {{ sub.lot_name|truncatechars:30 }}
                         </small>
                     </td>
