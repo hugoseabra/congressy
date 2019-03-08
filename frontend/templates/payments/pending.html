@@ -1,0 +1,54 @@
+{% load humanize l10n %}
+<div class="row">
+    <div class="col-md-12">
+        {% if not subscriptions %}
+            <div style="border:1px solid darkgray;padding: 30px">
+                Sem pagamentos
+            </div>
+        {% else %}
+
+        <table id="payments_table" class="table table-striped">
+            <thead>
+            <tr>
+                <th>Participante</th>
+                <th class="hidden-sm hidden-xs">Lote</th>
+                <th class="col-lg-2 col-md-3 col-sm-4 col-xs-5">Valor</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for _, sub in subscriptions.items %}
+                <tr>
+                    <td>
+                        <div>
+                            <i class="fa fa-circle" style="color: goldenrod"
+                                   data-toggle="tooltip"
+                                   title="Pendente"></i>
+                            <a href="{% url 'subscription:subscription-payments' event.pk sub.pk %}" target="_blank">
+                                {{ sub.name }}
+                            </a>
+                            {% if sub.part_info %}
+                            <small class="text-muted">(Parc.: {{ sub.part_info.num }}x de R$ {{ sub.part_info.part_amount|intcomma }})</small>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted hidden-md hidden-lg hidden-xl" data-toggle="tooltip" title="{{sub.lot_name}}" style="cursor: default">
+                            {{ sub.lot_name|truncatechars:30 }}
+                        </small>
+                    </td>
+                    <td class="hidden-sm hidden-xs">
+                        <div data-toggle="tooltip" title="{{sub.lot_name}}" style="cursor: default">
+                            {{ sub.lot_name|truncatechars:30 }}
+                        </div>
+                    </td>
+                    <td>
+                        <strong style="color:red">
+                            R$ {{ sub.liquid_amount|intcomma }}
+                        </strong>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+</div>
