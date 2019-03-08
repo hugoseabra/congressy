@@ -8,51 +8,41 @@
                         aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title">Minhas organizações</h4>
+                <h4 class="modal-title text-bold">MINHAS ORGANIZAÇÕES</h4>
             </div>
             <div class="modal-body modal-scroll">
-                <div class="panel panel-primary">
-                    <div class="panel-body ">
-                        {% if organizations %}
-                            <table id="organization_table"
-                                   class="table dataTable no-footer"
-                                   cellspacing="0"
-                                   width="100%">
-                                <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for item in organizations|slice:":5" %}
-                                    <tr>
-                                        <td onclick="cgsy_submit({{ item.pk }})">
-                                            <button class="btn btn-primary btn-trans btn-block text-left" href="javascript:void(0)" style="text-align: left">
-                                                {{ item.name }}
-                                            </button>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                            {% if organizations|length > 5 %}
-                                <div class="text-center">
-                                    <button type="button"
-                                            class="btn btn-success btn-trans btn-sm dropdown-toggle"
-                                            data-toggle="dropdown"
-                                            aria-expanded="false"
-                                            aria-haspopup="true"
-                                            onclick="location.href='{% url 'event:organization-list' %}'">
-                                        <span>Ver todas organizações</span>
-                                    </button>
-                                </div>
-                            {% endif %}
-                        {% else %}
-                            <h3>Nenhum dado.</h3>
-                        {% endif %}
+                {% if organizations %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% for item in organizations|slice:":5" %}
+                                <button class="btn btn-primary btn-trans btn-block text-left" href="javascript:void(0)" style="text-align: left;margin-bottom:10px"
+                                        onclick="$(this).parent().find('button').attr('disabled', true);cgsy_submit({{ item.pk }})"
+                                    {% if item.name|length > 50 %}data-toggle="tooltip" title="{{ item.name }}"{% endif %}>
+                                    {{ item.name|truncatechars:50 }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <h3>Nenhum dado.</h3>
+                {% endif %}
+            </div>
+            {% if organizations|length > 5 %}
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <button type="button"
+                                class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                                data-toggle="dropdown"
+                                aria-expanded="false"
+                                aria-haspopup="true"
+                                onclick="location.href='{% url 'event:organization-list' %}'">
+                            <span>Ver todas organizações</span>
+                        </button>
                     </div>
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
     <form action="{% url 'event:organization-switch' %}" method="post"

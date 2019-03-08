@@ -41,203 +41,149 @@
 
     <div class="row">
         <div class="col-md-12">
-            <div class="panel panel-primary">
+            <div class="panel panel-default">
                 <div class="panel-body">
-                    {% if object_list %}
-                        <table class="table no-footer"
-                               cellspacing="0"
-                               width="100%"
-                               style="border-collapse: separate;empty-cells: hide;">
-                            <tbody>
-                            <tr>
-                                <td class="text-muted"
-                                    style="border:none;text-align: right">
-                                    <strong>Total:</strong></td>
-                                <td width="15%" style="border:none;">
-                                    <strong style="font-size:16px">
-                                        R$ {{ totals.total|money_divide|intcomma }}
-                                    </strong>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted text-right"
-                                    style="border:none;">
-                                    <strong>Total (aguardando):</strong>
-                                </td>
-                                <td style="border:none;">
-                                    <strong class="text-muted"
-                                            style="font-size:16px">
-                                        R$ {{ totals.pending|money_divide|intcomma }}
-                                    </strong>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted text-right"
-                                    style="border:none;"><strong>Total
-                                    (recebível):</strong></td>
-                                <td style="border:none;">
-                                    <strong style="font-size:16px;color:blue">
-                                        R$ {{ totals.paid|money_divide|intcomma }}
-                                    </strong>
-                                </td>
-                            </tr>
-                            </tbody>
+                    <table class="table borderless"
+                           border="0"
+                           width="100%"
+                           style="border-collapse: separate;empty-cells: hide; margin-bottom:0">
+                        <tbody>
+                        <tr>
+                            <td width="25%" class="text-muted text-right">
+                                <strong>Inscrições não-pagas:</strong>
+                            </td>
+                            <td>
+                                <strong style="font-size:16px;color:darkorange">
+                                    R$ {{ totals.pending.amount|intcomma }}
+                                </strong>
+                                <i class="fa fa-info-circle" data-toggle="tooltip" title="Inscrições pendentes de pagamento por parte do participante."></i>
+                                <br />
+                                <a href="javascript:void(0)" class="btn btn-link" style="padding:0;margin:0;font-size: 10px;" onclick="$('#modal-payments-pending-details').modal()">
+                                    Detalhamento
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted text-right"><strong>Inscrições pagas:</strong></td>
+                            <td>
+                                <strong style="font-size:16px;color:blue">
+                                    R$ {{ totals.paid.amount|intcomma }}
+                                </strong>
+                                <i class="fa fa-info-circle" data-toggle="tooltip" title="Inscrições pagas pelo participante e que estão em processo de prazo de transferência."></i>
+                                <br />
+                                <a href="javascript:void(0)" class="btn btn-link" style="padding:0;margin:0;font-size: 10px;" onclick="$('#modal-payments-paid-details').modal()">
+                                    Detalhamento
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted text-right" colspan="2" style="padding:0">
+                                <a href="javascript:void(0)"
+                                   class="btn btn-link"
+                                   style="padding:0;margin:0;font-size: 12px"
+                                   onclick="$('#modal-payments-paid-subscriptions').modal()"
+                                   data-toggle="tooltip"
+                                   title="Dúvidas sobre Recebimento?">
+                                    <i class="fa fa-question-circle" style="padding:0"></i>
+                                    Recebimento e Prazos
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
 
-                        </table>
-                        <hr/>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="tab-wrapper tab-primary">
+                        <ul class="nav nav-tabs">
+                            <li id="super-payments-paid">
+                                <a href="#payments-paid" onclick="select('paid')" data-toggle="tab">Pagos</a>
+                            </li>
+                            <li id="super-payments-pending">
+                                <a href="#payments-pending" onclick="select('pending')" data-toggle="tab">Pendentes</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="payments-paid">
+                                <div id="payments-paid-loader" style="text-align: center;padding: 40px">
+                                    <span class="fas fa-circle-notch fa-spin fa-3x"></span>
+                                    <div>carregando pagos</div>
+                                </div>
+                                <div id="payments-paid-field" style="display: none"></div>
+                            </div>
+                            <div class="tab-pane" id="payments-pending">
 
-                        <table id="payments_table"
-                               class="table table-striped dataTable no-footer
-                               nowrap"
-                               cellspacing="0"
-                               width="100%"
-                               style="border-collapse: separate;empty-cells: hide;">
-                            <thead>
-                            <tr>
-                                <th class="hidden-xs nowrap">Lote</th>
-                                <th>Nome</th>
-                                <th width="5%" class="text-center">Tipo</th>
-                                <th width="25%" class="hidden-xs">Status</th>
-                                <th width="15%">Valor</th>
-                            </tr>
-                            </thead>
+                                <div id="payments-pending-loader" style="text-align: center;padding: 40px">
+                                    <span class="fas fa-circle-notch fa-spin fa-3x"></span>
+                                    <div>carregando pendentes</div>
+                                </div>
+                                <div id="payments-pending-field" style="display: none"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                            <tbody>
-
-                            {% for transaction in object_list %}
-                                <tr>
-                                    <td class="hidden-xs nowrap">
-                                        {{ transaction.subscription.lot.name }}
-                                    </td>
-                                    <td class="nowrap">
-                                        {{ transaction.subscription.person.name }}
-                                    </td>
-                                    <td class="text-center"
-                                        style="font-size: 22px;">
-                                        {% if transaction.type == transaction.BOLETO %}
-                                            <i class="fas fa-barcode"
-                                               title="{{ transaction.get_type_display }}"></i>
-                                        {% elif transaction.type == transaction.CREDIT_CARD %}
-                                            <i class="far fa-credit-card"
-                                               title="{{ transaction.get_type_display }}"></i>
-                                        {% else %}
-                                            {{ transaction.get_type_display }}
-                                        {% endif %}
-                                    </td>
-                                    <td class="hidden-xs nowrap">
-                                        {% if transaction.statuses.all %}
-                                            <div data-toggle="popover"
-                                                 title="Histórico"
-                                                 data-html="true"
-                                                 data-content='
-                                            {% for status in transaction.statuses.all|dictsort:"pk" %}
-                                                {% if status.status == status.AUTHORIZED or status.status == status.PAID %}
-                                                    <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
-                                                {% elif status.status == status.PROCESSING or status.status == status.WAITING_PAYMENT or status.status == status.PENDING_REFUND or status.status == status.CHARGEDBACK %}
-                                                    <i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i>
-                                                {% elif status.status == status.REFUNDED %}
-                                                   <i class="fa fa-circle" aria-hidden="true" style="color: #8977B6"></i>
-                                                {% elif status.status == status.REFUSED %}
-                                                    <i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i>
-                                                {% else %}
-                                                    <i class="fa fa-circle" aria-hidden="true"></i>
-                                                {% endif %}
-                                                <strong>{{ status.get_status_display }}</strong>
-                                                - {{ status.date_created|date:"M d, Y -  H\hi" }}
-                                                <br />
-                                            {% endfor %}'>
-                                        {% else %}
-                                            <div data-toggle="popover"
-                                                 title="Histórico"
-                                                 data-content="Nenhum dado até o momento.">
-                                        {% endif %}
-                                        {% if transaction.status == transaction.AUTHORIZED or transaction.status == transaction.PAID %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"
-                                               style="color:#5cb85c"></i>
-                                        {% elif transaction.status == transaction.PROCESSING or transaction.status == transaction.WAITING_PAYMENT or transaction.status == transaction.PENDING_REFUND or transaction.status == transaction.CHARGEDBACK %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"
-                                               style="color: #f0ad4e"></i>
-                                        {% elif transaction.status == transaction.REFUNDED %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"
-                                               style="color: #8977B6"></i>
-                                        {% elif transaction.status == transaction.REFUSED %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"
-                                               style="color: #d9534f"></i>
-                                        {% else %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"></i>
-                                        {% endif %}
-                                        <strong>{{ transaction.get_status_display }}</strong>
-                                        <div style="text-indent: 18px;font-weight: bold"
-                                             class="text-muted">
-                                            {% if transaction.statuses.last.date_created %}
-                                                {{ transaction.statuses.last.date_created|date:"M d, Y -  H\hi" }}
-                                            {% else %}
-                                                {{ transaction.date_created|date:"M d, Y -  H\hi" }}
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {% if transaction.status == transaction.REFUSED or transaction.status == transaction.REFUNDED %}
-                                            -
-                                        {% else %}
-                                            R$
-                                            {{ transaction.liquid_amount|default_if_none:'-'|unlocalize|intcomma }}
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                        <hr/>
-                        <table class="table no-footer"
-                               cellspacing="0"
-                               width="100%"
-                               style="border-collapse: separate;empty-cells: hide;">
-                            <tbody>
-                            <tr>
-                                <td class="text-muted"
-                                    style="border:none;text-align: right">
-                                    <strong>Total:</strong></td>
-                                <td width="15%" style="border:none;">
-                                    <strong style="font-size:16px">
-                                        R$ {{ totals.total|money_divide|intcomma }}
-                                    </strong>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted text-right"
-                                    style="border:none;">
-                                    <strong>Total (aguardando):</strong>
-                                </td>
-                                <td style="border:none;">
-                                    <strong class="text-muted"
-                                            style="font-size:16px">
-                                        R$ {{ totals.pending|money_divide|intcomma }}
-                                    </strong>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted text-right"
-                                    style="border:none;"><strong>Total
-                                    (recebível):</strong></td>
-                                <td style="border:none;">
-                                    <strong style="font-size:16px;color:blue">
-                                        R$ {{ totals.paid|money_divide|intcomma }}
-                                    </strong>
-                                </td>
-                            </tr>
-                            </tbody>
-
-                        </table>
-
-                    {% else %}
-                        <h3>Nenhum dado.</h3>
-                    {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <table class="table borderless"
+                           border="0"
+                           width="100%"
+                           style="border-collapse: separate;empty-cells: hide; margin-bottom:0">
+                        <tbody>
+                        <tr>
+                            <td width="25%" class="text-muted text-right">
+                                <strong>Inscrições não-pagas:</strong>
+                            </td>
+                            <td>
+                                <strong style="font-size:16px;color:darkorange">
+                                    R$ {{ totals.pending.amount|intcomma }}
+                                </strong>
+                                <i class="fa fa-info-circle" data-toggle="tooltip" title="Inscrições pendentes de pagamento por parte do participante."></i>
+                                <br />
+                                <a href="javascript:void(0)" class="btn btn-link" style="padding:0;margin:0;font-size: 10px;" onclick="$('#modal-payments-pending-details').modal()">
+                                    Detalhamento
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted text-right"><strong>Inscrições pagas:</strong></td>
+                            <td>
+                                <strong style="font-size:16px;color:blue">
+                                    R$ {{ totals.paid.amount|intcomma }}
+                                </strong>
+                                <i class="fa fa-info-circle" data-toggle="tooltip" title="Inscrições pagas pelo participante e que estão em processo de prazo de transferência."></i>
+                                <br />
+                                <a href="javascript:void(0)" class="btn btn-link" style="padding:0;margin:0;font-size: 10px;" onclick="$('#modal-payments-paid-details').modal()">
+                                    Detalhamento
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted text-right" colspan="2" style="padding:0">
+                                <a href="javascript:void(0)"
+                                   class="btn btn-link"
+                                   style="padding:0;margin:0;font-size: 12px"
+                                   onclick="$('#modal-payments-paid-subscriptions').modal()"
+                                   data-toggle="tooltip"
+                                   title="Dúvidas sobre Recebimento?">
+                                    <i class="fa fa-question-circle" style="padding:0"></i>
+                                    Recebimento e Prazos
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -245,14 +191,451 @@
 
 {% endblock %}
 
+{% block modals %}
+<div class="modal" id="modal-payments-paid-subscriptions" role="dialog" data-backdrop="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal"
+                        aria-label="Close"><span
+                        aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-bold">INSCRIÇÕES PAGAS PELOS PARTICIPANTES</h4>
+            </div>
+            <div class="modal-body" style="padding: 30px">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="well text-justify">
+                            <div style="text-indent: 20px">
+                                As transferências da Congressy referente aos valores pagos pelos
+                                participantes são realizadas de acordo com os prazos de processamento
+                                dos boletos e cartões de crédito.
+                            </div>
+                            <br />
+                            <div style="text-indent: 20px">
+                                O saldo estará liberado em 2 dias úteis para boletos, e 30 dias corridos
+                                para cartões de crédito.
+                            </div>
+                            <br />
+                            <div style="text-indent: 20px">
+                                As transferências bancárias são feitas por TED automático
+                                semanalmente, toda sexta-feira.
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button type="button" class="btn btn-primary" onclick="window.open('https://www.congressy.com/faq', '_blank')">
+                                Dúvidas
+                            </button>
+                        </div>
+                        <div class="text-center">
+                            Ou fale conosco pelo chat ou enviando e-mail para
+                            <a href="mailto:congressy@congressy.com?Subject=Dúvidas%20sobre%20inscrições%20pagas" target="_top">congressy@congressy.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modal-payments-pending-details" role="dialog" data-backdrop="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal"
+                        aria-label="Close"><span
+                        aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-bold">DETALHAMENTO DE INSCRIÇÕES PENDENTES</h4>
+            </div>
+            <div class="modal-body" style="padding: 30px">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3 class="text-bold" style="margin-bottom: 8px;">Proporção</h3>
+                        <table class="table table-bordered" style="font-size: 14px">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="33%">Insc. Pendentes</th>
+                                    <th class="text-center" width="33%">Inscr. Pagantes</th>
+                                    <th class="text-center" width="34%">Todas as inscrições</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">{{totals.pending.total}}</td>
+                                    <td class="text-center">
+                                        <div class="text-bold">{{totals.pending.payable_proportion}}%</div>
+                                        <small>{{totals.pending.total_payable}}</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="text-bold">{{totals.pending.general_proportion}}%</div>
+                                        <small>{{totals.pending.total_general}}</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3 class="text-bold" style="margin-bottom: 8px;">Origem</h3>
+                        <table class="table table-bordered" style="font-size: 14px">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="50%">Hotsite</th>
+                                    <th class="text-center" width="50%">Interna</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.pending.total_origin_hotsite_amount|intcomma }}</div>
+                                        <small>{{totals.pending.total_origin_hotsite}} ({{totals.pending.origin_hotsite_proportion}}%)</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.pending.total_origin_internal_amount|intcomma }}</div>
+                                        <small>{{totals.pending.total_origin_internal}} ({{totals.pending.origin_internal_proportion}}%)</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3 class="text-bold" style="margin-bottom: 8px;">Parcelamentos de Boleto</h3>
+                        <table class="table table-bordered" style="font-size: 14px">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="50%">Sem parcelamento</th>
+                                    <th class="text-center" width="50%">Com parcelamento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.pending.without_installment_amount|intcomma }}</div>
+                                        <small>{{totals.pending.without_installment}} ({{totals.pending.without_installment_proportion}}%)</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.pending.with_installment_amount|intcomma }}</div>
+                                        <small>{{totals.pending.with_installment}} ({{totals.pending.with_installment_proportion}}%)</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="table borderless"
+                           border="0"
+                           width="100%"
+                           style="border-collapse: separate;empty-cells: hide; margin-bottom:0">
+                            <tbody>
+                                <tr>
+                                    <td class="text-right">
+                                        <strong>TOTAL</strong>
+                                    </td>
+                                    <td width="25%">
+                                        <strong style="font-size:16px;color:darkorange">
+                                            R$ {{ totals.pending.amount|intcomma }}
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modal-payments-paid-details" role="dialog" data-backdrop="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal"
+                        aria-label="Close"><span
+                        aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-bold">DETALHAMENTO DE PAGAMENTOS REALIZADOS</h4>
+            </div>
+            <div class="modal-body" style="padding: 30px">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3 class="text-bold" style="margin-bottom: 8px;">Proporção</h3>
+                        <table class="table table-bordered" style="font-size: 14px">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="33%">Insc. Pagas</th>
+                                    <th class="text-center" width="33%">Inscr. Pagantes</th>
+                                    <th class="text-center" width="34%">Todas as inscrições</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center text-bold">{{totals.paid.total}}</td>
+                                    <td class="text-center">
+                                        <div class="text-bold">{{totals.paid.payable_proportion}}%</div>
+                                        <small>{{totals.paid.total_payable}}</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="text-bold">{{totals.paid.general_proportion}}%</div>
+                                        <small>{{totals.paid.total_general}}</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3 class="text-bold" style="margin-bottom: 8px;">Origem</h3>
+                        <table class="table table-bordered" style="font-size: 14px">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="50%">Hotsite</th>
+                                    <th class="text-center" width="50%">Interna</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.paid.origin_hotsite_amount|intcomma }}</div>
+                                        <small>{{totals.paid.total_origin_hotsite}} ({{totals.paid.origin_hotsite_proportion}}%)</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.paid.origin_internal_amount|intcomma }}</div>
+                                        <small>{{totals.paid.total_origin_internal}} ({{totals.paid.origin_internal_proportion}}%)</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3 class="text-bold" style="margin-bottom: 8px;">Tipos de Pagamento</h3>
+                        <table class="table table-bordered" style="font-size: 14px">
+                            <thead>
+                                <tr>
+                                    <th width="40%" class="text-center">Tipo</th>
+                                    <th class="text-center">Valor (R$)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="vertical-align: middle;">Cartão de Crédito</td>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.paid.cc_amount|intcomma }}</div>
+                                        <small>{{ totals.paid.cc_total }} ({{ totals.paid.cc_proportion }}%)</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: middle;">Boleto</td>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.paid.boleto_amount|intcomma }}</div>
+                                        <small>{{ totals.paid.boleto_total }} ({{ totals.paid.boleto_proportion }}%)</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: middle;">Manual s/ Parcelamento</td>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.paid.manual_no_installment_amount|intcomma }}</div>
+                                        <small>{{ totals.paid.manual_no_installment_total }} ({{ totals.paid.manual_no_installment_proportion }}%)</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: middle;">Manual c/ Parcelamento</td>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.paid.manual_installment_amount|intcomma }}</div>
+                                        <small>{{ totals.paid.manual_installment_total }} ({{ totals.paid.manual_installment_proportion }}%)</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3 class="text-bold" style="margin-bottom: 8px;">Métodos de Pagamento</h3>
+                        <table class="table table-bordered" style="font-size: 14px">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="50%">Gateway de Pagamento</th>
+                                    <th class="text-center" width="50%">Manual (interno)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.paid.gateway_method_amount|intcomma }}</div>
+                                        <small>{{ totals.paid.gateway_method_total }} ({{ totals.paid.gateway_method_proportion }}%)</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.paid.manual_method_amount|intcomma }}</div>
+                                        <small>{{ totals.paid.manual_method_total }} ({{ totals.paid.manual_method_proportion }}%)</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3 class="text-bold" style="margin-bottom: 8px;">Parcelamentos</h3>
+                        <table class="table table-bordered" style="font-size: 14px">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="34%">Sem parcelamento</th>
+                                    <th class="text-center" width="33%">Parc. de Cartão</th>
+                                    <th class="text-center" width="33%">Parc. de Boleto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.paid.without_installment_amount|intcomma }}</div>
+                                        <small>{{totals.paid.without_installment}} ({{totals.paid.without_installment_proportion}}%)</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.paid.with_installment_cc_amount|intcomma }}</div>
+                                        <small>{{totals.paid.with_installment_cc}} ({{totals.paid.with_installment_cc_proportion}}%)</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="text-bold">R$ {{ totals.paid.with_installment_boleto_amount|intcomma }}</div>
+                                        <small>{{totals.paid.with_installment_boleto}} ({{totals.paid.with_installment_boleto_proportion}}%)</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="table borderless"
+                           border="0"
+                           width="100%"
+                           style="border-collapse: separate;empty-cells: hide; margin-bottom:0">
+                            <tbody>
+                                <tr>
+                                    <td class="text-right">
+                                        <strong>TOTAL</strong>
+                                    </td>
+                                    <td width="25%">
+                                        <strong style="font-size:16px;color:blue">
+                                            R$ {{ totals.paid.amount|intcomma }}
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
 {% block scripts %}
     <script>
+        var fetch_paid_in_process = false;
+        var paid_payments_fetched = false;
+        function fetchPaidPayments(force) {
+            force = force === true;
+
+            if (paid_payments_fetched && force === false) {
+                return;
+            }
+
+            if (fetch_paid_in_process) {
+                return;
+            }
+
+            var loader = $('#payments-paid-loader');
+            var main_field = $('#payments-paid-field');
+
+            main_field.fadeOut(function() {
+                main_field.html('');
+                loader.fadeIn();
+            });
+
+            var url = window.location.origin + window.location.pathname + '?template_name=payments/paid';
+            var sender = new window.cgsy.AjaxSender(url);
+            sender.setSuccessCallback(function(response) {
+                main_field.html(response);
+                loader.fadeOut(function() {
+                    main_field.fadeIn();
+                });
+                paid_payments_fetched = true;
+                fetch_paid_in_process = false;
+            });
+            sender.setFailCallback(function() {
+                fetch_paid_in_process = false;
+                console.error('fail');
+            });
+            sender.get();
+        }
+
+        var fetch_pending_in_process = false;
+        var pending_payments_fetched = false;
+        function fetchPendingPayments(force) {
+            force = force === true;
+            if (pending_payments_fetched && force === false) {
+                return;
+            }
+
+            if (fetch_pending_in_process) {
+                return;
+            }
+
+            fetch_pending_in_process = true;
+
+            var loader = $('#payments-pending-loader');
+            var main_field = $('#payments-pending-field');
+
+            main_field.fadeOut(function() {
+                main_field.html('');
+                loader.fadeIn();
+            });
+
+            var url = window.location.origin + window.location.pathname + '?template_name=payments/pending';
+
+            var sender = new window.cgsy.AjaxSender(url);
+            sender.setSuccessCallback(function(response) {
+                main_field.html(response);
+                loader.fadeOut(function() {
+                    main_field.fadeIn();
+                });
+                fetch_pending_in_process = false;
+                pending_payments_fetched = true;
+            });
+            sender.setFailCallback(function() {
+                fetch_pending_in_process = false;
+                console.error('fail');
+            });
+            sender.get();
+        }
+
+        function selectFromHash() {
+            var hash = window.location.hash.substring(1);
+            var tab_type = hash.replace('tab=', '');
+            select(tab_type);
+        }
+
+        function select(tab_type) {
+            tab_type = tab_type || 'paid';
+
+            $('li', '.nav-tabs').removeClass('active');
+            $('.tab-pane').removeClass('active');
+
+            $('#super-payments-' + tab_type).addClass('active');
+            $('#payments-' + tab_type).addClass('active');
+            window.location.hash = '#tab=' + tab_type;
+
+            switch (tab_type) {
+                case 'pending':
+                    fetchPendingPayments();
+                    break;
+                case 'paid':
+                    fetchPaidPayments();
+                    break;
+                case 'details':
+                    break;
+            }
+        }
+
         $(document).ready(function () {
             $('[data-toggle="popover"]').popover({
                 placement: 'bottom',
                 container: 'body',
                 trigger: 'hover'
             });
+
+            selectFromHash();
         });
     </script>
 {% endblock %}
