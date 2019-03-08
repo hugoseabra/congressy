@@ -25,6 +25,7 @@ INSTALLED_APPS += [
     'service_tags',
     'mix_boleto',
     'installment',
+    'cgsy_commands',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'
