@@ -8,6 +8,7 @@ from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from core.util.string import clear_string
 from gatheros_subscription.lot_api_permissions import MultiLotsAllowed
 from gatheros_subscription.models import Subscription
 from gatheros_subscription.serializers import (
@@ -151,8 +152,13 @@ class SubscriptionListViewSet(RestrictionViewMixin,
             return queryset
 
         return queryset.filter(
+            Q(uuid=search_param, ) |
+            Q(code=search_param, ) |
+            Q(lot__name__icontains=search_param, ) |
+            Q(lot__category__name__icontains=search_param, ) |
             Q(person__name__icontains=search_param, ) |
             Q(person__email__icontains=search_param, ) |
+            Q(person__cpf__icontains=clear_string(search_param), ) |
             Q(person__phone__icontains=search_param, ) |
             Q(person__international_doc__icontains=search_param, ) |
             Q(person__city__name__icontains=search_param, ) |
