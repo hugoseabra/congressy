@@ -839,7 +839,7 @@ def notify_new_user_and_free_subscription(event, subscription):
         body=body,
         to=person.email,
         reply_to=event.organization.email,
-        attachment=voucher_attach,
+        # attachment=voucher_attach,
     )
 
 

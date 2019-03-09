@@ -91,12 +91,12 @@ class ProfileCreateForm(forms.ModelForm):
             )
 
         # Criando o email de confirmação e definição de senha
-        reset_form = PasswordResetForm(
-            data={
-                'email': self.cleaned_data["email"]
-            }
-        )
-        reset_form.is_valid()
+        # reset_form = PasswordResetForm(
+        #     data={
+        #         'email': self.cleaned_data["email"]
+        #     }
+        # )
+        # reset_form.is_valid()
 
         """
         Generates a one-use only link for resetting password and sends via
