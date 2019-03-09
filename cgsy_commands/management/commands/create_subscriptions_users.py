@@ -1,7 +1,9 @@
-from django.core.management.base import BaseCommand
-from django.core.management import call_command
+import sys
 
-from gatheros_subscription.models import LotCategory, Subscription
+from django.core.management import call_command
+from django.core.management.base import BaseCommand
+
+from gatheros_subscription.models import Lot, LotCategory, Subscription
 
 
 class Command(BaseCommand):
@@ -43,6 +45,48 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(
                 '{} insc. encontradas.'.format(num)
             ))
+
+            sub = sub_qs.first()
+            event = sub.event
+            cat = sub.lot.category
+
+            self.stdout.write(self.style.SUCCESS(
+                'EVENTO: .'.format(event.name)
+            ))
+            self.stdout.write(self.style.SUCCESS(
+                'CATEGORIA: .'.format(cat.name)
+            ))
+
+            if lot_ids:
+                lots = Lot.objects.filter(pk__in=lot_ids)
+                self.stdout.write(self.style.SUCCESS(
+                    'LOTE(S): .'.format(cat.name)
+                ))
+                for lot in lots:
+                    self.stdout.write(self.style.SUCCESS(
+                        '  - {} ({})'.format(lot.name, lot.pk,)
+                    ))
+
+                print()
+
+            self.stdout.write(self.style.SUCCESS(
+                '{} insc. encontradas.'.format(num)
+            ))
+
+            confirmation = input("\nProcessar y/N:  ")
+
+            possibilities = [
+                'y',
+                'yes',
+                's',
+                'sim',
+            ]
+
+            if confirmation.lower() not in possibilities:
+                self.stdout.write(self.style.NOTICE(
+                    "\n Exit!"
+                ))
+                sys.exit(0)
 
             for sub in sub_qs:
                 person = sub.person.user
