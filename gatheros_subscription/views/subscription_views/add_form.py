@@ -105,6 +105,7 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
                     person=self.object,
                     lot_pk=lot_pk,
                 )
+
                 if not subscription_form.is_valid():
 
                     for name, error in subscription_form.errors.items():
@@ -130,30 +131,6 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
                         survey_form.save()
                     else:
                         return self.form_invalid(form, survey_form=survey_form)
-
-                if self.subscription.lot.price and \
-                        self.subscription.lot.price > 0:
-
-                    # Criação de Transaction caso seja pago
-                    trans_type = Transaction.MANUAL_WAITING_PAYMENT
-                    trans_form = forms.ManualTransactionForm(
-                        subscription=self.subscription,
-                        data={
-                            'manual_author': '{} ({})'.format(
-                                request.user.get_full_name(),
-                                request.user.email,
-                            ),
-                            'paid': False,
-                            'manual_payment_type': trans_type,
-                            'amount':
-                                self.subscription.lot.get_calculated_price()
-                        }
-                    )
-                    if not trans_form.is_valid():
-                        return self.form_invalid(form, survey_form=survey_form)
-
-                    trans_form.save()
-                    return self.form_valid(form)
 
                 return self.form_valid(form)
 

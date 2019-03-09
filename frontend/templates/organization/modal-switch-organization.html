@@ -14,7 +14,7 @@
                 {% if organizations %}
                     <div class="row">
                         <div class="col-md-12">
-                            {% for item in organizations|slice:":5" %}
+                            {% for item in organizations|slice:":8" %}
                                 <button class="btn btn-primary btn-trans btn-block text-left" href="javascript:void(0)" style="text-align: left;margin-bottom:10px"
                                         onclick="$(this).parent().find('button').attr('disabled', true);cgsy_submit({{ item.pk }})"
                                     {% if item.name|length > 50 %}data-toggle="tooltip" title="{{ item.name }}"{% endif %}>
@@ -27,7 +27,7 @@
                     <h3>Nenhum dado.</h3>
                 {% endif %}
             </div>
-            {% if organizations|length > 5 %}
+            {% if organizations|length > 8 %}
             <div class="modal-footer">
                 <div class="row">
                     <div class="col-md-12 text-center">

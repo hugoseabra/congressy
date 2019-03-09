@@ -76,9 +76,9 @@ class SubscriptionForm(forms.ModelForm):
 
         model = Subscription
         fields = (
+            'origin',
             'lot',
             'person',
-            'origin',
             'created_by',
         )
 
@@ -100,10 +100,13 @@ class SubscriptionForm(forms.ModelForm):
             completed=True,
         ).exclude(status=Subscription.CANCELED_STATUS).count()
 
-        if num_subs and lot.limit and num_subs >= lot.limit:
-            raise forms.ValidationError(
-                'Lote está lotado e não permite novas inscrições'
-            )
+        origin = self.cleaned_data.get('origin')
+
+        if origin != Subscription.DEVICE_ORIGIN_MANAGE:
+            if num_subs and lot.limit and num_subs >= lot.limit:
+                raise forms.ValidationError(
+                    'Lote está lotado e não permite novas inscrições'
+                )
 
         return lot
 
