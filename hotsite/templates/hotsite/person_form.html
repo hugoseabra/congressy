@@ -73,11 +73,17 @@
                                                 <div class="col-md-12">
                                                     {% render_generic_field form.country %}
                                                 </div>
+                                                {% if config and config.cpf != config.CPF_HIDE %}
                                                 <div class="col-md-5"
                                                      id="doc-type"
                                                      style="display: none">
-                                                    {% render_generic_field form.international_doc_type %}
+                                                    {% if config.cpf == config.CPF_REQUIRED %}
+                                                        {% render_generic_field form.international_doc_type required=True %}
+                                                    {% else %}
+                                                        {% render_generic_field form.international_doc_type %}
+                                                    {% endif %}
                                                 </div>
+                                                {% endif %}
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -368,6 +374,7 @@
             var phone_el = $('#id_person-phone');
             var cpf = $('#id_person-cpf');
             var international_doc = $('#id_person-international_doc');
+            var international_doc_type = $('#id_person-international_doc_type');
             var city_block = $('#brazilian_city_block');
             var state_international = $('#state_international_block');
             var city_intern_block = $('#city_international_city_block');
@@ -382,19 +389,22 @@
             country.parent().parent().parent().removeClass('col-md-12').addClass('col-md-7');
 
             // phone_el.unmask();
-            phone_el.attr('onkeyup', 'this.value = this.value.replace(/\\D/g,\'\');');
+            //phone_el.attr('onkeyup', 'this.value = this.value.replace(/\\D/g,\'\');');
             phone_el.parent().parent().parent().find('label').css('margin-bottom', 0);
             phone_el.closest('.form-group').css('margin-top', '20px');
 
             {% if config and config.cpf != config.CPF_HIDE %}
+                international_doc_type.parent().parent().show();
                 international_doc.parent().parent().show();
                 international_doc.closest('.form-group').css('margin-top', '20px');
                 cpf.parent().parent().hide();
 
                 cpf.removeAttr('required');
                 international_doc.removeAttr('required');
+                international_doc_type.removeAttr('required');
 
                 {% if config.cpf == config.CPF_REQUIRED %}
+                    international_doc_type.attr('required', 'required');
                     international_doc.attr('required', 'required');
                 {% endif %}
             {% endif %}
