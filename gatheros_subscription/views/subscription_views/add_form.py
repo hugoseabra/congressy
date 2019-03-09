@@ -115,7 +115,6 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
                 self.subscription = subscription_form.save()
 
-                survey_form = None
                 if self.subscription.lot.event_survey:
 
                     survey = self.subscription.lot.event_survey.survey
