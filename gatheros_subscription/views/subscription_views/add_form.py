@@ -9,8 +9,6 @@ from gatheros_subscription.models import (
     Lot,
 )
 from gatheros_subscription.views import SubscriptionFormMixin
-from payment import forms
-from payment.models import Transaction
 
 
 class SubscriptionAddFormView(SubscriptionFormMixin):
@@ -106,17 +104,9 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
                     lot_pk=lot_pk,
                 )
 
-                if not subscription_form.is_valid():
-
-                    for name, error in subscription_form.errors.items():
-                        form.add_error(field='__all__', error=error[0])
-
-                    return self.form_invalid(form)
-
-                self.subscription = subscription_form.save()
+                survey_form = None
 
                 if self.subscription.lot.event_survey:
-
                     survey = self.subscription.lot.event_survey.survey
 
                     survey_form = self.get_survey_form(
@@ -125,6 +115,20 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
                         files=self.request.FILES,
                         subscription=self.subscription,
                     )
+
+                if not subscription_form.is_valid():
+
+                    for name, error in subscription_form.errors.items():
+                        form.add_error(field='__all__', error=error[0])
+
+                    if survey_form:
+                        return self.form_invalid(form, survey_form=survey_form)
+                    else:
+                        return self.form_invalid(form)
+
+                self.subscription = subscription_form.save()
+
+                if survey_form:
 
                     if survey_form.is_valid():
                         survey_form.save()
