@@ -9,6 +9,7 @@ from gatheros_subscription.models import (
     Lot,
 )
 from gatheros_subscription.views import SubscriptionFormMixin
+from survey.models import Survey
 
 
 class SubscriptionAddFormView(SubscriptionFormMixin):
@@ -91,22 +92,42 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
                 request.POST[field] = clear_string(request.POST[field])
 
         form = self.get_form()
-        if form.is_valid():
-
-            lot_pk = self.request.POST.get('subscription-lot')
-            if not lot_pk:
-                lot_pk = self.subscription.lot.pk
-
-            with atomic():
-                self.object = form.save()
-                subscription_form = self.get_subscription_form(
-                    person=self.object,
-                    lot_pk=lot_pk,
+        if form.is_valid() is False:
+            return self.form_invalid(
+                form,
+                survey_form=self.get_survey_form(
+                    data=self.request.POST,
+                    files=self.request.FILES,
                 )
+            )
 
-                survey_form = None
+        lot_pk = self.request.POST.get('subscription-lot')
+        if not lot_pk:
+            lot_pk = self.subscription.lot.pk
+
+        with atomic():
+            self.object = form.save()
+            subscription_form = self.get_subscription_form(
+                person=self.object,
+                lot_pk=lot_pk,
+            )
+
+            is_valid = True
+            survey_form = None
+
+            if not subscription_form.is_valid():
+
+                for name, error in subscription_form.errors.items():
+                    form.add_error(field='__all__', error=error[0])
+
+                is_valid = False
+
+            else:
+
+                self.subscription = subscription_form.save()
 
                 if self.subscription.lot.event_survey:
+
                     survey = self.subscription.lot.event_survey.survey
 
                     survey_form = self.get_survey_form(
@@ -116,29 +137,25 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
                         subscription=self.subscription,
                     )
 
-                if not subscription_form.is_valid():
-
-                    for name, error in subscription_form.errors.items():
-                        form.add_error(field='__all__', error=error[0])
-
-                    if survey_form:
-                        return self.form_invalid(form, survey_form=survey_form)
+                    if survey_form.is_valid() is False:
+                        is_valid = False
                     else:
-                        return self.form_invalid(form)
-
-                self.subscription = subscription_form.save()
-
-                if survey_form:
-
-                    if survey_form.is_valid():
                         survey_form.save()
-                    else:
-                        return self.form_invalid(form, survey_form=survey_form)
 
-                return self.form_valid(form)
+            if is_valid is False:
+                if survey_form is None:
+                    kwargs = dict()
+                    if self.subscription:
+                        kwargs['subscription'] = self.subscription
 
-        else:
-            return self.form_invalid(form)
+                    survey_form = self.get_survey_form(**kwargs)
+
+                return self.form_invalid(
+                    form=form,
+                    survey_form=survey_form,
+                )
+
+            return self.form_valid(form)
 
     def form_invalid(self, form, survey_form=None):
         """
@@ -148,8 +165,24 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
         return self.render_to_response(
             self.get_context_data(form=form, survey_form=survey_form))
 
-    def get_survey_form(self, survey, subscription=None, data=None,
+    def get_survey_form(self, survey=None, subscription=None, data=None,
                         files=None):
+
+        survey_form = None
+
+        if survey is None:
+
+            lot_pk = self.request.GET.get('lot', 0)
+            if not lot_pk and self.subscription:
+                lot_pk = self.subscription.lot.pk
+
+            if lot_pk != 0:
+                lot = Lot.objects.get(pk=lot_pk)
+                if lot.event_survey:
+                    survey = lot.event_survey.survey
+
+        if not isinstance(survey, Survey):
+            return survey_form
 
         survey_director = SubscriptionSurveyDirector(subscription)
 
