@@ -83,7 +83,7 @@ class SurveyBaseForm(forms.Form):
                             required=required,
                             label=label,
                             help_text=help_text,
-                            select_intro=intro,)
+                            select_intro=intro, )
         self.fields[name] = field.get_django_field()
 
     def clean(self):
@@ -154,10 +154,10 @@ class SurveyAnswerForm(SurveyBaseForm):
                 )[0]
 
             if self.author is None and self.name:
-                self.author = Author.objects.get_or_create(
+                self.author = Author.objects.create(
                     survey=self.survey,
                     name=self.name,
-                )[0]
+                )
 
             if self.author is None:
                 raise Exception(

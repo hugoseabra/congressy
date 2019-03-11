@@ -142,21 +142,33 @@ class SubscriptionSurveyDirector(object):
         # Caso não seja passado uma inscrição, resgatar apenas um
         # SurveyAnswerForm vazio
         if self.subscription is None:
-            return ActiveSurveyAnswerForm(
-                survey=survey,
-                data=data,
-                files=files,
-            )
 
-        user = None
+            kwargs = {
+                'survey': survey,
+                'data': data,
+                'files': files,
+            }
+
+            if data and 'person-name' in data:
+                kwargs['name'] = data['person-name']
+
+            return ActiveSurveyAnswerForm(**kwargs)
+
+        kwargs = {
+            'name': self.subscription.person.name,
+            'survey': survey,
+            'user': None,
+        }
+
         if self.subscription.person.user:
-            user = self.subscription.person.user
+            kwargs['user'] = self.subscription.person.user
 
-        self.subscription.author, _ = Author.objects.get_or_create(
-            name=self.subscription.person.name,
-            survey=survey,
-            user=user,
-        )
+        if kwargs['user'] is not None:
+            self.subscription.author, _ = \
+                Author.objects.get_or_create(**kwargs)
+        else:
+            self.subscription.author = Author.objects.create(**kwargs)
+
         self.subscription.save()
 
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
