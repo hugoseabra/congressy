@@ -560,7 +560,7 @@ def _export_addon_services(worksheet, services):
 
             theme = get_object_value(
                 obj=optional,
-                attr='thee',
+                attr='theme',
                 cached_type='addon_services',
             )
 
