@@ -223,7 +223,17 @@ class XLSLotExamplePersister(XLSPersister):
 
         ws1 = wb.active
 
-        ws1.title = 'Planilha de exemplo -  {}'.format(self.lot.name)
+        # Some of the printable ASCII characters are invalid:  * : / \ ? [ ]
+        name = self.lot.name\
+            .replace('*', '')\
+            .replace(':', '')\
+            .replace('/', '-')\
+            .replace("\\", '-')\
+            .replace('?', '')\
+            .replace('[', '')\
+            .replace(']', '')
+
+        ws1.title = 'Planilha de exemplo -  {}'.format(name)
 
         i = 1
         for header in headers_list:
