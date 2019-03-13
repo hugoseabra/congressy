@@ -56,6 +56,9 @@
                         {% endif %}
                     </div>
                     <div class="float-right">
+                        {% if optional.tag %}
+                        <div style="font-size:14px" class="badge badge-primary" data-toggle="tooltip" title="" data-original-title="Identificador único">{{ optional.tag }}</div>
+                        {% endif %}
                         {% if optional.theme %}
                         <div style="font-size:14px" class="badge badge-primary" data-toggle="tooltip" title="" data-original-title="Grupo temático da atividade">{{ optional.theme.name }}</div>
                         {% endif %}

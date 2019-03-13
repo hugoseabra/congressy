@@ -49,11 +49,20 @@ def get_all_options(
         available = len(reasons) == 0
 
         if available:
-            for service in pre_existing_optionals:
-                # Checks for bi-lateral time restrictions.
-                if not is_in_time_frame(service.optional, optional):
-                    reasons.append('Conflito de horário')
+            if optional.tag:
+                existing_tag_qs = \
+                    pre_existing_optionals.filter(optional__tag=optional.tag)
+
+                if existing_tag_qs.count() > 0:
+                    reasons.append('Conflito de tema')
                     available = False
+
+            if available is True:
+                for service in pre_existing_optionals:
+                    # Checks for bi-lateral time restrictions.
+                    if not is_in_time_frame(service.optional, optional):
+                        reasons.append('Conflito de horário')
+                        available = False
 
         if available_only:
             results.append(optional)

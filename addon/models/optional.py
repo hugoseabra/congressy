@@ -229,6 +229,16 @@ class Product(AbstractOptional):
         help_text='Exemplo: palestra, workshop, curso, hospedagem',
     )
 
+    tag = models.CharField(
+        max_length=24,
+        verbose_name="Identificador único",
+        help_text='Inscrições que são feitas em opcional que possui'
+                  ' identificador único não podem fazer inscrição em outro'
+                  ' opcional com o mesmo identificador.',
+        null=True,
+        blank=True,
+    )
+
     @property
     def num_consumed(self):
         """
@@ -242,6 +252,13 @@ class Product(AbstractOptional):
             subscription__completed=True,
             subscription__test_subscription=False
         ).exclude(subscription__status=Subscription.CANCELED_STATUS).count()
+
+    def save(self, *args, **kwargs):
+        if self.tag:
+            self.tag = self.tag.upper()
+            self.tag = self.tag.replace(' ', '')
+
+        super().save(*args, **kwargs)
 
 
 @track_data('schedule_start', 'schedule_end')
@@ -307,6 +324,16 @@ class Service(AbstractOptional):
                   ' em conflito de horário com esta.'
     )
 
+    tag = models.CharField(
+        max_length=24,
+        verbose_name="Identificador único",
+        help_text='Inscrições que são feitas em atividade extra que possui'
+                  ' identificador único não podem fazer inscrição em outra'
+                  ' atividadade extra com o mesmo identificador.',
+        null=True,
+        blank=True,
+    )
+
     @property
     def num_consumed(self):
         """
@@ -320,6 +347,13 @@ class Service(AbstractOptional):
             subscription__completed=True,
             subscription__test_subscription=False
         ).exclude(subscription__status=Subscription.CANCELED_STATUS).count()
+
+    def save(self, *args, **kwargs):
+        if self.tag:
+            self.tag = self.tag.upper()
+            self.tag = self.tag.replace(' ', '')
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return '{} - {}'.format(self.name, self.theme.name)
