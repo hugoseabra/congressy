@@ -228,34 +228,40 @@ class EventPaymentView(AccountMixin,
 
             'total_general': total,
             'total_payable': paid_total,
-            'general_proportion': round((total_pending * 100) / total, 2),
-            'payable_proportion': round((total_pending * 100) / paid_total, 2),
+            'general_proportion': round(
+                (total_pending * 100) / total,
+                2
+            ) if total > 0 else 0,
+            'payable_proportion': round(
+                (total_pending * 100) / paid_total,
+                2
+            ) if paid_total > 0 else 0,
 
             'total_origin_internal': len(origin_internal_amount),
             'total_origin_internal_amount': sum(origin_internal_amount),
             'origin_internal_proportion': round(
                 (len(origin_internal_amount) * 100) / total_pending,
                 2
-            ),
+            ) if total_pending > 0 else 0,
             'total_origin_hotsite': len(origin_hotsite_amount),
             'total_origin_hotsite_amount': sum(origin_internal_amount),
             'origin_hotsite_proportion': round(
                 (len(origin_hotsite_amount) * 100) / total_pending,
                 2
-            ),
+            ) if total_pending > 0 else 0,
 
             'with_installment': len(pending_part),
             'with_installment_amount': sum(pending_part),
             'with_installment_proportion': round(
                 (len(pending_part) * 100) / total_pending,
                 2
-            ),
+            ) if total_pending > 0 else 0,
             'without_installment_amount': sum(pending_subs),
             'without_installment': len(pending_subs),
             'without_installment_proportion': round(
                 (len(pending_subs) * 100) / total_pending,
                 2
-            ),
+            ) if total_pending > 0 else 0,
         }
 
     def _get_paid_reports(self):
@@ -346,49 +352,49 @@ class EventPaymentView(AccountMixin,
             'general_proportion': round(
                 (total_paid * 100) / total,
                 2
-            ),
+            ) if total > 0 else 0,
             'payable_proportion': round(
                 (total_paid * 100) / total_payable,
                 2
-            ),
+            ) if total_payable > 0 else 0,
 
             'total_origin_internal': len(internal_amounts),
             'origin_internal_amount': sum(internal_amounts),
             'origin_internal_proportion': round(
                 (len(internal_amounts) * 100) / len(paid_amounts),
                 2
-            ),
+            ) if len(paid_amounts) > 0 else 0,
             'total_origin_hotsite': len(hotsite_amounts),
             'origin_hotsite_amount': sum(hotsite_amounts),
             'origin_hotsite_proportion': round(
                 (len(hotsite_amounts) * 100) / len(paid_amounts),
                 2
-            ),
+            ) if len(paid_amounts) > 0 else 0,
 
             'cc_total': len(cc_amounts),
             'cc_amount': sum(cc_amounts),
             'cc_proportion': round(
                 (len(cc_amounts) * 100) / len(paid_amounts),
                 2
-            ),
+            ) if len(paid_amounts) > 0 else 0,
             'boleto_total': len(boleto_amounts),
             'boleto_amount': sum(boleto_amounts),
             'boleto_proportion': round(
                 (len(boleto_amounts) * 100) / len(paid_amounts),
                 2
-            ),
+            ) if len(paid_amounts) > 0 else 0,
             'manual_installment_total': len(manual_part_amounts),
             'manual_installment_amount': sum(manual_part_amounts),
             'manual_installment_proportion': round(
                 (len(manual_part_amounts) * 100) / len(paid_amounts),
                 2
-            ),
+            ) if len(paid_amounts) > 0 else 0,
             'manual_no_installment_total': len(manual_amounts),
             'manual_no_installment_amount': sum(manual_amounts),
             'manual_no_installment_proportion': round(
                 (len(manual_amounts) * 100) / len(paid_amounts),
                 2
-            ),
+            ) if len(paid_amounts) > 0 else 0,
 
             'gateway_method_total': len(method_gateway_amounts),
             'gateway_method_amount': sum(method_gateway_amounts),
@@ -401,24 +407,24 @@ class EventPaymentView(AccountMixin,
             'manual_method_proportion': round(
                 (len(method_internal_amounts) * 100) / len(paid_amounts),
                 2
-            ),
+            ) if len(paid_amounts) > 0 else 0,
 
             'with_installment_boleto': len(installment_boletos_amounts),
             'with_installment_boleto_amount': sum(installment_boletos_amounts),
             'with_installment_boleto_proportion': round(
                 (len(installment_boletos_amounts) * 100) / len(paid_amounts),
                 2
-            ),
+            ) if len(paid_amounts) > 0 else 0,
             'with_installment_cc': len(installment_cc_amounts),
             'with_installment_cc_amount': sum(installment_cc_amounts),
             'with_installment_cc_proportion': round(
                 (len(installment_cc_amounts) * 100) / len(paid_amounts),
                 2
-            ),
+            ) if len(paid_amounts) > 0 else 0,
             'without_installment': len(no_installment_amounts),
             'without_installment_amount': sum(no_installment_amounts),
             'without_installment_proportion': round(
                 (len(no_installment_amounts) * 100) / len(paid_amounts),
                 2
-            ),
+            ) if len(paid_amounts) > 0 else 0,
         }
