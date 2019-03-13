@@ -41,54 +41,14 @@
 {% endblock %}
 
 {% block scripts %}
+
     <script src="{% static "/assets/plugins/gauge/gauge.min.js" %}"></script>
     <script src="{% static "assets/js/messenger.js" %}"></script>
     <script src="{% static "/assets/plugins/chartjs/Chart.min.js" %}"></script>
-    <link href="https://fonts.googleapis.com/css?family=Roboto"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 
     <script>
         //=================Gauge Inscritos=================================
-
-
-        var opts = {
-            lines: 12, // The number of lines to draw
-            angle: 0, // The length of each line
-            lineWidth: 0.4, // The line thickness
-            pointer: {
-                length: 0.75, // The radius of the inner circle
-                strokeWidth: 0.042, // The rotation offset
-                color: '#1D212A' // Fill color
-            },
-            limitMax: 'false',   // If true, the pointer will not go past the end of the gauge
-            colorStart: '#1f7bb6',   // Colors
-            colorStop: '#1f7bb6',    // just experiment with them
-            strokeColor: '#F0F3F3',   // to see which ones work best for you
-            generateGradient: true
-        };
-        var target = document.getElementById('gauge');
-        if (target != null) {
-            var gauge = new Gauge(target).setOptions(opts); // create sexy gauge!
-// your canvas element
-            gauge.maxValue = {{ limit }}; // set max gauge value
-            gauge.animationSpeed = 32; // set animation speed (32 is default value)
-            gauge.set({{total_subscriptions}}); // set actual value
-            gauge.setTextField(document.getElementById("gauge-text"));
-        }
-        //==================================================
-        //=================Doughnut Genero=================================
-        var doughnutData = [{
-            value: {{gender.men}},
-            color: "#1F7BB6",
-            highlight: "#1F7BB6",
-            label: "Homens"
-        }, {
-            value: {{gender.women}},
-            color: "#FF80AB",
-            highlight: "#FF80AB",
-            label: "Mulheres"
-        }
-        ];
 
         $(document).ready(function () {
 
@@ -97,15 +57,6 @@
                 'messenger-on-right',
                 theme: 'flat'
             };
-
-            var ctx3 = document.getElementById("doughnut");
-            if (ctx3 != null) {
-                ctx3 = ctx3.getContext('2d');
-                window.myDoughnut = new Chart(ctx3).Doughnut(doughnutData, {
-                    responsive: true
-                });
-            }
-
         });
 
         window.cgsy = window.cgsy || {};
