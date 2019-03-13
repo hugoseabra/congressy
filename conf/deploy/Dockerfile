@@ -19,6 +19,7 @@ LABEL cgsy.image.name="cgsy-platform-production"
 RUN apt-get update -q && apt-get install -qy --no-install-recommends \
     apt-utils \
     nano \
+    vim \
     locales \
         && apt-get purge -y --auto-remove \
         && apt-get clean \
