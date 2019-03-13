@@ -401,7 +401,7 @@ class EventPaymentView(AccountMixin,
             'gateway_method_proportion': round(
                 (len(method_gateway_amounts) * 100) / len(paid_amounts),
                 2
-            ),
+            ) if len(paid_amounts) > 0 else 0,
             'manual_method_total': len(method_internal_amounts),
             'manual_method_amount': sum(method_internal_amounts),
             'manual_method_proportion': round(
