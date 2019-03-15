@@ -87,26 +87,10 @@ class DebtForm(forms.ModelForm):
         Seta valores líquidos e a ser pago esperados de acordo com a
         configuração do lote.
         """
-        event = self.subscription.event
         lot = self.subscription.lot
 
-        cgsy_percent = Decimal(event.congressy_percent) / 100
-        percent_amount = lot.price * cgsy_percent
-
-        if lot.transfer_tax is True:
-            # Se há transferência de taxas ao participante, o valor a ser
-            # recebido pelo organizador será o valor informando em 'price'.
-            # O montante a processar o pagamento possui as taxas adicionais.
-            self.liquid_amount = lot.price
-            self.original_amount = round(lot.price + percent_amount, 2)
-
-        else:
-            # Se não há transferência de taxas ao participante, o valor a ser
-            # recebeido pelo organizador será o valor informado em 'price'
-            # menos as taxas adicionais. O montante a processar é o valor
-            # original de 'price'.
-            self.original_amount = lot.price
-            self.liquid_amount = round(lot.price - percent_amount, 2)
+        self.liquid_amount = lot.get_liquid_price()
+        self.original_amount = lot.price
 
     def _set_service_amounts(self):
         """
