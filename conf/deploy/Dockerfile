@@ -60,7 +60,7 @@ RUN pip install --no-cache-dir --upgrade \
         lxml \
         celery[redis] \
         # Celery UI
-        flower \
+        # flower \
         # send email
         sparkpost \
         # server
