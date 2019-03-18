@@ -277,7 +277,7 @@
                                                                         </button>
                                                                     {% endif %}
                                                                 {% endif %}
-                                                                {% if last_transaction.status == last_transaction.WAITING_PAYMENT  %}
+                                                                {% if last_transaction.status == last_transaction.PROCESSING  %}
                                                                     <button type="button"
                                                                             data-toggle="tooltip"
                                                                             title="{% if last_transaction.boleto_url %}Abrir boleto{% else %}Aguardando processamento{% endif %}"

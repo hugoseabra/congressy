@@ -105,25 +105,25 @@ class EventPanelView(EventDraftStateMixin,
         context['event'] = self.object
         context['feature_config'] = self.object.feature_configuration
         context['feature_management'] = self.object.feature_management
-        context['status'] = self._get_status()
-        context['totals'] = self._get_payables()
-        context['limit'] = self._get_limit()
-        context['event_is_subscribable'] = EventSubscribable() \
-            .is_satisfied_by(self.object)
-        context['event_is_payable'] = is_paid_event(self.object)
-        context['all_lots'] = self.all_lots_status()
-        context['gender'] = self._get_gender()
-        context['pending'] = self._get_number_pending()
+        # context['status'] = self._get_status()
+        # context['totals'] = self._get_payables()
+        # context['limit'] = self._get_limit()
+        # context['event_is_subscribable'] = EventSubscribable() \
+        #     .is_satisfied_by(self.object)
+        # context['event_is_payable'] = is_paid_event(self.object)
+        # context['all_lots'] = self.all_lots_status()
+        # context['gender'] = self._get_gender()
+        # context['pending'] = self._get_number_pending()
         context['has_inside_bar'] = True
         context['active'] = 'panel'
-        context['total_subscriptions'] = self._get_total_subscriptions()
+        # context['total_subscriptions'] = self._get_total_subscriptions()
         context['can_transfer'] = self._can_transfer
         context['can_change'] = self._can_change
         context['can_delete'] = self._can_delete
         context['can_view_lots'] = self._can_view_lots
         context['can_manage_subscriptions'] = self.can_manage_subscriptions
 
-        context['report'] = self._get_report()
+        # context['report'] = self._get_report()
         context['full_banking'] = self._get_full_banking()
         context['has_survey_create'] = self.has_survey_create()
         context['status_addons'] = self.get_status_addons()
