@@ -375,9 +375,17 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
 
         user = self.request.user
         if not isinstance(user, User):
+            messages.warning(
+                request,
+                "Você não está logado, por favor faça seu login. "
+            )
             return redirect('public:hotsite', slug=self.event.slug)
 
         if not self.current_event.subscription_enabled():
+            messages.warning(
+                request,
+                "Evento não está permitindo inscrições."
+            )
             return redirect('public:hotsite', slug=self.event.slug)
 
         try:
@@ -400,6 +408,11 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
 
             if self.event.is_scientific and hasattr(self.event, 'work_config'):
                 if not self.event.work_config.is_configured:
+                    messages.warning(
+                        request,
+                        "Este evento científico ainda não está permitindo "
+                        "inscrições"
+                    )
                     return redirect('public:hotsite', slug=self.event.slug)
 
             return super().dispatch(request, *args, **kwargs)
