@@ -474,7 +474,7 @@
     {% endif %}
 </div>
 
-{% if event.running is True %}
+{% if event.feature_configuration.feature_checkin is True %}
 {% include 'subscription/includes/attendance.html' %}
 {% endif  %}
 
