@@ -546,7 +546,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             button.addClass('btn-' + button_class_name);
 
             if (button_disabled) {
-                button.attr('disabled', '');
+                button.attr('disabled', true);
             }
 
             button.text(button_text);
@@ -1151,4 +1151,15 @@ function createBarCodeSearch(options) {
     );
     $(options['inputEl']).focus();
     barCodeSearch.watch($(options['inputEl']), $(options['listEl']));
+}
+
+function createAttendance(options) {
+    return new window.cgsy.attendance.Attendance(
+        options['checkinUri'],
+        options['success_checkin_msg'],
+        options['fail_checkin_msg'],
+        options['checkoutUri'],
+        options['success_checkout_msg'],
+        options['fail_checkout_msg']
+    );
 }

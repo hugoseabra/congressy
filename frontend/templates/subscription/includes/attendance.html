@@ -1,0 +1,44 @@
+<div class="row tooltip-wrapper ">
+    <div class="col-xl-11 col-lg-11 col-md-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Serviços de Atendimento</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <label for="attendance_id">Registrar atendimento em:</label>
+                                <select class="form-control" name="attendance_id" id="attendance_id">
+                                    {% for attendance in attendances %}
+                                    <option value="{{ attendance.pk }}">{{ attendance.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-block btn-primary" style="margin-top:25px;">Registrar</button>
+                            </div>
+                        </div>
+                        <hr class="divider"/>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4 class="text-bold">Atendimento Registrados:</h4>
+                                <br />
+                                <ul>
+                                    {% for checkin in services_attended %}
+                                    <li>
+                                        {{ checkin.attendance_service.name }}
+                                        &ensp;
+                                        <button class="btn btn-xs btn-danger btn-trans" style="margin-top: 4px"
+                                            onclick="attendanceCheckout('{{ checkin.pk }}', '{{ object.pk }}', '{{ user.person.pk }}')">X</button></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
