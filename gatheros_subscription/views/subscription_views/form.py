@@ -147,8 +147,9 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
         if 'manual_payment_form' not in ctx:
             ctx['manual_payment_form'] = self.get_form()
 
-        ctx['attendances'] = self.get_available_attendances()
-        ctx['services_attended'] = self.get_services_attended()
+        if self.event.running is True:
+            ctx['services_attended'] = self.get_services_attended()
+            ctx['attendances'] = self.get_available_attendances()
 
         return ctx
 
@@ -324,7 +325,12 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
         return settings.CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS
 
     def get_available_attendances(self):
-        return self.event.attendance_services.all()
+        checkins = self.get_services_attended()
+        pks = [c.attendance_service_id for c in checkins]
+
+        return self.event.attendance_services.all().exclude(
+            id__in=pks
+        )
 
     def get_services_attended(self):
         return self.object.checkins.filter(

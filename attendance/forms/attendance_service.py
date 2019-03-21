@@ -17,7 +17,10 @@ class AttendanceServiceForm(forms.ModelForm):
             'event',
             'lot_categories',
             'checkout_enabled',
-            'with_certificate'
+            'with_certificate',
+            'printing_queue_webhook',
+            'printer_number',
+            'pwa_pin',
         )
 
     def clean_lot_category_filter(self):

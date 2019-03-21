@@ -21,6 +21,7 @@
 
 {% block scripts %}
     <!--ABSTRACTS DEPENDENCIES-->
+    <script src="{% static "assets/js/ajax.js" %}"></script>
     <script src="{% static "assets/js/messenger.js" %}"></script>
     <script src="{% static "assets/js/vendor/moment.js" %}"></script>
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
@@ -68,10 +69,10 @@
         {% endif %}
     {% endif %}
 
+    {% if event.running is True %}
     <script src="{% static "assets/js/attendance/attendance.js" %}"></script>
-
     <script>
-        function attendanceCheckout(service_pk, subscription_pk, created_by) {
+        function attendanceCheckin(service_pk) {
             var options = {
                 'checkinUri': "{% url 'api:attendance:checkin-list' %}",
                 'success_checkin_msg': 'Atendimento registrado com succeso',
@@ -90,12 +91,69 @@
                 options['fail_checkout_msg']
             );
 
-            var subscription = new window.cgsy.attendance.Subscription(subscription_pk);
-            console.log(subscription);
+            var subscription = new window.cgsy.attendance.Subscription(
+                '{{ object.pk }}',
+                '{{ object.person.name }}',
+                '{{ object.lot.name }}',
+                '{{ object.lot.category.name }}',
+                '{{ object.person.email }}',
+                {{ object.event_count }},
+                '{{ object.code }}',
+                '{{ object.status }}',
+                {% if object.attended %}true{% else %}false{% endif %}
+            );
 
-            // attendance.checkout(service_pk, subscription, created_by);
+            subscription.setUri("/api/attendance/services/"+ service_pk +"/subscriptions/:pk/");
+
+            attendance.checkin(service_pk, subscription, '{{ user.person.name }}').then(function() {
+
+                window.location.reload(true);
+            });
         }
 
+        function attendanceCheckout(service_pk) {
+            var options = {
+                'checkinUri': "{% url 'api:attendance:checkin-list' %}",
+                'success_checkin_msg': 'Atendimento registrado com succeso',
+                'fail_checkin_msg': 'Falha ao registrar atendimento',
+                'checkoutUri': "{% url 'api:attendance:checkout-list' %}",
+                'success_checkout_msg': 'Saída de atendimento registrada com sucesso',
+                'fail_checkout_msg': 'Falha ao registrar saía',
+            };
+
+            var attendance = new window.cgsy.attendance.Attendance(
+                options['checkinUri'],
+                options['success_checkin_msg'],
+                options['fail_checkin_msg'],
+                options['checkoutUri'],
+                options['success_checkout_msg'],
+                options['fail_checkout_msg']
+            );
+
+
+            var subscription = new window.cgsy.attendance.Subscription(
+                '{{ object.pk }}',
+                '{{ object.person.name }}',
+                '{{ object.lot.name }}',
+                '{{ object.lot.category.name }}',
+                '{{ object.person.email }}',
+                {{ object.event_count }},
+                '{{ object.code }}',
+                '{{ object.status }}',
+                {% if object.attended %}true{% else %}false{% endif %}
+            );
+
+            subscription.setUri("/api/attendance/services/"+ service_pk +"/subscriptions/:pk/");
+
+            attendance.checkout(service_pk, subscription, '{{ user.person.name }}').then(function() {
+
+                window.location.reload(true);
+            });
+        }
+    </script>
+    {% endif %}
+
+    <script>
         $(document).ready(function () {
             $('#test-sub').on('change', function () {
                 var switchState = $('#test-sub').is(":checked");

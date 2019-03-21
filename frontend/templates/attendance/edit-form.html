@@ -29,6 +29,7 @@
           role="form" name="attendance_list_form">
         {% csrf_token %}
 
+
         {% if form.non_field_errors %}
             {% render_errors form.non_field_errors %}
         {% endif %}
@@ -114,7 +115,34 @@
 
                     </div>
                 </div>
+            </div>
+        </div>
 
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Integração com aplicativo de Atendimento</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-5">
+                                {% render_generic_field form.printing_queue_webhook %}
+                            </div>
+                            <div class="col-md-3">
+                                {% render_generic_field form.printer_number %}
+                            </div>
+                            <div class="col-md-4">
+                                {% render_generic_field form.pwa_pin %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="buttonbar bottom">
                     <div class="float-right">
                         <a href="{% url 'attendance:attendance' event.pk object.pk %}"
@@ -130,7 +158,6 @@
                     </div>
                     <div class="clearfix"></div>
                 </div>
-
             </div>
         </div>
 
