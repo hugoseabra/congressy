@@ -39,6 +39,7 @@ def trigger_checkin_pwa(instance, raw, **_):
     r = requests.post(
         webhook,
         data=json.dumps({
+            'event_id': service.event_id,
             'service_id': service.pk,
             'subscription_id': str(instance.subscription_id),
             'printer_number': service.printer_number or 1,
