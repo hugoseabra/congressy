@@ -69,7 +69,7 @@
         {% endif %}
     {% endif %}
 
-    {% if event.running is True %}
+    {% if event.feature_configuration.feature_checkin is True %}
     <script src="{% static "assets/js/attendance/attendance.js" %}"></script>
     <script>
         function attendanceCheckin(service_pk) {

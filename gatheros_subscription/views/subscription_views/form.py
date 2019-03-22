@@ -147,7 +147,7 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
         if 'manual_payment_form' not in ctx:
             ctx['manual_payment_form'] = self.get_form()
 
-        if self.event.running is True:
+        if self.event.feature_configuration.feature_checkin:
             ctx['services_attended'] = self.get_services_attended()
             ctx['attendances'] = self.get_available_attendances()
 
