@@ -185,6 +185,15 @@ class Subscription(models.Model, GatherosModelMixin):
 
     test_subscription = models.BooleanField(default=False)
 
+
+    tag_info = models.CharField(
+        max_length=16,
+        verbose_name='informação para crachá',
+        help_text="Informação customizada para sair no crachá do participante",
+        null=True,
+        blank=True,
+    )
+
     objects = SubscriptionManager()
 
     class Meta:
