@@ -271,7 +271,9 @@
                         }
                     },
                     {data: 'lot_name'},
-                    {data: 'institution'},
+                    {% if event.id == 374 %}
+                        {data: 'institution'},
+                    {% endif %}
                     {data: 'event_count'},
                     {
                         data: 'link', "render": function (data, type, row, meta) {
@@ -515,7 +517,11 @@
 
                                 <th width="18%">Lote</th>
 
-                                <th width="25%">Instituição</th>
+                                {% if event.id == 374 %}
+
+                                    <th width="25%">Instituição</th>
+
+                                {% endif %}
 
                                 <th width="10%" class="text-center"># Insc.</th>
 
