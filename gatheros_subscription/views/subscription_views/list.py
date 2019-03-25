@@ -24,6 +24,7 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
                 test_subscription=False,
             ).count() > 0,
             'institutions': self.get_institutions(),
+            'group_tags': self.get_group_tags(),
             'lots': self.get_lots(),
             'event_is_paid': is_paid_event(self.event),
             'has_inside_bar': True,
@@ -49,6 +50,21 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
                     institutions.append(institution)
 
         return sorted(institutions, key=cmp_to_key(locale.strcoll))
+
+    def get_group_tags(self):
+
+        group_tags = list()
+
+        for sub in self.event.subscriptions.all():
+
+            if sub.tag_group:
+
+                tag_group = str.strip(sub.tag_group)
+                if tag_group not in group_tags:
+                    group_tags.append(tag_group)
+
+        return sorted(group_tags, key=cmp_to_key(locale.strcoll))
+
     #
     # def get_categories(self):
     #

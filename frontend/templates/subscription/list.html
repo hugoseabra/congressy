@@ -469,6 +469,18 @@
 
                                         </div>
 
+                                        <div class="col-xs-2">
+
+                                            <label class="control-label">Tag de Agrupador:</label>
+                                            <select class="form-control input-sm" id="tag_group_filter">
+                                                <option selected>---</option>
+                                                {% for tag in group_tags %}
+                                                    <option value="{{ tag }}">{{ tag }}</option>
+                                                {% endfor %}
+                                            </select>
+
+                                        </div>
+
 
                                     </div>
 
