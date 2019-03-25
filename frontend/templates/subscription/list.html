@@ -42,7 +42,6 @@
             });
         };
 
-
         var get_status_el = function (data, row) {
 
 
@@ -174,7 +173,7 @@
                 'person_uf',
                 'person_phone',
                 'person_city_international',
-                'person_international_doc',
+                'person_international_doc'
             ];
 
 
@@ -200,7 +199,7 @@
 
             var url = '{% url 'api:subscription:subscription-list-api' event.pk %}';
 
-            $('#subscription_table').DataTable({
+            var table = $('#subscription_table').DataTable({
                 "processing": true,
                 "serverSide": true,
                 "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
@@ -208,18 +207,36 @@
                 "searchDelay": 500,
                 "ajax": function (data, callback, settings) {
 
+                    var institution = $('#institution_filter option:selected').val();
+                    var category = $('#category_filter option:selected').val();
+                    var lot = $('#lot_filter option:selected').val();
+
+
+                    var payload = {
+                        limit: data.length,
+                        offset: data.start,
+                        filter_by: settings.aaSorting[0][0],
+                        dir: settings.aaSorting[0][1],
+                        search: data.search['value']
+
+                    };
+
+
+                    if (institution !== "---") {
+                        payload['institution'] = institution
+                    }
+
+                    if (category !== "---") {
+                        payload['category'] = category
+                    }
+
+
                     $.ajax({
                         url: url,
-                        data: {
-                            limit: data.length,
-                            offset: data.start,
-                            filter_by: settings.aaSorting[0][0],
-                            dir: settings.aaSorting[0][1],
-                            search: data.search['value'],
-                        },
+                        data: payload,
                         success: function (res) {
                             callback(res);
-                        },
+                        }
                     });
 
 
@@ -254,6 +271,9 @@
                         }
                     },
                     {data: 'lot_name'},
+                    {% if event.id == 374 %}
+                        {data: 'institution'},
+                    {% endif %}
                     {data: 'event_count'},
                     {
                         data: 'link', "render": function (data, type, row, meta) {
@@ -304,7 +324,11 @@
                 ],
                 // Default order
                 "order": [[0, 'asc']],
-                responsive: true,
+                responsive: true
+            });
+
+            $('#institution_filter,#category_filter,#lot_filter').on("change", function () {
+                table.ajax.reload();
             });
 
 
@@ -412,6 +436,62 @@
         </div>
     </div>
 
+    {% if event.id == 374 %}
+
+        <div class="row tooltip-wrapper">
+
+            <div class="col-md-12">
+
+                <div class="panel panel-primary">
+
+                    <div class="panel-body">
+
+
+                        <div class="col-md-12">
+                            <div>
+
+                                <span style="font-weight: bold; font-size: 17px">Filtros:</span>
+
+                                <form class="form">
+
+                                    <div class="form-group row">
+
+
+                                        <div class="col-xs-2">
+
+                                            <label class="control-label">Instituição:</label>
+                                            <select class="form-control input-sm" id="institution_filter">
+                                                <option selected>---</option>
+                                                {% for institution in institutions %}
+                                                    <option value="{{ institution }}">{{ institution }}</option>
+                                                {% endfor %}
+                                            </select>
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                </form>
+
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
     <div class="row tooltip-wrapper">
 
         <div class="col-md-12">
@@ -420,8 +500,8 @@
 
                 <div class="panel-body">
 
-
                     <div class="col-md-12 table-responsive">
+
 
                         <table id="subscription_table"
                                class="table table-striped table-bordered"
@@ -436,6 +516,12 @@
                                 <th width="10%">Código</th>
 
                                 <th width="18%">Lote</th>
+
+                                {% if event.id == 374 %}
+
+                                    <th width="25%">Instituição</th>
+
+                                {% endif %}
 
                                 <th width="10%" class="text-center"># Insc.</th>
 

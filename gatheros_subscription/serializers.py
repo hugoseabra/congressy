@@ -152,6 +152,7 @@ class SubscriptionSerializer(serializers.BaseSerializer):
             'status': obj.status,
             'created': obj.created,
             'category_name': None,
+            'institution': None,
             'link': reverse(
                 'subscription:subscription-view', kwargs={
                     'event_pk': obj.event.pk,
@@ -182,5 +183,8 @@ class SubscriptionSerializer(serializers.BaseSerializer):
         if obj.person.city:
             rep['person_city'] = obj.person.city.name
             rep['person_uf'] = obj.person.city.uf
+
+        if obj.person.institution:
+            rep['institution'] = obj.person.institution
 
         return rep
