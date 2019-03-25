@@ -42,7 +42,6 @@
             });
         };
 
-
         var get_status_el = function (data, row) {
 
 
@@ -174,7 +173,7 @@
                 'person_uf',
                 'person_phone',
                 'person_city_international',
-                'person_international_doc',
+                'person_international_doc'
             ];
 
 
@@ -215,11 +214,11 @@
                             offset: data.start,
                             filter_by: settings.aaSorting[0][0],
                             dir: settings.aaSorting[0][1],
-                            search: data.search['value'],
+                            search: data.search['value']
                         },
                         success: function (res) {
                             callback(res);
-                        },
+                        }
                     });
 
 
@@ -304,7 +303,7 @@
                 ],
                 // Default order
                 "order": [[0, 'asc']],
-                responsive: true,
+                responsive: true
             });
 
 
