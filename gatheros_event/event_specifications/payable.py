@@ -1,5 +1,4 @@
 from decimal import Decimal
-
 from django.db.models import Count
 
 from addon.models import Product, Service
@@ -152,9 +151,10 @@ class EventHasHadTransactions(EventCompositeSpecificationMixin):
         super().is_satisfied_by(event)
 
         return Subscription.objects.annotate(
-            num_transactions=Count('transactions')
+            num_transactions=Count('transactions'),
         ).filter(
             event=event,
+            test_subscription=False,
             num_transactions__gt=0,
         ).count() > 0
 
