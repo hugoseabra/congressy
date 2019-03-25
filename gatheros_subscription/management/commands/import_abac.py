@@ -49,6 +49,7 @@ class Command(BaseCommand):
                 g = g.replace('- 2', '')
 
             p_instance.institution = g.upper()
+            p_instance.function = sub['tag_info']
 
             p_instance.save()
 
@@ -60,7 +61,6 @@ class Command(BaseCommand):
             Subscription.objects.create(
                 person=p_instance,
                 event_id=374,
-                tag_info=sub['tag_info'],
                 completed=True,
                 test_subscription=False,
                 lot=lot,
