@@ -22,7 +22,7 @@
                                 <label for="attendance_id">Registrar atendimento em:</label>
                                 <select class="form-control" name="attendance_id" id="attendance_id">
                                     {% for service in services %}
-                                    <option value="{{ service.pk }}" data-webhook="{{ service.printing_queue_webhook }}">{{ service.name }}</option>
+                                    <option value="{{ service.pk }}" data-webhook="{{ service.printing_queue_webhook }}" data-pin="{{ service.pwa_pin }}">{{ service.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -32,7 +32,7 @@
                                     onclick="attendanceCheckin($('#attendance_id').val());$(this).parent().parent().find('button').attr('disabled', true);$(this).text('aguarde...')">Registrar</button>
                                 {% if has_webhook %}
                                 <button class="btn btn-primary"
-                                    onclick="attendanceCheckin($('#attendance_id').val(), $('#attendance_id').find('option:selected').data('webhook'));$(this).parent().parent().find('button').attr('disabled', true);$(this).text('aguarde...')">Registrar e imprimir</button>
+                                    onclick="attendanceCheckin($('#attendance_id').val(), $('#attendance_id').find('option:selected').data('webhook'), $('#attendance_id').find('option:selected').data('pin'));$(this).parent().parent().find('button').attr('disabled', true);$(this).text('aguarde...')">Registrar e imprimir</button>
                                 {% endif %}
                             </div>
                         </div>
@@ -51,13 +51,13 @@
                                             <div class="col-sm-4 col-xs-12">
                                                 {% if checkin.attendance_service.printing_queue_webhook %}
                                                 <button class="btn btn-sm btn-primary btn-block btn-trans"
-                                                    onclick="var that=$(this);triggerPrintWebhook(parseInt('{{ checkin.attendance_service_id }}'), '{{ checkin.attendance_service.printing_queue_webhook }}').then(function() { that.parent().parent().find('button').removeAttr('disabled'); });$(this).parent().parent().find('button').attr('disabled', true)">
+                                                    onclick="var that=$(this);triggerPrintWebhook(parseInt('{{ checkin.attendance_service_id }}'), '{{ checkin.attendance_service.printing_queue_webhook }}', '{{ checkin.attendance_service.pwa_pin }}').then(function() { that.parent().parent().find('button').removeAttr('disabled'); });$(this).parent().parent().find('button').attr('disabled', true)">
                                                     <i class="fa fa-print"></i>
                                                     <span>Imprimir</span>
                                                 </button>
                                                 {% endif %}
                                                 <button class="btn btn-sm btn-danger btn-block btn-trans"
-                                                    onclick="attendanceCheckout('{{ checkin.attendance_service_id }}');$(this).parent().parent().find('button').attr('disabled', true)">
+                                                    onclick="attendanceCheckout('{{ checkin.attendance_service_id }}', '{{ checkin.attendance_service.pwa_pin }}');$(this).parent().parent().find('button').attr('disabled', true)">
                                                     <i class="fa fa-remove"></i>
                                                     <span>Remover</span>
                                                 </button>
