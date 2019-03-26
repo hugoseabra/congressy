@@ -637,9 +637,40 @@
 
                                 </div>
 
+
                             </div>
                         </div>
                     {% endif %}
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                Tags e Observação
+                            </div>
+                        </div>
+                        <div class="panel-body">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {% render_generic_field form.tag_info %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    {% render_generic_field form.tag_group %}
+                                </div>
+
+                                <div class="col-md-12">
+                                    {% render_generic_field form.obs %}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
             </div>
 
