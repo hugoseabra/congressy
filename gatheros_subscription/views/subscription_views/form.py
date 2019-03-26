@@ -149,7 +149,13 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
 
         if self.event.feature_configuration.feature_checkin:
             ctx['services_attended'] = self.get_services_attended()
-            ctx['attendances'] = self.get_available_attendances()
+
+            services = self.get_available_attendances()
+
+            ctx['all_services'] = self.event.attendance_services.all()
+            ctx['services'] = services
+            ctx['has_webhook'] = \
+                len([a.printing_queue_webhook for a in services]) > 0
 
         return ctx
 
