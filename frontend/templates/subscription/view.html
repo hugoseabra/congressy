@@ -72,7 +72,7 @@
     {% if event.feature_configuration.feature_checkin is True %}
     <script src="{% static "assets/js/attendance/attendance.js" %}"></script>
     <script>
-        function attendanceCheckin(service_pk, printing_webhook) {
+        function attendanceCheckin(service_pk, printing_webhook, pin) {
 
             var options = {
                 'checkinUri': "{% url 'api:attendance:checkin-list' %}",
@@ -108,7 +108,7 @@
 
             attendance.checkin(service_pk, subscription, '{{ user.person.name }}').then(function() {
                 if (printing_webhook) {
-                    triggerPrintWebhook(service_pk, printing_webhook).then(function() {
+                    triggerPrintWebhook(service_pk, printing_webhook, pin).then(function() {
                         window.location.reload(true);
                     });
                 } else {
@@ -155,7 +155,7 @@
             });
         }
 
-        function triggerPrintWebhook(service_pk, printing_webhook) {
+        function triggerPrintWebhook(service_pk, printing_webhook, pin) {
             return new Promise(function(resolve, reject) {
 
                 var printer_number  = 1;
@@ -175,7 +175,7 @@
                 var messenger = new window.cgsy.abstracts.messenger.Messenger();
 
                 var sender = new window.cgsy.AjaxSender(printing_webhook + '/queues/items');
-                    sender.addHeader('PIN', '123');
+                    sender.addHeader('PIN', pin);
                     sender.crossDomainMode();
                     sender.payloadMode();
 
