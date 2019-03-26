@@ -147,18 +147,18 @@ class SubscriptionListViewSet(RestrictionViewMixin,
     def filter(self, request, queryset):
 
         search_param = request.query_params.get("search")
-        institution_param = request.query_params.get("institution")
+        tag_group_param = request.query_params.get("tag_group")
         category_param = request.query_params.get("category")
 
-        if institution_param and institution_param != '':
+        if tag_group_param and tag_group_param != '':
             queryset = queryset.filter(
-                person__institution__icontains=institution_param,
+                tag_group__icontains=tag_group_param,
             )
 
-        # if category_param and category_param != '':
-        #     queryset = queryset.filter(
-        #         lot__category__id=category_param,
-        #     )
+        if category_param and category_param != '':
+            queryset = queryset.filter(
+                lot__category__id=category_param,
+            )
 
         if search_param is None or search_param == '':
             return queryset

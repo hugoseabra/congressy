@@ -1,10 +1,12 @@
+from collections import OrderedDict
+
 import locale
 from django.views import generic
 from functools import cmp_to_key
 
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_subscription.models import (
-    Subscription)
+    Subscription, LotCategory)
 from gatheros_subscription.views import SubscriptionViewMixin
 
 
@@ -13,6 +15,7 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
 
     model = Subscription
     template_name = 'subscription/list.html'
+    has_filter = False
 
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
@@ -23,9 +26,10 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
                 completed=True,
                 test_subscription=False,
             ).count() > 0,
-            'institutions': self.get_institutions(),
             'group_tags': self.get_group_tags(),
-            'lots': self.get_lots(),
+            'categories': self.get_categories(),
+            # 'lots': self.get_lots(),
+            'has_filter': self.has_filter,
             'event_is_paid': is_paid_event(self.event),
             'has_inside_bar': True,
             'active': 'inscricoes',
@@ -37,19 +41,6 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
             'gatheros_event.can_manage_subscriptions',
             self.get_event()
         )
-
-    def get_institutions(self):
-        institutions = list()
-
-        for sub in self.event.subscriptions.all():
-
-            if sub.person.institution:
-
-                institution = str.strip(sub.person.institution)
-                if institution not in institutions:
-                    institutions.append(institution)
-
-        return sorted(institutions, key=cmp_to_key(locale.strcoll))
 
     def get_group_tags(self):
 
@@ -63,25 +54,28 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
                 if tag_group not in group_tags:
                     group_tags.append(tag_group)
 
+        self.has_filter = len(group_tags) > 0
+
         return sorted(group_tags, key=cmp_to_key(locale.strcoll))
 
-    #
-    # def get_categories(self):
-    #
-    #     categories = dict()
-    #
-    #     for cat in LotCategory.objects.filter(event=self.event):
-    #         if cat.pk not in categories.values():
-    #             categories[cat.name] = cat.pk
-    #
-    #     sorted_categories = OrderedDict()
-    #
-    #     for name in sorted(categories.keys(), key=cmp_to_key(locale.strcoll)):
-    #         for _name, pk in categories.items():
-    #             if name == _name:
-    #                 sorted_categories[name] = pk
-    #
-    #     return sorted_categories
+    def get_categories(self):
+
+        categories = dict()
+
+        for cat in LotCategory.objects.filter(event=self.event):
+            if cat.pk not in categories.values():
+                categories[cat.name] = cat.pk
+
+        sorted_categories = OrderedDict()
+
+        for name in sorted(categories.keys(), key=cmp_to_key(locale.strcoll)):
+            for _name, pk in categories.items():
+                if name == _name:
+                    sorted_categories[name] = pk
+
+        self.has_filter = len(sorted_categories) > 0
+
+        return sorted_categories
     #
     # def get_lots(self):
     #
