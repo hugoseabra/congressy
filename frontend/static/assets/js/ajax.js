@@ -6,6 +6,7 @@ window.cgsy = window.cgsy || {};
 
         url = url || window.location.href;
         var sender_method = null;
+        var headers = {};
 
         var beforeSendCallback = function (response) {};
         var success_callback = function (response) {};
@@ -47,6 +48,11 @@ window.cgsy = window.cgsy || {};
             // these HTTP methods do not require CSRF protection
             return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
         }
+
+        this.setHeader = function(key, value) {
+            "use strict";
+            headers[key] = value;
+        };
 
         this.setSuccessCallback = function (callback) {
             if (typeof callback !== 'function') {
@@ -91,6 +97,11 @@ window.cgsy = window.cgsy || {};
                     if (!csrfSafeMethod(settings.type)) {
                         xhr.setRequestHeader("X-CSRFToken", csrftoken);
                     }
+
+                    $.each(headers, function(key, value) {
+                        "use strict";
+                        xhr.setRequestHeader(key, value);
+                    });
 
                     beforeSendCallback();
                 },
