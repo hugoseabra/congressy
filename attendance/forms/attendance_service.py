@@ -19,7 +19,6 @@ class AttendanceServiceForm(forms.ModelForm):
             'checkout_enabled',
             'with_certificate',
             'printing_queue_webhook',
-            'printer_number',
             'pwa_pin',
         )
 
