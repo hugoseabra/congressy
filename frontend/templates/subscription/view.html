@@ -72,7 +72,8 @@
     {% if event.feature_configuration.feature_checkin is True %}
     <script src="{% static "assets/js/attendance/attendance.js" %}"></script>
     <script>
-        function attendanceCheckin(service_pk) {
+        function attendanceCheckin(service_pk, printing_webhook) {
+
             var options = {
                 'checkinUri': "{% url 'api:attendance:checkin-list' %}",
                 'success_checkin_msg': 'Atendimento registrado com succeso',
@@ -106,8 +107,13 @@
             subscription.setUri("/api/attendance/services/"+ service_pk +"/subscriptions/:pk/");
 
             attendance.checkin(service_pk, subscription, '{{ user.person.name }}').then(function() {
-
-                window.location.reload(true);
+                if (printing_webhook) {
+                    triggerPrintWebhook(service_pk, printing_webhook).then(function() {
+                        window.location.reload(true);
+                    });
+                } else {
+                    window.location.reload(true);
+                }
             });
         }
 
@@ -130,7 +136,6 @@
                 options['fail_checkout_msg']
             );
 
-
             var subscription = new window.cgsy.attendance.Subscription(
                 '{{ object.pk }}',
                 '{{ object.person.name }}',
@@ -146,34 +151,90 @@
             subscription.setUri("/api/attendance/services/"+ service_pk +"/subscriptions/:pk/");
 
             attendance.checkout(service_pk, subscription, '{{ user.person.name }}').then(function() {
-
                 window.location.reload(true);
             });
         }
 
-        function triggerPrintWebhook(service_pk) {
-            var data = {
-                'event_id': {{ event.pk }},
-                'service_id': service_pk,
-                'subscription_id': '{{ object.pk }}',
-                'printer_number': 1
-            };
+        function triggerPrintWebhook(service_pk, printing_webhook) {
+            return new Promise(function(resolve, reject) {
 
-            var sender = new window.cgsy.AjaxSender('http://0.0.0.0:8100/queues/items');
-            
-            sender.setFailCallback(function() {
-                console.log(arguments);
+                var printer_number  = 1;
+
+                var config = getPrinterConfig();
+                if (config && config.hasOwnProperty('printer_number')) {
+                    printer_number = parseInt(config['printer_number']) || 1;
+                }
+
+                var data = {
+                    'event_id': parseInt('{{ event.pk }}'),
+                    'service_id': parseInt(service_pk),
+                    'subscription_id': '{{ object.pk }}',
+                    'printer_number': printer_number
+                };
+
+                var messenger = new window.cgsy.abstracts.messenger.Messenger();
+
+                var sender = new window.cgsy.AjaxSender(printing_webhook + '/queues/items');
+                    sender.addHeader('PIN', '123');
+                    sender.crossDomainMode();
+                    sender.payloadMode();
+
+                sender.setFailCallback(function() {
+                    messenger.notifyError('Não foi possível registrar impressão do atendimento');
+                    reject();
+                });
+                sender.setSuccessCallback(function() {
+                    messenger.notifySuccess('Impressão enviada com sucesso.');
+                    resolve();
+                });
+                sender.post(data);
             });
-            sender.setSuccessCallback(function() {
-                console.log(arguments);
-            });
-            sender.post(data);
         }
+
+        var printer_config_key = 'cgsy-printer-config-' + '{{ event.pk }}';
+        function savePrinterConfig(service_pk, printer_number) {
+            var data = {
+                'service_pk': service_pk,
+                'event_pk': parseInt('{{ event.pk }}'),
+                'printer_number': parseInt(printer_number)
+            };
+            localStorage.setItem(printer_config_key, JSON.stringify(data));
+
+            var messenger = new window.cgsy.abstracts.messenger.Messenger();
+            messenger.notifySuccess('Configurações salvas com sucesso');
+            setConfigToAttendanceForm();
+        }
+
+        function getPrinterConfig() {
+            var config = localStorage.getItem(printer_config_key);
+            if (!config) {
+                return;
+            }
+            return JSON.parse(config);
+        }
+
+        function setConfigToAttendanceForm() {
+            var config = getPrinterConfig() || {};
+            var service_pk = config.hasOwnProperty('service_pk') ? config['service_pk'] : null;
+            var printer_number = config.hasOwnProperty('printer_number') ? config['printer_number'] : 1;
+
+            if (service_pk) {
+                $('#config-default-service').val(service_pk);
+                $('#attendance_id').val(service_pk);
+            }
+
+            $('#config-printer-number').val(printer_number);
+
+            console.log(config);
+        }
+
     </script>
     {% endif %}
 
     <script>
         $(document).ready(function () {
+            setConfigToAttendanceForm();
+
             $('#test-sub').on('change', function () {
                 var switchState = $('#test-sub').is(":checked");
                 var messageState = switchState ? "True" : "False";
@@ -417,17 +478,18 @@
 
 {% block modals %}
 
+    {% if event.feature_configuration.feature_manual_payments is True %}
     {% include 'subscription/includes/modal-manual-payment-form.html' with form=manual_payment_form %}
+    {% endif %}
+
+    {% if event.feature_configuration.feature_checkin is True %}
+    {% include 'subscription/includes/modal-configure-printer.html' %}
+    {% endif %}
 
     {% include 'subscription/includes/modal-delete-manual-payment-form.html' with form=manual_payment_form %}
 
     {% include 'subscription/includes/modal-part-transaction.html' with manual_form=manual_form%}
 
     {% include 'abstracts/modal.html' %}
-
-    {% if event.feature_configuration.feature_manual_payments is True %}
-
-    {% endif %}
-
 
 {% endblock %}
