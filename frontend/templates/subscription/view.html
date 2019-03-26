@@ -150,6 +150,25 @@
                 window.location.reload(true);
             });
         }
+
+        function triggerPrintWebhook(service_pk) {
+            var data = {
+                'event_id': {{ event.pk }},
+                'service_id': service_pk,
+                'subscription_id': '{{ object.pk }}',
+                'printer_number': 1
+            };
+
+            var sender = new window.cgsy.AjaxSender('http://0.0.0.0:8100/queues/items');
+            
+            sender.setFailCallback(function() {
+                console.log(arguments);
+            });
+            sender.setSuccessCallback(function() {
+                console.log(arguments);
+            });
+            sender.post(data);
+        }
     </script>
     {% endif %}
 

@@ -105,6 +105,32 @@
 
                     </div>
                 </div>
+
+                {% if user.is_superuser %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="panel-title">Integração com aplicativo de Atendimento</div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        {% render_generic_field form.printing_queue_webhook %}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {% render_generic_field form.printer_number %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        {% render_generic_field form.pwa_pin %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
                 <div class="buttonbar bottom">
                     <div class="float-right">
                         {% if next_path %}
