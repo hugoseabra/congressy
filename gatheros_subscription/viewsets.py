@@ -149,6 +149,7 @@ class SubscriptionListViewSet(RestrictionViewMixin,
         search_param = request.query_params.get("search")
         tag_group_param = request.query_params.get("tag_group")
         category_param = request.query_params.get("category")
+        lot_param = request.query_params.get("lot")
 
         if tag_group_param and tag_group_param != '':
             queryset = queryset.filter(
@@ -158,6 +159,11 @@ class SubscriptionListViewSet(RestrictionViewMixin,
         if category_param and category_param != '':
             queryset = queryset.filter(
                 lot__category__id=category_param,
+            )
+
+        if lot_param and lot_param != '':
+            queryset = queryset.filter(
+                lot__id=lot_param,
             )
 
         if search_param is None or search_param == '':

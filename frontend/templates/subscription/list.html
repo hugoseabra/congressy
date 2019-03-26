@@ -1,6 +1,6 @@
 {% extends "base/base.html" %}
 
-{% load i18n static  subscription_tags queryset_filter %}
+{% load i18n static subscription_tags queryset_filter %}
 
 {% block title %} Inscrições | Congressy{% endblock %}
 
@@ -34,6 +34,8 @@
     <script src="{% static 'assets/plugins/icheck/js/icheck.min.js' %}"></script>
 
     <script>
+
+
         var customCheckbox = function () {
             $('input.icheck').iCheck({
                 checkboxClass: 'icheckbox_flat-green',
@@ -210,6 +212,8 @@
         $(document).ready(function () {
             customCheckbox();
 
+            var lots = {% jsonify lots %};
+
             var url = '{% url 'api:subscription:subscription-list-api' event.pk %}';
 
             var table = $('#subscription_table').DataTable({
@@ -240,6 +244,10 @@
 
                     if (category !== "---") {
                         payload['category'] = category
+                    }
+
+                    if (lot !== "---") {
+                        payload['lot'] = lot
                     }
 
 
@@ -339,6 +347,28 @@
 
             $('#tag_group_filter,#category_filter,#lot_filter').on("change", function () {
                 table.ajax.reload();
+            });
+
+            $('#category_filter').on("change", function () {
+
+                var select = $("#lot_filter");
+
+                select.empty()
+                    .append('<option selected>---</option>');
+
+                var id = $(this).val();
+
+                if (lots.hasOwnProperty(id)) {
+
+                    Object.keys(lots[id]).forEach(function (k) {
+                        select.append($("<option>").val(k).html(lots[id][k]));
+                    });
+
+                } else {
+                    console.log('Nenhum lote.')
+                }
+
+
             });
 
 
@@ -464,43 +494,57 @@
                                 <span style="font-weight: bold; font-size: 17px">Filtros:</span>
 
                                 <form class="form">
+                                    <div class="form-group row">
 
-                                    {% if group_tags|length > 0 %}
-
-                                        <div class="form-group row">
-
-                                        <div class="col-xs-3">
-
-                                            <label class="control-label">Tag de Agrupador:</label>
-                                            <select class="form-control input-sm" id="tag_group_filter">
-                                                <option selected>---</option>
-                                                {% for tag in group_tags %}
-                                                    <option value="{{ tag }}">{{ tag }}</option>
-                                                {% endfor %}
-                                            </select>
-
-                                        </div>
-
-                                    {% endif %}
+                                        {% if group_tags|length > 0 %}
 
 
-                                    {% if categories|length > 0 %}
 
-                                        <div class="form-group row">
+                                            <div class="col-xs-3">
+                                                <label class="control-label">Tag de Agrupador:</label>
+                                                <select class="form-control input-sm" id="tag_group_filter">
+                                                    <option selected>---</option>
+                                                    {% for tag in group_tags %}
+                                                        <option value="{{ tag }}">{{ tag }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
 
-                                        <div class="col-xs-3">
 
-                                            <label class="control-label">Categorias:</label>
-                                            <select class="form-control input-sm" id="category_filter">
-                                                <option selected>---</option>
-                                                {% for category_name, category_pk in categories.items %}
-                                                    <option value="{{ category_pk }}">{{ category_name }}</option>
-                                                {% endfor %}
-                                            </select>
 
-                                        </div>
+                                        {% endif %}
 
-                                    {% endif %}
+
+                                        {% if categories|length > 0 %}
+
+
+
+                                            <div class="col-xs-3">
+
+                                                <label class="control-label">Categorias:</label>
+                                                <select class="form-control input-sm" id="category_filter">
+                                                    <option selected>---</option>
+                                                    {% for category_name, category_pk in categories.items %}
+                                                        <option value="{{ category_pk }}">{{ category_name }}</option>
+                                                    {% endfor %}
+                                                </select>
+
+                                            </div>
+
+
+                                            <div class="col-xs-3">
+
+                                                <label class="control-label">Lotes:</label>
+                                                <select class="form-control input-sm" id="lot_filter">
+                                                    <option selected>---</option>
+                                                </select>
+
+                                            </div>
+
+
+
+                                        {% endif %}
+
 
                                     </div>
 

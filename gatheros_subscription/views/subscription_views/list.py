@@ -6,7 +6,7 @@ from functools import cmp_to_key
 
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_subscription.models import (
-    Subscription, LotCategory)
+    Subscription, LotCategory, Lot)
 from gatheros_subscription.views import SubscriptionViewMixin
 
 
@@ -28,7 +28,7 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
             ).count() > 0,
             'group_tags': self.get_group_tags(),
             'categories': self.get_categories(),
-            # 'lots': self.get_lots(),
+            'lots': self.get_lots(),
             'has_filter': self.has_filter,
             'event_is_paid': is_paid_event(self.event),
             'has_inside_bar': True,
@@ -76,21 +76,21 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
         self.has_filter = len(sorted_categories) > 0
 
         return sorted_categories
-    #
-    # def get_lots(self):
-    #
-    #     lots = dict()
-    #
-    #     for lot in Lot.objects.filter(event=self.event, internal=False):
-    #
-    #         if lot.pk not in lots.values():
-    #             lots[lot.name] = lot.pk
-    #
-    #     sorted_lots = OrderedDict()
-    #
-    #     for name in sorted(lots.keys(), key=cmp_to_key(locale.strcoll)):
-    #         for _name, pk in lots.items():
-    #             if name == _name:
-    #                 sorted_lots[name] = pk
-    #
-    #     return sorted_lots
+
+    def get_lots(self):
+
+        categories = dict()
+
+        for cat in LotCategory.objects.filter(event=self.event):
+            if cat.pk not in categories.keys():
+                categories[cat.pk] = dict()
+
+        for lot in Lot.objects.filter(event=self.event, internal=False):
+
+            if lot.category.pk not in categories.keys():
+                categories[lot.category.pk] = dict()
+
+            if lot.pk not in categories[lot.category.pk].keys():
+                categories[lot.category.pk][lot.pk] = lot.name
+
+        return categories
