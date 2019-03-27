@@ -16,5 +16,3 @@ def patch_unaccent():
     DatabaseOperations.lookup_cast = lookup_cast
     DatabaseWrapper.operators['icontains'] = 'LIKE UPPER(unaccent(%s))'
     DatabaseWrapper.operators['istartswith'] = 'LIKE UPPER(unaccent(%s))'
-
-    print('Unaccent patch applied')
