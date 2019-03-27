@@ -119,6 +119,12 @@ class Subscription(models.Model, GatherosModelMixin):
         verbose_name='compareceu'
     )
 
+    accredited = models.BooleanField(
+        default=False,
+        verbose_name='credenciado',
+        help_text='Pessoa já foi atendimento pelo serviço de credenciamento.',
+    )
+
     code = models.CharField(
         max_length=15,
         blank=True,
