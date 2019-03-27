@@ -1,4 +1,4 @@
-{% if attendances or services_attended %}
+{% if services or services_attended %}
 <div class="row tooltip-wrapper ">
     <div class="col-xl-11 col-lg-11 col-md-12">
         <div class="panel panel-primary">
@@ -6,7 +6,7 @@
                 <div class="panel-title">
                     Serviços de Atendimento
                     <div class="pull-right" style="cursor: pointer">
-                        <a href="#">
+                        <a href="javascript:void(0)" data-toggle="modal" data-target="#configure-printer-modal">
                             <i class="fa fa-cog"></i>
                             Configurar
                         </a>
@@ -16,13 +16,13 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-md-12">
-                        {% if attendances %}
+                        {% if services %}
                         <div class="row">
                             <div class="col-xl-9 col-lg-8 col-md-8 col-sm-7">
                                 <label for="attendance_id">Registrar atendimento em:</label>
                                 <select class="form-control" name="attendance_id" id="attendance_id">
-                                    {% for attendance in attendances %}
-                                    <option value="{{ attendance.pk }}">{{ attendance.name }}</option>
+                                    {% for service in services %}
+                                    <option value="{{ service.pk }}" data-webhook="{{ service.printing_queue_webhook }}" data-pin="{{ service.pwa_pin }}">{{ service.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -30,8 +30,10 @@
                                 <div class="hidden-xs" style="margin-top:27px"></div>
                                 <button class="btn btn-primary"
                                     onclick="attendanceCheckin($('#attendance_id').val());$(this).parent().parent().find('button').attr('disabled', true);$(this).text('aguarde...')">Registrar</button>
+                                {% if has_webhook %}
                                 <button class="btn btn-primary"
-                                    onclick="attendanceCheckin($('#attendance_id').val());$(this).parent().parent().find('button').attr('disabled', true);$(this).text('aguarde...')">Registrar e imprimir</button>
+                                    onclick="attendanceCheckin($('#attendance_id').val(), $('#attendance_id').find('option:selected').data('webhook'), $('#attendance_id').find('option:selected').data('pin'));$(this).parent().parent().find('button').attr('disabled', true);$(this).text('aguarde...')">Registrar e imprimir</button>
+                                {% endif %}
                             </div>
                         </div>
                         <hr class="divider"/>
@@ -47,12 +49,15 @@
                                         <td class="col-xl-4 col-lg-7 col-md-7 col-sm-5 col-xs-9">{{ checkin.attendance_service.name }}</td>
                                         <td class="col-xl-2 col-lg-5 col-md-5 col-sm-7 col-xs-3">
                                             <div class="col-sm-4 col-xs-12">
-                                                <button class="btn btn-sm btn-primary btn-block btn-trans">
+                                                {% if checkin.attendance_service.printing_queue_webhook %}
+                                                <button class="btn btn-sm btn-primary btn-block btn-trans"
+                                                    onclick="var that=$(this);triggerPrintWebhook(parseInt('{{ checkin.attendance_service_id }}'), '{{ checkin.attendance_service.printing_queue_webhook }}', '{{ checkin.attendance_service.pwa_pin }}').then(function() { that.parent().parent().find('button').removeAttr('disabled'); });$(this).parent().parent().find('button').attr('disabled', true)">
                                                     <i class="fa fa-print"></i>
                                                     <span>Imprimir</span>
                                                 </button>
+                                                {% endif %}
                                                 <button class="btn btn-sm btn-danger btn-block btn-trans"
-                                                    onclick="attendanceCheckout('{{ checkin.attendance_service_id }}');$(this).parent().parent().find('button').attr('disabled', true)">
+                                                    onclick="attendanceCheckout('{{ checkin.attendance_service_id }}', '{{ checkin.attendance_service.pwa_pin }}');$(this).parent().parent().find('button').attr('disabled', true)">
                                                     <i class="fa fa-remove"></i>
                                                     <span>Remover</span>
                                                 </button>

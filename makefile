@@ -1,11 +1,19 @@
 
 
 up:
-	docker-compose -f bin/env/docker-compose_dev.yml up -d; docker logs -f cgsy-postgres;
+	mkdir -p /tmp/bkp;
+	sudo cp bin/env/extension_installer.sh /tmp/bkp/;
+	docker-compose -f bin/env/docker-compose_dev.yml up -d;
+	docker logs -f cgsy-postgres;
 
 
 down:
 	docker-compose -f bin/env/docker-compose_dev.yml down
+
+
+logs:
+	docker-compose -f bin/env/docker-compose_dev.yml logs -f
+
 
 pgadmin:
 	docker network inspect pg &>/dev/null || docker network create pg;

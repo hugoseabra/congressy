@@ -4,6 +4,11 @@ import os
 from django.contrib.messages import constants as message_constants
 from django.utils.translation import ugettext_lazy as _
 
+from core.database.postgresql import patch_unaccent
+
+# Patch para buscas no postgresql
+patch_unaccent()
+
 # ========================== BASE CONFIGURATION ============================= #
 BASE_DIR = os.path.abspath(os.path.join(
     os.path.dirname(__file__),
