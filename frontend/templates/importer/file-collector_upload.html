@@ -84,8 +84,41 @@
 
         }
 
-        function Checkout(subscription_pk) {
-            var uri = "/api/attendance/checkouts/";
+        function Checkout(checkin_id, time, alert) {
+            var url = "/api/attendance/checkouts/";
+
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {
+                    'created_by': '{{ user_id }}',
+                    'registration': time,
+                    'checkin': checkin_id
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                },
+                success: function () {
+
+                    if (alert) {
+                        window.cgsy.messenger.triggerSuccess('Sucesso!');
+                        window.location.reload()
+                    }
+
+                },
+                error: function (response) {
+                    var msg = 'Failure on request to "' + url + '" with method POST';
+
+                    if (response.hasOwnProperty('detail')) {
+                        msg += ' Detalhes: ' + response.detail;
+                    }
+
+                    window.cgsy.messenger.triggerError(msg)
+                }
+            });
+
+
         }
 
 
@@ -101,12 +134,6 @@
                 Checkin($(this).data('subscription_id'), $(this).data('registration_time'), true);
             });
 
-
-            $('.checkout').on("click", function () {
-
-            });
-
-
             $('.checkin-all').on("click", function () {
 
                 window.cgsy.messenger.triggerLoader('Por favor aguarde...');
@@ -120,6 +147,31 @@
 
 
             });
+
+
+            // ================================================================
+
+
+            $('.checkout').on("click", function () {
+                window.cgsy.messenger.triggerLoader('Por favor aguarde...');
+                Checkout($(this).data('checkin_id'), $(this).data('registration_time'), true);
+            });
+
+
+            $('.checkout-all').on("click", function () {
+
+                window.cgsy.messenger.triggerLoader('Por favor aguarde...');
+
+                $('.checkout').each(function () {
+                    Checkout($(this).data('checkin_id'), $(this).data('registration_time'), false);
+                });
+
+                window.cgsy.messenger.triggerSuccess('Sucesso!');
+                window.location.reload()
+
+
+            });
+
 
         });
     </script>

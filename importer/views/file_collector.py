@@ -97,6 +97,7 @@ class Parser:
         self.state = False
         self.registered = False
         self.error = None
+        self.checkin = None
 
         self._process()
 
@@ -128,6 +129,8 @@ class Parser:
             elif self.attendance_type == "checkout":
                 self.registered = Checkout.objects.filter(checkin__attendance_service=self.attendance,
                                                           checkin__subscription=sub).exists()
+
+                self.checkin = Checkin.objects.get(attendance_service=self.attendance, subscription=sub)
 
             self.state = True
 

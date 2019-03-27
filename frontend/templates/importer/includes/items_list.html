@@ -41,7 +41,9 @@
                                     Registrar
                                 </button>
                             {% elif form.cleaned_data.type == "checkout" %}
-                                <button class="btn btn-primary btn-sm checkout">
+                                <button data-checkin_id="{{ item.checkin.pk }}"
+                                        data-registration_time="{{ item.processed_line.1|date:"Y-m-d H:i:s" }}"
+                                        class="btn btn-primary btn-sm checkout">
                                     Registrar
                                 </button>
                             {% endif %}
