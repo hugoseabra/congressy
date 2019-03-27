@@ -52,6 +52,10 @@ if [[ ! -f "$BKP_FILE_PATH" ]]; then
       ${DBNAME} > ${BKP_FILE_PATH}
 
     echo "1" > ${BKP_DUMP_DIR}/recreate.txt
+
+    # Assegura que a extensão UNACCENT seja criada ao recriar o serviço
+    cp ././../extension_installer.sh ${BKP_DIR}/.
+
 else
     echo "0" > ${BKP_DUMP_DIR}/recreate.txt
 fi
