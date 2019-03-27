@@ -19,6 +19,7 @@ class ManageListAttendanceView(AttendancesFeatureFlagMixin, ListView):
         context['event'] = self.event
         context['has_inside_bar'] = True
         context['active'] = 'attendance'
+        context['is_staff'] = self.request.user.is_staff
         context['attendance_lists'] = AttendanceService.objects.filter(
             event=self.event
         )

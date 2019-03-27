@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.contrib import messages
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 
@@ -18,6 +19,17 @@ class FileCollectorImportView(SubscriptionViewMixin, TemplateNameableMixin, gene
         View usada para fazer apenas upload de arquivos
     """
     template_name = "importer/file-collector_upload.html"
+
+    def dispatch(self, request, *args, **kwargs):
+
+        res = super().dispatch(request, *args, **kwargs)
+
+        if not request.user.is_staff:
+            return redirect(reverse_lazy('attendance:manage-list-attendance', kwargs={
+                'event_pk': self.event.pk
+            }))
+
+        return res
 
     def get_form(self, form_class=None):
         kwargs = self.get_form_kwargs()
