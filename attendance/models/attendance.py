@@ -23,6 +23,12 @@ class Attendance(models.Model):
         verbose_name='criado por'
     )
 
+    registration = models.DateTimeField(
+        verbose_name='tempo informado pelo organizador',
+        null=True,
+        blank=True,
+    )
+
 
 class Checkin(Attendance):
     class Meta (Attendance.Meta):

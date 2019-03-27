@@ -37,6 +37,12 @@ class AttendanceService(models.Model):
         blank=True,
     )
 
+    printer_number = models.PositiveIntegerField(
+        verbose_name='Núm. impressora',
+        null=True,
+        blank=True,
+    )
+
     pwa_pin = models.CharField(
         max_length=12,
         verbose_name='PIN de acesso',
@@ -44,6 +50,9 @@ class AttendanceService(models.Model):
         null=True,
         blank=True,
     )
+
+    def __str__(self):
+        return self.name
 
     accreditation = models.BooleanField(
         default=False,

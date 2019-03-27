@@ -1,0 +1,280 @@
+{% extends "base/base.html" %}
+{% load  form_config_tags static %}
+{% block title %}Importar | Congressy{% endblock %}
+
+{% block page_title %}Importar via Arquivo Coletor{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_description %}
+    Importação de dados via arquivo coletor
+{% endblock %}
+
+{% block styles %}
+
+    <style>
+
+
+    </style>
+
+{% endblock %}
+
+{% block scripts %}
+    <!--ABSTRACTS DEPENDENCIES-->
+    <script src="{% static "assets/js/ajax.js" %}"></script>
+    <script src="{% static "assets/js/messenger.js" %}"></script>
+    <script src="{% static "assets/js/vendor/moment.js" %}"></script>
+    <script src="{% static "assets/js/price-format.min.js" %}"></script>
+
+    <!--ABSTRACTS-->
+    {% if DEBUG is True and STAGING_MODE is False %}
+        <script src="{% static "assets/js/abstracts/01-dom.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/01-error.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/01-messenger.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/01-uri.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/02-alerter.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/02-form-field-mapper.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/02-http.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/03-form.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/03-model.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/04-collection.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/04-model-form.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/05-element-list.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/05-modal.js" %}"></script>
+    {% else %}
+        <script src="{% static "assets/js/abstracts/cgsy-abstracts.js" %}?v=1"></script>
+    {% endif %}
+
+
+    <script src="{% static "assets/js/attendance/attendance.js" %}"></script>
+    <script>
+
+        function Checkin(subscription_pk, time, alert) {
+
+            var url = "/api/attendance/checkins/";
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {
+                    'created_by': '{{ user_id }}',
+                    'registration': time,
+                    'attendance_service': '{{ form.cleaned_data.services.pk }}',
+                    'subscription': subscription_pk
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                },
+                success: function () {
+
+                    if (alert) {
+                        window.cgsy.messenger.triggerSuccess('Sucesso!');
+                        window.location.reload()
+                    }
+
+                },
+                error: function (response) {
+                    var msg = 'Failure on request to "' + url + '" with method POST';
+
+                    if (response.hasOwnProperty('detail')) {
+                        msg += ' Detalhes: ' + response.detail;
+                    }
+
+                    window.cgsy.messenger.triggerError(msg)
+                }
+            });
+
+        }
+
+        function Checkout(checkin_id, time, alert) {
+            var url = "/api/attendance/checkouts/";
+
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {
+                    'created_by': '{{ user_id }}',
+                    'registration': time,
+                    'checkin': checkin_id
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                },
+                success: function () {
+
+                    if (alert) {
+                        window.cgsy.messenger.triggerSuccess('Sucesso!');
+                        window.location.reload()
+                    }
+
+                },
+                error: function (response) {
+                    var msg = 'Failure on request to "' + url + '" with method POST';
+
+                    if (response.hasOwnProperty('detail')) {
+                        msg += ' Detalhes: ' + response.detail;
+                    }
+
+                    window.cgsy.messenger.triggerError(msg)
+                }
+            });
+
+
+        }
+
+
+    </script>
+
+
+    <script>
+
+        $(document).ready(function () {
+
+            $('.checkin').on("click", function () {
+                window.cgsy.messenger.triggerLoader('Por favor aguarde...');
+                Checkin($(this).data('subscription_id'), $(this).data('registration_time'), true);
+            });
+
+            $('.checkin-all').on("click", function () {
+
+                window.cgsy.messenger.triggerLoader('Por favor aguarde...');
+
+                $('.checkin').each(function () {
+                    Checkin($(this).data('subscription_id'), $(this).data('registration_time'), false);
+                });
+
+                window.cgsy.messenger.triggerSuccess('Sucesso!');
+                window.location.reload()
+
+
+            });
+
+
+            // ================================================================
+
+
+            $('.checkout').on("click", function () {
+                window.cgsy.messenger.triggerLoader('Por favor aguarde...');
+                Checkout($(this).data('checkin_id'), $(this).data('registration_time'), true);
+            });
+
+
+            $('.checkout-all').on("click", function () {
+
+                window.cgsy.messenger.triggerLoader('Por favor aguarde...');
+
+                $('.checkout').each(function () {
+                    Checkout($(this).data('checkin_id'), $(this).data('registration_time'), false);
+                });
+
+                window.cgsy.messenger.triggerSuccess('Sucesso!');
+                window.location.reload()
+
+
+            });
+
+
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-left">
+                    <a href="{% url 'attendance:manage-list-attendance' event.pk %}"
+                       class="btn btn-primary">
+                        <i class="fas fa-arrow-circle-left"></i>
+                        Voltar
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    {% if data %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            Dados processados
+                        </h3>
+                    </div>
+
+                    <div class="panel-body">
+
+                        <div class="alert alert-info">
+                            <strong>ATENÇÃO!</strong>
+                            Você estará realizando o <b>{{ form.cleaned_data.type }}</b> dessas inscrições.
+                        </div>
+
+                        <div class="row">
+
+                            <div>
+
+                                {% include 'importer/includes/items_list.html' %}
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="panel-footer">
+                        <button class="btn btn-primary" onclick="window.location = window.location.href;">
+                            Novo
+                        </button>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            Upload
+                        </h3>
+                    </div>
+
+
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <form method="POST" enctype="multipart/form-data">
+
+                                {% csrf_token %}
+
+
+                                {% render_generic_field form.type %}
+                                {% render_generic_field form.services %}
+                                {% render_generic_field form.collector_file %}
+
+                                <button type="submit" class="btn btn-success" id="save-submission"
+                                        style="margin-left: 10px">
+                                    Enviar
+                                </button>
+
+
+                            </form>
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+
+{% endblock %}
