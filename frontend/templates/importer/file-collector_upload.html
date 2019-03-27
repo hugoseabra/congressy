@@ -1,0 +1,198 @@
+{% extends "base/base.html" %}
+{% load  form_config_tags static %}
+{% block title %}Importar | Congressy{% endblock %}
+
+{% block page_title %}Importar via Arquivo Coletor{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_description %}
+    Importação de dados via arquivo coletor
+{% endblock %}
+
+{% block styles %}
+
+    <style>
+
+
+    </style>
+
+{% endblock %}
+{% block scripts %}
+
+{% endblock %}
+
+
+{% block content %}
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-left">
+                    <a href="{% url 'subscription:subscription-list' event.pk %}"
+                       class="btn btn-primary">
+                        <i class="fas fa-arrow-circle-left"></i>
+                        Voltar
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    {% if data %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            Dados processados
+                        </h3>
+                    </div>
+
+                    <div class="panel-body">
+
+                        <div class="alert alert-info">
+                            <strong>ATENÇÃO!</strong>
+                            Você estará realizando o <b>{{ form.cleaned_data.type }}</b> dessas inscrições.
+                        </div>
+
+                        <div class="row">
+
+                            <div>
+
+
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th width="75%">Inscrição</th>
+                                        <th width="3%">Status</th>
+                                        <th width="15%">Ação</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for item in data %}
+
+                                        {% if item.processed_line %}
+
+                                            {% if item.state is False %}
+
+                                                <tr>
+                                                    <td data-toggle="tooltip" title="{{ item.error }}">
+                                                        {{ item.processed_line }}
+                                                    </td>
+                                                    <td>
+                                                        <i class="fa fa-circle"
+                                                           aria-hidden="true"
+                                                           style="color: #d9534f;"></i>
+
+                                                    </td>
+                                                    <td> ---</td>
+                                                </tr>
+
+                                            {% else %}
+
+                                                <tr>
+                                                    <td>
+                                                        {{ item.processed_line.0.code }}
+                                                    </td>
+                                                    <td>
+                                                        <i class="fa fa-circle"
+                                                           style="color:#5cb85c;"
+                                                           aria-hidden="true"></i>
+                                                    </td>
+                                                    <td>
+                                                        {% if form.cleaned_data.type == "checkin" %}
+                                                            <a href="#">Check-in</a>
+                                                        {% elif form.cleaned_data.type == "checkout" %}
+                                                            <a href="#">Check-out</a>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+
+                                            {% endif %}
+
+                                        {% endif %}
+
+                                    {% endfor %}
+
+
+                                    <tr>
+                                        <td>
+
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>
+                                            {% if form.cleaned_data.type == "checkin" %}
+                                                <a href="#">Check-in todos</a>
+                                            {% elif form.cleaned_data.type == "checkout" %}
+                                                <a href="#">Check-out todos</a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="panel-footer">
+                        <button class="btn btn-primary" onclick="window.location = window.location.href;">
+                            Novo
+                        </button>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            Upload
+                        </h3>
+                    </div>
+
+
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <form method="POST" enctype="multipart/form-data">
+
+                                {% csrf_token %}
+
+
+                                {% render_generic_field form.type %}
+                                {% render_generic_field form.services %}
+                                {% render_generic_field form.collector_file %}
+
+                                <button type="submit" class="btn btn-success" id="save-submission"
+                                        style="margin-left: 10px">
+                                    Enviar
+                                </button>
+
+
+                            </form>
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+
+{% endblock %}

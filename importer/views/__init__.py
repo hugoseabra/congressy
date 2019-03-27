@@ -8,3 +8,4 @@ from .csv import (
     CSVErrorXLSView,
     CSVFixCitiesView,
 )
+from .file_collector import FileCollectorImportView
