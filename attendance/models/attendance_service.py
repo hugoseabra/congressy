@@ -45,6 +45,14 @@ class AttendanceService(models.Model):
         blank=True,
     )
 
+    accreditation = models.BooleanField(
+        default=False,
+        verbose_name='Credenciamento principal',
+        help_text='Este é o serviço de credenciamento? O evento só poderá ter'
+                  ' um.'
+
+    )
+
     class Meta:
         verbose_name = 'Lista de Check-in/out'
         verbose_name_plural = 'Lista de Check-ins/outs'
