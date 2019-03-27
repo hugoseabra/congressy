@@ -1,0 +1,97 @@
+<table class="table">
+    <thead>
+    <tr>
+        <th width="75%">Inscrição</th>
+        <th width="3%">Status</th>
+        <th width="15%">Ação</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for item in data %}
+
+        {% if item.processed_line %}
+
+            {% if item.state is True %}
+
+                <tr>
+                    <td>
+                        {{ item.processed_line.0.code }}
+                    </td>
+                    <td>
+                        <i class="fa fa-circle"
+                           style="color:#5cb85c;"
+                           aria-hidden="true"></i>
+                    </td>
+                    <td>
+
+
+                        {% if item.registered is True %}
+
+                            <button class="btn btn-sm btn-primary disabled">
+                                Registrado
+                            </button>
+
+                        {% else %}
+
+                            {% if form.cleaned_data.type == "checkin" %}
+                                <button data-subscription_id="{{ item.processed_line.0.pk }}"
+                                        data-registration_time="{{ item.processed_line.1|date:"Y-m-d H:i:s" }}"
+                                        class="btn btn-sm btn-primary checkin">
+                                    Registrar
+                                </button>
+                            {% elif form.cleaned_data.type == "checkout" %}
+                                <button class="btn btn-primary btn-sm checkout">
+                                    Registrar
+                                </button>
+                            {% endif %}
+
+                        {% endif %}
+
+
+                    </td>
+                </tr>
+
+            {% else %}
+
+                <tr>
+                    <td data-toggle="tooltip" title="{{ item.error }}">
+                        {{ item.processed_line }}
+                    </td>
+                    <td>
+                        <i class="fa fa-circle"
+                           aria-hidden="true"
+                           style="color: #d9534f;"></i>
+
+                    </td>
+                    <td> ---</td>
+                </tr>
+
+            {% endif %}
+
+        {% endif %}
+
+    {% endfor %}
+
+    {% if processable %}
+        <tr>
+            <td>
+
+            </td>
+            <td>
+            </td>
+            <td>
+                {% if form.cleaned_data.type == "checkin" %}
+                    <button class="btn btn-primary btn-sm checkin-all">Registrar todos
+                    </button>
+                {% elif form.cleaned_data.type == "checkout" %}
+                    <button class="btn btn-primary btn-sm checkout-all">Registrar todos
+                    </button>
+                {% endif %}
+            </td>
+        </tr>
+
+    {% endif %}
+
+    </tbody>
+</table>

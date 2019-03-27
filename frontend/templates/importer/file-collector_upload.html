@@ -16,10 +16,114 @@
     </style>
 
 {% endblock %}
+
 {% block scripts %}
+    <!--ABSTRACTS DEPENDENCIES-->
+    <script src="{% static "assets/js/ajax.js" %}"></script>
+    <script src="{% static "assets/js/messenger.js" %}"></script>
+    <script src="{% static "assets/js/vendor/moment.js" %}"></script>
+    <script src="{% static "assets/js/price-format.min.js" %}"></script>
 
+    <!--ABSTRACTS-->
+    {% if DEBUG is True and STAGING_MODE is False %}
+        <script src="{% static "assets/js/abstracts/01-dom.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/01-error.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/01-messenger.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/01-uri.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/02-alerter.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/02-form-field-mapper.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/02-http.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/03-form.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/03-model.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/04-collection.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/04-model-form.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/05-element-list.js" %}"></script>
+        <script src="{% static "assets/js/abstracts/05-modal.js" %}"></script>
+    {% else %}
+        <script src="{% static "assets/js/abstracts/cgsy-abstracts.js" %}?v=1"></script>
+    {% endif %}
+
+
+    <script src="{% static "assets/js/attendance/attendance.js" %}"></script>
+    <script>
+
+        function Checkin(subscription_pk, time, alert) {
+
+            var url = "/api/attendance/checkins/";
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {
+                    'created_by': '{{ user_id }}',
+                    'registration': time,
+                    'attendance_service': '{{ form.cleaned_data.services.pk }}',
+                    'subscription': subscription_pk
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                },
+                success: function () {
+
+                    if (alert) {
+                        window.cgsy.messenger.triggerSuccess('Sucesso!');
+                        window.location.reload()
+                    }
+
+                },
+                error: function (response) {
+                    var msg = 'Failure on request to "' + url + '" with method POST';
+
+                    if (response.hasOwnProperty('detail')) {
+                        msg += ' Detalhes: ' + response.detail;
+                    }
+
+                    window.cgsy.messenger.triggerError(msg)
+                }
+            });
+
+        }
+
+        function Checkout(subscription_pk) {
+            var uri = "/api/attendance/checkouts/";
+        }
+
+
+    </script>
+
+
+    <script>
+
+        $(document).ready(function () {
+
+            $('.checkin').on("click", function () {
+                window.cgsy.messenger.triggerLoader('Por favor aguarde...');
+                Checkin($(this).data('subscription_id'), $(this).data('registration_time'), true);
+            });
+
+
+            $('.checkout').on("click", function () {
+
+            });
+
+
+            $('.checkin-all').on("click", function () {
+
+                window.cgsy.messenger.triggerLoader('Por favor aguarde...');
+
+                $('.checkin').each(function () {
+                    Checkin($(this).data('subscription_id'), $(this).data('registration_time'), false);
+                });
+
+                window.cgsy.messenger.triggerSuccess('Sucesso!');
+                window.location.reload()
+
+
+            });
+
+        });
+    </script>
 {% endblock %}
-
 
 {% block content %}
 
@@ -59,81 +163,7 @@
 
                             <div>
 
-
-                                <table class="table">
-                                    <thead>
-                                    <tr>
-                                        <th width="75%">Inscrição</th>
-                                        <th width="3%">Status</th>
-                                        <th width="15%">Ação</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-
-                                    {% for item in data %}
-
-                                        {% if item.processed_line %}
-
-                                            {% if item.state is False %}
-
-                                                <tr>
-                                                    <td data-toggle="tooltip" title="{{ item.error }}">
-                                                        {{ item.processed_line }}
-                                                    </td>
-                                                    <td>
-                                                        <i class="fa fa-circle"
-                                                           aria-hidden="true"
-                                                           style="color: #d9534f;"></i>
-
-                                                    </td>
-                                                    <td> ---</td>
-                                                </tr>
-
-                                            {% else %}
-
-                                                <tr>
-                                                    <td>
-                                                        {{ item.processed_line.0.code }}
-                                                    </td>
-                                                    <td>
-                                                        <i class="fa fa-circle"
-                                                           style="color:#5cb85c;"
-                                                           aria-hidden="true"></i>
-                                                    </td>
-                                                    <td>
-                                                        {% if form.cleaned_data.type == "checkin" %}
-                                                            <a href="#">Check-in</a>
-                                                        {% elif form.cleaned_data.type == "checkout" %}
-                                                            <a href="#">Check-out</a>
-                                                        {% endif %}
-                                                    </td>
-                                                </tr>
-
-                                            {% endif %}
-
-                                        {% endif %}
-
-                                    {% endfor %}
-
-
-                                    <tr>
-                                        <td>
-
-                                        </td>
-                                        <td>
-                                        </td>
-                                        <td>
-                                            {% if form.cleaned_data.type == "checkin" %}
-                                                <a href="#">Check-in todos</a>
-                                            {% elif form.cleaned_data.type == "checkout" %}
-                                                <a href="#">Check-out todos</a>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-
-                                    </tbody>
-                                </table>
-
+                                {% include 'importer/includes/items_list.html' %}
 
                             </div>
 

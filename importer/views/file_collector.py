@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views import generic
 
+from attendance.models import AttendanceService, Checkin, Checkout
+from core.views.mixins import TemplateNameableMixin
 from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
 from gatheros_subscription.views import SubscriptionViewMixin
@@ -11,7 +13,7 @@ from importer.forms import (
 )
 
 
-class FileCollectorImportView(SubscriptionViewMixin, generic.FormView):
+class FileCollectorImportView(SubscriptionViewMixin, TemplateNameableMixin, generic.FormView):
     """
         View usada para fazer apenas upload de arquivos
     """
@@ -24,10 +26,12 @@ class FileCollectorImportView(SubscriptionViewMixin, generic.FormView):
 
         return FileCollectorFileForm(**kwargs)
 
-    def get_context_data(self, data=None, **kwargs):
+    def get_context_data(self, data=None, processable=False, **kwargs):
         context = super().get_context_data(**kwargs)
         context['has_inside_bar'] = True
         context['data'] = data
+        context['user_id'] = self.request.user.person.name
+        context['processable'] = processable
         context['active'] = 'inscricoes'
         return context
 
@@ -40,17 +44,31 @@ class FileCollectorImportView(SubscriptionViewMixin, generic.FormView):
         content = form.cleaned_data['collector_file'].read().decode("utf-8")
         lines = list()
 
+        processable = False
+
         raw_lines = content.split('\n')
 
         if len(raw_lines) > 1:
             raw_lines.pop(0)
 
         for line in raw_lines:
-            lines.append(Parser(self.event, line))
+            lines.append(
+                Parser(
+                    event=self.event,
+                    attendance=form.cleaned_data['services'],
+                    attendance_type=form.cleaned_data['type'],
+                    line=line,
+                )
+            )
 
-        messages.success(self.request, "Arquivo submetido com sucesso!")
+        for item in lines:
+            if item.state is True and item.registered is False:
+                processable = True
+
+        # messages.success(self.request, "Arquivo submetido com sucesso!")
         return self.render_to_response(self.get_context_data(
             data=lines,
+            processable=processable,
             form=form,
         ))
 
@@ -70,11 +88,14 @@ class FileCollectorImportView(SubscriptionViewMixin, generic.FormView):
 
 class Parser:
 
-    def __init__(self, event: Event, line: str) -> None:
+    def __init__(self, event: Event, attendance: AttendanceService, attendance_type: str, line: str) -> None:
         self.event = event
+        self.attendance_type = attendance_type
+        self.attendance = attendance
         self._raw_line = line
         self._processed_line = None
         self.state = False
+        self.registered = False
         self.error = None
 
         self._process()
@@ -101,6 +122,12 @@ class Parser:
             except Subscription.DoesNotExist:
                 self.error = "Não foi possivel encontrar essa inscrição"
                 return
+
+            if self.attendance_type == "checkin":
+                self.registered = Checkin.objects.filter(attendance_service=self.attendance, subscription=sub).exists()
+            elif self.attendance_type == "checkout":
+                self.registered = Checkout.objects.filter(checkin__attendance_service=self.attendance,
+                                                          checkin__subscription=sub).exists()
 
             self.state = True
 
