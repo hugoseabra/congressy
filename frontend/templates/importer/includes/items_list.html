@@ -1,14 +1,16 @@
 <table class="table">
     <thead>
     <tr>
-        <th width="75%">Inscrição</th>
+        <th width="10%">Código</th>
+        <th>Participante</th>
+        <th width="20%">Data/Hora</th>
         <th width="3%">Status</th>
         <th width="15%">Ação</th>
     </tr>
     </thead>
     <tbody>
 
-    {% for item in data %}
+    {% for item in items %}
 
         {% if item.processed_line %}
 
@@ -16,33 +18,33 @@
 
                 <tr>
                     <td>
-                        {{ item.processed_line.0.code }}
+                        {{ item.processed_line.code }}
                     </td>
                     <td>
-                        <i class="fa fa-circle"
-                           style="color:#5cb85c;"
-                           aria-hidden="true"></i>
+                        {{ item.processed_line.name }}
                     </td>
                     <td>
-
-
+                        {{ item.processed_line.created_on|date:"d/m/Y H:i:s" }}
+                    </td>
+                    <td>
+                        <i class="fa fa-circle" style="color:#5cb85c;" aria-hidden="true"></i>
+                    </td>
+                    <td>
                         {% if item.registered is True %}
 
-                            <button class="btn btn-sm btn-primary disabled">
-                                Registrado
-                            </button>
+                            <button class="btn btn-sm btn-primary disabled">Registrado</button>
 
                         {% else %}
 
                             {% if form.cleaned_data.type == "checkin" %}
-                                <button data-subscription_id="{{ item.processed_line.0.pk }}"
-                                        data-registration_time="{{ item.processed_line.1|date:"Y-m-d H:i:s" }}"
+                                <button data-subscription_id="{{ item.processed_line.pk }}"
+                                        data-registration_time="{{ item.processed_line.created_on|date:"Y-m-d H:i:s" }}"
                                         class="btn btn-sm btn-primary checkin">
                                     Registrar
                                 </button>
                             {% elif form.cleaned_data.type == "checkout" %}
                                 <button data-checkin_id="{{ item.checkin.pk }}"
-                                        data-registration_time="{{ item.processed_line.1|date:"Y-m-d H:i:s" }}"
+                                        data-registration_time="{{ item.processed_line.created_on|date:"Y-m-d H:i:s" }}"
                                         class="btn btn-primary btn-sm checkout">
                                     Registrar
                                 </button>
@@ -58,15 +60,18 @@
 
                 <tr>
                     <td data-toggle="tooltip" title="{{ item.error }}">
-                        {{ item.processed_line }}
+                        {{ item.processed_line.code }}
                     </td>
-                    <td>
-                        <i class="fa fa-circle"
-                           aria-hidden="true"
-                           style="color: #d9534f;"></i>
-
+                    <td data-toggle="tooltip" title="{{ item.error }}">
+                        -
                     </td>
-                    <td> ---</td>
+                    <td data-toggle="tooltip" title="{{ item.error }}">
+                        {{ item.processed_line.created_on|date:"d/m/Y H:i:s" }}
+                    </td>
+                    <td data-toggle="tooltip" title="{{ item.error }}">
+                        <i class="fa fa-circle" aria-hidden="true" style="color: #d9534f;"></i>
+                    </td>
+                    <td data-toggle="tooltip" title="{{ item.error }}">---</td>
                 </tr>
 
             {% endif %}
@@ -77,12 +82,7 @@
 
     {% if processable %}
         <tr>
-            <td>
-
-            </td>
-            <td>
-            </td>
-            <td>
+            <td colspan="5" class="text-center">
                 {% if form.cleaned_data.type == "checkin" %}
                     <button class="btn btn-primary btn-sm checkin-all">Registrar todos
                     </button>

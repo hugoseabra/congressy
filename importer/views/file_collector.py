@@ -1,10 +1,11 @@
 from datetime import datetime
+
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 
-from attendance.models import AttendanceService, Checkin, Checkout
+from attendance.models import AttendanceService, Checkin
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
@@ -14,7 +15,8 @@ from importer.forms import (
 )
 
 
-class FileCollectorImportView(SubscriptionViewMixin, TemplateNameableMixin, generic.FormView):
+class FileCollectorImportView(SubscriptionViewMixin, TemplateNameableMixin,
+                              generic.FormView):
     """
         View usada para fazer apenas upload de arquivos
     """
@@ -25,9 +27,10 @@ class FileCollectorImportView(SubscriptionViewMixin, TemplateNameableMixin, gene
         res = super().dispatch(request, *args, **kwargs)
 
         if not request.user.is_staff:
-            return redirect(reverse_lazy('attendance:manage-list-attendance', kwargs={
-                'event_pk': self.event.pk
-            }))
+            return redirect(
+                reverse_lazy('attendance:manage-list-attendance', kwargs={
+                    'event_pk': self.event.pk
+                }))
 
         return res
 
@@ -49,7 +52,8 @@ class FileCollectorImportView(SubscriptionViewMixin, TemplateNameableMixin, gene
 
     def get_success_url(self):
         return reverse_lazy(
-            'importer:file-collector-import', kwargs={'event_pk': self.event.pk}
+            'importer:file-collector-import',
+            kwargs={'event_pk': self.event.pk}
         )
 
     def form_valid(self, form):
@@ -69,7 +73,7 @@ class FileCollectorImportView(SubscriptionViewMixin, TemplateNameableMixin, gene
                     event=self.event,
                     attendance=form.cleaned_data['services'],
                     attendance_type=form.cleaned_data['type'],
-                    line=line,
+                    line=line.replace('\r', '').strip(),
                 )
             )
 
@@ -79,7 +83,7 @@ class FileCollectorImportView(SubscriptionViewMixin, TemplateNameableMixin, gene
 
         # messages.success(self.request, "Arquivo submetido com sucesso!")
         return self.render_to_response(self.get_context_data(
-            data=lines,
+            items=lines,
             processable=processable,
             form=form,
         ))
@@ -100,12 +104,13 @@ class FileCollectorImportView(SubscriptionViewMixin, TemplateNameableMixin, gene
 
 class Parser:
 
-    def __init__(self, event: Event, attendance: AttendanceService, attendance_type: str, line: str) -> None:
+    def __init__(self, event: Event, attendance: AttendanceService,
+                 attendance_type: str, line: str) -> None:
         self.event = event
         self.attendance_type = attendance_type
         self.attendance = attendance
         self._raw_line = line
-        self._processed_line = None
+        self._processed_line = dict()
         self.state = False
         self.registered = False
         self.error = None
@@ -119,34 +124,56 @@ class Parser:
             contents = self._raw_line.split(',')
 
             if len(contents) != 2:
-                self.error = "Não foi possivel dar split corretamente nessa linha."
+                self.error = "Não foi possivel dar split corretamente nessa" \
+                             " linha."
                 return
 
-            sub_id = contents[0]
-            timestamp = contents[1]  # 14/03/2019 10:35:06
+            code = contents[0].strip()
+            created_on = contents[1].strip()  # 14/03/2019 10:35:06
+
             try:
-                timestamp = datetime.strptime(timestamp, '%d/%m/%Y %H:%M:%S')
+                created_on = datetime.strptime(created_on, '%d/%m/%Y %H:%M:%S')
             except ValueError:
-                self.error = "Não foi possivel serializar neste formato, verifique se está: %d/%m/%Y %H:%M:%S"
+                self.error = "Não foi possivel serializar neste formato," \
+                             " verifique se está: %d/%m/%Y %H:%M:%S"
                 return
 
+            self._processed_line['created_on'] = created_on
+
             try:
-                sub = Subscription.objects.get(code=sub_id, event=self.event)
+                sub = Subscription.objects.get(code=code, event=self.event)
+                self._processed_line['pk'] = sub.pk
+
             except Subscription.DoesNotExist:
                 self.error = "Não foi possivel encontrar essa inscrição"
+
+                self._processed_line['pk'] = None
+                self._processed_line['code'] = code
                 return
 
-            if self.attendance_type == "checkin":
-                self.registered = Checkin.objects.filter(attendance_service=self.attendance, subscription=sub).exists()
-            elif self.attendance_type == "checkout":
-                self.registered = Checkout.objects.filter(checkin__attendance_service=self.attendance,
-                                                          checkin__subscription=sub).exists()
+            self._processed_line['code'] = code
+            self._processed_line['name'] = sub.person.name
 
-                self.checkin = Checkin.objects.get(attendance_service=self.attendance, subscription=sub)
+            if self.attendance_type == "checkin":
+                self.registered = Checkin.objects.filter(
+                    attendance_service=self.attendance,
+                    checkout__isnull=True,
+                    subscription=sub,
+                ).exists()
+
+            elif self.attendance_type == "checkout":
+                checkins_qs = Checkin.objects.filter(
+                    attendance_service=self.attendance,
+                    checkout__isnull=True,
+                    subscription=sub,
+                )
+
+                self.registered = checkins_qs.exists() is False
+
+                if self.registered is False:
+                    self.checkin = checkins_qs.last()
 
             self.state = True
-
-            self._processed_line = (sub, timestamp)
 
     @property
     def processed_line(self):
