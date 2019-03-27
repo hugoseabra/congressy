@@ -153,7 +153,7 @@ class SubscriptionListViewSet(RestrictionViewMixin,
 
         if tag_group_param and tag_group_param != '':
             queryset = queryset.filter(
-                tag_group__icontains=tag_group_param,
+                tag_group=tag_group_param,
             )
 
         if category_param and category_param != '':

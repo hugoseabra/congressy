@@ -31,7 +31,7 @@ docker-compose -f ./conf/staging/docker-compose.yml logs manage
 echo ;
 
 RUNNING=$(docker inspect -f {{.State.Running}} manage-staging)
-if [ "$RUNNING" != "true" ]; then
+if [[ "$RUNNING" != "true" ]]; then
     error_msg "Container do manage não subiu."
     exit 1
 fi
