@@ -169,6 +169,9 @@ def _export_subscriptions(worksheet, subscriptions):
         'INSTITUICAO/EMPRESA',
         'CNPJ',
         'FUNÇÃO/CARGO',
+        'TAG DE AGRUPAMENTO',
+        'INFO. PARA CRACHÁ',
+        'OBS',
         'CRIADO EM',
     ])
 
@@ -277,6 +280,9 @@ def _export_subscriptions(worksheet, subscriptions):
         collector[row_idx].append(get_object_value(person, 'institution'))
         collector[row_idx].append(get_object_value(person, 'institution_cnpj'))
         collector[row_idx].append(get_object_value(person, 'function'))
+        collector[row_idx].append(get_object_value(sub, 'tag_group'))
+        collector[row_idx].append(get_object_value(sub, 'tag_info'))
+        collector[row_idx].append(get_object_value(sub, 'obs'))
         collector[row_idx].append(sub.created.strftime('%d/%m/%Y %H:%M:%S'))
 
         row_idx += 1
