@@ -5,7 +5,6 @@ from django.views.generic import View
 from openpyxl import Workbook
 from six import BytesIO
 
-from attendance.helpers.attendance import subscription_is_checked
 from attendance.models import AttendanceService, Checkin
 from gatheros_subscription.helpers.export import clean_sheet_title, \
     get_object_value
@@ -20,8 +19,10 @@ class AttendanceXLSExportView(AttendancesFeatureFlagMixin, View):
     #  For now any authenticated user can access this.
 
     def get(self, request, *args, **kwargs):
+        pk = request.GET.get('pk', None)
+
         # Chamando exportação
-        output = export_attendance(515)
+        output = export_attendance(pk)
 
         # Criando resposta http com arquivo de download
         response = HttpResponse(
@@ -39,7 +40,7 @@ class AttendanceXLSExportView(AttendancesFeatureFlagMixin, View):
         return response
 
 
-def export_attendance(attendance_service_pk: int):
+def export_attendance(attendance_service_pk=None):
     """
     Exportação de inscrições de um serviço de atendimento em formato xlsx
 
@@ -51,7 +52,12 @@ def export_attendance(attendance_service_pk: int):
 
     ws1 = wb.active
     ws1.title = clean_sheet_title('Participantes')
-    wb.create_sheet(title='Detalhamento')
+    # wb.create_sheet(title='Detalhamento')
+
+    if attendance_service_pk is None:
+        ws1.append(["ERRO: Identificador de serviço não informado."])
+        wb.save(stream)
+        return stream.getvalue()
 
     try:
         service = AttendanceService.objects.get(pk=attendance_service_pk)
@@ -170,8 +176,6 @@ def export_attendance_checkin_subscriptions(worksheet, subscriptions,
         collector[row_idx].append(lot.name)
 
         collector[row_idx].append(sub.get_status_display())
-
-        collector[row_idx].append(is_checked)
         collector[row_idx].append(person.get_gender_display())
 
         collector[row_idx].append(get_object_value(person, 'name'))
