@@ -90,7 +90,6 @@ def export_attendance_checkin_subscriptions(worksheet, subscriptions,
         'CATEGORIA DE PARTICIPANTE',
         'LOTE',
         'STATUS',
-        'ATENDIDO',
         'SEXO',
         'NOME',
         'TIPO DE DOCUMENTO',
@@ -171,11 +170,6 @@ def export_attendance_checkin_subscriptions(worksheet, subscriptions,
         collector[row_idx].append(lot.name)
 
         collector[row_idx].append(sub.get_status_display())
-
-        if subscription_is_checked(sub.pk):
-            is_checked = "Sim"
-        else:
-            is_checked = "Não"
 
         collector[row_idx].append(is_checked)
         collector[row_idx].append(person.get_gender_display())
