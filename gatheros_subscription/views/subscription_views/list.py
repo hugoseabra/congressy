@@ -1,8 +1,9 @@
-from collections import OrderedDict
-
 import locale
-from django.views import generic
+from collections import OrderedDict
 from functools import cmp_to_key
+
+from django.core.exceptions import ObjectDoesNotExist
+from django.views import generic
 
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_subscription.models import (
@@ -33,6 +34,7 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
             'event_is_paid': is_paid_event(self.event),
             'has_inside_bar': True,
             'active': 'inscricoes',
+            'accreditation_service': self.get_accreditation_service()
         })
         return cxt
 
@@ -94,3 +96,10 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
                 categories[lot.category.pk][lot.pk] = lot.name
 
         return categories
+
+    def get_accreditation_service(self):
+        try:
+            return self.event.attendance_services.get(accreditation=True)
+
+        except ObjectDoesNotExist:
+            return None

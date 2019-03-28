@@ -1,7 +1,8 @@
-from django.db.models.signals import post_save
+from datetime import datetime
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
-from attendance.models import AttendanceService
+from attendance.models import AttendanceService, Checkin, Checkout
 from gatheros_event.models import Event
 
 
@@ -19,62 +20,35 @@ def create_default_attendance(instance, raw, created, **_):
             checkout_enabled=False,
         )
 
-# @receiver(pre_save, sender=Checkin)
-# def trigger_checkin_pwa(instance, raw, **_):
-#     if raw is True:
-#         return
-#
-#     service = instance.attendance_service
-#
-#     if not service.printing_queue_webhook or not service.pwa_pin:
-#         return
-#
-#     webhook = service.printing_queue_webhook
-#     if webhook.endswith('/'):
-#         webhook = webhook[0:len(webhook) - 1]
-#
-#     r = requests.post(
-#         webhook,
-#         data=json.dumps({
-#             'event_id': service.event_id,
-#             'service_id': service.pk,
-#             'subscription_id': str(instance.subscription_id),
-#             'printer_number': service.printer_number or 1,
-#         }),
-#         headers={
-#             'Content-Type': 'application/json',
-#             'PIN': service.pwa_pin,
-#         }
-#     )
-#
-#     from pprint import pprint
-#     pprint(r)
-#
-#
-# @receiver(pre_save, sender=Checkout)
-# def trigger_checkout_pwa(instance, raw, **_):
-#     if raw is True:
-#         return
-#
-#     checkin = instance.checkin
-#     service = checkin.attendance_service
-#
-#     if not service.printing_queue_webhook or not service.pwa_pin:
-#         return
-#
-#     webhook = service.printing_queue_webhook
-#     if webhook.endswith('/'):
-#         webhook = webhook[0:len(webhook) - 1]
-#
-#     webhook += '/' + str(checkin.subscription_id)
-#
-#     r = requests.delete(
-#         webhook,
-#         headers={
-#             'Content-Type': 'application/json',
-#             'PIN': service.pwa_pin,
-#         }
-#     )
-#
-#     from pprint import pprint
-#     pprint(r)
+
+@receiver(pre_save, sender=Checkin)
+def register_subscription_as_attended(instance, raw, **_):
+    if raw is True:
+        return
+
+    service = instance.attendance_service
+
+    if service.accreditation is False:
+        return
+
+    sub = instance.subscription
+    sub.accredited = True
+    sub.accredited_on = datetime.now()
+    sub.save()
+
+
+@receiver(pre_save, sender=Checkout)
+def register_subscription_as_not_attended(instance, raw, **_):
+    if raw is True:
+        return
+
+    checkin = instance.checkin
+    service = checkin.attendance_service
+
+    if service.accreditation is False:
+        return
+
+    sub = checkin.subscription
+    sub.accredited = False
+    sub.accredited_on = datetime.now()
+    sub.save()

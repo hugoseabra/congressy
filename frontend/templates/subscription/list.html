@@ -24,6 +24,33 @@
 {% endblock %}
 
 {% block scripts %}
+    <!--ABSTRACTS DEPENDENCIES-->
+    <script src="{% static "assets/js/ajax.js" %}"></script>
+    <script src="{% static "assets/js/messenger.js" %}"></script>
+    <script src="{% static "assets/js/vendor/moment.js" %}"></script>
+    <script src="{% static "assets/js/price-format.min.js" %}"></script>
+
+    <!--ABSTRACTS-->
+    {% if DEBUG is True and STAGING_MODE is False %}
+    <script src="{% static "assets/js/abstracts/01-dom.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/01-error.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/01-messenger.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/01-uri.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/02-alerter.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/02-form-field-mapper.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/02-http.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/03-form.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/03-model.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/04-collection.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/04-model-form.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/05-element-list.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/05-modal.js" %}"></script>
+
+    {% else %}
+        <script src="{% static "assets/js/abstracts/cgsy-abstracts.js" %}?v=1"></script>
+    {% endif %}
+
+
     <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'assets/plugins/dataTables/js/dataTables.responsive.min.js' %}"></script>
 
@@ -33,9 +60,158 @@
 
     <script src="{% static 'assets/plugins/icheck/js/icheck.min.js' %}"></script>
 
+    {% if event.feature_configuration.feature_checkin is True %}
+    <script src="{% static "assets/js/attendance/attendance.js" %}"></script>
     <script>
+        var ACCREDITATION_SERVICE_ID = '';
+        var priting_webhook_url = '';
+        var priting_pin = '';
 
+        {% if accreditation_service %}
+        ACCREDITATION_SERVICE_ID = '{{ accreditation_service.pk }}';
+        {% if accreditation_service.printing_queue_webhook %}
+            priting_webhook_url = '{{ accreditation_service.printing_queue_webhook }}';
+            priting_pin = '{{ accreditation_service.pwa_pin }}';
+        {% endif %}
 
+        var printer_config_key = 'cgsy-printer-config-' + '{{ event.pk }}';
+        function savePrinterConfig(service_pk, printer_number) {
+            var data = {
+                'service_pk': service_pk,
+                'event_pk': parseInt('{{ event.pk }}'),
+                'printer_number': parseInt(printer_number)
+            };
+            localStorage.setItem(printer_config_key, JSON.stringify(data));
+
+            var messenger = new window.cgsy.abstracts.messenger.Messenger();
+            messenger.notifySuccess('Configurações salvas com sucesso');
+            setConfigToAttendanceForm();
+        }
+
+        function getPrinterConfig() {
+            var config = localStorage.getItem(printer_config_key);
+            if (!config) {
+                return;
+            }
+            return JSON.parse(config);
+        }
+
+        function setConfigToAttendanceForm() {
+            var config = getPrinterConfig() || {};
+            var service_pk = config.hasOwnProperty('service_pk') ? config['service_pk'] : null;
+            var printer_number = config.hasOwnProperty('printer_number') ? config['printer_number'] : 1;
+
+            if (service_pk) {
+                $('#config-default-service').val(service_pk);
+                $('#attendance_id').val(service_pk);
+            }
+
+            $('#config-printer-number').val(printer_number);
+        }
+
+        var registerAccreditation = function(button_el, procced_printing) {
+            procced_printing = procced_printing === true;
+
+            if (!ACCREDITATION_SERVICE_ID) {
+                return;
+            }
+
+            var data = button_el.data();
+            var pk = data['pk'];
+            var name = data['person_name'];
+            var lot_name = data['lot_name'];
+            var category_name = data['category_name'];
+            var email = data['person_email'];
+            var event_count = data['event_count'];
+            var code = data['code'];
+            var status = data['status'];
+            var attended = data['attended'];
+
+            var options = {
+                'checkinUri': "{% url 'api:attendance:checkin-list' %}",
+                'success_checkin_msg': 'Atendimento registrado com succeso',
+                'fail_checkin_msg': 'Falha ao registrar atendimento',
+                'checkoutUri': "{% url 'api:attendance:checkout-list' %}",
+                'success_checkout_msg': 'Saída de atendimento registrada com sucesso',
+                'fail_checkout_msg': 'Falha ao registrar saída'
+            };
+
+            var attendance = new window.cgsy.attendance.Attendance(
+                options['checkinUri'],
+                options['success_checkin_msg'],
+                options['fail_checkin_msg'],
+                options['checkoutUri'],
+                options['success_checkout_msg'],
+                options['fail_checkout_msg']
+            );
+
+            var subscription = new window.cgsy.attendance.Subscription(
+                pk,
+                name,
+                lot_name,
+                category_name,
+                email,
+                event_count,
+                code,
+                status,
+                attended
+            );
+
+            subscription.setUri("/api/attendance/services/"+ ACCREDITATION_SERVICE_ID +"/subscriptions/:pk/");
+
+            attendance.checkin(ACCREDITATION_SERVICE_ID, subscription, name).then(function() {
+                if (procced_printing) {
+                    triggerPrintWebhook(ACCREDITATION_SERVICE_ID, pk, priting_webhook_url, printing_pin).then(function() {
+                        alert('bla');
+                    });
+                } else {
+                    var parent = button_el.parent();
+                    parent.append(getAccreditationInfo())
+                }
+            });
+        };
+
+        function triggerPrintWebhook(service_pk, sub_pk, printing_webhook, pin) {
+            return new Promise(function(resolve, reject) {
+
+                var printer_number  = 1;
+
+                var config = getPrinterConfig();
+                if (config && config.hasOwnProperty('printer_number')) {
+                    printer_number = parseInt(config['printer_number']) || 1;
+                }
+
+                var data = {
+                    'event_id': parseInt('{{ event.pk }}'),
+                    'service_id': parseInt(service_pk),
+                    'subscription_id': sub_pk,
+                    'printer_number': printer_number
+                };
+
+                var messenger = new window.cgsy.abstracts.messenger.Messenger();
+
+                var sender = new window.cgsy.AjaxSender(printing_webhook + '/queues/items');
+                    sender.addHeader('PIN', pin);
+                    sender.crossDomainMode();
+                    sender.payloadMode();
+
+                sender.setFailCallback(function() {
+                    messenger.notifyError('Não foi possível registrar impressão do atendimento');
+                    reject();
+                });
+                sender.setSuccessCallback(function() {
+                    messenger.notifySuccess('Impressão enviada com sucesso.');
+                    resolve();
+                });
+                sender.post(data);
+            });
+        }
+
+        {% endif %}
+    </script>
+    {% endif %}
+
+    <script>
         var customCheckbox = function () {
             $('input.icheck').iCheck({
                 checkboxClass: 'icheckbox_flat-green',
@@ -113,7 +289,7 @@
             return tag.prop('outerHTML');
         };
 
-        var get_badge_el = function (row) {
+        var get_origin_badge_el = function (row) {
 
             var tag = document.createElement("div");
             tag = $(tag);
@@ -134,6 +310,17 @@
             }
 
             return ''
+        };
+
+        var get_code_badge_el = function (row) {
+
+            var span = $('<span>').addClass('badge badge-info');
+            span.text(row['code']);
+
+            var tag = $('<div>').css("margin-left", '18px');
+            tag.append(span);
+
+            return tag.prop('outerHTML');
         };
 
         var get_test_badge_el = function (row) {
@@ -209,6 +396,94 @@
 
         };
 
+        var getAccreditationInfo = function(row) {
+
+            var output = '';
+
+
+            var printer_list = $('<select>').attr({
+                'class': 'form-control form-control-sm printer-number-' + row['code'],
+                'data-toggle': 'tooltip',
+                'data-placement': 'bottom',
+                'title': 'Número da impressora',
+                'style': 'display:none'
+            });
+
+            for (var a = 1; a <= 15; a++) {
+                var o = $('<option>').attr('value', a).text(a);
+                printer_list.append(o)
+            }
+
+            if (row['accredited'] === false) {
+
+                output += '<div>';
+                output += '<button class="btn btn-sm btn-block btn-success"' +
+                    ' data-pk="'+row['pk']+'"' +
+                    ' data-person_name="'+row['person_name']+'"' +
+                    ' data-lot_name="'+row['lot_name']+'"' +
+                    ' data-category_name="'+row['category_name']+'"' +
+                    ' data-person_email="'+row['person_email']+'"' +
+                    ' data-event_count="'+row['event_count']+'"' +
+                    ' data-code="'+row['code']+'"' +
+                    ' data-status="'+row['status']+'"' +
+                    ' onclick="registerAccreditation($(this))">Registrar</div>';
+
+
+                if (priting_webhook_url) {
+                    output += '<button class="btn btn-sm btn-block btn-success btn-trans">Registrar e imprimir</button>';
+                }
+
+                output += '<button class="btn btn-sm btn-block btn-danger btn-trans">Cancelar</button>';
+                output += '</div>';
+
+                if (priting_webhook_url) {
+                    output += '<div class="text-center">';
+                    output += '<a href="javascript:void(0)" onclick="$(this).hide();$(\'.printer-number-' + row['code'] + '\').show();">';
+                    output += '<div style="margin-top:10px;"></div>';
+                    output += '<strong data-toggle="tooltip" data-placement="bottom" title="Número da impressora" style="border:1px solid lightgray;padding:6px;border-radius:2px">1</strong>';
+                    output += '</a>';
+                    output += printer_list.prop('outerHTML');
+                    output += '</div>';
+                }
+
+                return output;
+            }
+
+            if (row['accredited_on']) {
+                var date = new Date(row['accredited_on']);
+
+                output += '<div>';
+                output += '<span class="text-bold">Data:</span> ';
+                output += date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                output += '</div>';
+
+                if (ACCREDITATION_SERVICE_ID && priting_webhook_url) {
+                    output += '<hr />';
+                }
+            }
+
+            if (ACCREDITATION_SERVICE_ID && priting_webhook_url) {
+                output += '<div>';
+                output += '<div class="float-left" style="margin-left:69px">';
+                output += '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="bottom" title="Reimprimir" onclick="$(this).hide();$(this).parent().parent().find(\'i.fa-spinner\').show()">';
+                output += '<i class="fas fa-print fa-2x"></i>';
+                output += '</a>';
+                output += '<i class="fas fa-spinner fa-spin fa-2x" style="display:none"></i>';
+                output += '&ensp;';
+                output += '</div>';
+                output += '<div class="float-right input-group input-group-sm" style="margin-right:17px;margin-top:4px">';
+                output += '<a href="javascript:void(0)" onclick="$(this).hide();$(\'.printer-number-' + row['code'] + '\').show()">';
+                output += '<strong data-toggle="tooltip" data-placement="bottom" title="Número da impressora" style="border:1px solid lightgray;padding:6px;border-radius:2px">1</strong>';
+                output += '</a>';
+                output += printer_list.prop('outerHTML');
+                output += '</div>';
+                output += '<div class="clearfix"></div>';
+                output += '</div>';
+            }
+
+            return output;
+        };
+
         $(document).ready(function () {
             customCheckbox();
 
@@ -264,9 +539,13 @@
                 "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
 
                     if (aData['category_name']) {
-                        $("td:eq(2)", nRow).attr("data-toggle", "tooltip").attr("title", aData['category_name']);
+                        $("td:eq(3)", nRow).attr("data-toggle", "tooltip").attr("title", aData['category_name']);
                     }
 
+                },
+                "drawCallback": function( settings ) {
+                    $('.accredited').popover({'html': true});
+                    $('.not-accredited').popover({'html': true});
                 },
                 // constract columns
                 columns: [
@@ -277,9 +556,17 @@
                             var dateCreated = get_date_el(row);
                             var institution = get_institution_el(row);
                             var testBage = get_test_badge_el(row);
-                            var badge = get_badge_el(row);
+                            var badge = get_origin_badge_el(row);
+                            var code = get_code_badge_el(row);
 
-                            return statusBall + '&nbsp;' + nameWithLink + testBage + badge + institution + dateCreated;
+                            return statusBall
+                                + '&nbsp;'
+                                + nameWithLink
+                                + testBage
+                                + badge
+                                + code
+                                + institution
+                                + dateCreated;
                         }
                     },
                     {
@@ -289,6 +576,55 @@
                             var hidden = get_hidden_person(row);
 
                             return data + hidden
+                        }
+                    },
+                    {
+                        data: 'accredited', "render": function (data, type, row, meta) {
+
+                            if (!ACCREDITATION_SERVICE_ID) {
+                                return '-';
+                            }
+
+                            var a;
+                            var icon = $('<span>').addClass('fas fa-2x');
+                            if (row['accredited'] === false) {
+                                icon.addClass('fa-minus-circle').css('color', 'gray');
+                                icon.attr({
+                                    'data-toggle': 'tooltip',
+                                    'title': 'Não credenciado'
+                                });
+
+                                a = $('<a>').attr({
+                                    'href': 'javascript:void(0)',
+                                    'data-toggle': 'popover',
+                                    'data-placement': 'bottom',
+                                    'title': 'Credenciamento',
+                                    'data-content': getAccreditationInfo(row)
+                                });
+
+                                a.addClass('not-accredited');
+                                a.append(icon);
+
+                                return a.prop('outerHTML');
+                            }
+
+                            icon.addClass('fa-check-circle').css('color', 'green');
+                            icon.attr({
+                                'data-toggle': 'tooltip',
+                                'title': 'Credenciado'
+                            });
+
+                            a = $('<a>').attr({
+                                'href': 'javascript:void(0)',
+                                'data-toggle': 'popover',
+                                'data-placement': 'bottom',
+                                'title': 'Credenciamento',
+                                'data-content': getAccreditationInfo(row)
+                            });
+                            a.addClass('accredited');
+                            a.append(icon);
+
+                            return a.prop('outerHTML');
                         }
                     },
                     {data: 'lot_name'},
@@ -335,7 +671,17 @@
                         "orderable": false
                     },
                     {
-                        "targets": 3,
+                        "targets": 2,
+                        "orderable": false,
+                        "class": "text-center"
+                    },
+                    {
+                        "targets": 4,
+                        "orderable": true,
+                        "class": "text-center"
+                    },
+                    {
+                        "targets": 5,
                         "orderable": true,
                         "type": 'date-euro'
                     }
@@ -367,11 +713,7 @@
                 } else {
                     console.log('Nenhum lote.')
                 }
-
-
             });
-
-
         });
 
     </script>
@@ -587,6 +929,7 @@
                                 <th>Nome do Participante</th>
 
                                 <th width="10%">Código</th>
+                                <th width="10%">Credenciado</th>
 
                                 <th width="18%">Lote</th>
 

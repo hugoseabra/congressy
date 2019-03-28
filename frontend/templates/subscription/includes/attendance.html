@@ -57,7 +57,7 @@
                                                 </button>
                                                 {% endif %}
                                                 <button class="btn btn-sm btn-danger btn-block btn-trans"
-                                                    onclick="attendanceCheckout('{{ checkin.attendance_service_id }}', '{{ checkin.attendance_service.pwa_pin }}');$(this).parent().parent().find('button').attr('disabled', true)">
+                                                    onclick="if(confirm('Tem certeza que deseja desfazer o atendimento?')){attendanceCheckout('{{ checkin.attendance_service_id }}', '{{ checkin.attendance_service.pwa_pin }}');$(this).parent().parent().find('button').attr('disabled', true)}">
                                                     <i class="fa fa-remove"></i>
                                                     <span>Remover</span>
                                                 </button>
