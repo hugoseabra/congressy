@@ -70,6 +70,13 @@
     <div class="row">
         <div class="col-md-12">
             <div class="buttonbar">
+                <div class="float-left">
+                    <a href="{% url 'importer:file-collector-import' event.pk %}"
+                       class="btn btn-primary">
+                        <i class="fas fa-file-import"></i>
+                        Importação via arquivo
+                    </a>
+                </div>
                 <div class="float-right">
                     <a href="{% url 'attendance:attendance-list-add' event.pk %}"
                        class="btn
@@ -124,8 +131,8 @@
                                                 </a>
                                             </li>
 
-                                            <li onclick="$('#lot-delete-form').attr('action','{% url 'attendance:attendance-list-delete' event.pk item.pk%}');
-                                                $('#attendace-list-delete-modal').modal();">
+                                            <li onclick="$('#lot-delete-form').attr('action','{% url 'attendance:attendance-list-delete' event.pk item.pk %}');
+                                                    $('#attendace-list-delete-modal').modal();">
                                                 <a href="#">
                                                     <i class="fas fa-trash-alt"> </i>
                                                     Excluir

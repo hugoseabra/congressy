@@ -43,6 +43,11 @@ urls = [
         views.CSVListView.as_view(),
         name='csv-list'
     ),
+    url(
+        r'^file-collector/upload/$',
+        views.FileCollectorImportView.as_view(),
+        name='file-collector-import'
+    ),
 ]
 
 urlpatterns = [

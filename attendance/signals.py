@@ -14,6 +14,7 @@ def create_default_attendance(instance, raw, created, **_):
         AttendanceService.objects.create(
             event=instance,
             name='Credenciamento',
+            accreditation=True,
             with_certificate=True,
             checkout_enabled=False,
         )
