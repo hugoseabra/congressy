@@ -71,10 +71,10 @@
             console.log("URL => " + url);
             console.log("ITEM PK => " + item_pk);
 
+            window.setTimeout(function() {
+                $('#attendance-exporter-modal').modal('hide');
+            }, 3000);
             window.location=url;
-
-
-
         }
 
     </script>
@@ -120,6 +120,7 @@
                         <thead>
                         <tr>
                             <th>Nome do Serviço de Atendimento</th>
+                            <th width="20%"># Atendidos</th>
                             <th width="5%"></th>
                         </tr>
                         </thead>
@@ -129,6 +130,7 @@
                                 <td>
                                     <a href="{% url 'attendance:dashboard' event.pk item.pk %}">{{ item.name }}</a>
                                 </td>
+                                <td class="text-center">{{ num_checkins }}</td>
                                 <td>
                                     <div class="btn-group">
                                         <button type="button"
@@ -155,8 +157,8 @@
                                                 </a>
                                             </li>
 
-                                            <li onclick="export_service('{{ item.pk }}');$('#attendance-exporter-modal').modal();">
-                                                <a href="#">
+                                            <li>
+                                                <a href="#" onclick="export_service('{{ item.pk }}');$('#attendance-exporter-modal').modal();">
                                                     <i class="fas fa-file-excel"></i>
                                                     Exportar
                                                 </a>
@@ -225,17 +227,12 @@
                     </h4>
                 </div>
                 <div class="modal-body">
-
                     <div class="text-center">
-
                         <h2>Aguarde enquanto preparamos sua exportação...</h2>
                         <i class="fas info-color fa-circle-notch fa-spin fa-4x" style="margin-top: 20px"></i>
-
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
-
 {% endblock %}
