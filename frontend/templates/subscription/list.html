@@ -65,13 +65,13 @@
     <script>
         var ACCREDITATION_SERVICE_ID = '';
         var priting_webhook_url = '';
-        var priting_pin = '';
+        var printing_pin = '';
 
         {% if accreditation_service %}
         ACCREDITATION_SERVICE_ID = '{{ accreditation_service.pk }}';
         {% if accreditation_service.printing_queue_webhook %}
             priting_webhook_url = '{{ accreditation_service.printing_queue_webhook }}';
-            priting_pin = '{{ accreditation_service.pwa_pin }}';
+            printing_pin = '{{ accreditation_service.pwa_pin }}';
         {% endif %}
 
         var printer_config_key = 'cgsy-printer-config-' + '{{ event.pk }}';
@@ -159,14 +159,23 @@
 
             subscription.setUri("/api/attendance/services/"+ ACCREDITATION_SERVICE_ID +"/subscriptions/:pk/");
 
+
+            var parent = button_el.parent().parent();
+            parent.find('button').attr('disabled', true);
+            button_el.text('aguarde...');
+
+            data['accredited'] = true;
+            data['accredited_on'] = new Date();
+
             attendance.checkin(ACCREDITATION_SERVICE_ID, subscription, name).then(function() {
                 if (procced_printing) {
                     triggerPrintWebhook(ACCREDITATION_SERVICE_ID, pk, priting_webhook_url, printing_pin).then(function() {
-                        alert('bla');
+                        parent.parent().parent().html(loadAccreditationContent(data));
+                        $('.accredited').popover({'html': true});
                     });
                 } else {
-                    var parent = button_el.parent();
-                    parent.append(getAccreditationInfo())
+                    parent.parent().parent().html(loadAccreditationContent(data));
+                    $('.accredited').popover({'html': true});
                 }
             });
         };
@@ -433,14 +442,21 @@
                     ' data-event_count="'+row['event_count']+'"' +
                     ' data-code="'+row['code']+'"' +
                     ' data-status="'+row['status']+'"' +
-                    ' onclick="registerAccreditation($(this))">Registrar</div>';
+                    ' onclick="registerAccreditation($(this))">Registrar</button>';
 
 
                 if (priting_webhook_url) {
-                    output += '<button class="btn btn-sm btn-block btn-success btn-trans">Registrar e imprimir</button>';
+                    output += '<button class="btn btn-sm btn-block btn-success btn-trans"' +
+                    ' data-pk="'+row['pk']+'"' +
+                    ' data-person_name="'+row['person_name']+'"' +
+                    ' data-lot_name="'+row['lot_name']+'"' +
+                    ' data-category_name="'+row['category_name']+'"' +
+                    ' data-person_email="'+row['person_email']+'"' +
+                    ' data-event_count="'+row['event_count']+'"' +
+                    ' data-code="'+row['code']+'"' +
+                    ' data-status="'+row['status']+'"' +
+                    ' onclick="registerAccreditation($(this), true)">Registrar e imprimir</button>';
                 }
-
-                output += '<button class="btn btn-sm btn-block btn-danger btn-trans">Cancelar</button>';
                 output += '</div>';
 
                 if (priting_webhook_url) {
@@ -457,6 +473,7 @@
             }
 
             if (row['accredited_on']) {
+
                 var date = new Date(row['accredited_on']);
 
                 output += '<div>';
@@ -488,7 +505,59 @@
                 output += '</div>';
             }
 
+            output += '<hr />';
+            output += '<div>';
+            output += '<button class="btn btn-sm btn-block btn-danger btn-trans">Cancelar</button>';
+            output += '</div>';
+
             return output;
+        };
+
+        var loadAccreditationContent = function (data) {
+            if (!ACCREDITATION_SERVICE_ID) {
+                return '-';
+            }
+
+            var a;
+            var icon = $('<span>').addClass('fas fa-2x');
+            if (data['accredited'] === false) {
+                icon.addClass('fa-minus-circle').css('color', 'gray');
+                icon.attr({
+                    'data-toggle': 'tooltip',
+                    'title': 'Não credenciado'
+                });
+
+                a = $('<a>').attr({
+                    'href': 'javascript:void(0)',
+                    'data-toggle': 'popover',
+                    'data-placement': 'bottom',
+                    'title': 'Credenciamento',
+                    'data-content': getAccreditationInfo(data)
+                });
+
+                a.addClass('not-accredited');
+                a.append(icon);
+
+                return a.prop('outerHTML');
+            }
+
+            icon.addClass('fa-check-circle').css('color', 'green');
+            icon.attr({
+                'data-toggle': 'tooltip',
+                'title': 'Credenciado'
+            });
+
+            a = $('<a>').attr({
+                'href': 'javascript:void(0)',
+                'data-toggle': 'popover',
+                'data-placement': 'bottom',
+                'title': 'Credenciamento',
+                'data-content': getAccreditationInfo(data)
+            });
+            a.addClass('accredited');
+            a.append(icon);
+
+            return a.prop('outerHTML');
         };
 
         $(document).ready(function () {
@@ -587,51 +656,7 @@
                     },
                     {
                         data: 'accredited', "render": function (data, type, row, meta) {
-
-                            if (!ACCREDITATION_SERVICE_ID) {
-                                return '-';
-                            }
-
-                            var a;
-                            var icon = $('<span>').addClass('fas fa-2x');
-                            if (row['accredited'] === false) {
-                                icon.addClass('fa-minus-circle').css('color', 'gray');
-                                icon.attr({
-                                    'data-toggle': 'tooltip',
-                                    'title': 'Não credenciado'
-                                });
-
-                                a = $('<a>').attr({
-                                    'href': 'javascript:void(0)',
-                                    'data-toggle': 'popover',
-                                    'data-placement': 'bottom',
-                                    'title': 'Credenciamento',
-                                    'data-content': getAccreditationInfo(row)
-                                });
-
-                                a.addClass('not-accredited');
-                                a.append(icon);
-
-                                return a.prop('outerHTML');
-                            }
-
-                            icon.addClass('fa-check-circle').css('color', 'green');
-                            icon.attr({
-                                'data-toggle': 'tooltip',
-                                'title': 'Credenciado'
-                            });
-
-                            a = $('<a>').attr({
-                                'href': 'javascript:void(0)',
-                                'data-toggle': 'popover',
-                                'data-placement': 'bottom',
-                                'title': 'Credenciamento',
-                                'data-content': getAccreditationInfo(row)
-                            });
-                            a.addClass('accredited');
-                            a.append(icon);
-
-                            return a.prop('outerHTML');
+                            return loadAccreditationContent(row);
                         }
                     },
                     {data: 'lot_name'},
@@ -922,7 +947,7 @@
 
                 <div class="panel-body">
 
-                    <div class="col-md-12 table-responsive">
+                    <div class="col-md-12">
 
 
                         <table id="subscription_table"
