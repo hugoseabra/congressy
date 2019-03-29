@@ -1,6 +1,7 @@
 {% extends "base/base.html" %}
 {% load static %}
 {% load static i18n %}
+{% load attendance_tags %}
 
 {% block title %}
     Serviços de Atendimento | Congressy
@@ -130,7 +131,7 @@
                                 <td>
                                     <a href="{% url 'attendance:dashboard' event.pk item.pk %}">{{ item.name }}</a>
                                 </td>
-                                <td class="text-center">{{ num_checkins }}</td>
+                                <td class="text-center">{% count_checkins item %}</td>
                                 <td>
                                     <div class="btn-group">
                                         <button type="button"
