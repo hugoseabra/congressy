@@ -276,6 +276,13 @@
         };
 
         var get_institution_el = function (row) {
+
+            var institution = row['institution'];
+
+            if (!institution) {
+                return ''
+            }
+
             var tag = document.createElement("div");
             tag = $(tag);
             tag.css("margin-left", '18px');
@@ -283,7 +290,7 @@
             var span = $(document.createElement('small'));
             span.addClass('text-muted');
 
-            span.append(row['institution']);
+            span.append(institution);
 
             tag.append(span);
             return tag.prop('outerHTML');

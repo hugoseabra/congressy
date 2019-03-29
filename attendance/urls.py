@@ -10,6 +10,11 @@ urls = [
         name='attendance-list-add'
     ),
     url(
+        r'^export/$',
+        views.AttendanceXLSExportView.as_view(),
+        name='attendance-xls-export',
+    ),
+    url(
         r'^(?P<pk>[\d]+)/edit/',
         views.EditAttendanceServiceView.as_view(),
         name='attendance-list-edit'

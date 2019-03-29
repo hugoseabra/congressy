@@ -155,6 +155,8 @@ class SubscriptionSerializer(serializers.BaseSerializer):
             'test_subscription': obj.test_subscription,
             'status': obj.status,
             'created': obj.created,
+            'tag_info': obj.tag_info,
+            'tag_group': obj.tag_group,
             'category_name': None,
             'institution': None,
             'link': reverse(

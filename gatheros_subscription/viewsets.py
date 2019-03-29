@@ -98,7 +98,7 @@ class SubscriptionListViewSet(RestrictionViewMixin,
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *_, **__):
         queryset = self.filter(request, self.get_queryset())
         queryset = self.get_order_by(request, queryset)
 
@@ -110,6 +110,7 @@ class SubscriptionListViewSet(RestrictionViewMixin,
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    # noinspection PyMethodMayBeStatic
     def get_order_by(self, request, queryset):
 
         required = [
@@ -144,6 +145,7 @@ class SubscriptionListViewSet(RestrictionViewMixin,
 
         return queryset.order_by(order + field)
 
+    # noinspection PyMethodMayBeStatic
     def filter(self, request, queryset):
 
         search_param = request.query_params.get("search")
