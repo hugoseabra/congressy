@@ -22,18 +22,6 @@ class FileCollectorImportView(SubscriptionViewMixin, TemplateNameableMixin,
     """
     template_name = "importer/file-collector_upload.html"
 
-    def dispatch(self, request, *args, **kwargs):
-
-        res = super().dispatch(request, *args, **kwargs)
-
-        if not request.user.is_staff:
-            return redirect(
-                reverse_lazy('attendance:manage-list-attendance', kwargs={
-                    'event_pk': self.event.pk
-                }))
-
-        return res
-
     def get_form(self, form_class=None):
         kwargs = self.get_form_kwargs()
 
