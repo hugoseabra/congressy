@@ -1,6 +1,7 @@
 {% extends "base/base.html" %}
 {% load static %}
 {% load static i18n %}
+{% load attendance_tags %}
 
 {% block title %}
     Serviços de Atendimento | Congressy
@@ -63,10 +64,25 @@
                 }
             });
         });
+
+
+        var export_service = function (item_pk) {
+            var url = '{% url "attendance:attendance-xls-export" event.pk%}' + '?pk=' + item_pk;
+
+            console.log("URL => " + url);
+            console.log("ITEM PK => " + item_pk);
+
+            window.setTimeout(function() {
+                $('#attendance-exporter-modal').modal('hide');
+            }, 3000);
+            window.location=url;
+        }
+
     </script>
 {% endblock %}
 
 {% block content %}
+
     <div class="row">
         <div class="col-md-12">
             <div class="buttonbar">
@@ -89,6 +105,7 @@
             </div>
         </div>
     </div>
+
     <div class="row tooltip-wrapper">
         <div class="col-md-12">
             <div class="panel panel-primary">
@@ -104,6 +121,7 @@
                         <thead>
                         <tr>
                             <th>Nome do Serviço de Atendimento</th>
+                            <th width="20%"># Atendidos</th>
                             <th width="5%"></th>
                         </tr>
                         </thead>
@@ -113,6 +131,7 @@
                                 <td>
                                     <a href="{% url 'attendance:dashboard' event.pk item.pk %}">{{ item.name }}</a>
                                 </td>
+                                <td class="text-center">{% count_checkins item %}</td>
                                 <td>
                                     <div class="btn-group">
                                         <button type="button"
@@ -132,10 +151,17 @@
                                             </li>
 
                                             <li onclick="$('#lot-delete-form').attr('action','{% url 'attendance:attendance-list-delete' event.pk item.pk %}');
-                                                    $('#attendace-list-delete-modal').modal();">
+                                                    $('#attendance-list-delete-modal').modal();">
                                                 <a href="#">
                                                     <i class="fas fa-trash-alt"> </i>
                                                     Excluir
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a href="#" onclick="export_service('{{ item.pk }}');$('#attendance-exporter-modal').modal();">
+                                                    <i class="fas fa-file-excel"></i>
+                                                    Exportar
                                                 </a>
                                             </li>
                                         </ul>
@@ -153,7 +179,8 @@
 {% endblock %}
 
 {% block modals %}
-    <div class="modal" id="attendace-list-delete-modal" role="dialog"
+
+    <div class="modal" id="attendance-list-delete-modal" role="dialog"
          data-backdrop="true">
         <div class="modal-dialog " role="document">
             <div class="modal-content">
@@ -190,4 +217,23 @@
         </div>
     </div>
 
+    <div class="modal fade" id="attendance-exporter-modal" tabindex="-1" role="dialog"
+         aria-labelledby="modal-service-delete-title" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">
+                        Exportação de Atendimento
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <h2>Aguarde enquanto preparamos sua exportação...</h2>
+                        <i class="fas info-color fa-circle-notch fa-spin fa-4x" style="margin-top: 20px"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
