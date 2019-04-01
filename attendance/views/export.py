@@ -137,7 +137,7 @@ def export_attendance_checkin_subscriptions(worksheet, subscriptions,
     row_idx = 1
     for sub in subscriptions:
 
-        checkin = Checkin.objects.get(
+        checkins = Checkin.objects.filter(
             subscription=sub,
             checkout__isnull=True,
             attendance_service=attendance,
@@ -242,11 +242,25 @@ def export_attendance_checkin_subscriptions(worksheet, subscriptions,
         collector[row_idx].append(get_object_value(sub, 'tag_info'))
         collector[row_idx].append(get_object_value(sub, 'obs'))
         collector[row_idx].append(sub.created.strftime('%d/%m/%Y %H:%M:%S'))
-        if checkin.registration:
-            collector[row_idx].append(
-                checkin.registration.strftime('%d/%m/%Y %H:%M:%S'))
+
+        if checkins.count() > 0:
+
+            checkin_str = ''
+            for i in range(1, len(checkins)):
+
+                instance = checkins[i - 1]
+
+                if instance.registration:
+                    t = instance.registration.strftime('%H:%M:%S de %d/%m/%Y')
+                else:
+                    t = instance.created_on.strftime('%H:%M:%S de %d/%m/%Y')
+
+                checkin_str += "Checkin {}º feito ás {} \n".format(i, t)
+
         else:
-            '----'
+            checkin_str = '----'
+
+        collector[row_idx].append(checkin_str)
 
         row_idx += 1
 
