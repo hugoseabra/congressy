@@ -60,7 +60,15 @@
                         sSortAscending: ": Ordenar colunas de forma ascendente",
                         sSortDescending: ": Ordenar colunas de forma descendente"
                     }
-                }
+                },
+                "columnDefs": [
+                    // Disable sort in first, last column
+                    {
+                        "searchable": false,
+                        "orderable": false,
+                        "targets": [-1]
+                    }
+                ]
             });
         });
 
@@ -128,10 +136,13 @@
                         {% for item in attendance_lists %}
                             <tr>
                                 <td>
+                                    {% if item.accreditation is True %}
+                                    <span class="fas fa-check-circle text-success" data-toggle="tooltip" title="Serviço de Credenciamento"></span>
+                                    {% endif %}
                                     <a href="{% url 'attendance:dashboard' event.pk item.pk %}">{{ item.name }}</a>
                                 </td>
                                 <td class="text-center">{{ num_checkins }}</td>
-                                <td>
+                                <td class="text-center">
                                     <div class="btn-group">
                                         <button type="button"
                                                 class="btn btn-primary btn-trans btn-sm dropdown-toggle"
