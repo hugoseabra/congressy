@@ -1,6 +1,7 @@
 {% extends "base/base.html" %}
 {% load static %}
 {% load static i18n %}
+{% load attendance_tags %}
 
 {% block title %}
     Serviços de Atendimento | Congressy
@@ -96,8 +97,8 @@
                 <div class="float-left">
                     <a href="{% url 'importer:file-collector-import' event.pk %}"
                        class="btn btn-primary">
-                        <i class="fas fa-file-import"></i>
-                        Importação via arquivo
+                        <i class="fas fa-barcode"></i>
+                        Importação de coletor de dados
                     </a>
                 </div>
                 <div class="float-right">
@@ -141,8 +142,8 @@
                                     {% endif %}
                                     <a href="{% url 'attendance:dashboard' event.pk item.pk %}">{{ item.name }}</a>
                                 </td>
-                                <td class="text-center">{{ num_checkins }}</td>
-                                <td class="text-center">
+                                <td class="text-center">{% count_checkins item %}</td>
+                                <td>
                                     <div class="btn-group">
                                         <button type="button"
                                                 class="btn btn-primary btn-trans btn-sm dropdown-toggle"
