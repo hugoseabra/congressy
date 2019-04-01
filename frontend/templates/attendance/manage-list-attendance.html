@@ -10,6 +10,7 @@
 {% block page_title %}
     Serviços de Atendimento
 {% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
 {% block page_description %}
     Serviços gerais utilizados para atendimentos de participantes.
 {% endblock %}
@@ -137,10 +138,11 @@
                         {% for item in attendance_lists %}
                             <tr>
                                 <td>
+                                    <a href="{% url 'attendance:dashboard' event.pk item.pk %}">{{ item.name }}</a>
                                     {% if item.accreditation is True %}
+                                    &ensp; &ensp;
                                     <span class="fas fa-check-circle text-success" data-toggle="tooltip" title="Serviço de Credenciamento"></span>
                                     {% endif %}
-                                    <a href="{% url 'attendance:dashboard' event.pk item.pk %}">{{ item.name }}</a>
                                 </td>
                                 <td class="text-center">{% count_checkins item %}</td>
                                 <td>
