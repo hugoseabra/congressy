@@ -108,9 +108,8 @@ class EventPanelView(EventDraftStateMixin,
         # context['status'] = self._get_status()
         # context['totals'] = self._get_payables()
         # context['limit'] = self._get_limit()
-        # context['event_is_subscribable'] = EventSubscribable() \
-        #     .is_satisfied_by(self.object)
-        # context['event_is_payable'] = is_paid_event(self.object)
+        context['event_is_subscribable'] = EventSubscribable().is_satisfied_by(self.object)
+        context['event_is_payable'] = is_paid_event(self.object)
         # context['all_lots'] = self.all_lots_status()
         # context['gender'] = self._get_gender()
         # context['pending'] = self._get_number_pending()
