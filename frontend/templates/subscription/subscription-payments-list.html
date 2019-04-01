@@ -378,32 +378,53 @@
                                     </td>
                                     <td class="table-row text-center text-bold">
                                         {% if transaction.manual is False %}
-                                        <div class="{% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}cancelled{% endif %}">
-                                            {% if transaction.status == transaction.PAID %}
-                                                <span class="text-success" data-toggle="tooltip" title="Entrada">C</span>
+                                            {% if transaction.type == transaction.CREDIT_CARD %}
+                                                <div class="{% if transaction.status == transaction.REFUSED or transaction.status == transaction.REFUNDED %}cancelled{% endif %}">
+                                                    {% if transaction.status == transaction.PAID %}
+                                                        <span class="text-success" data-toggle="tooltip" title="Entrada">C</span>
+                                                    {% else %}
+                                                        <span class="text-default" data-toggle="tooltip" title="Entrada">C</span>
+                                                    {% endif %}
+                                                </div>
                                             {% else %}
-                                                <span class="text-default" data-toggle="tooltip" title="Saída">D</span>
+                                                <div class="{% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}cancelled{% endif %}">
+                                                    {% if transaction.status == transaction.PAID %}
+                                                        <span class="text-success" data-toggle="tooltip" title="Entrada">C</span>
+                                                    {% else %}
+                                                        <span class="text-default" data-toggle="tooltip" title="Saída">D</span>
+                                                    {% endif %}
+                                                </div>
                                             {% endif %}
-                                        </div>
+
                                         {% else %}
-                                        <div>
-                                            {% if transaction.status == transaction.PAID %}
-                                                <span class="text-success" data-toggle="tooltip" title="Entrada">C</span>
-                                            {% else %}
-                                                <span class="text-danger" data-toggle="tooltip" title="Saída">D</span>
-                                            {% endif %}
-                                        </div>
+                                            <div>
+                                                {% if transaction.status == transaction.PAID %}
+                                                    <span class="text-success" data-toggle="tooltip" title="Entrada">C</span>
+                                                {% else %}
+                                                    <span class="text-danger" data-toggle="tooltip" title="Saída">D</span>
+                                                {% endif %}
+                                            </div>
                                         {% endif %}
                                     </td>
                                     <td class="table-row text-right">
                                         {% if transaction.manual is False %}
-                                        <div class="{% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}cancelled{% endif %}">
-                                            {% if transaction.status == transaction.PAID %}
-                                                <span class="text-success">R$ {{ transaction.amount|intcomma }}</span>
+                                            {% if transaction.type == transaction.CREDIT_CARD %}
+                                                <div class="{% if transaction.status == transaction.REFUSED or transaction.status == transaction.REFUNDED %}cancelled{% endif %}">
+                                                    {% if transaction.status == transaction.PAID %}
+                                                        <span class="text-success">R$ {{ transaction.amount|intcomma }}</span>
+                                                    {% else %}
+                                                        <span class="text-default">R$ {{ transaction.amount|intcomma }}</span>
+                                                    {% endif %}
+                                                </div>
                                             {% else %}
-                                                <span class="text-default">R$ {{ transaction.amount|intcomma }}</span>
+                                                <div class="{% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}cancelled{% endif %}">
+                                                    {% if transaction.status == transaction.PAID %}
+                                                        <span class="text-success">R$ {{ transaction.amount|intcomma }}</span>
+                                                    {% else %}
+                                                        <span class="text-default">R$ {{ transaction.amount|intcomma }}</span>
+                                                    {% endif %}
+                                                </div>
                                             {% endif %}
-                                        </div>
                                         {% else %}
                                         <div>
                                             {% if transaction.status == transaction.PAID %}
@@ -416,13 +437,24 @@
                                     </td>
                                     <td class="table-row">
                                         {% if transaction.manual is False %}
-                                        <div class="{% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}cancelled{% endif %}">
-                                            {% if transaction.status == transaction.PAID %}
-                                                <span class="text-success">{{ transaction.get_status_display }}</span>
+
+                                            {% if transaction.type == transaction.CREDIT_CARD %}
+                                                <div class="{% if transaction.status == transaction.REFUSED or transaction.status == transaction.REFUNDED %}cancelled{% endif %}">
+                                                    {% if transaction.status == transaction.PAID %}
+                                                        <span class="text-success">{{ transaction.get_status_display }}</span>
+                                                    {% else %}
+                                                        <span class="text-default">{{ transaction.get_status_display }}</span>
+                                                    {% endif %}
+                                                </div>
                                             {% else %}
-                                                <span class="text-default">{{ transaction.get_status_display }}</span>
+                                                <div class="{% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}cancelled{% endif %}">
+                                                    {% if transaction.status == transaction.PAID %}
+                                                        <span class="text-success">{{ transaction.get_status_display }}</span>
+                                                    {% else %}
+                                                        <span class="text-default">{{ transaction.get_status_display }}</span>
+                                                    {% endif %}
+                                                </div>
                                             {% endif %}
-                                        </div>
                                         {% else %}
                                         <div>
                                             {% if transaction.status == transaction.PAID %}
