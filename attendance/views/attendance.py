@@ -85,7 +85,7 @@ class CheckinListView(AttendanceFeatureFlagMixin, generic.TemplateView):
         self.attendances = Checkin.objects.filter(
             attendance_service=self.object,
             checkout__isnull=True
-        ).order_by('-created_on')
+        ).order_by('subscription_id', '-created_on').distinct('subscription_id')
         return self.attendances
 
 
