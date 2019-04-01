@@ -47,75 +47,80 @@
     <script src="{% static "assets/js/attendance/attendance.js" %}"></script>
     <script>
 
-        function Checkin(subscription_pk, time, alert) {
+        function Checkin(subscription_pk, time) {
 
             var url = "/api/attendance/checkins/";
 
-            $.ajax({
-                url: url,
-                type: "POST",
-                data: {
-                    'created_by': '{{ user_id }}',
-                    'registration': time,
-                    'attendance_service': '{{ form.cleaned_data.services.pk }}',
-                    'subscription': subscription_pk
-                },
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
-                },
-                success: function () {
 
-                    if (alert) {
-                        window.cgsy.messenger.triggerSuccess('Sucesso!');
-                        window.location.reload()
+            return new Promise(function (resolve, reject) {
+
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: {
+                        'created_by': '{{ user_id }}',
+                        'registration': time,
+                        'attendance_service': '{{ form.cleaned_data.services.pk }}',
+                        'subscription': subscription_pk
+                    },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    },
+                    success: function () {
+                        resolve();
+                    },
+                    error: function (response) {
+                        var msg;
+                        if (response.responseText) {
+                            msg = response.responseText
+                        } else {
+                            msg = 'Failure on request to "' + url + '" with method POST';
+                            if (response.hasOwnProperty('detail')) {
+                                msg += ' Detalhes: ' + response.detail;
+                            }
+                        }
+                        reject(msg);
                     }
+                });
 
-                },
-                error: function (response) {
-                    var msg = 'Failure on request to "' + url + '" with method POST';
-
-                    if (response.hasOwnProperty('detail')) {
-                        msg += ' Detalhes: ' + response.detail;
-                    }
-
-                    window.cgsy.messenger.triggerError(msg)
-                }
             });
+
 
         }
 
-        function Checkout(checkin_id, time, alert) {
+        function Checkout(checkin_id, time) {
             var url = "/api/attendance/checkouts/";
 
+            return new Promise(function (resolve, reject) {
 
-            $.ajax({
-                url: url,
-                type: "POST",
-                data: {
-                    'created_by': '{{ user_id }}',
-                    'registration': time,
-                    'checkin': checkin_id
-                },
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
-                },
-                success: function () {
-
-                    if (alert) {
-                        window.cgsy.messenger.triggerSuccess('Sucesso!');
-                        window.location.reload()
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: {
+                        'created_by': '{{ user_id }}',
+                        'registration': time,
+                        'checkin': checkin_id
+                    },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    },
+                    success: function () {
+                        resolve();
+                    },
+                    error: function (response) {
+                        var msg;
+                        if (response.responseText) {
+                            msg = response.responseText
+                        } else {
+                            msg = 'Failure on request to "' + url + '" with method POST';
+                            if (response.hasOwnProperty('detail')) {
+                                msg += ' Detalhes: ' + response.detail;
+                            }
+                        }
+                        reject(msg);
                     }
+                });
 
-                },
-                error: function (response) {
-                    var msg = 'Failure on request to "' + url + '" with method POST';
-
-                    if (response.hasOwnProperty('detail')) {
-                        msg += ' Detalhes: ' + response.detail;
-                    }
-
-                    window.cgsy.messenger.triggerError(msg)
-                }
             });
 
 
@@ -131,19 +136,48 @@
 
             $('.checkin').on("click", function () {
                 window.cgsy.messenger.triggerLoader('Por favor aguarde...');
-                Checkin($(this).data('subscription_id'), $(this).data('registration_time'), true);
+                var checkin = Checkin($(this).data('subscription_id'), $(this).data('registration_time'));
+
+                checkin.then(function () {
+                    window.cgsy.messenger.triggerSuccess("Sucesso!");
+                    window.location.reload();
+                }).catch(function (reason) {
+                    console.error(reason);
+                    var usr_msg = 'Ocorreu um erro durante o processamento. Por favor tente novamente.';
+                    window.cgsy.messenger.triggerError(usr_msg);
+                    window.location.reload();
+                })
+
+
             });
 
             $('.checkin-all').on("click", function () {
 
                 window.cgsy.messenger.triggerLoader('Por favor aguarde...');
 
+                var promises = [];
+                var ids = [];
+
                 $('.checkin').each(function () {
-                    Checkin($(this).data('subscription_id'), $(this).data('registration_time'), false);
+                    var id = $(this).data('subscription_id');
+                    var time = $(this).data('registration_time');
+
+                    if (!ids.includes(id)) {
+                        ids.push(id);
+                        promises.push(Checkin(id, time));
+                    } else {
+                        console.log("FOUND DUPLICATE: " + id);
+                    }
                 });
 
-                window.cgsy.messenger.triggerSuccess('Sucesso!');
-                window.location.reload()
+                Promise.all(promises).then(function () {
+                    window.cgsy.messenger.triggerSuccess('Sucesso!');
+                    window.location.reload();
+                }).catch(function (err) {
+                    console.error(err);
+                    var usr_msg = 'Ocorreu um erro durante o processamento. Por favor tente novamente.';
+                    window.cgsy.messenger.triggerError(usr_msg);
+                });
 
 
             });
@@ -154,26 +188,52 @@
 
             $('.checkout').on("click", function () {
                 window.cgsy.messenger.triggerLoader('Por favor aguarde...');
-                Checkout($(this).data('checkin_id'), $(this).data('registration_time'), true);
-            });
+                var checkout = Checkout($(this).data('checkin_id'), $(this).data('registration_time'));
 
+                checkout.then(function () {
+                    window.cgsy.messenger.triggerSuccess("Sucesso!");
+                    window.location.reload();
+                }).catch(function (reason) {
+                    console.error(reason);
+                    var usr_msg = 'Ocorreu um erro durante o processamento. Por favor tente novamente.';
+                    window.cgsy.messenger.triggerError(usr_msg);
+                    window.location.reload();
+                })
+
+            });
 
             $('.checkout-all').on("click", function () {
 
                 window.cgsy.messenger.triggerLoader('Por favor aguarde...');
 
+                var promises = [];
+                var ids = [];
+
                 $('.checkout').each(function () {
-                    Checkout($(this).data('checkin_id'), $(this).data('registration_time'), false);
+                    var id = $(this).data('checkin_id');
+                    var time = $(this).data('registration_time');
+
+                    if (!ids.includes(id)) {
+                        ids.push(id);
+                        promises.push(Checkout(id, time));
+                    } else {
+                        console.log("FOUND DUPLICATE: " + id);
+                    }
                 });
 
-                window.cgsy.messenger.triggerSuccess('Sucesso!');
-                window.location.reload()
+                Promise.all(promises).then(function () {
+                    window.cgsy.messenger.triggerSuccess('Sucesso!');
+                    window.location.reload();
+                }).catch(function (err) {
+                    console.error(err);
+                    var usr_msg = 'Ocorreu um erro durante o processamento. Por favor tente novamente.';
+                    window.cgsy.messenger.triggerError(usr_msg);
+                });
 
 
             });
-
-
         });
+
     </script>
 {% endblock %}
 

@@ -129,6 +129,9 @@ class PagarmeDataBuilder:
 
             data['boleto_instructions'] = instructions
 
+            assert len(instructions) <= 255, 'boleto_instructions len({})' \
+                                             ''.format(len(instructions))
+
             event_config = event.feature_configuration
 
             if event_config.feature_boleto_expiration_on_lot_expiration:
