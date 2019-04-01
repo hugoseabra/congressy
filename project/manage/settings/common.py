@@ -50,4 +50,4 @@ AUTH_PASSWORD_VALIDATORS += [
     # },
 ]
 # ============================== GOOGLE ===================================== #
-GOOGLE_MAPS_API_KEY = 'AIzaSyAPpiE3QALhF_5AhBSZJ9K27eDiJXCtTK0'
+GOOGLE_MAPS_API_KEY = 'AIzaSyDCx_62viOjiSf-NFZ1m-1mQF-9-ize9EA'
