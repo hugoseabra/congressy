@@ -125,6 +125,12 @@ class Subscription(models.Model, GatherosModelMixin):
         help_text='Pessoa já foi atendimento pelo serviço de credenciamento.',
     )
 
+    accredited_on = models.DateTimeField(
+        verbose_name='credenciado em',
+        null=True,
+        blank=True
+    )
+
     code = models.CharField(
         max_length=15,
         blank=True,
