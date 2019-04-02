@@ -19,36 +19,3 @@ def create_default_attendance(instance, raw, created, **_):
             with_certificate=True,
             checkout_enabled=False,
         )
-
-
-@receiver(pre_save, sender=Checkin)
-def register_subscription_as_attended(instance, raw, **_):
-    if raw is True:
-        return
-
-    service = instance.attendance_service
-
-    if service.accreditation is False:
-        return
-
-    sub = instance.subscription
-    sub.accredited = True
-    sub.accredited_on = datetime.now()
-    sub.save()
-
-
-@receiver(pre_save, sender=Checkout)
-def register_subscription_as_not_attended(instance, raw, **_):
-    if raw is True:
-        return
-
-    checkin = instance.checkin
-    service = checkin.attendance_service
-
-    if service.accreditation is False:
-        return
-
-    sub = checkin.subscription
-    sub.accredited = False
-    sub.accredited_on = datetime.now()
-    sub.save()
