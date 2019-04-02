@@ -1,7 +1,9 @@
 import locale
 from datetime import datetime
+
 from django.db.models import QuerySet
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
+from django.utils.text import slugify
 from django.views.generic import View
 from openpyxl import Workbook
 from six import BytesIO
@@ -23,8 +25,13 @@ class AttendanceXLSExportView(AttendancesFeatureFlagMixin, View):
     def get(self, request, *args, **kwargs):
         pk = request.GET.get('pk', None)
 
+        try:
+            service = AttendanceService.objects.get(pk=pk)
+        except AttendanceService.DoesNotExist:
+            raise Http404('Serviço de atendimento não encontrado.')
+
         # Chamando exportação
-        output = export_attendance(pk)
+        output = export_attendance(service)
 
         # Criando resposta http com arquivo de download
         response = HttpResponse(
@@ -33,8 +40,9 @@ class AttendanceXLSExportView(AttendancesFeatureFlagMixin, View):
         )
 
         # Definindo nome do arquivo
-        name = "%s_%s.xlsx" % (
+        name = "%s_%s_%s.xlsx" % (
             self.event.slug,
+            slugify(service.name),
             datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         )
         response['Content-Disposition'] = 'attachment; filename=%s' % name
@@ -42,7 +50,7 @@ class AttendanceXLSExportView(AttendancesFeatureFlagMixin, View):
         return response
 
 
-def export_attendance(attendance_service_pk=None):
+def export_attendance(service):
     """
     Exportação de inscrições de um serviço de atendimento em formato xlsx
     :return: ByteIO
@@ -51,26 +59,13 @@ def export_attendance(attendance_service_pk=None):
 
     wb = Workbook()
 
-    # ===================== PRESENTES ==========================================
+    # ===================== PRESENTES =========================================
 
     ws1 = wb.active
     ws1.title = clean_sheet_title('Presentes')
 
-    if attendance_service_pk is None:
-        ws1.append(["ERRO: Identificador de serviço não informado."])
-        wb.save(stream)
-        return stream.getvalue()
-
-    try:
-        service = AttendanceService.objects.get(pk=attendance_service_pk)
-    except AttendanceService.DoesNotExist:
-        ws1.append(["ERRO: Não foi possivel encontrar esse serviço de "
-                    "atendimento."])
-        wb.save(stream)
-        return stream.getvalue()
-
     checkins = Checkin.objects.filter(
-        attendance_service=service,
+        attendance_service_id=service.pk,
         checkout__isnull=True,
     )
 
@@ -91,16 +86,16 @@ def export_attendance(attendance_service_pk=None):
             attendance=service
         )
 
-    # ===================== AUSENTES ===========================================
+    # ===================== AUSENTES ==========================================
 
-    ws2 = wb.create_sheet(title='Ausentes(Participantes que fizeram checkout)')
+    ws2 = wb.create_sheet(title='Ausentes (checkouts realizados)')
 
     checkouts = Checkin.objects.filter(
         attendance_service=service,
         checkout__isnull=False,
     ).exclude(
         subscription_id__in=[str(s.pk) for s in subscriptions]
-    ).order_by('registration', 'created_by')
+    ).order_by('registration', 'created_on')
 
     subscriptions = list()
 
@@ -119,13 +114,13 @@ def export_attendance(attendance_service_pk=None):
             attendance=service,
         )
 
-    # ===================== AUDITORIA ==========================================
+    # ===================== AUDITORIA =========================================
 
     ws3 = wb.create_sheet(title='Auditoria')
 
     checkins = Checkin.objects.filter(
         attendance_service=service,
-    ).order_by('registration', 'created_by')
+    ).order_by('registration', 'created_on')
 
     subscriptions = list()
 
@@ -373,8 +368,8 @@ def export_attendance_checkouts(worksheet, subscriptions, attendance):
     for sub in subscriptions:
 
         checkout = Checkout.objects.filter(
-            checkin__subscription=sub,
-            checkin__attendance_service=attendance,
+            checkin__subscription_id=sub.pk,
+            checkin__attendance_service_id=attendance.pk,
         ).order_by('registration', 'created_by').last()
 
         if row_idx not in collector:
@@ -504,11 +499,18 @@ def export_attendance_auditing(worksheet, subscriptions, attendance):
 
     collector = {}
     row_idx = 1
+
+
+
+
+
+
+
     for sub in subscriptions:
 
         checkins = Checkin.objects.filter(
-            subscription=sub,
-            attendance_service=attendance,
+            subscription_id=sub.pk,
+            attendance_service_id=attendance.id,
         ).order_by('registration', 'created_by')
 
         for checkin in checkins:
@@ -540,7 +542,7 @@ def export_attendance_auditing(worksheet, subscriptions, attendance):
             collector[row_idx].append("{}".format(t))
 
             try:
-                checkout = Checkout.objects.get(checkin=checkin)
+                checkout = Checkout.objects.get(checkin_id=checkin.pk)
 
                 if instance.registration:
                     t = checkout.registration.strftime('%d/%m/%Y %H:%M:%S')

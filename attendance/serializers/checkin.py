@@ -23,8 +23,12 @@ class CheckinSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         subscription = attrs.get('subscription')
         service = attrs.get('attendance_service')
-        checkins = subscription.checkins.filter(attendance_service=service)
-        if checkins.count() and not hasattr(checkins.last(), 'checkout'):
+        checkins = subscription.checkins.filter(
+            attendance_service_id=service.pk,
+            checkout__isnull=True,
+        )
+
+        if checkins.count():
             raise serializers.ValidationError({
                 'subscription': 'Entrada já registrada neste Atendimento para'
                                 ' esta inscrição.'

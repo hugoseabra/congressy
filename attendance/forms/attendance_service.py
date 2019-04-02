@@ -47,7 +47,6 @@ class AttendanceServiceForm(forms.ModelForm):
         return accreditation
 
     def _create_lot_category_filters(self, service):
-        print('gfdfhgsfad')
         lc_pks = self.data.getlist('category_list', [])
         lc_pks = list(map(int, lc_pks))
         existing_cat_filters = []

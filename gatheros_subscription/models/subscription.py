@@ -4,8 +4,10 @@ Inscrições de pessoas em eventos.
 """
 
 import uuid
+
 from django.db import models
 from django.db.models import Max
+from django.utils.functional import cached_property
 
 from core.model import track_data
 from gatheros_event.models import Event, Person
@@ -119,18 +121,6 @@ class Subscription(models.Model, GatherosModelMixin):
         verbose_name='compareceu'
     )
 
-    accredited = models.BooleanField(
-        default=False,
-        verbose_name='credenciado',
-        help_text='Pessoa já foi atendimento pelo serviço de credenciamento.',
-    )
-
-    accredited_on = models.DateTimeField(
-        verbose_name='credenciado em',
-        null=True,
-        blank=True
-    )
-
     code = models.CharField(
         max_length=15,
         blank=True,
@@ -153,6 +143,7 @@ class Subscription(models.Model, GatherosModelMixin):
         null=True,
         blank=True
     )
+
     created = models.DateTimeField(
         auto_now_add=True,
         verbose_name='criado em'
@@ -292,3 +283,28 @@ class Subscription(models.Model, GatherosModelMixin):
         if not self.count:
             return '--'
         return '{0:03d}'.format(self.count)
+
+    @cached_property
+    def accreditation_checkin(self):
+        checkins = self.checkins.filter(
+            attendance_service__accreditation=True,
+            checkout__isnull=True,
+        )
+
+        if checkins.count() == 0:
+            return None
+
+        return checkins.last()
+
+    @property
+    def accredited(self):
+        return self.accreditation_checkin is not None
+
+    @property
+    def accredited_on(self):
+        checkin = self.accreditation_checkin
+
+        if not checkin:
+            return None
+
+        return checkin.registration or checkin.created_on

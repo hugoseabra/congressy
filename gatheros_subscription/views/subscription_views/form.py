@@ -155,7 +155,7 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
             ctx['all_services'] = self.event.attendance_services.all()
             ctx['services'] = services
             ctx['has_webhook'] = \
-                len([a.printing_queue_webhook for a in services]) > 0
+                len([a for a in services if a.printing_queue_webhook]) > 0
 
         return ctx
 

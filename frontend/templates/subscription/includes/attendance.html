@@ -20,9 +20,9 @@
                         <div class="row">
                             <div class="col-xl-9 col-lg-8 col-md-8 col-sm-7">
                                 <label for="attendance_id">Registrar atendimento em:</label>
-                                <select class="form-control" name="attendance_id" id="attendance_id">
+                                <select class="form-control" name="attendance_id" id="attendance_id" onchange="showHidePrinterButton($(this))">
                                     {% for service in services %}
-                                    <option value="{{ service.pk }}" data-webhook="{{ service.printing_queue_webhook }}" data-pin="{{ service.pwa_pin }}">{{ service.name }}</option>
+                                    <option value="{{ service.pk }}" data-webhook="{{ service.printing_queue_webhook|default_if_none:'' }}" data-pin="{{ service.pwa_pin|default_if_none:'' }}">{{ service.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -30,10 +30,8 @@
                                 <div class="hidden-xs" style="margin-top:27px"></div>
                                 <button class="btn btn-primary"
                                     onclick="attendanceCheckin($('#attendance_id').val());$(this).parent().parent().find('button').attr('disabled', true);$(this).text('aguarde...')">Registrar</button>
-                                {% if has_webhook %}
-                                <button class="btn btn-primary"
+                                <button class="btn btn-primary webhook-register-and-print" style="display:none"
                                     onclick="attendanceCheckin($('#attendance_id').val(), $('#attendance_id').find('option:selected').data('webhook'), $('#attendance_id').find('option:selected').data('pin'));$(this).parent().parent().find('button').attr('disabled', true);$(this).text('aguarde...')">Registrar e imprimir</button>
-                                {% endif %}
                             </div>
                         </div>
                         <hr class="divider"/>
@@ -57,7 +55,7 @@
                                                 </button>
                                                 {% endif %}
                                                 <button class="btn btn-sm btn-danger btn-block btn-trans"
-                                                    onclick="attendanceCheckout('{{ checkin.attendance_service_id }}', '{{ checkin.attendance_service.pwa_pin }}');$(this).parent().parent().find('button').attr('disabled', true)">
+                                                    onclick="if(confirm('Tem certeza que deseja desfazer o atendimento?')){attendanceCheckout('{{ checkin.attendance_service_id }}', '{{ checkin.attendance_service.pwa_pin }}');$(this).parent().parent().find('button').attr('disabled', true)}">
                                                     <i class="fa fa-remove"></i>
                                                     <span>Remover</span>
                                                 </button>
