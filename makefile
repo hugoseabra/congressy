@@ -10,8 +10,8 @@ up:
 
 
 down:
-	docker-compose -f bin/env/docker-compose_dev.yml down
 	-pkill -f "celery worker";
+	docker-compose -f bin/env/docker-compose_dev.yml down;
 
 
 logs:

@@ -45,8 +45,54 @@ def remove_export_lock(event: Event) -> None:
     os.remove(lock_file_path)
 
 
-def async_exporter(event: Event):
-    pass
+def has_existing_export_files(event: Event) -> bool:
+    exporter_folder_path = _get_exporter_folder_path(event)
+
+    if not os.path.isdir(exporter_folder_path):
+        return False
+
+    for file in os.listdir(exporter_folder_path):
+        if file.endswith(".xlsx"):
+            return True
+
+    return False
+
+
+def create_export_file(event: Event, payload: bytes) -> None:
+    exporter_folder_path = _get_exporter_folder_path(event)
+    exporter_file_path = exporter_folder_path + 'cgsy.xlsx'
+
+    if not os.path.isdir(exporter_folder_path):
+        logger.info("Creating exporter lock folder for event id: {}".format(
+            event.pk
+        ))
+        os.makedirs(exporter_folder_path)
+
+    f = open(exporter_file_path, 'wb')
+    f.write(payload)
+    f.close()
+    logger.info(
+        "Created export file '{}' for event id: {}".format(
+            exporter_file_path,
+            event.pk,
+        )
+    )
+
+
+def remove_export_files(event: Event) -> None:
+    exporter_folder_path = _get_exporter_folder_path(event)
+
+    for file in os.listdir(exporter_folder_path):
+        if file.endswith(".xlsx"):
+            logger.info("Removing export file '{}' for event id: {}".format(
+                file,
+                event.pk
+            ))
+            os.remove(exporter_folder_path + file)
+
+
+def get_export_file_path(event: Event) -> str:
+    return _get_exporter_folder_path(event) + 'cgsy.xlsx'
 
 
 def _get_lock_file_path(event: Event) -> str:

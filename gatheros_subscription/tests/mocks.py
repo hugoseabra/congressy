@@ -18,6 +18,9 @@ class MockFactory:
     def __init__(self):
         self.fake_factory = Faker('pt_BR')
 
+    def fake_person(self):
+        return Person.objects.create(name=self.fake_factory.name())
+
     def fake_organization(self):
         return Organization.objects.create(
             name=self.fake_factory.company(),

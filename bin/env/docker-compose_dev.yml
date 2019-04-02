@@ -49,9 +49,6 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=cgsy
       - RABBITMQ_DEFAULT_PASS=cgsy
-    hostname: cgsy-rabbitmq
-    networks:
-      - rabbitmq
     ports:
       - "8080:15672"
       - "5672:5672"
@@ -63,6 +60,3 @@ networks:
     name: local_mailhog
   wkhtmltopdf:
     name: local_wkhtmltopdf
-  rabbitmq:
-    name: local_rabbitmq
-
