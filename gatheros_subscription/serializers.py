@@ -136,6 +136,8 @@ class SubscriptionSerializer(serializers.BaseSerializer):
 
     def to_representation(self, obj):
         rep = {
+            'pk': obj.pk,
+            'person_pk': obj.person.pk,
             'person_name': obj.person.name,
             'person_email': obj.person.email,
             'person_cpf': obj.person.cpf,
@@ -146,6 +148,8 @@ class SubscriptionSerializer(serializers.BaseSerializer):
             'person_international_doc': obj.person.international_doc,
             'origin': obj.origin,
             'code': obj.code,
+            'accredited': obj.accredited,
+            'accredited_on': obj.accredited_on,
             'lot_name': obj.lot.name,
             'event_count': obj.event_count,
             'test_subscription': obj.test_subscription,

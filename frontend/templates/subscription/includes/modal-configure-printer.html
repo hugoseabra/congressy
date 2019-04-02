@@ -46,7 +46,7 @@
                                 </select>
                             </div>
                             <div class="text-center">
-                                <button class="btn btn-success" onclick="savePrinterConfig($('#config-default-service').val(), $('#config-printer-number').val())">Salvar</button>
+                                <button class="btn btn-success" onclick="var button=$(this);console.log(button);button.attr('disabled', true).text('aguarde...');savePrinterConfig($('#config-default-service').val(), $('#config-printer-number').val());window.setTimeout(function(){$('#configure-printer-modal').modal('hide');button.removeAttr('disabled').text('Salvar');}, 1500);">Salvar</button>
                             </div>
                         </form>
                     </div>

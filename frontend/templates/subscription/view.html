@@ -80,7 +80,7 @@
                 'fail_checkin_msg': 'Falha ao registrar atendimento',
                 'checkoutUri': "{% url 'api:attendance:checkout-list' %}",
                 'success_checkout_msg': 'Saída de atendimento registrada com sucesso',
-                'fail_checkout_msg': 'Falha ao registrar saía',
+                'fail_checkout_msg': 'Falha ao registrar saída',
             };
 
             var attendance = new window.cgsy.attendance.Attendance(
@@ -217,15 +217,22 @@
             var config = getPrinterConfig() || {};
             var service_pk = config.hasOwnProperty('service_pk') ? config['service_pk'] : null;
             var printer_number = config.hasOwnProperty('printer_number') ? config['printer_number'] : 1;
+            var service_list = $('#attendance_id');
+            var has_service = false;
 
-            if (service_pk) {
+            $('option', service_list).each(function(i, option) {
+                if (parseInt($(option).attr('value')) === parseInt(service_pk)) {
+                    has_service = true;
+                }
+            });
+
+            if (service_pk && has_service) {
                 $('#config-default-service').val(service_pk);
-                $('#attendance_id').val(service_pk);
+                service_list.val(service_pk);
+                showHidePrinterButton($('#attendance_id'));
             }
 
             $('#config-printer-number').val(printer_number);
-
-            console.log(config);
         }
 
     </script>
@@ -321,6 +328,16 @@
             checkout.run();
         }
 
+        function showHidePrinterButton(service_select_el) {
+            var printer_button = $('.webhook-register-and-print');
+
+            if($(service_select_el).find('option:selected').data('webhook')){
+                printer_button.show();
+            }else{
+                printer_button.hide();
+            }
+        }
+
         $(document).ready(function () {
             Messenger.options = {
                 extraClasses: 'messenger-fixed messenger-on-bottom ' +
@@ -361,7 +378,7 @@
                 console.log('new_contract not enabled');
             {% endif %}
 
-
+            showHidePrinterButton($('#attendance_id'));
         });
     </script>
 {% endblock %}
@@ -482,7 +499,7 @@
     {% include 'subscription/includes/modal-manual-payment-form.html' with form=manual_payment_form %}
     {% endif %}
 
-    {% if event.feature_configuration.feature_checkin is True %}
+    {% if event.feature_configuration.feature_checkin is True and event.feature_management.checkin is True %}
     {% include 'subscription/includes/modal-configure-printer.html' %}
     {% endif %}
 
