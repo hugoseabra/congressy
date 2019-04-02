@@ -544,7 +544,7 @@ def export_attendance_auditing(worksheet, subscriptions, attendance):
             try:
                 checkout = Checkout.objects.get(checkin_id=checkin.pk)
 
-                if instance.registration:
+                if checkout.registration:
                     t = checkout.registration.strftime('%d/%m/%Y %H:%M:%S')
                 else:
                     t = checkout.created_on.strftime('%d/%m/%Y %H:%M:%S')
