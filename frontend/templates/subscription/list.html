@@ -85,7 +85,9 @@
 
             var messenger = new window.cgsy.abstracts.messenger.Messenger();
             messenger.notifySuccess('Configurações salvas com sucesso');
-            setConfigToAttendanceForm();
+            setConfigToEnvironment();
+
+            $('#subscription_table').DataTable().ajax.reload();
         }
 
         function getPrinterConfig() {
@@ -96,17 +98,11 @@
             return JSON.parse(config);
         }
 
-        function setConfigToAttendanceForm() {
+        function setConfigToEnvironment() {
             var config = getPrinterConfig() || {};
-            var service_pk = config.hasOwnProperty('service_pk') ? config['service_pk'] : null;
             var printer_number = config.hasOwnProperty('printer_number') ? config['printer_number'] : 1;
 
-            if (service_pk) {
-                $('#config-default-service').val(service_pk);
-                $('#attendance_id').val(service_pk);
-            }
-
-            $('#config-printer-number').val(printer_number);
+            $('.list-printer-number').text(printer_number);
         }
 
         var registerAccreditation = function(button_el, procced_printing) {
@@ -180,10 +176,89 @@
             });
         };
 
+        var unregisterAccreditation = function(button_el) {
+            if (!ACCREDITATION_SERVICE_ID) {
+                return;
+            }
+
+            var data = button_el.data();
+            var pk = data['pk'];
+            var name = data['person_name'];
+            var lot_name = data['lot_name'];
+            var category_name = data['category_name'];
+            var email = data['person_email'];
+            var event_count = data['event_count'];
+            var code = data['code'];
+            var status = data['status'];
+            var attended = data['attended'];
+
+            var options = {
+                'checkinUri': "{% url 'api:attendance:checkin-list' %}",
+                'success_checkin_msg': 'Atendimento registrado com succeso',
+                'fail_checkin_msg': 'Falha ao registrar atendimento',
+                'checkoutUri': "{% url 'api:attendance:checkout-list' %}",
+                'success_checkout_msg': 'Saída de atendimento registrada com sucesso',
+                'fail_checkout_msg': 'Falha ao registrar saída'
+            };
+
+            var attendance = new window.cgsy.attendance.Attendance(
+                options['checkinUri'],
+                options['success_checkin_msg'],
+                options['fail_checkin_msg'],
+                options['checkoutUri'],
+                options['success_checkout_msg'],
+                options['fail_checkout_msg']
+            );
+
+            var subscription = new window.cgsy.attendance.Subscription(
+                pk,
+                name,
+                lot_name,
+                category_name,
+                email,
+                event_count,
+                code,
+                status,
+                attended
+            );
+
+            subscription.setUri("/api/attendance/services/"+ ACCREDITATION_SERVICE_ID +"/subscriptions/:pk/");
+
+            var parent = button_el.parent().parent();
+            parent.find('button').attr('disabled', true);
+            button_el.text('aguarde...');
+
+            data['accredited'] = false;
+            data['accredited_on'] = null;
+
+            attendance.checkout(ACCREDITATION_SERVICE_ID, subscription, name).then(function() {
+                parent.parent().parent().html(loadAccreditationContent(data));
+                $('.not-accredited').popover({'html': true});
+            });
+        };
+
+        function triggerPrintFromButton(button_el, sub_pk) {
+
+            button_el = $(button_el);
+            var parent = button_el.parent().parent();
+            var spinner = parent.find('i.fa-spinner').show();
+
+            button_el.hide();
+            spinner.show();
+
+            triggerPrintWebhook(ACCREDITATION_SERVICE_ID, sub_pk, priting_webhook_url, printing_pin).then(function() {
+                button_el.show();
+                spinner.hide();
+                window.setTimeout(function() {
+                    $('.accredited').popover('hide');
+                }, 500);
+            });
+        }
+
         function triggerPrintWebhook(service_pk, sub_pk, printing_webhook, pin) {
             return new Promise(function(resolve, reject) {
 
-                var printer_number  = 1;
+                var printer_number = 1;
 
                 var config = getPrinterConfig();
                 if (config && config.hasOwnProperty('printer_number')) {
@@ -216,7 +291,12 @@
             });
         }
 
+        $(document).ready(function () {
+            setConfigToEnvironment();
+        });
+
         {% endif %}
+
     </script>
     {% endif %}
 
@@ -248,13 +328,10 @@
                     return;
             }
 
-
             status.remove('id');
             status.show();
 
             return status.prop('outerHTML');
-
-
         };
 
         var get_name_as_link_el = function (data, row) {
@@ -416,18 +493,23 @@
 
             var output = '';
 
+            var config = getPrinterConfig();
 
             var printer_list = $('<select>').attr({
                 'class': 'form-control form-control-sm printer-number-' + row['code'],
                 'data-toggle': 'tooltip',
                 'data-placement': 'bottom',
                 'title': 'Número da impressora',
-                'style': 'display:none'
+                'style': 'display:none',
+                'onchange': 'savePrinterConfig('+ACCREDITATION_SERVICE_ID+', $(this).val());$(\'.list-printer-number\').text($(this).val());'
             });
 
             for (var a = 1; a <= 15; a++) {
                 var o = $('<option>').attr('value', a).text(a);
-                printer_list.append(o)
+                if (a === parseInt(config['printer_number'])) {
+                    o.attr('selected', true);
+                }
+                printer_list.append(o);
             }
 
             if (row['accredited'] === false) {
@@ -463,7 +545,7 @@
                     output += '<div class="text-center">';
                     output += '<a href="javascript:void(0)" onclick="$(this).hide();$(\'.printer-number-' + row['code'] + '\').show();">';
                     output += '<div style="margin-top:10px;"></div>';
-                    output += '<strong data-toggle="tooltip" data-placement="bottom" title="Número da impressora" style="border:1px solid lightgray;padding:6px;border-radius:2px">1</strong>';
+                    output += '<strong class="list-printer-number" data-toggle="tooltip" data-placement="bottom" title="Número da impressora" style="border:1px solid lightgray;padding:6px;border-radius:2px">'+config['printer_number']+'</strong>';
                     output += '</a>';
                     output += printer_list.prop('outerHTML');
                     output += '</div>';
@@ -489,7 +571,7 @@
             if (ACCREDITATION_SERVICE_ID && priting_webhook_url) {
                 output += '<div>';
                 output += '<div class="float-left" style="margin-left:69px">';
-                output += '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="bottom" title="Reimprimir" onclick="$(this).hide();$(this).parent().parent().find(\'i.fa-spinner\').show()">';
+                output += '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="bottom" title="Reimprimir" onclick="triggerPrintFromButton($(this), \''+row['pk']+'\')">';
                 output += '<i class="fas fa-print fa-2x"></i>';
                 output += '</a>';
                 output += '<i class="fas fa-spinner fa-spin fa-2x" style="display:none"></i>';
@@ -497,7 +579,7 @@
                 output += '</div>';
                 output += '<div class="float-right input-group input-group-sm" style="margin-right:17px;margin-top:4px">';
                 output += '<a href="javascript:void(0)" onclick="$(this).hide();$(\'.printer-number-' + row['code'] + '\').show()">';
-                output += '<strong data-toggle="tooltip" data-placement="bottom" title="Número da impressora" style="border:1px solid lightgray;padding:6px;border-radius:2px">1</strong>';
+                output += '<strong class="list-printer-number" data-toggle="tooltip" data-placement="bottom" title="Número da impressora" style="border:1px solid lightgray;padding:6px;border-radius:2px">'+config['printer_number']+'</strong>';
                 output += '</a>';
                 output += printer_list.prop('outerHTML');
                 output += '</div>';
@@ -507,7 +589,16 @@
 
             output += '<hr />';
             output += '<div>';
-            output += '<button class="btn btn-sm btn-block btn-danger btn-trans">Cancelar</button>';
+            output += '<button class="btn btn-sm btn-block btn-danger btn-trans"' +
+                ' data-pk="'+row['pk']+'"' +
+                ' data-person_name="'+row['person_name']+'"' +
+                ' data-lot_name="'+row['lot_name']+'"' +
+                ' data-category_name="'+row['category_name']+'"' +
+                ' data-person_email="'+row['person_email']+'"' +
+                ' data-event_count="'+row['event_count']+'"' +
+                ' data-code="'+row['code']+'"' +
+                ' data-status="'+row['status']+'"' +
+                ' onclick="unregisterAccreditation($(this), true)">Cancelar</button>';
             output += '</div>';
 
             return output;
@@ -654,11 +745,13 @@
                             return data + hidden
                         }
                     },
+                    {% if event.feature_configuration.feature_checkin is True and event.feature_management.checkin is True %}
                     {
                         data: 'accredited', "render": function (data, type, row, meta) {
                             return loadAccreditationContent(row);
                         }
                     },
+                    {% endif %}
                     {data: 'lot_name'},
                     {data: 'event_count'},
                     {
@@ -707,6 +800,7 @@
                         "orderable": false,
                         "class": "text-center"
                     },
+                    {% if event.feature_configuration.feature_checkin is True and event.feature_management.checkin is True %}
                     {
                         "targets": 4,
                         "orderable": true,
@@ -717,6 +811,14 @@
                         "orderable": true,
                         "type": 'date-euro'
                     }
+                    {% else %}
+                    {
+                        "targets": 4,
+                        "orderable": true,
+                        "class": 'text-center',
+                        "type": 'date-euro'
+                    }
+                    {% endif %}
                 ],
                 // Default order
                 "order": [[0, 'asc']],
@@ -961,7 +1063,9 @@
                                 <th>Nome do Participante</th>
 
                                 <th width="10%">Código</th>
+                                {% if event.feature_configuration.feature_checkin is True and event.feature_management.checkin is True %}
                                 <th width="10%">Credenciado</th>
+                                {% endif %}
 
                                 <th width="18%">Lote</th>
 
