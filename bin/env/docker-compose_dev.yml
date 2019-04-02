@@ -23,7 +23,7 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
-                    
+
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas
     container_name: wkhtmltopdf
@@ -32,16 +32,29 @@ services:
     ports:
       - "5010:80"
 
-#  ngrok:
-#    image: hugoseabra19/ngrok-tunnel
-#    container_name: ngrok
-#    environment:
-#    - TARGET_HOST=172.17.0.1
-#    - TARGET_PORT=8000
-#    volumes:
-#    - /tmp/ngrok:/tmp/bkp
-#    ports:
-#    - "4040:4040"
+  ngrok:
+    image: hugoseabra19/ngrok-tunnel
+    container_name: ngrok
+    environment:
+      - TARGET_HOST=172.17.0.1
+      - TARGET_PORT=8000
+    volumes:
+      - /tmp/ngrok:/tmp/bkp
+    ports:
+      - "4040:4040"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: cgsy-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=cgsy
+      - RABBITMQ_DEFAULT_PASS=cgsy
+    hostname: cgsy-rabbitmq
+    networks:
+      - rabbitmq
+    ports:
+      - "8080:15672"
+      - "5672:5672"
 
 networks:
   postgres:
@@ -50,4 +63,6 @@ networks:
     name: local_mailhog
   wkhtmltopdf:
     name: local_wkhtmltopdf
+  rabbitmq:
+    name: local_rabbitmq
 

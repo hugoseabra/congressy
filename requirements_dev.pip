@@ -1,6 +1,7 @@
 -r requirements_staging.pip
 django-debug-toolbar
 django-extensions
+celery
 django-bootstrap-datepicker-plus
 Faker==0.8.12
 uglipyjs==0.2.5
