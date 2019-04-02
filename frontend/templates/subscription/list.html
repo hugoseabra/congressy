@@ -493,7 +493,12 @@
 
             var output = '';
 
+            var printer_number = 1;
+
             var config = getPrinterConfig();
+            if (config && config.hasOwnProperty('printer_number')) {
+                printer_number = parseInt(config['printer_number']) || 1;
+            }
 
             var printer_list = $('<select>').attr({
                 'class': 'form-control form-control-sm printer-number-' + row['code'],
@@ -506,7 +511,7 @@
 
             for (var a = 1; a <= 15; a++) {
                 var o = $('<option>').attr('value', a).text(a);
-                if (a === parseInt(config['printer_number'])) {
+                if (a === printer_number) {
                     o.attr('selected', true);
                 }
                 printer_list.append(o);
@@ -545,7 +550,7 @@
                     output += '<div class="text-center">';
                     output += '<a href="javascript:void(0)" onclick="$(this).hide();$(\'.printer-number-' + row['code'] + '\').show();">';
                     output += '<div style="margin-top:10px;"></div>';
-                    output += '<strong class="list-printer-number" data-toggle="tooltip" data-placement="bottom" title="Número da impressora" style="border:1px solid lightgray;padding:6px;border-radius:2px">'+config['printer_number']+'</strong>';
+                    output += '<strong class="list-printer-number" data-toggle="tooltip" data-placement="bottom" title="Número da impressora" style="border:1px solid lightgray;padding:6px;border-radius:2px">'+printer_number+'</strong>';
                     output += '</a>';
                     output += printer_list.prop('outerHTML');
                     output += '</div>';
@@ -579,7 +584,7 @@
                 output += '</div>';
                 output += '<div class="float-right input-group input-group-sm" style="margin-right:17px;margin-top:4px">';
                 output += '<a href="javascript:void(0)" onclick="$(this).hide();$(\'.printer-number-' + row['code'] + '\').show()">';
-                output += '<strong class="list-printer-number" data-toggle="tooltip" data-placement="bottom" title="Número da impressora" style="border:1px solid lightgray;padding:6px;border-radius:2px">'+config['printer_number']+'</strong>';
+                output += '<strong class="list-printer-number" data-toggle="tooltip" data-placement="bottom" title="Número da impressora" style="border:1px solid lightgray;padding:6px;border-radius:2px">'+printer_number+'</strong>';
                 output += '</a>';
                 output += printer_list.prop('outerHTML');
                 output += '</div>';
