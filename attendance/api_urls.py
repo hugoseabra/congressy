@@ -1,5 +1,5 @@
 # pylint: skip-file
-
+from django.conf.urls import url
 from rest_framework import routers
 
 from attendance import viewsets
@@ -17,5 +17,10 @@ router.register(
 
 router.register(r'attendance/checkins', viewsets.CheckinViewSet)
 router.register(r'attendance/checkouts', viewsets.CheckoutViewSet)
+single_endpoints = [
+    url(r'^attendance/services/(?P<service_pk>[\d]+)/export/',
+        viewsets.AttendanceServiceExporterViewSet.as_view())
+]
 
-urlpatterns = router.urls
+urlpatterns = single_endpoints
+urlpatterns += router.urls

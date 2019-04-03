@@ -5,7 +5,7 @@ up:
 	sudo cp bin/env/extension_installer.sh /tmp/bkp/;
 	docker-compose -f bin/env/docker-compose_dev.yml up -d;
 	-pkill -f "celery worker";
-	celery --app=mailer --app=gatheros_subscription worker --loglevel=INFO --detach;
+	celery -A attendance -A mailer -A gatheros_subscription worker --loglevel=INFO; --detach;
 	docker logs -f cgsy-postgres;
 
 
@@ -16,7 +16,7 @@ down:
 
 celery_debug:
 	-pkill -f "celery worker";
-	celery --app=mailer --app=gatheros_subscription worker --loglevel=INFO;
+	celery -A attendance -A mailer -A gatheros_subscription worker --loglevel=INFO;
 
 
 logs:
