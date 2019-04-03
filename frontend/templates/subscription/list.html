@@ -656,6 +656,74 @@
             return a.prop('outerHTML');
         };
 
+        var openExportModal = function () {
+            $('#export-modal').modal('show');
+            asyncExport(true);
+        };
+
+        var asyncExport = function (create) {
+
+            var modalEl = $('#export-modal');
+
+            var promise = asyncExporterPromise(create);
+
+            promise.then(function (value) {
+
+                if (value === 201 || value === 204) {
+                    setTimeout(function () {
+                        asyncExport(false);
+                    }, 5000);
+                } else if (value === 200) {
+                    modalEl.modal('hide');
+                    window.location.href = '/api/events/{{ event.pk }}/export/';
+                }
+
+            }).catch(function (reason, value) {
+
+                if (typeof(value) !== 'undefined') {
+                    if (value === 403) {
+                        asyncExport(false);
+                    } else {
+                        console.error("Status code: " + value);
+                        console.error(reason);
+                    }
+                }
+
+
+            });
+
+        };
+
+
+        var asyncExporterPromise = function (create) {
+
+            return new Promise(function (resolve, reject) {
+
+                var defaultArgs = {
+                    url: '/api/events/{{ event.pk }}/export/',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    },
+                    success: function (data, textStatus, xhr) {
+                        console.log("SUCCESS STATUS CODE IS: " + xhr.status);
+                        resolve(xhr.status);
+                    },
+                    error: function (xhr, textStatus, errThrown) {
+                        reject(errThrown, xhr.status);
+                    }
+                };
+
+                if (create) {
+                    defaultArgs.type = "POST"
+                } else {
+                    defaultArgs.type = "GET"
+                }
+                $.ajax(defaultArgs);
+            });
+
+        };
+
+
         $(document).ready(function () {
             customCheckbox();
 
@@ -920,11 +988,9 @@
         <div class="col-md-12">
             <div class="buttonbar">
                 <div class="float-left">
-                    <button type="button"
+                    <button type="button" id="export_btn"
                             class="btn btn-primary {% if not has_subs %}disabled{% endif %}"
-                            {% if not has_subs %}disabled
-                            title="Nenhuma inscrição para exportar."{% endif %}
-                            onclick="console.log('Clicked!!');">
+                            onclick="openExportModal();">
                         <i class="fa fa-download"></i>
                         Exportar
                     </button>
@@ -1090,5 +1156,44 @@
         </div>
 
     </div>
+
+{% endblock %}
+
+{% block modals %}
+
+    <div class="modal fade" id="export-modal" tabindex="-1" role="dialog"
+         aria-labelledby="modal-service-delete-title" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="modal-service-delete-title">
+                        Exportar
+                    </h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row text-center">
+                        <h3 class="text-bold">Estamos gerando seu arquivo, por gentileza agaurde...</h3>
+                    </div>
+
+                    <div class="row text-center" style="margin-top: 10px">
+                        <i class="fas fa-circle-notch info-color fa-spin fa-4x"></i>
+                    </div>
+
+                    <div class="row text-center" style="margin-top: 15px">
+
+                        <i class="text-mute">
+                            Em casos de evento com muitas inscrições pode demorar alguns minutos.
+                        </i>
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 {% endblock %}
