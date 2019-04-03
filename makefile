@@ -14,10 +14,8 @@ down:
 	docker-compose -f bin/env/docker-compose_dev.yml down;
 
 
-celery_down:
+celery_debug:
 	-pkill -f "celery worker";
-
-celery_up:
 	celery --app=mailer --app=gatheros_subscription worker --loglevel=INFO;
 
 
