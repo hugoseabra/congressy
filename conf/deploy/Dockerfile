@@ -58,7 +58,7 @@ RUN pip install --no-cache-dir --upgrade \
         pip setuptools \
         # required by celery
         lxml \
-        celery[redis] \
+        celery \
         # Celery UI
         # flower \
         # send email

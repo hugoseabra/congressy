@@ -2,10 +2,11 @@
 
 up:
 	mkdir -p /tmp/bkp;
+	export DJANGO_SETTINGS_MODULE=project.manage.settings.dev;
 	sudo cp bin/env/extension_installer.sh /tmp/bkp/;
 	docker-compose -f bin/env/docker-compose_dev.yml up -d;
 	-pkill -f "celery worker";
-	celery --app=gatheros_subscription worker --loglevel=INFO --detach;
+	celery --app=mailer --app=gatheros_subscription worker --loglevel=INFO --detach;
 	docker logs -f cgsy-postgres;
 
 
