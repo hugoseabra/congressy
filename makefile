@@ -2,7 +2,6 @@
 
 up:
 	mkdir -p /tmp/bkp;
-	export DJANGO_SETTINGS_MODULE=project.manage.settings.dev;
 	sudo cp bin/env/extension_installer.sh /tmp/bkp/;
 	docker-compose -f bin/env/docker-compose_dev.yml up -d;
 	-pkill -f "celery worker";
@@ -13,6 +12,13 @@ up:
 down:
 	-pkill -f "celery worker";
 	docker-compose -f bin/env/docker-compose_dev.yml down;
+
+
+celery_down:
+	-pkill -f "celery worker";
+
+celery_up:
+	celery --app=mailer --app=gatheros_subscription worker --loglevel=INFO;
 
 
 logs:
