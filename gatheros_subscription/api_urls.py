@@ -30,8 +30,8 @@ subs_urls = [
 single_endpoints = [url(r'^events/(?P<event_pk>[\d]+)/lots/', include(urls))]
 sub_single_endpoints = [
     url(r'^events/(?P<event_pk>[\d]+)/subsriptions/', include(subs_urls)),
-    url(r'^events/(?P<event_pk>[\d]+)/export/',
-        viewsets.ExporterViewSet.as_view())
+    url(r'^events/(?P<event_pk>[\d]+)/subscriptions/export/',
+        viewsets.SubscriptionExporterViewSet.as_view())
 ]
 
 urlpatterns = router.urls

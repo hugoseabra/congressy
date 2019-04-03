@@ -675,7 +675,7 @@
                     }, 5000);
                 } else if (value === 200) {
                     modalEl.modal('hide');
-                    window.location.href = '/api/events/{{ event.pk }}/export/';
+                    window.location.href = '/api/events/{{ event.pk }}/subscriptions/export/';
                 }
 
             }).catch(function (reason, value) {
@@ -700,7 +700,7 @@
             return new Promise(function (resolve, reject) {
 
                 var defaultArgs = {
-                    url: '/api/events/{{ event.pk }}/export/',
+                    url: '/api/events/{{ event.pk }}/subscriptions/export/',
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
                     },

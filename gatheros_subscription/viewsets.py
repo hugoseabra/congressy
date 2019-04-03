@@ -15,9 +15,8 @@ from rest_framework.views import APIView
 
 from core.util.string import clear_string
 from gatheros_event.models import Event
-from gatheros_subscription.helpers.async_exporter_helpers import \
-    create_export_lock, has_export_lock, has_existing_export_files, \
-    get_export_file_path
+from gatheros_subscription.helpers.subscription_async_exporter import \
+    SubscriptionServiceAsyncExporter
 from gatheros_subscription.lot_api_permissions import MultiLotsAllowed
 from gatheros_subscription.models import Subscription
 from gatheros_subscription.serializers import (
@@ -25,7 +24,7 @@ from gatheros_subscription.serializers import (
     LotSerializer,
     SubscriptionSerializer,
 )
-from gatheros_subscription.tasks import async_exporter
+from gatheros_subscription.tasks import async_subscription_exporter_task
 from .permissions import OrganizerOnly
 
 
@@ -203,7 +202,7 @@ class SubscriptionListViewSet(RestrictionViewMixin,
         )
 
 
-class ExporterViewSet(RestrictionViewMixin, APIView):
+class SubscriptionExporterViewSet(RestrictionViewMixin, APIView):
     permission_classes = (OrganizerOnly,)
 
     def post(self, request, *args, **kwargs):
@@ -215,11 +214,13 @@ class ExporterViewSet(RestrictionViewMixin, APIView):
 
         event = Event.objects.get(pk=event_pk)
 
-        if has_export_lock(event):
+        exporter = SubscriptionServiceAsyncExporter(event)
+
+        if exporter.has_export_lock():
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        create_export_lock(event)
-        async_exporter.delay(event.pk)
+        exporter.create_export_lock()
+        async_subscription_exporter_task.delay(event.pk)
 
         return HttpResponse(status=status.HTTP_201_CREATED)
 
@@ -233,17 +234,19 @@ class ExporterViewSet(RestrictionViewMixin, APIView):
 
         event = Event.objects.get(pk=event_pk)
 
-        if has_export_lock(event):
+        exporter = SubscriptionServiceAsyncExporter(event)
+
+        if exporter.has_export_lock():
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        if not has_existing_export_files(event):
+        if not exporter.has_existing_export_files():
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         # Criando resposta http com arquivo de download
         # Reading file
-        fileName = get_export_file_path(event)
+        file_name = exporter.get_export_file_path()
 
-        output = open(fileName, mode='rb').read()
+        output = open(file_name, mode='rb').read()
         name = "%s_%s.xlsx" % (
             event.slug,
             datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
