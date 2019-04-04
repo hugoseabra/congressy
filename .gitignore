@@ -8,4 +8,5 @@ conf/deploy/env-file
 .coverage
 cover
 logs/
+_build/
 

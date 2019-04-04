@@ -4,3 +4,4 @@ django-extensions
 django-bootstrap-datepicker-plus
 Faker==0.8.12
 uglipyjs==0.2.5
+sphinx-rtd-theme==0.4.3
