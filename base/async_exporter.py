@@ -1,5 +1,6 @@
 import logging
 import os
+import tempfile
 from pathlib import Path
 
 from django.conf import settings
@@ -66,7 +67,7 @@ class BaseAsyncExporter:
 
     def create_export_file(self, payload: bytes) -> None:
         exporter_folder_path = self._get_exporter_folder_path()
-        exporter_file_path = exporter_folder_path + 'cgsy.xlsx'
+        exporter_file_path = os.path.join(exporter_folder_path, 'cgsy.xlsx')
 
         if not os.path.isdir(exporter_folder_path):
             self.logger.info(
@@ -95,14 +96,14 @@ class BaseAsyncExporter:
                         file,
                         self.event.pk
                     ))
-                os.remove(exporter_folder_path + file)
+                os.remove(os.path.join(exporter_folder_path, file))
 
     def get_export_file_path(self) -> str:
-        return self._get_exporter_folder_path() + 'cgsy.xlsx'
+        return os.path.join(self._get_exporter_folder_path(), 'cgsy.xlsx')
 
     def _get_lock_file_path(self) -> str:
-        return self._get_exporter_folder_path() + 'cgsy.lock'
+        return os.path.join(self._get_exporter_folder_path(), 'cgsy.lock')
 
     def _get_exporter_folder_path(self) -> str:
-        media_url = settings.MEDIA_ROOT
-        return media_url + self.exporter_url + '{}/'.format(self.event.pk)
+        tmp_dir = tempfile.gettempdir()
+        return os.path.join(tmp_dir, 'exporter', str(self.event.pk))

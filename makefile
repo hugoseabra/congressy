@@ -1,22 +1,26 @@
 
 
 up:
+	ps x --no-header -o pid,cmd | awk '!/awk/&&/celery/{print $$1}' | xargs -r kill;
+	celery -A attendance -A mailer -A gatheros_subscription worker --loglevel=INFO --detach;
 	mkdir -p /tmp/bkp;
 	sudo cp bin/env/extension_installer.sh /tmp/bkp/;
 	docker-compose -f bin/env/docker-compose_dev.yml up -d;
-	-pkill -f "celery worker";
-	celery -A attendance -A mailer -A gatheros_subscription worker --loglevel=INFO; --detach;
 	docker logs -f cgsy-postgres;
 
 
 down:
-	-pkill -f "celery worker";
+	ps x --no-header -o pid,cmd | awk '!/awk/&&/celery/{print $$1}' | xargs -r kill;
 	docker-compose -f bin/env/docker-compose_dev.yml down;
 
 
-celery_debug:
-	-pkill -f "celery worker";
+debug_broker:
+	ps x --no-header -o pid,cmd | awk '!/awk/&&/celery/{print $$1}' | xargs -r kill;
 	celery -A attendance -A mailer -A gatheros_subscription worker --loglevel=INFO;
+
+
+flower:
+	celery flower -A attendance -A mailer -A gatheros_subscription worker --address=127.0.0.1 --port=5555 --detach;
 
 
 logs:
