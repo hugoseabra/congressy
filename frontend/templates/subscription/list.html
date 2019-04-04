@@ -661,7 +661,10 @@
             asyncExport(true);
         };
 
+        var exporter_process = null;
         var asyncExport = function (create) {
+
+            window.clearTimeout(exporter_process);
 
             var modalEl = $('#export-modal');
 
@@ -670,7 +673,7 @@
             promise.then(function (value) {
 
                 if (value === 201 || value === 204) {
-                    setTimeout(function () {
+                    exporter_process = setTimeout(function () {
                         asyncExport(false);
                     }, 5000);
                 } else if (value === 200) {
@@ -678,20 +681,13 @@
                     window.location.href = '/api/events/{{ event.pk }}/subscriptions/export/';
                 }
 
-            }).catch(function (reason, value) {
-
-                if (typeof(value) !== 'undefined') {
-                    if (value === 403) {
-                        asyncExport(false);
-                    } else {
-                        console.error("Status code: " + value);
-                        console.error(reason);
-                    }
+            }).catch(function (reason) {
+                if (reason['status'] === 403) {
+                    asyncExport(false);
+                } else {
+                    console.error(reason);
                 }
-
-
             });
-
         };
 
 
@@ -709,7 +705,7 @@
                         resolve(xhr.status);
                     },
                     error: function (xhr, textStatus, errThrown) {
-                        reject(errThrown, xhr.status);
+                        reject({'reason': errThrown, 'status': xhr.status});
                     }
                 };
 
@@ -1161,7 +1157,7 @@
 
 {% block modals %}
 
-    <div class="modal fade" id="export-modal" tabindex="-1" role="dialog"
+    <div class="modal fade" id="export-modal" tabindex="-1" role="dialog" data-backdrop="static"
          aria-labelledby="modal-service-delete-title" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

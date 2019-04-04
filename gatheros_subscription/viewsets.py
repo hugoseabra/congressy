@@ -217,7 +217,7 @@ class SubscriptionExporterViewSet(RestrictionViewMixin, APIView):
         exporter = SubscriptionServiceAsyncExporter(event)
 
         if exporter.has_export_lock():
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
         exporter.create_export_lock()
         async_subscription_exporter_task.delay(event.pk)

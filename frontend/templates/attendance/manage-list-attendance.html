@@ -79,7 +79,10 @@
             asyncExport(true, item_pk);
         };
 
+        var exporter_process = null;
         var asyncExport = function (create, item_pk) {
+
+            window.clearTimeout(exporter_process);
 
             var modalEl = $('#export-modal');
 
@@ -88,7 +91,7 @@
             promise.then(function (value) {
 
                 if (value === 201 || value === 204) {
-                    setTimeout(function () {
+                    exporter_process = setTimeout(function () {
                         asyncExport(false, item_pk);
                     }, 5000);
                 } else if (value === 200) {
@@ -96,21 +99,15 @@
                     window.location.href = '/api/attendance/services/' + item_pk + '/export/';
                 }
 
-            }).catch(function (reason, value) {
-
-                if (typeof (value) !== 'undefined') {
-                    if (value === 403) {
-                        asyncExport(false, item_pk);
-                    } else {
-                        console.error("Status code: " + value);
-                        console.error(reason);
-                    }
+            }).catch(function (reason) {
+                if (reason['status'] === 403) {
+                    asyncExport(false);
+                } else {
+                    console.error(reason);
                 }
-
-
             });
-
         };
+
 
         var asyncExporterPromise = function (create, item_pk) {
 
@@ -126,7 +123,7 @@
                         resolve(xhr.status);
                     },
                     error: function (xhr, textStatus, errThrown) {
-                        reject(errThrown, xhr.status);
+                        reject({'reason': errThrown, 'status': xhr.status});
                     }
                 };
 
@@ -210,16 +207,14 @@
                                         <ul class="dropdown-menu dropdown-menu-right"
                                             role="menu">
                                             <li>
-                                                <a href="{% url 'attendance:attendance-list-edit' event.pk item.pk %}"
-                                                >
+                                                <a href="{% url 'attendance:attendance-list-edit' event.pk item.pk %}">
                                                     <i class="fas fa-pencil-alt"></i>
                                                     Editar
                                                 </a>
                                             </li>
 
-                                            <li onclick="$('#lot-delete-form').attr('action','{% url 'attendance:attendance-list-delete' event.pk item.pk %}');
-                                                    $('#attendance-list-delete-modal').modal();">
-                                                <a href="#">
+                                            <li>
+                                                <a href="javascript:void(0)" onclick="$('#lot-delete-form').attr('action','{% url 'attendance:attendance-list-delete' event.pk item.pk %}');$('#attendance-list-delete-modal').modal();">
                                                     <i class="fas fa-trash-alt"> </i>
                                                     Excluir
                                                 </a>
@@ -284,7 +279,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="export-modal" tabindex="-1" role="dialog"
+    <div class="modal fade" id="export-modal" tabindex="-1" role="dialog" data-backdrop="static"
          aria-labelledby="modal-service-delete-title" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -307,8 +302,9 @@
                     <div class="row text-center" style="margin-top: 15px">
 
                         <i class="text-mute">
-                            Em casos de serviços com muitas inscrições pode demorar alguns minutos.
+                            Em casos de evento com muitas inscrições pode demorar alguns minutos.
                         </i>
+
 
                     </div>
 
