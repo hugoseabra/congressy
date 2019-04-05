@@ -5,10 +5,10 @@ from django.db import models
 
 class Lot(models.Model):
     class Meta:
-        verbose_name = "lote de inscriÃ§Ã£o"
-        verbose_name_plural = "lotes de inscriÃ§Ã£o"
+        verbose_name = "lote de ingressos"
+        verbose_name_plural = "lotes de ingressos"
         unique_together = (
-            ('audience_category', 'date_start', 'date_end',),
+            ('ticket', 'date_start', 'date_end',),
         )
 
     ticket = models.ForeignKey(

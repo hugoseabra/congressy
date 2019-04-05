@@ -28,10 +28,19 @@ no momento. Dentro desse prazo caso ocorra de lotar o limite, acontecerá o que 
 mais é que o ato de fechar o lote vigente e antecipar o próximo lote caso exista. Essa *virada* também irá ocorrer
 automaticamente ao atingir a data de fim do lote.
 
+
+
 Regras de Integridade
 -------------------------------------
 
-- As unicas pessoas que podem criar, atualizar, apagar categorias são os organizadores do evento
-- Só é possivel apagar uma categoria ou lote caso não possua nenhuma inscrição
+Nenhuma.
+
+
+
+Regras de API
+-------------------------------------
+
+- As únicas pessoas que podem criar, atualizar, apagar categorias são os organizadores do evento
+- Só é possível apagar uma categoria ou lote caso não possua nenhuma inscrição
 
 

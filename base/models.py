@@ -50,7 +50,7 @@ class EntityMixin(object):
 
     def __init__(self, *args, **kwargs):
 
-        checked_rules = []
+        checked_rules = list()
         for rule in self.rule_instances:
             if isinstance(rule, RuleChecker) or issubclass(rule, RuleChecker):
                 checked_rules.append(rule)
