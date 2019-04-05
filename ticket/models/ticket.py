@@ -55,15 +55,6 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
         null=True,
     )
 
-    transfer_tax = models.BooleanField(
-        verbose_name="transferir taxas",
-        default=True,
-        help_text="transferir taxas e despesas financeiras ao participante",
-        # Making field required
-        blank=False,
-        null=False,
-    )
-
     free_installments = models.IntegerField(
         verbose_name="absorver taxas de parcelamento",
         default=0,

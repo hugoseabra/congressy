@@ -264,6 +264,15 @@ class Event(models.Model, GatherosModelMixin):
         null=True,
     )
 
+    transfer_tax = models.BooleanField(
+        verbose_name="transferir taxas",
+        default=True,
+        help_text="transferir taxas e despesas financeiras ao participante",
+        # Making field required
+        blank=False,
+        null=False,
+    )
+
     class Meta:
         verbose_name = 'evento'
         verbose_name_plural = 'eventos'

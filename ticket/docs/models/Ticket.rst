@@ -30,11 +30,6 @@ Campos
    - Padrão: Falso
    - Obrigatorio: Não
 
-- transfer_tax
-   - Tipo: *Booleano*
-   - Padrão: Verdadeiro
-   - Obrigatorio: Sim
-
 - free_installments
    - Tipo: *Inteiro*
    - Padrão: 0

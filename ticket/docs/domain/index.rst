@@ -14,14 +14,13 @@ Esse modelo age como uma categoria para os lotes, exemplo de ingressos seria *Es
 Seria uma forma cobrir um determinado número de lotes com algumas caracteristicas especificas gerais, como:
 
 - Formulário Personalizado
-- Transferencia de taxa ao participante
 - Ativo ou inativo (Se aparece ou não para participantes)
 - Quantidade de parcelas sem juros
 - Limite
 - Privacidade
 
 
-*Lote*
+**Lote**
 
 Nada mais é do que um forma de aplicar algumas regras do *ingresso* a qual ela pertence, além de suas proprias regras
 com mais granularidade como, limite de tempo com data de inicio e fim. Cada ingresso pode ter apenas um lote vigiante
