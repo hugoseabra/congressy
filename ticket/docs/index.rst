@@ -10,6 +10,7 @@ Documentação do módulo de Ticket
    :maxdepth: 2
    :caption: Contents:
 
+   domain/index
    models/index
 
 
