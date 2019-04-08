@@ -38,7 +38,12 @@ Nenhuma.
 
 Regras de Negócio
 -------------------------------------
-- Não pode haver conflito de data com lotes.
+- Lote:
+    - Não pode haver conflito de data com lotes.
+    - Ao criar e houver limite de vaga, verificar se o limite, somado aos outros lotes, ultrapassa o limite define na categoria.
+    - Se há inscrições confirmadas não permitir mudar preço.
+- Ingresso:
+    - Não é possivel absorver mais de 10 parcelas.
 
 
 Permissões de acesso
@@ -53,7 +58,7 @@ Permissões de acesso
 - Lote:
    - Criação    - Apenas organizadores do evento a qual a entidade pertence e a qualquer momento.
    - Leitura    - Apenas organizadores do evento a qual a entidade pertence e a qualquer momento.
-   - Edição     - Apenas organizadores do evento a qual a entidade pertence e a qualquer momento, com ressalva ao preço, que pode ser editado apenas se o lote não possuir nenhum inscrito
+   - Edição     - Apenas organizadores do evento a qual a entidade pertence e a qualquer momento.
    - Deletação  - Apenas organizadores do evento a qual a entidade pertence e apenas se não possuirem inscritos.
 
 
