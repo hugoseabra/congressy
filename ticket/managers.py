@@ -28,6 +28,9 @@ class LotManager(Manager):
     def clean_price(self):
         price = self.cleaned_data['price']
 
+        if not hasattr(self.instance, 'pk'):
+            return price
+
         if price and self._lot_has_subscriptions():
             raise ValidationError(
                 "não é possivel alterar o preço quando há inscrições nesse lote"
@@ -55,7 +58,8 @@ class LotManager(Manager):
             if limit_count > ticket_limit:
                 raise ValidationError(
                     "a soma dos limites dos lotes ultrapassam o numero de "
-                    "vagas da categoria")
+                    "vagas da categoria"
+                )
 
     def clean(self):
         cleaned_data = super().clean()
@@ -68,7 +72,7 @@ class LotManager(Manager):
 
         return bool(
             Subscription.objects.filter(
-                ticket_id=self.instance.pk,
+                ticket_lot_id=self.instance.pk,
                 test_subscription=False,
                 completed=True,
                 fill_vacancy=True,
