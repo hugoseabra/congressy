@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
 from django.views.generic import RedirectView
+from rest_framework.documentation import include_docs_urls
 
 from certificate.urls import urlpatterns_certificate_urls
 from gatheros_event.urls.invitation import urlpatterns_public_invitation
@@ -121,4 +122,6 @@ if settings.DEBUG:
 
         urlpatterns = [
                           url(r'^__debug__/', include(debug_toolbar.urls)),
+                          url(r'^docs/',
+                              include_docs_urls(title='Congressy API')),
                       ] + urlpatterns

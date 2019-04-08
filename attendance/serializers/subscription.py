@@ -20,7 +20,11 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
         # Instantiate the superclass normally
         super(DynamicFieldsModelSerializer, self).__init__(*args, **kwargs)
 
-        fields = kwargs['context']['request'].query_params.get('fields')
+        if kwargs['context']['request']:
+            fields = kwargs['context']['request'].query_params.get('fields')
+        else:
+            fields = None
+
         if fields:
             fields = fields.split(',')
             # Drop any fields that are not specified in the `fields` argument.
