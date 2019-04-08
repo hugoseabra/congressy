@@ -91,6 +91,7 @@ api_urls = [
     url(r'^', include('attendance.api_urls', 'attendance')),
     url(r'^', include('mix_boleto.api_urls', 'mix_boleto')),
     url(r'^', include('installment.api_urls', 'installment')),
+    url(r'^', include('ticket.urls', 'ticket')),
     url(r'^', include('kanu_locations.urls', 'city')),
 ]
 

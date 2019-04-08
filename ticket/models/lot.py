@@ -94,6 +94,12 @@ class Lot(models.Model):
 
     def __str__(self):
         if self.name:
+            return self.name
+
+        return ''
+
+    def __repr__(self):
+        if self.name:
             return '{} - ID: {}'.format(
                 self.name, str(self.pk)
             )

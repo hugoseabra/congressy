@@ -7,11 +7,12 @@ Documentação do módulo de Ticket
 ======================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
    domain/index
    models/index
+   behavior/index
 
 
 

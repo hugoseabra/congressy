@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from django.db import models
 
@@ -109,6 +109,9 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
     )
 
     def __str__(self):
+        return self.name
+
+    def __repr__(self):
         return '{} - ID: {}'.format(
             self.name, str(self.pk)
         )
@@ -155,55 +158,3 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
             return '{} - {}'.format(self.name, lot)
 
         return self.name
-
-    def anticipate_lots(self):
-        """
-        Colocar o lote seguinte no ar, adaptando a data inicial do lote (em
-        caso de virada por vagas, puxando a data inicial do lote para a data
-        e hora da virada e adaptando a data final do lote que está saindo
-        para não dar conflito de data);
-        """
-
-        current = self.current_lot
-
-        if current is None:
-            return
-
-        if current.is_full and not current.last:
-            current.date_end = datetime.now() - timedelta(seconds=30)
-            current.save()
-
-            next_lot = self.lots.all().filter(
-                date_start__gte=datetime.now()
-            ).order_by('date_start')
-
-            if next_lot.count() == 0:
-                return
-
-            next_lot = next_lot.first()
-
-            next_lot.date_start = datetime.now()
-            next_lot.save()
-
-    def update_num_subs(self):
-        """
-        Atualizar número de inscrições em num_subs deve ser controlado e
-        centralizado por signal como controle interno
-        """
-
-        lots = self.lots.all()
-
-        counter = 0
-
-        for lot in lots:
-            counter += lot.audience_subscriptions.all().filter(
-                fill_vacancy=True,
-                test_subscription=False,
-                completed=True,
-            ).count()
-
-        self.num_subs = counter
-
-        self.save()
-
-        return self
