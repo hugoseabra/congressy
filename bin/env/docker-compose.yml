@@ -35,9 +35,9 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: cgsy-rabbitmq
+    hostname: cgsyrabbitmq # database unique name
     networks:
       - rabbitmq
-    hostname: cgsyrabbitmq # database unique name
     environment:
       - RABBITMQ_DEFAULT_USER=cgsy
       - RABBITMQ_DEFAULT_PASS=cgsy
