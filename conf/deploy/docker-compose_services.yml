@@ -14,7 +14,7 @@ services:
       - "15672:15672"
       - "5672:5672"
     volumes:
-      - ~/rabbitmq-database:/var/lib/rabbitmq/mnesia
+      - rabbitmq_data:/var/lib/rabbitmq/mnesia
 
   flower:
     image: hugoseabra19/docker-celery-flower
@@ -49,6 +49,9 @@ services:
     env_file: ./env-file
     networks:
       - wkhtmltopdf
+
+volumes:
+  rabbitmq_data:
 
 networks:
   rabbitmq:
