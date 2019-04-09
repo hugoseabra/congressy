@@ -6,7 +6,6 @@ source /scripts.sh
 export DJANGO_SETTINGS_MODULE=project.manage.settings.prod
 
 run_python_script "Configurando SETTINGS" /configure-settings.py
-run_python_script "Configurando RABBITMQ" /configure-rabbitmq.py
 
 run_python_script_with_output "Executando migrate" "manage.py migrate"
 

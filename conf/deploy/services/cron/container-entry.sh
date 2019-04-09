@@ -20,6 +20,5 @@ printf "OK"
 echo;
 
 run_python_script "Configurando SETTINGS" /configure-settings.py
-run_python_script "Configurando RABBITMQ" /configure-rabbitmq.py
 
 /usr/sbin/cron -f -L 15

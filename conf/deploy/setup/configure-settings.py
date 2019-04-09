@@ -27,6 +27,15 @@ if not dbhost or not dbuser or dbpass is None or not dbname:
     )
     sys.exit(1)
 
+rabbitmq_server = os.environ.get('RABBITMQ_SERVER')
+
+if not rabbitmq_server:
+    print(
+        "RABBITMQ_SERVER not provided or misconfigured:"
+        " -e RABBITMQ_SERVER=server_host"
+    )
+    sys.exit(1)
+
 
 def read_file(file_path):
     if not os.path.exists(file_path):
@@ -50,6 +59,7 @@ env_dict = {
     'SECRET_KEY': 'jq0m!8!um0yva5i5b!!j(imcu148gco-w+pe_y2k)wdg9x67t8',
     # 'SECRET_KEY': get_random_secret_key(),
     'APP_VERSION': read_file('/var/www/cgsy/version'),
+    'RABBITMQ_SERVER': rabbitmq_server,
 }
 
 # Manage
