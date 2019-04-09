@@ -59,6 +59,11 @@ class EventPayableSpecificationTest(TestCase):
         for i in range(4):
             self.addon_factory.fake_service(lot_category=lot.category)
 
+        self.paid_private_event = self.event_factory.fake_event()
+        for i in range(4):
+            self.sub_factory.fake_private_paid_lot(
+                event=self.paid_private_event)
+
     # ======= is_specification =======
 
     def test_is_free_lots_spec(self):
@@ -68,6 +73,12 @@ class EventPayableSpecificationTest(TestCase):
     def test_is_paid_lots_spec(self):
         root_specification = EventPayable()
         self.assertTrue(root_specification.is_satisfied_by(self.paid_lot_event))
+
+    def test_is_paid_private_lots_spec(self):
+        root_specification = EventPayable()
+        self.assertTrue(
+            root_specification.is_satisfied_by(self.paid_private_event)
+        )
 
     def test_is_free_products_spec(self):
         root_specification = EventPayable()

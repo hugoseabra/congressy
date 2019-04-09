@@ -39,36 +39,10 @@ if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
 
     sed -i -e 's/HOSTNAME/'"$HOSTNAME"'/g' ~/cgsy/docker-compose.yml
     docker-compose -f ~/cgsy/docker-compose.yml up -d --remove-orphans --force
-    sleep 30
 
     echo ;
     docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
     echo ;
-
-    echo "==========================================================="
-    echo "RABBIT MQ"
-    echo "==========================================================="
-    echo;
-    docker-compose -f ${BASE}/docker-compose.yml logs rabbitmq
-    echo;
-
-    echo "==========================================================="
-    echo "WKHTMLTOPDF"
-    echo "==========================================================="
-    echo;
-    docker-compose -f ${BASE}/docker-compose.yml logs wkhtmltopdf
-    echo;
-
-    echo "==========================================================="
-    echo; echo "CRON"; echo;
-    echo "==========================================================="
-    echo;
-    docker-compose -f ${BASE}/docker-compose.yml logs cron
-
-    echo "###########################################################"
-    echo "DEPLOYING FINISHED"
-    echo "###########################################################"
-    echo;
 
     # Sucesso
     exit 0

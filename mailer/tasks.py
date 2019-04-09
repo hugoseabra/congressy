@@ -37,8 +37,18 @@ def send_mail(subject, body, to, reply_to=None, attachment=None):
     return mail.send(False)
 
 
-class MailerAttachment(object):
+class MailerAttachment(dict):
+
     def __init__(self, name, content, mime):
         self.name = name
         self.content = content
         self.mime = mime
+        dict.__init__(
+            self,
+            name=str(name),
+            content=str(content),
+            mime=str(mime)
+        )
+
+    def __str__(self) -> str:
+        return self.name or ''

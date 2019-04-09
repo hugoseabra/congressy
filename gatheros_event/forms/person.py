@@ -1,11 +1,14 @@
 """ Formulários de `Person` """
+from datetime import datetime, timedelta
+
 from django import forms
 from django.db.models.fields import NOT_PROVIDED
 from django.utils import six
 from localflavor.br.forms import BRCPFField, BRCNPJField
 
 from core.forms.cleaners import clear_string, clean_cellphone as phone_cleaner
-from core.forms.widgets import AjaxChoiceField, DateInput, TelephoneInput, DateInputBootstrap
+from core.forms.widgets import AjaxChoiceField, DateInput, TelephoneInput, \
+    DateInputBootstrap
 from gatheros_event.locale.phone_choices import get_country_phone_code
 from gatheros_event.models import Occupation, Person
 
@@ -15,7 +18,7 @@ class PersonForm(forms.ModelForm):
 
     states = (
         ('', '----'),
-            # replace the value '----' with whatever you want, it won't matter
+        # replace the value '----' with whatever you want, it won't matter
         ("AC", "AC"),
         ("AL", "AL"),
         ("AP", "AP"),
@@ -136,6 +139,25 @@ class PersonForm(forms.ModelForm):
 
         self.required_fields.append(field_name)
         self.fields[field_name].required = True
+
+    def clean_birth_date(self):
+        birth_date = self.cleaned_data.get('birth_date')
+
+        if birth_date:
+            # 100y in days
+            one_hundred_years = 36500
+            min_limit = datetime.now() - timedelta(days=one_hundred_years)
+            if min_limit.date() > birth_date:
+                raise forms.ValidationError(
+                    "Data de aniversário menor do que o permitido"
+                )
+
+            if birth_date > datetime.now().date():
+                raise forms.ValidationError(
+                    "Data de aniversário maior do que hoje"
+                )
+
+        return birth_date
 
     def clean_zip_code(self):
         zip_code = self.cleaned_data.get('zip_code')
