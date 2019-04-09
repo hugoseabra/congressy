@@ -16,7 +16,6 @@ services:
       - wkhtmltopdf
     ports:
       - "8000:80"
-      - "5555:5555"
     entrypoint:
       - /services/web/manage/container-entry.sh
     volumes:

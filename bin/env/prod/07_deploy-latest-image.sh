@@ -46,13 +46,6 @@ if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
     echo ;
 
     echo "==========================================================="
-    echo "RABBIT MQ"
-    echo "==========================================================="
-    echo;
-    docker-compose -f ${BASE}/docker-compose.yml logs rabbitmq
-    echo;
-
-    echo "==========================================================="
     echo "WKHTMLTOPDF"
     echo "==========================================================="
     echo;
