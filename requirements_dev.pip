@@ -3,6 +3,7 @@ django-debug-toolbar
 django-extensions
 django-bootstrap-datepicker-plus
 Faker==0.8.12
+flower==0.9.3
 uglipyjs==0.2.5
 sphinx-rtd-theme==0.4.3
 coreapi==2.3.3

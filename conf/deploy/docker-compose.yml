@@ -1,13 +1,5 @@
 version: "3.5"
 services:
-  redis:
-    image: redis:4-alpine
-    restart: always
-    networks:
-      - redis
-    volumes:
-      - ./shared-volume/redis:/data
-
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas
     restart: always
@@ -17,11 +9,10 @@ services:
   manage:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
+    hostname: HOSTNAME-manage
     depends_on:
-      - redis
       - wkhtmltopdf
     networks:
-      - redis
       - wkhtmltopdf
     ports:
       - "8000:80"
@@ -30,7 +21,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/var/www/cgsy/media
-      - ./shared-volume/logs:/var/www/cgsy/logs
+      - ./shared-volume/exporter:/tmp/exporter
     env_file:
       - ./env-file
       - ./env-manage-file
@@ -38,16 +29,17 @@ services:
   partner:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
+    hostname: HOSTNAME-partner
     depends_on:
-      - redis
+      - wkhtmltopdf
     networks:
-      - redis
+      - wkhtmltopdf
     ports:
       - "8001:80"
     volumes:
       - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/var/www/cgsy/media
-      - ./shared-volume/logs:/var/www/cgsy/logs
+      - ./shared-volume/exporter:/tmp/exporter
     entrypoint:
       - /services/web/partner/container-entry.sh
     env_file:
@@ -57,11 +49,10 @@ services:
 #  admin_intranet:
 #    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
 #    restart: unless-stopped
+#    hostname: HOSTNAME-admin
 #    depends_on:
-#      - redis
 #      - wkhtmltopdf
 #    networks:
-#      - redis
 #      - wkhtmltopdf
 #    ports:
 #      - "8002:80"
@@ -70,11 +61,10 @@ services:
 #    volumes:
 #      - /etc/localtime:/etc/localtime
 #      - ./shared-volume/media:/var/www/cgsy/media
-#      - ./shared-volume/logs:/var/www/cgsy/logs
+#      - ./exporter:/tmp/exporter
 #    env_file:
 #      - ./env-file
 #      - ./env-admin_intranet-file
 
 networks:
-  redis:
   wkhtmltopdf:

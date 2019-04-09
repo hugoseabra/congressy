@@ -37,19 +37,13 @@ fi
 # dos releases. Sendo assim, basta comparar
 if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
 
+    sed -i -e 's/HOSTNAME/'"$HOSTNAME"'/g' ~/cgsy/docker-compose.yml
     docker-compose -f ~/cgsy/docker-compose.yml up -d --remove-orphans --force
     sleep 30
 
     echo ;
     docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
     echo ;
-
-    echo "==========================================================="
-    echo "REDIS"
-    echo "==========================================================="
-    echo;
-    docker-compose -f ${BASE}/docker-compose.yml logs redis
-    echo;
 
     echo "==========================================================="
     echo "WKHTMLTOPDF"

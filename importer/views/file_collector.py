@@ -35,7 +35,7 @@ class FileCollectorImportView(SubscriptionViewMixin, TemplateNameableMixin,
         context['data'] = data
         context['user_id'] = self.request.user.person.name
         context['processable'] = processable
-        context['active'] = 'inscricoes'
+        context['active'] = 'attendance'
         return context
 
     def get_success_url(self):

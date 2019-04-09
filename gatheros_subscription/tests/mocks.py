@@ -2,11 +2,11 @@
     Mock factory used during tests to create required gatheros subscription
     domain objects.
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from faker import Faker
 
-from gatheros_event.models import Event, Person
+from gatheros_event.models import Event, Person, Organization, Category
 from gatheros_subscription.models import Lot, LotCategory, Subscription
 
 
@@ -17,6 +17,28 @@ class MockFactory:
 
     def __init__(self):
         self.fake_factory = Faker('pt_BR')
+
+    def fake_person(self):
+        return Person.objects.create(name=self.fake_factory.name())
+
+    def fake_organization(self):
+        return Organization.objects.create(
+            name=self.fake_factory.company(),
+            email=self.fake_factory.email(),
+        )
+
+    def fake_event(self, organization=None):
+
+        if not organization:
+            organization = self.fake_organization()
+
+        return Event.objects.create(
+            organization=organization,
+            name='Event: ' + ' '.join(self.fake_factory.words(nb=3)),
+            date_start=datetime.now() + timedelta(days=3),
+            date_end=datetime.now() + timedelta(days=4),
+            category=Category.objects.first(),
+        )
 
     def fake_lot(self, event: Event, date_start=None, date_end=None):
         if not isinstance(event, Event):

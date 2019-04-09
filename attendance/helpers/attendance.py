@@ -1,9 +1,8 @@
-from gatheros_subscription.models import Subscription
 from attendance.models import AttendanceService
+from gatheros_subscription.models import Subscription
 
 
 def subscription_has_certificate(subscription_pk):
-
     try:
         subscription = Subscription.objects.get(pk=subscription_pk)
 
@@ -34,7 +33,6 @@ def subscription_has_certificate(subscription_pk):
 
 
 def subscription_is_checked(subscription_pk):
-
     try:
         subscription = Subscription.objects.get(pk=subscription_pk)
 
