@@ -4,7 +4,7 @@ import os
 from celery import Celery
 from kombu import Queue, Exchange
 
-logger = logging.getLogger("Celery[Mailer]")
+logger = logging.getLogger("Celery[AttendanceExporter]")
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.manage.settings.dev')
 
@@ -17,6 +17,6 @@ CELERY_QUEUES = (
     ),
 )
 
-app = Celery('mailer')
+app = Celery('attendance_exporter')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()

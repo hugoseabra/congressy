@@ -27,7 +27,7 @@
                         style="margin-top: 8px"
                         data-toggle="tooltip"
                         title="Editar dados de atendimento"
-                        onclick="export_service('{{ object.pk }}');$('#attendance-exporter-modal').modal();">
+                        onclick="openExportModal('{{ item.pk }}')">
                     <span class="fas fa-file-excel"></span>
                     Exportar
                 </button>

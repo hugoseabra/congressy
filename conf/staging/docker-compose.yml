@@ -18,6 +18,7 @@ services:
   migration:
     image: cgsy-staging
     container_name: migration-staging
+    hostname: migration-staging
     entrypoint:
       - /services/migration/container-entry.sh
     env_file:
@@ -28,6 +29,7 @@ services:
   volume:
     image: cgsy-staging
     container_name: volume-staging
+    hostname: volume-staging
     depends_on:
       - migration
     entrypoint:
@@ -36,11 +38,12 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
       - ./media:/var/www/cgsy/media
-      - ./logs:/var/www/cgsy/logs
+      - ./exporter:/tmp/exporter
 
   cron:
     image: cgsy-staging
     container_name: cron-staging
+    hostname: cron-staging
     depends_on:
       - migration
       - volume
@@ -49,30 +52,35 @@ services:
     networks:
       - postgres
       - mailhog
+      - wkhtmltopdf
+      - rabbitmq
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
       - ./media:/var/www/cgsy/media
-      - ./logs:/var/www/cgsy/logs
+      - ./exporter:/tmp/exporter
 
   manage:
     image: cgsy-staging
     container_name: manage-staging
+    hostname: manage-staging
     depends_on:
       - migration
+      - rabbitmq
     entrypoint:
       - /services/web/manage/container-entry.sh
     networks:
       - postgres
       - mailhog
       - wkhtmltopdf
+      - rabbitmq
     ports:
       - "8080:80"
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
       - ./media:/var/www/cgsy/media
-      - ./logs:/var/www/cgsy/logs
+      - ./exporter:/tmp/exporter
 
 networks:
   postgres:
@@ -84,3 +92,6 @@ networks:
   wkhtmltopdf:
     external:
       name: local_wkhtmltopdf
+  rabbitmq:
+    external:
+      name: local_rabbitmq

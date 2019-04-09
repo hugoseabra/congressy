@@ -74,9 +74,6 @@ LOGGING = {
         },
     },
 }
-# ================================ CELERY =================================== #
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 # ============================ E-MAIL/SPARKPOST ============================= #
 EMAIL_BACKEND = 'sparkpost.django.email_backend.SparkPostEmailBackend'
 SPARKPOST_API_KEY = '6dacd78f4c49080da7bbe942d4f36dc95d0c110a'
@@ -94,3 +91,7 @@ RAVEN_CONFIG = {
 
 # ============================ WKHTMLTOPDF  ================================== #
 WKHTMLTOPDF_WS_URL = 'http://wkhtmltopdf'
+
+# =============================== CELERY ==================================== #
+CELERY_BROKER_URL = 'amqp://congressy:cgsy1601@{{ RABBITMQ_SERVER }}:5672/'
+CELERY_RESULT_BACKEND = 'amqp://congressy:cgsy1601@{{ RABBITMQ_SERVER }}:5672/'

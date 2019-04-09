@@ -32,7 +32,7 @@
             {% if  required  or required == 'True' %}
                 {{ field|add_class:"form-control"|attr:"style:display:none"|attr:"required:required" }}
             {% else %}
-                {{ field|add_class:"form-control" }}
+                {{ field|add_class:"form-control"|attr:"style:display:none" }}
             {% endif %}
         {% endif %}
 

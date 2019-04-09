@@ -22,7 +22,6 @@ from .subscription_views import (
     SubscriptionAddFormView,
     SubscriptionCancelView,
     SubscriptionEditFormView,
-    SubscriptionExportView,
     SubscriptionListView,
     SubscriptionViewFormView,
     VoucherSubscriptionPDFView,

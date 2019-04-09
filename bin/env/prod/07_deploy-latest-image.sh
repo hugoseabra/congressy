@@ -37,6 +37,7 @@ fi
 # dos releases. Sendo assim, basta comparar
 if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
 
+    sed -i -e 's/HOSTNAME/'"$HOSTNAME"'/g' ~/cgsy/docker-compose.yml
     docker-compose -f ~/cgsy/docker-compose.yml up -d --remove-orphans --force
     sleep 30
 
@@ -45,10 +46,10 @@ if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
     echo ;
 
     echo "==========================================================="
-    echo "REDIS"
+    echo "RABBIT MQ"
     echo "==========================================================="
     echo;
-    docker-compose -f ${BASE}/docker-compose.yml logs redis
+    docker-compose -f ${BASE}/docker-compose.yml logs rabbitmq
     echo;
 
     echo "==========================================================="

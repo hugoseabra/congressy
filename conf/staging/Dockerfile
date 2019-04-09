@@ -11,6 +11,11 @@ ENV DEBIAN_FRONTEND noninteractive
 # Celery does not work with root unless you force it
 ENV C_FORCE_ROOT true
 
+# PYTHONUNBUFFERED: Force stdin, stdout and stderr to be totally unbuffered. (equivalent to `python -u`)
+# PYTHONHASHSEED: Enable hash randomization (equivalent to `python -R`)
+# PYTHONDONTWRITEBYTECODE: Do not write byte files to disk, since we maintain it as readonly. (equivalent to `python -B`)
+ENV PYTHONUNBUFFERED=1 PYTHONHASHSEED=random PYTHONDONTWRITEBYTECODE=1
+
 LABEL cgsy.image.name="cgsy-platform-staging"
 
 # -----------------------------------------------------------------------------

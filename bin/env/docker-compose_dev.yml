@@ -23,7 +23,7 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
-                    
+
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas
     container_name: wkhtmltopdf
@@ -32,16 +32,43 @@ services:
     ports:
       - "5010:80"
 
-#  ngrok:
-#    image: hugoseabra19/ngrok-tunnel
-#    container_name: ngrok
-#    environment:
-#    - TARGET_HOST=172.17.0.1
-#    - TARGET_PORT=8000
-#    volumes:
-#    - /tmp/ngrok:/tmp/bkp
-#    ports:
-#    - "4040:4040"
+  ngrok:
+    image: hugoseabra19/ngrok-tunnel
+    container_name: ngrok
+    environment:
+      - TARGET_HOST=172.17.0.1
+      - TARGET_PORT=8000
+    volumes:
+      - /tmp/ngrok:/tmp/bkp
+    ports:
+      - "4040:4040"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: cgsy-rabbitmq
+    hostname: cgsyrabbitmq # database unique name
+    networks:
+      - rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=cgsy
+      - RABBITMQ_DEFAULT_PASS=cgsy
+      - RABBITMQ_ERLANG_COOKIE=cgsyrabbitmqservice
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - ~/rabbitmq-database:/var/lib/rabbitmq/mnesia
+
+  flower:
+    image: hugoseabra19/docker-celery-flower
+    container_name: cgsy-flower
+    environment:
+      - CELERY_BROKER_URL=amqp://cgsy:cgsy@rabbitmq:5672/
+      - FLOWER_PORT=5555
+    ports:
+      - 5555:5555
+    networks:
+      - rabbitmq
 
 networks:
   postgres:
@@ -50,4 +77,5 @@ networks:
     name: local_mailhog
   wkhtmltopdf:
     name: local_wkhtmltopdf
-
+  rabbitmq:
+    name: local_rabbitmq
