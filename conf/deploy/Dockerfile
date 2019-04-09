@@ -110,7 +110,6 @@ COPY ./conf/deploy/setup/configure-cron.py /configure-cron.py
 COPY ./conf/deploy/setup/configure-version.py /configure-version.py
 COPY ./conf/deploy/setup/configure-wsgi.py /configure-wsgi.py
 COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
-COPY ./conf/deploy/setup/configure-rabbitmq.py /configure-rabbitmq.py
 COPY ./conf/deploy/services /services
 
 # -----------------------------------------------------------------------------
