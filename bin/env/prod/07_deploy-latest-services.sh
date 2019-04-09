@@ -37,7 +37,8 @@ fi
 # dos releases. Sendo assim, basta comparar
 if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
 
-    docker-compose -f ~/cgsy/docker-compose_services.yml up -d --remove-orphans --force
+    sed -i -e 's/HOSTNAME/'"$HOSTNAME"'/g' ~/cgsy/docker-compose.yml
+    docker-compose -f ~/cgsy/docker-compose.yml up -d --remove-orphans --force
     sleep 30
 
     echo ;
@@ -45,24 +46,24 @@ if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
     echo ;
 
     echo "==========================================================="
-    echo "REDIS"
+    echo "RABBIT MQ"
     echo "==========================================================="
     echo;
-    docker-compose -f ${BASE}/docker-compose_services.yml logs redis
+    docker-compose -f ${BASE}/docker-compose.yml logs rabbitmq
     echo;
 
     echo "==========================================================="
     echo "WKHTMLTOPDF"
     echo "==========================================================="
     echo;
-    docker-compose -f ${BASE}/docker-compose_services.yml logs wkhtmltopdf
+    docker-compose -f ${BASE}/docker-compose.yml logs wkhtmltopdf
     echo;
 
     echo "==========================================================="
     echo; echo "CRON"; echo;
     echo "==========================================================="
     echo;
-    docker-compose -f ${BASE}/docker-compose_services.yml logs cron
+    docker-compose -f ${BASE}/docker-compose.yml logs cron
 
     echo "###########################################################"
     echo "DEPLOYING FINISHED"

@@ -31,6 +31,7 @@ pipeline:
     ]
     volumes:
       - /tmp/bkp:/tmp/bkp
+      - /etc/localtime:/etc/localtime
     commands:
       - ./bin/env/staging/01_backup-db-staging.sh
     when:
@@ -40,6 +41,7 @@ pipeline:
     image: tmaier/docker-compose
     pull: true
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/bkp:/tmp/bkp
     commands:
@@ -61,6 +63,7 @@ pipeline:
   build-staging-image:
     image: docker
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - |
@@ -77,6 +80,7 @@ pipeline:
     image: alpine
     pull: true
     volumes:
+      - /etc/localtime:/etc/localtime
       - /tmp/staging-files:/tmp/staging-files
     secrets: [
       aws_key,
@@ -108,6 +112,7 @@ pipeline:
       - echo "DBPORT=$${DBPORT_STAGING}" >> /tmp/staging-files/env-manage-staging
       - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> /tmp/staging-files/env-manage-staging
       - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> /tmp/staging-files/env-manage-staging
+      - echo "RABBITMQ_SERVER=rabbitmq" >> /tmp/staging-files/env-manage-staging
     when:
       branch: [ hotfix/*, release/* ]
 
@@ -115,6 +120,7 @@ pipeline:
     image: tmaier/docker-compose
     pull: true
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
       - /media:/var/www/cgsy/media
       - /tmp/staging-files:/tmp/staging-files
@@ -170,6 +176,7 @@ pipeline:
     image: docker
     pull: true
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
     secrets: [
       aws_key,
@@ -199,6 +206,7 @@ pipeline:
     image: docker
     pull: true
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - apk add --no-cache python3
@@ -211,6 +219,7 @@ pipeline:
   build-prod-images:
     image: docker
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - export REPO="871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy"
@@ -223,6 +232,7 @@ pipeline:
     image: docker
     pull: true
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - ./bin/env/prod/03_publish-tagged-version.sh
@@ -275,6 +285,8 @@ pipeline:
         target: SENTRY_PUBLIC_DSN
       - source: SENTRY_PRIVATE_DSN
         target: SENTRY_PRIVATE_DSN
+      - source: RABBITMQ_SERVER
+        target: RABBITMQ_SERVER
     envs: [
       congressy_deploy,
       aws_key,
@@ -292,7 +304,8 @@ pipeline:
       dbname,
       dbport,
       sentry_public_dsn,
-      sentry_private_dsn
+      sentry_private_dsn,
+      rabbitmq_server
     ]
     script:
       - mkdir -p ~/awsecr
@@ -303,8 +316,8 @@ pipeline:
       - echo "AWS_REGION=us-east-1" >> ~/awsecr/env-awsecr
       - echo "AWS_FORMAT=json" >> ~/awsecr/env-awsecr
 
-      - mkdir -p ~/cgsy
       # env-file do stack de produção - common
+      - mkdir -p ~/cgsy
       - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
       - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> ~/cgsy/env-file
@@ -317,6 +330,8 @@ pipeline:
       - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
       - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
       - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
+      - echo "RABBITMQ_SERVER=$${RABBITMQ_SERVER}" >> ~/cgsy/env-file
+
       # env-file do stack de produção - manage
       - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.prod" > ~/cgsy/env-manage-file
       - echo "DOMAIN=$${DOMAIN_MANAGE}" >> ~/cgsy/env-manage-file
@@ -394,7 +409,6 @@ pipeline:
       - 172.31.40.208
       - 172.31.35.124
       - 172.31.47.46
-      - 172.31.35.111
     port: 22
     user: ec2-user
     source: ./conf/deploy/docker-compose.yml
@@ -409,15 +423,11 @@ pipeline:
     image: drillster/drone-rsync
     pull: true
     hosts:
-    - 172.31.38.91
-    - 172.31.40.208
-    - 172.31.35.124
-    - 172.31.47.46
-    - 172.31.35.111
+      - 172.31.35.111
     port: 22
     user: ec2-user
     source: ./conf/deploy/docker-compose_services.yml
-    target: ~/cgsy/.
+    target: ~/cgsy/docker-compose.yml
     secrets:
     - source: CONGRESSY_DEPLOY
       target: RSYNC_KEY
@@ -539,6 +549,7 @@ pipeline:
     image: docker
     pull: true
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
     secrets: [
       sentry_release_api_token
@@ -559,6 +570,8 @@ pipeline:
   notify-production-on-telegram:
     image: appleboy/drone-telegram
     pull: true
+    volumes:
+      - /etc/localtime:/etc/localtime
     token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
     to: -275808686 # ID chat Congressy
 #    to: 245012348 # ID hugoseabra

@@ -1,14 +1,22 @@
+from datetime import datetime
+
 from django.db.models import Q
-from rest_framework import viewsets, generics, pagination
+from django.http import HttpResponse
+from rest_framework import viewsets, generics, pagination, status
 from rest_framework.authentication import (
     BasicAuthentication,
     SessionAuthentication,
+    TokenAuthentication,
 )
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from core.util.string import clear_string
+from gatheros_event.models import Event
+from gatheros_subscription.helpers.subscription_async_exporter import \
+    SubscriptionServiceAsyncExporter
 from gatheros_subscription.lot_api_permissions import MultiLotsAllowed
 from gatheros_subscription.models import Subscription
 from gatheros_subscription.serializers import (
@@ -16,11 +24,16 @@ from gatheros_subscription.serializers import (
     LotSerializer,
     SubscriptionSerializer,
 )
+from gatheros_subscription.tasks import async_subscription_exporter_task
 from .permissions import OrganizerOnly
 
 
 class RestrictionViewMixin:
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    authentication_classes = (
+        SessionAuthentication,
+        BasicAuthentication,
+        TokenAuthentication,
+    )
 
 
 class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
@@ -187,3 +200,63 @@ class SubscriptionListViewSet(RestrictionViewMixin,
             Q(person__cpf__icontains=search_param, ) |
             Q(person__institution_cnpj__icontains=search_param, )
         )
+
+
+class SubscriptionExporterViewSet(RestrictionViewMixin, APIView):
+    permission_classes = (OrganizerOnly,)
+
+    def post(self, request, *args, **kwargs):
+        event_pk = kwargs.get('event_pk')
+
+        if not event_pk:
+            return Response({'error: missing event_pk'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        event = Event.objects.get(pk=event_pk)
+
+        exporter = SubscriptionServiceAsyncExporter(event)
+
+        if exporter.has_export_lock():
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        exporter.create_export_lock()
+        async_subscription_exporter_task.delay(event.pk)
+
+        return HttpResponse(status=status.HTTP_201_CREATED)
+
+    def get(self, request, *args, **kwargs):
+
+        event_pk = kwargs.get('event_pk')
+
+        if not event_pk:
+            return Response({'error: missing event_pk'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        event = Event.objects.get(pk=event_pk)
+
+        exporter = SubscriptionServiceAsyncExporter(event)
+
+        if exporter.has_export_lock():
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        if not exporter.has_existing_export_files():
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # Criando resposta http com arquivo de download
+        # Reading file
+        file_name = exporter.get_export_file_path()
+
+        output = open(file_name, mode='rb').read()
+        name = "%s_%s.xlsx" % (
+            event.slug,
+            datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        )
+
+        response = HttpResponse(
+            output,
+            content_type="application/vnd.ms-excel"
+        )
+
+        response['Content-Disposition'] = 'attachment; filename=%s' % name
+
+        return response

@@ -74,18 +74,68 @@
             });
         });
 
+        var openExportModal = function (item_pk) {
+            $('#export-modal').modal('show');
+            asyncExport(true, item_pk);
+        };
 
-        var export_service = function (item_pk) {
-            var url = '{% url "attendance:attendance-xls-export" event.pk%}' + '?pk=' + item_pk;
+        var exporter_process = null;
+        var asyncExport = function (create, item_pk) {
 
-            console.log("URL => " + url);
-            console.log("ITEM PK => " + item_pk);
+            window.clearTimeout(exporter_process);
 
-            window.setTimeout(function() {
-                $('#attendance-exporter-modal').modal('hide');
-            }, 3000);
-            window.location=url;
-        }
+            var modalEl = $('#export-modal');
+
+            var promise = asyncExporterPromise(create, item_pk);
+
+            promise.then(function (value) {
+
+                if (value === 201 || value === 204) {
+                    exporter_process = setTimeout(function () {
+                        asyncExport(false, item_pk);
+                    }, 5000);
+                } else if (value === 200) {
+                    modalEl.modal('hide');
+                    window.location.href = '/api/attendance/services/' + item_pk + '/export/';
+                }
+
+            }).catch(function (reason) {
+                if (reason['status'] === 403) {
+                    asyncExport(false);
+                } else {
+                    console.error(reason);
+                }
+            });
+        };
+
+
+        var asyncExporterPromise = function (create, item_pk) {
+
+            return new Promise(function (resolve, reject) {
+
+                var defaultArgs = {
+                    url: '/api/attendance/services/' + item_pk + '/export/',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    },
+                    success: function (data, textStatus, xhr) {
+                        console.log("SUCCESS STATUS CODE IS: " + xhr.status);
+                        resolve(xhr.status);
+                    },
+                    error: function (xhr, textStatus, errThrown) {
+                        reject({'reason': errThrown, 'status': xhr.status});
+                    }
+                };
+
+                if (create) {
+                    defaultArgs.type = "POST"
+                } else {
+                    defaultArgs.type = "GET"
+                }
+                $.ajax(defaultArgs);
+            });
+
+        };
 
     </script>
 {% endblock %}
@@ -140,8 +190,9 @@
                                 <td>
                                     <a href="{% url 'attendance:dashboard' event.pk item.pk %}">{{ item.name }}</a>
                                     {% if item.accreditation is True %}
-                                    &ensp; &ensp;
-                                    <span class="fas fa-check-circle text-success" data-toggle="tooltip" title="Serviço de Credenciamento"></span>
+                                        &ensp; &ensp;
+                                        <span class="fas fa-check-circle text-success" data-toggle="tooltip"
+                                              title="Serviço de Credenciamento"></span>
                                     {% endif %}
                                 </td>
                                 <td class="text-center">{% count_checkins item %}</td>
@@ -156,23 +207,21 @@
                                         <ul class="dropdown-menu dropdown-menu-right"
                                             role="menu">
                                             <li>
-                                                <a href="{% url 'attendance:attendance-list-edit' event.pk item.pk %}"
-                                                >
+                                                <a href="{% url 'attendance:attendance-list-edit' event.pk item.pk %}">
                                                     <i class="fas fa-pencil-alt"></i>
                                                     Editar
                                                 </a>
                                             </li>
 
-                                            <li onclick="$('#lot-delete-form').attr('action','{% url 'attendance:attendance-list-delete' event.pk item.pk %}');
-                                                    $('#attendance-list-delete-modal').modal();">
-                                                <a href="#">
+                                            <li>
+                                                <a href="javascript:void(0)" onclick="$('#lot-delete-form').attr('action','{% url 'attendance:attendance-list-delete' event.pk item.pk %}');$('#attendance-list-delete-modal').modal();">
                                                     <i class="fas fa-trash-alt"> </i>
                                                     Excluir
                                                 </a>
                                             </li>
 
                                             <li>
-                                                <a href="#" onclick="export_service('{{ item.pk }}');$('#attendance-exporter-modal').modal();">
+                                                <a href="#" onclick="openExportModal('{{ item.pk }}')">
                                                     <i class="fas fa-file-excel"></i>
                                                     Exportar
                                                 </a>
@@ -230,23 +279,38 @@
         </div>
     </div>
 
-    <div class="modal fade" id="attendance-exporter-modal" tabindex="-1" role="dialog"
+    <div class="modal fade" id="export-modal" tabindex="-1" role="dialog" data-backdrop="static"
          aria-labelledby="modal-service-delete-title" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title">
-                        Exportação de Atendimento
+                    <h4 class="modal-title" id="modal-service-delete-title">
+                        Exportar
                     </h4>
                 </div>
                 <div class="modal-body">
-                    <div class="text-center">
-                        <h2>Aguarde enquanto preparamos sua exportação...</h2>
-                        <i class="fas info-color fa-circle-notch fa-spin fa-4x" style="margin-top: 20px"></i>
+
+                    <div class="row text-center">
+                        <h3 class="text-bold">Estamos gerando seu arquivo, por gentileza aguarde...</h3>
                     </div>
+
+                    <div class="row text-center" style="margin-top: 10px">
+                        <i class="fas fa-circle-notch info-color fa-spin fa-4x"></i>
+                    </div>
+
+                    <div class="row text-center" style="margin-top: 15px">
+
+                        <i class="text-mute">
+                            Em casos de evento com muitas inscrições pode demorar alguns minutos.
+                        </i>
+
+
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
+
 {% endblock %}

@@ -1,53 +1,15 @@
 import locale
-from datetime import datetime
 
 from django.db.models import QuerySet
-from django.http import HttpResponse, Http404
-from django.utils.text import slugify
-from django.views.generic import View
 from openpyxl import Workbook
 from six import BytesIO
 
-from attendance.models import AttendanceService, Checkin, Checkout
+from attendance.models import Checkin, Checkout
 from gatheros_subscription.helpers.export import clean_sheet_title, \
     get_object_value
 from gatheros_subscription.models import Subscription
-from .mixins import AttendancesFeatureFlagMixin
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-
-
-class AttendanceXLSExportView(AttendancesFeatureFlagMixin, View):
-
-    # @TODO Implement security features.
-    #  For now any authenticated user can access this.
-
-    def get(self, request, *args, **kwargs):
-        pk = request.GET.get('pk', None)
-
-        try:
-            service = AttendanceService.objects.get(pk=pk)
-        except AttendanceService.DoesNotExist:
-            raise Http404('Serviço de atendimento não encontrado.')
-
-        # Chamando exportação
-        output = export_attendance(service)
-
-        # Criando resposta http com arquivo de download
-        response = HttpResponse(
-            output,
-            content_type="application/vnd.ms-excel"
-        )
-
-        # Definindo nome do arquivo
-        name = "%s_%s_%s.xlsx" % (
-            self.event.slug,
-            slugify(service.name),
-            datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        )
-        response['Content-Disposition'] = 'attachment; filename=%s' % name
-
-        return response
 
 
 def export_attendance(service):
@@ -500,12 +462,6 @@ def export_attendance_auditing(worksheet, subscriptions, attendance):
     collector = {}
     row_idx = 1
 
-
-
-
-
-
-
     for sub in subscriptions:
 
         checkins = Checkin.objects.filter(
@@ -544,7 +500,7 @@ def export_attendance_auditing(worksheet, subscriptions, attendance):
             try:
                 checkout = Checkout.objects.get(checkin_id=checkin.pk)
 
-                if instance.registration:
+                if checkout.registration:
                     t = checkout.registration.strftime('%d/%m/%Y %H:%M:%S')
                 else:
                     t = checkout.created_on.strftime('%d/%m/%Y %H:%M:%S')

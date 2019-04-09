@@ -6,7 +6,7 @@ from django.test import TestCase
 from openpyxl import load_workbook
 
 from gatheros_event.models import Event, Person
-from gatheros_subscription.helpers.subscription import export
+from gatheros_subscription.helpers import export
 from gatheros_subscription.models import Subscription
 
 
