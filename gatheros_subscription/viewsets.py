@@ -25,7 +25,7 @@ from gatheros_subscription.serializers import (
     SubscriptionSerializer,
 )
 from gatheros_subscription.tasks import async_subscription_exporter_task
-from .permissions import OrganizerOnly
+from core.rest_permissions import OrganizerOnlyByKwargs
 
 
 class RestrictionViewMixin:
@@ -98,7 +98,7 @@ class SubscriptionListViewSet(RestrictionViewMixin,
     serializer_class = SubscriptionSerializer
     pagination_class = DatatablePagination
 
-    permission_classes = (IsAuthenticated, OrganizerOnly)
+    permission_classes = (IsAuthenticated, OrganizerOnlyByKwargs)
 
     def get_queryset(self):
         event_pk = self.kwargs['event_pk']
@@ -203,7 +203,7 @@ class SubscriptionListViewSet(RestrictionViewMixin,
 
 
 class SubscriptionExporterViewSet(RestrictionViewMixin, APIView):
-    permission_classes = (OrganizerOnly,)
+    permission_classes = (OrganizerOnlyByKwargs,)
 
     def post(self, request, *args, **kwargs):
         event_pk = kwargs.get('event_pk')

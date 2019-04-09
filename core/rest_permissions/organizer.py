@@ -3,7 +3,7 @@ from rest_framework.permissions import BasePermission
 from gatheros_event.models import Event
 
 
-class OrganizerOnly(BasePermission):
+class OrganizerOnlyByKwargs(BasePermission):
     """
     Allows access only to authenticated users.
     """
