@@ -1,5 +1,6 @@
 app-version==0.2.1
 appdirs==1.4.3
+celery==4.3.0
 certifi==2018.1.18
 chardet==3.0.4
 Django==1.11
@@ -54,4 +55,3 @@ timestring==1.6.2
 tolerance==0.1.2
 Unidecode==1.0.22
 urllib3==1.22
-
