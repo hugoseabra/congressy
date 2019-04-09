@@ -46,12 +46,29 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: cgsy-rabbitmq
+    hostname: cgsyrabbitmq # database unique name
+    networks:
+      - rabbitmq
     environment:
       - RABBITMQ_DEFAULT_USER=cgsy
       - RABBITMQ_DEFAULT_PASS=cgsy
+      - RABBITMQ_ERLANG_COOKIE=cgsyrabbitmqservice
     ports:
-      - "8080:15672"
+      - "15672:15672"
       - "5672:5672"
+    volumes:
+      - ~/rabbitmq-database:/var/lib/rabbitmq/mnesia
+
+  flower:
+    image: hugoseabra19/docker-celery-flower
+    container_name: cgsy-flower
+    environment:
+      - CELERY_BROKER_URL=amqp://cgsy:cgsy@rabbitmq:5672/
+      - FLOWER_PORT=5555
+    ports:
+      - 5555:5555
+    networks:
+      - rabbitmq
 
 networks:
   postgres:
@@ -60,3 +77,5 @@ networks:
     name: local_mailhog
   wkhtmltopdf:
     name: local_wkhtmltopdf
+  rabbitmq:
+    name: local_rabbitmq

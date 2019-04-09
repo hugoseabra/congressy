@@ -11,6 +11,11 @@ ENV DEBIAN_FRONTEND noninteractive
 # Celery does not work with root unless you force it
 ENV C_FORCE_ROOT true
 
+# PYTHONUNBUFFERED: Force stdin, stdout and stderr to be totally unbuffered. (equivalent to `python -u`)
+# PYTHONHASHSEED: Enable hash randomization (equivalent to `python -R`)
+# PYTHONDONTWRITEBYTECODE: Do not write byte files to disk, since we maintain it as readonly. (equivalent to `python -B`)
+ENV PYTHONUNBUFFERED=1 PYTHONHASHSEED=random PYTHONDONTWRITEBYTECODE=1
+
 LABEL cgsy.image.name="cgsy-platform-production"
 
 # -----------------------------------------------------------------------------
@@ -58,9 +63,6 @@ RUN pip install --no-cache-dir --upgrade \
         pip setuptools \
         # required by celery
         lxml \
-        celery \
-        # Celery UI
-        # flower \
         # send email
         sparkpost \
         # server
@@ -70,9 +72,9 @@ RUN pip install --no-cache-dir --upgrade \
         # template engine
         jinja2 \
         # Sentry
-        raven \
+        raven
         # nginx + sentry
-        sentrylogs
+#        sentrylogs
 
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.
@@ -108,6 +110,7 @@ COPY ./conf/deploy/setup/configure-cron.py /configure-cron.py
 COPY ./conf/deploy/setup/configure-version.py /configure-version.py
 COPY ./conf/deploy/setup/configure-wsgi.py /configure-wsgi.py
 COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
+COPY ./conf/deploy/setup/configure-rabbitmq.py /configure-rabbitmq.py
 COPY ./conf/deploy/services /services
 
 # -----------------------------------------------------------------------------
