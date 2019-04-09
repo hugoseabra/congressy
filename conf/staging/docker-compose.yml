@@ -66,7 +66,6 @@ services:
     hostname: manage-staging
     depends_on:
       - migration
-      - rabbitmq
     entrypoint:
       - /services/web/manage/container-entry.sh
     networks:
