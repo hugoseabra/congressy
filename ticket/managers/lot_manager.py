@@ -7,19 +7,6 @@ from gatheros_subscription.models import Subscription
 from ticket.models import Lot
 
 
-class TicketManager(Manager):
-    class Meta:
-        model = Lot
-        fields = '__all__'
-
-    def clean_free_installments(self):
-        free_installments = self.cleaned_data['free_installments']
-        if free_installments and free_installments > 10:
-            raise ValidationError('é possivel absorver no máximo 10 parcelas')
-
-        return free_installments
-
-
 class LotManager(Manager):
     class Meta:
         model = Lot
@@ -33,7 +20,7 @@ class LotManager(Manager):
 
         if price and self._lot_has_subscriptions():
             raise ValidationError(
-                "não é possivel alterar o preço quando há inscrições nesse lote"
+                "não é possivel alterar o preço quando há inscrições"
             )
 
         return price
