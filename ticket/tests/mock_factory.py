@@ -8,7 +8,8 @@ from django.contrib.auth.models import User
 from faker import Faker
 
 from gatheros_event.models import Organization, Event, Category, Person, Member
-from ticket.models import Ticket
+from gatheros_subscription.models import Subscription
+from ticket.models import Ticket, Lot
 
 
 class MockFactory:
@@ -17,7 +18,7 @@ class MockFactory:
     """
 
     def __init__(self):
-        self.fake_factory = Faker()
+        self.fake_factory = Faker('pt_BR')
 
     def fake_organization(self):
         return Organization.objects.create(
@@ -33,38 +34,50 @@ class MockFactory:
         return Event.objects.create(
             organization=organization,
             name='Event: ' + ' '.join(self.fake_factory.words(nb=3)),
-            date_start=datetime.now() + timedelta(days=3),
-            date_end=datetime.now() + timedelta(days=4),
+            date_start=datetime.now() + timedelta(days=5),
+            date_end=datetime.now() + timedelta(days=10),
             category=Category.objects.first(),
         )
 
     def fake_person(self):
         return Person.objects.create(name=self.fake_factory.name())
 
-    def fake_ticket(self, event=None, user=None):
+    def fake_ticket(self, event=None):
 
         if event is None:
             event = self.fake_event()
 
-        if user is None:
-            user = self.fake_user()
-
-        members = [m.person.user for m in
-                   event.organization.members.filter(active=True)]
-
-        if not hasattr(user, 'person'):
-            person = self.fake_person()
-            user.person = person
-            user.save()
-
-        if user not in members:
-            p = user.person
-            self.fake_membership(organization=event.organization, person=p)
-
         return Ticket.objects.create(
             event=event,
-            created_by=user,
-            name=self.fake_factory.word(ext_word_list=None)
+            name="Ticket: " + self.fake_factory.word(ext_word_list=None)
+        )
+
+    def fake_lot(self, ticket: Ticket = None):
+        if ticket is None:
+            ticket = self.fake_ticket(self.fake_event())
+
+        return Lot.objects.create(
+            ticket=ticket,
+            name="Lot: " + self.fake_factory.word(ext_word_list=None),
+            date_start=datetime.now(),
+            date_end=datetime.now() + timedelta(days=1),
+        )
+
+    def fake_subscription(self, lot=None, person=None):
+
+        if not person:
+            person = self.fake_person()
+
+        if not lot:
+            lot = self.fake_lot()
+
+        return Subscription.objects.create(
+            ticket_lot=lot,
+            event=lot.ticket.event,
+            person=person,
+            completed=True,
+            test_subscription=False,
+            created_by=0,
         )
 
     def fake_user(self):

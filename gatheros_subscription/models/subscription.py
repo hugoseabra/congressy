@@ -92,8 +92,22 @@ class Subscription(models.Model, GatherosModelMixin):
         Lot,
         verbose_name='lote',
         related_name='subscriptions',
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        # @TODO: Remove this field
+        null=True,
+        blank=True,
     )
+
+    ticket_lot = models.ForeignKey(
+        'ticket.Lot',
+        verbose_name='lote',
+        related_name='subscriptions',
+        on_delete=models.PROTECT,
+        # @TODO: Make this field required
+        null=True,
+        blank=True,
+    )
+
     event = models.ForeignKey(
         Event,
         verbose_name='evento',

@@ -17,7 +17,7 @@ def rule_1_limite_lote_excedido(subscription):
 
     manual = subscription.origin in allowed_origins
 
-    lot = subscription.lot
+    lot = subscription.ticket_lot
     limit = lot.limit
     num = lot.subscriptions.filter(
         completed=True,
@@ -68,7 +68,8 @@ def rule_5_inscricao_apos_data_final_lote(subscription, adding=False):
 
     manual = subscription.origin in allowed_origins
 
-    if adding and subscription.lot.date_end < datetime.now() and not manual:
+    if adding and subscription.ticket_lot.date_end < datetime.now() and \
+            not manual:
         raise IntegrityError(
             'O lote já foi encerrado e não pode mais ter inscrições.'
         )
@@ -86,7 +87,8 @@ def rule_6_inscricao_apos_data_final_evento(subscription, adding=False):
 
     manual = subscription.origin in allowed_origins
 
-    if adding and subscription.lot.event.date_end < datetime.now() \
+    if adding and subscription.ticket_lot.ticket.event.date_end < \
+            datetime.now() \
             and not manual:
         raise IntegrityError(
             'O evento já foi encerrado e não pode mais ter inscrições.'

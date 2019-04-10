@@ -2,8 +2,11 @@ from decimal import Decimal
 
 from django.db import models
 
+from base.models import EntityMixin
+from gatheros_event.models.mixins import GatherosModelMixin
 
-class Lot(models.Model):
+
+class Lot(GatherosModelMixin, EntityMixin, models.Model):
     class Meta:
         verbose_name = "lote de ingressos"
         verbose_name_plural = "lotes de ingressos"

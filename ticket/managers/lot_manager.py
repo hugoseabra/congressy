@@ -13,9 +13,10 @@ class LotManager(Manager):
         fields = '__all__'
 
     def clean_price(self):
-        price = self.cleaned_data['price']
+        price = self.cleaned_data.get('price')
 
-        if not hasattr(self.instance, 'pk'):
+        # Ignore on creation
+        if self.instance.pk is None:
             return price
 
         if price and self._lot_has_subscriptions():
@@ -27,26 +28,27 @@ class LotManager(Manager):
 
     def clean_limit(self):
 
-        limit = self.cleaned_data['limit']
-        ticket = self.cleaned_data['ticket']
+        limit = self.cleaned_data.get('limit')
+        ticket = self.cleaned_data.get('ticket')
 
-        ticket_limit = ticket.limit
+        if limit is None:
+            limit = 0
 
-        if limit and ticket_limit:
+        ticket_limit = ticket.limit or 0
 
-            limit_count = Lot.objects.filter(ticket_id=ticket.pk) \
-                .aggregate(all_limit=Sum('limit'))
+        limit_count = Lot.objects.filter(ticket_id=ticket.pk) \
+            .aggregate(all_limit=Sum('limit'))
 
-            if not limit_count['all_limit']:
-                limit_count = 0
-            else:
-                limit_count = limit_count['all_limit'] + limit
+        if not limit_count['all_limit']:
+            limit_count = 0 + limit
+        else:
+            limit_count = limit_count['all_limit'] + limit
 
-            if limit_count > ticket_limit:
-                raise ValidationError(
-                    "a soma dos limites dos lotes ultrapassam o numero de "
-                    "vagas da categoria"
-                )
+        if limit_count > ticket_limit:
+            raise ValidationError(
+                "a soma dos limites dos lotes ultrapassam o numero de "
+                "vagas da categoria"
+            )
 
     def clean(self):
         cleaned_data = super().clean()
@@ -62,35 +64,38 @@ class LotManager(Manager):
                 ticket_lot_id=self.instance.pk,
                 test_subscription=False,
                 completed=True,
-                fill_vacancy=True,
                 status=Subscription.CONFIRMED_STATUS,
             ).count()
         )
 
     def _clean_dates(self):
 
-        ticket = self.cleaned_data['audience_category']
+        date_start = self.cleaned_data.get('date_start')
+        date_end = self.cleaned_data.get('date_end')
+        ticket = self.cleaned_data.get('ticket')
 
-        existing_lots = Lot.objects.filter(
-            tick_id=ticket.pk,
-        )
+        if date_start == date_end:
+            raise ValidationError("Data de inicio e fim não podem ser iguais")
 
-        if hasattr(self.instance, 'pk'):
+        if date_end < date_start:
+            raise ValidationError("Data de fim não podem ser maior que data "
+                                  "de inicio")
+
+        existing_lots = ticket.lots.all()
+
+        if self.instance.pk is not None:
             existing_lots = existing_lots.exclude(pk=self.instance.pk)
 
-        new_start = self.cleaned_data['date_start']
-
         for lot in existing_lots:
-            start = lot.date_start
-            end = lot.date_end
-            session_range_two = DateTimeRange(start=start, stop=end)
+            start = lot.date_start.strftime('%d/%m/%Y %H:%M:%S')
+            dtr = DateTimeRange(start=lot.date_start, stop=lot.date_end)
 
-            if new_start == start:
+            if date_start.strftime('%d/%m/%Y %H:%M:%S') == start:
                 msg = "Esse lote possui a mesma data de inicio com o lote " \
                       "'{}'".format(lot.name)
                 raise ValidationError(msg)
 
-            if new_start in session_range_two:
-                msg = "Esse lote possui a mesma data de inicio dentro do " \
+            if date_start in dtr:
+                msg = "Esse lote possui a data de inicio dentro do " \
                       "lote: '{}'".format(lot.name)
                 raise ValidationError(msg)
