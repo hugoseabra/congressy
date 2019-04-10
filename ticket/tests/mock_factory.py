@@ -92,3 +92,19 @@ class MockFactory:
             active=True,
             organization=organization,
         )
+
+    def fake_organizer(self, event: Event = None, person: Person = None):
+
+        if not event:
+            event = self.fake_event()
+
+        if not person:
+            person = self.fake_person()
+
+        if person.user is None:
+            person.user = self.fake_user()
+            person.save()
+
+        self.fake_membership(organization=event.organization, person=person)
+
+        return person

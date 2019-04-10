@@ -44,6 +44,7 @@ Regras de Negócio
     - Se há inscrições confirmadas não permitir mudar preço.
 - Ingresso:
     - Não é possivel absorver mais de 10 parcelas.
+    - Uma vez criado, o evento do ticket é imutavel.
 
 
 Permissões de acesso

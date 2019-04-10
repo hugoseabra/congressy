@@ -16,7 +16,7 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
 
     ticket = models.ForeignKey(
         'ticket.Ticket',
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         verbose_name='ingresso de participante',
         related_name='lots',
         # Making field required

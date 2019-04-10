@@ -28,6 +28,25 @@ class TicketDomainTest(TestCase):
 
         self.assertTrue(TicketManager(data=d).is_valid())
 
+    def test_changing_event(self):
+        instance = self.mock_factory.fake_ticket(event=self.event)
+
+        new_event = self.mock_factory.fake_event()
+
+        d = {
+            'name': 'random name',
+            'event': new_event.pk,
+        }
+
+        self.assertFalse(TicketManager(data=d, instance=instance).is_valid())
+
+        d['event'] = self.event.pk
+
+        m = TicketManager(data=d, instance=instance)
+        m.is_valid()
+
+        self.assertTrue(TicketManager(data=d, instance=instance).is_valid())
+
 
 class LotDomainTest(TestCase):
 
