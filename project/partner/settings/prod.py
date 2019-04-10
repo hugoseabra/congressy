@@ -50,11 +50,11 @@ EMAIL_BACKEND = 'sparkpost.django.email_backend.SparkPostEmailBackend'
 SPARKPOST_API_KEY = '6dacd78f4c49080da7bbe942d4f36dc95d0c110a'
 # ============================== SENTRY ===================================== #
 # Sentry integration
-RAVEN_CONFIG = {
-    'environment': 'production',
-    'dsn': '{{ SENTRY_PRIVATE_DSN }}',
-    'release': '{{ APP_VERSION }}',
-}
+# RAVEN_CONFIG = {
+#     'environment': 'production',
+#     'dsn': '{{ SENTRY_PRIVATE_DSN }}',
+#     'release': '{{ APP_VERSION }}',
+# }
 # ================================ PAGAR.ME ================================= #
 PAGARME_API_KEY = 'ak_live_7Rxgr3GlxWycVDMNeeG2InzwPsoPrM'
 PAGARME_ENCRYPTION_KEY = 'ek_live_Hlpg45VTiyNOnAE4dmkEBbQDEtUZCX'
