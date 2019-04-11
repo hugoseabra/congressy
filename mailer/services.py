@@ -8,12 +8,8 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 from gatheros_event.models import Member
-from gatheros_subscription.helpers.voucher import (
-    create_voucher,
-    get_voucher_file_name,
-)
+from gatheros_subscription.helpers.voucher import create_voucher
 from mailer import exception, checks
-from .tasks import MailerAttachment
 from .worker import send_mail
 
 
@@ -73,14 +69,7 @@ def notify_paid_subscription_boleto(event, transaction):
 
     checks.check_notification_transaction_paid_boleto(transaction)
 
-    # Se inscrição confirmada, envia o voucher.
-    voucher_file = create_voucher(subscription)
-
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+    voucher_file = create_voucher(subscription, save=True)
 
     event_url = absoluteuri.reverse(
         'public:hotsite',
@@ -111,7 +100,7 @@ def notify_paid_subscription_boleto(event, transaction):
         body=body,
         to=person.email,
         reply_to=event.organization.email,
-        attachment=voucher_attach,
+        attachment_file_path=voucher_file,
     )
 
 
@@ -380,13 +369,7 @@ def notify_new_paid_subscription_credit_card(event, transaction):
 
     checks.check_notification_transaction_paid_credit_card(transaction)
 
-    voucher_file = create_voucher(subscription)
-
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+    voucher_file = create_voucher(subscription, save=True)
 
     person = subscription.person
 
@@ -418,7 +401,7 @@ def notify_new_paid_subscription_credit_card(event, transaction):
         body=body,
         to=person.email,
         reply_to=event.organization.email,
-        attachment=voucher_attach,
+        attachment_file_path=voucher_file,
     )
 
 
@@ -703,14 +686,7 @@ def notify_new_free_subscription(event, subscription):
             " está como confirmada.."
         )
 
-    voucher_file = create_voucher(subscription)
-
-    # Se inscrição confirmada, envia o voucher.
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+    voucher_file = create_voucher(subscription, save=True)
 
     person = subscription.person
 
@@ -741,7 +717,7 @@ def notify_new_free_subscription(event, subscription):
         body=body,
         to=person.email,
         reply_to=event.organization.email,
-        attachment=voucher_attach,
+        attachment_file_path=voucher_file,
     )
 
 
@@ -762,14 +738,7 @@ def notify_new_user_and_free_subscription(event, subscription):
             " está como confirmada.."
         )
 
-    voucher_file = create_voucher(subscription)
-
-    # Se inscrição confirmada, envia o voucher.
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+    voucher_file = create_voucher(subscription, save=True)
 
     person = subscription.person
 
@@ -812,7 +781,7 @@ def notify_new_user_and_free_subscription(event, subscription):
         body=body,
         to=person.email,
         reply_to=event.organization.email,
-        attachment=voucher_attach,
+        attachment_file_path=voucher_file,
     )
 
 
