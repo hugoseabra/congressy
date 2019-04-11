@@ -32,31 +32,13 @@ def send_mail(subject, body, to, reply_to=None, attachment_file_path=None):
 
     mail.attach_alternative(body, 'text/html')
 
-    if attachment_file_path and os.path.isfile(attachment_file_path):
+    if attachment_file_path:
+        if not os.path.isfile(attachment_file_path):
+            raise Exception(
+                'Aquivo de anexo informado e não'
+                ' encontrado: {}'.format(attachment_file_path)
+            )
+
         mail.attach_file(attachment_file_path)
 
     return mail.send(False)
-
-
-class MailerAttachment(object):
-
-    def __init__(self, name, content, mime):
-        self.name = name
-        self.content = content
-        self.mime = mime
-
-    def __json__(self):
-        return dict(self)
-
-    def __iter__(self):
-        iters = {
-            'name': self.name,
-            'content': self.content,
-            'mime': self.mime,
-        }
-
-        # now 'yield' through the items
-        for x, y in iters.items():
-            yield x, y
-
-    to_json = __json__  # supported by simplejson
