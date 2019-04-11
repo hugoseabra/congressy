@@ -22,6 +22,9 @@ services:
       - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/var/www/cgsy/media
       - ./shared-volume/exporter:/tmp/exporter
+      - ./shared-volume/qrcodes:/tmp/qrcodes
+      - ./shared-volume/barcodes:/tmp/barcodes
+      - ./shared-volume/vouchers:/tmp/vouchers
     env_file:
       - ./env-file
       - ./env-manage-file
@@ -40,6 +43,9 @@ services:
       - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/var/www/cgsy/media
       - ./shared-volume/exporter:/tmp/exporter
+      - ./shared-volume/qrcodes:/tmp/qrcodes
+      - ./shared-volume/barcodes:/tmp/barcodes
+      - ./shared-volume/vouchers:/tmp/vouchers
     entrypoint:
       - /services/web/partner/container-entry.sh
     env_file:
@@ -62,6 +68,9 @@ services:
 #      - /etc/localtime:/etc/localtime
 #      - ./shared-volume/media:/var/www/cgsy/media
 #      - ./exporter:/tmp/exporter
+#      - ./shared-volume/qrcodes:/tmp/qrcodes
+#      - ./shared-volume/barcodes:/tmp/barcodes
+#      - ./shared-volume/vouchers:/tmp/vouchers
 #    env_file:
 #      - ./env-file
 #      - ./env-admin_intranet-file
