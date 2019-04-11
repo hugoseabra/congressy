@@ -7,6 +7,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
+from gatheros_event.models import Member
 from gatheros_subscription.helpers.voucher import (
     create_voucher,
     get_voucher_file_name,
@@ -1381,6 +1382,23 @@ def notify_invite(organization, link, inviter, invited_person, email):
         Define a notificação para um novo convite
     """
 
+    members = organization.members.filter(
+        group=Member.ADMIN,
+        person__user__is_superuser=False,
+    ).order_by('created')
+
+    if members.count() == 0:
+        members = organization.members.filter(
+            group=Member.ADMIN,
+        ).order_by('created')
+
+    member = members.first()
+
+    if organization.email:
+        org_admin_email = organization.email
+    else:
+        org_admin_email = member.person.email
+
     body = render_to_string('mailer/notify_invitation.html', {
         'organizacao': organization.name,
         'hospedeiro': inviter,
@@ -1394,5 +1412,5 @@ def notify_invite(organization, link, inviter, invited_person, email):
         subject='Convite: {}'.format(organization.name),
         body=body,
         to=email,
-        reply_to=organization.email,
+        reply_to=org_admin_email,
     )
