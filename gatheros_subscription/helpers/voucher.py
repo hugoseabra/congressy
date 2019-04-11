@@ -2,6 +2,8 @@
 
 import base64
 import json
+import os
+from tempfile import gettempdir
 
 import absoluteuri
 import requests
@@ -10,8 +12,8 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
 
-from gatheros_subscription.helpers.barcode import create_barcode
-from gatheros_subscription.helpers.qrcode import create_qrcode
+from gatheros_subscription.helpers.barcode import get_barcode_file_path
+from gatheros_subscription.helpers.qrcode import get_qrcode_file_path
 
 
 def get_logo():
@@ -39,10 +41,19 @@ def get_context(subscription):
     except AttributeError:
         place = None
 
+    barcode_file_path = get_barcode_file_path(subscription)
+    with open(barcode_file_path, 'rb') as barcode_fh:
+        barcode_content = base64.b64encode(barcode_fh.read()).decode('UTF-8')
+        barcode_fh.close()
+
+    with open(get_qrcode_file_path(subscription), 'rb') as qrcode_fh:
+        qrcode_content = base64.b64encode(qrcode_fh.read()).decode('UTF-8')
+        qrcode_fh.close()
+
     context = {
         'base_url': absoluteuri.build_absolute_uri(settings.STATIC_URL),
-        'qrcode': create_qrcode(subscription),
-        'barcode': create_barcode(subscription),
+        'qrcode': qrcode_content,
+        'barcode': barcode_content,
         'logo': get_logo(),
         'event': event,
         'place': place,
@@ -55,7 +66,19 @@ def get_context(subscription):
     return context
 
 
-def create_voucher(subscription):
+def create_voucher(subscription, save=False, force=False):
+    tmp_dir = os.path.join(gettempdir(), 'vouchers')
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+
+    voucher_file_path = os.path.join(
+        tmp_dir,
+        '{}.pdf'.format(subscription.code)
+    )
+
+    if save is True and force is False and os.path.isfile(voucher_file_path):
+        return voucher_file_path
+
     wkhtml_ws_url = settings.WKHTMLTOPDF_WS_URL
 
     html = render_to_string(
@@ -88,8 +111,21 @@ def create_voucher(subscription):
         raise Exception('Could not create PDF: status code: {}'.format(
             response.status_code))
 
-    return ContentFile(response.content,
-                       name=get_voucher_file_name(subscription))
+    pdf_file = ContentFile(
+        response.content,
+        name=get_voucher_file_name(subscription)
+    )
+
+    if save is False:
+        return pdf_file
+
+    with open(voucher_file_path, 'wb') as f:
+        pdf_file.open()
+        f.write(pdf_file.read())
+        f.close()
+        pdf_file.close()
+
+    return voucher_file_path
 
 
 def get_voucher_file_name(subscription):

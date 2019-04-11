@@ -15,14 +15,15 @@ task_params = {
 
 
 @app.task(**task_params)
-def send_mail(self, subject, body, to, reply_to=None, attachment=None, ):
+def send_mail(self, subject, body, to, reply_to=None,
+              attachment_file_path=None, ):
     try:
         return tasks.send_mail(
             subject=subject,
             body=body,
             to=to,
             reply_to=reply_to,
-            attachment=attachment,
+            attachment_file_path=attachment_file_path,
         )
 
     except SMTPAuthenticationError as exc:

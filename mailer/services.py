@@ -194,13 +194,7 @@ def notify_new_user_and_paid_subscription_boleto(event, transaction):
 
     checks.check_notification_transaction_paid_boleto(transaction)
 
-    voucher_file = create_voucher(subscription)
-
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+    voucher_file = create_voucher(subscription, save=True)
 
     person = subscription.person
 
@@ -246,7 +240,7 @@ def notify_new_user_and_paid_subscription_boleto(event, transaction):
         body=body,
         to=person.email,
         reply_to=event.organization.email,
-        attachment=voucher_attach,
+        attachment_file_path=voucher_file,
     )
 
 
@@ -604,13 +598,7 @@ def notify_new_user_and_paid_subscription_credit_card(event, transaction):
 
     checks.check_notification_transaction_paid_credit_card(transaction)
 
-    voucher_file = create_voucher(subscription)
-
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+    voucher_file = create_voucher(subscription, save=True)
 
     person = subscription.person
 
@@ -645,7 +633,7 @@ def notify_new_user_and_paid_subscription_credit_card(event, transaction):
         body=body,
         to=person.email,
         reply_to=event.organization.email,
-        attachment=voucher_attach,
+        attachment_file_path=voucher_file,
     )
 
 
@@ -659,13 +647,7 @@ def notify_new_user_and_paid_subscription_credit_card_with_discrepancy(event,
 
     checks.check_notification_transaction_paid_credit_card(transaction)
 
-    voucher_file = create_voucher(subscription)
-
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+    voucher_file_path = create_voucher(subscription, save=True)
 
     person = subscription.person
 
@@ -699,7 +681,7 @@ def notify_new_user_and_paid_subscription_credit_card_with_discrepancy(event,
         body=body,
         to=person.email,
         reply_to=event.organization.email,
-        attachment=voucher_attach,
+        attachment_file_path=voucher_file_path,
     )
 
 

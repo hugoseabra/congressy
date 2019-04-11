@@ -440,15 +440,16 @@
             var main = $('#drop_down_btn').clone();
             main.remove("id");
 
-
             main.find("#link").attr("href", row['link']).remove("id");
             var edit_link = main.find("#edit_link");
             edit_link.attr("href", row['edit_link']).remove("id");
 
-
             if (row['status'] === 'confirmed') {
                 var voucher_link = main.find("#voucher_link");
-                voucher_link.attr("href", row['voucher_link']).show().remove("id");
+                voucher_link.attr({
+                    'href': row['voucher_link'],
+                    'target': '_blank'
+                }).show().remove("id");
             }
 
             main.show();
@@ -882,6 +883,11 @@
                         },
                     {% else %}
                         {
+                            "targets": 3,
+                            "orderable": true,
+                            "class": 'text-center'
+                        },
+                        {
                             "targets": 4,
                             "orderable": true,
                             "class": 'text-center',
@@ -969,7 +975,7 @@
             {% endif %}
 
             <li>
-                <a id="voucher_link" style="display: none">
+                <a href="javascript:void(0)" id="voucher_link" style="display: none">
                     <i class="fas fa-file-pdf"></i>
                     Voucher
                 </a>
