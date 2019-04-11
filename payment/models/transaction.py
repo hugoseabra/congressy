@@ -107,6 +107,16 @@ class Transaction(models.Model):
         editable=False,
         null=True,
         blank=True,
+        # TODO: Remove this field
+    )
+
+    ticket_lot = models.ForeignKey(
+        'ticket.Lot',
+        on_delete=models.DO_NOTHING,
+        related_name='transactions',
+        editable=False,
+        null=True,
+        blank=True,
     )
 
     part = models.ForeignKey(

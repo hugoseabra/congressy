@@ -58,6 +58,16 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
         verbose_name='categoria',
         related_name='%(class)s_optionals',
         help_text='Para qual categoria de participante se destina.',
+        # TODO: Remove this field
+    )
+
+    ticket = models.ForeignKey(
+        'ticket.Ticket',
+        on_delete=models.PROTECT,
+        verbose_name='ingresso',
+        related_name='%(class)s_optionals',
+        help_text='Para qual ingresso de participante se destina.',
+        null=True,
     )
 
     date_end_sub = models.DateTimeField(
