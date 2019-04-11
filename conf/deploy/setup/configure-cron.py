@@ -1,7 +1,7 @@
 import os
 import sys
 
-sys.path.append("..")
+sys.path.append(sys.path.append(os.path.dirname(os.path.dirname(__file__))))
 
 from scripts import setup
 
@@ -21,6 +21,6 @@ env_dict = {
 # Crontab
 setup(
     env_dict,
-    '/var/www/cgsy/conf/deploy/templates/crontab.j2',
+    '/code/conf/deploy/templates/crontab.j2',
     '/crontab.txt'
 )

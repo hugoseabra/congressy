@@ -1,7 +1,7 @@
 import os
 import sys
 
-sys.path.append("..")
+sys.path.append(sys.path.append(os.path.dirname(os.path.dirname(__file__))))
 
 from scripts import setup
 
@@ -10,7 +10,7 @@ def read_file(file_path):
     if not os.path.exists(file_path):
         return ''
 
-    with open('/var/www/cgsy/version') as f:
+    with open('/code/version') as f:
         content = f.read()
         f.close()
 
@@ -18,11 +18,11 @@ def read_file(file_path):
 
 
 env_dict = {
-    'APP_VERSION': read_file('/var/www/cgsy/version'),
+    'APP_VERSION': read_file('/code/version'),
 }
 
 setup(
     env_dict,
-    '/var/www/cgsy/conf/deploy/templates/footer.j2',
-    '/var/www/cgsy/frontend/templates/base/footer.html'
+    '/code/conf/deploy/templates/footer.j2',
+    '/code/frontend/templates/base/footer.html'
 )

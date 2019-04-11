@@ -77,7 +77,7 @@ if not settings.DEBUG:
         url(
             r'^$',
             RedirectView.as_view(
-                url='https://congressy.com'
+                url='https://ev.congressy.com/login/'
             ),
             name='root'
         ),

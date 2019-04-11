@@ -1,23 +1,20 @@
 #!/usr/bin/env bash
 
-source /scripts.sh
+source /deploy/scripts.sh
 
 # Define settings
 export DJANGO_SETTINGS_MODULE=project.manage.settings.prod
 
-# Celery correction - https://github.com/celery/celery/pull/4078
-export FORKED_BY_MULTIPROCESSING=1
+run_python_script "Configurando WSGI" /deploy/setup/configure-wsgi.py
 
-run_python_script "Configurando WSGI" /configure-wsgi.py
-run_python_script "Configurando NGINX" /configure-nginx.py
-
-run_python_script "Configurando SETTINGS" /configure-settings.py
-run_python_script "Configurando VERSÃO" /configure-version.py
+run_python_script "Configurando SETTINGS" /deploy/setup/configure-settings.py
+run_python_script "Configurando VERSÃO" /deploy/setup/configure-version.py
 run_python_script "Coletando arquivos estáticos" "manage.py collectstatic --noinput --verbosity 0"
 run_python_script_with_output "Atualizando Site ID" "manage.py loaddata 000_site"
 
-echo " > Iniciando SUPERVISOR"
+echo " > Iniciando SERVER"
 echo ;
 echo "########################################################################"
 echo ;
-supervisord -n
+source /deploy/uwsgi-env.sh
+uwsgi --enable-threads --cache 5000 --thunder-lock --show-config

@@ -5,6 +5,8 @@ services:
     restart: always
     networks:
       - wkhtmltopdf
+    volumes:
+      - /etc/localtime:/etc/localtime
 
   manage:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
@@ -15,9 +17,9 @@ services:
     networks:
       - wkhtmltopdf
     ports:
-      - "8000:80"
+      - "8000:8000"
     entrypoint:
-      - /services/web/manage/container-entry.sh
+      - /deploy/services/web/manage/container-entry.sh
     volumes:
       - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/var/www/cgsy/media
@@ -35,36 +37,36 @@ services:
     networks:
       - wkhtmltopdf
     ports:
-      - "8001:80"
+      - "8001:8000"
     volumes:
       - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/var/www/cgsy/media
       - ./shared-volume/exporter:/tmp/exporter
     entrypoint:
-      - /services/web/partner/container-entry.sh
+      - /deploy/services/web/partner/container-entry.sh
     env_file:
       - ./env-file
       - ./env-partner-file
 
-#  admin_intranet:
-#    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
-#    restart: unless-stopped
-#    hostname: HOSTNAME-admin
-#    depends_on:
-#      - wkhtmltopdf
-#    networks:
-#      - wkhtmltopdf
-#    ports:
-#      - "8002:80"
-#    entrypoint:
-#      - /services/web/admin_intranet/container-entry.sh
-#    volumes:
-#      - /etc/localtime:/etc/localtime
-#      - ./shared-volume/media:/var/www/cgsy/media
-#      - ./exporter:/tmp/exporter
-#    env_file:
-#      - ./env-file
-#      - ./env-admin_intranet-file
+  admin_intranet:
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    restart: unless-stopped
+    hostname: HOSTNAME-admin
+    depends_on:
+      - wkhtmltopdf
+    networks:
+      - wkhtmltopdf
+    ports:
+      - "8002:80"
+    entrypoint:
+      - /deploy/services/web/admin_intranet/container-entry.sh
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./shared-volume/media:/var/www/cgsy/media
+      - ./exporter:/tmp/exporter
+    env_file:
+      - ./env-file
+      - ./env-admin_intranet-file
 
 networks:
   wkhtmltopdf:
