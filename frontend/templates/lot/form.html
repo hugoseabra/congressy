@@ -83,6 +83,7 @@
 
                 var num_parts = $('#id_installment_limit');
                 var num_absortion = $('#id_num_install_interest_absortion');
+                num_absortion.show();
 
                 if (!num_parts.length || !num_absortion.length) {
                     return;
@@ -411,7 +412,9 @@
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="buttonbar">
                     <div class="float-right">
-                        <a href="{% url 'subscription:lot-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}" class="btn btn-danger">
+                        <a href="
+                                {% url 'subscription:lot-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}"
+                           class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>
                             Cancelar
                         </a>
@@ -620,7 +623,9 @@
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="buttonbar bottom">
                     <div class="float-right">
-                        <a href="{% url 'subscription:lot-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}" class="btn btn-danger">
+                        <a href="
+                                {% url 'subscription:lot-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}"
+                           class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>Cancelar
                         </a>
                         <button type="submit" class="btn btn-success">
