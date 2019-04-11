@@ -7,6 +7,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
+from gatheros_event.models import Member
 from gatheros_subscription.helpers.voucher import (
     create_voucher,
     get_voucher_file_name,
@@ -194,13 +195,7 @@ def notify_new_user_and_paid_subscription_boleto(event, transaction):
 
     checks.check_notification_transaction_paid_boleto(transaction)
 
-    voucher_file = create_voucher(subscription)
-
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+    voucher_file = create_voucher(subscription, save=True)
 
     person = subscription.person
 
@@ -246,7 +241,7 @@ def notify_new_user_and_paid_subscription_boleto(event, transaction):
         body=body,
         to=person.email,
         reply_to=event.organization.email,
-        attachment=voucher_attach,
+        attachment_file_path=voucher_file,
     )
 
 
@@ -604,13 +599,7 @@ def notify_new_user_and_paid_subscription_credit_card(event, transaction):
 
     checks.check_notification_transaction_paid_credit_card(transaction)
 
-    voucher_file = create_voucher(subscription)
-
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+    voucher_file = create_voucher(subscription, save=True)
 
     person = subscription.person
 
@@ -645,7 +634,7 @@ def notify_new_user_and_paid_subscription_credit_card(event, transaction):
         body=body,
         to=person.email,
         reply_to=event.organization.email,
-        attachment=voucher_attach,
+        attachment_file_path=voucher_file,
     )
 
 
@@ -659,13 +648,7 @@ def notify_new_user_and_paid_subscription_credit_card_with_discrepancy(event,
 
     checks.check_notification_transaction_paid_credit_card(transaction)
 
-    voucher_file = create_voucher(subscription)
-
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+    voucher_file_path = create_voucher(subscription, save=True)
 
     person = subscription.person
 
@@ -699,7 +682,7 @@ def notify_new_user_and_paid_subscription_credit_card_with_discrepancy(event,
         body=body,
         to=person.email,
         reply_to=event.organization.email,
-        attachment=voucher_attach,
+        attachment_file_path=voucher_file_path,
     )
 
 
@@ -1399,6 +1382,23 @@ def notify_invite(organization, link, inviter, invited_person, email):
         Define a notificação para um novo convite
     """
 
+    members = organization.members.filter(
+        group=Member.ADMIN,
+        person__user__is_superuser=False,
+    ).order_by('created')
+
+    if members.count() == 0:
+        members = organization.members.filter(
+            group=Member.ADMIN,
+        ).order_by('created')
+
+    member = members.first()
+
+    if organization.email:
+        org_admin_email = organization.email
+    else:
+        org_admin_email = member.person.email
+
     body = render_to_string('mailer/notify_invitation.html', {
         'organizacao': organization.name,
         'hospedeiro': inviter,
@@ -1412,5 +1412,5 @@ def notify_invite(organization, link, inviter, invited_person, email):
         subject='Convite: {}'.format(organization.name),
         body=body,
         to=email,
-        reply_to=organization.email,
+        reply_to=org_admin_email,
     )

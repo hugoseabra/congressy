@@ -14,7 +14,7 @@ services:
       - "15672:15672"
       - "5672:5672"
     volumes:
-      - ~/rabbitmq-database:/var/lib/rabbitmq/mnesia
+      - rabbitmq_data:/var/lib/rabbitmq/mnesia
 
   flower:
     image: hugoseabra19/docker-celery-flower
@@ -46,9 +46,16 @@ services:
       - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/var/www/cgsy/media
       - ./shared-volume/logs:/var/www/cgsy/logs
+      - ./shared-volume/exporter:/tmp/exporter
+      - ./shared-volume/qrcodes:/tmp/qrcodes
+      - ./shared-volume/barcodes:/tmp/barcodes
+      - ./shared-volume/vouchers:/tmp/vouchers
     env_file: ./env-file
     networks:
       - wkhtmltopdf
+
+volumes:
+  rabbitmq_data:
 
 networks:
   rabbitmq:

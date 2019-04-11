@@ -20,11 +20,11 @@ def send_invitation(invitation):
     })
 
     notify_invite(
-        invitation.author.organization,
-        url,
-        invitation.author.person.name,
-        invitation.to.first_name,
-        invitation.to.email
+        organization=invitation.author.organization,
+        link=url,
+        inviter=invitation.author.person.name,
+        invited_person=invitation.to.first_name,
+        email=invitation.to.email
     )
 
 

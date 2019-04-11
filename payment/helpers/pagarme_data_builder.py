@@ -110,17 +110,13 @@ class PagarmeDataBuilder:
 
         if transaction_type == Transaction.BOLETO:
             # TOTAL: 255 caracteres
-            # Instrução 1: 111 caracteres
-            instructions = 'Após o vencimento não há garantia de que o' \
-                           ' Lote estará disponível. Isso pode mudar o' \
-                           ' preço de sua inscrição.'
 
-            # Instrução 2: 97 caracteres
-            instructions += ' IMPORTANTE: após 3 dias de vencimento do' \
-                            ' boleto, sua vaga será liberada para outro' \
-                            ' participante.'
+            # Instrução 1: 99 caracteres
+            instructions = 'IMPORTANTE:  Após o vencimento não há garantia ' \
+                           'do mesmo valor e sua reserva de vaga poderá ' \
+                           'expirar.'
 
-            # Instrução 3: 47 caracteres
+            # Instrução 2: 47 caracteres
             instructions += 'Ev.: {}. Lote: {}. Insc.: {}.'.format(
                 self.subscription.event.name[:8],
                 self.subscription.lot.name[:8],

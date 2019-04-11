@@ -1,6 +1,7 @@
 """
 Task to send e-mails
 """
+import os
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
@@ -8,7 +9,7 @@ from django.utils import six
 from lxml import html
 
 
-def send_mail(subject, body, to, reply_to=None, attachment=None):
+def send_mail(subject, body, to, reply_to=None, attachment_file_path=None):
     """ Envia um email """
     if not to:
         to = []
@@ -31,14 +32,31 @@ def send_mail(subject, body, to, reply_to=None, attachment=None):
 
     mail.attach_alternative(body, 'text/html')
 
-    if attachment and isinstance(attachment, MailerAttachment):
-        mail.attach(attachment.name, attachment.content, attachment.mime)
+    if attachment_file_path and os.path.isfile(attachment_file_path):
+        mail.attach_file(attachment_file_path)
 
     return mail.send(False)
 
 
 class MailerAttachment(object):
+
     def __init__(self, name, content, mime):
         self.name = name
         self.content = content
         self.mime = mime
+
+    def __json__(self):
+        return dict(self)
+
+    def __iter__(self):
+        iters = {
+            'name': self.name,
+            'content': self.content,
+            'mime': self.mime,
+        }
+
+        # now 'yield' through the items
+        for x, y in iters.items():
+            yield x, y
+
+    to_json = __json__  # supported by simplejson
