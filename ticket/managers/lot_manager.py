@@ -26,13 +26,35 @@ class LotManager(Manager):
 
         return price
 
-    def clean_limit(self):
+    def clean_ticket(self):
+        ticket = self.cleaned_data['ticket']
 
-        limit = self.cleaned_data.get('limit')
-        ticket = self.cleaned_data.get('ticket')
+        if self.instance.pk is not None:
+
+            if ticket.pk != self.instance.ticket.pk:
+                raise ValidationError('não é permitido mudar o ingresso')
+
+        return ticket
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if len(self.errors) > 0:
+            return cleaned_data
+
+        self._clean_limit(cleaned_data)
+        self._clean_dates(cleaned_data)
+
+        return cleaned_data
+
+    # noinspection PyMethodMayBeStatic
+    def _clean_limit(self, cleaned_data):
+
+        limit = cleaned_data.get('limit')
+        ticket = cleaned_data.get('ticket')
 
         if limit is None:
-            limit = 0
+            return limit
 
         ticket_limit = ticket.limit or 0
 
@@ -50,29 +72,11 @@ class LotManager(Manager):
                 "vagas da categoria"
             )
 
-    def clean(self):
-        cleaned_data = super().clean()
+    def _clean_dates(self, cleaned_data):
 
-        self._clean_dates()
-
-        return cleaned_data
-
-    def _lot_has_subscriptions(self):
-
-        return bool(
-            Subscription.objects.filter(
-                ticket_lot_id=self.instance.pk,
-                test_subscription=False,
-                completed=True,
-                status=Subscription.CONFIRMED_STATUS,
-            ).count()
-        )
-
-    def _clean_dates(self):
-
-        date_start = self.cleaned_data.get('date_start')
-        date_end = self.cleaned_data.get('date_end')
-        ticket = self.cleaned_data.get('ticket')
+        date_start = cleaned_data.get('date_start')
+        date_end = cleaned_data.get('date_end')
+        ticket = cleaned_data.get('ticket')
 
         if date_start == date_end:
             raise ValidationError("Data de inicio e fim não podem ser iguais")
@@ -99,3 +103,14 @@ class LotManager(Manager):
                 msg = "Esse lote possui a data de inicio dentro do " \
                       "lote: '{}'".format(lot.name)
                 raise ValidationError(msg)
+
+    def _lot_has_subscriptions(self):
+
+        return bool(
+            Subscription.objects.filter(
+                ticket_lot_id=self.instance.pk,
+                test_subscription=False,
+                completed=True,
+                status=Subscription.CONFIRMED_STATUS,
+            ).count()
+        )

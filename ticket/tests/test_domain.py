@@ -133,3 +133,23 @@ class LotDomainTest(TestCase):
         sub.save()
 
         self.assertFalse(LotManager(instance=lot, data=d).is_valid())
+
+    def test_ticket_change(self):
+        t = self.mock_factory.fake_ticket(event=self.event)
+        lot = self.mock_factory.fake_lot(ticket=t)
+
+        new_ticket = self.mock_factory.fake_ticket(event=self.event)
+
+        d = {
+            'name': lot.name,
+            'ticket': new_ticket.pk,
+            'date_start': lot.date_start,
+            'date_end': lot.date_end,
+            'price': 300.00,
+        }
+
+        self.assertFalse(LotManager(instance=lot, data=d).is_valid())
+
+        d['ticket'] = lot.ticket.pk
+
+        self.assertTrue(LotManager(instance=lot, data=d).is_valid())

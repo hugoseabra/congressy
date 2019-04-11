@@ -11,11 +11,10 @@ from rest_framework.response import Response
 from gatheros_subscription.models import Subscription
 from ticket.models import Ticket, Lot
 from ticket.serializers import TicketSerializer, LotSerializer
-from .permissions import OrganizerOnly
+from .permissions import TicketOrganizerOnly, LotOrganizerOnly
 
 
 class TicketRestrictionMixin:
-    permission_classes = (IsAuthenticated, OrganizerOnly)
     authentication_classes = (
         SessionAuthentication,
         BasicAuthentication,
@@ -24,6 +23,7 @@ class TicketRestrictionMixin:
 
 
 class TicketViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, TicketOrganizerOnly)
     serializer_class = TicketSerializer
     queryset = Ticket.objects.all()
 
@@ -100,5 +100,78 @@ class TicketViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
 
 
 class LotViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, LotOrganizerOnly)
     serializer_class = LotSerializer
     queryset = Lot.objects.all()
+
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        ticket = serializer.validated_data.get('ticket')
+
+        event = ticket.event
+
+        event_organizers = [m.person.user for m in
+                            event.organization.members.filter(active=True)]
+
+        if request.user not in event_organizers:
+            raise PermissionDenied()
+
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED,
+            headers=headers,
+        )
+
+    def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        events = list()
+
+        if hasattr(request.user, 'person'):
+
+            for m in request.user.person.members.filter(active=True):
+
+                organization = m.organization
+
+                for event in organization.events.all():
+                    if event not in events:
+                        events.append(event.pk)
+
+        qs = Lot.objects.filter(
+            ticket__event_id__in=events,
+        )
+
+        queryset = self.filter_queryset(qs)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+
+        instance = self.get_object()
+
+        if self._ticket_has_subscriptions(instance):
+            return Response(status=status.HTTP_409_CONFLICT)
+
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @staticmethod
+    def _ticket_has_subscriptions(lot: Lot):
+
+        return bool(
+            Subscription.objects.filter(
+                ticket_lot_id=lot.pk,
+                test_subscription=False,
+                completed=True,
+                status=Subscription.CONFIRMED_STATUS,
+            ).count()
+        )

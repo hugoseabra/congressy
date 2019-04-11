@@ -38,13 +38,15 @@ Nenhuma.
 
 Regras de Negócio
 -------------------------------------
+- Ingresso:
+    - Não é possivel absorver mais de 10 parcelas.
+    - Uma vez criado, o evento do ticket é imutavel.
+
 - Lote:
     - Não pode haver conflito de data com lotes.
     - Ao criar e houver limite de vaga, verificar se o limite, somado aos outros lotes, ultrapassa o limite define na categoria.
     - Se há inscrições confirmadas não permitir mudar preço.
-- Ingresso:
-    - Não é possivel absorver mais de 10 parcelas.
-    - Uma vez criado, o evento do ticket é imutavel.
+    - Uma vez criado, o ticket do lote é imutavel.
 
 
 Permissões de acesso
