@@ -9,7 +9,7 @@ from gatheros_subscription.helpers.subscription_async_exporter import \
 logger = logging.getLogger(__name__)
 
 
-@app.task(ignore_result=True)
+@app.task(bind=True, ignore_result=True)
 def async_subscription_exporter_task(event_pk: int) -> None:
     event = Event.objects.get(pk=event_pk)
 
