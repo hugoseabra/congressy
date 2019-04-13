@@ -8,6 +8,22 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
 
+  celery:
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    restart: unless-stopped
+    hostname: HOSTNAME-celery
+    networks:
+      - wkhtmltopdf
+    entrypoint:
+      - /deploy/services/celery/container-entry.sh
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./shared-volume/media:/var/www/cgsy/media
+      - ./shared-volume/exporter:/tmp/exporter
+    env_file:
+      - ./env-file
+      - ./env-manage-file
+
   manage:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped

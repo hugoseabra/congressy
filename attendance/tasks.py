@@ -15,12 +15,10 @@ def async_attendance_exporter_task(service_pk: int) -> None:
 
     exporter = AttendanceServiceAsyncExporter(service)
 
-    assert exporter.has_export_lock(), \
-        "Attempting to export with no lock file on event id: {}, " \
-        "attendance id: {}".format(
-            service.event.pk,
-            service.pk,
-        )
+    if exporter.has_export_lock():
+        raise Exception('Exportação já está em andamento por outro usuário.')
+
+    exporter.create_export_lock()
 
     payload = export_attendance(service)
     if exporter.has_existing_export_files():

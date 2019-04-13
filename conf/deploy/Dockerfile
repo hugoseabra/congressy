@@ -22,6 +22,7 @@ RUN set -ex \
         libxml2 \
     " \
     && seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{} \
+
     && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -53,13 +54,20 @@ RUN set -ex \
         libxslt-dev \
         python-dev \
     " \
+    && seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{} \
     && apt-get update && apt-get install -y --no-install-recommends $BUILD_DEPS \
     && pip3 install -U pip \
     # Exclusive packages for production environment.
-    && pip3 install -U uwsgi==2.0.18 raven==6.10 sparkpost==1.3.6 s3cmd==2.0.2 jinja2==2.10.1 \
     && pip3 install --no-cache-dir -r /requirements.pip \
     # Django packs, after pip to avoid unnecessary download
-    && pip3 install --no-cache-dir -U django-uwsgi==0.2.2 django-uwsgi-cache==1.0.1 \
+    && pip3 install --no-cache-dir -U \
+        uwsgi==2.0.18 \
+        raven==6.10 \
+        sparkpost==1.3.6 \
+        s3cmd==2.0.2 \
+        jinja2==2.10.1 \
+        django-uwsgi==0.2.2 \
+        django-uwsgi-cache==1.0.1 \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -75,6 +83,7 @@ COPY ./. ./.
 
 RUN chmod +x /deploy/services/volume/container-entry.sh \
               /deploy/services/migration/container-entry.sh \
+              /deploy/services/celery/container-entry.sh \
               /deploy/services/cron/container-entry.sh \
               /deploy/services/web/manage/container-entry.sh \
               /deploy/services/web/partner/container-entry.sh \
