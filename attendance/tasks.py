@@ -9,7 +9,7 @@ from gatheros_subscription.celery import app
 logger = logging.getLogger(__name__)
 
 
-@app.task(ignore_result=True)
+@app.task(bind=True, ignore_result=True)
 def async_attendance_exporter_task(service_pk: int) -> None:
     service = AttendanceService.objects.get(pk=service_pk)
 

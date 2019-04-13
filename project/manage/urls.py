@@ -70,18 +70,8 @@ public_urlpatterns = [
 
 public_urlpatterns += [
     url(r'^captcha/', include('captcha.urls')),
+    url(r'^$', RedirectView.as_view(url='/login/'), name='root'),
 ]
-
-if not settings.DEBUG:
-    public_urlpatterns += [
-        url(
-            r'^$',
-            RedirectView.as_view(
-                url='https://ev.congressy.com/login/'
-            ),
-            name='root'
-        ),
-    ]
 
 # API
 api_urls = [

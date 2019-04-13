@@ -376,6 +376,7 @@ pipeline:
       - 172.31.35.124
       - 172.31.47.46
       - 172.31.35.111
+      - 172.31.33.85
     port: 22
     user: ec2-user
     source: ./bin/env/prod/previous_version
@@ -415,6 +416,9 @@ pipeline:
       - 172.31.40.208
       - 172.31.35.124
       - 172.31.47.46
+      - 172.31.35.111
+      - 172.31.38.106
+      - 172.31.33.85
     port: 22
     user: ec2-user
     source: ./conf/deploy/docker-compose.yml

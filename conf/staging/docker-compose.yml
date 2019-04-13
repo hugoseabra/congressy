@@ -39,6 +39,8 @@ services:
       - /etc/localtime:/etc/localtime
       - ./media:/var/www/cgsy/media
       - ./exporter:/tmp/exporter
+      - ./barcodes:/tmp/barcodes
+      - ./vouchers:/tmp/vouchers
 
   cron:
     image: cgsy-staging
@@ -59,6 +61,8 @@ services:
       - /etc/localtime:/etc/localtime
       - ./media:/var/www/cgsy/media
       - ./exporter:/tmp/exporter
+      - ./barcodes:/tmp/barcodes
+      - ./vouchers:/tmp/vouchers
 
   manage:
     image: cgsy-staging
@@ -80,6 +84,9 @@ services:
       - /etc/localtime:/etc/localtime
       - ./media:/var/www/cgsy/media
       - ./exporter:/tmp/exporter
+      - ./qrcodes:/tmp/qrcodes
+      - ./barcodes:/tmp/barcodes
+      - ./vouchers:/tmp/vouchers
 
 networks:
   postgres:
