@@ -251,7 +251,13 @@ class AttendanceServiceExporterViewSet(RestrictionViewMixin, APIView):
 
         service = AttendanceService.objects.get(pk=service_pk)
 
-        async_attendance_exporter_task.delay(service.pk)
+        exporter = AttendanceServiceAsyncExporter(service)
+
+        if exporter.has_export_lock():
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        async_attendance_exporter_task.delay(event_pk=service.event_id,
+                                             service_pk=service.pk)
 
         return HttpResponse(status=status.HTTP_201_CREATED)
 
