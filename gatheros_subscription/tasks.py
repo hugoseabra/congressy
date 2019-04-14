@@ -9,13 +9,12 @@ from gatheros_subscription.helpers.subscription_async_exporter import \
           rate_limit='5/m',  # Processaar até 5 tasks por minuto
           default_retry_delay=30,  # retry in 30s
           ignore_result=True)
-def async_subscription_exporter_task(*args, **kwargs) -> None:
-    event_pk = kwargs.get('event_pk')
+def async_subscription_exporter_task(self, event_pk: int) -> None:
+    event = Event.objects.get(pk=event_pk)
+
+    exporter = SubscriptionServiceAsyncExporter(event)
+
     try:
-        event = Event.objects.get(pk=event_pk)
-
-        exporter = SubscriptionServiceAsyncExporter(event)
-
         if exporter.has_export_lock():
             raise Exception(
                 'Exportação já está em andamento por outro usuário.'
@@ -31,4 +30,5 @@ def async_subscription_exporter_task(*args, **kwargs) -> None:
 
         exporter.remove_export_lock()
     except Exception as e:
+        exporter.remove_export_lock()
         raise self.retry(exec=e)
