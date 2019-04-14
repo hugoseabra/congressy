@@ -1,3 +1,8 @@
+# -----------------------------------------------------------------------------
+# Docker IMAGE congressy/cgsy
+# docker build --rm -t cgsy .
+# docker tag catalog <repo_url>/cgsy:<tag>
+# -----------------------------------------------------------------------------
 FROM python:3.6-slim
 
 # Celery does not work with root unless you force it

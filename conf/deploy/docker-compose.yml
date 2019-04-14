@@ -20,9 +20,7 @@ services:
       - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/var/www/cgsy/media
       - ./shared-volume/exporter:/tmp/exporter
-    env_file:
-      - ./env-file
-      - ./env-manage-file
+    env_file: ./env-file
 
   manage:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest

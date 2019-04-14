@@ -20,7 +20,7 @@ services:
     container_name: migration-staging
     hostname: migration-staging
     entrypoint:
-      - /services/migration/container-entry.sh
+      - /deploy/services/migration/container-entry.sh
     env_file:
       - /tmp/staging-files/env-manage-staging
     networks:
@@ -33,7 +33,7 @@ services:
     depends_on:
       - migration
     entrypoint:
-      - /services/volume/container-entry.sh
+      - /deploy/services/volume/container-entry.sh
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
@@ -41,6 +41,24 @@ services:
       - ./exporter:/tmp/exporter
       - ./barcodes:/tmp/barcodes
       - ./vouchers:/tmp/vouchers
+
+  celery:
+    image: cgsy-staging
+    restart: unless-stopped
+    hostname: HOSTNAME-celery
+    networks:
+      - wkhtmltopdf
+      - rabbitmq
+    entrypoint:
+      - /deploy/services/celery/container-entry.sh
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./media:/var/www/cgsy/media
+      - ./exporter:/tmp/exporter
+      - ./qrcodes:/tmp/qrcodes
+      - ./barcodes:/tmp/barcodes
+      - ./vouchers:/tmp/vouchers
+    env_file: /tmp/staging-files/env-manage-staging
 
   cron:
     image: cgsy-staging
@@ -50,7 +68,7 @@ services:
       - migration
       - volume
     entrypoint:
-      - /services/cron/container-entry.sh
+      - /deploy/services/cron/container-entry.sh
     networks:
       - postgres
       - mailhog
@@ -71,14 +89,14 @@ services:
     depends_on:
       - migration
     entrypoint:
-      - /services/web/manage/container-entry.sh
+      - /staging/services/web/manage/container-entry.sh
     networks:
       - postgres
       - mailhog
       - wkhtmltopdf
       - rabbitmq
     ports:
-      - "8080:80"
+      - "8080:8000"
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
