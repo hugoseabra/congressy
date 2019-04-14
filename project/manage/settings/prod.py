@@ -83,15 +83,15 @@ PAGARME_ENCRYPTION_KEY = 'ek_live_Hlpg45VTiyNOnAE4dmkEBbQDEtUZCX'
 PAGARME_RECIPIENT_ID = 're_cjaskozwr01u1of5zo7kc962u'
 # ============================== SENTRY ===================================== #
 # Sentry integration
-RAVEN_CONFIG = {
-    'environment': 'production',
-    'dsn': '{{ SENTRY_PRIVATE_DSN }}',
-    'release': '{{ APP_VERSION }}',
-}
+# RAVEN_CONFIG = {
+#     'environment': 'production',
+#     'dsn': '{{ SENTRY_PRIVATE_DSN }}',
+#     'release': '{{ APP_VERSION }}',
+# }
 
 # ============================ WKHTMLTOPDF  ================================== #
 WKHTMLTOPDF_WS_URL = 'http://wkhtmltopdf'
 
 # =============================== CELERY ==================================== #
-CELERY_BROKER_URL = 'amqp://congressy:cgsy1601@{{ RABBITMQ_SERVER }}:5672/'
-CELERY_RESULT_BACKEND = 'amqp://congressy:cgsy1601@{{ RABBITMQ_SERVER }}:5672/'
+CELERY_BROKER_URL = 'amqp://cgsy:cgsy@{{ RABBITMQ_SERVER }}:5672/'
+CELERY_RESULT_BACKEND = 'amqp://cgsy:cgsy@{{ RABBITMQ_SERVER }}:5672/'

@@ -254,10 +254,10 @@ class AttendanceServiceExporterViewSet(RestrictionViewMixin, APIView):
         exporter = AttendanceServiceAsyncExporter(service)
 
         if exporter.has_export_lock():
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
-        exporter.create_export_lock()
-        async_attendance_exporter_task.delay(service.pk)
+        async_attendance_exporter_task.delay(event_pk=service.event_id,
+                                             service_pk=service.pk)
 
         return HttpResponse(status=status.HTTP_201_CREATED)
 
