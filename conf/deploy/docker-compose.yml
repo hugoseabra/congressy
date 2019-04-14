@@ -5,6 +5,22 @@ services:
     restart: always
     networks:
       - wkhtmltopdf
+    volumes:
+      - /etc/localtime:/etc/localtime
+
+  celery:
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    restart: unless-stopped
+    hostname: HOSTNAME-celery
+    networks:
+      - wkhtmltopdf
+    entrypoint:
+      - /deploy/services/celery/container-entry.sh
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./shared-volume/media:/var/www/cgsy/media
+      - ./shared-volume/exporter:/tmp/exporter
+    env_file: ./env-file
 
   manage:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
@@ -15,9 +31,9 @@ services:
     networks:
       - wkhtmltopdf
     ports:
-      - "8000:80"
+      - "8000:8000"
     entrypoint:
-      - /services/web/manage/container-entry.sh
+      - /deploy/services/web/manage/container-entry.sh
     volumes:
       - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/var/www/cgsy/media
@@ -38,7 +54,7 @@ services:
     networks:
       - wkhtmltopdf
     ports:
-      - "8001:80"
+      - "8001:8000"
     volumes:
       - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/var/www/cgsy/media
@@ -47,33 +63,33 @@ services:
       - ./shared-volume/barcodes:/tmp/barcodes
       - ./shared-volume/vouchers:/tmp/vouchers
     entrypoint:
-      - /services/web/partner/container-entry.sh
+      - /deploy/services/web/partner/container-entry.sh
     env_file:
       - ./env-file
       - ./env-partner-file
 
-#  admin_intranet:
-#    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
-#    restart: unless-stopped
-#    hostname: HOSTNAME-admin
-#    depends_on:
-#      - wkhtmltopdf
-#    networks:
-#      - wkhtmltopdf
-#    ports:
-#      - "8002:80"
-#    entrypoint:
-#      - /services/web/admin_intranet/container-entry.sh
-#    volumes:
-#      - /etc/localtime:/etc/localtime
-#      - ./shared-volume/media:/var/www/cgsy/media
-#      - ./exporter:/tmp/exporter
-#      - ./shared-volume/qrcodes:/tmp/qrcodes
-#      - ./shared-volume/barcodes:/tmp/barcodes
-#      - ./shared-volume/vouchers:/tmp/vouchers
-#    env_file:
-#      - ./env-file
-#      - ./env-admin_intranet-file
+  admin_intranet:
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    restart: unless-stopped
+    hostname: HOSTNAME-admin
+    depends_on:
+      - wkhtmltopdf
+    networks:
+      - wkhtmltopdf
+    ports:
+      - "8002:80"
+    entrypoint:
+      - /deploy/services/web/admin_intranet/container-entry.sh
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./shared-volume/media:/var/www/cgsy/media
+      - ./shared-volume/exporter:/tmp/exporter
+      - ./shared-volume/qrcodes:/tmp/qrcodes
+      - ./shared-volume/barcodes:/tmp/barcodes
+      - ./shared-volume/vouchers:/tmp/vouchers
+    env_file:
+      - ./env-file
+      - ./env-admin_intranet-file
 
 networks:
   wkhtmltopdf:

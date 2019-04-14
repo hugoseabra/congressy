@@ -1,12 +1,7 @@
 import logging
-import os
 
 from celery import Celery
 from kombu import Queue, Exchange
-
-logger = logging.getLogger("Celery[Mailer]")
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.manage.settings.dev')
 
 CELERY_QUEUES = (
     Queue(
@@ -16,6 +11,8 @@ CELERY_QUEUES = (
         durable=True,
     ),
 )
+
+logger = logging.getLogger("Celery[Mailer]")
 
 app = Celery('mailer')
 app.config_from_object('django.conf:settings', namespace='CELERY')

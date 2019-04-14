@@ -36,17 +36,6 @@ public_urlpatterns += [
     url(r'^captcha/', include('captcha.urls')),
 ]
 
-if not settings.DEBUG:
-    public_urlpatterns += [
-        url(
-            r'^$',
-            RedirectView.as_view(
-                url='https://congressy.com'
-            ),
-            name='root'
-        ),
-    ]
-
 urlpatterns = private_urlpatterns
 urlpatterns += public_urlpatterns
 

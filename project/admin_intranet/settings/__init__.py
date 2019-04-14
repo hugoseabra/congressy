@@ -2,7 +2,7 @@
 from project.base_settings import *
 
 # ========================== BASE CONFIGURATION ============================= #
-ROOT_URLCONF = 'project.admin_intranet.urls'
+ROOT_URLCONF = 'project.manage.urls'
 # ================================= APPS ==================================== #
 INSTALLED_APPS += [
     'gatheros_event',
@@ -11,6 +11,8 @@ INSTALLED_APPS += [
     'mailer',
     'payment_debt',
     'payment',
+    'partner',
+    'hotsite',
     'survey',
     'addon',
     'associate',
@@ -21,8 +23,9 @@ INSTALLED_APPS += [
     'importer',
     'attendance',
     'service_tags',
-    'admin_intranet',
     'mix_boleto',
+    'installment',
+    'cgsy_commands',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'
@@ -44,4 +47,16 @@ MEDIA_URL = '/media/'
 # ============================== FIXTURES =================================== #
 FIXTURE_DIRS += [
     os.path.join(BASE_DIR, 'project', 'admin_intranet', 'fixtures'),
+    os.path.join(BASE_DIR, 'gatheros_event', 'tests', 'fixtures'),
+    os.path.join(BASE_DIR, 'gatheros_subscription', 'tests', 'fixtures'),
+    os.path.join(BASE_DIR, 'payment', 'tests', 'fixtures'),
+    os.path.join(BASE_DIR, 'addon', 'tests', 'fixtures'),
+    os.path.join(BASE_DIR, 'survey', 'tests', 'fixtures'),
 ]
+# ============================= TEMPLATES =================================== #
+TEMPLATES[0]['OPTIONS']['context_processors'].append(
+    'gatheros_event.context_processors.account',
+)
+
+# ============================ GOOGLE RECAPTCHA ============================= #
+GOOGLE_RECAPTCHA_SECRET_KEY = '6Lerw18UAAAAAGJyU5G_3CZN6Et4ZTcIhLiUhawX'
