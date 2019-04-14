@@ -47,6 +47,8 @@ services:
     restart: unless-stopped
     hostname: HOSTNAME-celery
     networks:
+      - postgres
+      - mailhog
       - wkhtmltopdf
       - rabbitmq
     entrypoint:
