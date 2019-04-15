@@ -11,7 +11,7 @@ up:
 
 down:
 	ps x --no-header -o pid,cmd | awk '!/awk/&&/celery/{print $$1}' | xargs -r kill;
-	docker-compose -f bin/env/docker-compose_dev.yml down --remove-orphans;
+	docker-compose -f bin/env/docker-compose_dev.yml down --remove-orphans; docker volume prune -f;
 
 
 clean:
