@@ -5,13 +5,13 @@ up:
 	celery -A attendance -A mailer -A gatheros_subscription worker --loglevel=INFO --detach;
 	mkdir -p /tmp/bkp;
 	sudo cp bin/env/extension_installer.sh /tmp/bkp/;
-	docker-compose -f bin/env/docker-compose_dev.yml up -d --remove-orphans;
-	docker-compose -f bin/env/docker-compose_dev.yml logs -f;
+	docker-compose  up -d --remove-orphans;
+	docker-compose  logs -f;
 
 
 down:
 	ps x --no-header -o pid,cmd | awk '!/awk/&&/celery/{print $$1}' | xargs -r kill;
-	docker-compose -f bin/env/docker-compose_dev.yml down --remove-orphans; docker volume prune -f;
+	docker-compose  down --remove-orphans; docker volume prune -f;
 
 
 clean:
@@ -24,7 +24,7 @@ debug_broker:
 
 
 logs:
-	docker-compose -f bin/env/docker-compose_dev.yml logs -f
+	docker-compose  logs -f
 
 
 pgadmin:
