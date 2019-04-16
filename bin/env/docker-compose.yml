@@ -1,63 +1,63 @@
 version: '3.5'
 services:
-    postgres:
-      image: postgres:9.6-alpine
-      container_name: cgsy-postgres
-      networks:
-        - postgres
-      volumes:
-        - /etc/localtime:/etc/localtime
-        - /tmp/bkp:/docker-entrypoint-initdb.d
-      ports:
-        - "5432:5432"
-      environment:
-        - POSTGRES_DB=cgsyplatform
-        - POSTGRES_USER=congressy
-        - POSTGRES_PASSWORD=congressy
+  postgres:
+    image: postgres:9.6-alpine
+    container_name: cgsy-postgres
+    networks:
+      - postgres
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /tmp/bkp:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=cgsyplatform
+      - POSTGRES_USER=congressy
+      - POSTGRES_PASSWORD=congressy
 
-    mailhog:
-      image: blueimp/mailhog
-      container_name: mailhog
-      networks:
-        - mailhog
-      ports:
-        - "1025:1025"
-        - "8025:8025"
+  mailhog:
+    image: blueimp/mailhog
+    container_name: mailhog
+    networks:
+      - mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
-    wkhtmltopdf:
-      image: openlabs/docker-wkhtmltopdf-aas
-      container_name: wkhtmltopdf
-      networks:
-        - wkhtmltopdf
-      ports:
-        - "5010:80"
+  wkhtmltopdf:
+    image: openlabs/docker-wkhtmltopdf-aas
+    container_name: wkhtmltopdf
+    networks:
+      - wkhtmltopdf
+    ports:
+      - "5010:80"
 
-    rabbitmq:
-      image: rabbitmq:3-management
-      container_name: cgsy-rabbitmq
-      hostname: cgsyrabbitmq # database unique name
-      networks:
-        - rabbitmq
-      environment:
-        - RABBITMQ_DEFAULT_USER=cgsy
-        - RABBITMQ_DEFAULT_PASS=cgsy
-        - RABBITMQ_ERLANG_COOKIE=cgsyrabbitmqservice
-      ports:
-        - "15672:15672"
-        - "5672:5672"
-      volumes:
-        - ~/rabbitmq-database:/var/lib/rabbitmq/mnesia
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: cgsy-rabbitmq
+    hostname: cgsyrabbitmq # database unique name
+    networks:
+      - rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=cgsy
+      - RABBITMQ_DEFAULT_PASS=cgsy
+      - RABBITMQ_ERLANG_COOKIE=cgsyrabbitmqservice
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - ~/rabbitmq-database:/var/lib/rabbitmq/mnesia
 
-    flower:
-      image: hugoseabra19/docker-celery-flower
-      container_name: cgsy-flower
-      environment:
-        - CELERY_BROKER_URL=amqp://cgsy:cgsy@rabbitmq:5672/
-        - FLOWER_PORT=5555
-      ports:
-        - 5555:5555
-      networks:
-        - rabbitmq
+  flower:
+    image: hugoseabra19/docker-celery-flower
+    container_name: cgsy-flower
+    environment:
+      - CELERY_BROKER_URL=amqp://cgsy:cgsy@rabbitmq:5672/
+      - FLOWER_PORT=5555
+    ports:
+      - 5555:5555
+    networks:
+      - rabbitmq
 
 networks:
   postgres:
