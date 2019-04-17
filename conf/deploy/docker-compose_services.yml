@@ -49,8 +49,8 @@ services:
       - /deploy/services/cron/container-entry.sh
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./shared-volume/media:/var/www/cgsy/media
-      - ./shared-volume/logs:/var/www/cgsy/logs
+      - ./shared-volume/media:/code/media
+      - ./shared-volume/logs:/code/logs
       - ./shared-volume/exporter:/tmp/exporter
       - ./shared-volume/qrcodes:/tmp/qrcodes
       - ./shared-volume/barcodes:/tmp/barcodes

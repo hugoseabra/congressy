@@ -95,7 +95,10 @@ pipeline:
       dbname_staging,
       dbport_staging,
       sentry_public_dsn,
-      sentry_private_dsn
+      sentry_private_dsn,
+      rabbitmq_user,
+      rabbitmq_pass,
+      rabbitmq_server
     ]
     commands:
       - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.staging" > /tmp/staging-files/env-manage-staging
@@ -112,6 +115,8 @@ pipeline:
       - echo "DBPORT=$${DBPORT_STAGING}" >> /tmp/staging-files/env-manage-staging
       - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> /tmp/staging-files/env-manage-staging
       - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> /tmp/staging-files/env-manage-staging
+      - echo "RABBITMQ_USER=$${RABBITMQ_USER}" >> /tmp/staging-files/env-manage-staging
+      - echo "RABBITMQ_PASS=$${RABBITMQ_PASS}" >> /tmp/staging-files/env-manage-staging
       - echo "RABBITMQ_SERVER=rabbitmq" >> /tmp/staging-files/env-manage-staging
     when:
       branch: [ hotfix/*, release/* ]
@@ -287,6 +292,10 @@ pipeline:
         target: SENTRY_PUBLIC_DSN
       - source: SENTRY_PRIVATE_DSN
         target: SENTRY_PRIVATE_DSN
+      - source: RABBITMQ_USER
+        target: RABBITMQ_USER
+      - source: RABBITMQ_PASS
+        target: RABBITMQ_PASS
       - source: RABBITMQ_SERVER
         target: RABBITMQ_SERVER
     envs: [
@@ -307,6 +316,8 @@ pipeline:
       dbport,
       sentry_public_dsn,
       sentry_private_dsn,
+      rabbitmq_user,
+      rabbitmq_pass,
       rabbitmq_server
     ]
     script:
@@ -332,6 +343,8 @@ pipeline:
       - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
       - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
       - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
+      - echo "RABBITMQ_USER=$${RABBITMQ_USER}" >> ~/cgsy/env-file
+      - echo "RABBITMQ_PASS=$${RABBITMQ_PASS}" >> ~/cgsy/env-file
       - echo "RABBITMQ_SERVER=$${RABBITMQ_SERVER}" >> ~/cgsy/env-file
 
       # env-file do stack de produção - manage

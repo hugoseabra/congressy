@@ -18,7 +18,7 @@ services:
       - /deploy/services/celery/container-entry.sh
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./shared-volume/media:/var/www/cgsy/media
+      - ./shared-volume/media:/code/media
       - ./shared-volume/exporter:/tmp/exporter
       - ./shared-volume/qrcodes:/tmp/qrcodes
       - ./shared-volume/barcodes:/tmp/barcodes
@@ -29,6 +29,12 @@ services:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
     hostname: HOSTNAME-manage
+    healthcheck:
+      test: "/code/bin/env/healthcheck.sh"
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 15s
     depends_on:
       - wkhtmltopdf
     networks:
@@ -39,7 +45,7 @@ services:
       - /deploy/services/web/manage/container-entry.sh
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./shared-volume/media:/var/www/cgsy/media
+      - ./shared-volume/media:/code/media
       - ./shared-volume/exporter:/tmp/exporter
       - ./shared-volume/qrcodes:/tmp/qrcodes
       - ./shared-volume/barcodes:/tmp/barcodes
@@ -52,6 +58,12 @@ services:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
     hostname: HOSTNAME-partner
+    healthcheck:
+      test: "/code/bin/env/healthcheck.sh"
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 15s
     depends_on:
       - wkhtmltopdf
     networks:
@@ -60,7 +72,7 @@ services:
       - "8001:8000"
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./shared-volume/media:/var/www/cgsy/media
+      - ./shared-volume/media:/code/media
       - ./shared-volume/exporter:/tmp/exporter
       - ./shared-volume/qrcodes:/tmp/qrcodes
       - ./shared-volume/barcodes:/tmp/barcodes
@@ -75,6 +87,12 @@ services:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
     hostname: HOSTNAME-admin
+    healthcheck:
+      test: "/code/bin/env/healthcheck.sh"
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 15s
     depends_on:
       - wkhtmltopdf
     networks:
@@ -85,7 +103,7 @@ services:
       - /deploy/services/web/admin_intranet/container-entry.sh
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./shared-volume/media:/var/www/cgsy/media
+      - ./shared-volume/media:/code/media
       - ./shared-volume/exporter:/tmp/exporter
       - ./shared-volume/qrcodes:/tmp/qrcodes
       - ./shared-volume/barcodes:/tmp/barcodes
