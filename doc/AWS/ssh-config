@@ -1,0 +1,183 @@
+
+host congressy-app
+    Hostname 34.230.221.176
+    User ubuntu
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem
+
+host congressy-legacy
+    Hostname 18.204.212.34
+    User ubuntu
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+
+host cgsy-platform
+    Hostname 54.208.167.55
+    User admin
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem
+
+host cgsy-platform2-1
+    Hostname 34.207.247.114
+    User ec2-user
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem
+
+host cgsy-platform2-2
+    Hostname 18.212.112.247
+    User ec2-user
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem
+
+host cgsy-platform2-4
+    Hostname 54.224.222.0
+    User ec2-user
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem
+
+host cgsy-platform2-5
+    Hostname 3.94.76.85
+    User ec2-user
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem
+
+host cgsy-platform2-6
+    Hostname 54.92.155.217
+    User ec2-user
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem
+
+host cgsy-platform2-7
+    Hostname 3.82.63.225
+    User ec2-user
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem
+
+host cgsy-platform-services
+    Hostname 54.80.4.43
+    User ec2-user
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem
+
+host faeggatheros
+    Hostname 201.48.226.194
+    User gatheros
+    Compression yes
+    Port 9955
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+
+host landare
+    Hostname 79.143.184.103
+    User root
+    Compression yes
+    Port 50683
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+
+host pesebem
+    Hostname 201.48.226.194
+    User pesebem
+    Compression yes
+    Port 9955
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+
+host vmteste
+    Hostname 192.168.1.234
+    User congressy
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+
+host cgsy-sentry
+    Hostname 3.95.247.35
+    User admin
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem
+
+host cgsy-site
+    Hostname 52.5.11.24
+    User ec2-user
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+
+host cgsy-site2
+    Hostname 52.200.169.54
+    User ubuntu
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem
+
+host cgsy-plesk-site
+    Hostname 35.174.170.151
+    User ubuntu
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem
+
+host cgsy-redmine
+    Hostname 34.228.198.35
+    User admin
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem
+
+host cgsy-ci
+    Hostname 18.232.132.191
+    User ec2-user
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem
+
+host cgsy-elk
+    Hostname 54.198.127.21
+    User ec2-user
+    Compression yes
+    Port 22
+    ServerAliveInterval 30
+    ServerAliveCountMax 120
+    IdentityFile ~/.ssh/congressy-deploy.pem

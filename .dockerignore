@@ -3,6 +3,12 @@
 .drone.yml
 .drone.yml.sig
 .pylintrc
-doc
 README.md
-media/s
+media/
+doc/
+addon/docs/
+gatheros_event/docs/
+partner/docs/
+payment/docs/
+scientific_work/docs/
+survey/doc/
