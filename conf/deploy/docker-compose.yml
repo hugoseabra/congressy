@@ -31,7 +31,7 @@ services:
     hostname: HOSTNAME-manage
     healthcheck:
       test: "/code/bin/env/healthcheck.sh"
-      interval: 1m
+      interval: 5m
       timeout: 10s
       retries: 3
       start_period: 15s
@@ -60,7 +60,7 @@ services:
     hostname: HOSTNAME-partner
     healthcheck:
       test: "/code/bin/env/healthcheck.sh"
-      interval: 1m
+      interval: 5m
       timeout: 10s
       retries: 3
       start_period: 15s
@@ -89,7 +89,7 @@ services:
     hostname: HOSTNAME-admin
     healthcheck:
       test: "/code/bin/env/healthcheck.sh"
-      interval: 1m
+      interval: 5m
       timeout: 10s
       retries: 3
       start_period: 15s

@@ -44,7 +44,7 @@ AUTH_PASSWORD_VALIDATORS += [
     # },
 ]
 # ============================== GOOGLE ===================================== #
-GOOGLE_MAPS_API_KEY = 'AIzaSyDCx_62viOjiSf-NFZ1m-1mQF-9-ize9EA'
+GOOGLE_MAPS_API_KEY = 'AIzaSyC739ZBG3MuLn8u_4R0xZuhcxBoyuGTwhI'
 
 # ============================ WKHTMLTOPDF  ================================== #
 WKHTMLTOPDF_WS_URL = 'http://wkhtmltopdf'
