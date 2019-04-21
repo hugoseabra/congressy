@@ -29,12 +29,6 @@ handler500 = 'project.views.handler500'
 
 admin_urlpatterns = []
 
-if not settings.DEBUG:
-    admin_urlpatterns += url(
-        r'^cgsy-admin18/uwsgi/',
-        include('django_uwsgi.urls')
-    ),
-
 admin_urlpatterns += [url(r'^cgsy-admin18/', admin.site.urls)]
 
 private_urlpatterns = [

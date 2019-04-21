@@ -98,7 +98,7 @@ RUN chmod +x /code/bin/env/healthcheck.sh \
             /deploy/services/cron/container-entry.sh \
             /staging/services/web/manage/container-entry.sh
 
-RUN mkdir media/; mkdir -p /tmp/exporter; mkdir -p /tmp/barcodes; mkdir -p /tmp/qrcodes; chmod 777 media/ /tmp/exporter /tmp/qrcodes /tmp/barcodes
+RUN mkdir media/; mkdir -p /tmp/exporter; mkdir -p /tmp/barcodes; mkdir -p /tmp/qrcodes; chmod -R 777 media/ /tmp/exporter /tmp/qrcodes /tmp/barcodes
 
 # server will listen on this port
 EXPOSE 8000

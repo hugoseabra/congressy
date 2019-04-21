@@ -4,7 +4,6 @@ from django.conf import settings
 from django.conf.urls import include, static, url
 
 from partner.urls import urlpatterns_public_partner
-from project.views import healthcheckView
 
 handler404 = 'project.views.handler404'
 handler500 = 'project.views.handler500'

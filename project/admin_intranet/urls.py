@@ -2,7 +2,6 @@
 
 from django.conf import settings
 from django.conf.urls import include, static, url
-from django.views.generic import RedirectView
 
 from gatheros_event.urls.me import (
     urlpatterns_public_account,
@@ -11,7 +10,6 @@ from gatheros_event.urls.me import (
 from gatheros_front.urls import (
     urlpatterns_public as gatheros_front_public,
 )
-from project.views import healthcheckView
 
 handler404 = 'project.views.handler404'
 handler500 = 'project.views.handler500'

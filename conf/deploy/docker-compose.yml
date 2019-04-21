@@ -8,6 +8,17 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
 
+  reverse-proxy:
+    image: traefik
+    command: --api --docker
+    networks:
+      - traefik
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+
   celery:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
@@ -34,13 +45,15 @@ services:
       interval: 5m
       timeout: 10s
       retries: 3
-      start_period: 15s
+      start_period: 5s
     depends_on:
       - wkhtmltopdf
+      - reverse-proxy
     networks:
       - wkhtmltopdf
+      - traefik
     ports:
-      - "8000:8000"
+      - "8000"
     entrypoint:
       - /deploy/services/web/manage/container-entry.sh
     volumes:
@@ -53,6 +66,9 @@ services:
     env_file:
       - ./env-file
       - ./env-manage-file
+    labels:
+      - "traefik.frontend.rule=Host:ev.congressy.com"
+      - "traefik.docker.network=traefik_default"
 
   partner:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
@@ -63,13 +79,15 @@ services:
       interval: 5m
       timeout: 10s
       retries: 3
-      start_period: 15s
+      start_period: 5s
     depends_on:
       - wkhtmltopdf
+      - reverse-proxy
     networks:
       - wkhtmltopdf
+      - traefik
     ports:
-      - "8001:8000"
+      - "8000"
     volumes:
       - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/code/media
@@ -82,6 +100,9 @@ services:
     env_file:
       - ./env-file
       - ./env-partner-file
+    labels:
+      - "traefik.frontend.rule=Host:parceiros.congressy.com"
+      - "traefik.docker.network=traefik_default"
 
   admin_intranet:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
@@ -92,13 +113,14 @@ services:
       interval: 5m
       timeout: 10s
       retries: 3
-      start_period: 15s
+      start_period: 5s
     depends_on:
       - wkhtmltopdf
     networks:
       - wkhtmltopdf
+      - traefik
     ports:
-      - "8002:80"
+      - "8000"
     entrypoint:
       - /deploy/services/web/admin_intranet/container-entry.sh
     volumes:
@@ -111,6 +133,11 @@ services:
     env_file:
       - ./env-file
       - ./env-admin_intranet-file
+    labels:
+      - "traefik.frontend.rule=Host:admin.congressy.com"
+      - "traefik.docker.network=traefik_default"
 
 networks:
   wkhtmltopdf:
+  traefik:
+    name: traefik_default
