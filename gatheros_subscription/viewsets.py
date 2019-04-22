@@ -221,7 +221,6 @@ class SubscriptionExporterViewSet(RestrictionViewMixin, APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         exporter.create_export_lock()
-        async_subscription_exporter_task.delay(event_pk=event.pk)
 
         lock = True
         lock_count = 0
@@ -232,6 +231,7 @@ class SubscriptionExporterViewSet(RestrictionViewMixin, APIView):
             exporter = SubscriptionServiceAsyncExporter(event)
 
             if exporter.has_export_lock():
+                async_subscription_exporter_task.delay(event_pk=event.pk)
                 return Response(status=status.HTTP_201_CREATED)
 
             lock_count += 1
