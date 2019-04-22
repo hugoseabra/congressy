@@ -20,7 +20,7 @@ function error_msg() {
 }
 
 # Configure traefik
-docker-compose -f ./conf/staging/docker-compose.yml up -d --remove-orphans --scale manage=2
+docker-compose -f ./conf/staging/docker-compose.yml up -d --force --remove-orphans --scale manage=2
 
 RUNNING=$(docker inspect -f {{.State.Running}} manage-staging)
 if [[ "$RUNNING" != "true" ]]; then
