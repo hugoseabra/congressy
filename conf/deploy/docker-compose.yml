@@ -17,6 +17,7 @@ services:
       - "80:80"
       - "8080:8080"
     volumes:
+      - ./traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
 
   celery:
@@ -67,8 +68,15 @@ services:
       - ./env-file
       - ./env-manage-file
     labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.weight=10"
+      - "traefik.backend=apollo"
+      - "traefik.protocol=http"
+      - "traefik.port=8000"
       - "traefik.frontend.rule=Host:ev.congressy.com"
       - "traefik.docker.network=traefik_default"
+      - "traefik.frontend.entryPoints=http"
 
   partner:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
@@ -101,8 +109,15 @@ services:
       - ./env-file
       - ./env-partner-file
     labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.weight=10"
+      - "traefik.backend=apollo"
+      - "traefik.protocol=http"
+      - "traefik.port=8000"
       - "traefik.frontend.rule=Host:parceiros.congressy.com"
       - "traefik.docker.network=traefik_default"
+      - "traefik.frontend.entryPoints=http"
 
   admin_intranet:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
@@ -134,8 +149,15 @@ services:
       - ./env-file
       - ./env-admin_intranet-file
     labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.weight=10"
+      - "traefik.backend=apollo"
+      - "traefik.protocol=http"
+      - "traefik.port=8000"
       - "traefik.frontend.rule=Host:admin.congressy.com"
       - "traefik.docker.network=traefik_default"
+      - "traefik.frontend.entryPoints=http"
 
 networks:
   wkhtmltopdf:

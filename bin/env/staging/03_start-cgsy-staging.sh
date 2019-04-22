@@ -19,8 +19,8 @@ function error_msg() {
     echo ;
 }
 
-docker-compose -f ./conf/staging/docker-compose.yml down --remove-orphans
-docker-compose -f ./conf/staging/docker-compose.yml up -d;
+# Configure traefik
+docker-compose -f ./conf/staging/docker-compose.yml up -d --remove-orphans --scale manage=2
 
 RUNNING=$(docker inspect -f {{.State.Running}} manage-staging)
 if [[ "$RUNNING" != "true" ]]; then

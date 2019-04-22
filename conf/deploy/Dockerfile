@@ -28,7 +28,6 @@ RUN set -ex \
         curl \
     " \
     && seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{} \
-
     && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -74,7 +73,7 @@ RUN set -ex \
         jinja2==2.10.1 \
         django-uwsgi==0.2.2 \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # -----------------------------------------------------------------------------
 # Setup configuration files
@@ -98,4 +97,4 @@ RUN chmod +x /code/bin/env/healthcheck.sh \
 RUN mkdir media/; mkdir -p /tmp/exporter; mkdir -p /tmp/barcodes; mkdir -p /tmp/qrcodes; chmod 777 -R media/ /tmp/exporter /tmp/qrcodes /tmp/barcodes
 
 # server will listen on this port
-EXPOSE 8000
+EXPOSE 8000 443

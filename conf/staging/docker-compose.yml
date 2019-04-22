@@ -42,6 +42,18 @@ services:
       - ./barcodes:/tmp/barcodes
       - ./vouchers:/tmp/vouchers
 
+  reverse-proxy:
+    image: traefik
+    command: --api --docker
+    networks:
+      - traefik
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - ../deploy/traefik.toml:/etc/traefik/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+
   celery:
     image: cgsy-staging
     restart: unless-stopped
@@ -103,8 +115,9 @@ services:
       - mailhog
       - wkhtmltopdf
       - rabbitmq
+      - traefik
     ports:
-      - "8080:8000"
+      - "8000"
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
@@ -113,8 +126,20 @@ services:
       - ./qrcodes:/tmp/qrcodes
       - ./barcodes:/tmp/barcodes
       - ./vouchers:/tmp/vouchers
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.weight=10"
+      - "traefik.backend=apollo"
+      - "traefik.protocol=http"
+      - "traefik.port=8000"
+      - "traefik.frontend.rule=Host:test.congressy.com"
+      - "traefik.docker.network=traefik_default"
+      - "traefik.frontend.entryPoints=http"
 
 networks:
+  traefik:
+    name: traefik_default
   postgres:
     external:
       name: local_postgres

@@ -29,7 +29,7 @@ function error_msg() {
 }
 
 function update_postgres_service() {
-    docker-compose -f ./bin/env/docker-compose.yml up -d
+    docker-compose -f ./bin/env/docker-compose.yml up -d --force --remove-orphans
     sleep 10
 
     local RUNNING=$(docker inspect -f {{.State.Running}} cgsy-postgres)
