@@ -11,6 +11,7 @@ from gatheros_event.urls.me import (
 from gatheros_front.urls import (
     urlpatterns_public as gatheros_front_public,
 )
+from project.views import healthcheckView
 
 handler404 = 'project.views.handler404'
 handler500 = 'project.views.handler500'
@@ -26,14 +27,12 @@ public_urls += urlpatterns_public_password
 public_auth_urlpatterns = [url(r'^', include(public_urls, 'public'))]
 
 public_urlpatterns = [
+    url(r'^captcha/', include('captcha.urls')),
+    url(r'^healthcheck/', include('health_check.urls')),
     url(r'^', include(public_urls, 'public')),
 
     # Patterns do Django não podem estar sob um 'namespace'
     url(r'^', include(urlpatterns_public_password)),
-]
-
-public_urlpatterns += [
-    url(r'^captcha/', include('captcha.urls')),
 ]
 
 urlpatterns = private_urlpatterns

@@ -57,11 +57,3 @@ class GlobList(list):
 
 # Internal IP's used by DDTB
 INTERNAL_IPS = GlobList(['*.*.*.*'])
-
-# ============================ WKHTMLTOPDF  ================================== #
-WKHTMLTOPDF_WS_URL = 'http://wkhtmltopdf'
-
-
-# =============================== CELERY ==================================== #
-CELERY_BROKER_URL = 'amqp://cgsy:cgsy@rabbitmq:5672/'
-CELERY_RESULT_BACKEND = 'amqp://cgsy:cgsy@rabbitmq:5672/'

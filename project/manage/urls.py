@@ -62,15 +62,16 @@ public_urls += urlpatterns_public_hotsite
 public_auth_urlpatterns = [url(r'^', include(public_urls, 'public'))]
 
 public_urlpatterns = [
+    url(r'^captcha/', include('captcha.urls')),
+    url(r'^healthcheck/', include('health_check.urls')),
+    url(r'^$', RedirectView.as_view(url='/login/'), name='root'),
+]
+
+public_urlpatterns += [
     url(r'^', include(public_urls, 'public')),
 
     # Patterns do Django não podem estar sob um 'namespace'
     url(r'^', include(urlpatterns_public_password)),
-]
-
-public_urlpatterns += [
-    url(r'^captcha/', include('captcha.urls')),
-    url(r'^$', RedirectView.as_view(url='/login/'), name='root'),
 ]
 
 # API

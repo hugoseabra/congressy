@@ -27,12 +27,15 @@ if not dbhost or not dbuser or dbpass is None or not dbname:
     )
     sys.exit(1)
 
+rabbitmq_user = os.environ.get('RABBITMQ_USER')
+rabbitmq_pass = os.environ.get('RABBITMQ_PASS')
 rabbitmq_server = os.environ.get('RABBITMQ_SERVER')
 
-if not rabbitmq_server:
+if not rabbitmq_user or not rabbitmq_pass or not rabbitmq_server:
     print(
-        "RABBITMQ_SERVER not provided or misconfigured:"
-        " -e RABBITMQ_SERVER=server_host"
+        "RABBITMQ configuration not provided or misconfigured:"
+        " -e RABBITMQ_USER=user -e RABBITMQ_PASS=pass"
+        " -e RABBITMQ_SERVER=server"
     )
     sys.exit(1)
 
@@ -59,6 +62,8 @@ env_dict = {
     'SECRET_KEY': 'jq0m!8!um0yva5i5b!!j(imcu148gco-w+pe_y2k)wdg9x67t8',
     # 'SECRET_KEY': get_random_secret_key(),
     'APP_VERSION': read_file('/code/version'),
+    'RABBITMQ_USER': rabbitmq_user,
+    'RABBITMQ_PASS': rabbitmq_pass,
     'RABBITMQ_SERVER': rabbitmq_server,
 }
 

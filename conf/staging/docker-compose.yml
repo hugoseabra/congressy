@@ -37,7 +37,7 @@ services:
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/var/www/cgsy/media
+      - ./media:/code/media
       - ./exporter:/tmp/exporter
       - ./barcodes:/tmp/barcodes
       - ./vouchers:/tmp/vouchers
@@ -55,7 +55,7 @@ services:
       - /deploy/services/celery/container-entry.sh
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/var/www/cgsy/media
+      - ./media:/code/media
       - ./exporter:/tmp/exporter
       - ./qrcodes:/tmp/qrcodes
       - ./barcodes:/tmp/barcodes
@@ -79,7 +79,7 @@ services:
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/var/www/cgsy/media
+      - ./media:/code/media
       - ./exporter:/tmp/exporter
       - ./barcodes:/tmp/barcodes
       - ./vouchers:/tmp/vouchers
@@ -88,6 +88,12 @@ services:
     image: cgsy-staging
     container_name: manage-staging
     hostname: manage-staging
+    healthcheck:
+      test: "/code/bin/env/healthcheck.sh"
+      interval: 5m
+      timeout: 10s
+      retries: 3
+      start_period: 15s
     depends_on:
       - migration
     entrypoint:
@@ -102,7 +108,7 @@ services:
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/var/www/cgsy/media
+      - ./media:/code/media
       - ./exporter:/tmp/exporter
       - ./qrcodes:/tmp/qrcodes
       - ./barcodes:/tmp/barcodes
