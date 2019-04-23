@@ -27,9 +27,6 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'django.contrib.humanize',
 
-    # UWSGI
-    'django_uwsgi',
-
     # Healthchecks
     'health_check',
     'health_check.db',
