@@ -19,5 +19,9 @@ function error_msg() {
     echo ;
 }
 
-docker volume create staging_media staging_exporter staging_barcodes staging_qrcodes staging_vouchers
+docker volume create staging_media
+docker volume create staging_exporter
+docker volume create staging_barcodes
+docker volume create staging_qrcodes
+docker volume create staging_vouchers
 docker-compose -f ./conf/staging/docker-compose.yml up -d --force --remove-orphans --scale manage=2
