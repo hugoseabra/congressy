@@ -19,7 +19,9 @@ export UWSGI_UID=1000
 export UWSGI_GID=2000
 export UWSGI_LAZY_APPS=1
 export UWSGI_WSGI_ENV_BEHAVIOR=holy
-export UWSGI_HARAKIRI=20
+
+export UWSGI_HARAKIRI=600
+export UWSGI_POST_BUFFERING=8192
 
 # By default uWSGI allocates a very small buffer (4096 bytes) for the headers
 # of each request. If you start receiving “invalid request block size” in your
@@ -35,6 +37,7 @@ export UWSGI_HONOUR_STDIN=1
 export UWSGI_STATIC_MAP="/static/=/code/static/"
 export UWSGI_STATIC_MAP="/media/=/code/media/"
 export UWSGI_STATIC_EXPIRES_URI="/static/.*\.[a-f0-9]{12,}\.(css|js|png|jpg|jpeg|gif|ico|woff|ttf|otf|svg|scss|map|txt) 315360000"
+export UWSGI_STATIC_EXPIRES_URI="/media/.*\.[a-f0-9]{12,}\.(css|js|png|jpg|jpeg|gif|ico|woff|ttf|otf|svg|scss|map|txt) 315360000"
 
 # Number of uWSGI workers and threads per worker (customize as needed:
 export UWSGI_WORKERS=2
