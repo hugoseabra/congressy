@@ -115,8 +115,8 @@ pipeline:
       - echo "DBPORT=$${DBPORT_STAGING}" >> /tmp/staging-files/env-manage-staging
       - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> /tmp/staging-files/env-manage-staging
       - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> /tmp/staging-files/env-manage-staging
-      - echo "RABBITMQ_USER=$${RABBITMQ_USER}" >> /tmp/staging-files/env-manage-staging
-      - echo "RABBITMQ_PASS=$${RABBITMQ_PASS}" >> /tmp/staging-files/env-manage-staging
+      - echo "RABBITMQ_USER=cgsy" >> /tmp/staging-files/env-manage-staging
+      - echo "RABBITMQ_PASS=cgsy" >> /tmp/staging-files/env-manage-staging
       - echo "RABBITMQ_SERVER=rabbitmq" >> /tmp/staging-files/env-manage-staging
     when:
       branch: [ hotfix/*, release/* ]

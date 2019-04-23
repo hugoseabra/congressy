@@ -19,7 +19,6 @@ function error_msg() {
     echo ;
 }
 
-# Configure traefik
 docker-compose -f ./conf/staging/docker-compose.yml up -d --force --remove-orphans --scale manage=2
 
 RUNNING=$(docker inspect -f {{.State.Running}} manage-staging)

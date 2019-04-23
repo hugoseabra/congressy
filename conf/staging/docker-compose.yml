@@ -17,7 +17,6 @@ services:
   # Preparação de volumes.
   migration:
     image: cgsy-staging
-    container_name: migration-staging
     hostname: migration-staging
     entrypoint:
       - /deploy/services/migration/container-entry.sh
@@ -28,7 +27,6 @@ services:
 
   volume:
     image: cgsy-staging
-    container_name: volume-staging
     hostname: volume-staging
     depends_on:
       - migration
@@ -76,7 +74,6 @@ services:
 
   cron:
     image: cgsy-staging
-    container_name: cron-staging
     hostname: cron-staging
     depends_on:
       - migration
@@ -98,7 +95,6 @@ services:
 
   manage:
     image: cgsy-staging
-    container_name: manage-staging
     hostname: manage-staging
     healthcheck:
       test: "/code/bin/env/healthcheck.sh"
