@@ -35,10 +35,11 @@ services:
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/code/media
-      - ./exporter:/tmp/exporter
-      - ./barcodes:/tmp/barcodes
-      - ./vouchers:/tmp/vouchers
+      - staging_media:/code/media
+      - staging_exporter:/tmp/exporter
+      - staging_barcodes:/tmp/barcodes
+      - staging_qrcodes:/tmp/qrcodes
+      - staging_vouchers:/tmp/vouchers
 
   reverse-proxy:
     image: traefik
@@ -65,11 +66,11 @@ services:
       - /deploy/services/celery/container-entry.sh
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/code/media
-      - ./exporter:/tmp/exporter
-      - ./qrcodes:/tmp/qrcodes
-      - ./barcodes:/tmp/barcodes
-      - ./vouchers:/tmp/vouchers
+      - staging_media:/code/media
+      - staging_exporter:/tmp/exporter
+      - staging_barcodes:/tmp/barcodes
+      - staging_qrcodes:/tmp/qrcodes
+      - staging_vouchers:/tmp/vouchers
     env_file: /tmp/staging-files/env-manage-staging
 
   cron:
@@ -88,10 +89,11 @@ services:
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/code/media
-      - ./exporter:/tmp/exporter
-      - ./barcodes:/tmp/barcodes
-      - ./vouchers:/tmp/vouchers
+      - staging_media:/code/media
+      - staging_exporter:/tmp/exporter
+      - staging_barcodes:/tmp/barcodes
+      - staging_qrcodes:/tmp/qrcodes
+      - staging_vouchers:/tmp/vouchers
 
   manage:
     image: cgsy-staging
@@ -117,11 +119,11 @@ services:
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/code/media
-      - ./exporter:/tmp/exporter
-      - ./qrcodes:/tmp/qrcodes
-      - ./barcodes:/tmp/barcodes
-      - ./vouchers:/tmp/vouchers
+      - staging_media:/code/media
+      - staging_exporter:/tmp/exporter
+      - staging_barcodes:/tmp/barcodes
+      - staging_qrcodes:/tmp/qrcodes
+      - staging_vouchers:/tmp/vouchers
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.passHostHeader=true"
@@ -148,3 +150,15 @@ networks:
   rabbitmq:
     external:
       name: local_rabbitmq
+
+volumes:
+  staging_media:
+    external: true
+  staging_exporter:
+    external: true
+  staging_barcodes:
+    external: true
+  staging_qrcodes:
+    external: true
+  staging_vouchers:
+    external: true
