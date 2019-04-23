@@ -20,9 +20,3 @@ function error_msg() {
 }
 
 docker-compose -f ./conf/staging/docker-compose.yml up -d --force --remove-orphans --scale manage=2
-
-RUNNING=$(docker inspect -f {{.State.Running}} manage-staging)
-if [[ "$RUNNING" != "true" ]]; then
-    error_msg "Container do manage não subiu."
-    exit 1
-fi
