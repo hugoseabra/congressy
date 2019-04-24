@@ -24,4 +24,5 @@ docker volume create staging_exporter
 docker volume create staging_barcodes
 docker volume create staging_qrcodes
 docker volume create staging_vouchers
+cp ./conf/deploy/traefik.toml /tmp/.
 docker-compose -f ./conf/staging/docker-compose.yml up -d --force --remove-orphans --scale manage=2
