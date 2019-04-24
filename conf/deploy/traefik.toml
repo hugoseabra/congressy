@@ -1,8 +1,3 @@
-[accessLog]
-  filePath = "/dev/stdout"
-[traefikLog]
-   filePath = "/dev/stdout"
-
 [entryPoints]
   [entryPoints.http]
   address = ":80"

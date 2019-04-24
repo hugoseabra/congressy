@@ -128,7 +128,7 @@ services:
       - "traefik.enable=true"
       - "traefik.frontend.passHostHeader=true"
       - "traefik.weight=10"
-      - "traefik.backend=apollo"
+      - "traefik.backend=cgsy-staging"
       - "traefik.protocol=http"
       - "traefik.port=8000"
       - "traefik.frontend.rule=Host:test.congressy.com"

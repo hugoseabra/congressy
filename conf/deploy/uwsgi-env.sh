@@ -35,9 +35,7 @@ export UWSGI_HONOUR_STDIN=1
 
 # uWSGI static file serving configuration (customize or comment out if not needed_:
 export UWSGI_STATIC_MAP="/static/=/code/static/"
-export UWSGI_STATIC_MAP="/media/=/code/media/"
 export UWSGI_STATIC_EXPIRES_URI="/static/.*\.[a-f0-9]{12,}\.(css|js|png|jpg|jpeg|gif|ico|woff|ttf|otf|svg|scss|map|txt) 315360000"
-export UWSGI_STATIC_EXPIRES_URI="/media/.*\.[a-f0-9]{12,}\.(css|js|png|jpg|jpeg|gif|ico|woff|ttf|otf|svg|scss|map|txt) 315360000"
 
 # Number of uWSGI workers and threads per worker (customize as needed:
 export UWSGI_WORKERS=2
