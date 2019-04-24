@@ -103,7 +103,7 @@ services:
       interval: 5m
       timeout: 10s
       retries: 3
-      start_period: 15s
+      start_period: 5s
     depends_on:
       - migration
     entrypoint:
