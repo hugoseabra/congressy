@@ -45,7 +45,7 @@ services:
     image: traefik
     command: --api --docker
     networks:
-      - host
+      - traefik
     ports:
       - "80:80"
       - "8080:8080"
@@ -132,10 +132,13 @@ services:
       - "traefik.protocol=http"
       - "traefik.port=8000"
       - "traefik.frontend.rule=Host:test.congressy.com"
-      - "traefik.docker.network=host"
+      - "traefik.docker.network=traefik_default"
       - "traefik.frontend.entryPoints=http"
 
 networks:
+  traefik:
+    external:
+      name: host
   postgres:
     external:
       name: local_postgres
