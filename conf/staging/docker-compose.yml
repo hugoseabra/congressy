@@ -138,6 +138,7 @@ services:
 networks:
   traefik:
     name: traefik_default
+    driver: host
   postgres:
     external:
       name: local_postgres
