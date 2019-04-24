@@ -137,8 +137,7 @@ services:
 
 networks:
   traefik:
-    external:
-      name: host
+    name: traefik_default
   postgres:
     external:
       name: local_postgres
