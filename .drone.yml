@@ -249,12 +249,12 @@ pipeline:
     pull: true
     host:
       - 172.31.38.91
-      - 172.31.40.208
-      - 172.31.35.124
-      - 172.31.47.46
-      - 172.31.35.111
-      - 172.31.38.106
-      - 172.31.33.85
+#      - 172.31.40.208
+#      - 172.31.35.124
+#      - 172.31.47.46
+#      - 172.31.35.111
+#      - 172.31.38.106
+#      - 172.31.33.85
     username: ec2-user
     port: 22
     secrets:
@@ -364,12 +364,12 @@ pipeline:
     pull: true
     hosts:
       - 172.31.38.91
-      - 172.31.40.208
-      - 172.31.35.124
-      - 172.31.47.46
-      - 172.31.35.111
-      - 172.31.38.106
-      - 172.31.33.85
+#      - 172.31.40.208
+#      - 172.31.35.124
+#      - 172.31.47.46
+#      - 172.31.35.111
+#      - 172.31.38.106
+#      - 172.31.33.85
     port: 22
     user: ec2-user
     source: ./bin/env/prod/01_create-awsecr-container.sh
@@ -385,11 +385,11 @@ pipeline:
     pull: true
     hosts:
       - 172.31.38.91
-      - 172.31.40.208
-      - 172.31.35.124
-      - 172.31.47.46
-      - 172.31.35.111
-      - 172.31.33.85
+#      - 172.31.40.208
+#      - 172.31.35.124
+#      - 172.31.47.46
+#      - 172.31.35.111
+#      - 172.31.33.85
     port: 22
     user: ec2-user
     source: ./bin/env/prod/previous_version
@@ -405,12 +405,12 @@ pipeline:
     pull: true
     hosts:
       - 172.31.38.91
-      - 172.31.40.208
-      - 172.31.35.124
-      - 172.31.47.46
-      - 172.31.35.111
-      - 172.31.38.106
-      - 172.31.33.85
+#      - 172.31.40.208
+#      - 172.31.35.124
+#      - 172.31.47.46
+#      - 172.31.35.111
+#      - 172.31.38.106
+#      - 172.31.33.85
     port: 22
     user: ec2-user
     source: ./version
@@ -426,12 +426,12 @@ pipeline:
     pull: true
     hosts:
       - 172.31.38.91
-      - 172.31.40.208
-      - 172.31.35.124
-      - 172.31.47.46
-      - 172.31.35.111
-      - 172.31.38.106
-      - 172.31.33.85
+#      - 172.31.40.208
+#      - 172.31.35.124
+#      - 172.31.47.46
+#      - 172.31.35.111
+#      - 172.31.38.106
+#      - 172.31.33.85
     port: 22
     user: ec2-user
     source: ./conf/deploy/docker-compose.yml
@@ -442,32 +442,32 @@ pipeline:
     when:
       branch: [ master ]
 
-  tranfer-service-stackfile:
-    image: drillster/drone-rsync
-    pull: true
-    hosts:
-      - 172.31.35.111
-    port: 22
-    user: ec2-user
-    source: ./conf/deploy/docker-compose_services.yml
-    target: ~/cgsy/docker-compose.yml
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: RSYNC_KEY
-    when:
-      branch: [ master ]
-
+#  tranfer-service-stackfile:
+#    image: drillster/drone-rsync
+#    pull: true
+#    hosts:
+#      - 172.31.35.111
+#    port: 22
+#    user: ec2-user
+#    source: ./conf/deploy/docker-compose_services.yml
+#    target: ~/cgsy/docker-compose.yml
+#    secrets:
+#      - source: CONGRESSY_DEPLOY
+#        target: RSYNC_KEY
+#    when:
+#      branch: [ master ]
+#
   tranfer-scripts:
     image: drillster/drone-rsync
     pull: true
     hosts:
       - 172.31.38.91
-      - 172.31.40.208
-      - 172.31.35.124
-      - 172.31.47.46
-      - 172.31.35.111
-      - 172.31.38.106
-      - 172.31.33.85
+#      - 172.31.40.208
+#      - 172.31.35.124
+#      - 172.31.47.46
+#      - 172.31.35.111
+#      - 172.31.38.106
+#      - 172.31.33.85
     port: 22
     user: ec2-user
     source: ./bin/env/prod
@@ -483,12 +483,12 @@ pipeline:
     pull: true
     hosts:
       - 172.31.38.91
-      - 172.31.40.208
-      - 172.31.35.124
-      - 172.31.47.46
-      - 172.31.35.111
-      - 172.31.38.106
-      - 172.31.33.85
+#      - 172.31.40.208
+#      - 172.31.35.124
+#      - 172.31.47.46
+#      - 172.31.35.111
+#      - 172.31.38.106
+#      - 172.31.33.85
     port: 22
     user: ec2-user
     source: ./conf/deploy/traefik.toml
@@ -499,23 +499,23 @@ pipeline:
     when:
       branch: [ master ]
 
-  deploy-services:
-    image: appleboy/drone-ssh
-    pull: true
-    host:
-      - 172.31.35.111
-    username: ec2-user
-    port: 22
-    command_timeout: 5m
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: ssh_key
-    script:
-      - ~/awsecr/01_create-awsecr-container.sh
-      - ~/cgsy/scripts/prod/04_download_images.sh
-      - ~/cgsy/scripts/prod/07_deploy-latest-services.sh
-    when:
-      branch: [ master ]
+#  deploy-services:
+#    image: appleboy/drone-ssh
+#    pull: true
+#    host:
+#      - 172.31.35.111
+#    username: ec2-user
+#    port: 22
+#    command_timeout: 5m
+#    secrets:
+#      - source: CONGRESSY_DEPLOY
+#        target: ssh_key
+#    script:
+#      - ~/awsecr/01_create-awsecr-container.sh
+#      - ~/cgsy/scripts/prod/04_download_images.sh
+#      - ~/cgsy/scripts/prod/07_deploy-latest-services.sh
+#    when:
+#      branch: [ master ]
 
   deploy-server1:
     image: appleboy/drone-ssh
@@ -537,95 +537,95 @@ pipeline:
     when:
       branch: [ master ]
 
-  deploy-server2:
-    image: appleboy/drone-ssh
-    pull: true
-    host:
-      - 172.31.40.208
-    username: ec2-user
-    port: 22
-    command_timeout: 5m
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: ssh_key
-    script:
-      - ~/awsecr/01_create-awsecr-container.sh
-      - ~/cgsy/scripts/prod/04_download_images.sh
-      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
-    when:
-      branch: [ master ]
-
-  deploy-server4:
-    image: appleboy/drone-ssh
-    pull: true
-    host:
-      - 172.31.35.124
-    username: ec2-user
-    port: 22
-    command_timeout: 5m
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: ssh_key
-    script:
-      - ~/awsecr/01_create-awsecr-container.sh
-      - ~/cgsy/scripts/prod/04_download_images.sh
-      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
-    when:
-      branch: [ master ]
-
-  deploy-server5:
-    image: appleboy/drone-ssh
-    pull: true
-    host:
-      - 172.31.47.46
-    username: ec2-user
-    port: 22
-    command_timeout: 5m
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: ssh_key
-    script:
-      - ~/awsecr/01_create-awsecr-container.sh
-      - ~/cgsy/scripts/prod/04_download_images.sh
-      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
-    when:
-      branch: [ master ]
-
-  deploy-server6:
-    image: appleboy/drone-ssh
-    pull: true
-    host:
-      - 172.31.38.106
-    username: ec2-user
-    port: 22
-    command_timeout: 5m
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: ssh_key
-    script:
-      - ~/awsecr/01_create-awsecr-container.sh
-      - ~/cgsy/scripts/prod/04_download_images.sh
-      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
-    when:
-      branch: [ master ]
-
-  deploy-server7:
-    image: appleboy/drone-ssh
-    pull: true
-    host:
-      - 172.31.33.85
-    username: ec2-user
-    port: 22
-    command_timeout: 5m
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: ssh_key
-    script:
-      - ~/awsecr/01_create-awsecr-container.sh
-      - ~/cgsy/scripts/prod/04_download_images.sh
-      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
-    when:
-      branch: [ master ]
+#  deploy-server2:
+#    image: appleboy/drone-ssh
+#    pull: true
+#    host:
+#      - 172.31.40.208
+#    username: ec2-user
+#    port: 22
+#    command_timeout: 5m
+#    secrets:
+#      - source: CONGRESSY_DEPLOY
+#        target: ssh_key
+#    script:
+#      - ~/awsecr/01_create-awsecr-container.sh
+#      - ~/cgsy/scripts/prod/04_download_images.sh
+#      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
+#    when:
+#      branch: [ master ]
+#
+#  deploy-server4:
+#    image: appleboy/drone-ssh
+#    pull: true
+#    host:
+#      - 172.31.35.124
+#    username: ec2-user
+#    port: 22
+#    command_timeout: 5m
+#    secrets:
+#      - source: CONGRESSY_DEPLOY
+#        target: ssh_key
+#    script:
+#      - ~/awsecr/01_create-awsecr-container.sh
+#      - ~/cgsy/scripts/prod/04_download_images.sh
+#      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
+#    when:
+#      branch: [ master ]
+#
+#  deploy-server5:
+#    image: appleboy/drone-ssh
+#    pull: true
+#    host:
+#      - 172.31.47.46
+#    username: ec2-user
+#    port: 22
+#    command_timeout: 5m
+#    secrets:
+#      - source: CONGRESSY_DEPLOY
+#        target: ssh_key
+#    script:
+#      - ~/awsecr/01_create-awsecr-container.sh
+#      - ~/cgsy/scripts/prod/04_download_images.sh
+#      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
+#    when:
+#      branch: [ master ]
+#
+#  deploy-server6:
+#    image: appleboy/drone-ssh
+#    pull: true
+#    host:
+#      - 172.31.38.106
+#    username: ec2-user
+#    port: 22
+#    command_timeout: 5m
+#    secrets:
+#      - source: CONGRESSY_DEPLOY
+#        target: ssh_key
+#    script:
+#      - ~/awsecr/01_create-awsecr-container.sh
+#      - ~/cgsy/scripts/prod/04_download_images.sh
+#      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
+#    when:
+#      branch: [ master ]
+#
+#  deploy-server7:
+#    image: appleboy/drone-ssh
+#    pull: true
+#    host:
+#      - 172.31.33.85
+#    username: ec2-user
+#    port: 22
+#    command_timeout: 5m
+#    secrets:
+#      - source: CONGRESSY_DEPLOY
+#        target: ssh_key
+#    script:
+#      - ~/awsecr/01_create-awsecr-container.sh
+#      - ~/cgsy/scripts/prod/04_download_images.sh
+#      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
+#    when:
+#      branch: [ master ]
 
 #  notify-sentry-release:
 #    image: docker
@@ -649,44 +649,44 @@ pipeline:
 #      status: [ success ]
 #      branch: [ master ]
 
-  notify-production-on-telegram:
-    image: appleboy/drone-telegram
-    pull: true
-    volumes:
-      - /etc/localtime:/etc/localtime
-    token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
-    to: -275808686 # ID chat Congressy
-    #    to: 245012348 # ID hugoseabra
-    format: markdown
-    message: >
-      *{{uppercase build.status }} - Produção*
-
-
-      *Repo:* {{ repo.name }} das {{datetime build.started "3:04PM" "UTC"}} às {{datetime build.finished"3:04PM" "UTC"}}
-
-      *Branch:* {{ commit.branch }}
-
-      *Build:* {{build.number}}
-
-      *Duração:* {{duration build.started build.finished}}
-
-      *Autor:* {{ commit.author }}
-
-      *Mensagem:*
-
-      ```
-      {{ commit.message }}
-      ```
-
-      *Ambiente:* https://ev.congressy.com/login/
-
-
-      *Build Link:* {{ build.link }}
-
-
-      *Commit:* {{ commit.link }}
-
-
-    when:
-      status: [ success, failure ]
-      branch: [ master ]
+#  notify-production-on-telegram:
+#    image: appleboy/drone-telegram
+#    pull: true
+#    volumes:
+#      - /etc/localtime:/etc/localtime
+#    token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
+#    to: -275808686 # ID chat Congressy
+#    #    to: 245012348 # ID hugoseabra
+#    format: markdown
+#    message: >
+#      *{{uppercase build.status }} - Produção*
+#
+#
+#      *Repo:* {{ repo.name }} das {{datetime build.started "3:04PM" "UTC"}} às {{datetime build.finished"3:04PM" "UTC"}}
+#
+#      *Branch:* {{ commit.branch }}
+#
+#      *Build:* {{build.number}}
+#
+#      *Duração:* {{duration build.started build.finished}}
+#
+#      *Autor:* {{ commit.author }}
+#
+#      *Mensagem:*
+#
+#      ```
+#      {{ commit.message }}
+#      ```
+#
+#      *Ambiente:* https://ev.congressy.com/login/
+#
+#
+#      *Build Link:* {{ build.link }}
+#
+#
+#      *Commit:* {{ commit.link }}
+#
+#
+#    when:
+#      status: [ success, failure ]
+#      branch: [ master ]
