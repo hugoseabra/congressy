@@ -41,7 +41,7 @@ if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
     docker run --rm \
         --env-file=${BASE}/env-file \
         -v /etc/localtime:/etc/localtime \
-        871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest /services/migration/container-entry.sh
+        871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest /deploy/services/migration/container-entry.sh
 
     echo ;
 

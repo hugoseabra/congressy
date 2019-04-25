@@ -17,4 +17,4 @@ echo ;
 echo "########################################################################"
 echo ;
 source /deploy/uwsgi-env.sh
-uwsgi --enable-threads --cache 5000 --thunder-lock --show-configs
+uwsgi --enable-threads --cache 5000 --thunder-lock --show-config
