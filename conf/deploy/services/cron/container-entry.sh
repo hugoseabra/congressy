@@ -19,8 +19,6 @@ crontab /crontab.txt
 printf "OK"
 echo;
 
-chmod -R 777 /code/media/ /tmp/exporter /tmp/qrcodes /tmp/barcodes /tmp/vouchers
-
 run_python_script "Configurando SETTINGS" /deploy/setup/configure-settings.py
 
 /usr/sbin/cron -f -L 15
