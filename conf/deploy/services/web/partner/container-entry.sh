@@ -12,6 +12,8 @@ run_python_script "Configurando VERSÃO" /deploy/setup/configure-version.py
 run_python_script "Coletando arquivos estáticos" "manage.py collectstatic --noinput --verbosity 0"
 run_python_script_with_output "Atualizando Site ID" "manage.py loaddata 000_site"
 
+chmod -R 777 /code/media/ /tmp/exporter /tmp/qrcodes /tmp/barcodes /tmp/vouchers
+
 echo " > Iniciando SERVER"
 echo ;
 echo "########################################################################"
