@@ -93,5 +93,8 @@ RAVEN_CONFIG = {
 WKHTMLTOPDF_WS_URL = 'http://wkhtmltopdf'
 
 # =============================== CELERY ==================================== #
-CELERY_BROKER_URL = 'amqp://congressy:cgsy1601@{{ RABBITMQ_SERVER }}:5672/'
-CELERY_RESULT_BACKEND = 'amqp://congressy:cgsy1601@{{ RABBITMQ_SERVER }}:5672/'
+CELERY_BROKER_URL = 'amqp://{{ RABBITMQ_USER }}:{{ RABBITMQ_PASS }}@{{ RABBITMQ_SERVER }}:5672/'
+CELERY_RESULT_BACKEND = 'amqp://{{ RABBITMQ_USER }}:{{ RABBITMQ_PASS }}@{{ RABBITMQ_SERVER }}:5672/'
+
+# ======================== HEALTH CHECK - RABBITMQ ========================== #
+BROKER_URL = CELERY_BROKER_URL

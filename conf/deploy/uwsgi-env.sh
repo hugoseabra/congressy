@@ -15,8 +15,8 @@ export UWSGI_HTTP_AUTO_CHUNKED=1
 export UWSGI_HTTP_KEEPALIVE=1
 
 export UWSGI_MASTER=1
-export UWSGI_UID=1000
-export UWSGI_GID=2000
+#export UWSGI_UID=www-data
+#export UWSGI_GID=root
 export UWSGI_LAZY_APPS=1
 export UWSGI_WSGI_ENV_BEHAVIOR=holy
 
