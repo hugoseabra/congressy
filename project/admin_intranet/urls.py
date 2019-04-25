@@ -2,7 +2,6 @@
 
 from django.conf import settings
 from django.conf.urls import include, static, url
-from django.views.generic import RedirectView
 
 from gatheros_event.urls.me import (
     urlpatterns_public_account,
@@ -26,14 +25,12 @@ public_urls += urlpatterns_public_password
 public_auth_urlpatterns = [url(r'^', include(public_urls, 'public'))]
 
 public_urlpatterns = [
+    url(r'^captcha/', include('captcha.urls')),
+    url(r'^healthcheck/', include('health_check.urls')),
     url(r'^', include(public_urls, 'public')),
 
     # Patterns do Django não podem estar sob um 'namespace'
     url(r'^', include(urlpatterns_public_password)),
-]
-
-public_urlpatterns += [
-    url(r'^captcha/', include('captcha.urls')),
 ]
 
 urlpatterns = private_urlpatterns

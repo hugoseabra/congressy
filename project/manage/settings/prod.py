@@ -93,10 +93,3 @@ RAVEN_CONFIG = {
     'dsn': '{{ SENTRY_PRIVATE_DSN }}',
     'release': '{{ APP_VERSION }}',
 }
-
-# ============================ WKHTMLTOPDF  ================================== #
-WKHTMLTOPDF_WS_URL = 'http://wkhtmltopdf'
-
-# =============================== CELERY ==================================== #
-CELERY_BROKER_URL = 'amqp://congressy:cgsy1601@{{ RABBITMQ_SERVER }}:5672/'
-CELERY_RESULT_BACKEND = 'amqp://congressy:cgsy1601@{{ RABBITMQ_SERVER }}:5672/'

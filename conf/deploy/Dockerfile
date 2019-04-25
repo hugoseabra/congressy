@@ -25,9 +25,10 @@ RUN set -ex \
         postgresql-client \
         build-essential \
         libxml2 \
+        curl \
+        cron \
     " \
     && seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{} \
-
     && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -72,9 +73,8 @@ RUN set -ex \
         s3cmd==2.0.2 \
         jinja2==2.10.1 \
         django-uwsgi==0.2.2 \
-        django-uwsgi-cache==1.0.1 \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # -----------------------------------------------------------------------------
 # Setup configuration files
@@ -86,13 +86,16 @@ WORKDIR /code/
 # -----------------------------------------------------------------------------
 COPY ./. ./.
 
-RUN chmod +x /deploy/services/volume/container-entry.sh \
-              /deploy/services/migration/container-entry.sh \
-              /deploy/services/celery/container-entry.sh \
-              /deploy/services/cron/container-entry.sh \
-              /deploy/services/web/manage/container-entry.sh \
-              /deploy/services/web/partner/container-entry.sh \
-              /deploy/services/web/admin_intranet/container-entry.sh
+RUN chmod +x /code/bin/env/healthcheck.sh \
+            /deploy/services/volume/container-entry.sh \
+            /deploy/services/migration/container-entry.sh \
+            /deploy/services/celery/container-entry.sh \
+            /deploy/services/cron/container-entry.sh \
+            /deploy/services/web/manage/container-entry.sh \
+            /deploy/services/web/partner/container-entry.sh \
+            /deploy/services/web/admin_intranet/container-entry.sh
+
+RUN mkdir -p /code/media/; mkdir -p /tmp/exporter; mkdir -p /tmp/barcodes; mkdir -p /tmp/qrcodes; chmod -R 777 /code/media/ /tmp/exporter /tmp/qrcodes /tmp/barcodes
 
 # server will listen on this port
 EXPOSE 8000

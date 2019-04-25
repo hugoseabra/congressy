@@ -3,8 +3,6 @@ import os
 import tempfile
 from pathlib import Path
 
-from django.conf import settings
-
 from gatheros_event.models import Event
 
 

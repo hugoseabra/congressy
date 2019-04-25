@@ -13,6 +13,7 @@ django-datetime-widget==0.9.3
 django-extra-fields==1.0.0
 django-formtools==2.1
 django-js-asset==1.0.0
+django-health-check==3.9.0
 django-localflavor==2.0
 django-permission==1.0.4
 django-simple-captcha==0.5.6
@@ -39,6 +40,7 @@ Pillow==5.0.0
 progressbar2==3.30.2
 # http://initd.org/psycopg/docs/install.html#disabling-wheel-packages-for-psycopg-2-7
 psycopg2>=2.7,<2.8 --no-binary psycopg2
+psutil==5.6.1
 PyExecJS==1.5.1
 pymysql==0.9.2
 pyparsing==2.2.0
