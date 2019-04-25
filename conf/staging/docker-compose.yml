@@ -98,12 +98,12 @@ services:
   manage:
     image: cgsy-staging
     hostname: manage-staging
-    healthcheck:
-      test: "/code/bin/env/healthcheck.sh"
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 0s
+#    healthcheck:
+#      test: "/code/bin/env/healthcheck.sh"
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 0s
     depends_on:
       - migration
     entrypoint:

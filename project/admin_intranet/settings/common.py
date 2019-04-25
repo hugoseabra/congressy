@@ -26,12 +26,6 @@ DATABASES = {
         'HOST': '{{ DBHOST }}',
     },
 }
-# =============================== CACHE ===================================== #
-CACHES = {
-    'default': {
-        'BACKEND': 'uwsgicache.UWSGICache',
-    }
-}
 # ============================ VALIDATORS =================================== #
 AUTH_PASSWORD_VALIDATORS += [
     {

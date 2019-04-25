@@ -41,12 +41,12 @@ services:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
     hostname: HOSTNAME-manage
-    healthcheck:
-      test: "/code/bin/env/healthcheck.sh"
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 0s
+#    healthcheck:
+#      test: "/code/bin/env/healthcheck.sh"
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 0s
     depends_on:
       - wkhtmltopdf
       - reverse-proxy
@@ -82,12 +82,12 @@ services:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
     hostname: HOSTNAME-partner
-    healthcheck:
-      test: "/code/bin/env/healthcheck.sh"
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 0s
+#    healthcheck:
+#      test: "/code/bin/env/healthcheck.sh"
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 0s
     depends_on:
       - wkhtmltopdf
       - reverse-proxy
@@ -123,12 +123,12 @@ services:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
     hostname: HOSTNAME-admin
-    healthcheck:
-      test: "/code/bin/env/healthcheck.sh"
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 0s
+#    healthcheck:
+#      test: "/code/bin/env/healthcheck.sh"
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 0s
     depends_on:
       - wkhtmltopdf
     networks:
