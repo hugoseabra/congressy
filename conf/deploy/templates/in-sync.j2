@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 S3CMD='/usr/local/bin/s3cmd'
-DIRECTORY='/var/www/cgsy/media/'
+DIRECTORY='/code/media/'
 
 # Runs in-sync: configuration state has priority of outsite if bucket exists
 insync() {
@@ -12,6 +12,6 @@ if [ ! -d "$DIRECTORY" ]; then
     mkdir -p "$DIRECTORY"
 fi
 
-if [ -z "$(ls -A "$DIRECTORY")" ]; then
+if [ "$(ls -A "$DIRECTORY")" ]; then
     insync
 fi

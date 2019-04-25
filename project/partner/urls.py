@@ -1,7 +1,5 @@
 # pylint: skip-file
 
-import os
-
 from django.conf import settings
 from django.conf.urls import include, static, url
 
@@ -11,8 +9,9 @@ handler404 = 'project.views.handler404'
 handler500 = 'project.views.handler500'
 
 urlpatterns = [
-    url(r'^', include(urlpatterns_public_partner, 'public')),
     url(r'^captcha/', include('captcha.urls')),
+    url(r'^healthcheck/', include('health_check.urls')),
+    url(r'^', include(urlpatterns_public_partner, 'public')),
 ]
 
 # ============================ STATIC CONFIG ================================ #
@@ -28,7 +27,6 @@ urlpatterns += static.static(
 
 # ========================== DEBUG ENVIRONMENT ============================== #
 if settings.DEBUG:
-
     import debug_toolbar
 
     urlpatterns = [

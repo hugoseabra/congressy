@@ -27,6 +27,15 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'django.contrib.humanize',
 
+    # Healthchecks
+    'health_check',
+    'health_check.db',
+    'health_check.cache',
+    'health_check.storage',
+    'health_check.contrib.psutil',
+    'health_check.contrib.rabbitmq',
+    'health_check.contrib.celery',
+
     # Django added apps
     'django.contrib.sites',
     'django.forms',
@@ -278,6 +287,13 @@ CKEDITOR_CONFIGS = {
     },
 }
 
+# =============================== CACHE ===================================== #
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache_table',
+    }
+}
 # ============================= MESSAGES ==================================== #
 MESSAGE_TAGS = {
     message_constants.DEBUG: 'debug',
@@ -294,6 +310,11 @@ SALES_ALERT_EMAILS = [
     'Wyndson Oliveira <wyndson@congressy.com>',
     'Infra Congressy <infra@congressy.com>'
 ]
+# ========================= HEALTH CHECK - PSUTILS ========================== #
+HEALTH_CHECK = {
+    'DISK_USAGE_MAX': 90,  # percent
+    'MEMORY_MIN': 100,    # in MB
+}
 # ============================== LOGGING ==================================== #
 CGSY_LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 
