@@ -83,11 +83,11 @@ PAGARME_ENCRYPTION_KEY = 'ek_live_Hlpg45VTiyNOnAE4dmkEBbQDEtUZCX'
 PAGARME_RECIPIENT_ID = 're_cjaskozwr01u1of5zo7kc962u'
 # ============================== SENTRY ===================================== #
 # Sentry integration
-# RAVEN_CONFIG = {
-#     'environment': 'production',
-#     'dsn': '{{ SENTRY_PRIVATE_DSN }}',
-#     'release': '{{ APP_VERSION }}',
-# }
+RAVEN_CONFIG = {
+    'environment': 'production',
+    'dsn': '{{ SENTRY_PRIVATE_DSN }}',
+    'release': '{{ APP_VERSION }}',
+}
 
 # ============================ WKHTMLTOPDF  ================================== #
 WKHTMLTOPDF_WS_URL = 'http://wkhtmltopdf'

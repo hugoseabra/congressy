@@ -93,3 +93,9 @@ setup(
     '/code/project/admin_intranet/settings/common.py',
     '/code/project/admin_intranet/settings/common.py'
 )
+
+setup(
+    env_dict,
+    '/code/project/admin_intranet/settings/prod.py',
+    '/code/project/admin_intranet/settings/prod.py'
+)
