@@ -247,7 +247,7 @@ class ProfileViewTest(TestCase):
     # @TODO reactivate this test.
     """ 
         Why is this commented you may ask?
-        Test temporally offline due to current dead line.
+        Test temporally data_cleaner due to current dead line.
         We removed the avatar from the form, so no need to test it at the moment.
             - nsm
     """
