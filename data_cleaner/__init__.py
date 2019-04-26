@@ -14,4 +14,5 @@ from .attendance import AttendanceDataCleaner
 from .raffel import RaffleDataCleaner
 from .addon import AddonDataCleaner
 from .person import PersonDataCleaner
+from .contract import ContractDataCleaner
 from .django_contrib import DjangoContribDataCleaner

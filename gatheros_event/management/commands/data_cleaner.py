@@ -18,8 +18,8 @@ from data_cleaner import (
     SubscriptionDataCleaner,
     EventDataCleaner,
     PersonDataCleaner,
-    DjangoContribDataCleaner
-)
+    DjangoContribDataCleaner,
+    ContractDataCleaner)
 
 
 class Command(BaseCommand):
@@ -84,6 +84,8 @@ class Command(BaseCommand):
                 .erase_all() \
                 .filter(event_pk)
             AddonDataCleaner(stdout=self.stdout, style=self.style).filter(
+                event_pk)
+            ContractDataCleaner(stdout=self.stdout, style=self.style).filter(
                 event_pk)
             SubscriptionDataCleaner(stdout=self.stdout, style=self.style) \
                 .filter(event_pk)
