@@ -171,6 +171,7 @@ services:
   metricbeat:
     image: docker.elastic.co/beats/metricbeat:7.0.0
     user: "root"
+    hostname: HOSTNAME
     command: -strict.perms=false
     volumes:
       - ./ELK/metricbeat/metricbeat.docker.yml:/usr/share/metricbeat/metricbeat.yml:ro
