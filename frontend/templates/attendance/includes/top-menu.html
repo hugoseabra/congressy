@@ -6,15 +6,14 @@
             Voltar
         </a>
     </div>
-    <div class="col-xs-12 col-sm-7">
+    <div class="col-xs-12 col-sm-5">
         <h3 class="text-bold" style="margin: 8px 0 0 20px;font-size:22px;">
             {{ title }}
-
         </h3>
     </div>
-    <div class="col-xs-12 col-sm-3">
-        <div class="row" >
-            <div class="col-xs-9">
+    <div class="col-xs-12 col-sm-5">
+        <div class="row">
+            <div class="col-xs-6">
                 <h3 style="margin: 8px 0 0 20px;padding-top: 4px">
                     {% if object.checkout_enabled %}
                         <i class="fas fa-check-circle text-success"></i>
@@ -22,13 +21,26 @@
                     {% endif %}
                 </h3>
             </div>
-            <div class="col-xs-3">
+
+            <div class="col-xs-6 text-right">
                 <button type="button" class="btn btn-primary btn-trans btn-sm"
-                        style="float: right;margin: 8px 0 0 20px;"
+                        style="margin-top: 8px"
+                        data-toggle="tooltip"
+                        title="Exportar dados de atendimento"
+                        onclick="openExportModal('{{ item.pk }}')">
+                    <span class="fas fa-file-excel"></span>
+                    Exportar
+                </button>
+                <button type="button" class="btn btn-primary btn-trans btn-sm"
+                        style="margin-top: 8px"
+                        data-toggle="tooltip"
+                        title="Editar"
                         onclick="location.href= '{% url 'attendance:attendance-list-edit' event.pk object.pk %}'">
 
                     <span class="fas fa-pencil-alt"></span>
+                    Editar
                 </button>
+                <div class="clearfix"></div>
             </div>
         </div>
     </div>

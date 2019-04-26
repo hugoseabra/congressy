@@ -110,17 +110,13 @@ class PagarmeDataBuilder:
 
         if transaction_type == Transaction.BOLETO:
             # TOTAL: 255 caracteres
-            # Instrução 1: 111 caracteres
-            instructions = 'Após o vencimento não há garantia de que o' \
-                           ' Lote estará disponível. Isso pode mudar o' \
-                           ' preço de sua inscrição.'
 
-            # Instrução 2: 97 caracteres
-            instructions += ' IMPORTANTE: após 3 dias de vencimento do' \
-                            ' boleto, sua vaga será liberada para outro' \
-                            ' participante.'
+            # Instrução 1: 99 caracteres
+            instructions = 'IMPORTANTE:  Após o vencimento não há garantia ' \
+                           'do mesmo valor e sua reserva de vaga poderá ' \
+                           'expirar.'
 
-            # Instrução 3: 47 caracteres
+            # Instrução 2: 47 caracteres
             instructions += 'Ev.: {}. Lote: {}. Insc.: {}.'.format(
                 self.subscription.event.name[:8],
                 self.subscription.lot.name[:8],
@@ -128,6 +124,9 @@ class PagarmeDataBuilder:
             )
 
             data['boleto_instructions'] = instructions
+
+            assert len(instructions) <= 255, 'boleto_instructions len({})' \
+                                             ''.format(len(instructions))
 
             event_config = event.feature_configuration
 
@@ -288,11 +287,25 @@ class PagarmeDataBuilder:
         # Por enquanto, receivers somente de inscrições
         publisher.create_and_publish_subscription()
 
+        total_receivers_amount = Decimal(0)
+        for _, receiver in subscriber.receivers.items():
+            total_receivers_amount += round(receiver.amount, 2)
+
+        # Verifica se a soma do rateamento é diferente do split. Se sim,
+        # vamos pegar o resto e atribuir para a Congressy;
+        diff = \
+            total_receivers_amount - round(amount, 2)
+
         split_rules = []
-        for id, receiver in subscriber.receivers.items():
+        for _, receiver in subscriber.receivers.items():
+
+            r_amount = receiver.amount
+            if diff != 0 and receiver.congressy_receiver is True:
+                r_amount -= diff
+
             split_rules.append({
-                "recipient_id": id,
-                "amount": self.as_payment_format(receiver.amount),
+                "recipient_id": receiver.id,
+                "amount": self.as_payment_format(r_amount),
                 "liable": receiver.chargeback_responsible,
                 "charge_processing_fee": receiver.processing_fee_responsible
             })

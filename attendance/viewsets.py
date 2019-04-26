@@ -1,7 +1,10 @@
 import re
+from datetime import datetime
 
 from django.db.models import Q
-from rest_framework import viewsets
+from django.http import HttpResponse
+from django.utils.text import slugify
+from rest_framework import viewsets, status
 from rest_framework.authentication import (
     BasicAuthentication,
     SessionAuthentication,
@@ -10,8 +13,13 @@ from rest_framework.authentication import (
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from attendance import models, serializers
+from attendance.helpers.async_exporter_helpers import \
+    AttendanceServiceAsyncExporter
+from attendance.models import AttendanceService
+from attendance.tasks import async_attendance_exporter_task
 from gatheros_subscription.models import Subscription
 
 
@@ -227,3 +235,65 @@ class CheckoutViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
             'status': 'request is not allowed.'
         }
         return Response(content, status=405)
+
+
+class AttendanceServiceExporterViewSet(RestrictionViewMixin, APIView):
+
+    # @TODO Implement OrganizerOnly permission
+    # @TODO Implement FeatureFlag permission
+
+    def post(self, request, *args, **kwargs):
+        service_pk = kwargs.get('service_pk')
+
+        if not service_pk:
+            return Response({'error: missing pk'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        service = AttendanceService.objects.get(pk=service_pk)
+
+        exporter = AttendanceServiceAsyncExporter(service)
+
+        if exporter.has_export_lock():
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        async_attendance_exporter_task.delay(event_pk=service.event_id,
+                                             service_pk=service.pk)
+
+        return HttpResponse(status=status.HTTP_201_CREATED)
+
+    def get(self, request, *args, **kwargs):
+
+        service_pk = kwargs.get('service_pk')
+
+        if not service_pk:
+            return Response({'error: missing pk'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        service = AttendanceService.objects.get(pk=service_pk)
+
+        exporter = AttendanceServiceAsyncExporter(service)
+
+        if exporter.has_export_lock():
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        if not exporter.has_existing_export_files():
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # Criando resposta http com arquivo de download
+        # Reading file
+        file_name = exporter.get_export_file_path()
+        output = open(file_name, mode='rb').read()
+        name = "%s_%s_%s.xlsx" % (
+            service.event.slug,
+            slugify(service.name),
+            datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        )
+
+        response = HttpResponse(
+            output,
+            content_type="application/vnd.ms-excel"
+        )
+
+        response['Content-Disposition'] = 'attachment; filename=%s' % name
+
+        return response

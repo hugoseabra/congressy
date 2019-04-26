@@ -1,7 +1,9 @@
 import os
 import sys
 
-from ..scripts import setup
+sys.path.append(sys.path.append(os.path.dirname(os.path.dirname(__file__))))
+
+from scripts import setup
 
 aws_key = os.environ.get('AWS_KEY')
 aws_secret = os.environ.get('AWS_SECRET')
@@ -31,20 +33,20 @@ env_dict = {
 # Configures s3 bucket creation
 setup(
     env_dict,
-    '/var/www/cgsy/conf/deploy/templates/create-s3bucket.j2',
+    '/code/conf/deploy/templates/create-s3bucket.j2',
     '/create-s3bucket.sh'
 )
 
 # in-sync configuration
 setup(
     env_dict,
-    '/var/www/cgsy/conf/deploy/templates/in-sync.j2',
+    '/code/conf/deploy/templates/in-sync.j2',
     '/in-sync.sh'
 )
 
 # setup s3cmd
 setup(
     env_dict,
-    '/var/www/cgsy/conf/deploy/templates/s3cfg.j2',
+    '/code/conf/deploy/templates/s3cfg.j2',
     '/root/.s3cfg'
 )

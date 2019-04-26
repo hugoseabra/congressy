@@ -20,9 +20,228 @@
 {% endblock %}
 
 {% block scripts %}
+    <!--ABSTRACTS DEPENDENCIES-->
+    <script src="{% static "assets/js/ajax.js" %}"></script>
     <script src="{% static "assets/js/messenger.js" %}"></script>
+    <script src="{% static "assets/js/vendor/moment.js" %}"></script>
+    <script src="{% static "assets/js/price-format.min.js" %}"></script>
+
+    <!--ABSTRACTS-->
+    {% if DEBUG is True and STAGING_MODE is False %}
+    <script src="{% static "assets/js/abstracts/01-dom.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/01-error.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/01-messenger.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/01-uri.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/02-alerter.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/02-form-field-mapper.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/02-http.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/03-form.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/03-model.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/04-collection.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/04-model-form.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/05-element-list.js" %}"></script>
+    <script src="{% static "assets/js/abstracts/05-modal.js" %}"></script>
+        {% if event.feature_configuration.feature_manual_payments %}
+            <!--INSTALLMENT - LIB-->
+            <script src="{% static "assets/js/installment/contract/domain.js" %}"></script>
+            <script src="{% static "assets/js/installment/contract/form.js" %}"></script>
+            <script src="{% static "assets/js/installment/contract/component.js" %}"></script>
+            <script src="{% static "assets/js/installment/part/domain.js" %}"></script>
+            <script src="{% static "assets/js/installment/part/service.js" %}"></script>
+            <script src="{% static "assets/js/installment/part/component.js" %}"></script>
+            <!--INSTALLMENT - USAGE-->
+            <script src="{% static "assets/js/installment/usage.js" %}"></script>
+            <script>
+                $(document).ready(function () {
+                    getContracts('{{ object.pk }}');
+                });
+            </script>
+        {% endif %}
+    {% else %}
+        <script src="{% static "assets/js/abstracts/cgsy-abstracts.js" %}?v=1"></script>
+        {% if event.feature_configuration.feature_manual_payments %}
+        <script src="{% static "assets/js/installment/cgsy-installment.js" %}?v=3"></script>
+        <script>
+            $(document).ready(function () {
+                getContracts('{{ object.pk }}');
+            });
+        </script>
+        {% endif %}
+    {% endif %}
+
+    {% if event.feature_configuration.feature_checkin is True %}
+    <script src="{% static "assets/js/attendance/attendance.js" %}"></script>
+    <script>
+        function attendanceCheckin(service_pk, printing_webhook, pin) {
+
+            var options = {
+                'checkinUri': "{% url 'api:attendance:checkin-list' %}",
+                'success_checkin_msg': 'Atendimento registrado com succeso',
+                'fail_checkin_msg': 'Falha ao registrar atendimento',
+                'checkoutUri': "{% url 'api:attendance:checkout-list' %}",
+                'success_checkout_msg': 'Saída de atendimento registrada com sucesso',
+                'fail_checkout_msg': 'Falha ao registrar saída',
+            };
+
+            var attendance = new window.cgsy.attendance.Attendance(
+                options['checkinUri'],
+                options['success_checkin_msg'],
+                options['fail_checkin_msg'],
+                options['checkoutUri'],
+                options['success_checkout_msg'],
+                options['fail_checkout_msg']
+            );
+
+            var subscription = new window.cgsy.attendance.Subscription(
+                '{{ object.pk }}',
+                '{{ object.person.name }}',
+                '{{ object.lot.name }}',
+                '{{ object.lot.category.name }}',
+                '{{ object.person.email }}',
+                {{ object.event_count }},
+                '{{ object.code }}',
+                '{{ object.status }}',
+                {% if object.attended %}true{% else %}false{% endif %}
+            );
+
+            subscription.setUri("/api/attendance/services/"+ service_pk +"/subscriptions/:pk/");
+
+            attendance.checkin(service_pk, subscription, '{{ user.person.name }}').then(function() {
+                if (printing_webhook) {
+                    triggerPrintWebhook(service_pk, printing_webhook, pin).then(function() {
+                        window.location.reload(true);
+                    });
+                } else {
+                    window.location.reload(true);
+                }
+            });
+        }
+
+        function attendanceCheckout(service_pk) {
+            var options = {
+                'checkinUri': "{% url 'api:attendance:checkin-list' %}",
+                'success_checkin_msg': 'Atendimento registrado com succeso',
+                'fail_checkin_msg': 'Falha ao registrar atendimento',
+                'checkoutUri': "{% url 'api:attendance:checkout-list' %}",
+                'success_checkout_msg': 'Saída de atendimento registrada com sucesso',
+                'fail_checkout_msg': 'Falha ao registrar saía',
+            };
+
+            var attendance = new window.cgsy.attendance.Attendance(
+                options['checkinUri'],
+                options['success_checkin_msg'],
+                options['fail_checkin_msg'],
+                options['checkoutUri'],
+                options['success_checkout_msg'],
+                options['fail_checkout_msg']
+            );
+
+            var subscription = new window.cgsy.attendance.Subscription(
+                '{{ object.pk }}',
+                '{{ object.person.name }}',
+                '{{ object.lot.name }}',
+                '{{ object.lot.category.name }}',
+                '{{ object.person.email }}',
+                {{ object.event_count }},
+                '{{ object.code }}',
+                '{{ object.status }}',
+                {% if object.attended %}true{% else %}false{% endif %}
+            );
+
+            subscription.setUri("/api/attendance/services/"+ service_pk +"/subscriptions/:pk/");
+
+            attendance.checkout(service_pk, subscription, '{{ user.person.name }}').then(function() {
+                window.location.reload(true);
+            });
+        }
+
+        function triggerPrintWebhook(service_pk, printing_webhook, pin) {
+            return new Promise(function(resolve, reject) {
+
+                var printer_number  = 1;
+
+                var config = getPrinterConfig();
+                if (config && config.hasOwnProperty('printer_number')) {
+                    printer_number = parseInt(config['printer_number']) || 1;
+                }
+
+                var data = {
+                    'event_id': parseInt('{{ event.pk }}'),
+                    'service_id': parseInt(service_pk),
+                    'subscription_id': '{{ object.pk }}',
+                    'printer_number': printer_number
+                };
+
+                var messenger = new window.cgsy.abstracts.messenger.Messenger();
+
+                var sender = new window.cgsy.AjaxSender(printing_webhook + '/queues/items');
+                    sender.addHeader('PIN', pin);
+                    sender.crossDomainMode();
+                    sender.payloadMode();
+
+                sender.setFailCallback(function() {
+                    messenger.notifyError('Não foi possível registrar impressão do atendimento');
+                    reject();
+                });
+                sender.setSuccessCallback(function() {
+                    messenger.notifySuccess('Impressão enviada com sucesso.');
+                    resolve();
+                });
+                sender.post(data);
+            });
+        }
+
+        var printer_config_key = 'cgsy-printer-config-' + '{{ event.pk }}';
+        function savePrinterConfig(service_pk, printer_number) {
+            var data = {
+                'service_pk': service_pk,
+                'event_pk': parseInt('{{ event.pk }}'),
+                'printer_number': parseInt(printer_number)
+            };
+            localStorage.setItem(printer_config_key, JSON.stringify(data));
+
+            var messenger = new window.cgsy.abstracts.messenger.Messenger();
+            messenger.notifySuccess('Configurações salvas com sucesso');
+            setConfigToAttendanceForm();
+        }
+
+        function getPrinterConfig() {
+            var config = localStorage.getItem(printer_config_key);
+            if (!config) {
+                return;
+            }
+            return JSON.parse(config);
+        }
+
+        function setConfigToAttendanceForm() {
+            var config = getPrinterConfig() || {};
+            var service_pk = config.hasOwnProperty('service_pk') ? config['service_pk'] : null;
+            var printer_number = config.hasOwnProperty('printer_number') ? config['printer_number'] : 1;
+            var service_list = $('#attendance_id');
+            var has_service = false;
+
+            $('option', service_list).each(function(i, option) {
+                if (parseInt($(option).attr('value')) === parseInt(service_pk)) {
+                    has_service = true;
+                }
+            });
+
+            if (service_pk && has_service) {
+                $('#config-default-service').val(service_pk);
+                service_list.val(service_pk);
+                showHidePrinterButton($('#attendance_id'));
+            }
+
+            $('#config-printer-number').val(printer_number);
+        }
+
+    </script>
+    {% endif %}
+
     <script>
         $(document).ready(function () {
+            setConfigToAttendanceForm();
+
             $('#test-sub').on('change', function () {
                 var switchState = $('#test-sub').is(":checked");
                 var messageState = switchState ? "True" : "False";
@@ -48,12 +267,6 @@
             el_to_hide.hide();
         }
 
-        function edit_payment(transaction_id, type, amount) {
-            $('#manual-payment-form-modal').modal();
-            $('#edit-transaction-id').val(transaction_id);
-            $('#id_manual_payment_type').val(type);
-            $('#id_amount').val(amount);
-        }
 
         function delete_payment(transaction_id, amount) {
             var message = "Tem certeza que deseja deletar o lançamento de R$ " + amount + " ?";
@@ -115,6 +328,16 @@
             checkout.run();
         }
 
+        function showHidePrinterButton(service_select_el) {
+            var printer_button = $('.webhook-register-and-print');
+
+            if($(service_select_el).find('option:selected').data('webhook')){
+                printer_button.show();
+            }else{
+                printer_button.hide();
+            }
+        }
+
         $(document).ready(function () {
             Messenger.options = {
                 extraClasses: 'messenger-fixed messenger-on-bottom ' +
@@ -142,11 +365,20 @@
                 {% endfor %}
             {% endif %}
 
-            {% if last_transaction and last_transaction.type == last_transaction.BOLETO and not last_transaction.boleto_url %}
+            {% if last_transaction and last_transaction.type == last_transaction.BOLETO and last_transaction.status == last_transaction.PROCESSING %}
                 window.setTimeout(function () {
                     window.location.href = window.location.href;
                 }, 7500);
             {% endif %}
+
+
+            {% if event.feature_configuration.feature_manual_payments is True %}
+                $('#new-contract-btn').show();
+            {% else %}
+                console.log('new_contract not enabled');
+            {% endif %}
+
+            showHidePrinterButton($('#attendance_id'));
         });
     </script>
 {% endblock %}
@@ -240,7 +472,7 @@
                 </div>
             </div>
         {% endif %}
-    
+
     </div>
 
     <div id="checkout_form_block" style="display:none">
@@ -258,9 +490,23 @@
         <input type="hidden" name="next_url" value=""/>
     </form>
 
+    {% include 'subscription/includes/form-installment-contract.html' %}
 {% endblock %}
+
 {% block modals %}
+
+    {% if event.feature_configuration.feature_manual_payments is True %}
     {% include 'subscription/includes/modal-manual-payment-form.html' with form=manual_payment_form %}
+    {% endif %}
+
+    {% if event.feature_configuration.feature_checkin is True and event.feature_management.checkin is True %}
+    {% include 'subscription/includes/modal-configure-printer.html' %}
+    {% endif %}
+
     {% include 'subscription/includes/modal-delete-manual-payment-form.html' with form=manual_payment_form %}
+
+    {% include 'subscription/includes/modal-part-transaction.html' with manual_form=manual_form%}
+
+    {% include 'abstracts/modal.html' %}
 
 {% endblock %}

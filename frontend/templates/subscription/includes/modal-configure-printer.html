@@ -1,0 +1,57 @@
+<div class="modal" id="configure-printer-modal" role="dialog" data-backdrop="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal"
+                        aria-label="Close"><span
+                        aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-bold">Configuração de Atendimento</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form role="form" onsubmit="return false;">
+                            <div class="form-group">
+                                <label for="config-default-service">
+                                    Serviço padrão:
+                                </label>
+                                <select class="form-control" name="config-default-service" id="config-default-service">
+                                    {% for serv in all_services %}
+                                    <option value="{{ serv.pk }}">{{ serv.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="config-printer-number">
+                                    Número da impressora:
+                                </label>
+                                <select class="form-control" name="config-printer-number" id="config-printer-number">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                </select>
+                            </div>
+                            <div class="text-center">
+                                <button class="btn btn-success" onclick="var button=$(this);console.log(button);button.attr('disabled', true).text('aguarde...');savePrinterConfig($('#config-default-service').val(), $('#config-printer-number').val());window.setTimeout(function(){$('#configure-printer-modal').modal('hide');button.removeAttr('disabled').text('Salvar');}, 1500);">Salvar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

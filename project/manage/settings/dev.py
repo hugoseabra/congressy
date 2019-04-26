@@ -43,8 +43,19 @@ PAGARME_API_KEY = 'ak_test_IkLKxOIdD0GVTHfmlSPA1zuGoaCQtd'
 PAGARME_ENCRYPTION_KEY = 'ek_test_ep7xk51I1XtWg58B9xij1VFwJRLcKa'
 PAGARME_RECIPIENT_ID = 're_cjcupb1iq0200zl6d89r92s32'
 PAGARME_TEST_RECIPIENT_ID = 're_cjdagxm5q00fqok6eeuukmmtp'
-# ============================ DEBUG TOOL BAR =============================== #
+# ============================ DEBUG TOOL BAR ================================ #
 INTERNAL_IPS = ['127.0.0.1']
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda r: False,  # disables it
+}
 
 # ============================ WKHTMLTOPDF  ================================== #
 WKHTMLTOPDF_WS_URL = 'http://localhost:5010'
+
+# ================================ CELERY ==================================== #
+CELERY_BROKER_URL = 'amqp://cgsy:cgsy@localhost:5672/'
+CELERY_RESULT_BACKEND = 'amqp://cgsy:cgsy@localhost:5672/'
+
+# ======================== HEALTH CHECK - RABBITMQ ========================== #
+BROKER_URL = CELERY_BROKER_URL

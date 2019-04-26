@@ -10,13 +10,21 @@ def rule_1_limite_lote_excedido(subscription):
     """
     Se limite do lote foi excedido, não se deve aceitar novas inscrições.
     """
+    allowed_origins = [
+        subscription.DEVICE_ORIGIN_MANAGE,
+        subscription.DEVICE_ORIGIN_CSV_IMPORT,
+    ]
+
+    manual = subscription.origin in allowed_origins
+
     lot = subscription.lot
     limit = lot.limit
     num = lot.subscriptions.filter(
         completed=True,
         test_subscription=False,
     ).exclude(status=subscription.CANCELED_STATUS).count()
-    if limit and int(limit) > 0 and int(num) >= limit:
+
+    if limit and int(limit) > 0 and int(num) >= limit and not manual:
         raise IntegrityError('O lote atingiu o limite de inscrições.')
 
 

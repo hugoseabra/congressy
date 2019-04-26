@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -ex
+set -e
 
 ###############################################################################
 # CUIDADO!
@@ -23,26 +23,25 @@ PREVIOUS_VERSION_FILE="$BASE/previous_version"
 PREVIOUS_VERSION="dev"
 VERSION="dev"
 
-if [ -f "$PREVIOUS_VERSION_FILE" ]; then
+if [[ -f "$PREVIOUS_VERSION_FILE" ]]; then
     PREVIOUS_VERSION=$(cat ${PREVIOUS_VERSION_FILE})
 fi
 
-if [ -f "$VERSION_FILE" ]; then
+if [[ -f "$VERSION_FILE" ]]; then
     VERSION=$(cat ${VERSION_FILE})
 fi
 
 # A versão nunca será a anterior a atual devido ao CI controlar a continuidade
 # dos releases. Sendo assim, basta comparar
-if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
+if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
 
     echo "Running volume synchronization for version ${VERSION}' ..."
 
     docker run --rm \
         --env-file=${BASE}/env-file \
         -v /etc/localtime:/etc/localtime \
-        -v ${BASE}/shared-volume/media:/var/www/cgsy/media \
-        -v ${BASE}/shared-volume/logs:/var/www/cgsy/logs \
-        871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest /services/volume/container-entry.sh
+        -v ${BASE}/shared-volume/media:/code/media \
+        871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest /deploy/services/volume/container-entry.sh
 
     echo ;
 

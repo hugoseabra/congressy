@@ -4,6 +4,11 @@ import os
 from django.contrib.messages import constants as message_constants
 from django.utils.translation import ugettext_lazy as _
 
+from core.database.postgresql import patch_unaccent
+
+# Patch para buscas no postgresql
+patch_unaccent()
+
 # ========================== BASE CONFIGURATION ============================= #
 BASE_DIR = os.path.abspath(os.path.join(
     os.path.dirname(__file__),
@@ -21,6 +26,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.postgres',
     'django.contrib.humanize',
+
+    # Healthchecks
+    'health_check',
+    'health_check.db',
+    'health_check.cache',
+    'health_check.storage',
+    'health_check.contrib.psutil',
+    'health_check.contrib.rabbitmq',
+    'health_check.contrib.celery',
 
     # Django added apps
     'django.contrib.sites',
@@ -77,6 +91,8 @@ FORMAT_MODULE_PATH = [
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # Middleware para saber de qual host que veio a resposta do Django
+    'project.manage.middleware.OriginMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -102,8 +118,9 @@ REST_FRAMEWORK = {
     ),
     'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S",
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 50
+    'PAGE_SIZE': 100
 }
+
 # ============================ VALIDATORS =================================== #
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -270,6 +287,13 @@ CKEDITOR_CONFIGS = {
     },
 }
 
+# =============================== CACHE ===================================== #
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache_table',
+    }
+}
 # ============================= MESSAGES ==================================== #
 MESSAGE_TAGS = {
     message_constants.DEBUG: 'debug',
@@ -286,6 +310,11 @@ SALES_ALERT_EMAILS = [
     'Wyndson Oliveira <wyndson@congressy.com>',
     'Infra Congressy <infra@congressy.com>'
 ]
+# ========================= HEALTH CHECK - PSUTILS ========================== #
+HEALTH_CHECK = {
+    'DISK_USAGE_MAX': 90,  # percent
+    'MEMORY_MIN': 100,    # in MB
+}
 # ============================== LOGGING ==================================== #
 CGSY_LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 
@@ -311,4 +340,22 @@ BITLY_TIMEOUT_STATS = 30
 # ========================== PARTNER ======================================== #
 # Valor maximo em que a soma de todos os parceiros do evento não deve
 # ultrapassar do rateamento do montante da Congressy
-PARTNER_MAX_PERCENTAGE_IN_EVENT = 20.00
+# PARTNER_MAX_PERCENTAGE_IN_EVENT = 20.00
+
+# @TODO remover. INserido provisionariamente - GYM Brasil
+PARTNER_MAX_PERCENTAGE_IN_EVENT = 60.00
+
+# ============================= PAYMENT ===================================== #
+# Planos da congressy, contemplam percentuais de recebimento em cima das
+# transações
+
+# Valor mínimo que a congrssy deve receber por transação. Se o valor do recebi
+# devido for menor do que este, o valor da transaçaõ da parte da congressy será
+# este valor.
+CONGRESSY_MINIMUM_AMOUNT = 4.99
+
+# Taxas de juros de parcelamento de valores da Congressy.
+CONGRESSY_INSTALLMENT_INTERESTS_RATE = 2.29
+
+# Valor minimo para cada parcela
+CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS = 10

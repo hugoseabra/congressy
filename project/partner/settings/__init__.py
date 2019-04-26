@@ -12,6 +12,7 @@ INSTALLED_APPS += [
     'payment_debt',
     'payment',
     'partner',
+    'hotsite',
     'survey',
     'addon',
     'associate',
@@ -23,6 +24,8 @@ INSTALLED_APPS += [
     'attendance',
     'service_tags',
     'mix_boleto',
+    'installment',
+    'cgsy_commands',
 ]
 # ========================= SERVER CONFIGURATION ============================ #
 WSGI_APPLICATION = 'project.wsgi.application'

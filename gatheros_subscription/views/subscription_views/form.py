@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
@@ -57,6 +59,17 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
 
         response = super().dispatch(request, *args, **kwargs)
 
+        if self.object.event_id != self.event.pk:
+            messages.warning(
+                request,
+                'Inscrição inválida para este evento..'
+            )
+
+            return redirect(
+                'subscription:subscription-list',
+                event_pk=self.event.pk,
+            )
+
         if self.financial is True:
             has_payable_products = self.object.subscription_products.filter(
                 optional_price__gt=0
@@ -114,9 +127,16 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
         ctx['financial'] = self.financial
         ctx['last_transaction'] = self.last_transaction
         ctx['form'] = self.get_checkout_form()
+        ctx['manual_form'] = forms.PartManualTransactionForm(self.object)
         ctx['encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
         ctx['services'] = self.get_services()
         ctx['products'] = self.get_products()
+        ctx['has_open_installment_contract'] = \
+            self.has_open_installment_contract()
+        ctx['base_expiration_day'] = self.get_base_expiration_day()
+        ctx['installment_limit_date'] = self.get_installment_limit_date()
+        ctx['minimum_amount'] = self.get_minimum_amount()
+
         ctx['new_boleto_allowed'] = payment_helpers.is_boleto_allowed(
             self.event
         )
@@ -126,6 +146,16 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
 
         if 'manual_payment_form' not in ctx:
             ctx['manual_payment_form'] = self.get_form()
+
+        if self.event.feature_configuration.feature_checkin:
+            ctx['services_attended'] = self.get_services_attended()
+
+            services = self.get_available_attendances()
+
+            ctx['all_services'] = self.event.attendance_services.all()
+            ctx['services'] = services
+            ctx['has_webhook'] = \
+                len([a for a in services if a.printing_queue_webhook]) > 0
 
         return ctx
 
@@ -171,7 +201,10 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
             request.user.get_full_name(),
             request.user.email,
         )
-        data['paid'] = True
+
+        manual_type = data.get('manual_payment_type')
+
+        data['paid'] = manual_type != Transaction.MANUAL_WAITING_PAYMENT
         kwargs = {'data': data}
 
         transaction_id = data.get('transaction_id')
@@ -179,6 +212,24 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
         if transaction_id:
             instance = get_object_or_404(Transaction, pk=transaction_id)
             kwargs.update({'instance': instance})
+
+        if action == 'manual-part':
+            if not self.event.feature_configuration.feature_manual_payments:
+                self.permission_denied_url = reverse(
+                    'subscription:subscription-list', kwargs={
+                        'event_pk': self.event.pk,
+                    }
+                )
+                raise PermissionDenied('Você não pode realizar esta ação.')
+
+            form = forms.PartManualTransactionForm(self.object, data=data)
+
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Recebimento criado com sucesso.')
+                return redirect(url + '?details=1')
+            else:
+                return self.render_to_response(self.get_context_data())
 
         form = self.get_form(**kwargs)
 
@@ -263,3 +314,31 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
                 })
 
         return survey_answers
+
+    def has_open_installment_contract(self):
+        return self.object.installment_contracts.filter(
+            status='open').count() > 0
+
+    def get_installment_limit_date(self):
+        date = self.event.date_start - timedelta(days=2)
+        return date.strftime('%Y-%m-%d')
+
+    def get_base_expiration_day(self):
+        date = self.event.date_start - timedelta(days=2)
+        return date.strftime('%d')
+
+    def get_minimum_amount(self):
+        return settings.CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS
+
+    def get_available_attendances(self):
+        checkins = self.get_services_attended()
+        pks = [c.attendance_service_id for c in checkins]
+
+        return self.event.attendance_services.all().exclude(
+            id__in=pks
+        )
+
+    def get_services_attended(self):
+        return self.object.checkins.filter(
+            checkout__isnull=True,
+        )

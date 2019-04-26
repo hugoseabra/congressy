@@ -91,12 +91,12 @@ class ProfileCreateForm(forms.ModelForm):
             )
 
         # Criando o email de confirmação e definição de senha
-        reset_form = PasswordResetForm(
-            data={
-                'email': self.cleaned_data["email"]
-            }
-        )
-        reset_form.is_valid()
+        # reset_form = PasswordResetForm(
+        #     data={
+        #         'email': self.cleaned_data["email"]
+        #     }
+        # )
+        # reset_form.is_valid()
 
         """
         Generates a one-use only link for resetting password and sends via
@@ -297,9 +297,10 @@ class ProfileForm(forms.ModelForm):
         )
 
         css = {
-            'all': ('assets/plugins/intl-tel-input-14.0.3/css/intlTelInput.min.css',)
+            'all': (
+            'assets/plugins/intl-tel-input-14.0.3/css/intlTelInput.min.css',
+            )
         }
-
 
     def __init__(self, user, password_required=True, *args, **kwargs):
         if hasattr(user, 'person'):
@@ -411,8 +412,8 @@ class ProfileForm(forms.ModelForm):
             self.instance.avatar = avatar
         # Correção de erro ao editar não salvar cidade
 
-        city_id = self.data.get('city_name')
-        self.user.person.city_id = city_id
+        # city_id = self.data.get('city_name')
+        # self.user.person.city_id = city_id
         self.instance.user = self.user
         self.instance.save()
 

@@ -162,18 +162,24 @@ class EventAddFormView(BaseEventView, generic.CreateView):
         return initial
 
     def get_success_url(self):
+
         form = self.get_form()
         event = form.instance
-        redirect_to = reverse_lazy('public:remarketing-redirect')
-        marketing_type = '?marketing_type=adwords'
-        page_type = '&page_type=new_event'
 
-        next_page = '&next=' + reverse(
-            'event:event-panel',
-            kwargs={'pk': event.pk}
-        )
+        if settings.DEBUG is False:
+            redirect_to = reverse_lazy('public:remarketing-redirect')
+            marketing_type = '?marketing_type=adwords'
+            page_type = '&page_type=new_event'
 
-        return redirect_to + marketing_type + page_type + next_page
+            next_page = '&next=' + reverse(
+                'event:event-panel',
+                kwargs={'pk': event.pk}
+            )
+
+            return redirect_to + marketing_type + page_type + next_page
+
+        return reverse('event:event-panel', kwargs={'pk': event.pk})
+
 
 
 class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):

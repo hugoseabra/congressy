@@ -8,6 +8,26 @@ from gatheros_subscription.models import Subscription, FormConfig
 
 
 class SubscriptionPersonForm(PersonForm):
+    tag_info = forms.CharField(
+        label='Informação para crachá',
+        help_text='Informação customizada para sair no crachá do participante',
+        required=False,
+        max_length=16,
+    )
+
+    tag_group = forms.CharField(
+        label='Informações de grupos',
+        help_text='Informação customizada para sair no crachá do participante',
+        required=False,
+        max_length=16,
+    )
+
+    obs = forms.CharField(
+        widget=forms.Textarea,
+        label='Observações Gerais',
+        required=False,
+    )
+
     def check_requirements(self, lot=None):
 
         event_is_payable = False
@@ -76,10 +96,13 @@ class SubscriptionForm(forms.ModelForm):
 
         model = Subscription
         fields = (
+            'origin',
             'lot',
             'person',
-            'origin',
             'created_by',
+            'tag_info',
+            'tag_group',
+            'obs',
         )
 
     def __init__(self, event, **kwargs):
@@ -100,10 +123,13 @@ class SubscriptionForm(forms.ModelForm):
             completed=True,
         ).exclude(status=Subscription.CANCELED_STATUS).count()
 
-        if num_subs and lot.limit and num_subs >= lot.limit:
-            raise forms.ValidationError(
-                'Lote está lotado e não permite novas inscrições'
-            )
+        origin = self.cleaned_data.get('origin')
+
+        if origin != Subscription.DEVICE_ORIGIN_MANAGE:
+            if num_subs and lot.limit and num_subs >= lot.limit:
+                raise forms.ValidationError(
+                    'Lote está lotado e não permite novas inscrições'
+                )
 
         return lot
 

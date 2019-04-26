@@ -78,7 +78,13 @@ window.cgsy.attendance = window.cgsy.attendance || {};
         this.name = name.substring(0, 22);
         this.lot_name = lot_name.substring(0, 30);
         this.category_name = category_name.substring(0, 30);
-        this.email = email.substring(0, 30);
+
+        if (email) {
+            this.email = email.substring(0, 30);
+        } else {
+            this.email = null;
+        }
+
         this.event_count = event_count;
         this.code = code;
         this.subscription_status = subscription_status;
@@ -119,7 +125,12 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     if (response['lot']['category']) {
                         self.category_name = response['lot']['category'].substring(0, 30);
                     }
-                    self.email = response['person']['email'].substring(0, 30);
+
+                    if (response['person']['email']) {
+                        self.email = response['person']['email'].substring(0, 30);
+                    } else {
+                        self.email = null;
+                    }
                     self.event_count = response['event_count'];
                     self.code = response['code'];
                     self.subscription_status = response['status'];
@@ -535,7 +546,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             button.addClass('btn-' + button_class_name);
 
             if (button_disabled) {
-                button.attr('disabled', '');
+                button.attr('disabled', true);
             }
 
             button.text(button_text);
@@ -578,8 +589,10 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             card_html += "<div class=\"col-md-12\" style=\"overflow: hidden\">";
             card_html += "<div class=\"divider-card\"></div>";
             card_html += "<h3 class=\"secondary-informations\" >";
-            card_html += "<i class=\"far fa-envelope\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Email\"></i>";
-            card_html += "<span> " + subscription.email + "</span>";
+            if (subscription.email) {
+                card_html += "<i class=\"far fa-envelope\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Email\"></i>";
+                card_html += "<span> " + subscription.email + "</span>";
+            }
             card_html += "</h3>";
             card_html += "<h3 class=\"secondary-informations\" >";
             card_html += "<i class=\"fas fa-th-list\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Categoria\"></i>";
@@ -1138,4 +1151,15 @@ function createBarCodeSearch(options) {
     );
     $(options['inputEl']).focus();
     barCodeSearch.watch($(options['inputEl']), $(options['listEl']));
+}
+
+function createAttendance(options) {
+    return new window.cgsy.attendance.Attendance(
+        options['checkinUri'],
+        options['success_checkin_msg'],
+        options['fail_checkin_msg'],
+        options['checkoutUri'],
+        options['success_checkout_msg'],
+        options['fail_checkout_msg']
+    );
 }

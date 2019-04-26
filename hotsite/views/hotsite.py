@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
@@ -81,6 +83,12 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
 
         context['event_is_publishable'] = publishable
         context['unpublishable_reason'] = unpublishable_reason
+        context['has_available_optionals'] = False
+
+        if sub:
+            lot = sub.lot
+            context['has_available_optionals'] = self._has_products(lot) or \
+                                                 self._has_services(lot)
 
         return context
 
@@ -89,7 +97,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
     def post(self, request, *args, **kwargs):
         """
         CONDIÇÃO 0 - Inscrições não disponíveis:
-            - redireciona para página inical.
+            - redireciona para página inicial.
 
         CONDIÇÃO 1 - Usuário logado:
             - redireciona para página de formulário de inscrição.
@@ -106,7 +114,8 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
         CONDIÇÃO 5 - Usuário não logado, possui conta e nunca logou:
             - Caso nunca tenha logado, o sistema deve se comportar como um
               usuário novo;
-            - Caso usuario já tenha logado,redireciona para página de inscrição;
+            - Caso usuario já tenha logado,redireciona para página de
+              inscrição;
             - Caso usuario tenha conta, nunca logou e já está inscrito,
             redirectiona para definir senha.
 
@@ -307,23 +316,6 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
             slug=self.current_event.slug
         )
 
-    def _configure_brand_person(self, person):
-        """ Configura nova pessoa cadastrada. """
-
-        if not person.members.count():
-            org = Organization(internal=False, name=person.name)
-
-            for attr, value in six.iteritems(person.get_profile_data()):
-                setattr(org, attr, value)
-
-            org.save()
-
-            Member.objects.create(
-                organization=org,
-                person=person,
-                group=Member.ADMIN
-            )
-
     def subscriber_has_account(self, email):
         if self.request.user.is_authenticated:
             return True
@@ -374,6 +366,48 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
                 pass
 
         return False
+
+    # noinspection PyMethodMayBeStatic
+    def _configure_brand_person(self, person):
+        """ Configura nova pessoa cadastrada. """
+
+        if not person.members.count():
+            org = Organization(internal=False, name=person.name)
+
+            for attr, value in six.iteritems(person.get_profile_data()):
+                setattr(org, attr, value)
+
+            org.save()
+
+            Member.objects.create(
+                organization=org,
+                person=person,
+                group=Member.ADMIN
+            )
+
+    # noinspection PyMethodMayBeStatic
+    def _has_services(self, lot):
+        try:
+            optionals = lot.category.service_optionals
+            return optionals.filter(
+                published=True,
+                date_end_sub__gte=datetime.now(),
+            ).count() > 0 and lot.event.feature_configuration.feature_services
+
+        except AttributeError:
+            return False
+
+    # noinspection PyMethodMayBeStatic
+    def _has_products(self, lot):
+        try:
+            optionals = lot.category.product_optionals
+            return optionals.filter(
+                published=True,
+                date_end_sub__gte=datetime.now(),
+            ).count() > 0
+
+        except AttributeError:
+            return False
 
 
 class UnpublishHotsiteView(generic.TemplateView):

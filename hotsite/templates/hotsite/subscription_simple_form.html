@@ -3,6 +3,7 @@
 
 <!-- FORM -->
 {% if is_subscribed_and_never_logged_in %}
+
     <form method="post"
           action="{% url 'public:password-set' %}"
           class="form"
@@ -29,18 +30,32 @@
                 Definir minha senha
             </button>
             {% if event.is_scientific and is_subscribed and event.work_config and event.work_config.is_submittable %}
-                <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
-                   class="btn btn-primary" style="margin-top: 15px">
-                    Deseja submeter seu artigo cientifico?
+                <div><strong>Científico:</strong></div>
+                <div>
+                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
+                       class="btn btn-success btn-block" style="margin-top: 15px">
+                        Enviar Resumo
+                    </a>
+                </div>
+            {% endif %}
+
+            {% if has_available_optionals %}
+
+                <a class="btn btn-primary btn-block" style="font-weight: bold; margin-top: 15px"
+                   href="{% url 'public:hotsite-subscription-optionals'  event.slug subscription.pk %}">
+                   Adic./Alterar Opcionais
                 </a>
+
             {% endif %}
 
         </div>
 
     </form>
+
 {% else %}
 
-    <form action="{% url 'public:hotsite' event.slug %}" method="post" class="form" role="form" onsubmit="submit_form_no_loader(this); return false;">
+    <form action="{% url 'public:hotsite' event.slug %}" method="post" class="form" role="form"
+          onsubmit="submit_form_no_loader(this); return false;">
 
         {% csrf_token %}
 
@@ -69,7 +84,9 @@
         {% endblock messages %}
 
         <div class="form-validation alert"></div>
+
         {% if is_subscribed and not has_private_subscription %}
+
             <div class="text-center">
                 <p style="font-size: 18px">
                     Você já está inscrito(a) neste evento.
@@ -89,23 +106,40 @@
             </div>
             <div class="row" style="margin-top:30px;padding: 0 30px">
                 <div class="col-md-12">
+
+
+                    {% if has_available_optionals %}
+
+                        <a class="btn btn-primary btn-block" style="font-weight: bold"
+                           href="{% url 'public:hotsite-subscription-optionals'  event.slug subscription.pk %}">
+                           Adic./Alterar Opcionais
+                        </a>
+
+                    {% endif %}
+
                     <button class="btn btn-warning btn-block" style="font-weight: bold"
                             onclick="window.location.href='{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}'">
                         Realizar Nova Inscrição
                     </button>
+
                     <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
                         {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                     </div>
+
                     {% if event.is_scientific and is_subscribed  and event.work_config and event.work_config.is_submittable %}
-                        <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
-                           class="btn btn-success" style="margin-top: 15px">
-                            Deseja submeter seu artigo cientifico?
-                        </a>
+                        <div style="margin-top: 15px;text-align: center">TRABALHOS CIENTÍFICOS</div>
+                        <div>
+                            <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
+                               class="btn btn-success btn-block">
+                                Enviar Resumo
+                            </a>
+                        </div>
                     {% endif %}
                 </div>
             </div>
 
         {% elif is_subscribed and has_private_subscription and lot_still_available %}
+
             <p class="text-muted">
                 Preencha os dados seguintes para refazer sua inscrição.
             </p>
@@ -133,6 +167,7 @@
                 </button>
             </div>
             <hr/>
+
             {% if not subscription.lot.price or subscription.lot.price and subscription.transactions.count > 0 %}
                 <p style="font-size: 18px">
                     Você já está inscrito(a) neste evento.
@@ -149,18 +184,37 @@
                     <i class="fa fa-check-circle fa-5x" style="color: darkgreen" aria-hidden="true"></i>
                 </div>
             {% endif %}
+
+            {% if has_available_optionals %}
+                <div class="row" style="margin-top:30px;padding: 0 30px">
+                    <div class="col-md-12">
+
+                        <a class="btn btn-primary btn-block" style="font-weight: bold"
+                           href="{% url 'public:hotsite-subscription-optionals'  event.slug subscription.pk %}">
+                           Adic./Alterar Opcionais
+                        </a>
+
+                    </div>
+                </div>
+            {% endif %}
+
             <div class="form-group form-group-submit">
                 <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
                     {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                 </div>
                 {% if event.is_scientific and is_subscribed and event.work_config and event.work_config.is_submittable %}
-                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
-                       class="btn btn-success" style="margin-top: 15px">
-                        Deseja submeter seu artigo cientifico?
-                    </a>
+                    <div style="margin-top: 15px;text-align: center">TRABALHOS CIENTÍFICOS</div>
+                    <div>
+                        <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
+                           class="btn btn-success btn-block">
+                            Enviar Resumo
+                        </a>
+                    </div>
                 {% endif %}
             </div>
+
         {% elif is_subscribed and has_private_subscription and not lot_still_available %}
+
             <p class="text-muted">
                 Preencha os dados seguintes para refazer sua inscrição.
             </p>
@@ -178,7 +232,6 @@
                 </div>
             </div>
 
-
             <div class="form-group form-group-submit">
                 <button class="btn btn-primary btn-lg btn-block"
                         data-loading-text="Quero me inscrever">
@@ -187,15 +240,30 @@
                 <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
                     {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                 </div>
-                {% if event.is_scientific and is_subscribed %}
-                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
-                       class="btn btn-success" style="margin-top: 15px">
-                        Deseja submeter seu artigo cientifico?
+
+                {% if has_available_optionals %}
+
+                    <a class="btn btn-primary btn-block" style="font-weight: bold; margin-top: 15px"
+                       href="{% url 'public:hotsite-subscription-optionals'  event.slug subscription.pk %}">
+                       Adic./Alterar Opcionais
                     </a>
+
+                {% endif %}
+
+
+                {% if event.is_scientific %}
+                    <div><strong>Científico:</strong></div>
+                    <div>
+                        <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
+                           class="btn btn-success btn-block" style="margin-top: 15px">
+                            Enviar Resumo
+                        </a>
+                    </div>
                 {% endif %}
             </div>
 
         {% else %}
+
             {% if not person or person and person.is_new is True %}
                 <p class="text-muted">
                     Preencha os dados seguintes para inicar sua inscrição.
@@ -218,7 +286,8 @@
                     </label>
                     <div>
                         <input type="text" name="exhibition_code"
-                               id="id_exhibition_code" style="text-transform: uppercase" maxlength="255" required="" class="form-control placeholder" autofocus="autofocus" placeholder="Informe o código">
+                               id="id_exhibition_code" style="text-transform: uppercase" maxlength="255" required=""
+                               class="form-control placeholder" autofocus="autofocus" placeholder="Informe o código">
                     </div>
                 </div>
             {% endif %}
@@ -232,16 +301,20 @@
                     {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                 </div>
                 {% if event.is_scientific and is_subscribed %}
-                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
-                       class="btn btn-success" style="margin-top: 15px">
-                        Deseja submeter seu artigo cientifico?
-                    </a>
+                    <div style="margin-top: 15px;text-align: center">TRABALHOS CIENTÍFICOS</div>
+                    <div>
+                        <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
+                           class="btn btn-success btn-block">
+                            Enviar Resumo
+                        </a>
+                    </div>
                 {% endif %}
             </div>
             {% if person and person.is_new is False %}
                 <div class="form-group">
                     <div class="text-center">
-                        <a href="{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}" style="font-weight: bold;color:#eea236;">
+                        <a href="{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}"
+                           style="font-weight: bold;color:#eea236;">
                             Realizar inscrição de outra pessoa?
                         </a>
                     </div>

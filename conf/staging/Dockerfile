@@ -3,114 +3,102 @@
 # docker build --rm -t cgsy .
 # docker tag catalog <repo_url>/cgsy:<tag>
 # -----------------------------------------------------------------------------
-FROM python:3.6
-MAINTAINER Hugo Seabra <hugoseabra19@gmail.com>
-
-ENV DEBIAN_FRONTEND noninteractive
+FROM python:3.6-slim
 
 # Celery does not work with root unless you force it
 ENV C_FORCE_ROOT true
 
-LABEL cgsy.image.name="cgsy-platform-staging"
+LABEL cgsy.image.name="cgsy-platform-production"
 
-# -----------------------------------------------------------------------------
-# Basics
-RUN apt-get update -q && apt-get install -qy --no-install-recommends \
-    apt-utils \
-    nano \
-    locales \
-        && apt-get purge -y --auto-remove \
-        && apt-get clean \
-        && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Install packages needed to run your application (not build deps):
+#   mime-support -- for mime types when serving static files
+#   postgresql-client -- for running database commands
+# We need to recreate the /usr/share/man/man{1..8} directories first because
+# they were clobbered by a parent image.
+RUN set -ex \
+    && RUN_DEPS=" \
+        nano \
+        mime-support \
+        vim \
+        locales \
+        libpcre3 \
+        postgresql-client \
+        build-essential \
+        libxml2 \
+        curl \
+        cron \
+    " \
+    && seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{} \
+    && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Locales
-ENV LC_ALL pt_BR.UTF-8
-ENV LANG pt_BR.UTF-8
+ENV LC_ALL=pt_BR.UTF-8 LANG=pt_BR.UTF-8
 
 RUN localedef -i pt_BR -c -f UTF-8 -A /usr/share/locale/locale.alias pt_BR.UTF-8
 
 # -----------------------------------------------------------------------------
-RUN apt-get update -q && apt-get install -qy --no-install-recommends \
-    build-essential \
-    apt-transport-https \
-    ca-certificates \
-    libffi-dev \
-    libssl-dev \
-    # Sincronização com S3
-    cron \
-    # Requerido pelo Postgresql Client
-    libpq5 postgresql-client \
-    # Nginx
-    nginx \
-    # Supervisor
-    supervisor \
-        && apt-get purge -y --auto-remove \
-        && apt-get clean \
-        && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# -----------------------------------------------------------------------------
-# Pypi packages
-
-# install uwsgi now because it takes a little while
-RUN pip install --no-cache-dir --upgrade \
-        pip setuptools \
-        # required by celery
-        lxml \
-        # send email
-        sparkpost \
-        # server
-        uwsgi django-uwsgi django-uwsgi-cache \
-        # s3 synchronization
-        s3cmd \
-        # template engine
-        jinja2
-
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.
 
-# -----------------------------------------------------------------------------
-WORKDIR /var/www/cgsy
+# Requirements - includes dev packages
+COPY ./requirements.pip /requirements.pip
+COPY ./requirements_staging.pip /requirements_staging.pip
 
-# -----------------------------------------------------------------------------
-# APP
-
-# Requirements
-# COPY requirements.txt and RUN pip install BEFORE adding the rest of your code, this will cause Docker's caching mechanism
-# to prevent re-installing (all your) dependencies when you made a change a line or two in your app.
-COPY ./requirements.pip ./.
-COPY ./requirements_staging.pip ./.
-RUN pip install --no-cache-dir --upgrade -r requirements_staging.pip
-
-# -----------------------------------------------------------------------------
-# Nginx
-COPY ./conf/deploy/nginx.conf /etc/nginx/nginx.conf
-
-# -----------------------------------------------------------------------------
-# Supervisor - STAGING
-COPY ./conf/staging/supervisor.conf /etc/supervisor/conf.d/
+# Install build deps, then run `pip install`, then remove unneeded build deps all in a single step.
+# Correct the path to your production requirements file, if needed.
+RUN set -ex \
+    && BUILD_DEPS=" \
+        build-essential \
+        libpcre3-dev \
+        libpq-dev \
+        libtiff5-dev \
+        libjpeg62-turbo-dev \
+        zlib1g-dev \
+        libfreetype6-dev \
+        liblcms2-dev \
+        libwebp-dev \
+        libxml2-dev \
+        libxslt-dev \
+        python-dev \
+    " \
+    && seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{} \
+    && apt-get update && apt-get install -y --no-install-recommends $BUILD_DEPS \
+    && pip3 install -U pip \
+    # Exclusive packages for production environment.
+    && pip3 install --no-cache-dir -r /requirements_staging.pip \
+    # Django packs, after pip to avoid unnecessary download
+    && pip3 install --no-cache-dir -U \
+        uwsgi==2.0.18 \
+        raven==6.10 \
+        sparkpost==1.3.6 \
+        s3cmd==2.0.2 \
+        jinja2==2.10.1 \
+        django-uwsgi==0.2.2 \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # -----------------------------------------------------------------------------
 # Setup configuration files
-COPY ./conf/deploy/scripts.sh /scripts.sh
-COPY ./conf/deploy/scripts.py /scripts.py
-
-COPY ./conf/deploy/setup/configure-settings.py /configure-settings.py
-COPY ./conf/deploy/setup/configure-sync.py /configure-sync.py
-COPY ./conf/deploy/setup/configure-cron.py /configure-cron.py
-COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
-COPY ./conf/deploy/services /services
+COPY ./conf/deploy /deploy
 
 # Setup STAGING
-COPY ./conf/staging/setup/configure-version.py /configure-version.py
-COPY ./conf/staging/setup/configure-wsgi.py /configure-wsgi.py
-COPY ./conf/staging/services /services
+COPY ./conf/staging /staging
+
+# -----------------------------------------------------------------------------
+WORKDIR /code/
 
 # -----------------------------------------------------------------------------
 COPY ./. ./.
 
-RUN chmod 775 /services/volume/container-entry.sh \
-              /services/migration/container-entry.sh \
-              /services/cron/container-entry.sh \
-              /services/web/manage/container-entry.sh
+RUN chmod +x /code/bin/env/healthcheck.sh \
+            /deploy/services/volume/container-entry.sh \
+            /deploy/services/migration/container-entry.sh \
+            /deploy/services/celery/container-entry.sh \
+            /deploy/services/cron/container-entry.sh \
+            /staging/services/web/manage/container-entry.sh
 
-EXPOSE 80
+RUN mkdir -p /code/media/; mkdir -p /tmp/exporter; mkdir -p /tmp/barcodes; mkdir -p /tmp/qrcodes;
+
+# server will listen on this port
+EXPOSE 8000

@@ -4,19 +4,53 @@ import locale
 from openpyxl import Workbook
 from six import BytesIO
 
+from attendance.helpers.attendance import subscription_is_checked
+from gatheros_event.helpers.event_business import is_paid_event
 from payment.models import Transaction
 from survey.models import Answer
-from gatheros_event.helpers.event_business import is_paid_event
-from attendance.helpers.attendance import subscription_is_checked
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
+cached_data = {
+    'people': dict(),
+    'lots': dict(),
+    'subscriptions': dict(),
+    'transactions': dict(),
+    'addon_products': dict(),
+    'addon_services': dict(),
+}
 
-def get_object_value(obj, attr):
+
+def get_object_value(obj, attr, cached_type=None, cached_key=None):
     if not hasattr(obj, attr):
         return ''
 
-    return getattr(obj, attr)
+    try:
+        if cached_type and cached_type in cached_data:
+            cached_container = cached_data[cached_type]
+
+            if cached_key and hasattr(obj, cached_key):
+                obj_pk = getattr(obj, cached_key)
+            else:
+                obj_pk = str(obj.pk)
+
+            if obj_pk in cached_container:
+                data = cached_container[obj_pk]
+
+                if attr in data:
+                    return data[attr]
+
+            else:
+                cached_container[obj_pk] = dict()
+
+            value = getattr(obj, attr)
+            cached_data[cached_type][obj_pk][attr] = value
+            return value
+
+        return getattr(obj, attr)
+
+    except AttributeError:
+        return ''
 
 
 def clean_sheet_title(title):
@@ -135,6 +169,9 @@ def _export_subscriptions(worksheet, subscriptions):
         'INSTITUICAO/EMPRESA',
         'CNPJ',
         'FUNÇÃO/CARGO',
+        'TAG DE AGRUPAMENTO',
+        'INFO. PARA CRACHÁ',
+        'OBS',
         'CRIADO EM',
     ])
 
@@ -144,19 +181,48 @@ def _export_subscriptions(worksheet, subscriptions):
         if row_idx not in collector:
             collector[row_idx] = []
 
-        person = sub.person
-        city = person.city
+        person = get_object_value(
+            obj=sub,
+            attr='person',
+            cached_type='subscriptions',
+        )
 
-        collector[row_idx].append(get_object_value(sub, 'event_count'))
-        collector[row_idx].append(get_object_value(sub, 'code'))
-        try:
-            collector[row_idx].append(sub.lot.category.name)
-        except AttributeError:
-            collector[row_idx].append('')
+        lot = get_object_value(
+            obj=sub,
+            attr='lot',
+            cached_type='subscriptions',
+        )
 
-        collector[row_idx].append(get_object_value(sub.lot, 'name'))
+        lot_category = get_object_value(
+            obj=lot,
+            attr='category',
+            cached_type='lots',
+        )
+
+        city = get_object_value(
+            obj=person,
+            attr='city',
+            cached_type='people',
+        )
+
+        collector[row_idx].append(get_object_value(
+            obj=sub,
+            attr='event_count',
+            cached_type='subscriptions',
+        ))
+
+        collector[row_idx].append(get_object_value(
+            obj=sub,
+            attr='code',
+            cached_type='subscriptions',
+        ))
+
+        collector[row_idx].append(lot_category.name)
+
+        collector[row_idx].append(lot.name)
 
         collector[row_idx].append(sub.get_status_display())
+
         if subscription_is_checked(sub.pk):
             is_checked = "Sim"
         else:
@@ -166,6 +232,7 @@ def _export_subscriptions(worksheet, subscriptions):
         collector[row_idx].append(person.get_gender_display())
 
         collector[row_idx].append(get_object_value(person, 'name'))
+
         country = get_object_value(person, 'country')
         if country == 'BR':
             doc_type = 'CPF'
@@ -213,6 +280,9 @@ def _export_subscriptions(worksheet, subscriptions):
         collector[row_idx].append(get_object_value(person, 'institution'))
         collector[row_idx].append(get_object_value(person, 'institution_cnpj'))
         collector[row_idx].append(get_object_value(person, 'function'))
+        collector[row_idx].append(get_object_value(sub, 'tag_group'))
+        collector[row_idx].append(get_object_value(sub, 'tag_info'))
+        collector[row_idx].append(get_object_value(sub, 'obs'))
         collector[row_idx].append(sub.created.strftime('%d/%m/%Y %H:%M:%S'))
 
         row_idx += 1
@@ -233,7 +303,7 @@ def _export_payments(worksheet, event):
         'VALOR A RECEBER (R$)',
     ])
 
-    transactions = Transaction.objects.filter(subscription__event=event)
+    transactions = Transaction.objects.filter(subscription__event_id=event.pk)
 
     collector = {}
     row_idx = 1
@@ -241,13 +311,25 @@ def _export_payments(worksheet, event):
         if row_idx not in collector:
             collector[row_idx] = []
 
-        sub = transaction.subscription
+        sub = get_object_value(
+            obj=transaction,
+            attr='subscription',
+            cached_type='transactions',
+        )
+
+        person = get_object_value(
+            obj=sub,
+            attr='person',
+            cached_type='subscriptions',
+        )
 
         created = transaction.date_created.strftime('%d/%m/%Y %H:%M:%S')
 
         collector[row_idx].append(get_object_value(sub, 'event_count'))
         collector[row_idx].append(get_object_value(sub, 'code'))
-        collector[row_idx].append(sub.person.name)
+
+        collector[row_idx].append(person.name)
+
         collector[row_idx].append(transaction.get_type_display())
         collector[row_idx].append(transaction.get_status_display())
         collector[row_idx].append(created)
@@ -298,19 +380,24 @@ def _export_survey_answers(worksheet, event_survey):
 
     subscriptions = event.subscriptions.filter(completed=True,
                                                test_subscription=False,
-                                               author__isnull=False)
+                                               author_id__isnull=False)
 
     collector = {}
     row_idx = 1
     for sub in subscriptions:
-        person = sub.person
+
+        person = get_object_value(
+            obj=sub,
+            attr='person',
+            cached_type='subscriptions',
+        )
 
         if row_idx not in collector:
             collector[row_idx] = []
 
         answers = Answer.objects.filter(
-            question__survey=survey,
-            author=sub.author,
+            question__survey_id=survey.pk,
+            author_id=sub.author_id,
         ).order_by('question__order')
 
         if not answers:
@@ -323,7 +410,7 @@ def _export_survey_answers(worksheet, event_survey):
         collector[row_idx].append(get_object_value(sub, 'event_count'))
         collector[row_idx].append(get_object_value(sub, 'code'))
         collector[row_idx].append(person.name)
-        collector[row_idx].append(person.email)
+        collector[row_idx].append(get_object_value(sub, 'email'))
 
         # Varrer por pergunta para depois encontrar as respostas.
         for question in questions:
@@ -363,8 +450,35 @@ def _export_addon_products(worksheet, products):
         )
 
         for addon_sub in subs:
-            sub = addon_sub.subscription
-            person = sub.person
+            sub = get_object_value(
+                obj=addon_sub,
+                attr='subscription',
+                cached_type='addon_products',
+            )
+
+            person = get_object_value(
+                obj=sub,
+                attr='person',
+                cached_type='subscriptions',
+            )
+
+            lot = get_object_value(
+                obj=sub,
+                attr='lot',
+                cached_type='subscriptions',
+            )
+
+            lot_category = get_object_value(
+                obj=lot,
+                attr='category',
+                cached_type='lots',
+            )
+
+            optional = get_object_value(
+                obj=addon_sub,
+                attr='optional',
+                cached_type='addon_products',
+            )
 
             created = addon_sub.created.strftime('%d/%m/%Y %H:%M:%S')
 
@@ -374,13 +488,13 @@ def _export_addon_products(worksheet, products):
             collector[row_idx].append(get_object_value(sub, 'event_count'))
             collector[row_idx].append(get_object_value(sub, 'code'))
             collector[row_idx].append(person.name)
-            collector[row_idx].append(person.email)
-            collector[row_idx].append(sub.lot.category.name)
-            collector[row_idx].append(addon_sub.optional.name)
+            collector[row_idx].append(get_object_value(sub, 'email'))
+            collector[row_idx].append(lot_category.name)
+            collector[row_idx].append(optional.name)
             collector[row_idx].append(sub.get_status_display())
             collector[row_idx].append(created)
-            collector[row_idx].append(addon_sub.optional_price)
-            collector[row_idx].append(addon_sub.optional_liquid_price)
+            collector[row_idx].append(optional.price)
+            collector[row_idx].append(optional.liquid_price)
 
             row_idx += 1
 
@@ -419,8 +533,42 @@ def _export_addon_services(worksheet, services):
         )
 
         for addon_sub in subs:
-            sub = addon_sub.subscription
-            person = sub.person
+
+            sub = get_object_value(
+                obj=addon_sub,
+                attr='subscription',
+                cached_type='addon_services',
+            )
+
+            person = get_object_value(
+                obj=sub,
+                attr='person',
+                cached_type='subscriptions',
+            )
+
+            lot = get_object_value(
+                obj=sub,
+                attr='lot',
+                cached_type='subscriptions',
+            )
+
+            lot_category = get_object_value(
+                obj=lot,
+                attr='category',
+                cached_type='lots',
+            )
+
+            optional = get_object_value(
+                obj=addon_sub,
+                attr='optional',
+                cached_type='addon_services',
+            )
+
+            theme = get_object_value(
+                obj=optional,
+                attr='theme',
+                cached_type='addon_services',
+            )
 
             created = addon_sub.created.strftime('%d/%m/%Y %H:%M:%S')
 
@@ -431,13 +579,13 @@ def _export_addon_services(worksheet, services):
             collector[row_idx].append(get_object_value(sub, 'code'))
             collector[row_idx].append(person.name)
             collector[row_idx].append(person.email)
-            collector[row_idx].append(sub.lot.category.name)
-            collector[row_idx].append(addon_sub.optional.theme.name)
-            collector[row_idx].append(addon_sub.optional.name)
+            collector[row_idx].append(lot_category.name)
+            collector[row_idx].append(theme.name)
+            collector[row_idx].append(optional.name)
             collector[row_idx].append(sub.get_status_display())
             collector[row_idx].append(created)
-            collector[row_idx].append(addon_sub.optional_price)
-            collector[row_idx].append(addon_sub.optional_liquid_price)
+            collector[row_idx].append(optional.price)
+            collector[row_idx].append(optional.liquid_price)
 
             row_idx += 1
 

@@ -1,10 +1,23 @@
 """
 gatheros_subscription templatetags
 """
+import json
 from django import template
+from django.core.serializers import serialize
+from django.db.models.query import QuerySet
+from django.utils.safestring import mark_safe
+
 from gatheros_subscription.models import Subscription
 
 register = template.Library()
+
+
+@register.simple_tag
+def jsonify(obj):
+    if isinstance(obj, QuerySet):
+        return serialize('json', obj)
+
+    return mark_safe(json.dumps(obj, ensure_ascii=False))
 
 
 @register.simple_tag

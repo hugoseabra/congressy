@@ -1,0 +1,68 @@
+version: "3.5"
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: cgsy-rabbitmq
+    networks:
+      - rabbitmq
+    hostname: cgsyrabbitmq # database unique name
+    environment:
+      - RABBITMQ_DEFAULT_USER=congressy
+      - RABBITMQ_DEFAULT_PASS=cgsy1601
+      - RABBITMQ_ERLANG_COOKIE=cgsyrabbitmqservice
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - rabbitmq_data:/var/lib/rabbitmq/mnesia
+
+  flower:
+    image: hugoseabra19/docker-celery-flower
+    container_name: cgsy-flower
+    environment:
+      - CELERY_BROKER_URL=amqp://congressy:cgsy1601@rabbitmq:5672/
+      - FLOWER_PORT=5555
+      - FLOWER_BASIC_AUTH=congressy:cgsy1601
+    ports:
+      - 5555:5555
+    networks:
+      - rabbitmq
+    volumes:
+      - /etc/localtime:/etc/localtime
+
+  wkhtmltopdf:
+    image: openlabs/docker-wkhtmltopdf-aas
+    restart: always
+    networks:
+      - wkhtmltopdf
+    volumes:
+      - /etc/localtime:/etc/localtime
+
+  cron:
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    restart: unless-stopped
+    hostname: HOSTNAME-cron
+    depends_on:
+      - wkhtmltopdf
+    entrypoint:
+      - /deploy/services/cron/container-entry.sh
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./shared-volume/media:/code/media
+      - ./shared-volume/logs:/code/logs
+      - ./shared-volume/exporter:/tmp/exporter
+      - ./shared-volume/qrcodes:/tmp/qrcodes
+      - ./shared-volume/barcodes:/tmp/barcodes
+      - ./shared-volume/vouchers:/tmp/vouchers
+    env_file: ./env-file
+    networks:
+      - wkhtmltopdf
+
+volumes:
+  rabbitmq_data:
+     external: true
+
+networks:
+  rabbitmq:
+  wkhtmltopdf:

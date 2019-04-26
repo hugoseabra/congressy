@@ -1,6 +1,7 @@
-{% load static humanize subscription_tags %}
+{% load static humanize l10n base_tags subscription_tags %}
 {% now "Y-m-d" as today %}
 {% is_subscription_free object as is_free %}
+{% filter_lookup full_prices object.lot_id as remaining_price %}
 
 <div class="row tooltip-wrapper">
     <div class="col-xl-11 col-lg-11 col-md-12">
@@ -15,6 +16,16 @@
                     Inscrições
                 </button>
             </div>
+            {% if object.lot.price > 0 %}
+                <div class="float-right">
+                    <button onclick='window.open("{% url 'subscription:subscription-extract' event.pk object.pk %}", "_blank")'
+                            class="btn btn-success btn-trans"
+                            data-toggle="tooltip"
+                            title="Extrato">
+                        <i class="fas fa-file-download"></i> Extrato Financeiro
+                    </button>
+                </div>
+            {% endif %}
             <div class="float-left">
                 <h3 class="text-bold" style="margin: 8px 0 0 20px;font-size:22px">Painel Financeiro do Participante</h3>
             </div>
@@ -44,12 +55,14 @@
                         <div class="float-right">
                             {% if last_transaction %}
                                 {% if dividend_amount < 0 %}
-                                    <i class="fas fa-exclamation-triangle text-warning animated shake" style="margin-left:20px"
+                                    <i class="fas fa-exclamation-triangle text-warning animated shake"
+                                       style="margin-left:20px"
                                        data-toggle="tooltip"
                                        title="Participante com pendências."
                                     ></i>
                                 {% elif dividend_amount > 0 %}
-                                    <i class="fas fa-exclamation-triangle text-warning animated shake" style="margin-left:20px"
+                                    <i class="fas fa-exclamation-triangle text-warning animated shake"
+                                       style="margin-left:20px"
                                        data-toggle="tooltip"
                                        title="Participante com valor em ver com o evento."
                                     ></i>
@@ -60,7 +73,8 @@
                                     ></i>
                                 {% endif %}
                             {% elif is_free is False %}
-                                <i class="fas fa-exclamation-triangle text-warning animated shake" style="margin-left:20px"
+                                <i class="fas fa-exclamation-triangle text-warning animated shake"
+                                   style="margin-left:20px"
                                    data-toggle="tooltip"
                                    title="Participante com pendências."
                                 ></i>
@@ -106,7 +120,7 @@
                                                     <button type="button"
                                                             data-toggle="tooltip"
                                                             title="Abrir voucher"
-                                                            onclick="window.location.href='{% url 'subscription:subscription-voucher' event.pk object.pk %}'"
+                                                            onclick="window.open('{% url 'subscription:subscription-voucher' event.pk object.pk %}', '_blank')"
                                                             class="btn btn-info btn-sm btn-trans">
                                                         voucher
                                                     </button>
@@ -127,7 +141,7 @@
                                         <div class="float-left">
                                             <span class="title">Valor inscrição</span>
                                             <strong class="text-info">
-                                                R$ {{ last_transaction.amount|intcomma }}
+                                                R$ {{ object.lot.get_calculated_price|intcomma }}
                                             </strong>
                                         </div>
                                         <div class="clearfix"></div>
@@ -165,7 +179,8 @@
                                                 {% if last_transaction.manual is True %}
                                                     {% if last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_MONEY %}
                                                         <div class="float-left">
-                                                            <i style="font-size: 40px" class="far fa-money-bill-alt"></i>
+                                                            <i style="font-size: 40px"
+                                                               class="far fa-money-bill-alt"></i>
                                                         </div>
                                                         <div class="float-left" style="margin-left:10px">
                                                             <span class="title">Método</span>
@@ -174,7 +189,8 @@
                                                         </div>
                                                     {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_PAYMENT_PAYCHECK %}
                                                         <div class="float-left">
-                                                            <i style="font-size: 40px" class="fas fa-money-check-alt"></i>
+                                                            <i style="font-size: 40px"
+                                                               class="fas fa-money-check-alt"></i>
                                                         </div>
                                                         <div class="float-left" style="margin-left:10px">
                                                             <span class="title">Método</span>
@@ -219,7 +235,8 @@
                                                         </div>
                                                     {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_WAITING_PAYMENT %}
                                                         <div class="float-left">
-                                                            <i style="font-size: 40px" class="fas fa-hourglass-start"></i>
+                                                            <i style="font-size: 40px"
+                                                               class="fas fa-hourglass-start"></i>
                                                         </div>
                                                         <div class="float-left"
                                                              style="margin-left:10px">
@@ -237,21 +254,25 @@
                                                             <span class="title">Método</span>
                                                             <div>
                                                                 Boleto
-                                                                {% if last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                                {% if last_transaction.status == last_transaction.REFUSED %}
+                                                                    <strong class="text-warning">(recusado)</strong>
+                                                                {% elif last_transaction.status == last_transaction.REFUNDED %}
+                                                                    <strong class="text-warning">(estonado)</strong>
+                                                                {% elif last_transaction.status == last_transaction.WAITING_PAYMENT and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
                                                                     <strong class="text-warning">(vencido)</strong>
                                                                 {% endif %}
                                                             </div>
                                                             <div style="margin-top:5px;">
-                                                                {% if last_transaction.status != last_transaction.PAID and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                                {% if last_transaction.status == last_transaction.WAITING_PAYMENT and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
                                                                     <button type="button"
                                                                             data-toggle="tooltip"
                                                                             title="{% if last_transaction.boleto_url %}Abrir boleto{% else %}Aguardando processamento{% endif %}"
                                                                             class="btn btn-success btn-sm btn-trans {% if not last_transaction.boleto_url %}disabled{% endif %}"
                                                                             onclick="window.open('{{ last_transaction.boleto_url }}')">
                                                                         <i class="far fa-file-alt"></i>
-                                                                        {% if last_transaction.boleto_url %}abrir{% else %}aguarde ...{% endif %}
+                                                                        abrir
                                                                     </button>
-                                                                    {% if last_transaction.boleto_url and object.person.email %}
+                                                                    {% if last_transaction.boleto_url and object.person.email and object.origin == object.DEVICE_ORIGIN_HOTSITE %}
                                                                         <button type="button"
                                                                                 data-toggle="tooltip"
                                                                                 title="Enviar boleto para o participante"
@@ -262,14 +283,33 @@
                                                                         </button>
                                                                     {% endif %}
                                                                 {% endif %}
-                                                                {% if new_boleto_allowed and last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                                {% if last_transaction.status == last_transaction.PROCESSING %}
                                                                     <button type="button"
                                                                             data-toggle="tooltip"
-                                                                            title="Abrir documento"
-                                                                            class="btn btn-info btn-sm btn-trans"
-                                                                            onclick="open_checkout()">
-                                                                        novo boleto
+                                                                            title="{% if last_transaction.boleto_url %}Abrir boleto{% else %}Aguardando processamento{% endif %}"
+                                                                            class="btn btn-success btn-sm btn-trans disabled">
+                                                                        <i class="far fa-file-alt"></i>
+                                                                        aguarde...
                                                                     </button>
+                                                                {% endif %}
+                                                                {% if new_boleto_allowed %}
+                                                                    {% if last_transaction.status == last_transaction.REFUSED or last_transaction.status == last_transaction.REFUNDED %}
+                                                                        <button type="button"
+                                                                                data-toggle="tooltip"
+                                                                                title="Abrir documento"
+                                                                                class="btn btn-info btn-sm btn-trans"
+                                                                                onclick="open_checkout()">
+                                                                            novo boleto
+                                                                        </button>
+                                                                    {% elif last_transaction.status == last_transaction.WAITING_PAYMENT and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                                        <button type="button"
+                                                                                data-toggle="tooltip"
+                                                                                title="Abrir documento"
+                                                                                class="btn btn-info btn-sm btn-trans"
+                                                                                onclick="open_checkout()">
+                                                                            novo boleto
+                                                                        </button>
+                                                                    {% endif %}
                                                                 {% endif %}
                                                             </div>
                                                         </div>
@@ -334,6 +374,19 @@
                                         Ver Painel Participante
                                     </button>
                                 </li>
+
+
+                                <li>
+                                    <button type="button"
+                                            class="btn btn-success btn-trans"
+                                            data-toggle="tooltip"
+                                            title="Realizar um pagamento de cartão de crédito."
+                                            onclick="$(this).parent().tooltip('hide');processPayment()">
+                                        <span class="fas fa-credit-card"></span>
+                                        Pagamento com Cartão de Crédito
+                                    </button>
+                                </li>
+
                                 {% if event.feature_configuration.feature_manual_payments %}
 
                                     <li>
@@ -346,6 +399,21 @@
                                             Receber pagamento
                                         </button>
                                     </li>
+
+                                    {% if has_open_installment_contract is False and remaining_price and remaining_price < 0 %}
+                                        <li>
+                                            <button type="button"
+                                                    class="btn btn-success btn-trans"
+                                                    style="display: none;"
+                                                    title="Criar novo contrato de parcelamento"
+                                                    id="new-contract-btn"
+                                                    onclick="getContractForm('{{ object.pk }}', '{{ installment_limit_date }}', parseInt({{ base_expiration_day }}), parseFloat('{{ remaining_price|unlocalize }}'), parseFloat('{{ minimum_amount }}'))">
+                                                <span class="fas fa-file-contract"></span>
+                                                Novo parcelamento
+                                            </button>
+                                        </li>
+
+                                    {% endif %}
 
                                 {% endif %}
                                 <li>
@@ -384,4 +452,77 @@
     </div>
 </div>
 
+<!-- SCRIPT Payment -->
+<!-- SCRIPT PAGAR.ME -->
+<script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
+<script src="{% static "assets/js/internal-payment.js" %}"></script>
+<script type="application/javascript">
+
+    var payment_obj;
+
+    var processPayment = function () {
+
+
+        payment_obj = new window.cgsy.payment.Payment();
+
+        {% if subscription.lot.allow_installment is False %}
+            // disable installment
+            payment_obj.disable_installment();
+        {% endif %}
+
+
+        payment_obj.set_interest_rate(2.29);
+        payment_obj.set_max_installments('{{ subscription.lot.installment_limit }}');
+        payment_obj.set_free_rate_installments('{{ subscription.lot.num_install_interest_absortion }}');
+
+
+        {% if subscription.lot.get_calculated_price %}
+            // Adiciona billing de inscrição
+            payment_obj.add_item(
+                'subscription',
+                '{{ subscription.pk }}',
+                'Inscrição: {{ subscription.lot.event.name }}',
+                1,
+                parseFloat('{{ subscription.lot.get_calculated_price|unlocalize }}')
+            );
+        {% endif %}
+
+        {% if products %}
+            // Adiciona billing de opcionais de produtos/serviços
+            {% for product in products %}
+                {% if product.optional_price %}
+                    payment_obj.add_item(
+                        'optional-product',
+                        '{{ subscription.pk }}',
+                        'Produto/Serviço: {{ product.optional.name }}',
+                        1,
+                        parseFloat('{{ product.optional_price|unlocalize }}')
+                    );
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        {% if services %}
+            // Adiciona billing de opcionais de atividades extras
+            {% for service in services %}
+                {% if service.optional_price %}
+                    payment_obj.add_item(
+                        'optional-service',
+                        '{{ subscription.pk }}',
+                        'Atividade extra: {{ service.optional.name }}',
+                        1,
+                        parseFloat('{{ service.optional_price|unlocalize }}')
+                    );
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        window.cgsy.pagarme.process_payment('{{ encryption_key }}', payment_obj);
+
+
+    };
+</script>
+
+
 {% include 'subscription/subscription-payments-list.html' %}
+

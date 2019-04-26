@@ -4,6 +4,7 @@
 # A configuração de banco de dados é gerada automaticamente pelo deploy.
 # Não mude as configurações de DATABASES.
 #############################################################################
+import re
 
 from .common import *
 import raven
@@ -25,6 +26,10 @@ MIDDLEWARE_CLASSES.append(
 MIDDLEWARE_CLASSES.append(
     'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',
 )
+
+IGNORABLE_404_URLS = (
+    re.compile('/coupon/'),
+)
 # ============================= TEMPLATES =================================== #
 # Sentry public DSN to template as SENTRY_PUBLIC_DSN
 TEMPLATES[0]['OPTIONS']['context_processors'].append(
@@ -35,6 +40,10 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append(
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
+    'root': {
+        'level': 'WARNING',
+        'handlers': ['sentry'],
+    },
     'formatters': {
         'verbose': {
             'format': '%(levelname)s %(asctime)s %(module)s '
@@ -45,7 +54,6 @@ LOGGING = {
         'sentry': {
             'level': 'ERROR', # To capture more than ERROR, change to WARNING, INFO, etc.
             'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
-            'tags': {'custom-tag': 'x'},
         },
         'console': {
             'level': 'DEBUG',
@@ -54,10 +62,6 @@ LOGGING = {
         }
     },
     'loggers': {
-        'root': {
-            'level': 'WARNING',
-            'handlers': ['sentry'],
-        },
         'django.db.backends': {
             'level': 'ERROR',
             'handlers': ['console'],
@@ -75,9 +79,6 @@ LOGGING = {
         },
     },
 }
-# ================================ CELERY =================================== #
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 # ============================ E-MAIL/SPARKPOST ============================= #
 EMAIL_BACKEND = 'sparkpost.django.email_backend.SparkPostEmailBackend'
 SPARKPOST_API_KEY = '6dacd78f4c49080da7bbe942d4f36dc95d0c110a'
@@ -92,6 +93,3 @@ RAVEN_CONFIG = {
     'dsn': '{{ SENTRY_PRIVATE_DSN }}',
     'release': '{{ APP_VERSION }}',
 }
-
-# ============================ WKHTMLTOPDF  ================================== #
-WKHTMLTOPDF_WS_URL = 'http://wkhtmltopdf'

@@ -1,7 +1,7 @@
 import os
 import sys
 
-sys.path.append("..")
+sys.path.append(os.path.join('/', 'code', 'conf', 'deploy'))
 
 from scripts import setup
 
@@ -18,20 +18,20 @@ def read_file(file_path):
 
 
 env_dict = {
-    'APP_VERSION': read_file('/var/www/cgsy/version'),
-    'BUILD': read_file('/var/www/cgsy/build_number'),
-    'BUILD_LINK': read_file('/var/www/cgsy/build_link'),
-    'AUTHOR': read_file('/var/www/cgsy/build_author'),
+    'APP_VERSION': read_file('/code/version'),
+    'BUILD': read_file('/code/build_number'),
+    'BUILD_LINK': read_file('/code/build_link'),
+    'AUTHOR': read_file('/code/build_author'),
 }
 
 setup(
     env_dict,
-    '/var/www/cgsy/conf/staging/templates/footer.j2',
-    '/var/www/cgsy/frontend/templates/base/footer.html'
+    '/code/conf/staging/templates/footer.j2',
+    '/code/frontend/templates/base/footer.html'
 )
 
 setup(
     env_dict,
-    '/var/www/cgsy/project/manage/settings/common.py',
-    '/var/www/cgsy/project/manage/settings/common.py'
+    '/code/project/manage/settings/common.py',
+    '/code/project/manage/settings/common.py'
 )

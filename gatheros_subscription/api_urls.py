@@ -20,7 +20,20 @@ urls = [
         name='lot-change-survey-api'
     ),
 ]
+
+subs_urls = [
+    url('^list/$', viewsets.SubscriptionListViewSet.as_view(),
+        name='subscription-list-api'),
+
+]
+
 single_endpoints = [url(r'^events/(?P<event_pk>[\d]+)/lots/', include(urls))]
+sub_single_endpoints = [
+    url(r'^events/(?P<event_pk>[\d]+)/subsriptions/', include(subs_urls)),
+    url(r'^events/(?P<event_pk>[\d]+)/subscriptions/export/',
+        viewsets.SubscriptionExporterViewSet.as_view())
+]
 
 urlpatterns = router.urls
 urlpatterns += single_endpoints
+urlpatterns += sub_single_endpoints

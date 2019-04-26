@@ -199,7 +199,7 @@
                 process_payment(
                     '{{ pagarme_encryption_key }}',
                     2.29,
-                    '{{ event.name }}',
+                    '{{ event.name|escapejs }}',
                     lots,
                     {#                    allowed_transactions#}
                     null

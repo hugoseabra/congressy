@@ -191,6 +191,20 @@ class SubscriptionFormMixin(SubscriptionViewMixin, generic.FormView):
         if self.object:
             kwargs['instance'] = self.object
 
+        if self.subscription:
+            initial = kwargs.get('initial', dict()) or dict()
+
+            if self.subscription.tag_info:
+                initial['tag_info'] = self.subscription.tag_info
+
+            if self.subscription.tag_group:
+                initial['tag_group'] = self.subscription.tag_group
+
+            if self.subscription.obs:
+                initial['obs'] = self.subscription.obs
+
+            kwargs.update({'initial': initial})
+
         return kwargs
 
     def get_form(self, form_class=None):
@@ -217,6 +231,18 @@ class SubscriptionFormMixin(SubscriptionViewMixin, generic.FormView):
             'lot': lot_pk,
             'created_by': self.request.user.pk,
         }
+
+        tag_info = self.request.POST.get('person-tag_info')
+        if tag_info:
+            data.update({'tag_info': tag_info})
+
+        obs = self.request.POST.get('person-obs')
+        if obs:
+            data.update({'obs': obs})
+
+        tag_group = self.request.POST.get('person-tag_group')
+        if tag_group:
+            data.update({'tag_group': tag_group})
 
         kwargs = {}
 

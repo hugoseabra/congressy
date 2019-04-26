@@ -8,4 +8,6 @@ conf/deploy/env-file
 .coverage
 cover
 logs/
-
+*.pid
+.pylintrc
+celeryd.pid

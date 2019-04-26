@@ -1,0 +1,11 @@
+sudo yum update
+sudo yum upgrade
+sudo yum install amazon-efs-utils docker python3-pip chrony
+sudo usermod -a -G docker ec2-user
+sudo hostnamectl set-hostname serverX
+sudo amazon-linux-extras install nginx1.12
+sudo pip3 install docker-compose
+sudo systemctl start docker nginx
+mkdir -p ~/cgsy/shared-volume
+sudo mount -t efs fs-12d9f659:/ ~/cgsy/shared-volume
+sudo ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime

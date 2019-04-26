@@ -134,9 +134,9 @@
                                             <button type="button"
                                                     data-toggle="tooltip"
                                                     title="Abrir voucher"
-                                                    onclick="window.location.href='{% url 'subscription:subscription-voucher' event.pk object.pk %}'"
+                                                    onclick='window.open("{% url 'subscription:subscription-voucher' event.pk object.pk %}", "_blank")'
                                                     class="btn btn-info btn-sm btn-trans">
-                                                voucher
+                                                Voucher
                                             </button>
                                         </div>
                                     {% endif %}
@@ -238,8 +238,8 @@
                                                         <small>(manual)</small>
                                                     </div>
                                                 {% elif last_transaction.manual_payment_type == last_transaction.MANUAL_WAITING_PAYMENT %}
-                                                    <div class="float-left">    
-                                                    <i style="font-size: 40px" class="fas fa-hourglass-start"></i>
+                                                    <div class="float-left">
+                                                        <i style="font-size: 40px" class="fas fa-hourglass-start"></i>
                                                     </div>
                                                     <div class="float-left"
                                                          style="margin-left:10px">
@@ -257,11 +257,15 @@
                                                          style="margin-left:10px">
                                                         <span class="title">Método</span>
                                                         Boleto
-                                                        {% if last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                        {% if last_transaction.status == last_transaction.REFUSED %}
+                                                            <strong class="text-warning">(recusado)</strong>
+                                                        {% elif last_transaction.status == last_transaction.REFUNDED %}
+                                                            <strong class="text-warning">(estonado)</strong>
+                                                        {% elif last_transaction.status == last_transaction.WAITING_PAYMENT and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
                                                             <strong class="text-warning">(vencido)</strong>
                                                         {% endif %}
                                                     </div>
-                                                    {% if last_transaction.status != last_transaction.PAID and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                    {% if last_transaction.status == last_transaction.WAITING_PAYMENT and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
                                                         <div class="float-right">
                                                             <button type="button"
                                                                     data-toggle="tooltip"
@@ -269,10 +273,7 @@
                                                                     class="btn btn-success btn-sm btn-trans {% if not last_transaction.boleto_url %}disabled{% endif %}"
                                                                     onclick="window.open('{{ last_transaction.boleto_url }}')">
                                                                 <i class="far fa-file-alt"></i>
-                                                                {% if last_transaction.boleto_url %}
-                                                                    abrir{% else %}
-                                                                    aguarde
-                                                                    ...{% endif %}
+                                                                abrir
                                                             </button>
                                                             {% if last_transaction.boleto_url and object.person.email %}
                                                                 <button type="button"
@@ -286,8 +287,20 @@
                                                             {% endif %}
                                                         </div>
                                                     {% endif %}
-                                                    {% if new_boleto_allowed and last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
-                                                        <div class="float-right">
+                                                    {% if last_transaction.status == last_transaction.PROCESSING  %}
+                                                    <div class="float-right">
+                                                        <button type="button"
+                                                                data-toggle="tooltip"
+                                                                title="{% if last_transaction.boleto_url %}Abrir boleto{% else %}Aguardando processamento{% endif %}"
+                                                                class="btn btn-success btn-sm btn-trans disabled">
+                                                            <i class="far fa-file-alt"></i>
+                                                            aguarde...
+                                                        </button>
+                                                    </div>
+                                                    {% endif %}
+                                                    {% if new_boleto_allowed %}
+                                                    <div class="float-right">
+                                                        {% if last_transaction.status == last_transaction.REFUSED or last_transaction.status == last_transaction.REFUNDED %}
                                                             <button type="button"
                                                                     data-toggle="tooltip"
                                                                     title="Abrir documento"
@@ -295,7 +308,16 @@
                                                                     onclick="open_checkout()">
                                                                 novo boleto
                                                             </button>
-                                                        </div>
+                                                        {% elif last_transaction.status == last_transaction.WAITING_PAYMENT and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                            <button type="button"
+                                                                    data-toggle="tooltip"
+                                                                    title="Abrir documento"
+                                                                    class="btn btn-info btn-sm btn-trans"
+                                                                    onclick="open_checkout()">
+                                                                novo boleto
+                                                            </button>
+                                                        {% endif %}
+                                                    </div>
                                                     {% endif %}
                                                 {% elif new_boleto_allowed and last_transaction.type == last_transaction.CREDIT_CARD %}
                                                     <div class="float-left">
@@ -352,7 +374,7 @@
                                             {% else %}
                                                 <span class="title">Valor inscrição</span>
                                                 <strong class="text-danger">
-                                                    R$ {{ last_transaction.amount|intcomma }}
+                                                    R$ {{ object.lot.get_calculated_price|intcomma }}
                                                 </strong>
                                             {% endif %}
                                         </div>
@@ -451,6 +473,10 @@
         </div>
     {% endif %}
 </div>
+
+{% if event.feature_configuration.feature_checkin is True and event.feature_management.checkin is True %}
+{% include 'subscription/includes/attendance.html' %}
+{% endif  %}
 
 <div class="row tooltip-wrapper">
     <div class="col-xl-11 col-lg-11 col-md-12">
@@ -567,7 +593,8 @@
                                 <div class="profile-info col-lg-3 col-md-6">
                                     <div class="profile-info-label">Cidade-UF:</div>
                                     <div class="profile-info-value">
-                                        {{ object.person.city_international|default:'' }}{% if object.person.city_international and object.person.state_international %},{% endif %}
+                                        {{ object.person.city_international|default:'' }}
+                                        {% if object.person.city_international and object.person.state_international %},{% endif %}
                                         {{ object.person.state_international|default:'' }}
                                     </div>
                                 </div>
@@ -590,7 +617,6 @@
                         <div class="connect social">
                             <ul>
                                 {% if is_free is False %}
-
                                     <li>
                                         <button type="button"
                                                 class="btn btn-info btn-trans"
@@ -680,12 +706,12 @@
                             </div>
                             <div class="row">
                                 {% if object.person.ddi == 'BR' %}
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Número:</label>
-                                        <div class="well well-sm profile-info-padding">{{ object.person.number|default:'-' }}</div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Número:</label>
+                                            <div class="well well-sm profile-info-padding">{{ object.person.number|default:'-' }}</div>
+                                        </div>
                                     </div>
-                                </div>
                                 {% endif %}
                                 <div class="{% if object.person.ddi == 'BR' %}col-md-8{% else %}col-md-12{% endif %}">
                                     <div class="form-group">
@@ -698,12 +724,12 @@
                             </div>
                             <div class="row">
                                 {% if object.person.ddi == 'BR' %}
-                                <div class="col-md-12 col-xl-4">
-                                    <div class="form-group">
-                                        <label>Bairro:</label>
-                                        <div class="well well-sm profile-info-padding">{{ object.person.village|default:'-' }}</div>
+                                    <div class="col-md-12 col-xl-4">
+                                        <div class="form-group">
+                                            <label>Bairro:</label>
+                                            <div class="well well-sm profile-info-padding">{{ object.person.village|default:'-' }}</div>
+                                        </div>
                                     </div>
-                                </div>
                                 {% endif %}
                                 <div class="col-md-12 {% if object.person.ddi == 'BR' %}col-xl-8{% else %}col-xl-12{% endif %}">
                                     <div class="form-group">
@@ -712,7 +738,8 @@
                                             {% if object.person.ddi == 'BR' %}
                                                 {{ object.person.city.name }}-{{ object.person.city.uf }}
                                             {% else %}
-                                                {{ object.person.city_international|default:'' }}{% if object.person.city_international and object.person.state_international %},{% endif %}
+                                                {{ object.person.city_international|default:'' }}
+                                                {% if object.person.city_international and object.person.state_international %},{% endif %}
                                                 {{ object.person.state_international|default:'' }}
                                             {% endif %}
                                         </div>
@@ -720,7 +747,8 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>CEP{% if object.person.ddi != 'BR' %} / Caixa Postal{% endif %}:</label>
+                                        <label>CEP
+                                            {% if object.person.ddi != 'BR' %} / Caixa Postal{% endif %}:</label>
                                         <div class="well well-sm profile-info-padding">
                                             {{ object.person.get_zip_code_display }}
                                         </div>

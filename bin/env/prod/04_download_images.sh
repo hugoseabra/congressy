@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -ex
+set -e
 
 ###############################################################################
 # CUIDADO!
@@ -23,11 +23,11 @@ PREVIOUS_VERSION_FILE="$BASE/previous_version"
 PREVIOUS_VERSION="dev"
 VERSION="dev"
 
-if [ -f "$PREVIOUS_VERSION_FILE" ]; then
+if [[ -f "$PREVIOUS_VERSION_FILE" ]]; then
     PREVIOUS_VERSION=$(cat ${PREVIOUS_VERSION_FILE})
 fi
 
-if [ -f "$VERSION_FILE" ]; then
+if [[ -f "$VERSION_FILE" ]]; then
     VERSION=$(cat ${VERSION_FILE})
 fi
 
@@ -35,7 +35,7 @@ echo "Download versão '${VERSION}' sobre a versão '${PREVIOUS_VERSION}'..."
 
 # A versão nunca será a anterior a atual devido ao CI controlar a continuidade
 # dos releases. Sendo assim, basta comparar
-if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
+if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
 
     echo "Baixando ${VERSION}' ..."
 

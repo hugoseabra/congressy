@@ -24,6 +24,8 @@ INSTALLED_APPS += [
     'attendance',
     'service_tags',
     'mix_boleto',
+    'installment',
+    'cgsy_commands',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'
@@ -55,20 +57,6 @@ FIXTURE_DIRS += [
 TEMPLATES[0]['OPTIONS']['context_processors'].append(
     'gatheros_event.context_processors.account',
 )
-# ============================= PAYMENT ===================================== #
-# Planos da congressy, contemplam percentuais de recebimento em cima das
-# transações
-
-# Valor mínimo que a congrssy deve receber por transação. Se o valor do recebi
-# devido for menor do que este, o valor da transaçaõ da parte da congressy será
-# este valor.
-CONGRESSY_MINIMUM_AMOUNT = 4.99
-
-# Taxas de juros de parcelamento de valores da Congressy.
-CONGRESSY_INSTALLMENT_INTERESTS_RATE = 2.29
-
-# Valor minimo para permitir parcelamentos
-CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS = 25
 
 # ============================ GOOGLE RECAPTCHA ============================= #
 GOOGLE_RECAPTCHA_SECRET_KEY = '6Lerw18UAAAAAGJyU5G_3CZN6Et4ZTcIhLiUhawX'

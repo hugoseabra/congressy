@@ -57,6 +57,3 @@ class GlobList(list):
 
 # Internal IP's used by DDTB
 INTERNAL_IPS = GlobList(['*.*.*.*'])
-
-# ============================ WKHTMLTOPDF  ================================== #
-WKHTMLTOPDF_WS_URL = 'http://wkhtmltopdf'

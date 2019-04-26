@@ -161,6 +161,69 @@
             });
 
         });
+
+        var openExportModal = function () {
+            $('#export-modal').modal('show');
+            asyncExport(true);
+        };
+
+        var exporter_process = null;
+        var asyncExport = function (create) {
+
+            window.clearTimeout(exporter_process);
+
+            var modalEl = $('#export-modal');
+
+            var promise = asyncExporterPromise(create);
+
+            promise.then(function (value) {
+
+                if (value === 201 || value === 204) {
+                    exporter_process = setTimeout(function () {
+                        asyncExport(false);
+                    }, 5000);
+                } else if (value === 200) {
+                    modalEl.modal('hide');
+                    window.location.href = '/api/attendance/services/{{ object.pk }}/export/';
+                }
+
+            }).catch(function (reason) {
+                if (reason['status'] === 403) {
+                    asyncExport(false);
+                } else {
+                    console.error(reason);
+                }
+            });
+        };
+
+
+        var asyncExporterPromise = function (create) {
+
+            return new Promise(function (resolve, reject) {
+
+                var defaultArgs = {
+                    url: '/api/attendance/services/{{ object.pk }}/export/',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    },
+                    success: function (data, textStatus, xhr) {
+                        console.log("SUCCESS STATUS CODE IS: " + xhr.status);
+                        resolve(xhr.status);
+                    },
+                    error: function (xhr, textStatus, errThrown) {
+                        reject({'reason': errThrown, 'status': xhr.status});
+                    }
+                };
+
+                if (create) {
+                    defaultArgs.type = "POST"
+                } else {
+                    defaultArgs.type = "GET"
+                }
+                $.ajax(defaultArgs);
+            });
+
+        };
     </script>
 
 {% endblock %}
@@ -175,4 +238,40 @@
     <link rel="stylesheet"
           href="{% static 'assets/plugins/dataTables/css/responsive.dataTables.min.css' %}">
 
+{% endblock %}
+
+{% block modals %}
+    <div class="modal fade" id="export-modal" tabindex="-1" role="dialog" data-backdrop="static"
+         aria-labelledby="modal-service-delete-title" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="modal-service-delete-title">
+                        Exportar
+                    </h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row text-center">
+                        <h3 class="text-bold">Estamos gerando seu arquivo, por gentileza aguarde...</h3>
+                    </div>
+
+                    <div class="row text-center" style="margin-top: 10px">
+                        <i class="fas fa-circle-notch info-color fa-spin fa-4x"></i>
+                    </div>
+
+                    <div class="row text-center" style="margin-top: 15px">
+
+                        <i class="text-mute">
+                            Em casos de evento com muitas inscrições pode demorar alguns minutos.
+                        </i>
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

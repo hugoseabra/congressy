@@ -17,7 +17,10 @@ class AttendanceServiceForm(forms.ModelForm):
             'event',
             'lot_categories',
             'checkout_enabled',
-            'with_certificate'
+            'with_certificate',
+            'printing_queue_webhook',
+            'accreditation',
+            'pwa_pin',
         )
 
     def clean_lot_category_filter(self):
@@ -27,8 +30,23 @@ class AttendanceServiceForm(forms.ModelForm):
 
         return AttendanceCategoryFilter.objects.filter(pk__in=category_pks)
 
+    def clean_accreditation(self):
+        accreditation = self.cleaned_data.get('accreditation', False)
+        event = self.cleaned_data.get('event')
+
+        if accreditation is True:
+            acc_qs = event.attendance_services.filter(accreditation=True)
+
+            if self.instance:
+                acc_qs = acc_qs.exclude(pk=self.instance.pk)
+
+            if acc_qs.count() > 0:
+                raise forms.ValidationError('Serviço de atendimento já possui'
+                                            ' serviço de credenciamento.')
+
+        return accreditation
+
     def _create_lot_category_filters(self, service):
-        print('gfdfhgsfad')
         lc_pks = self.data.getlist('category_list', [])
         lc_pks = list(map(int, lc_pks))
         existing_cat_filters = []
@@ -55,7 +73,8 @@ class AttendanceServiceForm(forms.ModelForm):
                     lot_category=lot_category
                 )
         else:
-            for lot_category in LotCategory.objects.filter(event_id=service.event_id):
+            for lot_category in LotCategory.objects.filter(
+                    event_id=service.event_id):
                 AttendanceCategoryFilter.objects.create(
                     attendance_service=service,
                     lot_category=lot_category

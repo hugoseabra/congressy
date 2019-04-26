@@ -1,0 +1,99 @@
+<table class="table">
+    <thead>
+    <tr>
+        <th width="10%">Código</th>
+        <th>Participante</th>
+        <th width="20%">Data/Hora</th>
+        <th width="3%">Status</th>
+        <th width="15%">Ação</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for item in items %}
+
+        {% if item.processed_line %}
+
+            {% if item.state is True %}
+
+                <tr>
+                    <td>
+                        {{ item.processed_line.code }}
+                    </td>
+                    <td>
+                        {{ item.processed_line.name }}
+                    </td>
+                    <td>
+                        {{ item.processed_line.created_on|date:"d/m/Y H:i:s" }}
+                    </td>
+                    <td>
+                        <i class="fa fa-circle" style="color:#5cb85c;" aria-hidden="true"></i>
+                    </td>
+                    <td>
+                        {% if item.registered is True %}
+
+                            <button class="btn btn-sm btn-primary disabled">Registrado</button>
+
+                        {% else %}
+
+                            {% if form.cleaned_data.type == "checkin" %}
+                                <button data-subscription_id="{{ item.processed_line.pk }}"
+                                        data-registration_time="{{ item.processed_line.created_on|date:"Y-m-d H:i:s" }}"
+                                        class="btn btn-sm btn-primary checkin">
+                                    Registrar
+                                </button>
+                            {% elif form.cleaned_data.type == "checkout" %}
+                                <button data-checkin_id="{{ item.checkin.pk }}"
+                                        data-registration_time="{{ item.processed_line.created_on|date:"Y-m-d H:i:s" }}"
+                                        class="btn btn-primary btn-sm checkout">
+                                    Registrar
+                                </button>
+                            {% endif %}
+
+                        {% endif %}
+
+
+                    </td>
+                </tr>
+
+            {% else %}
+
+                <tr>
+                    <td data-toggle="tooltip" title="{{ item.error }}">
+                        {{ item.processed_line.code }}
+                    </td>
+                    <td data-toggle="tooltip" title="{{ item.error }}">
+                        -
+                    </td>
+                    <td data-toggle="tooltip" title="{{ item.error }}">
+                        {{ item.processed_line.created_on|date:"d/m/Y H:i:s" }}
+                    </td>
+                    <td data-toggle="tooltip" title="{{ item.error }}">
+                        <i class="fa fa-circle" aria-hidden="true" style="color: #d9534f;"></i>
+                    </td>
+                    <td data-toggle="tooltip" title="{{ item.error }}">---</td>
+                </tr>
+
+            {% endif %}
+
+        {% endif %}
+
+    {% endfor %}
+
+    {% if processable %}
+        <tr>
+            <td colspan="5" class="text-center">
+                {% if form.cleaned_data.type == "checkin" %}
+                    <button class="btn btn-primary btn-sm checkin-all">Registrar todos
+                    </button>
+                {% elif form.cleaned_data.type == "checkout" %}
+                    <button class="btn btn-primary btn-sm checkout-all">Registrar todos
+                    </button>
+                {% endif %}
+            </td>
+        </tr>
+
+    {% endif %}
+
+    </tbody>
+</table>

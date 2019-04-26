@@ -27,10 +27,11 @@
             top: 48px;
             right: 34px;
         }
+
         @media ( max-width: 991px ) {
-            .cep-loader{
+            .cep-loader {
                 top: 28px;
-          }
+            }
         }
     </style>
 {% endblock %}
@@ -147,6 +148,12 @@
                 theme: "bootstrap4",
                 width: 'resolve'
             });
+
+            // Prevent double click
+            $('#subscription_form').submit(function () {
+                $(this).find(':submit').attr('disabled', 'disabled');
+            })
+
 
         });
 
@@ -304,7 +311,7 @@
 
 {% block content %}
     <form action="" method="post" class="skip-submition-check"
-          name="subscription_form" enctype="multipart/form-data">
+          name="subscription_form" id="subscription_form" enctype="multipart/form-data">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -630,9 +637,40 @@
 
                                 </div>
 
+
                             </div>
                         </div>
                     {% endif %}
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                Tags e Observação
+                            </div>
+                        </div>
+                        <div class="panel-body">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {% render_generic_field form.tag_info %}
+                                </div>
+
+                                <div class="col-md-6">
+                                    {% render_generic_field form.tag_group %}
+                                </div>
+
+                                <div class="col-md-12">
+                                    {% render_generic_field form.obs %}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
             </div>
 

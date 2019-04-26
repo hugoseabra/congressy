@@ -1,7 +1,7 @@
 import os
 import sys
 
-sys.path.append("..")
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from scripts import setup
 
@@ -15,6 +15,6 @@ env_dict = {
 
 setup(
     env_dict,
-    '/var/www/cgsy/conf/deploy/templates/wsgi.j2',
-    '/var/www/cgsy/project/wsgi.py'
+    '/code/conf/deploy/templates/wsgi.j2',
+    '/code/project/wsgi.py'
 )

@@ -3,7 +3,6 @@ from decimal import Decimal
 from django.db.models import Count
 
 from addon.models import Product, Service
-from core.specification import AndSpecification
 from gatheros_event.models import Event, Organization
 from gatheros_subscription.models import Lot, Subscription
 from .mixins import (
@@ -13,7 +12,6 @@ from .mixins import (
     ServiceCompositeSpecificationMixin,
     OrganizationCompositeSpecificationMixin,
 )
-from .visible import LotVisible
 
 
 class EventPayable(EventCompositeSpecificationMixin):
@@ -38,11 +36,8 @@ class EventPayable(EventCompositeSpecificationMixin):
                 if lot == self.exclude:
                     continue
 
-            one = LotVisible()
-            other = LotPayable(exclude=self.exclude,
-                               exclude_type=self.exclude_type)
-
-            spec = AndSpecification(one, other)
+            spec = LotPayable(exclude=self.exclude,
+                              exclude_type=self.exclude_type)
 
             if spec.is_satisfied_by(lot):
                 return True
@@ -93,7 +88,8 @@ class LotPayable(LotCompositeSpecificationMixin):
             if ServicePayable().is_satisfied_by(service):
                 paid_service_or_product_flag = True
 
-        if not paid_service_or_product_flag and not lot.price or lot.price == 0:
+        if not paid_service_or_product_flag and (
+                not lot.price or lot.price == 0):
             return False
 
         return True
@@ -151,9 +147,10 @@ class EventHasHadTransactions(EventCompositeSpecificationMixin):
         super().is_satisfied_by(event)
 
         return Subscription.objects.annotate(
-            num_transactions=Count('transactions')
+            num_transactions=Count('transactions'),
         ).filter(
             event=event,
+            test_subscription=False,
             num_transactions__gt=0,
         ).count() > 0
 

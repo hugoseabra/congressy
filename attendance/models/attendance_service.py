@@ -1,9 +1,9 @@
 from django.db import models
+
 from gatheros_event.models import Event
 
 
 class AttendanceService(models.Model):
-
     name = models.CharField(max_length=255, verbose_name='nome do atendimento')
 
     event = models.ForeignKey(
@@ -27,6 +27,38 @@ class AttendanceService(models.Model):
         default=False,
         verbose_name='Atendimento com certificado',
         help_text='Esse atendimento terá direito a certificado ?'
+
+    )
+
+    printing_queue_webhook = models.TextField(
+        verbose_name='Webhook de fila de impressão',
+        help_text='Use o endereço completo incluindo http(s)://',
+        null=True,
+        blank=True,
+    )
+
+    printer_number = models.PositiveIntegerField(
+        verbose_name='Núm. impressora',
+        null=True,
+        blank=True,
+    )
+
+    pwa_pin = models.CharField(
+        max_length=12,
+        verbose_name='PIN de acesso',
+        help_text='Acesso ao aplicativo PWA',
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self):
+        return self.name
+
+    accreditation = models.BooleanField(
+        default=False,
+        verbose_name='Credenciamento principal',
+        help_text='Este é o serviço de credenciamento? O evento só poderá ter'
+                  ' um.'
 
     )
 

@@ -1,9 +1,9 @@
 import os
 import sys
 
-# from django.core.management.utils import get_random_secret_key
+sys.path.append(sys.path.append(os.path.dirname(os.path.dirname(__file__))))
 
-sys.path.append("..")
+# from django.core.management.utils import get_random_secret_key
 
 from scripts import setup
 
@@ -24,6 +24,18 @@ if not dbhost or not dbuser or dbpass is None or not dbname:
         "DB credentials not provided or misconfigured:"
         " -e DBHOST=host -e DBUSER=user -e DBPASS=password -e DBNAME=dbname"
         " -e DBPORT=5432"
+    )
+    sys.exit(1)
+
+rabbitmq_user = os.environ.get('RABBITMQ_USER')
+rabbitmq_pass = os.environ.get('RABBITMQ_PASS')
+rabbitmq_server = os.environ.get('RABBITMQ_SERVER')
+
+if not rabbitmq_user or not rabbitmq_pass or not rabbitmq_server:
+    print(
+        "RABBITMQ configuration not provided or misconfigured:"
+        " -e RABBITMQ_USER=user -e RABBITMQ_PASS=pass"
+        " -e RABBITMQ_SERVER=server"
     )
     sys.exit(1)
 
@@ -49,32 +61,41 @@ env_dict = {
     'DBPORT': dbport,
     'SECRET_KEY': 'jq0m!8!um0yva5i5b!!j(imcu148gco-w+pe_y2k)wdg9x67t8',
     # 'SECRET_KEY': get_random_secret_key(),
-    'APP_VERSION': read_file('/var/www/cgsy/version'),
+    'APP_VERSION': read_file('/code/version'),
+    'RABBITMQ_USER': rabbitmq_user,
+    'RABBITMQ_PASS': rabbitmq_pass,
+    'RABBITMQ_SERVER': rabbitmq_server,
 }
 
 # Manage
 setup(
     env_dict,
-    '/var/www/cgsy/project/manage/settings/common.py',
-    '/var/www/cgsy/project/manage/settings/common.py'
+    '/code/project/manage/settings/common.py',
+    '/code/project/manage/settings/common.py'
 )
 
 setup(
     env_dict,
-    '/var/www/cgsy/project/manage/settings/prod.py',
-    '/var/www/cgsy/project/manage/settings/prod.py'
+    '/code/project/manage/settings/prod.py',
+    '/code/project/manage/settings/prod.py'
 )
 
 # Partner
 setup(
     env_dict,
-    '/var/www/cgsy/project/partner/settings/prod.py',
-    '/var/www/cgsy/project/partner/settings/prod.py'
+    '/code/project/partner/settings/prod.py',
+    '/code/project/partner/settings/prod.py'
 )
 
 # Admin
 setup(
     env_dict,
-    '/var/www/cgsy/project/admin_intranet/settings/prod.py',
-    '/var/www/cgsy/project/admin_intranet/settings/prod.py'
+    '/code/project/admin_intranet/settings/common.py',
+    '/code/project/admin_intranet/settings/common.py'
+)
+
+setup(
+    env_dict,
+    '/code/project/admin_intranet/settings/prod.py',
+    '/code/project/admin_intranet/settings/prod.py'
 )

@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -ex
+set -e
 
 ###############################################################################
 # CUIDADO!
@@ -20,7 +20,7 @@ BASE=$(dirname "$0")
 echo "${BASE}/tagged_version"
 CHECKABLE_FILE=$(cat ${BASE}/tagged_version)
 
-if [ "$CHECKABLE_FILE" == "1" ]; then
+if [[ "$CHECKABLE_FILE" == "1" ]]; then
     VERSION=$(cat "$BASE/../../../version")
 
     echo "Pushing version '${VERSION}' to repository ..."

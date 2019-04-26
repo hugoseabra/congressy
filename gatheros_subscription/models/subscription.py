@@ -4,10 +4,10 @@ Inscrições de pessoas em eventos.
 """
 
 import uuid
-from datetime import datetime
 
 from django.db import models
 from django.db.models import Max
+from django.utils.functional import cached_property
 
 from core.model import track_data
 from gatheros_event.models import Event, Person
@@ -143,6 +143,7 @@ class Subscription(models.Model, GatherosModelMixin):
         null=True,
         blank=True
     )
+
     created = models.DateTimeField(
         auto_now_add=True,
         verbose_name='criado em'
@@ -151,7 +152,7 @@ class Subscription(models.Model, GatherosModelMixin):
         auto_now_add=True,
         verbose_name='modificado em'
     )
-    synchronized = models.BooleanField(default=False, editable=False,)
+    synchronized = models.BooleanField(default=False, editable=False, )
 
     notified = models.BooleanField(
         default=False,
@@ -184,6 +185,28 @@ class Subscription(models.Model, GatherosModelMixin):
     )
 
     test_subscription = models.BooleanField(default=False)
+
+    tag_info = models.CharField(
+        max_length=16,
+        verbose_name='informação para crachá',
+        help_text="Informação customizada para sair no crachá do participante",
+        null=True,
+        blank=True,
+    )
+
+    tag_group = models.CharField(
+        max_length=16,
+        verbose_name='informação de grupo',
+        help_text="Informação de grupo do participante",
+        null=True,
+        blank=True,
+    )
+
+    obs = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Observações Gerais"
+    )
 
     objects = SubscriptionManager()
 
@@ -260,3 +283,28 @@ class Subscription(models.Model, GatherosModelMixin):
         if not self.count:
             return '--'
         return '{0:03d}'.format(self.count)
+
+    @cached_property
+    def accreditation_checkin(self):
+        checkins = self.checkins.filter(
+            attendance_service__accreditation=True,
+            checkout__isnull=True,
+        )
+
+        if checkins.count() == 0:
+            return None
+
+        return checkins.last()
+
+    @property
+    def accredited(self):
+        return self.accreditation_checkin is not None
+
+    @property
+    def accredited_on(self):
+        checkin = self.accreditation_checkin
+
+        if not checkin:
+            return None
+
+        return checkin.registration or checkin.created_on

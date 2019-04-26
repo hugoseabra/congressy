@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-source /scripts.sh
+source /deploy/scripts.sh
 
 # Define settings
 export DJANGO_SETTINGS_MODULE=project.manage.settings.prod
 
 # Configura dadosde sincronização.
-run_python_script "Configurando SYNC" /configure-sync.py
+run_python_script "Configurando SYNC" /deploy/setup/configure-sync.py
 
 run_bash_script "Verificando existência do Bucket" /create-s3bucket.sh
 

@@ -8,7 +8,7 @@ from django.forms import ValidationError
 from django.utils.safestring import mark_safe
 
 
-__all__ = ['EntityMixin', 'RuleChecker']
+__all__ = ['EntityMixin', 'RuleChecker', 'RuleIntegrityError']
 
 
 class RuleIntegrityError(IntegrityError):

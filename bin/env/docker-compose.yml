@@ -1,25 +1,3 @@
-###############################################################################
-# CUIDADO!
-# Esta script é:
-#     - executado para ./bin/env/setup.sh para criar a estrutura de dados do
-#       ambiente de desenvolvimento (local); e,
-#     - gerenciado pelo CI.
-#
-# Não altere ou mude sem saber o que está fazendo.
-###############################################################################
-# CI-STEP: Destruir e (re)criar container de versão de staging
-#
-# - IMPORTANTE manter o nome do container como "cgsy-postgres" pois outros
-# - A versão do postgres:9.6 é importante, pois o RDS da AWS suporta a versão
-#   9.* apenas.
-#   scripts utilizam esta referência.
-# - O nome do banco de dados de dev, staging (RC) e prod serão o mesmo.
-# - O volume /tmp/bkp:/docker-entrypoint-initdb.d é construído para que o
-#   container execute os arquivos que estejam lá (*.sql, *.sh)
-# - O container expõe uma porta local por causa do ambiente DEV, o que não é
-#   muito legal para o servidor do ambiente staging. DEVE-SE TER CUIDADO ao
-#   gerenciar o servidor para não expor esta porta publicamente.
-###############################################################################
 version: '3.5'
 services:
   postgres:
@@ -45,7 +23,7 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
-                    
+
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas
     container_name: wkhtmltopdf
@@ -54,6 +32,33 @@ services:
     ports:
       - "5010:80"
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: cgsy-rabbitmq
+    hostname: cgsyrabbitmq # database unique name
+    networks:
+      - rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=cgsy
+      - RABBITMQ_DEFAULT_PASS=cgsy
+      - RABBITMQ_ERLANG_COOKIE=cgsyrabbitmqservice
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - ~/rabbitmq-database:/var/lib/rabbitmq/mnesia
+
+  flower:
+    image: hugoseabra19/docker-celery-flower
+    container_name: cgsy-flower
+    environment:
+      - CELERY_BROKER_URL=amqp://cgsy:cgsy@rabbitmq:5672/
+      - FLOWER_PORT=5555
+    ports:
+      - 5555:5555
+    networks:
+      - rabbitmq
+
 networks:
   postgres:
     name: local_postgres
@@ -61,4 +66,5 @@ networks:
     name: local_mailhog
   wkhtmltopdf:
     name: local_wkhtmltopdf
-
+  rabbitmq:
+    name: local_rabbitmq

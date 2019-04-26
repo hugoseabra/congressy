@@ -22,10 +22,10 @@ from .subscription_views import (
     SubscriptionAddFormView,
     SubscriptionCancelView,
     SubscriptionEditFormView,
-    SubscriptionExportView,
     SubscriptionListView,
     SubscriptionViewFormView,
     VoucherSubscriptionPDFView,
+    ExtractSubscriptionPDFView,
     SwitchSubscriptionTestView,
 )
 from .subscription_api import (

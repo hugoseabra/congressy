@@ -1,0 +1,83 @@
+{% load humanize l10n %}
+<div class="row">
+    <div class="col-md-12">
+        {% if not subscriptions %}
+            <div style="border:1px solid darkgray;padding: 30px">
+                Sem pagamentos
+            </div>
+        {% else %}
+
+        <table id="payments_table" class="table table-striped">
+            <thead>
+            <tr>
+                <th>Participante</th>
+                <th class="hidden-sm hidden-xs">Lote</th>
+                <th class="col-lg-1 col-md-1 col-sm-1 col-xs-1 text-center">Tipo</th>
+                <th class="col-lg-2 col-md-3 col-sm-4 col-xs-5">Valor</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for _, sub in subscriptions.items %}
+            {% for item in sub.transactions %}
+                <tr>
+                    <td>
+                        <div>
+                            {% if item.is_paid %}
+                                <i class="fa fa-circle" style="color: green"
+                                   data-toggle="tooltip"
+                                   title="{{ item.status_name }}"></i>
+                            {% elif item.is_pending %}
+                                <i class="fa fa-circle" style="color: goldenrod"
+                                   data-toggle="tooltip"
+                                   title="{{ item.status_name }}"></i>
+                            {% endif %}
+                            <a href="{% url 'subscription:subscription-payments' event.pk sub.pk %}" target="_blank">
+                                {{ sub.name }}
+                            </a>
+                            {% if item.is_part and item.part_info %}
+                                ({{ item.part_info }})
+                            {% endif %}
+                        </div>
+                        <small class="text-muted hidden-md hidden-lg hidden-xl" {% if sub.lot_name|length > 30 %}data-toggle="tooltip" title="{{sub.lot_name}}"{% endif %}} style="cursor: default">
+                            {{ sub.lot_name|truncatechars:30 }}
+                        </small>
+                    </td>
+                    <td class="hidden-sm hidden-xs">
+                        <div data-toggle="tooltip" title="{{sub.lot_name}}" style="cursor: default">
+                            {{ sub.lot_name|truncatechars:30 }}
+                        </div>
+                    </td>
+                    <td style="text-align: center;">
+                        {% if item.is_boleto %}
+                            <i class="fas fa-barcode"
+                               data-toggle="tooltip"
+                               title="{{ item.type_name }}"></i>
+                        {% elif item.is_cc %}
+                            <i class="fas fa-credit-card"
+                               data-toggle="tooltip"
+                               title="{{ item.type_name }}"></i>
+                        {% elif item.is_manual %}
+                            <i class="fas fa-hand-holding-usd"
+                               data-toggle="tooltip"
+                               title="Recebido manualmente"></i>
+                        {% endif %}
+                        {% if item.is_part %}
+                        <i class="fas fa-file-contract"
+                           data-toggle="tooltip"
+                           title="Contrato de parcelamento"></i>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <strong style="color:{% if item.is_paid %}green{% elif item.is_pending %}red{% endif %}">
+                            R$ {{ item.liquid_amount|intcomma }}
+                        </strong>
+                    </td>
+                </tr>
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        {%  endif %}
+    </div>
+</div>

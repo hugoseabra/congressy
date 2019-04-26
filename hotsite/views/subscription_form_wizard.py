@@ -16,6 +16,7 @@ from formtools.wizard.views import SessionWizardView
 from core.helpers import sentry_log
 from core.util.string import clear_string
 from gatheros_event.helpers.event_business import is_paid_event
+from gatheros_subscription.directors import SubscriptionSurveyDirector
 from gatheros_subscription.models import Lot, Subscription
 from hotsite import forms
 from hotsite.views.mixins import SelectLotMixin
@@ -29,7 +30,7 @@ from payment.helpers.payment_helpers import (
     is_boleto_allowed,
 )
 from payment.models import Transaction
-from survey.directors import SurveyDirector
+# from survey.directors import SurveyDirector - TODO: Depreciate this director
 from survey.models import Question
 
 FORMS = [
@@ -374,9 +375,17 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
 
         user = self.request.user
         if not isinstance(user, User):
+            messages.warning(
+                request,
+                "Você não está logado, por favor faça seu login. "
+            )
             return redirect('public:hotsite', slug=self.event.slug)
 
         if not self.current_event.subscription_enabled():
+            messages.warning(
+                request,
+                "Evento não está permitindo inscrições."
+            )
             return redirect('public:hotsite', slug=self.event.slug)
 
         try:
@@ -399,6 +408,11 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
 
             if self.event.is_scientific and hasattr(self.event, 'work_config'):
                 if not self.event.work_config.is_configured:
+                    messages.warning(
+                        request,
+                        "Este evento científico ainda não está permitindo "
+                        "inscrições"
+                    )
                     return redirect('public:hotsite', slug=self.event.slug)
 
             return super().dispatch(request, *args, **kwargs)
@@ -596,8 +610,7 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
         # Persisting survey
         if isinstance(form, forms.SurveyForm):
 
-            survey_director = SurveyDirector(event=self.event,
-                                             user=self.request.user)
+            survey_director = SubscriptionSurveyDirector(self.current_subscription.subscription)
 
             lot = self.get_lot()
 

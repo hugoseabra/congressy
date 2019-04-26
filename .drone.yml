@@ -16,9 +16,9 @@ clone:
 
 # Steps of deploy, according to configurations and conditionals
 pipeline:
-#=============================================================================#
-# STAGING
-#=============================================================================#
+  #=============================================================================#
+  # STAGING
+  #=============================================================================#
   backup-db-staging:
     image: postgres:9.6-alpine
     pull: true
@@ -31,6 +31,7 @@ pipeline:
     ]
     volumes:
       - /tmp/bkp:/tmp/bkp
+      - /etc/localtime:/etc/localtime
     commands:
       - ./bin/env/staging/01_backup-db-staging.sh
     when:
@@ -40,6 +41,7 @@ pipeline:
     image: tmaier/docker-compose
     pull: true
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/bkp:/tmp/bkp
     commands:
@@ -61,6 +63,7 @@ pipeline:
   build-staging-image:
     image: docker
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - |
@@ -77,6 +80,7 @@ pipeline:
     image: alpine
     pull: true
     volumes:
+      - /etc/localtime:/etc/localtime
       - /tmp/staging-files:/tmp/staging-files
     secrets: [
       aws_key,
@@ -91,7 +95,10 @@ pipeline:
       dbname_staging,
       dbport_staging,
       sentry_public_dsn,
-      sentry_private_dsn
+      sentry_private_dsn,
+      rabbitmq_user,
+      rabbitmq_pass,
+      rabbitmq_server
     ]
     commands:
       - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.staging" > /tmp/staging-files/env-manage-staging
@@ -108,6 +115,9 @@ pipeline:
       - echo "DBPORT=$${DBPORT_STAGING}" >> /tmp/staging-files/env-manage-staging
       - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> /tmp/staging-files/env-manage-staging
       - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> /tmp/staging-files/env-manage-staging
+      - echo "RABBITMQ_USER=cgsy" >> /tmp/staging-files/env-manage-staging
+      - echo "RABBITMQ_PASS=cgsy" >> /tmp/staging-files/env-manage-staging
+      - echo "RABBITMQ_SERVER=rabbitmq" >> /tmp/staging-files/env-manage-staging
     when:
       branch: [ hotfix/*, release/* ]
 
@@ -115,6 +125,7 @@ pipeline:
     image: tmaier/docker-compose
     pull: true
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
       - /media:/var/www/cgsy/media
       - /tmp/staging-files:/tmp/staging-files
@@ -129,7 +140,7 @@ pipeline:
     pull: true
     token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
     to: -275808686 # ID chat Congressy
-#    to: 245012348 # ID hugoseabra
+    #    to: 245012348 # ID hugoseabra
     format: markdown
     message: >
       *{{uppercase build.status }} - Ambiente RC*
@@ -163,13 +174,14 @@ pipeline:
       status: [ success, failure ]
       branch: [ hotfix/*, release/* ]
 
-#=============================================================================#
-# PRODUCTION
-#=============================================================================#
+  #=============================================================================#
+  # PRODUCTION
+  #=============================================================================#
   create-awsecr:
     image: docker
     pull: true
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
     secrets: [
       aws_key,
@@ -199,6 +211,7 @@ pipeline:
     image: docker
     pull: true
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - apk add --no-cache python3
@@ -211,6 +224,7 @@ pipeline:
   build-prod-images:
     image: docker
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - export REPO="871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy"
@@ -223,6 +237,7 @@ pipeline:
     image: docker
     pull: true
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - ./bin/env/prod/03_publish-tagged-version.sh
@@ -235,6 +250,9 @@ pipeline:
     host:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
     username: ec2-user
     port: 22
     secrets:
@@ -272,6 +290,12 @@ pipeline:
         target: SENTRY_PUBLIC_DSN
       - source: SENTRY_PRIVATE_DSN
         target: SENTRY_PRIVATE_DSN
+      - source: RABBITMQ_USER
+        target: RABBITMQ_USER
+      - source: RABBITMQ_PASS
+        target: RABBITMQ_PASS
+      - source: RABBITMQ_SERVER
+        target: RABBITMQ_SERVER
     envs: [
       congressy_deploy,
       aws_key,
@@ -289,7 +313,10 @@ pipeline:
       dbname,
       dbport,
       sentry_public_dsn,
-      sentry_private_dsn
+      sentry_private_dsn,
+      rabbitmq_user,
+      rabbitmq_pass,
+      rabbitmq_server
     ]
     script:
       - mkdir -p ~/awsecr
@@ -300,8 +327,8 @@ pipeline:
       - echo "AWS_REGION=us-east-1" >> ~/awsecr/env-awsecr
       - echo "AWS_FORMAT=json" >> ~/awsecr/env-awsecr
 
-      - mkdir -p ~/cgsy
       # env-file do stack de produção - common
+      - mkdir -p ~/cgsy
       - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
       - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> ~/cgsy/env-file
@@ -314,6 +341,10 @@ pipeline:
       - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
       - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
       - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
+      - echo "RABBITMQ_USER=$${RABBITMQ_USER}" >> ~/cgsy/env-file
+      - echo "RABBITMQ_PASS=$${RABBITMQ_PASS}" >> ~/cgsy/env-file
+      - echo "RABBITMQ_SERVER=$${RABBITMQ_SERVER}" >> ~/cgsy/env-file
+
       # env-file do stack de produção - manage
       - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.prod" > ~/cgsy/env-manage-file
       - echo "DOMAIN=$${DOMAIN_MANAGE}" >> ~/cgsy/env-manage-file
@@ -332,6 +363,9 @@ pipeline:
     hosts:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
     port: 22
     user: ec2-user
     source: ./bin/env/prod/01_create-awsecr-container.sh
@@ -348,7 +382,9 @@ pipeline:
     hosts:
       - 172.31.38.91
       - 172.31.40.208
-    port: 22
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
     user: ec2-user
     source: ./bin/env/prod/previous_version
     target: ~/cgsy/.
@@ -358,13 +394,15 @@ pipeline:
     when:
       branch: [ master ]
 
-  transfer-build-version-file:
+  transfer-version-file:
     image: drillster/drone-rsync
     pull: true
     hosts:
       - 172.31.38.91
       - 172.31.40.208
-    port: 22
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
     user: ec2-user
     source: ./version
     target: ~/cgsy/.
@@ -374,12 +412,15 @@ pipeline:
     when:
       branch: [ master ]
 
-  tranfer-stackfile-production:
+  tranfer-stackfile:
     image: drillster/drone-rsync
     pull: true
     hosts:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
     port: 22
     user: ec2-user
     source: ./conf/deploy/docker-compose.yml
@@ -390,12 +431,30 @@ pipeline:
     when:
       branch: [ master ]
 
-  tranfer-deploy-script:
+  tranfer-service-stackfile:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.35.111
+    port: 22
+    user: ec2-user
+    source: ./conf/deploy/docker-compose_services.yml
+    target: ~/cgsy/docker-compose.yml
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+#
+  tranfer-scripts:
     image: drillster/drone-rsync
     pull: true
     hosts:
       - 172.31.38.91
       - 172.31.40.208
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
     port: 22
     user: ec2-user
     source: ./bin/env/prod
@@ -406,42 +465,113 @@ pipeline:
     when:
       branch: [ master ]
 
-  deploy-latest-version-server1:
+  tranfer-traefik-conf:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.38.91
+      - 172.31.40.208
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
+    port: 22
+    user: ec2-user
+    source: ./conf/deploy/traefik.toml
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  deploy-services:
+    image: appleboy/drone-ssh
+    pull: true
+    host:
+      - 172.31.35.111
+    username: ec2-user
+    port: 22
+    command_timeout: 5m
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: ssh_key
+    script:
+      - ~/awsecr/01_create-awsecr-container.sh
+      - ~/cgsy/scripts/prod/04_download_images.sh
+      - ~/cgsy/scripts/prod/05_run_migration.sh
+      - ~/cgsy/scripts/prod/06_run_volume.sh
+      - ~/cgsy/scripts/prod/07_deploy-latest-services.sh
+    when:
+      branch: [ master ]
+
+  deploy-server1:
     image: appleboy/drone-ssh
     pull: true
     host:
       - 172.31.38.91
     username: ec2-user
     port: 22
-    command_timeout: 300
+    command_timeout: 5m
     secrets:
       - source: CONGRESSY_DEPLOY
         target: ssh_key
     script:
       - ~/awsecr/01_create-awsecr-container.sh
       - ~/cgsy/scripts/prod/04_download_images.sh
-      - ~/cgsy/scripts/prod/05_run_migration.sh
-      - ~/cgsy/scripts/prod/06_run_volume.sh
       - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
     when:
       branch: [ master ]
 
-  deploy-latest-version-server2:
+  deploy-server2:
     image: appleboy/drone-ssh
     pull: true
     host:
       - 172.31.40.208
     username: ec2-user
     port: 22
-    command_timeout: 300
+    command_timeout: 5m
     secrets:
       - source: CONGRESSY_DEPLOY
         target: ssh_key
     script:
       - ~/awsecr/01_create-awsecr-container.sh
       - ~/cgsy/scripts/prod/04_download_images.sh
-      - ~/cgsy/scripts/prod/05_run_migration.sh
-      - ~/cgsy/scripts/prod/06_run_volume.sh
+      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
+    when:
+      branch: [ master ]
+
+  deploy-server4:
+    image: appleboy/drone-ssh
+    pull: true
+    host:
+      - 172.31.35.124
+    username: ec2-user
+    port: 22
+    command_timeout: 5m
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: ssh_key
+    script:
+      - ~/awsecr/01_create-awsecr-container.sh
+      - ~/cgsy/scripts/prod/04_download_images.sh
+      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
+    when:
+      branch: [ master ]
+
+  deploy-server5:
+    image: appleboy/drone-ssh
+    pull: true
+    host:
+      - 172.31.47.46
+    username: ec2-user
+    port: 22
+    command_timeout: 5m
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: ssh_key
+    script:
+      - ~/awsecr/01_create-awsecr-container.sh
+      - ~/cgsy/scripts/prod/04_download_images.sh
       - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
     when:
       branch: [ master ]
@@ -450,19 +580,20 @@ pipeline:
     image: docker
     pull: true
     volumes:
+      - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock
     secrets: [
       sentry_release_api_token
     ]
     commands:
       - export VERSION=`cat ./version`
-      - echo "SENTRY PROJECT = Congressy v1"
+      - echo "SENTRY PROJECT = Congressy"
       - echo "NEW RELEASE = congressy/cgsy:$${VERSION}"
       - echo "SENTRY_BASE_URL = https://bugs.congressy.com"
       - echo "SENTRY_ORG_ALIAS = sentry"
       - echo "VERSION = $${VERSION}"
       - echo "COMMIT_SHA = ${DRONE_COMMIT_SHA}"
-      - docker run --rm byrnedo/alpine-curl https://bugs.congressy.com/api/0/organizations/sentry/releases/ -X POST -H "Authorization:Bearer $${SENTRY_RELEASE_API_TOKEN}" -H "Content-Type:application/json" -d "{\"version\":\"$${VERSION}\",\"refs\":[{\"repository\":\"congressy/cgsy\",\"commit\":\"${DRONE_COMMIT_SHA}\"}],\"projects\":[\"congressy-v1\"]}"
+      - docker run --rm byrnedo/alpine-curl https://bugs.congressy.com/api/0/organizations/sentry/releases/ -X POST -H "Authorization:Bearer $${SENTRY_RELEASE_API_TOKEN}" -H "Content-Type:application/json" -d "{\"version\":\"$${VERSION}\",\"refs\":[{\"repository\":\"congressy/cgsy\",\"commit\":\"${DRONE_COMMIT_SHA}\"}],\"projects\":[\"congressy\"]}"
     when:
       status: [ success ]
       branch: [ master ]
@@ -470,9 +601,11 @@ pipeline:
   notify-production-on-telegram:
     image: appleboy/drone-telegram
     pull: true
+    volumes:
+      - /etc/localtime:/etc/localtime
     token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
     to: -275808686 # ID chat Congressy
-#    to: 245012348 # ID hugoseabra
+    #    to: 245012348 # ID hugoseabra
     format: markdown
     message: >
       *{{uppercase build.status }} - Produção*

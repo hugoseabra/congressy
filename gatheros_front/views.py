@@ -23,6 +23,7 @@ from mailer.services import notify_set_password
 LOGIN_SUPERUSER_ONLY = getattr(settings, 'LOGIN_SUPERUSER_ONLY', False)
 ALLOW_ACCOUNT_REGISTRATION = getattr(settings, 'ACCOUNT_REGISTRATION', False)
 
+
 @login_required
 def start(request):
     return MySubscriptionsListView.as_view()(request)
