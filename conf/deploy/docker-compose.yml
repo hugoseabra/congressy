@@ -159,6 +159,26 @@ services:
       - "traefik.docker.network=traefik_default"
       - "traefik.frontend.entryPoints=http"
 
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:6.2.4
+    user: "root"
+    command: -strict.perms=false
+    volumes:
+      - ./ELK/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:7.0.0
+    user: "root"
+    command: -strict.perms=false
+    volumes:
+      - ./ELK/metricbeat/metricbeat.docker.yml:/usr/share/metricbeat/metricbeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /proc:/hostfs/proc:ro
+      - /:/hostfs:ro
+
 networks:
   wkhtmltopdf:
   traefik:
