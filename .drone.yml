@@ -495,10 +495,8 @@ pipeline:
       - source: ELASTICSEARCH_SERVER
         target: ELASTICSEARCH_SERVER
     commands:
-      - FILE_BEAT_FILE_PATH="$BASE/conf/deploy/ELK/filebeat/filebeat.docker.yml"
-      - METRIC_BEAT_FILE_PATH="$BASE/conf/deploy/ELK/metricbeat/metricbeat.docker.yml"
-      - sed -i -e 's/{ELASTICSEARCH_SERVER}/'"$$ELASTICSEARCH_SERVER"'/g' ${FILE_BEAT_FILE_PATH}
-      - sed -i -e 's/{ELASTICSEARCH_SERVER}/'"$$ELASTICSEARCH_SERVER"'/g' ${METRIC_BEAT_FILE_PATH}
+      - sed -i -e 's/{ELASTICSEARCH_SERVER}/'"$$ELASTICSEARCH_SERVER"'/g' ./conf/deploy/ELK/filebeat/filebeat.docker.yml
+      - sed -i -e 's/{ELASTICSEARCH_SERVER}/'"$$ELASTICSEARCH_SERVER"'/g' ./conf/deploy/ELK/metricbeat/metricbeat.docker.yml
     when:
       branch: [ master ]
 
