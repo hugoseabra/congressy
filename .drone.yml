@@ -511,7 +511,7 @@ pipeline:
 #      - 172.31.35.111
     port: 22
     user: ec2-user
-    source: ./conf/ELK
+    source: ./conf/deploy/ELK
     target: ~/cgsy/.
     secrets:
       - source: CONGRESSY_DEPLOY
