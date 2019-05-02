@@ -10,7 +10,7 @@ run_python_script "Configurando WSGI" /staging/setup/configure-wsgi.py
 run_python_script "Configurando SETTINGS" /deploy/setup/configure-settings.py
 run_python_script "Configurando VERSÃO" /staging/setup/configure-version.py
 run_python_script "Coletando arquivos estáticos" "manage.py collectstatic --noinput --verbosity 0"
-run_python_script_with_output "Atualizando Site ID" "manage.py loaddata 000_site"
+run_python_script_with_output "Atualizando Site ID" "manage.py loaddata 000_site_staging"
 
 echo " > Iniciando SERVER"
 echo ;
