@@ -233,134 +233,6 @@ pipeline:
     when:
       branch: [ master ]
 
-  publish-images:
-    image: docker
-    pull: true
-    volumes:
-      - /etc/localtime:/etc/localtime
-      - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-      - ./bin/env/prod/03_publish-tagged-version.sh
-    when:
-      branch: [ master ]
-
-  prepare-production:
-    image: appleboy/drone-ssh
-    pull: true
-    host:
-      - 172.31.38.91
-      - 172.31.40.208
-      - 172.31.35.124
-      - 172.31.47.46
-      - 172.31.35.111
-    username: ec2-user
-    port: 22
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: ssh_key
-      - source: AWS_KEY
-        target: AWS_KEY
-      - source: AWS_SECRET
-        target: AWS_SECRET
-      - source: AWS_ACCOUNT_ID
-        target: AWS_ACCOUNT_ID
-      - source: DOMAIN_MANAGE
-        target: DOMAIN_MANAGE
-      - source: DOMAIN_PARTNER
-        target: DOMAIN_PARTNER
-      - source: DOMAIN_ADMIN
-        target: DOMAIN_ADMIN
-      - source: FORCE_HTTPS
-        target: FORCE_HTTPS
-      - source: BUCKET_LOCATION
-        target: BUCKET_LOCATION
-      - source: BUCKET_NAME
-        target: BUCKET_NAME
-      - source: DBHOST
-        target: DBHOST
-      - source: DBUSER
-        target: DBUSER
-      - source: DBPASS
-        target: DBPASS
-      - source: DBNAME
-        target: DBNAME
-      - source: DBPORT
-        target: DBPORT
-      - source: SENTRY_PUBLIC_DSN
-        target: SENTRY_PUBLIC_DSN
-      - source: SENTRY_PRIVATE_DSN
-        target: SENTRY_PRIVATE_DSN
-      - source: RABBITMQ_USER
-        target: RABBITMQ_USER
-      - source: RABBITMQ_PASS
-        target: RABBITMQ_PASS
-      - source: RABBITMQ_SERVER
-        target: RABBITMQ_SERVER
-      - source: ELASTICSEARCH_SERVER
-        target: ELASTICSEARCH_SERVER
-    envs: [
-      congressy_deploy,
-      aws_key,
-      aws_secret,
-      aws_account_id,
-      domain_manage,
-      domain_partner,
-      domain_admin,
-      force_https,
-      bucket_location,
-      bucket_name,
-      dbhost,
-      dbuser,
-      dbpass,
-      dbname,
-      dbport,
-      sentry_public_dsn,
-      sentry_private_dsn,
-      rabbitmq_user,
-      rabbitmq_pass,
-      rabbitmq_server,
-      elasticsearch_server
-    ]
-    script:
-      - mkdir -p ~/awsecr
-      # env-file do awsecr
-      - echo "AWS_KEY=$${AWS_KEY}" > ~/awsecr/env-awsecr
-      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/awsecr/env-awsecr
-      - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ~/awsecr/env-awsecr
-      - echo "AWS_REGION=us-east-1" >> ~/awsecr/env-awsecr
-      - echo "AWS_FORMAT=json" >> ~/awsecr/env-awsecr
-
-      # env-file do stack de produção - common
-      - mkdir -p ~/cgsy
-      - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
-      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
-      - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> ~/cgsy/env-file
-      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ~/cgsy/env-file
-      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ~/cgsy/env-file
-      - echo "DBHOST=$${DBHOST}" >> ~/cgsy/env-file
-      - echo "DBUSER=$${DBUSER}" >> ~/cgsy/env-file
-      - echo "DBPASS=$${DBPASS}" >> ~/cgsy/env-file
-      - echo "DBNAME=$${DBNAME}" >> ~/cgsy/env-file
-      - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
-      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
-      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
-      - echo "RABBITMQ_USER=$${RABBITMQ_USER}" >> ~/cgsy/env-file
-      - echo "RABBITMQ_PASS=$${RABBITMQ_PASS}" >> ~/cgsy/env-file
-      - echo "RABBITMQ_SERVER=$${RABBITMQ_SERVER}" >> ~/cgsy/env-file
-      - echo "ELASTICSEARCH_SERVER=$${ELASTICSEARCH_SERVER}" >> ~/cgsy/env-file
-
-      # env-file do stack de produção - manage
-      - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.prod" > ~/cgsy/env-manage-file
-      - echo "DOMAIN=$${DOMAIN_MANAGE}" >> ~/cgsy/env-manage-file
-      # env-file do stack de produção - partner
-      - echo "DJANGO_SETTINGS_MODULE=project.partner.settings.prod" > ~/cgsy/env-partner-file
-      - echo "DOMAIN=$${DOMAIN_PARTNER}" >> ~/cgsy/env-partner-file
-      # env-file do stack de produção - admin_intranet
-      - echo "DJANGO_SETTINGS_MODULE=project.admin_intranet.settings.prod" > ~/cgsy/env-admin_intranet-file
-      - echo "DOMAIN=$${DOMAIN_ADMIN}" >> ~/cgsy/env-admin_intranet-file
-    when:
-      branch: [ master ]
-
   tranfer-stackfile-awsecr:
     image: drillster/drone-rsync
     pull: true
@@ -538,6 +410,135 @@ pipeline:
       - ~/cgsy/scripts/prod/07_deploy-latest-services.sh
     when:
       branch: [ master ]
+
+  publish-images:
+    image: docker
+    pull: true
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - ./bin/env/prod/03_publish-tagged-version.sh
+    when:
+      branch: [ master ]
+
+    prepare-production:
+      image: appleboy/drone-ssh
+      pull: true
+      host:
+        - 172.31.38.91
+        - 172.31.40.208
+        - 172.31.35.124
+        - 172.31.47.46
+        - 172.31.35.111
+      username: ec2-user
+      port: 22
+      secrets:
+        - source: CONGRESSY_DEPLOY
+          target: ssh_key
+        - source: AWS_KEY
+          target: AWS_KEY
+        - source: AWS_SECRET
+          target: AWS_SECRET
+        - source: AWS_ACCOUNT_ID
+          target: AWS_ACCOUNT_ID
+        - source: DOMAIN_MANAGE
+          target: DOMAIN_MANAGE
+        - source: DOMAIN_PARTNER
+          target: DOMAIN_PARTNER
+        - source: DOMAIN_ADMIN
+          target: DOMAIN_ADMIN
+        - source: FORCE_HTTPS
+          target: FORCE_HTTPS
+        - source: BUCKET_LOCATION
+          target: BUCKET_LOCATION
+        - source: BUCKET_NAME
+          target: BUCKET_NAME
+        - source: DBHOST
+          target: DBHOST
+        - source: DBUSER
+          target: DBUSER
+        - source: DBPASS
+          target: DBPASS
+        - source: DBNAME
+          target: DBNAME
+        - source: DBPORT
+          target: DBPORT
+        - source: SENTRY_PUBLIC_DSN
+          target: SENTRY_PUBLIC_DSN
+        - source: SENTRY_PRIVATE_DSN
+          target: SENTRY_PRIVATE_DSN
+        - source: RABBITMQ_USER
+          target: RABBITMQ_USER
+        - source: RABBITMQ_PASS
+          target: RABBITMQ_PASS
+        - source: RABBITMQ_SERVER
+          target: RABBITMQ_SERVER
+        - source: ELASTICSEARCH_SERVER
+          target: ELASTICSEARCH_SERVER
+      envs: [
+        congressy_deploy,
+        aws_key,
+        aws_secret,
+        aws_account_id,
+        domain_manage,
+        domain_partner,
+        domain_admin,
+        force_https,
+        bucket_location,
+        bucket_name,
+        dbhost,
+        dbuser,
+        dbpass,
+        dbname,
+        dbport,
+        sentry_public_dsn,
+        sentry_private_dsn,
+        rabbitmq_user,
+        rabbitmq_pass,
+        rabbitmq_server,
+        elasticsearch_server
+      ]
+      script:
+        - mkdir -p ~/awsecr
+        # env-file do awsecr
+        - echo "AWS_KEY=$${AWS_KEY}" > ~/awsecr/env-awsecr
+        - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/awsecr/env-awsecr
+        - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ~/awsecr/env-awsecr
+        - echo "AWS_REGION=us-east-1" >> ~/awsecr/env-awsecr
+        - echo "AWS_FORMAT=json" >> ~/awsecr/env-awsecr
+
+        # env-file do stack de produção - common
+        - mkdir -p ~/cgsy
+        - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
+        - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
+        - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> ~/cgsy/env-file
+        - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ~/cgsy/env-file
+        - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ~/cgsy/env-file
+        - echo "DBHOST=$${DBHOST}" >> ~/cgsy/env-file
+        - echo "DBUSER=$${DBUSER}" >> ~/cgsy/env-file
+        - echo "DBPASS=$${DBPASS}" >> ~/cgsy/env-file
+        - echo "DBNAME=$${DBNAME}" >> ~/cgsy/env-file
+        - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
+        - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
+        - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
+        - echo "RABBITMQ_USER=$${RABBITMQ_USER}" >> ~/cgsy/env-file
+        - echo "RABBITMQ_PASS=$${RABBITMQ_PASS}" >> ~/cgsy/env-file
+        - echo "RABBITMQ_SERVER=$${RABBITMQ_SERVER}" >> ~/cgsy/env-file
+        - echo "ELASTICSEARCH_SERVER=$${ELASTICSEARCH_SERVER}" >> ~/cgsy/env-file
+
+        # env-file do stack de produção - manage
+        - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.prod" > ~/cgsy/env-manage-file
+        - echo "DOMAIN=$${DOMAIN_MANAGE}" >> ~/cgsy/env-manage-file
+        # env-file do stack de produção - partner
+        - echo "DJANGO_SETTINGS_MODULE=project.partner.settings.prod" > ~/cgsy/env-partner-file
+        - echo "DOMAIN=$${DOMAIN_PARTNER}" >> ~/cgsy/env-partner-file
+        # env-file do stack de produção - admin_intranet
+        - echo "DJANGO_SETTINGS_MODULE=project.admin_intranet.settings.prod" > ~/cgsy/env-admin_intranet-file
+        - echo "DOMAIN=$${DOMAIN_ADMIN}" >> ~/cgsy/env-admin_intranet-file
+      when:
+        branch: [ master ]
+
 
   deploy-server1:
     image: appleboy/drone-ssh
