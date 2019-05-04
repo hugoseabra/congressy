@@ -1,13 +1,14 @@
 from django.contrib import admin
+from django_grappelli_custom_autocomplete.admin import CustomAutocompleteMixin
 
 from certificate import forms
 from certificate.models import Certificate
 
 
 @admin.register(Certificate)
-class CertificateAdmin(admin.ModelAdmin):
+class CertificateAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     form = forms.CertificateForm
-
+    raw_id_fields = ['event']
     fieldsets = (
         ('Texto Principal', {
             'fields': (
@@ -40,3 +41,6 @@ class CertificateAdmin(admin.ModelAdmin):
             ),
         }),
     )
+
+    def has_add_permission(self, request):
+        return False

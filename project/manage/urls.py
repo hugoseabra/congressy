@@ -29,7 +29,12 @@ handler500 = 'project.views.handler500'
 
 admin_urlpatterns = []
 
-admin_urlpatterns += [url(r'^cgsy-admin18/', admin.site.urls)]
+admin_urlpatterns += [
+    url(r'^grapelli/', include('grappelli.urls')),
+    url(r'^grappelli_custom_autocomplete/',
+        include('django_grappelli_custom_autocomplete.urls')),
+    url(r'^cgsy-admin18/', admin.site.urls)
+]
 
 private_urlpatterns = [
     url(r'^manage/', include('attendance.urls', 'attendance')),
