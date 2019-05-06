@@ -228,7 +228,7 @@
         </tr>
     {% endif %}
 
-    {% if feature_management.services and feature_config.feature_services %}
+    {% if feature_management.services %}
         <tr id="del-extra_activities" class="todo_list_element"
             role="presentation">
             <td>
@@ -248,12 +248,12 @@
                 <a>Atividades extras</a>
             </td>
             <td>
-                <button type="button"
-                        class="btn btn-success btn-trans btn-sm dropdown-toggle"
-                        onclick="location.href='{% url 'addon:optional-service-list' event.pk %}'"
-                >
-                    <span>Acessar</span>
-                </button>
+<!--                <button type="button"-->
+<!--                        class="btn btn-success btn-trans btn-sm dropdown-toggle"-->
+<!--                        onclick="location.href='{% url 'addon:optional-service-list' event.pk %}'"-->
+<!--                >-->
+<!--                    <span>Acessar</span>-->
+<!--                </button>-->
             </td>
             <td>
                 {% if status_addons.services == True %}
@@ -455,24 +455,6 @@
                 </tr>
             {% endif %}
 
-            {% if not feature_management.checkin and feature_config.feature_checkin %}
-                <tr id="add-checkin" class="todo_list_element"
-                    role="presentation">
-                    <td>
-
-                        <button type="button"
-                                class="add_todo_element btn btn-success btn-trans btn-sm dropdown-toggle"
-                                data-toggle="tooltip"
-                                data-placement="left"
-                                title=""
-                                data-original-title="Adicionar">
-                    <span class="fas
-            fa-plus"></span>
-                        </button>
-                        <a>CheckIn</a>
-                    </td>
-                </tr>
-            {% endif %}
 
             {% if not feature_management.services and feature_config.feature_services %}
                 <tr id="add-extra_activities" class="todo_list_element"

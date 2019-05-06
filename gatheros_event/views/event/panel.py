@@ -44,15 +44,15 @@ class EventPanelView(EventDraftStateMixin,
             elif id_row[:3] == 'del':
                 val = False
 
-            if row_name == 'checkin':
-                if feature_config.feature_checkin:
-                    feature_management.checkin = val
-                    feature_management.save()
-                    return HttpResponse(status=201)
-                else:
-                    return HttpResponse(
-                        "Evento não possui essa funcionalidade",
-                        status=403)
+            # if row_name == 'checkin':
+            #     if feature_config.feature_checkin:
+            #         feature_management.checkin = val
+            #         feature_management.save()
+            #         return HttpResponse(status=201)
+            #     else:
+            #         return HttpResponse(
+            #             "Evento não possui essa funcionalidade",
+            #             status=403)
 
             elif row_name == 'extra_activities':
                 if feature_config.feature_services:

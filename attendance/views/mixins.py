@@ -50,8 +50,8 @@ class AttendanceBaseMixin(AccountMixin, generic.View, EventDraftStateMixin):
 
 class AttendancesFeatureFlagMixin(AttendanceBaseMixin):
     def can_access(self):
-        features = self.event.feature_configuration
-        return features.feature_checkin is True
+        features = self.event.feature_management
+        return features.checkin is True
 
 
 class AttendanceFeatureFlagMixin(AttendancesFeatureFlagMixin):
