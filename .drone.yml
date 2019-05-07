@@ -391,26 +391,6 @@ pipeline:
     when:
       branch: [ master ]
 
-  deploy-services:
-    image: appleboy/drone-ssh
-    pull: true
-    host:
-      - 172.31.35.111
-    username: ec2-user
-    port: 22
-    command_timeout: 5m
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: ssh_key
-    script:
-      - ~/awsecr/01_create-awsecr-container.sh
-      - ~/cgsy/scripts/prod/04_download_images.sh
-      - ~/cgsy/scripts/prod/05_run_migration.sh
-      - ~/cgsy/scripts/prod/06_run_volume.sh
-      - ~/cgsy/scripts/prod/07_deploy-latest-services.sh
-    when:
-      branch: [ master ]
-
   publish-images:
     image: docker
     pull: true
@@ -536,6 +516,26 @@ pipeline:
       # env-file do stack de produção - admin_intranet
       - echo "DJANGO_SETTINGS_MODULE=project.admin_intranet.settings.prod" > ~/cgsy/env-admin_intranet-file
       - echo "DOMAIN=$${DOMAIN_ADMIN}" >> ~/cgsy/env-admin_intranet-file
+    when:
+      branch: [ master ]
+
+  deploy-services:
+    image: appleboy/drone-ssh
+    pull: true
+    host:
+      - 172.31.35.111
+    username: ec2-user
+    port: 22
+    command_timeout: 5m
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: ssh_key
+    script:
+      - ~/awsecr/01_create-awsecr-container.sh
+      - ~/cgsy/scripts/prod/04_download_images.sh
+      - ~/cgsy/scripts/prod/05_run_migration.sh
+      - ~/cgsy/scripts/prod/06_run_volume.sh
+      - ~/cgsy/scripts/prod/07_deploy-latest-services.sh
     when:
       branch: [ master ]
 
