@@ -50,21 +50,27 @@ class TicketViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
 
     def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
 
-        events = list()
+        event_id = request.query_params.get('event_id', None)
 
-        if hasattr(request.user, 'person'):
+        if event_id is None:
+            qs = Ticket.objects.none()
+        else:
 
-            for m in request.user.person.members.filter(active=True):
+            events = list()
 
-                organization = m.organization
+            if hasattr(request.user, 'person'):
 
-                for event in organization.events.all():
-                    if event not in events:
-                        events.append(event.pk)
+                for m in request.user.person.members.filter(active=True):
 
-        qs = Ticket.objects.filter(
-            event_id__in=events,
-        )
+                    organization = m.organization
+
+                    for event in organization.events.all():
+                        if event not in events:
+                            events.append(event.pk)
+
+            qs = Ticket.objects.filter(
+                event_id__in=events,
+            )
 
         queryset = self.filter_queryset(qs)
 
@@ -128,21 +134,28 @@ class LotViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
         )
 
     def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
-        events = list()
 
-        if hasattr(request.user, 'person'):
+        ticket_id = request.query_params.get('ticket_id', None)
 
-            for m in request.user.person.members.filter(active=True):
+        if ticket_id is None:
+            qs = Lot.objects.none()
+        else:
+            events = list()
 
-                organization = m.organization
+            if hasattr(request.user, 'person'):
 
-                for event in organization.events.all():
-                    if event not in events:
-                        events.append(event.pk)
+                for m in request.user.person.members.filter(active=True):
 
-        qs = Lot.objects.filter(
-            ticket__event_id__in=events,
-        )
+                    organization = m.organization
+
+                    for event in organization.events.all():
+                        if event not in events:
+                            events.append(event.pk)
+
+            qs = Lot.objects.filter(
+                ticket__event_id__in=events,
+                ticket_id=ticket_id
+            )
 
         queryset = self.filter_queryset(qs)
 
