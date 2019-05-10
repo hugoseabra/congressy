@@ -14,7 +14,8 @@ services:
       - "15672:15672"
       - "5672:5672"
     volumes:
-      - ~/rabbitmq-database:/var/lib/rabbitmq/mnesia
+      - /etc/localtime:/etc/localtime
+      - rabbitmq_data:/var/lib/rabbitmq/mnesia
 
   flower:
     image: hugoseabra19/docker-celery-flower
@@ -27,12 +28,16 @@ services:
       - 5555:5555
     networks:
       - rabbitmq
+    volumes:
+      - /etc/localtime:/etc/localtime
 
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas
     restart: always
     networks:
       - wkhtmltopdf
+    volumes:
+      - /etc/localtime:/etc/localtime
 
   cron:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
@@ -41,14 +46,42 @@ services:
     depends_on:
       - wkhtmltopdf
     entrypoint:
-      - /services/cron/container-entry.sh
+      - /deploy/services/cron/container-entry.sh
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./shared-volume/media:/var/www/cgsy/media
-      - ./shared-volume/logs:/var/www/cgsy/logs
+      - ./shared-volume/media:/code/media
+      - ./shared-volume/logs:/code/logs
+      - ./shared-volume/exporter:/tmp/exporter
+      - ./shared-volume/qrcodes:/tmp/qrcodes
+      - ./shared-volume/barcodes:/tmp/barcodes
+      - ./shared-volume/vouchers:/tmp/vouchers
     env_file: ./env-file
     networks:
       - wkhtmltopdf
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:6.2.4
+    user: "root"
+    command: -strict.perms=false
+    volumes:
+      - ./ELK/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:7.0.0
+    user: "root"
+    command: -strict.perms=false
+    volumes:
+      - ./ELK/metricbeat/metricbeat.docker.yml:/usr/share/metricbeat/metricbeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /proc:/hostfs/proc:ro
+      - /:/hostfs:ro
+
+volumes:
+  rabbitmq_data:
+     external: true
 
 networks:
   rabbitmq:

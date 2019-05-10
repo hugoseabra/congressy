@@ -1,0 +1,6 @@
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+     [entryPoints.http.redirect]
+     regex = "^http://(.*)$"
+     replacement = "https://$1"

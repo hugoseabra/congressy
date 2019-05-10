@@ -2,10 +2,10 @@
 
 up:
 	ps x --no-header -o pid,cmd | awk '!/awk/&&/celery/{print $$1}' | xargs -r kill;
-	celery -A attendance -A mailer -A gatheros_subscription worker --loglevel=INFO --detach;
 	mkdir -p /tmp/bkp;
 	sudo cp bin/env/extension_installer.sh /tmp/bkp/;
 	docker-compose -f bin/env/docker-compose_dev.yml up -d --remove-orphans;
+	celery -E -A attendance -A mailer -A gatheros_subscription worker --loglevel=INFO --detach;
 	docker-compose -f bin/env/docker-compose_dev.yml logs -f;
 
 
@@ -17,10 +17,13 @@ down:
 clean:
 	sudo rm -rf /tmp/exporter
 
-
-debug_broker:
+broker_kill:
 	ps x --no-header -o pid,cmd | awk '!/awk/&&/celery/{print $$1}' | xargs -r kill;
-	celery -A attendance -A mailer -A gatheros_subscription worker --loglevel=INFO;
+
+
+broker_debug:
+	ps x --no-header -o pid,cmd | awk '!/awk/&&/celery/{print $$1}' | xargs -r kill;
+	celery -E -A attendance -A mailer -A gatheros_subscription worker --loglevel=INFO;
 
 
 logs:

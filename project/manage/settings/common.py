@@ -26,12 +26,6 @@ DATABASES = {
         'HOST': '{{ DBHOST }}',
     },
 }
-# =============================== CACHE ===================================== #
-CACHES = {
-    'default': {
-        'BACKEND': 'uwsgicache.UWSGICache',
-    }
-}
 # ============================ VALIDATORS =================================== #
 AUTH_PASSWORD_VALIDATORS += [
     {
@@ -50,4 +44,14 @@ AUTH_PASSWORD_VALIDATORS += [
     # },
 ]
 # ============================== GOOGLE ===================================== #
-GOOGLE_MAPS_API_KEY = 'AIzaSyDCx_62viOjiSf-NFZ1m-1mQF-9-ize9EA'
+GOOGLE_MAPS_API_KEY = 'AIzaSyDHSKpeRLaPsVxO6yDcoHjxpPK0DymAeRo'
+
+# ============================ WKHTMLTOPDF  ================================== #
+WKHTMLTOPDF_WS_URL = 'http://wkhtmltopdf'
+
+# =============================== CELERY ==================================== #
+CELERY_BROKER_URL = 'amqp://{{ RABBITMQ_USER }}:{{ RABBITMQ_PASS }}@{{ RABBITMQ_SERVER }}:5672/'
+CELERY_RESULT_BACKEND = 'amqp://{{ RABBITMQ_USER }}:{{ RABBITMQ_PASS }}@{{ RABBITMQ_SERVER }}:5672/'
+
+# ======================== HEALTH CHECK - RABBITMQ ========================== #
+BROKER_URL = CELERY_BROKER_URL

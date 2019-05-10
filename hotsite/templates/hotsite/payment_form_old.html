@@ -63,7 +63,7 @@
                                         <ol><strong>R$ {{ lot.price }}</strong>
                                         </ol>
                                     {% else %}
-                                        <ol><strong>Grátis</strong></ol>
+                                        <ol><strong>Sem custo</strong></ol>
                                     {% endif %}
                                 </ul>
 
@@ -73,9 +73,7 @@
                                         {% for product in products %}
                                             <ol>{{ product.optional.name }}:
                                                 <strong>
-                                                    {% if product.optional.price == 0.00 %}
-                                                        Grátis
-                                                    {% else %}
+                                                    {% if product.optional.price > 0.00 %}
                                                         {{ product.optional.price }}
                                                     {% endif %}
                                                 </strong>
@@ -90,9 +88,7 @@
                                         {% for service in services %}
                                             <ol>{{ service.optional.name }}:
                                                 <strong>
-                                                    {% if service.optional.price == 0.00 %}
-                                                        Grátis
-                                                    {% else %}
+                                                    {% if service.optional.price > 0.00 %}
                                                         R$
                                                         {{ service.optional.price }}
                                                     {% endif %}

@@ -18,8 +18,11 @@ class VoucherSubscriptionPDFView(AccountMixin):
         return super().pre_dispatch(request)
 
     def get(self, request, *args, **kwargs):
-        pdf = create_voucher(subscription=self.subscription)
-        response = HttpResponse(pdf, content_type='application/pdf')
+        pdf = create_voucher(subscription=self.subscription, save=True,
+                             force=True)
+        pdf_content = open(pdf, 'rb')
+
+        response = HttpResponse(pdf_content, content_type='application/pdf')
         response['Content-Disposition'] = 'inline; filename="{}"'.format(
             get_voucher_file_name(subscription=self.subscription)
         )

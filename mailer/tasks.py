@@ -1,6 +1,7 @@
 """
 Task to send e-mails
 """
+import os
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
@@ -8,7 +9,7 @@ from django.utils import six
 from lxml import html
 
 
-def send_mail(subject, body, to, reply_to=None, attachment=None):
+def send_mail(subject, body, to, reply_to=None, attachment_file_path=None):
     """ Envia um email """
     if not to:
         to = []
@@ -31,24 +32,13 @@ def send_mail(subject, body, to, reply_to=None, attachment=None):
 
     mail.attach_alternative(body, 'text/html')
 
-    if attachment and isinstance(attachment, MailerAttachment):
-        mail.attach(attachment.name, attachment.content, attachment.mime)
+    if attachment_file_path:
+        if not os.path.isfile(attachment_file_path):
+            raise Exception(
+                'Aquivo de anexo informado e não'
+                ' encontrado: {}'.format(attachment_file_path)
+            )
+
+        mail.attach_file(attachment_file_path)
 
     return mail.send(False)
-
-
-class MailerAttachment(dict):
-
-    def __init__(self, name, content, mime):
-        self.name = name
-        self.content = content
-        self.mime = mime
-        dict.__init__(
-            self,
-            name=str(name),
-            content=str(content),
-            mime=str(mime)
-        )
-
-    def __str__(self) -> str:
-        return self.name or ''

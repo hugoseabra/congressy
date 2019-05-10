@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -ex
+set -e
 
 ###############################################################################
 # CUIDADO!
@@ -38,7 +38,7 @@ fi
 if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
 
     sed -i -e 's/HOSTNAME/'"$HOSTNAME"'/g' ~/cgsy/docker-compose.yml
-    docker-compose -f ~/cgsy/docker-compose.yml up -d --remove-orphans --force
+    docker-compose -f ~/cgsy/docker-compose.yml up -d --remove-orphans --force --scale manage=2
 
     echo ;
     docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'

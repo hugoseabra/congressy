@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django_grappelli_custom_autocomplete.admin import CustomAutocompleteMixin
 
 from .models import (
     OptionalServiceType,
@@ -10,13 +11,17 @@ from .models import (
     Theme,
 )
 
-admin.site.register(Theme)
 admin.site.register(OptionalServiceType)
 admin.site.register(OptionalProductType)
 
 
+@admin.register(Theme)
+class ThemeAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+    raw_id_fields = ['event']
+
+
 @admin.register(Service)
-class OptionalServiceAdmin(admin.ModelAdmin):
+class OptionalServiceAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     search_fields = (
         'lot_category__event__name',
         'lot_category__lots__name',
@@ -32,6 +37,7 @@ class OptionalServiceAdmin(admin.ModelAdmin):
         'quantity',
         'liquid_price',
     )
+    raw_id_fields = ['theme', 'optional_type', 'lot_category']
     fieldsets = (
         (None, {
             'fields': (
@@ -60,7 +66,7 @@ class OptionalServiceAdmin(admin.ModelAdmin):
 
 
 @admin.register(Product)
-class OptionalProductAdmin(admin.ModelAdmin):
+class OptionalProductAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     search_fields = (
         'lot_category__event__name',
         'lot_category__lots__name',
@@ -73,6 +79,7 @@ class OptionalProductAdmin(admin.ModelAdmin):
         'quantity',
         'liquid_price',
     )
+    raw_id_fields = ['optional_type', 'lot_category']
     fieldsets = (
         (None, {
             'fields': (
@@ -97,10 +104,14 @@ class OptionalProductAdmin(admin.ModelAdmin):
 
 
 @admin.register(SubscriptionService)
-class OptionalSubscriptionServiceAdmin(admin.ModelAdmin):
+class OptionalSubscriptionServiceAdmin(CustomAutocompleteMixin,
+                                       admin.ModelAdmin):
     fields = (
         'optional',
+        'subscription',
     )
+
+    raw_id_fields = ['optional', 'subscription']
 
     search_fields = (
         'subscription__person__name',
@@ -131,10 +142,13 @@ class OptionalSubscriptionServiceAdmin(admin.ModelAdmin):
 
 
 @admin.register(SubscriptionProduct)
-class OptionalSubscriptionProductAdmin(admin.ModelAdmin):
+class OptionalSubscriptionProductAdmin(CustomAutocompleteMixin,
+                                       admin.ModelAdmin):
     fields = (
         'optional',
+        'subscription',
     )
+    raw_id_fields = ['optional', 'subscription']
 
     search_fields = (
         'subscription__person__name',
@@ -145,7 +159,6 @@ class OptionalSubscriptionProductAdmin(admin.ModelAdmin):
     list_display = (
         'get_person_name',
         'get_optional_name',
-        'get_theme',
     )
 
     def render_change_form(self, request, context, *args, **kwargs):

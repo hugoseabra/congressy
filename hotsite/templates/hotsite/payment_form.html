@@ -58,8 +58,6 @@
                                 <ul>
                                     {% if lot.price %}
                                         <strong>R$ {{ lot.get_calculated_price|intcomma }}</strong>
-                                    {% else %}
-                                        <strong>Grátis</strong>
                                     {% endif %}
                                 </ul>
                                 {% if products %}
@@ -68,9 +66,7 @@
                                         {% for product in products %}
                                             <ol>{{ product.optional.name }}:
                                                 <strong>
-                                                    {% if product.optional.price == 0.00 %}
-                                                        Grátis
-                                                    {% else %}
+                                                    {% if product.optional.price > 0.00 %}
                                                         R$
                                                         {{ product.optional.price|intcomma }}
                                                     {% endif %}
@@ -86,9 +82,7 @@
                                         {% for service in services %}
                                             <ol>{{ service.optional.name }}:
                                                 <strong>
-                                                    {% if service.optional.price == 0.00 %}
-                                                        Grátis
-                                                    {% else %}
+                                                    {% if service.optional.price > 0.00 %}
                                                         R$
                                                         {{ service.optional.price|intcomma }}
                                                     {% endif %}

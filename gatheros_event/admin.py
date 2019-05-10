@@ -4,11 +4,12 @@ Django Admin para Gatheros Event
 """
 from django.contrib import admin
 from django.db.models import Sum
+from django_grappelli_custom_autocomplete.admin import CustomAutocompleteMixin
 
+from gatheros_event.forms import FeatureConfigurationForm
 from .models import Category, Event, Info, Invitation, Member, Occupation, \
     Organization, Person, Place, Segment, Subject, FeatureConfiguration, \
     FeatureManagement
-from gatheros_event.forms import FeatureConfigurationForm
 
 
 @admin.register(Segment)
@@ -21,7 +22,7 @@ class NameActivePKAdmin(admin.ModelAdmin):
 
 
 @admin.register(Event)
-class EventAdmin(admin.ModelAdmin):
+class EventAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     """
     Admin para Event
     """
@@ -38,6 +39,7 @@ class EventAdmin(admin.ModelAdmin):
     )
     ordering = ['name']
     readonly_fields = ['slug']
+    raw_id_fields = ['organization',]
 
     fieldsets = (
         (None, {
@@ -104,7 +106,7 @@ class EventAdmin(admin.ModelAdmin):
 
 
 @admin.register(Person)
-class PersonAdmin(admin.ModelAdmin):
+class PersonAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     """
     Admin para Person
     """
@@ -116,6 +118,7 @@ class PersonAdmin(admin.ModelAdmin):
         'term_version',
         'politics_version'
     ]
+    raw_id_fields = ['user', ]
 
     fieldsets = (
         (None, {
@@ -334,6 +337,12 @@ class InvitationAdmin(admin.ModelAdmin):
     get_organization.__name__ = 'organização'
     get_user.__name__ = 'convidado'
 
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(FeatureConfiguration)
 class FeatureConfigurationAdmin(admin.ModelAdmin):
@@ -358,6 +367,12 @@ class FeatureConfigurationAdmin(admin.ModelAdmin):
 
         return AdminFormWithRequest
 
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(FeatureManagement)
 class FeatureManagementAdmin(admin.ModelAdmin):
@@ -367,3 +382,8 @@ class FeatureManagementAdmin(admin.ModelAdmin):
     search_fields = ('event__name',)
     exclude = ('event',)
 
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

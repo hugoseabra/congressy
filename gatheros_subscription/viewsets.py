@@ -1,4 +1,5 @@
 from datetime import datetime
+from time import sleep
 
 from django.db.models import Q
 from django.http import HttpResponse
@@ -219,9 +220,25 @@ class SubscriptionExporterViewSet(RestrictionViewMixin, APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         exporter.create_export_lock()
-        async_subscription_exporter_task.delay(event.pk)
 
-        return HttpResponse(status=status.HTTP_201_CREATED)
+        lock = True
+        lock_count = 0
+
+        while lock:
+            sleep(2)
+
+            exporter = SubscriptionServiceAsyncExporter(event)
+
+            if exporter.has_export_lock():
+                async_subscription_exporter_task.delay(event_pk=event.pk)
+                return Response(status=status.HTTP_201_CREATED)
+
+            lock_count += 1
+
+            if lock_count >= 10:
+                lock = False
+
+        return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get(self, request, *args, **kwargs):
 

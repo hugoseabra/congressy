@@ -95,7 +95,10 @@ pipeline:
       dbname_staging,
       dbport_staging,
       sentry_public_dsn,
-      sentry_private_dsn
+      sentry_private_dsn,
+      rabbitmq_user,
+      rabbitmq_pass,
+      rabbitmq_server
     ]
     commands:
       - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.staging" > /tmp/staging-files/env-manage-staging
@@ -112,6 +115,8 @@ pipeline:
       - echo "DBPORT=$${DBPORT_STAGING}" >> /tmp/staging-files/env-manage-staging
       - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> /tmp/staging-files/env-manage-staging
       - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> /tmp/staging-files/env-manage-staging
+      - echo "RABBITMQ_USER=cgsy" >> /tmp/staging-files/env-manage-staging
+      - echo "RABBITMQ_PASS=cgsy" >> /tmp/staging-files/env-manage-staging
       - echo "RABBITMQ_SERVER=rabbitmq" >> /tmp/staging-files/env-manage-staging
     when:
       branch: [ hotfix/*, release/* ]
@@ -228,6 +233,164 @@ pipeline:
     when:
       branch: [ master ]
 
+  tranfer-stackfile-awsecr:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.38.91
+      - 172.31.40.208
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
+    port: 22
+    user: ec2-user
+    source: ./bin/env/prod/01_create-awsecr-container.sh
+    target: ~/awsecr/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  transfer-previous-version-file:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.38.91
+      - 172.31.40.208
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
+    user: ec2-user
+    source: ./bin/env/prod/previous_version
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  transfer-version-file:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.38.91
+      - 172.31.40.208
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
+    user: ec2-user
+    source: ./version
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  tranfer-stackfile:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.38.91
+      - 172.31.40.208
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
+    port: 22
+    user: ec2-user
+    source: ./conf/deploy/docker-compose.yml
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  tranfer-service-stackfile:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.35.111
+    port: 22
+    user: ec2-user
+    source: ./conf/deploy/docker-compose_services.yml
+    target: ~/cgsy/docker-compose.yml
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  tranfer-scripts:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.38.91
+      - 172.31.40.208
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
+    port: 22
+    user: ec2-user
+    source: ./bin/env/prod
+    target: ~/cgsy/scripts
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  tranfer-traefik-conf:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.38.91
+      - 172.31.40.208
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
+    port: 22
+    user: ec2-user
+    source: ./conf/deploy/traefik.toml
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  configure-ELK-files:
+    image: alpine
+    pull: true
+    secrets:
+      - source: ELASTICSEARCH_SERVER
+        target: ELASTICSEARCH_SERVER
+    commands:
+      - sed -i -e 's/{ELASTICSEARCH_SERVER}/'"$$ELASTICSEARCH_SERVER"'/g' ./conf/deploy/ELK/filebeat/filebeat.docker.yml
+      - sed -i -e 's/{ELASTICSEARCH_SERVER}/'"$$ELASTICSEARCH_SERVER"'/g' ./conf/deploy/ELK/metricbeat/metricbeat.docker.yml
+    when:
+      branch: [ master ]
+
+  tranfer-ELK-conf:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.38.91
+      - 172.31.40.208
+      - 172.31.35.124
+      - 172.31.47.46
+      - 172.31.35.111
+    port: 22
+    user: ec2-user
+    source: ./conf/deploy/ELK
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
   publish-images:
     image: docker
     pull: true
@@ -248,8 +411,6 @@ pipeline:
       - 172.31.35.124
       - 172.31.47.46
       - 172.31.35.111
-      - 172.31.38.106
-      - 172.31.33.85
     username: ec2-user
     port: 22
     secrets:
@@ -287,8 +448,14 @@ pipeline:
         target: SENTRY_PUBLIC_DSN
       - source: SENTRY_PRIVATE_DSN
         target: SENTRY_PRIVATE_DSN
+      - source: RABBITMQ_USER
+        target: RABBITMQ_USER
+      - source: RABBITMQ_PASS
+        target: RABBITMQ_PASS
       - source: RABBITMQ_SERVER
         target: RABBITMQ_SERVER
+      - source: ELASTICSEARCH_SERVER
+        target: ELASTICSEARCH_SERVER
     envs: [
       congressy_deploy,
       aws_key,
@@ -307,7 +474,10 @@ pipeline:
       dbport,
       sentry_public_dsn,
       sentry_private_dsn,
-      rabbitmq_server
+      rabbitmq_user,
+      rabbitmq_pass,
+      rabbitmq_server,
+      elasticsearch_server
     ]
     script:
       - mkdir -p ~/awsecr
@@ -332,7 +502,10 @@ pipeline:
       - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
       - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
       - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
+      - echo "RABBITMQ_USER=$${RABBITMQ_USER}" >> ~/cgsy/env-file
+      - echo "RABBITMQ_PASS=$${RABBITMQ_PASS}" >> ~/cgsy/env-file
       - echo "RABBITMQ_SERVER=$${RABBITMQ_SERVER}" >> ~/cgsy/env-file
+      - echo "ELASTICSEARCH_SERVER=$${ELASTICSEARCH_SERVER}" >> ~/cgsy/env-file
 
       # env-file do stack de produção - manage
       - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.prod" > ~/cgsy/env-manage-file
@@ -343,121 +516,6 @@ pipeline:
       # env-file do stack de produção - admin_intranet
       - echo "DJANGO_SETTINGS_MODULE=project.admin_intranet.settings.prod" > ~/cgsy/env-admin_intranet-file
       - echo "DOMAIN=$${DOMAIN_ADMIN}" >> ~/cgsy/env-admin_intranet-file
-    when:
-      branch: [ master ]
-
-  tranfer-stackfile-awsecr:
-    image: drillster/drone-rsync
-    pull: true
-    hosts:
-      - 172.31.38.91
-      - 172.31.40.208
-      - 172.31.35.124
-      - 172.31.47.46
-      - 172.31.35.111
-      - 172.31.38.106
-      - 172.31.33.85
-    port: 22
-    user: ec2-user
-    source: ./bin/env/prod/01_create-awsecr-container.sh
-    target: ~/awsecr/.
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: RSYNC_KEY
-    when:
-      branch: [ master ]
-
-  transfer-previous-version-file:
-    image: drillster/drone-rsync
-    pull: true
-    hosts:
-      - 172.31.38.91
-      - 172.31.40.208
-      - 172.31.35.124
-      - 172.31.47.46
-      - 172.31.35.111
-    port: 22
-    user: ec2-user
-    source: ./bin/env/prod/previous_version
-    target: ~/cgsy/.
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: RSYNC_KEY
-    when:
-      branch: [ master ]
-
-  transfer-version-file:
-    image: drillster/drone-rsync
-    pull: true
-    hosts:
-      - 172.31.38.91
-      - 172.31.40.208
-      - 172.31.35.124
-      - 172.31.47.46
-      - 172.31.35.111
-      - 172.31.38.106
-      - 172.31.33.85
-    port: 22
-    user: ec2-user
-    source: ./version
-    target: ~/cgsy/.
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: RSYNC_KEY
-    when:
-      branch: [ master ]
-
-  tranfer-stackfile:
-    image: drillster/drone-rsync
-    pull: true
-    hosts:
-      - 172.31.38.91
-      - 172.31.40.208
-      - 172.31.35.124
-      - 172.31.47.46
-    port: 22
-    user: ec2-user
-    source: ./conf/deploy/docker-compose.yml
-    target: ~/cgsy/.
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: RSYNC_KEY
-    when:
-      branch: [ master ]
-
-  tranfer-service-stackfile:
-    image: drillster/drone-rsync
-    pull: true
-    hosts:
-      - 172.31.35.111
-    port: 22
-    user: ec2-user
-    source: ./conf/deploy/docker-compose_services.yml
-    target: ~/cgsy/docker-compose.yml
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: RSYNC_KEY
-    when:
-      branch: [ master ]
-
-  tranfer-scripts:
-    image: drillster/drone-rsync
-    pull: true
-    hosts:
-      - 172.31.38.91
-      - 172.31.40.208
-      - 172.31.35.124
-      - 172.31.47.46
-      - 172.31.35.111
-      - 172.31.38.106
-      - 172.31.33.85
-    port: 22
-    user: ec2-user
-    source: ./bin/env/prod
-    target: ~/cgsy/scripts
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: RSYNC_KEY
     when:
       branch: [ master ]
 
@@ -475,6 +533,8 @@ pipeline:
     script:
       - ~/awsecr/01_create-awsecr-container.sh
       - ~/cgsy/scripts/prod/04_download_images.sh
+      - ~/cgsy/scripts/prod/05_run_migration.sh
+      - ~/cgsy/scripts/prod/06_run_volume.sh
       - ~/cgsy/scripts/prod/07_deploy-latest-services.sh
     when:
       branch: [ master ]
@@ -493,8 +553,6 @@ pipeline:
     script:
       - ~/awsecr/01_create-awsecr-container.sh
       - ~/cgsy/scripts/prod/04_download_images.sh
-      - ~/cgsy/scripts/prod/05_run_migration.sh
-      - ~/cgsy/scripts/prod/06_run_volume.sh
       - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
     when:
       branch: [ master ]
@@ -553,42 +611,6 @@ pipeline:
     when:
       branch: [ master ]
 
-  deploy-server6:
-    image: appleboy/drone-ssh
-    pull: true
-    host:
-      - 172.31.38.106
-    username: ec2-user
-    port: 22
-    command_timeout: 5m
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: ssh_key
-    script:
-      - ~/awsecr/01_create-awsecr-container.sh
-      - ~/cgsy/scripts/prod/04_download_images.sh
-      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
-    when:
-      branch: [ master ]
-
-  deploy-server7:
-    image: appleboy/drone-ssh
-    pull: true
-    host:
-      - 172.31.33.85
-    username: ec2-user
-    port: 22
-    command_timeout: 5m
-    secrets:
-      - source: CONGRESSY_DEPLOY
-        target: ssh_key
-    script:
-      - ~/awsecr/01_create-awsecr-container.sh
-      - ~/cgsy/scripts/prod/04_download_images.sh
-      - ~/cgsy/scripts/prod/07_deploy-latest-image.sh
-    when:
-      branch: [ master ]
-
   notify-sentry-release:
     image: docker
     pull: true
@@ -600,13 +622,13 @@ pipeline:
     ]
     commands:
       - export VERSION=`cat ./version`
-      - echo "SENTRY PROJECT = Congressy v1"
+      - echo "SENTRY PROJECT = Congressy"
       - echo "NEW RELEASE = congressy/cgsy:$${VERSION}"
       - echo "SENTRY_BASE_URL = https://bugs.congressy.com"
       - echo "SENTRY_ORG_ALIAS = sentry"
       - echo "VERSION = $${VERSION}"
       - echo "COMMIT_SHA = ${DRONE_COMMIT_SHA}"
-      - docker run --rm byrnedo/alpine-curl https://bugs.congressy.com/api/0/organizations/sentry/releases/ -X POST -H "Authorization:Bearer $${SENTRY_RELEASE_API_TOKEN}" -H "Content-Type:application/json" -d "{\"version\":\"$${VERSION}\",\"refs\":[{\"repository\":\"congressy/cgsy\",\"commit\":\"${DRONE_COMMIT_SHA}\"}],\"projects\":[\"congressy-v1\"]}"
+      - docker run --rm byrnedo/alpine-curl https://bugs.congressy.com/api/0/organizations/sentry/releases/ -X POST -H "Authorization:Bearer $${SENTRY_RELEASE_API_TOKEN}" -H "Content-Type:application/json" -d "{\"version\":\"$${VERSION}\",\"refs\":[{\"repository\":\"congressy/cgsy\",\"commit\":\"${DRONE_COMMIT_SHA}\"}],\"projects\":[\"congressy\"]}"
     when:
       status: [ success ]
       branch: [ master ]

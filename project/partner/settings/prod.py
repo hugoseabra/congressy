@@ -61,5 +61,8 @@ PAGARME_ENCRYPTION_KEY = 'ek_live_Hlpg45VTiyNOnAE4dmkEBbQDEtUZCX'
 PAGARME_RECIPIENT_ID = 're_cjaskozwr01u1of5zo7kc962u'
 
 # =============================== CELERY ==================================== #
-CELERY_BROKER_URL = 'amqp://congressy:cgsy1601@{{ RABBITMQ_SERVER }}:5672/'
-CELERY_RESULT_BACKEND = 'amqp://congressy:cgsy1601@{{ RABBITMQ_SERVER }}:5672/'
+CELERY_BROKER_URL = 'amqp://{{ RABBITMQ_USER }}:{{ RABBITMQ_PASS }}@{{ RABBITMQ_SERVER }}:5672/'
+CELERY_RESULT_BACKEND = 'amqp://{{ RABBITMQ_USER }}:{{ RABBITMQ_PASS }}@{{ RABBITMQ_SERVER }}:5672/'
+
+# ======================== HEALTH CHECK - RABBITMQ ========================== #
+BROKER_URL = CELERY_BROKER_URL

@@ -5,30 +5,15 @@
 # Não mude as configurações de DATABASES.
 #############################################################################
 
-from . import *
+from .common import *
 import raven
 
 # ========================== BASE CONFIGURATION ============================= #
 DEBUG = False
-SECRET_KEY = '{{ SECRET_KEY }}'
-
-# ========================= SERVER CONFIGURATION ============================ #
-ABSOLUTEURI_PROTOCOL = 'https'
 # ================================= APPS ==================================== #
 INSTALLED_APPS.extend([
     'raven.contrib.django.raven_compat',
 ])
-# ============================== DATABASE =================================== #
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': '{{ DBNAME }}',
-        'USER': '{{ DBUSER }}',
-        'PASSWORD': '{{ DBPASS }}',
-        'PORT': '{{ DBPORT }}',
-        'HOST': '{{ DBHOST }}',
-    },
-}
 # ============================= MIDDLEWARES ================================= #
 # SENTRY User Feedback
 # We recommend putting this as high in the chain as possible
@@ -45,12 +30,57 @@ MIDDLEWARE_CLASSES.append(
 TEMPLATES[0]['OPTIONS']['context_processors'].append(
     'frontend.context_processors.sentry_public_dsn'
 )
-# ================================ CELERY =================================== #
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+
+# ============================== LOGGING ==================================== #
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'root': {
+        'level': 'WARNING',
+        'handlers': ['sentry'],
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s '
+                      '%(process)d %(thread)d %(message)s'
+        },
+    },
+    'handlers': {
+        'sentry': {
+            'level': 'ERROR', # To capture more than ERROR, change to WARNING, INFO, etc.
+            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'ERROR',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'raven': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'sentry.errors': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+    },
+}
 # ============================ E-MAIL/SPARKPOST ============================= #
 EMAIL_BACKEND = 'sparkpost.django.email_backend.SparkPostEmailBackend'
 SPARKPOST_API_KEY = '6dacd78f4c49080da7bbe942d4f36dc95d0c110a'
+# ================================ PAGAR.ME ================================= #
+PAGARME_API_KEY = 'ak_live_7Rxgr3GlxWycVDMNeeG2InzwPsoPrM'
+PAGARME_ENCRYPTION_KEY = 'ek_live_Hlpg45VTiyNOnAE4dmkEBbQDEtUZCX'
+PAGARME_RECIPIENT_ID = 're_cjaskozwr01u1of5zo7kc962u'
 # ============================== SENTRY ===================================== #
 # Sentry integration
 RAVEN_CONFIG = {
@@ -58,7 +88,13 @@ RAVEN_CONFIG = {
     'dsn': '{{ SENTRY_PRIVATE_DSN }}',
     'release': '{{ APP_VERSION }}',
 }
-# ================================ PAGAR.ME ================================= #
-PAGARME_API_KEY = 'ak_live_7Rxgr3GlxWycVDMNeeG2InzwPsoPrM'
-PAGARME_ENCRYPTION_KEY = 'ek_live_Hlpg45VTiyNOnAE4dmkEBbQDEtUZCX'
-PAGARME_RECIPIENT_ID = 're_cjaskozwr01u1of5zo7kc962u'
+
+# ============================ WKHTMLTOPDF  ================================== #
+WKHTMLTOPDF_WS_URL = 'http://wkhtmltopdf'
+
+# =============================== CELERY ==================================== #
+CELERY_BROKER_URL = 'amqp://{{ RABBITMQ_USER }}:{{ RABBITMQ_PASS }}@{{ RABBITMQ_SERVER }}:5672/'
+CELERY_RESULT_BACKEND = 'amqp://{{ RABBITMQ_USER }}:{{ RABBITMQ_PASS }}@{{ RABBITMQ_SERVER }}:5672/'
+
+# ======================== HEALTH CHECK - RABBITMQ ========================== #
+BROKER_URL = CELERY_BROKER_URL

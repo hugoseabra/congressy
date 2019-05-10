@@ -19,19 +19,12 @@ function error_msg() {
     echo ;
 }
 
-docker-compose -f ./conf/staging/docker-compose.yml down --remove-orphans
-docker-compose -f ./conf/staging/docker-compose.yml up -d;
-sleep 20
-
-echo ;
-docker-compose -f ./conf/staging/docker-compose.yml logs migration
-docker-compose -f ./conf/staging/docker-compose.yml logs volume
-docker-compose -f ./conf/staging/docker-compose.yml logs cron
-docker-compose -f ./conf/staging/docker-compose.yml logs manage
-echo ;
-
-RUNNING=$(docker inspect -f {{.State.Running}} manage-staging)
-if [[ "$RUNNING" != "true" ]]; then
-    error_msg "Container do manage não subiu."
-    exit 1
-fi
+docker volume create staging_media
+docker volume create staging_exporter
+docker volume create staging_barcodes
+docker volume create staging_qrcodes
+docker volume create staging_vouchers
+cat ./conf/deploy/traefik.toml
+cp ./conf/deploy/traefik.toml /tmp/staging-files/.
+cp ./conf/staging/docker-compose.yml /tmp/staging-files/.
+docker-compose -f ./conf/staging/docker-compose.yml up -d --force --remove-orphans --scale manage=2

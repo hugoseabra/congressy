@@ -30,13 +30,12 @@ handler500 = 'project.views.handler500'
 
 admin_urlpatterns = []
 
-if not settings.DEBUG:
-    admin_urlpatterns += url(
-        r'^cgsy-admin18/uwsgi/',
-        include('django_uwsgi.urls')
-    ),
-
-admin_urlpatterns += [url(r'^cgsy-admin18/', admin.site.urls)]
+admin_urlpatterns += [
+    url(r'^grapelli/', include('grappelli.urls')),
+    url(r'^grappelli_custom_autocomplete/',
+        include('django_grappelli_custom_autocomplete.urls')),
+    url(r'^cgsy-admin18/', admin.site.urls)
+]
 
 private_urlpatterns = [
     url(r'^manage/', include('attendance.urls', 'attendance')),
@@ -63,26 +62,17 @@ public_urls += urlpatterns_public_hotsite
 public_auth_urlpatterns = [url(r'^', include(public_urls, 'public'))]
 
 public_urlpatterns = [
+    url(r'^captcha/', include('captcha.urls')),
+    url(r'^healthcheck/', include('health_check.urls')),
+    url(r'^$', RedirectView.as_view(url='/login/'), name='root'),
+]
+
+public_urlpatterns += [
     url(r'^', include(public_urls, 'public')),
 
     # Patterns do Django não podem estar sob um 'namespace'
     url(r'^', include(urlpatterns_public_password)),
 ]
-
-public_urlpatterns += [
-    url(r'^captcha/', include('captcha.urls')),
-]
-
-if not settings.DEBUG:
-    public_urlpatterns += [
-        url(
-            r'^$',
-            RedirectView.as_view(
-                url='https://congressy.com'
-            ),
-            name='root'
-        ),
-    ]
 
 # API
 api_urls = [

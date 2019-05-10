@@ -338,4 +338,3 @@ class Organization(models.Model, GatherosModelMixin):
                 invitations += list(invitation_qs.all())
 
         return invitations
-

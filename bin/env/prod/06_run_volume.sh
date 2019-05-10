@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -ex
+set -e
 
 ###############################################################################
 # CUIDADO!
@@ -40,9 +40,8 @@ if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
     docker run --rm \
         --env-file=${BASE}/env-file \
         -v /etc/localtime:/etc/localtime \
-        -v ${BASE}/shared-volume/media:/var/www/cgsy/media \
-        -v ${BASE}/shared-volume/logs:/var/www/cgsy/logs \
-        871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest /services/volume/container-entry.sh
+        -v ${BASE}/shared-volume/media:/code/media \
+        871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest /deploy/services/volume/container-entry.sh
 
     echo ;
 

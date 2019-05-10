@@ -4,6 +4,7 @@
 # A configuração de banco de dados é gerada automaticamente pelo deploy.
 # Não mude as configurações de DATABASES.
 #############################################################################
+import re
 
 from .common import *
 import raven
@@ -24,6 +25,10 @@ MIDDLEWARE_CLASSES.append(
 # Sentry logging
 MIDDLEWARE_CLASSES.append(
     'raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware',
+)
+
+IGNORABLE_404_URLS = (
+    re.compile('/coupon/'),
 )
 # ============================= TEMPLATES =================================== #
 # Sentry public DSN to template as SENTRY_PUBLIC_DSN
@@ -88,10 +93,3 @@ RAVEN_CONFIG = {
     'dsn': '{{ SENTRY_PRIVATE_DSN }}',
     'release': '{{ APP_VERSION }}',
 }
-
-# ============================ WKHTMLTOPDF  ================================== #
-WKHTMLTOPDF_WS_URL = 'http://wkhtmltopdf'
-
-# =============================== CELERY ==================================== #
-CELERY_BROKER_URL = 'amqp://congressy:cgsy1601@{{ RABBITMQ_SERVER }}:5672/'
-CELERY_RESULT_BACKEND = 'amqp://congressy:cgsy1601@{{ RABBITMQ_SERVER }}:5672/'

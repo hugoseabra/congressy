@@ -9,21 +9,31 @@ from gatheros_subscription.helpers.subscription_async_exporter import \
 logger = logging.getLogger(__name__)
 
 
-@app.task(ignore_result=True)
-def async_subscription_exporter_task(event_pk: int) -> None:
+@app.task(bind=True,
+          rate_limit='5/m',  # Processar até 5 tasks por minuto
+          default_retry_delay=30,  # retry in 30s
+          ignore_result=True)
+def async_subscription_exporter_task(self, event_pk: int) -> None:
     event = Event.objects.get(pk=event_pk)
 
     exporter = SubscriptionServiceAsyncExporter(event)
 
-    assert exporter.has_export_lock(), \
-        "Attempting to export with no lock file on event id: {}".format(
-            event.pk
-        )
+    try:
 
-    payload = export_event_data(event)
-    if exporter.has_existing_export_files():
-        exporter.remove_export_files()
+        if not exporter.has_export_lock():
+            logger.warning(
+                "Creating missing exporter lock for event id: {}".format(
+                    event.pk
+                ))
+            exporter.create_export_lock()
 
-    exporter.create_export_file(payload)
+        payload = export_event_data(event)
+        if exporter.has_existing_export_files():
+            exporter.remove_export_files()
 
-    exporter.remove_export_lock()
+        exporter.create_export_file(payload)
+
+        exporter.remove_export_lock()
+    except Exception as e:
+        exporter.remove_export_lock()
+        raise self.retry(exec=e)

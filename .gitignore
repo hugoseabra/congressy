@@ -9,5 +9,5 @@ conf/deploy/env-file
 cover
 logs/
 *.pid
-_build/
-
+.pylintrc
+celeryd.pid

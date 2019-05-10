@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from django_grappelli_custom_autocomplete.admin import CustomAutocompleteMixin
+
 from .models import (
     EventSurvey,
     LotCategory,
@@ -10,19 +12,23 @@ from .models import (
 
 
 @admin.register(FormConfig)
-class FormConfigAdmin(admin.ModelAdmin):
+class FormConfigAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     search_fields = (
         'event__name',      
     )
+    raw_id_fields = ['event']
 
 
 @admin.register(LotCategory)
-class LotCategoryAdmin(admin.ModelAdmin):
-    pass
+class LotCategoryAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+    search_fields = (
+        'event__name',
+    )
+    raw_id_fields = ['event']
 
 
 @admin.register(Lot)
-class LotAdmin(admin.ModelAdmin):
+class LotAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     search_fields = (
         'event__name',
         'name',
@@ -35,11 +41,11 @@ class LotAdmin(admin.ModelAdmin):
         'date_start',
         'date_end',
         'get_percent_completed',
-        # 'get_percent_attended',
         'private',
         'internal',
         'pk'
     )
+    raw_id_fields = ['category']
     fieldsets = (
         (None, {
             'fields': (
@@ -88,24 +94,11 @@ class LotAdmin(admin.ModelAdmin):
         percent = '{0:.2f}'.format(100 - instance.percent_completed)
         return '{} ({}%)'.format(remaining, percent)
 
-    # def get_percent_attended(self, instance):
-    #     queryset = instance.subscriptions.filter(
-    #         completed=True, test_subscription=False
-    #     ).exclude(
-    #         status=Subscription.CANCELED_STATUS,
-    #     )
-    #     return '{}/{} ({}%)'.format(
-    #         queryset.filter(attended=True).count(),
-    #         queryset.count(),
-    #         '{0:.2f}'.format(instance.percent_attended)
-    #     )
-
     get_percent_completed.__name__ = 'Vagas restantes'
-    # get_percent_attended.__name__ = 'Credenciados'
 
 
 @admin.register(Subscription)
-class SubscriptionAdmin(admin.ModelAdmin):
+class SubscriptionAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     search_fields = (
         'uuid',
         'person__uuid',
@@ -121,11 +114,15 @@ class SubscriptionAdmin(admin.ModelAdmin):
         'event',
         'code',
         'count',
+        'completed',
         'event_count',
         'synchronized',
         'attended',
-        'completed',
         'created_by',
         'congressy_percent',
     ]
-    ordering = ('lot', 'count', 'person',)
+    ordering = ('lot', 'event_count', 'person',)
+    raw_id_fields = ['lot', 'person', 'author']
+
+    def has_add_permission(self, request):
+        return False

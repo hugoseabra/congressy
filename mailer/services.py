@@ -1,4 +1,8 @@
 """ Mailer service. """
+import os
+import time
+from datetime import timedelta, datetime
+
 import absoluteuri
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -7,12 +11,9 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-from gatheros_subscription.helpers.voucher import (
-    create_voucher,
-    get_voucher_file_name,
-)
+from gatheros_event.models import Member
+from gatheros_subscription.helpers.voucher import create_voucher
 from mailer import exception, checks
-from .tasks import MailerAttachment
 from .worker import send_mail
 
 
@@ -72,14 +73,20 @@ def notify_paid_subscription_boleto(event, transaction):
 
     checks.check_notification_transaction_paid_boleto(transaction)
 
-    # Se inscrição confirmada, envia o voucher.
-    voucher_file = create_voucher(subscription)
+    # Precisamos de outros serviços para gerar qrcode, barcode e PDF.from
+    # Vamos saber se esses serviços possuem delay e/ou estão disponíveis. Caso
+    # não, vamos levantar uma exceção.
+    voucher_file = ''
+    counter = 1
+    while os.path.isfile(voucher_file) is False:
+        if counter == 50:  # 50 tentativas
+            raise Exception('Não foi possível criar arquivo de voucher.')
 
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+        elif counter > 1:
+            time.sleep(secs=5)
+
+        voucher_file = create_voucher(subscription, save=True)
+        counter += 1
 
     event_url = absoluteuri.reverse(
         'public:hotsite',
@@ -103,14 +110,19 @@ def notify_paid_subscription_boleto(event, transaction):
         'password_set_url': None,
     })
 
-    sender = send_mail.delay
+    # Vamos processar dando tempo para o arquivo propagar em todos os
+    # servidores
+    sender = send_mail.apply_async
 
     return sender(
-        subject='Inscrição: {}'.format(event.name),
-        body=body,
-        to=person.email,
-        reply_to=event.organization.email,
-        attachment=voucher_attach,
+        kwargs={
+            'subject': 'Inscrição: {}'.format(event.name),
+            'body': body,
+            'to': person.email,
+            'reply_to': event.organization.email,
+            'attachment_file_path': voucher_file,
+        },
+        eta=datetime.now() + timedelta(seconds=30)  # exec after 30 secs
     )
 
 
@@ -194,13 +206,20 @@ def notify_new_user_and_paid_subscription_boleto(event, transaction):
 
     checks.check_notification_transaction_paid_boleto(transaction)
 
-    voucher_file = create_voucher(subscription)
+    # Precisamos de outros serviços para gerar qrcode, barcode e PDF.from
+    # Vamos saber se esses serviços possuem delay e/ou estão disponíveis. Caso
+    # não, vamos levantar uma exceção.
+    voucher_file = ''
+    counter = 1
+    while os.path.isfile(voucher_file) is False:
+        if counter == 50:  # 50 tentativas
+            raise Exception('Não foi possível criar arquivo de voucher.')
 
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+        elif counter > 1:
+            time.sleep(secs=5)
+
+        voucher_file = create_voucher(subscription, save=True)
+        counter += 1
 
     person = subscription.person
 
@@ -239,14 +258,19 @@ def notify_new_user_and_paid_subscription_boleto(event, transaction):
         'password_set_url': password_set_url,
     })
 
-    sender = send_mail.delay
+    # Vamos processar dando tempo para o arquivo propagar em todos os
+    # servidores
+    sender = send_mail.apply_async
 
     return sender(
-        subject='Inscrição: {}'.format(event.name),
-        body=body,
-        to=person.email,
-        reply_to=event.organization.email,
-        attachment=voucher_attach,
+        kwargs={
+            'subject': 'Inscrição: {}'.format(event.name),
+            'body': body,
+            'to': person.email,
+            'reply_to': event.organization.email,
+            'attachment_file_path': voucher_file,
+        },
+        eta=datetime.now() + timedelta(seconds=30)  # exec after 30 secs
     )
 
 
@@ -385,13 +409,20 @@ def notify_new_paid_subscription_credit_card(event, transaction):
 
     checks.check_notification_transaction_paid_credit_card(transaction)
 
-    voucher_file = create_voucher(subscription)
+    # Precisamos de outros serviços para gerar qrcode, barcode e PDF.from
+    # Vamos saber se esses serviços possuem delay e/ou estão disponíveis. Caso
+    # não, vamos levantar uma exceção.
+    voucher_file = ''
+    counter = 1
+    while os.path.isfile(voucher_file) is False:
+        if counter == 50:  # 50 tentativas
+            raise Exception('Não foi possível criar arquivo de voucher.')
 
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+        elif counter > 1:
+            time.sleep(secs=5)
+
+        voucher_file = create_voucher(subscription, save=True)
+        counter += 1
 
     person = subscription.person
 
@@ -416,14 +447,19 @@ def notify_new_paid_subscription_credit_card(event, transaction):
         'reset_password_url': absoluteuri.reverse('public:password_reset'),
     })
 
-    sender = send_mail.delay
+    # Vamos processar dando tempo para o arquivo propagar em todos os
+    # servidores
+    sender = send_mail.apply_async
 
     return sender(
-        subject='Inscrição: {}'.format(event.name),
-        body=body,
-        to=person.email,
-        reply_to=event.organization.email,
-        attachment=voucher_attach,
+        kwargs={
+            'subject': 'Inscrição: {}'.format(event.name),
+            'body': body,
+            'to': person.email,
+            'reply_to': event.organization.email,
+            'attachment_file_path': voucher_file,
+        },
+        eta=datetime.now() + timedelta(seconds=30)  # exec after 30 secs
     )
 
 
@@ -604,13 +640,20 @@ def notify_new_user_and_paid_subscription_credit_card(event, transaction):
 
     checks.check_notification_transaction_paid_credit_card(transaction)
 
-    voucher_file = create_voucher(subscription)
+    # Precisamos de outros serviços para gerar qrcode, barcode e PDF.from
+    # Vamos saber se esses serviços possuem delay e/ou estão disponíveis. Caso
+    # não, vamos levantar uma exceção.
+    voucher_file = ''
+    counter = 1
+    while os.path.isfile(voucher_file) is False:
+        if counter == 50:  # 50 tentativas
+            raise Exception('Não foi possível criar arquivo de voucher.')
 
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+        elif counter > 1:
+            time.sleep(secs=5)
+
+        voucher_file = create_voucher(subscription, save=True)
+        counter += 1
 
     person = subscription.person
 
@@ -638,14 +681,19 @@ def notify_new_user_and_paid_subscription_credit_card(event, transaction):
         'password_set_url': '',
     })
 
-    sender = send_mail.delay
+    # Vamos processar dando tempo para o arquivo propagar em todos os
+    # servidores
+    sender = send_mail.apply_async
 
     return sender(
-        subject='Inscrição: {}'.format(event.name),
-        body=body,
-        to=person.email,
-        reply_to=event.organization.email,
-        attachment=voucher_attach,
+        kwargs={
+            'subject': 'Inscrição: {}'.format(event.name),
+            'body': body,
+            'to': person.email,
+            'reply_to': event.organization.email,
+            'attachment_file_path': voucher_file,
+        },
+        eta=datetime.now() + timedelta(seconds=30)  # exec after 30 secs
     )
 
 
@@ -659,13 +707,20 @@ def notify_new_user_and_paid_subscription_credit_card_with_discrepancy(event,
 
     checks.check_notification_transaction_paid_credit_card(transaction)
 
-    voucher_file = create_voucher(subscription)
+    # Precisamos de outros serviços para gerar qrcode, barcode e PDF.from
+    # Vamos saber se esses serviços possuem delay e/ou estão disponíveis. Caso
+    # não, vamos levantar uma exceção.
+    voucher_file = ''
+    counter = 1
+    while os.path.isfile(voucher_file) is False:
+        if counter == 50:  # 50 tentativas
+            raise Exception('Não foi possível criar arquivo de voucher.')
 
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+        elif counter > 1:
+            time.sleep(secs=5)
+
+        voucher_file = create_voucher(subscription, save=True)
+        counter += 1
 
     person = subscription.person
 
@@ -692,14 +747,19 @@ def notify_new_user_and_paid_subscription_credit_card_with_discrepancy(event,
         'password_set_url': '',
     })
 
-    sender = send_mail.delay
+    # Vamos processar dando tempo para o arquivo propagar em todos os
+    # servidores
+    sender = send_mail.apply_async
 
     return sender(
-        subject='Inscrição: {}'.format(event.name),
-        body=body,
-        to=person.email,
-        reply_to=event.organization.email,
-        attachment=voucher_attach,
+        kwargs={
+            'subject': 'Inscrição: {}'.format(event.name),
+            'body': body,
+            'to': person.email,
+            'reply_to': event.organization.email,
+            'attachment_file_path': voucher_file,
+        },
+        eta=datetime.now() + timedelta(seconds=30)  # exec after 30 secs
     )
 
 
@@ -720,14 +780,20 @@ def notify_new_free_subscription(event, subscription):
             " está como confirmada.."
         )
 
-    voucher_file = create_voucher(subscription)
+    # Precisamos de outros serviços para gerar qrcode, barcode e PDF.from
+    # Vamos saber se esses serviços possuem delay e/ou estão disponíveis. Caso
+    # não, vamos levantar uma exceção.
+    voucher_file = ''
+    counter = 1
+    while os.path.isfile(voucher_file) is False:
+        if counter == 50:  # 50 tentativas
+            raise Exception('Não foi possível criar arquivo de voucher.')
 
-    # Se inscrição confirmada, envia o voucher.
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+        elif counter > 1:
+            time.sleep(secs=5)
+
+        voucher_file = create_voucher(subscription, save=True)
+        counter += 1
 
     person = subscription.person
 
@@ -751,14 +817,19 @@ def notify_new_free_subscription(event, subscription):
         'reset_password_url': absoluteuri.reverse('public:password_reset'),
     })
 
-    sender = send_mail.delay
+    # Vamos processar dando tempo para o arquivo propagar em todos os
+    # servidores
+    sender = send_mail.apply_async
 
     return sender(
-        subject='Inscrição: {}'.format(event.name),
-        body=body,
-        to=person.email,
-        reply_to=event.organization.email,
-        attachment=voucher_attach,
+        kwargs={
+            'subject': 'Inscrição: {}'.format(event.name),
+            'body': body,
+            'to': person.email,
+            'reply_to': event.organization.email,
+            'attachment_file_path': voucher_file,
+        },
+        eta=datetime.now() + timedelta(seconds=30)  # exec after 30 secs
     )
 
 
@@ -779,14 +850,20 @@ def notify_new_user_and_free_subscription(event, subscription):
             " está como confirmada.."
         )
 
-    voucher_file = create_voucher(subscription)
+    # Precisamos de outros serviços para gerar qrcode, barcode e PDF.from
+    # Vamos saber se esses serviços possuem delay e/ou estão disponíveis. Caso
+    # não, vamos levantar uma exceção.
+    voucher_file = ''
+    counter = 1
+    while os.path.isfile(voucher_file) is False:
+        if counter == 50:  # 50 tentativas
+            raise Exception('Não foi possível criar arquivo de voucher.')
 
-    # Se inscrição confirmada, envia o voucher.
-    voucher_attach = MailerAttachment(
-        name=get_voucher_file_name(subscription),
-        content=voucher_file.read(),
-        mime='application/pdf'
-    )
+        elif counter > 1:
+            time.sleep(secs=5)
+
+        voucher_file = create_voucher(subscription, save=True)
+        counter += 1
 
     person = subscription.person
 
@@ -822,14 +899,19 @@ def notify_new_user_and_free_subscription(event, subscription):
         'password_set_url': password_set_url,
     })
 
-    sender = send_mail.delay
+    # Vamos processar dando tempo para o arquivo propagar em todos os
+    # servidores
+    sender = send_mail.apply_async
 
     return sender(
-        subject='Inscrição: {}'.format(event.name),
-        body=body,
-        to=person.email,
-        reply_to=event.organization.email,
-        attachment=voucher_attach,
+        kwargs={
+            'subject': 'Inscrição: {}'.format(event.name),
+            'body': body,
+            'to': person.email,
+            'reply_to': event.organization.email,
+            'attachment_file_path': voucher_file,
+        },
+        eta=datetime.now() + timedelta(seconds=30)  # exec after 30 secs
     )
 
 
@@ -1399,6 +1481,23 @@ def notify_invite(organization, link, inviter, invited_person, email):
         Define a notificação para um novo convite
     """
 
+    members = organization.members.filter(
+        group=Member.ADMIN,
+        person__user__is_superuser=False,
+    ).order_by('created')
+
+    if members.count() == 0:
+        members = organization.members.filter(
+            group=Member.ADMIN,
+        ).order_by('created')
+
+    member = members.first()
+
+    if organization.email:
+        org_admin_email = organization.email
+    else:
+        org_admin_email = member.person.email
+
     body = render_to_string('mailer/notify_invitation.html', {
         'organizacao': organization.name,
         'hospedeiro': inviter,
@@ -1412,5 +1511,5 @@ def notify_invite(organization, link, inviter, invited_person, email):
         subject='Convite: {}'.format(organization.name),
         body=body,
         to=email,
-        reply_to=organization.email,
+        reply_to=org_admin_email,
     )

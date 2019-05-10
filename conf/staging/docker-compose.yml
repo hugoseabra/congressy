@@ -17,10 +17,9 @@ services:
   # Preparação de volumes.
   migration:
     image: cgsy-staging
-    container_name: migration-staging
     hostname: migration-staging
     entrypoint:
-      - /services/migration/container-entry.sh
+      - /deploy/services/migration/container-entry.sh
     env_file:
       - /tmp/staging-files/env-manage-staging
     networks:
@@ -28,27 +27,60 @@ services:
 
   volume:
     image: cgsy-staging
-    container_name: volume-staging
     hostname: volume-staging
     depends_on:
       - migration
     entrypoint:
-      - /services/volume/container-entry.sh
+      - /deploy/services/volume/container-entry.sh
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/var/www/cgsy/media
-      - ./exporter:/tmp/exporter
+      - staging_media:/code/media
+      - staging_exporter:/tmp/exporter
+      - staging_barcodes:/tmp/barcodes
+      - staging_qrcodes:/tmp/qrcodes
+      - staging_vouchers:/tmp/vouchers
+
+  reverse-proxy:
+    image: traefik
+    command: --api --docker
+    networks:
+      - traefik
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /tmp/staging-files/traefik.toml:/etc/traefik/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+
+  celery:
+    image: cgsy-staging
+    restart: unless-stopped
+    hostname: HOSTNAME-celery
+    networks:
+      - postgres
+      - mailhog
+      - wkhtmltopdf
+      - rabbitmq
+    entrypoint:
+      - /deploy/services/celery/container-entry.sh
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - staging_media:/code/media
+      - staging_exporter:/tmp/exporter
+      - staging_barcodes:/tmp/barcodes
+      - staging_qrcodes:/tmp/qrcodes
+      - staging_vouchers:/tmp/vouchers
+    env_file: /tmp/staging-files/env-manage-staging
 
   cron:
     image: cgsy-staging
-    container_name: cron-staging
     hostname: cron-staging
     depends_on:
       - migration
       - volume
     entrypoint:
-      - /services/cron/container-entry.sh
+      - /deploy/services/cron/container-entry.sh
     networks:
       - postgres
       - mailhog
@@ -57,31 +89,55 @@ services:
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/var/www/cgsy/media
-      - ./exporter:/tmp/exporter
+      - staging_media:/code/media
+      - staging_exporter:/tmp/exporter
+      - staging_barcodes:/tmp/barcodes
+      - staging_qrcodes:/tmp/qrcodes
+      - staging_vouchers:/tmp/vouchers
 
   manage:
     image: cgsy-staging
-    container_name: manage-staging
     hostname: manage-staging
+#    healthcheck:
+#      test: "/code/bin/env/healthcheck.sh"
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 0s
     depends_on:
       - migration
     entrypoint:
-      - /services/web/manage/container-entry.sh
+      - /staging/services/web/manage/container-entry.sh
     networks:
       - postgres
       - mailhog
       - wkhtmltopdf
       - rabbitmq
+      - traefik
     ports:
-      - "8080:80"
+      - "8000"
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./media:/var/www/cgsy/media
-      - ./exporter:/tmp/exporter
+      - staging_media:/code/media
+      - staging_exporter:/tmp/exporter
+      - staging_barcodes:/tmp/barcodes
+      - staging_qrcodes:/tmp/qrcodes
+      - staging_vouchers:/tmp/vouchers
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.weight=10"
+      - "traefik.backend=cgsy-staging"
+      - "traefik.protocol=http"
+      - "traefik.port=8000"
+      - "traefik.frontend.rule=Host:test.congressy.com"
+      - "traefik.docker.network=traefik_default"
+      - "traefik.frontend.entryPoints=http"
 
 networks:
+  traefik:
+    name: traefik_default
   postgres:
     external:
       name: local_postgres
@@ -94,3 +150,15 @@ networks:
   rabbitmq:
     external:
       name: local_rabbitmq
+
+volumes:
+  staging_media:
+    external: true
+  staging_exporter:
+    external: true
+  staging_barcodes:
+    external: true
+  staging_qrcodes:
+    external: true
+  staging_vouchers:
+    external: true

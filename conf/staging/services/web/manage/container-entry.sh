@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 
-source /scripts.sh
+source /deploy/scripts.sh
 
-# Define settings to be run
+# Define settings
 export DJANGO_SETTINGS_MODULE=project.manage.settings.staging
 
-run_python_script "Configurando WSGI" /configure-wsgi.py
-run_python_script "Configurando NGINX" /configure-nginx.py
+run_python_script "Configurando WSGI" /staging/setup/configure-wsgi.py
 
-run_python_script "Configurando SETTINGS" /configure-settings.py
-run_python_script "Configurando VERSÃO" /configure-version.py
+run_python_script "Configurando SETTINGS" /deploy/setup/configure-settings.py
+run_python_script "Configurando VERSÃO" /staging/setup/configure-version.py
 run_python_script "Coletando arquivos estáticos" "manage.py collectstatic --noinput --verbosity 0"
 run_python_script_with_output "Atualizando Site ID" "manage.py loaddata 000_site_staging"
 
-echo " > Iniciando SUPERVISOR"
+echo " > Iniciando SERVER"
 echo ;
 echo "########################################################################"
 echo ;
-supervisord -n
+source /deploy/uwsgi-env.sh
+uwsgi --enable-threads --cache 5000 --thunder-lock --show-config --static-map /static/=/code/static/ --static-map /media/=/code/media/
