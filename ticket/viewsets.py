@@ -70,6 +70,7 @@ class TicketViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
 
             qs = Ticket.objects.filter(
                 event_id__in=events,
+                event_id=event_id,
             )
 
         queryset = self.filter_queryset(qs)
