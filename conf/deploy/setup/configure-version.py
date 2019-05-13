@@ -19,6 +19,7 @@ def read_file(file_path):
 
 env_dict = {
     'APP_VERSION': read_file('/code/version'),
+    'COPYRIGHT_YEAR': datetime.now().strftime('%Y'),
 }
 
 setup(
