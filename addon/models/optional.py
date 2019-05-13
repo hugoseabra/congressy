@@ -355,5 +355,26 @@ class Service(AbstractOptional):
 
         super().save(*args, **kwargs)
 
+    def get_period(self):
+        """Recupera string de período de evento de acordo com as datas."""
+        start_date = self.schedule_start.date()
+        end_date = self.schedule_end.date()
+        start_time = self.schedule_start.time()
+        end_time = self.schedule_end.time()
+
+        period = ''
+        if start_date < end_date:
+            period = 'De ' + self.schedule_start.strftime('%d/%m/%Y %Hh%M')
+            period += ' a ' + self.schedule_end.strftime('%d/%m/%Y %Hh%M')
+
+        if start_date == end_date:
+            period = self.schedule_start.strftime('%d/%m/%Y')
+            period += ' das '
+            period += start_time.strftime('%Hh%M')
+            period += ' às '
+            period += end_time.strftime('%Hh%M')
+
+        return period
+
     def __str__(self):
         return '{} - {}'.format(self.name, self.theme.name)
