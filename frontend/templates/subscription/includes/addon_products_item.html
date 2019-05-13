@@ -1,0 +1,44 @@
+<div class="well well-sm" style="margin-bottom: 3px;">
+    <div class="float-left" style="width:90%">
+        <table width="100%">
+            <thead>
+            <tr>
+                <th>Opcional</th>
+                <th width="20%">Valor pago</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div>{{ product.name }}</div>
+                    </td>
+                    <td>
+                        <div class="text-success">
+                            R$ {{ product.price }}
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="float-right">
+        <div id="drop_down_btn" class="btn-group">
+            <button
+                type="button"
+                class="btn btn-primary btn-trans btn-sm dropdown-toggle"
+                data-toggle="dropdown"
+                aria-expanded="false">
+                <span class="fas fa-cog"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                <li>
+                    <a href="{% url 'addon:optional-product-edit' event.pk product.pk %}" target="_blank" id="link">
+                        <i class="fa fa-eye"></i>
+                        Visualizar opcional
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>

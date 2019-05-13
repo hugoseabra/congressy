@@ -1,0 +1,31 @@
+{% load addon_subscription_products %}
+{% get_subscription_products object as sub_products %}
+{% if sub_products.0 %}
+<div class="row tooltip-wrapper ">
+    <div class="col-xl-11 col-lg-11 col-md-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="panel-title">
+                    Opcionais
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div {% if sub_products.1 %}class="col-md-6"{% else %}class="col-md-12"{% endif %}>
+                        {%  for sub_product in sub_products.0 %}
+                            {% subscription_product_row event sub_product %}
+                        {%  endfor %}
+                    </div>
+                    {% if sub_products.1 %}
+                    <div class="col-md-6">
+                        {%  for sub_product in sub_products.1 %}
+                            {% subscription_product_row event sub_product %}
+                        {%  endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

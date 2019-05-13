@@ -1,0 +1,56 @@
+<div class="well well-sm" style="margin-bottom: 3px;">
+    <div class="float-left" style="width:90%">
+        <table width="100%">
+            <thead>
+            <tr>
+                <th>Atividade</th>
+                {% if service.price %}
+                <th width="20%">Valor pago</th>
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    <div>{{ service.name }}</div>
+                    <hr class="divider" />
+                    <div style="text-indent: 20px">
+                        <div><strong>Tema:</strong> {{ service.theme.name }}</div>
+                        <div><strong>Data:</strong> {{ service.get_period }}</div>
+                        {% if service.place %}
+                        <div><strong>Local:</strong> {{ service.place }}</div>
+                        {% endif %}
+                    </div>
+                </td>
+                {% if service.price %}
+                <td>
+                    <div class="text-success">
+                        R$ {{ service.price }}
+                    </div>
+                </td>
+                {% endif %}
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="float-right">
+        <div id="drop_down_btn" class="btn-group">
+            <button
+                type="button"
+                class="btn btn-primary btn-trans btn-sm dropdown-toggle"
+                data-toggle="dropdown"
+                aria-expanded="false">
+                <span class="fas fa-cog"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                <li>
+                    <a href="{% url 'addon:optional-service-edit' event.pk service.pk %}" target="_blank" id="link">
+                        <i class="fa fa-eye"></i>
+                        Visualizar atividade extra
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>

@@ -7,7 +7,9 @@ from . import Event
 
 
 class FeatureConfiguration(models.Model):
-    """ Configuração de Recursos liberados de um evento """
+    """
+    Recursos ativados pela Congressy para ser utilizado em um evento.
+    """
 
     SYSTEM_USER_NAME = 'system'
 

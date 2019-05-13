@@ -474,6 +474,14 @@
     {% endif %}
 </div>
 
+{% if event.feature_configuration.feature_services is True and event.feature_management.services is True %}
+{% include 'subscription/includes/addon_services.html' %}
+{% endif  %}
+
+{% if event.feature_configuration.feature_products is True and event.feature_management.products is True %}
+{% include 'subscription/includes/addon_products.html' %}
+{% endif  %}
+
 {% if event.feature_configuration.feature_checkin is True and event.feature_management.checkin is True %}
 {% include 'subscription/includes/attendance.html' %}
 {% endif  %}
@@ -573,7 +581,7 @@
                                 </div>
                             {% endif %}
                         {% endif %}
-                        {% if config.phone and object.person.phone %}
+                        {% if object.person.phone %}
                             <div class="profile-info col-lg-3 col-md-6">
                                 <div class="profile-info-label">
                                     Celular:
