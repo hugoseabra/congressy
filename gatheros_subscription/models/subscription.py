@@ -181,7 +181,6 @@ class Subscription(models.Model, GatherosModelMixin):
         default=False,
         verbose_name='completa',
         help_text='Inscrições que passaram por todo o fluxo de inscrições.',
-        editable=False
     )
 
     test_subscription = models.BooleanField(default=False)

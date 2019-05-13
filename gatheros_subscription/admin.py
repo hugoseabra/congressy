@@ -114,7 +114,6 @@ class SubscriptionAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
         'event',
         'code',
         'count',
-        'completed',
         'event_count',
         'synchronized',
         'attended',
