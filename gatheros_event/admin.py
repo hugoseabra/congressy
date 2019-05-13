@@ -350,7 +350,7 @@ class FeatureConfigurationAdmin(admin.ModelAdmin):
     Admin para Configurações de Eventos
     """
     search_fields = ('event__name',)
-    exclude = ('event', 'last_updated_by')
+    exclude = ('event',)
     form = FeatureConfigurationForm
 
     def get_form(self, request, obj=None, **kwargs):
@@ -380,7 +380,7 @@ class FeatureManagementAdmin(admin.ModelAdmin):
     Admin para Configurações de Eventos selecionadas pelos organizadores
     """
     search_fields = ('event__name',)
-    exclude = ('event',)
+    exclude = ('event', 'checkin',)
 
     def has_add_permission(self, request):
         return False
