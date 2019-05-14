@@ -17,7 +17,7 @@ from gatheros_subscription.helpers.qrcode import get_qrcode_file_path
 
 
 def get_logo():
-    uri = staticfiles_storage.url('assets/img/logo_v3.png')
+    uri = staticfiles_storage.url('assets/img/logo_v4.png')
     url = settings.BASE_DIR + "/frontend" + uri
     with open(url, 'rb') as f:
         read_data = f.read()
