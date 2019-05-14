@@ -12,6 +12,6 @@ if [ ! -d "$DIRECTORY" ]; then
     mkdir -p "$DIRECTORY"
 fi
 
-if [ "$(ls -A "$DIRECTORY")" ]; then
+if [ -z "$(ls -A "$DIRECTORY")" ]; then
     insync
 fi
