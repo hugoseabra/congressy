@@ -101,11 +101,11 @@ class LotAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 class SubscriptionAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     search_fields = (
         'uuid',
+        'code',
         'person__uuid',
         'person__name',
         'person__email',
         'person__cpf',
-        'created',
         'event__name',
     )
     list_display = ('person', 'event_count', 'lot', 'code', 'completed',)

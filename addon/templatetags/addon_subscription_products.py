@@ -12,6 +12,7 @@ def get_subscription_products(subscription):
     products = []
 
     qs = subscription.subscription_products
+    qs = qs.filter(optional__lot_category_id=subscription.lot.category_id)
 
     for sub_prod in qs.order_by('optional__name'):
         products.append(sub_prod.optional)

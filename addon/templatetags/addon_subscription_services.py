@@ -12,6 +12,7 @@ def get_subscription_services(subscription):
     services = []
 
     qs = subscription.subscription_services
+    qs = qs.filter(optional__lot_category_id=subscription.lot.category_id)
 
     for sub_serv in qs.order_by('optional__schedule_start'):
         services.append(sub_serv.optional)
