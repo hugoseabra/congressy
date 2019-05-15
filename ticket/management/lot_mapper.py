@@ -131,7 +131,6 @@ class LotMapper:
 
         if lots.count() == 0:
             return lot_map
-            # raise Exception('Evento futuro sem lote: {} ({})'.format(self.event.name, self.event.pk))
 
         for lot in lots:
 
@@ -174,7 +173,8 @@ class LotMapper:
                 ticket.event_survey = lot.event_survey
                 ticket.save()
 
-            if lot.private:
+            if lot.private and lot.exhibition_code:
+                ticket.exhibition_code = lot.exhibition_code
                 ticket.active = False
                 ticket.save()
 

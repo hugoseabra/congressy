@@ -96,6 +96,13 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
         null=False,
     )
 
+    exhibition_code = models.CharField(
+        max_length=15,
+        null=True,
+        blank=True,
+        verbose_name='código de exibição',
+    )
+
     created = models.DateTimeField(
         auto_now_add=True,
         verbose_name='criado em',
