@@ -499,7 +499,7 @@
     {% include 'subscription/includes/modal-manual-payment-form.html' with form=manual_payment_form %}
     {% endif %}
 
-    {% if event.feature_configuration.feature_checkin is True and event.feature_management.checkin is True %}
+    {% if event.feature_configuration.feature_checkin is True %}
     {% include 'subscription/includes/modal-configure-printer.html' %}
     {% endif %}
 
