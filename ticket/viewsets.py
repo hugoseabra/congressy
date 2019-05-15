@@ -1,14 +1,24 @@
 from typing import Any
 
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.authentication import SessionAuthentication, \
     BasicAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
+from ticket.helpers import (
+    get_lot_price_for_audience,
+    get_lot_price_for_organizer,
+    get_lot_installment_prices_for_audience,
+    get_lot_installment_prices_for_organizer,
+    get_max_installments_allowed_for_price,
+)
 from ticket.models import Ticket, Lot
 from ticket.serializers import TicketSerializer, LotSerializer
 from .permissions import TicketOrganizerOnly, LotOrganizerOnly
@@ -53,7 +63,11 @@ class TicketViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
         event_id = request.query_params.get('event_id', None)
 
         if event_id is None:
-            qs = Ticket.objects.none()
+            content = {
+                'errors': ['missing event_id in query', ]
+            }
+
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
         else:
 
             events = list()
@@ -106,6 +120,75 @@ class TicketViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
         )
 
 
+class TicketCalculatorAPIView(TicketRestrictionMixin, APIView):
+
+    # noinspection PyMethodMayBeStatic
+    def get(self, request, *_, **kwargs):
+        free_installments = request.query_params.get("free_installments", 0)
+        event = get_object_or_404(Event, pk=kwargs['event_pk'])
+
+        members = [
+            m.person
+            for m in event.organization.members.filter(active=True)
+        ]
+
+        if request.user.person not in members:
+            content = {
+                'detail': 'unauthorized'
+            }
+
+            return Response(content, status=status.HTTP_401_UNAUTHORIZED)
+
+        price_allowed_installments = \
+            get_max_installments_allowed_for_price(kwargs['price'])
+
+        installment_lists = {
+            'audience_installments':
+                get_lot_installment_prices_for_audience(
+                    price=kwargs['price'],
+                    cgsy_percent=event.congressy_percent,
+                    transfer_tax=event.transfer_tax,
+                    free_installments=free_installments,
+                    installments=price_allowed_installments,
+                ),
+
+            'organizer_installments':
+                get_lot_installment_prices_for_organizer(
+                    price=kwargs['price'],
+                    cgsy_percent=event.congressy_percent,
+                    transfer_tax=event.transfer_tax,
+                    free_installments=free_installments,
+                    installments=price_allowed_installments,
+                ),
+        }
+
+        data = {
+
+            'transfer_tax': event.transfer_tax,
+            'free_installments': free_installments,
+            'congressy_percent': event.congressy_percent,
+
+            'price': get_lot_price_for_audience(
+                raw_price=kwargs['price'],
+                cgsy_percent=event.congressy_percent,
+                transfer_tax=event.transfer_tax
+            ),
+
+            'liquid_price': get_lot_price_for_organizer(
+                raw_price=kwargs['price'],
+                cgsy_percent=event.congressy_percent,
+                transfer_tax=event.transfer_tax
+            ),
+
+            'allowed_installments': price_allowed_installments,
+
+            'installments': installment_lists,
+
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
 class LotViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, LotOrganizerOnly)
     serializer_class = LotSerializer
@@ -139,7 +222,11 @@ class LotViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
         ticket_id = request.query_params.get('ticket_id', None)
 
         if ticket_id is None:
-            qs = Lot.objects.none()
+            content = {
+                'errors': ['missing ticket_id in query', ]
+            }
+
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
         else:
             events = list()
 
