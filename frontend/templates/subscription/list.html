@@ -815,7 +815,7 @@
                             return data + hidden
                         }
                     },
-                    {% if event.feature_configuration.feature_checkin is True and event.feature_management.checkin is True %}
+                    {% if event.feature_configuration.feature_checkin is True %}
                         {
                             data: 'accredited', "render": function (data, type, row, meta) {
                                 return loadAccreditationContent(row);
@@ -870,7 +870,7 @@
                         "orderable": false,
                         "class": "text-center"
                     },
-                    {% if event.feature_configuration.feature_checkin is True and event.feature_management.checkin is True %}
+                    {% if event.feature_configuration.feature_checkin is True %}
                         {
                             "targets": 4,
                             "orderable": true,
@@ -1133,7 +1133,7 @@
                                 <th>Nome do Participante</th>
 
                                 <th width="10%">Código</th>
-                                {% if event.feature_configuration.feature_checkin is True and event.feature_management.checkin is True %}
+                                {% if event.feature_configuration.feature_checkin is True %}
                                     <th width="10%">Credenciado</th>
                                 {% endif %}
 
