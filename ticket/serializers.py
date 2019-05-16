@@ -10,6 +10,9 @@ class TicketSerializer(FormSerializerMixin, serializers.ModelSerializer):
     lot_count = serializers.SerializerMethodField()
     subscription_count = serializers.SerializerMethodField()
 
+    display_name = serializers.ReadOnlyField()
+    status = serializers.ReadOnlyField()
+
     class Meta:
         model = Ticket
         form = TicketService
@@ -32,7 +35,6 @@ class TicketSerializer(FormSerializerMixin, serializers.ModelSerializer):
 
 
 class LotSerializer(FormSerializerMixin, serializers.ModelSerializer):
-
     subscription_count = serializers.SerializerMethodField()
 
     class Meta:

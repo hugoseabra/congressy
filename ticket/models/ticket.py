@@ -8,6 +8,16 @@ from gatheros_event.models.mixins import GatherosModelMixin
 
 
 class Ticket(GatherosModelMixin, EntityMixin, models.Model):
+    NOT_STARTED_STATUS = 'not_started'
+    RUNNING_STATUS = 'running'
+    ENDED_STATUS = 'ended'
+
+    STATUSES = (
+        (NOT_STARTED_STATUS, 'Não iniciado'),
+        (RUNNING_STATUS, 'Em andamento'),
+        (ENDED_STATUS, 'Encerrado'),
+    )
+
     class Meta:
         verbose_name = 'ingresso'
         verbose_name_plural = 'ingressos'
@@ -149,7 +159,7 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
             if now in dtr:
                 found_lots.append(lot)
 
-        assert len(found_lots) > 1, 'Mais de um lote dentro de um prazo!'
+        assert len(found_lots) <= 1, '{} lotes ativos neste momento.'.format(len(found_lots))
 
         if found_lots:
             self._current_lot = found_lots[0]
@@ -165,3 +175,19 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
             return '{} - {}'.format(self.name, lot)
 
         return self.name
+
+    @property
+    def status(self):
+        if self._current_lot is not None:
+            return self.RUNNING_STATUS
+
+        now = datetime.now()
+
+        future_lots = self.lots.filter(
+            date_start__gte=now,
+        ).count()
+
+        if future_lots > 0:
+            return self.NOT_STARTED_STATUS
+
+        return self.ENDED_STATUS
