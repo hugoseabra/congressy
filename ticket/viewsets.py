@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.authentication import SessionAuthentication, \
     BasicAuthentication, TokenAuthentication
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -22,6 +23,10 @@ from ticket.helpers import (
 from ticket.models import Ticket, Lot
 from ticket.serializers import TicketSerializer, LotSerializer
 from .permissions import TicketOrganizerOnly, LotOrganizerOnly
+
+
+class CurrentLotNotFoundError(Exception):
+    pass
 
 
 class TicketRestrictionMixin:
@@ -189,6 +194,51 @@ class TicketCalculatorAPIView(TicketRestrictionMixin, APIView):
         }
 
         return Response(data, status=status.HTTP_200_OK)
+
+
+class TicketCurrentLotView(TicketRestrictionMixin, RetrieveAPIView):
+    serializer_class = LotSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+
+        try:
+            instance = self.get_object()
+        except Ticket.DoesNotExist:
+            return Response({"detail": "Ticket not found."},
+                            status=status.HTTP_404_NOT_FOUND)
+        except CurrentLotNotFoundError:
+            return Response({"detail": "Lot not found."},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def get_object(self):
+        """
+        Returns the object the view is displaying.
+        """
+
+        user = self.request.user
+        ticket_pk = self.kwargs.get('pk')
+
+        org_pks = [
+            m.organization.pk
+            for m in user.person.members.filter(active=True)
+        ]
+
+        ticket = Ticket.objects.get(
+            pk=ticket_pk,
+            event__organization_id__in=org_pks,
+        )
+
+        obj = ticket.current_lot
+        if obj is None:
+            raise CurrentLotNotFoundError()
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, obj)
+
+        return obj
 
 
 class LotViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):

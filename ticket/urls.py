@@ -10,7 +10,10 @@ router.register(r'ticket/lots', viewsets.LotViewSet, base_name="lot")
 single_endpoints = [
     url(r'^ticket/lots/(?P<event_pk>[\d]+)/calculator/(?P<price>\d+\.\d{2})',
         viewsets.TicketCalculatorAPIView.as_view(),
-        name='ticket-calculator')
+        name='ticket-calculator'),
+    url(r'^ticket/tickets/(?P<pk>[\d]+)/lots/current/',
+        viewsets.TicketCurrentLotView.as_view(),
+        name='ticket-lot-current'),
 ]
 
 urlpatterns = router.urls
