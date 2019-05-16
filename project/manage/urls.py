@@ -76,6 +76,7 @@ public_urlpatterns += [
 
 # API
 api_urls = [
+    url(r'^', include('gatheros_event.urls.api', 'event')),
     url(r'^', include(urlpatterns_public_payments_api, 'payment')),
     url(r'^', include('gatheros_subscription.api_urls', 'subscription')),
     url(r'^', include('addon.api_urls', 'addon')),

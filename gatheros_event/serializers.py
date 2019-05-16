@@ -51,3 +51,11 @@ class EventSerializer(serializers.ModelSerializer):
             'category',
             'organization',
         )
+
+
+class EventReadOnlySerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+
+    class Meta:
+        model = Event
+        fields = '__all__'
