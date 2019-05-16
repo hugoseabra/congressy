@@ -124,8 +124,10 @@ class TicketCalculatorAPIView(TicketRestrictionMixin, APIView):
 
     # noinspection PyMethodMayBeStatic
     def get(self, request, *_, **kwargs):
-        free_installments = request.query_params.get("free_installments", 0)
         event = get_object_or_404(Event, pk=kwargs['event_pk'])
+
+        transfer_tax = request.query_params.get("transfer_tax", False)
+        free_installments = request.query_params.get("free_installments", 0)
 
         members = [
             m.person
@@ -147,7 +149,7 @@ class TicketCalculatorAPIView(TicketRestrictionMixin, APIView):
                 get_lot_installment_prices_for_audience(
                     price=kwargs['price'],
                     cgsy_percent=event.congressy_percent,
-                    transfer_tax=event.transfer_tax,
+                    transfer_tax=transfer_tax,
                     free_installments=free_installments,
                     installments=price_allowed_installments,
                 ),
@@ -156,7 +158,7 @@ class TicketCalculatorAPIView(TicketRestrictionMixin, APIView):
                 get_lot_installment_prices_for_organizer(
                     price=kwargs['price'],
                     cgsy_percent=event.congressy_percent,
-                    transfer_tax=event.transfer_tax,
+                    transfer_tax=transfer_tax,
                     free_installments=free_installments,
                     installments=price_allowed_installments,
                 ),
@@ -164,7 +166,7 @@ class TicketCalculatorAPIView(TicketRestrictionMixin, APIView):
 
         data = {
 
-            'transfer_tax': event.transfer_tax,
+            'transfer_tax': transfer_tax,
             'free_installments': free_installments,
             'congressy_percent': event.congressy_percent,
 
