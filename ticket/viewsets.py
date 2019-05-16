@@ -75,6 +75,15 @@ class TicketViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
         else:
 
+            try:
+                event_id = int(event_id)
+            except ValueError:
+                content = {
+                    'errors': ["event_id in query is not int: '{}' ".format(event_id), ]
+                }
+
+                return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
             events = list()
 
             if hasattr(request.user, 'person'):
@@ -280,6 +289,16 @@ class LotViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
 
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
         else:
+
+            try:
+                ticket_id = int(ticket_id)
+            except ValueError:
+                content = {
+                    'errors': ["ticket_id in query is not int: '{}' ".format(ticket_id), ]
+                }
+
+                return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
             events = list()
 
             if hasattr(request.user, 'person'):
