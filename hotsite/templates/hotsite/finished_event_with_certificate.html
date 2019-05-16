@@ -1,0 +1,49 @@
+{% load form_config_tags subscription_tags %}
+{% is_subscription_free subscription as is_free %}
+
+<!-- FORM -->
+{% if user.is_authenticated and is_subscribed and event.has_certificate_config and subscription.status == subscription.CONFIRMED_STATUS and subscription.completed and event.feature_configuration.feature_certificate %}
+
+    <form action="{% url 'public:hotsite' event.slug %}" method="post" class="form" role="form" onsubmit="return false;">
+        <h4 class="form-heading" style="font-weight: bold;">Olá, {{ user.first_name }}</h4>
+
+        {% block messages %}
+            {% if messages %}
+                <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            {{ message|capfirst }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endblock messages %}
+
+        <div class="text-center">
+            <p style="font-size: 18px">
+                Seu certificado já está disponível.
+            </p>
+
+            <div style="align-items: center;display: flex;justify-content: center;">
+                <button type="button" class="btn btn-lg btn-success" onclick="window.open('{% url 'certificate:event-certificate-pdf' event.pk subscription.pk %}', '_blank')">
+                    <i class="fas fa-graduation-cap fa-3x"></i>
+                    <br />
+                    <small>Certificado</small>
+                </button>
+            </div>
+
+        </div>
+        <div class="row" style="margin-top:30px;padding: 0 30px">
+            <div class="col-md-12">
+                <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
+                    {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+{% endif %}
