@@ -58,4 +58,10 @@ class EventReadOnlySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        fields = '__all__'
+        exclude = (
+            'has_optionals',
+            'has_extra_activities',
+            'has_checkin',
+            'has_certificate',
+            'has_survey',
+        )
