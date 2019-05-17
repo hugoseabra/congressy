@@ -1,8 +1,8 @@
-{% load form_config_tags subscription_tags %}
+{% load form_config_tags subscription_tags core_utils %}
 {% is_subscription_free subscription as is_free %}
 
 <!-- FORM -->
-{% if user.is_authenticated and is_subscribed and event.has_certificate_config and subscription.status == subscription.CONFIRMED_STATUS and subscription.completed and event.feature_configuration.feature_certificate %}
+{% if user.is_authenticated and is_subscribed and has_certificate %}
 
     <form action="{% url 'public:hotsite' event.slug %}" method="post" class="form" role="form" onsubmit="return false;">
         <h4 class="form-heading" style="font-weight: bold;">Olá, {{ user.first_name }}</h4>

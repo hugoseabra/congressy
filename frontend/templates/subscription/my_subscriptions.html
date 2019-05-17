@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load i18n static subscription_tags %}
+{% load i18n static subscription_tags core_utils %}
 
 {% block title %} Minhas inscrições | Congressy{% endblock %}
 
@@ -10,24 +10,23 @@
 {% block content %}
 
     <div class="row">
+        <div class="col-md-12">
 
-        <div class="col-md-12 ">
+            {% if object_list %}
+            {% for item in object_list %}
+                {% get_from_dict status_events item.event_id as has_certificate %}
 
-            <div class="row">
-                {% if object_list %}
-
-                {% for item in object_list %}
                 <div class="col-xs-4 col-sm-4 col-md-4 col-lg-3 col-xl-3">
-                    <div class="panel" style="border-radius: 5px; box-shadow: 0 10px 15px 0 rgba(223, 223, 223, 0.5);overflow: hidden">
-                        <div class="panel-body">
+                    <div class="panel" style="border-radius: 5px; box-shadow: 0 10px 15px 0 rgba(223, 223, 223, 0.5);overflow: hidden;max-height: 680px">
+                        <div class="panel-body" style="min-height: 465px;">
                             <div class="row">
                                 <div class="col-xs-12 text-center">
                                     {% if item.event.info.image_main.thumbnail.url %}
                                         <img src="{{ item.event.info.image_main.thumbnail.url }}"
-                                         class="img-thumbnail" alt="{{ item.event.name }}" width="40%">
+                                         class="img-thumbnail" alt="{{ item.event.name|truncatechars:50 }}" width="40%">
                                     {% else %}
                                         <img src="{% static 'assets/img/200x266.png' %}"
-                                         class="img-thumbnail" alt="{{ item.event.name }}" width="40%">
+                                         class="img-thumbnail" alt="{{ item.event.name|truncatechars:50 }}" width="40%">
                                     {% endif %}
                                     <div style="position: relative;margin-top: -17px">
                                         <span class="fa fa-circle" aria-hidden="true"
@@ -38,12 +37,12 @@
                                     <br />
                                 </div>
                                 <div class="col-xs-12 text-center">
-                                    <h2 class="text-center" style="font-size: 16px;text-transform: uppercase;font-weight: bold">
+                                    <h2 class="text-center" style="font-size: 15px;text-transform: uppercase;font-weight: bold;max-height: 62px;overflow-y: hidden">
                                         <a href="{% url 'public:hotsite' item.event.slug %}" target="_blank">
                                             {{ item.event.name }}
                                         </a>
                                     </h2>
-                                    <div style="padding: 0 16px">
+                                    <div style="padding: 0 16px;max-height: 35px;overflow-y: hidden">
                                         <small style="font-size: 12px;color:dimgray">{{ item.event.organization.name }}</small>
                                     </div>
                                 </div>
@@ -58,7 +57,9 @@
                                                    data-original-title="Categoria"></i>
                                             </td>
                                             <td>
-                                                {{ item.lot.category.name }} - {{ item.lot.name }}
+                                                <div style="max-height: 25px;overflow-y: hidden">
+                                                    {{ item.lot.category.name }} - {{ item.lot.name }}
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
@@ -90,16 +91,18 @@
                                 </div>
                             </div>
                         </div>
-                        {% if item.completed is True and item.status == item.CONFIRMED_STATUS %}
+
                         <div class="panel-footer">
                             <div class="row">
                                 <div class="col-xs-12 text-center">
+                                    {% if item.completed is True and item.status == item.CONFIRMED_STATUS %}
                                     <button type="button" class="btn btn-trans btn-primary" onclick="window.open('{% url 'subscription:subscription-voucher' item.event.pk item.pk %}', '_blank')">
                                         <i class="fas fa-file-pdf"></i>
                                         <br />
                                         <small>Voucher</small>
                                     </button>
-                                    {% if item.event.has_certificate_config and item.event.feature_configuration.feature_certificate %}
+                                    {% endif %}
+                                    {% if has_certificate %}
                                     <button type="button" class="btn btn-trans btn-success" onclick="window.open('{% url 'certificate:event-certificate-pdf' item.event.pk item.pk %}', '_blank')">
                                         <i class="fas fa-graduation-cap"></i>
                                         <br />
@@ -109,19 +112,16 @@
                                 </div>
                             </div>
                         </div>
-                        {% endif %}
                     </div>
                 </div>
-                {% endfor %}
-                {% else %}
-                    <div class="col-xs-12;background: #FFF;padding:10px">
-                        Nenhuma inscrição
-                    </div>
-                {% endif %}
-            </div>
 
+            {% endfor %}
+            {% else %}
+                <div class="col-xs-12;background: #FFF;padding:10px">
+                    Nenhuma inscrição
+                </div>
+            {% endif %}
         </div>
-
     </div>
 
 {% endblock %}
