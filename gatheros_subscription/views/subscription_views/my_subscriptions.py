@@ -39,8 +39,9 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
         return query_set.filter(
             person=person,
-            completed=True, test_subscription=False
-            # event__published=True,
+            completed=True,
+            test_subscription=False,
+            event__published=True,
         )
 
     def get(self, request, *args, **kwargs):
@@ -83,14 +84,10 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
         ).distinct().order_by('event__name')
 
     def get_attendance_status_events(self):
-        status_events = []
+        status_events = dict()
         subscription = self.get_queryset()
         for sub in subscription:
-            checked = subscription_has_certificate(sub.pk)
-            status_events.append({
-                'event_pk': sub.event.id,
-                'checked': checked
-            })
+            status_events[sub.event_id] = subscription_has_certificate(sub.pk)
 
         return status_events
 
