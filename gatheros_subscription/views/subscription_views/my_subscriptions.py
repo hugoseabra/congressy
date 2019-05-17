@@ -42,7 +42,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
             completed=True,
             test_subscription=False,
             event__published=True,
-        )
+        ).order_by('-event__date_start', 'event__name')
 
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)

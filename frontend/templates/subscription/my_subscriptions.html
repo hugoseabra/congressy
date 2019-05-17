@@ -10,17 +10,15 @@
 {% block content %}
 
     <div class="row">
+        <div class="col-md-12">
 
-        <div class="col-md-12 ">
+            {% if object_list %}
+            {% for item in object_list %}
+                {% get_from_dict status_events item.event_id as has_certificate %}
 
-            <div class="row">
-                {% if object_list %}
-
-                {% for item in object_list %}
-                    {% get_from_dict status_events item.event_id as has_certificate %}
                 <div class="col-xs-4 col-sm-4 col-md-4 col-lg-3 col-xl-3">
                     <div class="panel" style="border-radius: 5px; box-shadow: 0 10px 15px 0 rgba(223, 223, 223, 0.5);overflow: hidden;max-height: 680px">
-                        <div class="panel-body">
+                        <div class="panel-body" style="min-height: 380px;">
                             <div class="row">
                                 <div class="col-xs-12 text-center">
                                     {% if item.event.info.image_main.thumbnail.url %}
@@ -39,7 +37,7 @@
                                     <br />
                                 </div>
                                 <div class="col-xs-12 text-center">
-                                    <h2 class="text-center" style="font-size: 16px;text-transform: uppercase;font-weight: bold;max-height: 62px;overflow-y: hidden">
+                                    <h2 class="text-center" style="font-size: 15px;text-transform: uppercase;font-weight: bold;max-height: 62px;overflow-y: hidden">
                                         <a href="{% url 'public:hotsite' item.event.slug %}" target="_blank">
                                             {{ item.event.name }}
                                         </a>
@@ -116,16 +114,14 @@
                         </div>
                     </div>
                 </div>
-                {% endfor %}
-                {% else %}
-                    <div class="col-xs-12;background: #FFF;padding:10px">
-                        Nenhuma inscrição
-                    </div>
-                {% endif %}
-            </div>
 
+            {% endfor %}
+            {% else %}
+                <div class="col-xs-12;background: #FFF;padding:10px">
+                    Nenhuma inscrição
+                </div>
+            {% endif %}
         </div>
-
     </div>
 
 {% endblock %}
