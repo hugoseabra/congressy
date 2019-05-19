@@ -24,14 +24,6 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
         null=False,
     )
 
-    name = models.CharField(
-        max_length=80,
-        verbose_name="nome do lote",
-        # Making field required
-        blank=False,
-        null=False,
-    )
-
     date_start = models.DateTimeField(
         verbose_name='data/hora inicial',
         # Making field required
@@ -72,15 +64,6 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
         null=True,
         editable=False,
         help_text="controle interno para contagem de inscrições",
-    )
-
-    last = models.NullBooleanField(
-        verbose_name="ultimo lote",
-        # Making field optional
-        blank=True,
-        null=True,
-        editable=False,
-        help_text="controle inter para contagem de inscrições",
     )
 
     created = models.DateTimeField(

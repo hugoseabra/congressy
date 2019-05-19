@@ -102,7 +102,7 @@ class Subscription(models.Model, GatherosModelMixin):
         'ticket.Lot',
         verbose_name='lote',
         related_name='subscriptions',
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
         # @TODO: Make this field required
         null=True,
         blank=True,

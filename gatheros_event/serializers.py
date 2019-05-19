@@ -53,8 +53,14 @@ class EventSerializer(serializers.ModelSerializer):
         )
 
 
+class CategoryField(serializers.RelatedField):
+    def to_representation(self, value):
+        return value.name
+
+
 class EventReadOnlySerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
+    category = serializers.SerializerMethodField()
+    organization = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
@@ -65,3 +71,10 @@ class EventReadOnlySerializer(serializers.ModelSerializer):
             'has_certificate',
             'has_survey',
         )
+
+    def get_category(self, obj):
+        return obj.category.name
+
+
+    def get_organization(self, obj):
+        return obj.organization.name
