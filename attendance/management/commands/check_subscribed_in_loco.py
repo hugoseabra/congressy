@@ -15,9 +15,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
-
-    def add_arguments(self, parser):
-        super(Command, self).add_arguments(parser)
         parser.add_argument(
             '--dry-run',
             dest='dry',
