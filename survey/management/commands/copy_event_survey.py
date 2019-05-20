@@ -40,41 +40,6 @@ class Command(BaseCommand, CliInteractionMixin):
 
         self.copy(survey, to_event)
 
-        # if interact:
-        #     self.report('Inscrições confirmadas', checkins_qs.count())
-        #     self.report(
-        #         'Inscrições a confirmar',
-        #         not_checked_subs_qs.count()
-        #     )
-        #
-        # num_subs = not_checked_subs_qs.count()
-        #
-        # if interact:
-        #     self.stdout.write("\n")
-        #     progress_bar(
-        #         0,
-        #         num_subs,
-        #         prefix='Progress:',
-        #         suffix='Complete',
-        #         length=40
-        #     )
-        #
-        # counter = 1
-        # for sub in in_loco_sub_qs:
-        #     Checkin.objects.create(
-        #         attendance_service=service,
-        #         subscription=sub,
-        #     )
-        #     if interact:
-        #         progress_bar(
-        #             counter,
-        #             num_subs,
-        #             prefix='Progress:',
-        #             suffix='Complete',
-        #             length=40
-        #         )
-        #     counter += 1
-
     def _get_event(self):
         event = None
 
