@@ -60,7 +60,7 @@ class LotMapper:
 
             Lot.objects.create(
                 ticket=ticket,
-                name='Lote 1',
+                # name='Lote 1',
                 date_start=self.event.date_start - timedelta(days=30),
                 date_end=self.event.date_start - timedelta(minutes=1),
             )
@@ -109,7 +109,7 @@ class LotMapper:
                 ticket.save()
 
             new_lot, _ = Lot.objects.get_or_create(
-                name=lot.name[0:79],
+                # name=lot.name[0:79],
                 date_start=lot.date_start,
                 date_end=lot.date_end,
                 ticket=ticket,
@@ -179,7 +179,7 @@ class LotMapper:
                 ticket.save()
 
             nl, _ = Lot.objects.get_or_create(
-                name=lot.name[0:79],
+                # name=lot.name[0:79],
                 date_start=lot.date_start,
                 date_end=lot.date_end,
                 ticket=ticket,
