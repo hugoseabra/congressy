@@ -48,21 +48,25 @@
     <div class="row">
         <div class="col-md-12">
             <div class="text-center">
-                <h2 class="text-center" style="font-weight: bold;">{{ event.name|upper }}</h2>
+                <h2 class="text-center" style="font-weight: bold;">{{ person.name|upper }}</h2>
             </div>
-            <p style="font-size: 14px">
-                Agradecemos seu interesse em participar de nosso evento.
-            </p>
-            <p style="margin-top: 12px;font-size: 14px">
-                Abaixo estão os dados do seu pedido:
-            </p>
+            <div style="width: 90%;margin:18px auto">
+                <p style="font-size: 14px">
+                    Agradecemos seu interesse em participar de nosso evento.
+                </p>
+            </div>
+            <div style="width: 90%;margin:18px auto">
+                <p style="margin-top: 12px;font-size: 14px">
+                    Abaixo estão os dados do seu pedido:
+                </p>
+            </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-12">
-            <div style="width: 80%;margin:6px auto">
-                <div class="text-muted" style="font-weight: bold">Nome da Inscrição:</div>
-                <div class="text-center" style="font-size: 18px;font-weight: bold">{{ person.name|upper }}</div>
+            <div style="width: 90%;margin:6px auto">
+                <div class="text-muted" style="font-weight: bold">Nome do evento:</div>
+                <div style="font-size: 18px;font-weight: bold">{{ event.name|upper }}</div>
             </div>
         </div>
     </div>
@@ -155,39 +159,60 @@
     <hr />
     <div class="row">
         <div class="col-xs-12">
-            <div class="text-center">
-                <h3 class="text-center" style="font-weight: bold;margin-top:0">Sobre o evento:</h3>
+            <div class="text-left">
+                <h4 style="font-weight: bold;margin-top:0">Sobre o evento:</h4>
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-xs-12">
-            <div style="width: 80%;margin:10px auto">
-                <div class="text-muted" style="font-weight: bold">Organizador:</div>
-                <div class="text-center" style="font-size: 18px;font-weight: bold">{{ organization.name|upper }}</div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-5">
-            <div style="width: 80%;margin:18px auto">
-                <div class="text-muted" style="font-weight: bold">Quando:</div>
-                <div style="font-size: 14px">
-                    {{ event.get_period }}
-                </div>
-            </div>
-        </div>
         {% if event.place.show_location %}
-        <div class="col-xs-7 col-xs-pull-1">
-            <div style="width: 80%;margin:18px auto">
+        <div class="col-xs-12">
+            <div style="width: 90%;margin:10px auto">
                 <div class="text-muted" style="font-weight: bold">Onde:</div>
-                <div style="font-size: 12px">
+                <div style="font-size: 14px">
                     {{ event.place.name }} - {{ event.place.get_complete_address }}
                 </div>
             </div>
         </div>
         {% endif %}
     </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div style="width: 90%;margin:10px auto">
+                <div class="text-muted" style="font-weight: bold">Quando:</div>
+                <div style="font-size: 14px">
+                    {{ event.get_period }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div style="width: 90%;margin:10px auto">
+                <div class="text-muted" style="font-weight: bold">Organizador:</div>
+                <div style="font-size: 14px">{{ organization.name|upper }}</div>
+            </div>
+        </div>
+    </div>
+    {% if event.info.voucher_extra_info %}
+    <hr />
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="text-left">
+                <h4 style="font-weight: bold;margin-top:0">Orientações:</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div style="width: 90%;margin:10px auto">
+                <div style="font-size: 14px; text-align: justify">
+                    <p>{{ event.info.voucher_extra_info }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 </body>

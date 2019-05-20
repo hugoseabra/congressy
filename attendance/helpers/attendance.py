@@ -4,12 +4,22 @@ from gatheros_subscription.models import Subscription
 
 def subscription_has_certificate(subscription_pk):
     try:
-        subscription = Subscription.objects.get(pk=subscription_pk)
+        subscription = Subscription.objects.get(
+            pk=subscription_pk,
+            test_subscription=False,
+            completed=True,
+            event__published=True,
+            status=Subscription.CONFIRMED_STATUS,
+        )
 
     except Subscription.DoesNotExist:
         return False
 
     event = subscription.event
+
+    if event.has_certificate_config is False \
+            or event.feature_configuration.feature_certificate is False:
+        return False
 
     only_attended = False
     if hasattr(event, 'certificate'):
