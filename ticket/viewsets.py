@@ -180,6 +180,7 @@ class TicketCalculatorAPIView(TicketRestrictionMixin, APIView):
 
         data = {
 
+            'event': event.pk,
             'transfer_tax': transfer_tax,
             'free_installments': free_installments,
             'congressy_percent': event.congressy_percent,

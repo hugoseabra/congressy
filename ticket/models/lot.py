@@ -78,16 +78,26 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
         verbose_name='modificado em'
     )
 
-    def __str__(self):
-        if self.name:
-            return self.name
+    @property
+    def is_full(self):
+        if self.limit is None:
+            return False
 
-        return ''
+        return self.num_subs >= self.limit
 
-    def __repr__(self):
-        if self.name:
-            return '{} - ID: {}'.format(
-                self.name, str(self.pk)
-            )
+    def update_lot_num_subs(self):
+        """
+           Número de inscrições em num_subs deve ser controlado e
+           centralizado e deve ser usados apenas por signal como controle
+           interno
+        """
 
-        return str(self.pk)
+        self.num_subs = self.subscriptions.all().filter(
+            test_subscription=False,
+            completed=True,
+        ).count()
+
+        self.save()
+
+        return self
+

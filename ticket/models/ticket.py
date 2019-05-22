@@ -191,3 +191,23 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
             return self.NOT_STARTED_STATUS
 
         return self.ENDED_STATUS
+
+    def update_audience_category_num_subs(self):
+        """
+        Número de inscrições em num_subs deve ser controlado e centralizado por
+        signal como controle interno
+        """
+
+        counter = 0
+
+        for lot in self.lots.all():
+            counter += lot.subscriptions.all().filter(
+                test_subscription=False,
+                completed=True,
+            ).count()
+
+        self.num_subs = counter
+
+        self.save()
+
+        return self

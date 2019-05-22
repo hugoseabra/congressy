@@ -44,10 +44,10 @@ class Normalizer(Base):
 
                 msg = "Nenhum ticket encontrado para inscrição {} com lot_id " \
                       "{} e event_id {}\n".format(
-                        str(subscription.pk),
-                        subscription.lot.id,
-                        subscription.event.id,
-                        )
+                    str(subscription.pk),
+                    subscription.lot.id,
+                    subscription.event.id,
+                )
 
                 self.stderr.write(self.style.ERROR(msg))
 
@@ -57,11 +57,8 @@ class Normalizer(Base):
 
             assert isinstance(ticket_lot, Lot)
 
-            Subscription.objects.filter(
-                pk=subscription.pk
-            ).update(
-                ticket_lot=ticket_lot,
-            )
+            subscription.ticket_lot = ticket_lot
+            subscription.save()
 
         self.stdout.write(
             self.style.SUCCESS(

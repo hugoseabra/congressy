@@ -5,6 +5,7 @@ from django.db.transaction import atomic
 
 from gatheros_event.models import Event
 from ticket.management import LotMapper, Normalizer, CommandFileLogger
+from ticket.models import Lot, Ticket
 
 
 class Command(BaseCommand):
@@ -96,6 +97,12 @@ class Command(BaseCommand):
                     'events': list()
                 }
 
+            for lot in Lot.objects.filter(ticket__event=event):
+                lot.update_lot_num_subs()
+
+            for ticket in Ticket.objects.filter(event=event):
+                ticket.update_audience_category_num_subs()
+
             past_event_orgs[event.organization.name]['events'].append(event)
 
             print('----------------------------------------------------------')
@@ -120,6 +127,12 @@ class Command(BaseCommand):
 
             present_event_orgs[event.organization.name]['events'] \
                 .append(event)
+
+            for lot in Lot.objects.filter(ticket__event=event):
+                lot.update_lot_num_subs()
+
+            for ticket in Ticket.objects.filter(event=event):
+                ticket.update_audience_category_num_subs()
 
             print('----------------------------------------------------------')
 
@@ -148,6 +161,12 @@ class Command(BaseCommand):
 
                 future_events_orgs[event.organization.name]['events'] \
                     .append(event)
+
+            for lot in Lot.objects.filter(ticket__event=event):
+                lot.update_lot_num_subs()
+
+            for ticket in Ticket.objects.filter(event=event):
+                ticket.update_audience_category_num_subs()
 
             print('----------------------------------------------------------')
 
