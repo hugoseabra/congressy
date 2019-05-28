@@ -119,7 +119,6 @@ class LotDomainTest(TestCase):
         lot = self.mock_factory.fake_lot(ticket=t)
 
         d = {
-            'name': lot.name,
             'ticket': lot.ticket.pk,
             'date_start': lot.date_start,
             'date_end': lot.date_end,
@@ -141,7 +140,6 @@ class LotDomainTest(TestCase):
         new_ticket = self.mock_factory.fake_ticket(event=self.event)
 
         d = {
-            'name': lot.name,
             'ticket': new_ticket.pk,
             'date_start': lot.date_start,
             'date_end': lot.date_end,

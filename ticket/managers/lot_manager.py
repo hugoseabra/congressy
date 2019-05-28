@@ -95,13 +95,13 @@ class LotManager(Manager):
             dtr = DateTimeRange(start=lot.date_start, stop=lot.date_end)
 
             if date_start.strftime('%d/%m/%Y %H:%M:%S') == start:
-                msg = "Esse lote possui a mesma data de inicio com o lote " \
-                      "'{}'".format(lot.name)
+                msg = "Esse lote possui a data de inicio dentro de um" \
+                      "lote existente"
                 raise ValidationError(msg)
 
             if date_start in dtr:
-                msg = "Esse lote possui a data de inicio dentro do " \
-                      "lote: '{}'".format(lot.name)
+                msg = "Esse lote possui a data de inicio dentro de um" \
+                      "lote existente"
                 raise ValidationError(msg)
 
     def _lot_has_subscriptions(self):
