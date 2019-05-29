@@ -135,6 +135,7 @@ class TicketViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
 
 
 class TicketCalculatorAPIView(TicketRestrictionMixin, APIView):
+    permission_classes = (IsAuthenticated,)
 
     # noinspection PyMethodMayBeStatic
     def get(self, request, *_, **kwargs):
