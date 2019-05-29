@@ -144,6 +144,11 @@ class TicketCalculatorAPIView(TicketRestrictionMixin, APIView):
         transfer_tax = request.query_params.get("transfer_tax", False)
         free_installments = request.query_params.get("free_installments", 0)
 
+        try:
+            free_installments = int(free_installments)
+        except ValueError:
+            free_installments = 0
+
         members = [
             m.person
             for m in event.organization.members.filter(active=True)
