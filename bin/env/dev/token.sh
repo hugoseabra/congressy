@@ -7,12 +7,17 @@ if [ -z "$1"  ]
 fi
 
 
-
-if [ $SHELL = "/usr/bin/zsh" ]; then
+if [ -n "`$SHELL -c 'echo $ZSH_VERSION'`" ]; then
 	FILE="$HOME/.zshrc"
-else
+elif [ -n "`$SHELL -c 'echo $BASH_VERSION'`" ]; then
 	FILE="$HOME/.bashrc"
+else
+  	echo "Unknown $SHELL. Fix me to add support.";
+        exit 1;	
 fi
+
+
+
 
 
 TOKEN="$(python manage.py drf_create_token $1  | cut -d ' ' -f 3)";
