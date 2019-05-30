@@ -34,6 +34,13 @@ LOGIN_REDIRECT_URL = '/manage/'
 LOGOUT_REDIRECT_URL = '/login/'
 LOGIN_SUPERUSER_ONLY = False
 ACCOUNT_REGISTRATION = True
+
+# =========================== REST FRAMEWORK ================================= #
+REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False
+}
+
+
 # ========================= SERVER CONFIGURATION ============================ #
 WSGI_APPLICATION = 'project.wsgi.application'
 
