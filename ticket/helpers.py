@@ -199,7 +199,7 @@ def get_lot_installment_prices_for_organizer(price, cgsy_percent,
 
         if counter <= free_installments:
             organizer_price_lists[counter] = round(
-                liquid_price - interests_amount,
+                liquid_price - Decimal(interests_amount),
                 3
             )
         else:
