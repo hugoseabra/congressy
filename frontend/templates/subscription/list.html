@@ -615,6 +615,10 @@
                 return '-';
             }
 
+            if (data['status'] !== "confirmed") {
+                return '-';
+            }
+
             var a;
             var icon = $('<span>').addClass('fas fa-2x');
             if (data['accredited'] === false) {

@@ -482,7 +482,7 @@
 {% include 'subscription/includes/addon_products.html' %}
 {% endif  %}
 
-{% if event.feature_configuration.feature_checkin is True %}
+{% if event.feature_configuration.feature_checkin is True and object.status == object.CONFIRMED_STATUS %}
 {% include 'subscription/includes/attendance.html' %}
 {% endif  %}
 
