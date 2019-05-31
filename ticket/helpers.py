@@ -187,7 +187,7 @@ def get_lot_installment_prices_for_organizer(price, cgsy_percent,
     if transfer_tax:
         price = price + congressy_cut
 
-    interests_amounts = calculator.get_liquid_interest_prices(price)
+    interests_amounts = calculator.get_absorbed_liquid_interest_prices(price)
 
     organizer_price_lists = dict()
 

@@ -69,6 +69,25 @@ class Calculator(object):
 
         return prices
 
+    def get_absorbed_liquid_interest_prices(self, amount: Decimal) -> list:
+        """ Resgata lista de valores de juros por parcela para o organizador """
+        interests_amount = amount * self.interests_rate
+
+        prices = [0.00]
+
+        for part in range(1, int(self.total_installments) + 1):
+            if part <= 1:
+                continue
+
+            part_amount = 0.00
+
+            if part <= self.free_installments:
+                part_amount = part * interests_amount
+
+            prices.append(part_amount)
+
+        return prices
+
     def get_installment_total_amount(self,
                                      amount: Decimal,
                                      installments=1) -> Decimal:
