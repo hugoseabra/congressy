@@ -137,7 +137,7 @@ class SubscriptionService(AbstractSubscriptionOptional):
         :type: bool
         """
         return self.optional.subscription_services.exclude(
-            subscription__status='canceled'
+            subscription__status=Subscription.CANCELED_STATUS,
         ).count()
 
     @property
