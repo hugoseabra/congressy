@@ -119,11 +119,27 @@ class Parser:
             code = contents[0].strip()
             created_on = contents[1].strip()  # 14/03/2019 10:35:06
 
-            try:
-                created_on = datetime.strptime(created_on, '%d/%m/%Y %H:%M:%S')
-            except ValueError:
-                self.error = "Não foi possivel serializar neste formato," \
-                             " verifique se está: %d/%m/%Y %H:%M:%S"
+            dt_supported_formst = [
+                '%d/%m/%y %H:%M:%S',
+                '%d/%m/%Y %H:%M:%S',
+                '%Y-%m-%d %H:%M:%S',
+            ]
+
+            dt_error = True
+            for dt_format in dt_supported_formst:
+                try:
+                    created_on = datetime.strptime(created_on, dt_format)
+                    dt_error = False
+                    break
+
+                except ValueError:
+                    pass
+
+            if dt_error is True:
+                self.error = \
+                    "Não foi possivel serializar neste formato," \
+                    " verifique se está com um dos seguintes formatos:" \
+                    " {}".format(", ".join(dt_supported_formst))
                 return
 
             self._processed_line['created_on'] = created_on

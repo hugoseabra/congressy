@@ -13,6 +13,7 @@ from django.utils.html import strip_tags
 
 from core.util import model_field_slugify
 from gatheros_event.models import Person
+from payment.bank_accounts import BANK_ACCOUNTS
 from .member import Member
 from .mixins import GatherosModelMixin
 
@@ -23,15 +24,6 @@ class Organization(models.Model, GatherosModelMixin):
     CONTA_CORRENTE_CONJUNTA = 'conta_corrente_conjunta'
     CONTA_POUPANCA_CONJUNTA = 'conta_poupanca_conjunta'
 
-    BANCO_DO_BRASIL = "001"
-    ITAU = "341"
-    BRADESCO = "237"
-    SANTANDER = "033"
-    CAIXA_ECONOMICA = "104"
-    BANCOOB = "756"
-    SICOOB = "756"
-    BANCO_COOPERATIVO_SICREDI = "748"
-
     ACCOUNT_TYPES = (
         (CONTA_CORRENTE, 'Conta corrente'),
         (CONTA_POUPANCA, 'Conta poupanca'),
@@ -39,16 +31,7 @@ class Organization(models.Model, GatherosModelMixin):
         (CONTA_POUPANCA_CONJUNTA, 'Conta poupanca conjunta'),
     )
 
-    BANK_CODES = (
-        (BANCO_DO_BRASIL, 'Banco do Brasil'),
-        (ITAU, 'Itau'),
-        (BRADESCO, 'Bradesco'),
-        (SANTANDER, 'Santander'),
-        (CAIXA_ECONOMICA, 'Caixa Economica'),
-        (BANCOOB, 'BANCOOB - Banco Cooperativo do Brasil'),
-        (SICOOB, 'Sicoob'),
-        (BANCO_COOPERATIVO_SICREDI, 'BANCO COOPERATIVO SICREDI S.A.'),
-    )
+    BANK_CODES = BANK_ACCOUNTS
 
     """ Organização """
     name = models.CharField(max_length=100, verbose_name='nome da organização')
