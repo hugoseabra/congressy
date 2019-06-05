@@ -30,6 +30,7 @@ class LotCategoryAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 @admin.register(Lot)
 class LotAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     search_fields = (
+        'pk',
         'event__name',
         'name',
     )
