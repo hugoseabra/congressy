@@ -13,7 +13,7 @@ from django.utils.datastructures import OrderedDict
 
 from base.managers import Manager
 
-__all__ = ['ApplicationServiceMixin']
+__all__ = ['ApplicationService']
 
 
 class ManagerClassMissingError(Exception):
