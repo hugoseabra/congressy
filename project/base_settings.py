@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'health_check.contrib.celery',
 
     # Django added apps
+    'django.contrib.admindocs',
     'django.contrib.sites',
     'django.forms',
 
@@ -96,6 +97,7 @@ FORMAT_MODULE_PATH = [
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.admindocs.middleware.XViewMiddleware',
     # Middleware para saber de qual host que veio a resposta do Django
     'project.manage.middleware.OriginMiddleware',
     'django.middleware.locale.LocaleMiddleware',
