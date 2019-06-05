@@ -10,7 +10,7 @@ from project.manage import settings
 
 
 class Command(BaseCommand, CliInteractionMixin, CommandEventMixin):
-    help = 'Copia serviços de uma categoria de evento para outra.'
+    help = 'Relatório de Atividades Extras por tag.'
 
     def add_arguments(self, parser):
         parser.add_argument('event_id', type=int, nargs='?')
