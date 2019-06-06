@@ -10,8 +10,8 @@ def get_opened_boleto_transactions(subscription):
     now = datetime.now()
 
     return Transaction.objects.filter(
-        subscription=subscription,
-        lot__event=subscription.event,
+        subscription_id=subscription.pk,
+        lot__event_id=subscription.event_id,
         type=Transaction.BOLETO,
         boleto_expiration_date__gt=now.date(),
     ).exclude(
@@ -21,6 +21,10 @@ def get_opened_boleto_transactions(subscription):
             Transaction.REFUSED,
         ],
     )
+
+
+def has_open_boleto(subscription):
+    return get_opened_boleto_transactions(subscription).count()
 
 
 def is_boleto_allowed(event):

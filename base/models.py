@@ -7,7 +7,6 @@ from django.db.utils import IntegrityError
 from django.forms import ValidationError
 from django.utils.safestring import mark_safe
 
-
 __all__ = ['EntityMixin', 'RuleChecker', 'RuleIntegrityError']
 
 
@@ -65,6 +64,9 @@ class EntityMixin(object):
 
     def clean(self):
         self._check_rules()
+
+    def is_new(self):
+        return self._state.adding is True
 
     def _check_rules(self):
         """ Verifica as regras de integridade de domínio. """

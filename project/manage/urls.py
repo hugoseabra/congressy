@@ -33,6 +33,7 @@ admin_urlpatterns += [
     url(r'^grapelli/', include('grappelli.urls')),
     url(r'^grappelli_custom_autocomplete/',
         include('django_grappelli_custom_autocomplete.urls')),
+    url(r'^cgsy-admin18/doc/', include('django.contrib.admindocs.urls')),
     url(r'^cgsy-admin18/', admin.site.urls)
 ]
 

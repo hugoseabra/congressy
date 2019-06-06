@@ -46,9 +46,6 @@ class AbstractSubscriptionOptional(EntityMixin, models.Model):
         blank=True,
     )
 
-    def __str__(self):
-        return '{}: {}'.format(__name__, self.subscription.person.name)
-
 
 class SubscriptionProduct(AbstractSubscriptionOptional):
     """

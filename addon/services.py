@@ -2,6 +2,7 @@ from datetime import datetime
 
 from addon import constants, managers
 from base import services
+from payment.helpers.payment_helpers import has_open_boleto
 
 
 class ThemeService(services.ApplicationService):
@@ -84,12 +85,15 @@ def remove_expired_optional_subscription(
         Verifica se a inscrição de um opcional será excluída
     """
     subscription = subscription_optional.subscription
-    if subscription.status == subscription.CONFIRMED_STATUS:
+    if subscription.confirmed is True:
         return False
 
     diff_datetime = datetime.now() - subscription.created
 
     if diff_datetime.days <= int(min_days):
+        return False
+
+    if has_open_boleto(subscription) is True:
         return False
 
     subscription_optional.delete()
@@ -102,7 +106,7 @@ class SubscriptionServiceReleaseMixin(object):
         da inscrição do opcional
     """
 
-    def release_optional(self):
+    def release_optional(self, min_days=None):
         """
             Exclui Inscrição de Opcional caso a inscrição informada não esteja
             confirmada e o número de dias desde a criação da mesma for maior do
@@ -116,10 +120,20 @@ class SubscriptionServiceReleaseMixin(object):
 
         # Se manager não possui instancia de Inscrição de opcional, não há
         # nada a fazer.
-        if has_instance is False or not self.manager.instance.pk:
+        if has_instance is False:
             return False
 
-        return remove_expired_optional_subscription(self.manager.instance)
+        instance = self.manager.instance
+
+        if instance.is_new():
+            return False
+
+        kwargs = {'subscription_optional': instance}
+
+        if min_days:
+            kwargs.update({'min_days': min_days})
+
+        return remove_expired_optional_subscription(**kwargs)
 
 
 class SubscriptionProductService(
