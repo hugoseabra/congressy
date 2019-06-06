@@ -21,9 +21,11 @@ class CommandEventMixin:
                 )
 
                 if confirmed is False:
+                    pk = None
                     event = None
 
             except Exception:
+                pk = None
                 event = None
 
         return event
