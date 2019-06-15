@@ -85,11 +85,14 @@
             }
 
 
-            $('.switchery').on('click', function () {
-                $('#map-block').toggle();
-                $('#address').toggle();
-                $('#place-form-block').toggleClass('col-md-6');
-                $('#place-form-block').toggleClass('col-md-12');
+            $('.switchery').on('click', function (e) {
+                var chk_id = $(this).parent().find('input[type=checkbox]').attr('id');
+                if (chk_id === 'id_show_location') {
+                    $('#map-block').toggle();
+                    $('#address').toggle();
+                    $('#place-form-block').toggleClass('col-md-6');
+                    $('#place-form-block').toggleClass('col-md-12');
+                }
             })
         });
 
@@ -651,6 +654,47 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         {% render_generic_field form.voucher_extra_info %}
+                                    </div>
+                                </div>
+                                <button type="button"
+                                        class="btn btn-success submit-button"
+                                        style=" float: right; margin-right:
+                                        10px">
+                                    <i class="fa fa-save"></i>
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="panel-title">
+                                    Streaming ao Vivo
+                                </div>
+                            </div>
+                            <div class="panel-body">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_switchery_field form.enable_streaming_page %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.stream_page_title %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.stream_page_button %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.stream_youtube_code %}
                                     </div>
                                 </div>
                                 <button type="button"
