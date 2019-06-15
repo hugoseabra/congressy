@@ -84,7 +84,9 @@
 
 <div id="document" class="document">
 
-    {% include 'hotsite/includes/1_top_menu.html' %}
+    {% block topmenu %}
+        {% include 'hotsite/includes/1_top_menu.html' %}
+    {% endblock %}
 
     {% block content %}{% endblock %}
 

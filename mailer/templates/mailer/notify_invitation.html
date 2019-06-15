@@ -1,13 +1,17 @@
 {% load humanize %}
 
 <p style="text-align: justify;">
+    {% if convidado %}
     Prezado <strong>{{ convidado }}</strong>,
+    {% else %}
+    Olá,
+    {% endif %}
 </p>
 <p style="text-align: justify;">
-    Eu configurei a {{ organizacao }} na Congressy para nós - para que possamos gerenciar nossos eventos.
+    Este é um convite para que você possa entrar em nossa organização gerenciar eventos conosco.
 </p>
 <hr/>
-<h2>Click no link abaixo para aceitar o convite</h2>
+<h2>Click no link abaixo para aceitar ou negar o convite</h2>
 <p style="text-align: justify;">
     <a href="{{ link }}">Convite</a>
 </p>

@@ -61,6 +61,10 @@ class InfoForm(BaseModelFileForm):
             'scientific_rules',
             'editorial_body',
             'voucher_extra_info',
+            'enable_streaming_page',
+            'stream_page_title',
+            'stream_page_button',
+            'stream_youtube_code',
         ]
         widgets = {
             'description_html': CKEditorWidget(),

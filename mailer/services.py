@@ -17,6 +17,48 @@ from mailer import exception, checks
 from .worker import send_mail
 
 
+# =============================== HELPERS =================================== #
+def send(event, body, to, subject, attachment_file_path=None):
+    """ Dados necessários para envio do e-mail. """
+    org = event.organization
+
+    if org.email:
+        author_email = org.email
+    else:
+        members = org.members.filter(
+            group=Member.ADMIN,
+            person__user__is_superuser=False,
+        ).order_by('created')
+
+        if members.count() == 0:
+            members = org.members.filter(
+                group=Member.ADMIN,
+            ).order_by('created')
+
+        member = members.first()
+        author_email = member.person.email
+
+    kwargs = {
+        'subject': subject,
+        'body': body,
+        'to': to,
+        'reply_to': author_email,
+    }
+
+    if attachment_file_path:
+        kwargs.update({
+            'attachment_file_path': attachment_file_path,
+        })
+
+    # Vamos processar dando tempo para o arquivo propagar em todos os
+    # servidores
+    sender = send_mail.apply_async
+    return sender(
+        kwargs=kwargs,
+        eta=datetime.now() + timedelta(seconds=30),  # exec after 30 secs
+    )
+
+
 # =========================== SUBSCRIBER EMAILS ============================= #
 def notify_new_unpaid_subscription_boleto(event, transaction):
     """
@@ -53,13 +95,11 @@ def notify_new_unpaid_subscription_boleto(event, transaction):
 
     })
 
-    sender = send_mail.delay
-
-    return sender(
-        subject='Inscrição: {}'.format(event.name),
+    return send(
+        event=event,
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
+        subject='Inscrição: {}'.format(event.name)
     )
 
 
@@ -110,20 +150,11 @@ def notify_paid_subscription_boleto(event, transaction):
         'password_set_url': None,
     })
 
-    # Vamos processar dando tempo para o arquivo propagar em todos os
-    # servidores
-    sender = send_mail.apply_async
-
-    return sender(
-        kwargs={
-            'subject': 'Inscrição: {}'.format(event.name),
-            'body': body,
-            'to': person.email,
-            'reply_to': event.organization.email,
-            'attachment_file_path': voucher_file,
-        },
-        eta=datetime.now() + timedelta(seconds=30)  # exec after 30 secs
-    )
+    return send(event=event,
+                body=body,
+                to=person.email,
+                subject='Inscrição: {}'.format(event.name),
+                attachment_file_path=voucher_file)
 
 
 def notify_new_user_and_unpaid_subscription_boleto(event, transaction):
@@ -187,13 +218,11 @@ def notify_new_user_and_unpaid_subscription_boleto(event, transaction):
             'boleto_url': boleto_url,
         })
 
-    sender = send_mail.delay
-
-    return sender(
-        subject='Inscrição: {}'.format(event.name),
+    return send(
+        event=event,
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
+        subject='Inscrição: {}'.format(event.name)
     )
 
 
@@ -258,19 +287,12 @@ def notify_new_user_and_paid_subscription_boleto(event, transaction):
         'password_set_url': password_set_url,
     })
 
-    # Vamos processar dando tempo para o arquivo propagar em todos os
-    # servidores
-    sender = send_mail.apply_async
-
-    return sender(
-        kwargs={
-            'subject': 'Inscrição: {}'.format(event.name),
-            'body': body,
-            'to': person.email,
-            'reply_to': event.organization.email,
-            'attachment_file_path': voucher_file,
-        },
-        eta=datetime.now() + timedelta(seconds=30)  # exec after 30 secs
+    return send(
+        event=event,
+        body=body,
+        to=person.email,
+        subject='Inscrição: {}'.format(event.name),
+        attachment_file_path=voucher_file,
     )
 
 
@@ -306,13 +328,11 @@ def notify_new_unpaid_subscription_credit_card(event, transaction):
         'reset_password_url': absoluteuri.reverse('public:password_reset'),
     })
 
-    sender = send_mail.delay
-
-    return sender(
-        subject='Inscrição: {}'.format(event.name),
+    return send(
+        event=event,
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
+        subject='Inscrição: {}'.format(event.name)
     )
 
 
@@ -348,13 +368,11 @@ def notify_new_refused_subscription_credit_card(event, transaction):
         'reset_password_url': absoluteuri.reverse('public:password_reset'),
     })
 
-    sender = send_mail.delay
-
-    return sender(
-        subject='Inscrição: {} - pagamento recusado'.format(event.name),
+    return send(
+        event=event,
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
+        subject='Inscrição: {} - pagamento recusado'.format(event.name),
     )
 
 
@@ -390,13 +408,11 @@ def notify_new_refused_subscription_boleto(event, transaction):
         'reset_password_url': absoluteuri.reverse('public:password_reset'),
     })
 
-    sender = send_mail.delay
-
-    return sender(
-        subject='Inscrição: {} - pagamento recusado'.format(event.name),
+    return send(
+        event=event,
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
+        subject='Inscrição: {} - pagamento recusado'.format(event.name),
     )
 
 
@@ -447,19 +463,12 @@ def notify_new_paid_subscription_credit_card(event, transaction):
         'reset_password_url': absoluteuri.reverse('public:password_reset'),
     })
 
-    # Vamos processar dando tempo para o arquivo propagar em todos os
-    # servidores
-    sender = send_mail.apply_async
-
-    return sender(
-        kwargs={
-            'subject': 'Inscrição: {}'.format(event.name),
-            'body': body,
-            'to': person.email,
-            'reply_to': event.organization.email,
-            'attachment_file_path': voucher_file,
-        },
-        eta=datetime.now() + timedelta(seconds=30)  # exec after 30 secs
+    return send(
+        event=event,
+        body=body,
+        to=person.email,
+        subject='Inscrição: {}'.format(event.name),
+        attachment_file_path=voucher_file,
     )
 
 
@@ -509,13 +518,11 @@ def notify_new_user_and_unpaid_subscription_credit_card(event, transaction):
         'password_set_url': password_set_url,
     })
 
-    sender = send_mail.delay
-
-    return sender(
+    return send(
+        event=event,
         subject='Inscrição: {}'.format(event.name),
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
     )
 
 
@@ -565,13 +572,11 @@ def notify_new_user_and_refused_subscription_credit_card(event, transaction):
         'password_set_url': password_set_url,
     })
 
-    sender = send_mail.delay
-
-    return sender(
+    return send(
+        event=event,
         subject='Inscrição: {} - pagamento recusado'.format(event.name),
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
     )
 
 
@@ -621,13 +626,11 @@ def notify_new_user_and_refused_subscription_boleto(event, transaction):
         'password_set_url': password_set_url,
     })
 
-    sender = send_mail.delay
-
-    return sender(
-        subject='Inscrição: {} - pagamento recusado'.format(event.name),
+    return send(
+        event=event,
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
+        subject='Inscrição: {} - pagamento recusado'.format(event.name),
     )
 
 
@@ -681,19 +684,12 @@ def notify_new_user_and_paid_subscription_credit_card(event, transaction):
         'password_set_url': '',
     })
 
-    # Vamos processar dando tempo para o arquivo propagar em todos os
-    # servidores
-    sender = send_mail.apply_async
-
-    return sender(
-        kwargs={
-            'subject': 'Inscrição: {}'.format(event.name),
-            'body': body,
-            'to': person.email,
-            'reply_to': event.organization.email,
-            'attachment_file_path': voucher_file,
-        },
-        eta=datetime.now() + timedelta(seconds=30)  # exec after 30 secs
+    return send(
+        event=event,
+        body=body,
+        to=person.email,
+        subject='Inscrição: {}'.format(event.name),
+        attachment_file_path=voucher_file,
     )
 
 
@@ -747,19 +743,12 @@ def notify_new_user_and_paid_subscription_credit_card_with_discrepancy(event,
         'password_set_url': '',
     })
 
-    # Vamos processar dando tempo para o arquivo propagar em todos os
-    # servidores
-    sender = send_mail.apply_async
-
-    return sender(
-        kwargs={
-            'subject': 'Inscrição: {}'.format(event.name),
-            'body': body,
-            'to': person.email,
-            'reply_to': event.organization.email,
-            'attachment_file_path': voucher_file,
-        },
-        eta=datetime.now() + timedelta(seconds=30)  # exec after 30 secs
+    return send(
+        event=event,
+        body=body,
+        to=person.email,
+        subject='Inscrição: {}'.format(event.name),
+        attachment_file_path=voucher_file,
     )
 
 
@@ -817,19 +806,12 @@ def notify_new_free_subscription(event, subscription):
         'reset_password_url': absoluteuri.reverse('public:password_reset'),
     })
 
-    # Vamos processar dando tempo para o arquivo propagar em todos os
-    # servidores
-    sender = send_mail.apply_async
-
-    return sender(
-        kwargs={
-            'subject': 'Inscrição: {}'.format(event.name),
-            'body': body,
-            'to': person.email,
-            'reply_to': event.organization.email,
-            'attachment_file_path': voucher_file,
-        },
-        eta=datetime.now() + timedelta(seconds=30)  # exec after 30 secs
+    return send(
+        event=event,
+        body=body,
+        to=person.email,
+        subject='Inscrição: {}'.format(event.name),
+        attachment_file_path=voucher_file,
     )
 
 
@@ -899,19 +881,12 @@ def notify_new_user_and_free_subscription(event, subscription):
         'password_set_url': password_set_url,
     })
 
-    # Vamos processar dando tempo para o arquivo propagar em todos os
-    # servidores
-    sender = send_mail.apply_async
-
-    return sender(
-        kwargs={
-            'subject': 'Inscrição: {}'.format(event.name),
-            'body': body,
-            'to': person.email,
-            'reply_to': event.organization.email,
-            'attachment_file_path': voucher_file,
-        },
-        eta=datetime.now() + timedelta(seconds=30)  # exec after 30 secs
+    return send(
+        event=event,
+        body=body,
+        to=person.email,
+        subject='Inscrição: {}'.format(event.name),
+        attachment_file_path=voucher_file,
     )
 
 
@@ -961,13 +936,11 @@ def notify_refunded_subscription_boleto(event, transaction):
         'password_set_url': password_set_url,
     })
 
-    sender = send_mail.delay
-
-    return sender(
-        subject='Reembolso de Inscrição: {}'.format(event.name),
+    return send(
+        event=event,
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
+        subject='Reembolso de Inscrição: {}'.format(event.name),
     )
 
 
@@ -1017,13 +990,11 @@ def notify_refunded_subscription_credit_card(event, transaction):
         'password_set_url': password_set_url,
     })
 
-    sender = send_mail.delay
-
-    return sender(
-        subject='Reembolso de Inscrição: {}'.format(event.name),
+    return send(
+        event=event,
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
+        subject='Reembolso de Inscrição: {}'.format(event.name),
     )
 
 
@@ -1072,13 +1043,12 @@ def notify_pending_refund_subscription(event, transaction):
         'password_set_url': password_set_url,
     })
 
-    sender = send_mail.delay
-
-    return sender(
-        subject='Reembolso de Inscrição em Andamento: {}'.format(event.name),
+    return send(
+        event=event,
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
+        subject='Reembolso de Inscrição em'
+                ' Andamento: {}'.format(event.name),
     )
 
 
@@ -1111,13 +1081,11 @@ def notify_chargedback_subscription(event, transaction):
         'reset_password_url': absoluteuri.reverse('public:password_reset'),
     })
 
-    sender = send_mail.delay
-
-    return sender(
-        subject='Chargedback de Inscrição: {}'.format(event.name),
+    return send(
+        event=event,
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
+        subject='Chargedback de Inscrição: {}'.format(event.name),
     )
 
 
@@ -1152,13 +1120,11 @@ def notify_paid_with_incoming_installment(event, transaction):
         'password_set_url': None,
     })
 
-    sender = send_mail.delay
-
-    return sender(
-        subject='Inscrição: {}'.format(event.name),
+    return send(
+        event=event,
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
+        subject='Inscrição: {}'.format(event.name),
     )
 
 
@@ -1192,13 +1158,11 @@ def notify_unpaid_installment(event, transaction):
         'password_set_url': None,
     })
 
-    sender = send_mail.delay
-
-    return sender(
-        subject='Inscrição: {}'.format(event.name),
+    return send(
+        event=event,
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
+        subject='Inscrição: {}'.format(event.name),
     )
 
 
@@ -1248,13 +1212,11 @@ def notify_installment_with_discrepancy(event, transaction):
         'password_set_url': None,
     })
 
-    sender = send_mail.delay
-
-    return sender(
-        subject='Inscrição: {}'.format(event.name),
+    return send(
+        event=event,
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
+        subject='Inscrição: {}'.format(event.name),
     )
 
 
@@ -1269,7 +1231,7 @@ def notify_new_user(context):
 
     subject = 'Confirmação de cadastro na {0}'.format(context['site_name'])
 
-    sender = send_mail.delay
+    sender = send_mail.apply_async
 
     return sender(
         subject=subject,
@@ -1290,7 +1252,7 @@ def notify_new_partner(context):
 
     subject = 'Cadastro de parceria na  {0}'.format(context['site_name'])
 
-    sender = send_mail.delay
+    sender = send_mail.apply_async
 
     return sender(
         subject=subject,
@@ -1309,7 +1271,7 @@ def notify_reset_password(context):
 
     subject = 'Redefina sua senha na {0}'.format(context['site_name'])
 
-    sender = send_mail.delay
+    sender = send_mail.apply_async
 
     return sender(
         subject=subject,
@@ -1328,7 +1290,7 @@ def notify_set_password(context):
 
     subject = 'Defina sua senha na {0}'.format(context['site_name'])
 
-    sender = send_mail.delay
+    sender = send_mail.apply_async
 
     return sender(
         subject=subject,
@@ -1351,7 +1313,7 @@ def notify_partner_contract(context):
     body = render_to_string('mailer/notify_partner_contract_email.html',
                             context=context)
 
-    sender = send_mail.delay
+    sender = send_mail.apply_async
 
     return sender(
         subject=subject,
@@ -1373,7 +1335,7 @@ def notify_new_partner_internal(context):
 
     subject = 'Novo parceiro cadastrado: {0}'.format(context['partner_name'])
 
-    sender = send_mail.delay
+    sender = send_mail.apply_async
 
     return sender(
         subject=subject,
@@ -1408,7 +1370,7 @@ def notify_new_event(event):
         }
     )
 
-    sender = send_mail.delay
+    sender = send_mail.apply_async
 
     sender(
         body=body,
@@ -1465,13 +1427,11 @@ def notify_open_boleto(transaction):
         'password_set_url': password_set_url,
     })
 
-    sender = send_mail.delay
-
-    return sender(
-        subject='Boleto disponível: {}'.format(event.name),
+    return send(
+        event=event,
         body=body,
         to=person.email,
-        reply_to=event.organization.email,
+        subject='Boleto disponível: {}'.format(event.name),
     )
 
 
@@ -1505,7 +1465,7 @@ def notify_invite(organization, link, inviter, invited_person, email):
         'link': link,
     })
 
-    sender = send_mail.delay
+    sender = send_mail.apply_async
 
     return sender(
         subject='Convite: {}'.format(organization.name),

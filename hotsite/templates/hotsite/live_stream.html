@@ -1,0 +1,30 @@
+{% extends 'hotsite/base.html' %}
+
+
+{% block content %}
+{% include 'hotsite/includes/2_cover_no_form.html' %}
+
+<!-- FORM
+================================= -->
+<section id="about" class="about-section section">
+    <div class="container">
+        <h2 class="section-heading text-center">{{ event.info.stream_page_title|default:"Transmissão ao vivo" }}</h2>
+        <div class="about-row row">
+            <div class="col-md-12 text-center">
+
+                <iframe src="https://www.youtube-nocookie.com/embed/{{ event.info.stream_youtube_code }}?controls=0&enablejsapi=1&modestbranding=1&disablekb=1&origin={{ domain }}"
+                        width="640"
+                        height="360"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+{% block scripts %}
+{% endblock %}
