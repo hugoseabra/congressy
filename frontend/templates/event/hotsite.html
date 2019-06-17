@@ -850,8 +850,7 @@
                                 </div>
                                 <div class="col-md-12 event-info-status-item">
                                     <div>
-                                        <i class="fas fa-check-circle fa-4x
-{% if info and info.lead %}success-color{% endif %}"></i>
+                                        <i class="fas fa-check-circle fa-4x {% if info and info.lead %}success-color{% endif %}"></i>
                                     </div>
                                     <div>
                                         <div class="title">Descrição rápida
@@ -868,8 +867,7 @@
 
                                 <div class="col-md-12 event-info-status-item">
                                     <div>
-                                        <i class="fas fa-check-circle fa-4x
-{% if info and info.description_html %}success-color{% endif %}"></i>
+                                        <i class="fas fa-check-circle fa-4x {% if info and info.description_html %}success-color{% endif %}"></i>
                                     </div>
                                     <div>
                                         <div class="title">
@@ -893,8 +891,7 @@
 
                                     <div class="col-md-12 event-info-status-item">
                                         <div>
-                                            <i class="fas fa-check-circle fa-4x
-{% if info and info.editorial_body %}success-color{% endif %}"></i>
+                                            <i class="fas fa-check-circle fa-4x {% if info and info.editorial_body %}success-color{% endif %}"></i>
                                         </div>
                                         <div>
                                             <div class="title">
@@ -912,8 +909,7 @@
 
                                     <div class="col-md-12 event-info-status-item">
                                         <div>
-                                            <i class="fas fa-check-circle fa-4x
-{% if info and info.scientific_rules %}success-color{% endif %}"></i>
+                                            <i class="fas fa-check-circle fa-4x {% if info and info.scientific_rules %}success-color{% endif %}"></i>
                                         </div>
                                         <div>
                                             <div class="title">
@@ -1091,6 +1087,13 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
+                            <div class="col-md-12">
+                                <div class="well well-sm well-info">
+                                    O vídeo só estará disponível para participantes confirmados.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-10">
                                 {% render_switchery_field form.enable_streaming_page %}
                             </div>
@@ -1105,11 +1108,6 @@
                         <div class="row">
                             <div class="col-md-12">
                                 {% render_generic_field form.stream_page_title %}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                {% render_generic_field form.stream_page_button %}
                             </div>
                         </div>
                         <div class="row">
@@ -1177,7 +1175,7 @@
                                     onclick="askForFile();" id="edit_btn"
                                     type="button">
                                 <i class="fas fa-upload"></i>
-                                Upload
+                                Enviar
                             </button>
 
                             <button class="btn btn-sm btn-primary"

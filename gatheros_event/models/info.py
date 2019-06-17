@@ -151,21 +151,14 @@ class Info(models.Model, GatherosModelMixin):
         max_length=80,
         blank=True,
         default='Transmissão ao vivo',
-        verbose_name='Título da Pàgina de Vídeo',
-    )
-
-    stream_page_button = models.CharField(
-        max_length=20,
-        blank=True,
-        default='Transmissão ao vivo',
-        verbose_name='Texto do botão da página de vídeo',
+        verbose_name='Título da Página de Vídeo',
     )
 
     stream_youtube_code = models.CharField(
         max_length=15,
         blank=True,
         null=True,
-        verbose_name='Código do streaming do Youtube',
+        verbose_name='Código do Vídeo (Youtube)',
         help_text='https://www.youtube.com/watch?v=<strong>CÓDIGO</strong>',
     )
 

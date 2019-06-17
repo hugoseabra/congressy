@@ -63,7 +63,6 @@ class InfoForm(BaseModelFileForm):
             'voucher_extra_info',
             'enable_streaming_page',
             'stream_page_title',
-            'stream_page_button',
             'stream_youtube_code',
         ]
         widgets = {
