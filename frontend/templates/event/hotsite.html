@@ -597,7 +597,7 @@
           function onPlayerReady(event) {
               done = true;
               if ($('#id_stream_youtube_code').val()) {
-                  $('#player').show();
+                  $('.videoWrapper').show();
               }
           }
 
@@ -615,7 +615,7 @@
                       return;
                   }
 
-                  var player_el = $('#player');
+                  var player_el = $('.videoWrapper');
                   window.clearTimeout(videoCodeWatcher);
                   videoCodeWatcher = window.setTimeout(function() {
                       if (!$('#id_stream_youtube_code').val()) {
@@ -1124,8 +1124,8 @@
                                 <h3 class="text-bold" style="margin-left:10px">Pré-visualização</h3>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="videoWrapper" style="margin-left: 12px">
-                                            <div id="player" style="display:none"></div>
+                                        <div class="videoWrapper" style="margin-left: 12px;display:none">
+                                            <div id="player"></div>
                                         </div>
                                     </div>
                                 </div>
