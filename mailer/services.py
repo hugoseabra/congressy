@@ -1231,7 +1231,7 @@ def notify_new_user(context):
 
     subject = 'Confirmação de cadastro na {0}'.format(context['site_name'])
 
-    sender = send_mail.apply_async
+    sender = send_mail.delay
 
     return sender(
         subject=subject,
@@ -1252,7 +1252,7 @@ def notify_new_partner(context):
 
     subject = 'Cadastro de parceria na  {0}'.format(context['site_name'])
 
-    sender = send_mail.apply_async
+    sender = send_mail.delay
 
     return sender(
         subject=subject,
@@ -1271,7 +1271,7 @@ def notify_reset_password(context):
 
     subject = 'Redefina sua senha na {0}'.format(context['site_name'])
 
-    sender = send_mail.apply_async
+    sender = send_mail.delay
 
     return sender(
         subject=subject,
@@ -1290,7 +1290,7 @@ def notify_set_password(context):
 
     subject = 'Defina sua senha na {0}'.format(context['site_name'])
 
-    sender = send_mail.apply_async
+    sender = send_mail.delay
 
     return sender(
         subject=subject,
@@ -1313,7 +1313,8 @@ def notify_partner_contract(context):
     body = render_to_string('mailer/notify_partner_contract_email.html',
                             context=context)
 
-    sender = send_mail.apply_async
+    sender = send_mail.delay
+    sender = send_mail.delay
 
     return sender(
         subject=subject,
@@ -1335,7 +1336,7 @@ def notify_new_partner_internal(context):
 
     subject = 'Novo parceiro cadastrado: {0}'.format(context['partner_name'])
 
-    sender = send_mail.apply_async
+    sender = send_mail.delay
 
     return sender(
         subject=subject,
@@ -1370,7 +1371,7 @@ def notify_new_event(event):
         }
     )
 
-    sender = send_mail.apply_async
+    sender = send_mail.delay
 
     sender(
         body=body,
@@ -1465,7 +1466,7 @@ def notify_invite(organization, link, inviter, invited_person, email):
         'link': link,
     })
 
-    sender = send_mail.apply_async
+    sender = send_mail.delay
 
     return sender(
         subject='Convite: {}'.format(organization.name),
