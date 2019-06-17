@@ -32,7 +32,7 @@ class Command(BaseCommand, CliInteractionMixin, CommandEventMixin):
         ).order_by('tag', 'schedule_start')
 
         lines = [
-            ["ID", "nome", "tema", "num. inscricoes"]
+            ["ID", "nome", "categoria", "tema", "num. inscricoes"]
         ]
 
         for addon in addons:
@@ -46,6 +46,7 @@ class Command(BaseCommand, CliInteractionMixin, CommandEventMixin):
             line = [
                 str(addon.pk),
                 addon.name,
+                addon.lot_category.name,
                 addon.theme.name,
                 str(subs_qs.count()),
             ]

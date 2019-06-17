@@ -77,9 +77,7 @@ class EventMixin(TemplateNameableMixin):
         return context
 
 
-class SubscriptionFormMixin(EventMixin):
-    form_class = PersonForm
-    initial = {}
+class SubscriptionMixin(EventMixin):
     current_subscription = None
 
     def pre_dispatch(self):
@@ -137,10 +135,6 @@ class SubscriptionFormMixin(EventMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form_config'] = self.current_event.form_config
-
-        if 'form' not in kwargs:
-            context['form'] = self.get_form()
 
         person = self.current_subscription.person
         sub = self.current_subscription.subscription
@@ -155,6 +149,20 @@ class SubscriptionFormMixin(EventMixin):
                 sub_lot and self.current_event.is_lot_running(sub_lot)
         else:
             context['is_subscribed'] = sub is not None
+
+        return context
+
+
+class SubscriptionFormMixin(SubscriptionMixin):
+    form_class = PersonForm
+    initial = {}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form_config'] = self.current_event.form_config
+
+        if 'form' not in kwargs:
+            context['form'] = self.get_form()
 
         return context
 

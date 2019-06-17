@@ -54,6 +54,22 @@
             background-color: #1f7bb6;
         }
     </style>
+
+    <style>
+        .videoWrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            padding-top: 25px;
+            height: 0;
+        }
+        .videoWrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 {% endblock %}
 
 {% block scripts %}
@@ -85,11 +101,14 @@
             }
 
 
-            $('.switchery').on('click', function () {
-                $('#map-block').toggle();
-                $('#address').toggle();
-                $('#place-form-block').toggleClass('col-md-6');
-                $('#place-form-block').toggleClass('col-md-12');
+            $('.switchery').on('click', function (e) {
+                var chk_id = $(this).parent().find('input[type=checkbox]').attr('id');
+                if (chk_id === 'id_show_location') {
+                    $('#map-block').toggle();
+                    $('#address').toggle();
+                    $('#place-form-block').toggleClass('col-md-6');
+                    $('#place-form-block').toggleClass('col-md-12');
+                }
             })
         });
 
@@ -103,17 +122,8 @@
 
             window.cgsy.maps.retrieveAddress = function () {
                 var name = $('#id_name');
-                var country = $('#id_country');
-                var street = $('#id_street');
-                var city = $('#id_city_name :selected');
-                var state = $('#id_state :selected');
-                var zip_code = $('#id_zip_code');
 
                 var address = name.val();
-                {#                    address += ', ' + street.val();#}
-                {#                    address += ', ' + city.text();#}
-                {#                    address += ', ' + state.text();#}
-                {#                    address += '. ' + zip_code.val();#}
 
                 var map = new window.google.maps.Map(
                     document.getElementById("map"),
@@ -375,11 +385,11 @@
             if (typeof(croppie_obj) === "undefined") {
                 croppie_obj = createCroppieObj();
             }
-            croppie_obj.croppie('result', 'base64', 'original', 'png', '1', false).then(function (base64_image) {
-                $('#banner-cropped')[0].src = base64_image;
-                banner_form_el.val(base64_image);
-                $('#hotsite-form').submit();
-            });
+            // croppie_obj.croppie('result', 'base64', 'original', 'png', '1', false).then(function (base64_image) {
+            //     $('#banner-cropped')[0].src = base64_image;
+            //     banner_form_el.val(base64_image);
+            //     $('#hotsite-form').submit();
+            // });
         }
 
         function createCroppieObj() {
@@ -552,6 +562,117 @@
             })(jQuery);
         });
     </script>
+
+    <script>
+          // 2. This code loads the IFrame Player API code asynchronously.
+          var tag = document.createElement('script');
+
+          tag.src = "https://www.youtube.com/iframe_api";
+          var firstScriptTag = document.getElementsByTagName('script')[0];
+          firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+          // 3. This function creates an <iframe> (and YouTube player)
+          //    after the API code downloads.
+          var player;
+
+          function onYouTubeIframeAPIReady() {
+              player = new YT.Player('player', {
+                  width: '640',
+                  height: '360',
+                  videoId: $('#id_stream_youtube_code').val(),
+                  playerVars: {
+                      'autoplay': 0,
+                      'controls': 0,
+                      'modestbranding': 1
+                  },
+                  events: {
+                      'onReady': onPlayerReady
+                  }
+              });
+          }
+
+          var done = false;
+
+          // 4. The API will call this function when the video player is ready.
+          function onPlayerReady(event) {
+              done = true;
+              if ($('#id_stream_youtube_code').val()) {
+                  $('#player').show();
+              }
+          }
+
+          function stopVideo() {
+              player.stopVideo();
+          }
+
+          $(document).ready(function () {
+              var videoCodeWatcher = null;
+              var youtube_code_el = $('#id_stream_youtube_code');
+              var existingVideo = youtube_code_el.val();
+              youtube_code_el.keyup(function() {
+                  console.log('done', done);
+                  if (!done) {
+                      return;
+                  }
+
+                  var player_el = $('#player');
+                  window.clearTimeout(videoCodeWatcher);
+                  videoCodeWatcher = window.setTimeout(function() {
+                      if (!$('#id_stream_youtube_code').val()) {
+                          player_el.fadeOut();
+                          return;
+                      }
+                      player_el.fadeIn(function() {
+                          var isNew = existingVideo !== youtube_code_el.val();
+                          console.log(isNew);
+                          if (isNew) {
+                            existingVideo = youtube_code_el.val();
+                            player.loadVideoById(existingVideo, 0, "large");
+                            stopVideo();
+                          }
+                      });
+
+                  }, 150);
+              });
+
+
+
+              // Find all YouTube videos
+              var $allVideos = $("iframe[src^='//www.youtube.com']"),
+
+              // The element that is fluid width
+              $fluidEl = $("body");
+
+              // Figure out and save aspect ratio for each video
+              $allVideos.each(function () {
+                  $(this)
+                      .data('aspectRatio', this.height / this.width)
+
+                      // and remove the hard coded width/height
+                      .removeAttr('height')
+                      .removeAttr('width');
+              });
+
+              // When the window is resized
+              $(window).resize(function () {
+
+                  var newWidth = $fluidEl.width();
+
+                  // Resize all videos according to their own aspect ratio
+                  $allVideos.each(function () {
+
+                      var $el = $(this);
+                      $el
+                          .width(newWidth)
+                          .height(newWidth * $el.data('aspectRatio'));
+
+                  });
+
+                  // Kick off one resize to fix all videos on page load
+              }).resize();
+          });
+
+        </script>
 {% endblock %}
 
 {% include 'event/event-menu.html' %}
@@ -664,6 +785,7 @@
                         </div>
                     </div>
                 </div>
+
                 {% if event.is_scientific %}
                     <div class="row">
                         <div class="col-md-12">
@@ -958,6 +1080,71 @@
                 </div>
             </div>
         </div>
+
+         <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Streaming ao Vivo
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-10">
+                                {% render_switchery_field form.enable_streaming_page %}
+                            </div>
+                            <div class="col-md-2 text-right">
+                                <button type="button"
+                                        class="btn btn-success submit-button">
+                                    <i class="fa fa-save"></i>
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% render_generic_field form.stream_page_title %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% render_generic_field form.stream_page_button %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                {% render_generic_field form.stream_youtube_code %}
+                                <small class="text-muted">
+                                    <strong>Código do youtube:</strong>
+                                    https://www.youtube.com/watch?v=<strong>Código</strong>
+                                </small>
+                            </div>
+                            <div class="col-md-8">
+                                <h3 class="text-bold" style="margin-left:10px">Pré-visualização</h3>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="videoWrapper" style="margin-left: 12px">
+                                            <div id="player" style="display:none"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <br />
+                                <button type="button"
+                                        class="btn btn-success submit-button">
+                                    <i class="fa fa-save"></i>
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </form>
 {% endblock %}
 
@@ -975,56 +1162,48 @@
                     <h3 class="modal-title">Editar banner: </h3>
                 </div>
                 <div class="modal-body">
-
-                    <div class="row text-center">
-                        <input type="file" style="display: none"
-                               id="id_banner_file" accept="image/*">
-                        <img {% if event.info.image_main %}
-                            src="{{ event.info.image_main.url }}"
-                        {% else %}
-                            src="{% static 'assets/img/480x640.png' %}"
-                        {% endif %}
-                            id="banner-cropped">
-                    </div>
-
-                    <div class="row text-center" style="margin-top: 5px">
-                        <div class="row text-center" style="margin-top: 5px">
-                            <div class="row text-center" style="margin-top: 3px;
-                    margin-bottom: 5px">
-
-                                <button class="btn btn-md btn-info"
-                                        onclick="askForFile();" id="edit_btn"
-                                        type="button">
-                                    <i class="fas fa-exchange-alt"></i>
-                                    Trocar
-                                </button>
-
-
-                                <button class="btn btn-md btn-info"
-                                        id="start_crop"
-                                        type="button">
-                                    <i class="fas fa-crop"></i>
-                                    Recortar
-                                </button>
-
-
-                                <button type="button"
-                                        class="btn btn-md  btn-danger banner-remove"
-                                        data-dismiss="modal">
-                                    <i class="fas fa-trash"></i>
-                                    Deletar
-                                </button>
-
-                            </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <input type="file" style="display: none" id="id_banner_file" accept="image/*">
+                            <img
+                                src="{% if event.info.image_main %}{{ event.info.image_main.url }}{% else %}{% static 'assets/img/480x640.png' %}{% endif %}"
+                                id="banner-cropped">
                         </div>
                     </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-xs-8 col-xs-push-1 text-left">
+                            <button class="btn btn-sm btn-info"
+                                    onclick="askForFile();" id="edit_btn"
+                                    type="button">
+                                <i class="fas fa-upload"></i>
+                                Upload
+                            </button>
 
-
+                            <button class="btn btn-sm btn-primary"
+                                    id="start_crop"
+                                    type="button">
+                                <i class="fas fa-crop"></i>
+                                Modo de Recorte
+                            </button>
+                        </div>
+                        <div class="col-xs-4 col-xs-pull-1 text-right">
+                            <button type="button"
+                                    class="btn btn-sm btn-danger banner-remove"
+                                    data-dismiss="modal">
+                                <i class="fas fa-trash"></i>
+                                Excluir
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
 
-
                     <div class="pull-right">
+                        <button type="button" class="btn btn-md btn-default"
+                                data-dismiss="modal">
+                            Fechar
+                        </button>
                         <button type="button"
                                 class="btn btn-md btn-success banner-save"
                                 data-dismiss="modal"
@@ -1032,10 +1211,6 @@
                                 id="edit_banner_modal_btn">
                             <i class="fas fa-save"></i>
                             Salvar
-                        </button>
-                        <button type="button" class="btn btn-md  btn-default"
-                                data-dismiss="modal">
-                            Cancelar
                         </button>
                     </div>
                 </div>
