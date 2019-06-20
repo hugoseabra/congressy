@@ -104,9 +104,6 @@
             var city_el = $('#id_person-city_name');
             var zip_code_el = $('#id_person-zip_code');
 
-            zip_code_el.on('keyup', function () {
-                hotsiteSearchByCep();
-            });
             window.setTimeout(function () {
                 {% if object.city %}
                     uf_el.val('{{ object.city.uf }}');
@@ -139,9 +136,11 @@
                 $('#id_city').val($(this).val());
             });
 
+            {% if not OFFLINE_SERVER %}
             $('#id_zip_code').on('keyup', function () {
                 searchByCep();
             });
+            {% endif %}
 
             // Starting select2
             $('#id_subscription-lot').select2({
@@ -285,9 +284,13 @@
 
             {% if config and config.address == config.ADDRESS_SHOW %}
                 zip_code_block_el.show();
+
+                {% if not OFFLINE_SERVER %}
                 zip_code_el.on('keyup', function () {
                     hotsiteSearchByCep();
                 });
+                {% endif %}
+
                 zip_code_el.mask("99999-999");
                 zip_code_el.attr('required', 'required');
 
@@ -310,6 +313,7 @@
 {% endblock %}
 
 {% block content %}
+{{ OFFLINE_SERVER }}
     <form action="" method="post" class="skip-submition-check"
           name="subscription_form" id="subscription_form" enctype="multipart/form-data">
         {% csrf_token %}

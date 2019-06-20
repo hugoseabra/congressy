@@ -197,6 +197,7 @@ TEMPLATES = [
                 'project.context_processors.environment_version',
                 'frontend.context_processors.render_app_only',
                 'frontend.context_processors.is_debug_mode',
+                'frontend.context_processors.is_offline_server',
             ],
             'builtins': [
                 'permission.templatetags.permissionif',

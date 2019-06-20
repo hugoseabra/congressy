@@ -145,11 +145,13 @@
 {% include 'sentry-javascript-sdk.html' %}
 
 {% block support %}
-    {% include 'facebook-pixel.html' %}
-    {% include 'google-analytics.html' %}
-    {% include 'google-remarketing.html' %}
-    {% include 'google-adwords.html' %}
-    {#{% inclide 'google-tag-manager.html' %}#}
+    {% if not OFFLINE_SERVER %}
+        {% include 'facebook-pixel.html' %}
+        {% include 'google-analytics.html' %}
+        {% include 'google-remarketing.html' %}
+        {% include 'google-adwords.html' %}
+        {#{% inclide 'google-tag-manager.html' %}#}
+    {% endif %}
 {% endblock %}
 
 {% block global_js %}

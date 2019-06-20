@@ -24,9 +24,13 @@ def is_debug_mode(request):
     return {
         'debug': settings.DEBUG is True,
         'DEBUG': settings.DEBUG is True,
-        'STAGING_MODE': \
+        'STAGING_MODE':
             '.settings.staging' in os.getenv('DJANGO_SETTINGS_MODULE'),
     }
+
+
+def is_offline_server(request):
+    return {'OFFLINE_SERVER': os.getenv('OFFLINE_SERVER') == 'True', }
 
 
 def sentry_public_dsn(request):
