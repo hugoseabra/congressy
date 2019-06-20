@@ -337,13 +337,15 @@
 {#{% include 'sentry-javascript-sdk.html' %}#}
 
 {% block support %}
-    {% include 'tawto.html' %}
-    {% include 'hotjar.html' %}
-    {% include 'facebook-pixel.html' %}
-    {% include 'google-analytics.html' %}
-    {% include 'google-remarketing.html' %}
-    {% include 'google-adwords.html' %}
-    {#{% inclide 'google-tag-manager.html' %}#}
+    {% if not OFFLINE_SERVER %}
+        {% include 'tawto.html' %}
+        {% include 'hotjar.html' %}
+        {% include 'facebook-pixel.html' %}
+        {% include 'google-analytics.html' %}
+        {% include 'google-remarketing.html' %}
+        {% include 'google-adwords.html' %}
+        {#{% inclide 'google-tag-manager.html' %}#}
+    {% endif %}
 {% endblock %}
 
 <!--Global JS-->
@@ -416,6 +418,7 @@
     }
 </style>
 
+{% if not OFFLINE_SERVER %}
 <script type="text/javascript">window.cgsy.URI_DEBUG_MODE={% if DEBUG is True %}true{% else %}false{% endif %};</script>
 <script type="text/javascript">
     function googleTranslateElementInit() {
@@ -443,6 +446,7 @@
 
 <script type="text/javascript"
         src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+{% endif %}
 
 {% if form %}
     {{ form.media.js }}

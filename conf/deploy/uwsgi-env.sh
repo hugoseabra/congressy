@@ -39,3 +39,6 @@ export UWSGI_STATIC_EXPIRES_URI="/static/.*\.[a-f0-9]{12,}\.(css|js|png|jpg|jpeg
 # Number of uWSGI workers and threads per worker (customize as needed:
 export UWSGI_WORKERS=2
 export UWSGI_THREADS=4
+
+# Socket to receive commands
+export UWSGI_MASTER_FIFO=/tmp/fifo0
