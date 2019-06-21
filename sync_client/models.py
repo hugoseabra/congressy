@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 
 from base.models import EntityMixin
@@ -44,11 +46,20 @@ class SyncItem(GatherosModelMixin, EntityMixin, models.Model):
     )
 
     process_type = models.CharField(
+        max_length=10,
         verbose_name='tipo de processamento',
         choices=ACTION_TYPES,
         # required
         blank=True,
         null=True,
+    )
+
+    process_time = models.DateTimeField(
+        verbose_name='data e hora de processamento',
+        default=datetime.now(),
+        blank=True,
+        null=False,
+        editable=False,
     )
 
     object_type = models.TextField(
@@ -75,12 +86,8 @@ class SyncItem(GatherosModelMixin, EntityMixin, models.Model):
 
     change_messages = models.TextField(
         verbose_name='Mudanças',
-    )
-
-    created = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='criado em',
-        editable=False,
+        blank=True,
+        null=True,
     )
 
     def __str__(self):
