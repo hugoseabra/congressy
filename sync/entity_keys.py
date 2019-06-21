@@ -92,31 +92,31 @@ subscription_other_keys = [
 
 transaction_required_keys = [
     'uuid',
+    'status',
+    'installments',
+    'installment_amount',
     'type',
+    'date_created',
     'subscription_id',
     'lot_id',
     'lot_price',
     'amount',
+    'manual',
+    'manual_payment_type',
+    'manual_author',
     'liquid_amount',
 ]
 
 transaction_other_keys = [
     # 'payment',
     # 'statuses',  -> OK
-    'status',
-    'date_created',
     'part_id',
-    'installments',
     'installment_part',
-    'installment_amount',
     'boleto_url',
     'boleto_expiration_date',
     'credit_card_holder',
     'credit_card_first_digits',
     'credit_card_last_digits',
-    'manual',
-    'manual_payment_type',
-    'manual_author',
     'data',
 ]
 
@@ -131,15 +131,15 @@ transaction_status_required_keys = [
 attendance_service_required_keys = [
     # 'checkins -> ok
     # 'lot_category_filters',
+    # 'printer_number',
+    # 'printing_queue_webhook',
+    # 'pwa_pin',
     'id',
     'name',
-    'event',
+    'event_id',
     'created_on',
     'checkout_enabled',
     'with_certificate',
-    'printing_queue_webhook',
-    'printer_number',
-    'pwa_pin',
     'accreditation',
 ]
 
@@ -150,7 +150,7 @@ checkin_required_keys = [
     'created_by',
     'registration',
     'attendance_service_id',
-    'subscription',
+    'subscription_id',
     'printed_on',
 ]
 
@@ -161,3 +161,5 @@ checkout_required_keys = [
     'registration',
     'checkin_id',
 ]
+
+# SURVEY: questions, options, authors, answc bers

@@ -1,5 +1,6 @@
 import json
-import os
+
+from django.core.files import File
 
 from sync.entity_keys import (
     sync_file_keys,
@@ -7,10 +8,11 @@ from sync.entity_keys import (
     subscription_required_keys,
     transaction_required_keys,
     attendance_service_required_keys, checkin_required_keys,
-    checkout_required_keys, transaction_status_required_keys)
+    checkout_required_keys, transaction_status_required_keys,
+    person_other_keys, subscription_other_keys, transaction_other_keys)
 
 
-def check_file_sync_error(sync_file_path):
+def check_file_sync_error(sync_file: File):
     """
     Verifica se arquivo de sincronização possui erros.
 
@@ -20,30 +22,23 @@ def check_file_sync_error(sync_file_path):
     4. Se chaves do conteúdo json estão corretas
     5. Se existir chave, verificar se campos obrigatórios estão presentes.
     """
-    if os.path.isfile(sync_file_path) is False:
-        raise Exception('Arquivo não existe')
+    try:
+        all_data = json.loads(sync_file.read().decode('utf-8'))
+    except ValueError as e:
+        raise Exception('Arquivo inválido: {}'.format(e))
 
-    file_split = sync_file_path.split('.')
-
-    if len(file_split) < 1 or str(file_split[-1]).lower() != 'json':
-        raise Exception('Arquivo não é uma extensão JSON')
-
-    with open(sync_file_path) as json_file:
-        try:
-            all_data = json.loads(json_file.read())
-        except ValueError as e:
-            json_file.close()
-            raise Exception('Arquivo inválido: {}'.format(e))
-
-    error_keys = list()
+    error_keys = dict()
     all_data_keys = list(all_data.keys())
 
     for key in sync_file_keys:
+        if key not in error_keys:
+            error_keys[key] = list()
+
         if key not in all_data_keys:
-            error_keys.append(key)
+            error_keys[key].append('{} não encontrado.'.format(key))
             continue
 
-        data_keys = list(sync_file_keys[key].keys())
+        data_keys = list(all_data[key].keys())
 
         if not data_keys:
             continue
@@ -66,64 +61,65 @@ def check_file_sync_error(sync_file_path):
             checkable_keys = list()
 
         for key2 in checkable_keys:
-            if key2 not in data_keys:
-                error_keys.append(
-                    '{} possui campos faltando: {}'.format(key.upper(), key2)
-                )
+            if key2 in data_keys:
+                continue
+
+            error_keys[key].append('"{}"'.format(key2))
 
     if error_keys:
-        raise Exception('Arquivo inválido. Chaves desconhecidas: {}'.format(
-            ", ".join(error_keys),
-        ))
+        error_keys_list = list()
+
+        for key, error_list in error_keys.items():
+            if not error_list:
+                continue
+
+            error_keys_list.append(
+                'Errors em {}: {} não encontrados.'.format(
+                    key, ", ".join(error_list)
+                )
+            )
+
+        if error_keys_list:
+            raise Exception(", ".join(error_keys_list))
 
 
-def get_sync_warning(sync_file_path):
+def get_sync_warning(sync_file: File):
     """
     Recupera mensagem de alerta relevantes do conteúdo de um arquivo de
     sincronização.
 
-    Este helper
+    Este helper parte do suposto de que o arquivo de sincronização já é válido.
     """
 
-    error_keys = list()
-    all_data_keys = list(all_data.keys())
+    try:
+        all_data = json.loads(sync_file.read().decode('utf-8'))
+    except ValueError as e:
+        raise Exception('Arquivo inválido: {}'.format(e))
+
+    warning_keys = list()
 
     for key in sync_file_keys:
-        if key not in all_data_keys:
-            error_keys.append(key)
-            continue
-
-        data_keys = list(sync_file_keys[key].keys())
+        data_keys = list(all_data[key].keys())
 
         if not data_keys:
             continue
 
         if key == 'persons':
-            checkable_keys = person_required_keys
+            checkable_keys = person_other_keys
         elif key == 'subscriptions':
-            checkable_keys = subscription_required_keys
+            checkable_keys = subscription_other_keys
         elif key == 'transactions':
-            checkable_keys = transaction_required_keys
-        elif key == 'transaction_statuses':
-            checkable_keys = transaction_status_required_keys
-        elif key == 'attendance_services':
-            checkable_keys = attendance_service_required_keys
-        elif key == 'checkins':
-            checkable_keys = checkin_required_keys
-        elif key == 'checkouts':
-            checkable_keys = checkout_required_keys
+            checkable_keys = transaction_other_keys
         else:
             checkable_keys = list()
 
         for key2 in checkable_keys:
             if key2 not in data_keys:
-                error_keys.append(
-                    '{} possui campos faltando: {}'.format(key.upper(), key2)
+                warning_keys.append(
+                    '{} possui campos ignorados: {}'.format(key.upper(), key2)
                 )
 
-    if error_keys:
-        return 'Arquivo inválido. Chaves desconhecidas: {}'.format(
-            ", ".join(error_keys),
-        )
+    if warning_keys:
+        return 'Atenção: {}'.format(", ".join(warning_keys), )
 
     return None

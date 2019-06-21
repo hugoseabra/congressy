@@ -26,6 +26,7 @@ INSTALLED_APPS += [
     'mix_boleto',
     'installment',
     'cgsy_commands',
+    'sync',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'

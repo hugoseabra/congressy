@@ -1,5 +1,6 @@
 from copy import copy
 
+from django.core.files import File
 from django.db.models import Model
 from django.forms.models import model_to_dict
 from rest_framework import serializers
@@ -33,12 +34,16 @@ class FormSerializerMixin(object):
     def validate(self, data):
 
         form_data = data
+        files = dict()
 
         for name, item in form_data.items():
-            if isinstance(item, Model):
+            if item and isinstance(item, Model):
                 form_data[name] = item.pk
 
-        self.form_instance = self.get_form(data=form_data)
+            if item and isinstance(item, File):
+                files[name] = item
+
+        self.form_instance = self.get_form(data=form_data, files=files)
 
         if not self.form_instance.is_valid():
             raise serializers.ValidationError(
@@ -49,7 +54,7 @@ class FormSerializerMixin(object):
 
         return cleaned_data
 
-    def get_form(self, data=None, **kwargs):
+    def get_form(self, data=None, files=None, **kwargs):
         """
         Returns an instance of the form to be used in this view.
         """
@@ -72,7 +77,9 @@ class FormSerializerMixin(object):
             kwargs['instance'] = self.instance
 
         if not self.form_instance:
-            self.form_instance = self.Meta.form(data=data, **kwargs)
+            self.form_instance = self.Meta.form(data=data,
+                                                files=files,
+                                                **kwargs)
 
         return self.form_instance
 
