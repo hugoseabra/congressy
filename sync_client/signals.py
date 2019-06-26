@@ -1,4 +1,5 @@
 """ Signals do model `sync_client` """
+import json
 from datetime import datetime
 
 from django.contrib.contenttypes.models import ContentType
@@ -12,6 +13,8 @@ from gatheros_subscription.models import Subscription
 from payment.models import Transaction, TransactionStatus
 from sync_client.models import SyncItem
 
+from django.core import serializers
+
 
 @receiver(post_save, sender=Person)
 @receiver(post_save, sender=Subscription)
@@ -24,11 +27,16 @@ def save_sync_item_for_creation_edition(instance, raw, **_):
     if raw is True:
         return
 
+    force_sync = \
+        hasattr(instance, 'sync_force') and instance.sync_force is True
+
     process_type = SyncItem.CREATION if instance.is_new() else SyncItem.EDITION
 
     updated_fields = instance.whats_changed()
 
-    if process_type == SyncItem.EDITION and not updated_fields:
+    if force_sync is False \
+            and process_type == SyncItem.EDITION \
+            and not updated_fields:
         return
 
     content_type = ContentType.objects.get_for_model(instance)
@@ -50,8 +58,9 @@ def save_sync_item_for_creation_edition(instance, raw, **_):
 
         item.process_type = process_type
         item.object_repr = str(instance)
-        item.change_messages = str(updated_fields) if updated_fields else None
         item.process_time = datetime.now()
+        data = json.loads(serializers.serialize("json", [instance]))
+        item.content = json.dumps(data[0])
 
         item.save()
 
@@ -83,7 +92,7 @@ def save_sync_item_for_deletion(instance, **_):
 
         item.process_type = SyncItem.DELETION
         item.object_repr = str(instance)
-        item.change_messages = None
+        item.content = None
         item.process_time = datetime.now()
 
         item.save()
