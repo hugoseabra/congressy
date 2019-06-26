@@ -4,12 +4,8 @@ from django.core.files import File
 
 from sync.entity_keys import (
     sync_file_keys,
-    person_required_keys,
-    subscription_required_keys,
-    transaction_required_keys,
-    attendance_service_required_keys, checkin_required_keys,
-    checkout_required_keys, transaction_status_required_keys,
-    person_other_keys, subscription_other_keys, transaction_other_keys)
+    sync_schema_keys,
+)
 
 
 def check_file_sync_error(sync_file: File):
@@ -38,33 +34,17 @@ def check_file_sync_error(sync_file: File):
             error_keys[key].append('{} não encontrado.'.format(key))
             continue
 
-        data_keys = list(all_data[key].keys())
+        for data_item in all_data[key]:
+            data_keys = list(data_item.keys())
 
-        if not data_keys:
-            continue
-
-        if key == 'persons':
-            checkable_keys = person_required_keys
-        elif key == 'subscriptions':
-            checkable_keys = subscription_required_keys
-        elif key == 'transactions':
-            checkable_keys = transaction_required_keys
-        elif key == 'transaction_statuses':
-            checkable_keys = transaction_status_required_keys
-        elif key == 'attendance_services':
-            checkable_keys = attendance_service_required_keys
-        elif key == 'checkins':
-            checkable_keys = checkin_required_keys
-        elif key == 'checkouts':
-            checkable_keys = checkout_required_keys
-        else:
-            checkable_keys = list()
-
-        for key2 in checkable_keys:
-            if key2 in data_keys:
+            if not data_keys:
                 continue
 
-            error_keys[key].append('"{}"'.format(key2))
+            for sync_schema_key in sync_schema_keys:
+                if sync_schema_key in data_keys:
+                    continue
+
+                error_keys[key].append('"{}"'.format(sync_schema_key))
 
     if error_keys:
         error_keys_list = list()
@@ -81,45 +61,3 @@ def check_file_sync_error(sync_file: File):
 
         if error_keys_list:
             raise Exception(", ".join(error_keys_list))
-
-
-def get_sync_warning(sync_file: File):
-    """
-    Recupera mensagem de alerta relevantes do conteúdo de um arquivo de
-    sincronização.
-
-    Este helper parte do suposto de que o arquivo de sincronização já é válido.
-    """
-
-    try:
-        all_data = json.loads(sync_file.read().decode('utf-8'))
-    except ValueError as e:
-        raise Exception('Arquivo inválido: {}'.format(e))
-
-    warning_keys = list()
-
-    for key in sync_file_keys:
-        data_keys = list(all_data[key].keys())
-
-        if not data_keys:
-            continue
-
-        if key == 'persons':
-            checkable_keys = person_other_keys
-        elif key == 'subscriptions':
-            checkable_keys = subscription_other_keys
-        elif key == 'transactions':
-            checkable_keys = transaction_other_keys
-        else:
-            checkable_keys = list()
-
-        for key2 in checkable_keys:
-            if key2 not in data_keys:
-                warning_keys.append(
-                    '{} possui campos ignorados: {}'.format(key.upper(), key2)
-                )
-
-    if warning_keys:
-        return 'Atenção: {}'.format(", ".join(warning_keys), )
-
-    return None
