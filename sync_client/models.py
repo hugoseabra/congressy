@@ -1,6 +1,5 @@
-from datetime import datetime
-
 from django.db import models
+from django.utils.timezone import now
 
 from base.models import EntityMixin
 from gatheros_event.models.mixins import GatherosModelMixin
@@ -56,7 +55,7 @@ class SyncItem(GatherosModelMixin, EntityMixin, models.Model):
 
     process_time = models.DateTimeField(
         verbose_name='data e hora de processamento',
-        default=datetime.now(),
+        default=now,
         blank=True,
         null=False,
         editable=False,
@@ -84,8 +83,8 @@ class SyncItem(GatherosModelMixin, EntityMixin, models.Model):
         null=True,
     )
 
-    change_messages = models.TextField(
-        verbose_name='Mudanças',
+    content = models.TextField(
+        verbose_name='Conteúdo a ser sincronizado',
         blank=True,
         null=True,
     )
