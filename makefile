@@ -14,6 +14,11 @@ down:
 	docker-compose -f bin/env/docker-compose_dev.yml down --remove-orphans;
 
 
+stop:
+	ps x --no-header -o pid,cmd | awk '!/awk/&&/celery/{print $$1}' | xargs -r kill;
+	docker-compose -f bin/env/docker-compose_dev.yml stop;
+
+
 clean:
 	sudo rm -rf /tmp/exporter
 
