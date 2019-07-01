@@ -1,14 +1,19 @@
 from datetime import datetime
 
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 
+from addon.models import Product, Service, Theme, SubscriptionService, \
+    SubscriptionProduct
 from attendance.models import AttendanceService, Checkin, Checkout
 from core.cli.mixins import CliInteractionMixin
 from gatheros_event.models import Person
 from gatheros_subscription.management.cmd_event_mixins import CommandEventMixin
-from gatheros_subscription.models import Subscription
+from gatheros_subscription.models import Subscription, EventSurvey, \
+    LotCategory, Lot
 from payment.models import Transaction, TransactionStatus
+from survey.models import Author, Question, Option, Answer, Survey
 
 
 class Command(BaseCommand, CliInteractionMixin, CommandEventMixin):
@@ -17,82 +22,115 @@ class Command(BaseCommand, CliInteractionMixin, CommandEventMixin):
 
     def add_arguments(self, parser):
         parser.add_argument('event_id', type=int, nargs='?')
-        parser.add_argument('date_start', type=str, nargs='?',
-                            help='Informa no formato: YYYY-MM-DD')
 
     def handle(self, *args, **options):
         event = self._get_event(pk=options.get('event_id'))
 
-        date_start_str = options.get('date_start')
-        if date_start_str:
-            date_start = datetime.strptime(date_start_str, '%Y-%m-%d')
-
-        else:
-            date_start = event.date_start
-            self.stdout.write(self.style.WARNING(
-                'Data incial do evento como referência: {}'.format(
-                    date_start.replace(hour=0, minute=0, second=0)
-                )
-            ))
-
-        date_start = date_start.replace(hour=0, minute=0, second=0)
         print('==============================================================')
-        self.collect_subscriptions_and_persons(event, date_start)
-        self.collect_transactions_and_statuses(event, date_start)
-        self.collect_attendance_services(event, date_start)
-        self.collect_checkins(event, date_start)
-        self.collect_checkouts(event, date_start)
+        self.collect_categories_and_lots(event)
+        self.collect_surveys(event)
+        self.collect_addons(event)
+        self.collect_attendance_services(event)
 
-    def collect_subscriptions_and_persons(self, event, date_start):
-        collection = Subscription.objects.filter(
-            Q(created__gte=date_start) | Q(modified__gte=date_start),
-            event_id=event.pk,
-        )
-        self._collect_data('gatheros_subscription.subscription', collection)
+        sub_pks = list()
 
-        person_pks = [sub.person_id for sub in collection]
-        persons = Person.objects.filter(
-            Q(created__gte=date_start) | Q(modified__gte=date_start),
-            pk__in=person_pks
-        )
-        self._collect_data('gatheros_event.person', persons)
+        self.collect_subscriptions(event)
 
-    def collect_transactions_and_statuses(self, event, date_start):
-        collection = Transaction.objects.filter(
-            date_created__gte=date_start,
-            lot__event_id=event.pk,
-        )
-        self._collect_data('payment.transaction', collection)
+    def collect_categories_and_lots(self, event):
+        categories = LotCategory.objects.filter(event_id=event.pk)
+        self._collect_data('gatheros_subscription.lotcategory', categories)
 
-        trans_pks = [t.pk for t in collection]
-        collection = TransactionStatus.objects.filter(
-            transaction_id__in=trans_pks,
-        )
-        self._collect_data('payment.transactionstatus', collection)
+        lots = Lot.objects.filter(event_id=event.pk)
+        self._collect_data('gatheros_subscription.lot', lots)
 
-    def collect_attendance_services(self, event, date_start):
-        collection = AttendanceService.objects.filter(
-            Q(created_on__gte=date_start) | Q(modified_on__gte=date_start),
-            event_id=event.pk,
-        )
+    def collect_surveys(self, event):
+        event_surveys = EventSurvey.objects.filter(event_id=event.pk)
+        self._collect_data('gatheros_subscription.eventsurvey', event_surveys)
+
+        survey_pks = [s.survey_id for s in event_surveys]
+        surveys = Survey.objects.filter(pk__in=survey_pks)
+        self._collect_data('survey.survey', surveys)
+
+        questions = Question.objects.filter(survey_id__in=survey_pks)
+        self._collect_data('survey.question', questions)
+
+        question_pks = [q.pk for q in questions]
+        options = Option.objects.filter(question_id__in=question_pks)
+        self._collect_data('survey.option', options)
+
+    def collect_addons(self, event):
+        products = Product.objects.filter(lot_category__event_id=event.pk)
+        self._collect_data('addon.product', products)
+
+        services = Service.objects.filter(lot_category__event_id=event.pk)
+        self._collect_data('addon.service', services)
+
+        theme_pks = [s.theme_id for s in services]
+        themes = Theme.objects.filter(pk__in=theme_pks)
+        self._collect_data('addon.theme', themes)
+
+    def collect_attendance_services(self, event):
+        collection = AttendanceService.objects.filter(event_id=event.pk)
         self._collect_data('attendance.attendanceservice', collection)
 
-    def collect_checkins(self, event, date_start):
-        collection = Checkin.objects.filter(
-            created_on__gte=date_start,
-            attendance_service__event_id=event.pk,
-        )
-        self._collect_data('attendance.checkin', collection)
+    def collect_subscriptions(self, event):
+        subscriptions = Subscription.objects.filter(event_id=event.pk)
+        self._collect_data('gatheros_subscription.subscription', subscriptions)
 
-    def collect_checkouts(self, event, date_start):
-        collection = Checkout.objects.filter(
-            created_on__gte=date_start,
-            checkin__attendance_service__event_id=event.pk,
+        sub_pks = [s.pk for s in subscriptions]
+
+        person_pks = [sub.person_id for sub in subscriptions]
+        persons = Person.objects.filter(pk__in=person_pks)
+        self._collect_data('gatheros_event.person', persons)
+
+        user_pks = [p.user_id for p in persons if p.user_id]
+        users = User.objects.filter(pk__in=user_pks)
+        self._collect_data('auth.user', users)
+
+        # SURVEY
+        sub_author_pks = [sub.author_id for sub in subscriptions]
+        authors = Author.objects.filter(
+            Q(pk__in=sub_author_pks, ) | Q(user_id__in=user_pks, )
         )
-        self._collect_data('attendance.checkout', collection)
+        self._collect_data('survey.author', authors)
+
+        author_pks = [a.pk for a in authors]
+        answers = Answer.objects.filter(author_id__in=author_pks)
+        self._collect_data('survey.answer', answers)
+
+        # ADDON
+        sub_services = SubscriptionService.objects.filter(
+            subscription_id__in=sub_pks,
+        )
+        self._collect_data('addon.subscriptionservice', sub_services)
+
+        sub_products = SubscriptionProduct.objects.filter(
+            subscription_id__in=sub_pks,
+        )
+        self._collect_data('addon.subscriptionproduct', sub_products)
+
+        # Transaction
+        transactions = Transaction.objects.filter(subscription_id__in=sub_pks)
+        self._collect_data('payment.transaction', transactions)
+
+        trans_pks = [t.pk for t in transactions]
+        transaction_statuses = TransactionStatus.objects.filter(
+            transaction_id__in=trans_pks,
+        )
+        self._collect_data('payment.transactionstatus', transaction_statuses)
+
+        # Attendances
+        checkins = Checkin.objects.filter(subscription_id__in=sub_pks)
+        self._collect_data('attendance.checkin', checkins)
+
+        checkouts = Checkin.objects.filter(subscription_id__in=sub_pks)
+        self._collect_data('attendance.checkout', checkouts)
 
     def _collect_data(self, name, collection):
         num_records = len(collection)
+
+        if num_records == 0:
+            return
 
         print()
         self.stdout.write(
