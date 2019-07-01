@@ -15,6 +15,12 @@ DEBUG = False
 INSTALLED_APPS.extend([
     'raven.contrib.django.raven_compat',
 ])
+
+if os.getenv('OFFLINE_SERVER') == 'True':
+    INSTALLED_APPS.extend([
+        'sync_client',
+    ])
+
 # ============================= MIDDLEWARES ================================= #
 # SENTRY User Feedback
 # We recommend putting this as high in the chain as possible
