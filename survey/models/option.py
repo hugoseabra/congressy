@@ -3,10 +3,13 @@
     Opção de uma pergunta que suporta múltiplas possibilidades de resposta.
 """
 from django.db import models
+
+from core.model import track_data
 from . import Question
 from survey.models.mixins import Entity
 
 
+@track_data('question_id', 'name', 'value', 'active')
 class Option(Entity, models.Model):
     """
         Option domain model implementation.
