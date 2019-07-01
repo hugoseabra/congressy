@@ -5,7 +5,7 @@ from core.model import track_data
 from gatheros_event.models import Event
 
 
-@track_data('name', 'checkout_enabled', 'with_certificate')
+@track_data('name', 'checkout_enabled', 'with_certificate', 'accreditation')
 class AttendanceService(models.Model, EntityMixin):
     name = models.CharField(max_length=255, verbose_name='nome do atendimento')
 
