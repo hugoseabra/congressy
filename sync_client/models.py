@@ -9,7 +9,7 @@ class SyncItem(GatherosModelMixin, EntityMixin, models.Model):
     class Meta:
         verbose_name = 'item de sincronização'
         verbose_name_plural = 'items de sincronização'
-        unique_together = ('object_id', 'object_repr',)
+        unique_together = ('object_id', 'object_type',)
 
     CREATION = 'creation'
     EDITION = 'edition'
