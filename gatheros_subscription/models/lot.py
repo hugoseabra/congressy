@@ -14,6 +14,7 @@ from django.db import models
 from django.utils.encoding import force_text
 from django.utils.formats import localize
 
+from base.models import EntityMixin
 from core.model import track_data
 from gatheros_event.models import Event
 from gatheros_event.models.mixins import GatherosModelMixin
@@ -57,8 +58,11 @@ class RunningLots(models.Manager):
         return
 
 
-@track_data('price')
-class Lot(models.Model, GatherosModelMixin):
+@track_data('name', 'category_id', 'date_start', 'date_end', 'limit', 'price',
+            'tax', 'transfer_tax', 'allow_installment', 'allow_installments',
+            'installment_limit', 'num_install_interest_absortion', 'private',
+            'exhibition_code', 'event_survey_id', 'active')
+class Lot(models.Model, GatherosModelMixin, EntityMixin):
     """ Modelo de Lote """
 
     INTERNAL_DEFAULT_NAME = 'default'
