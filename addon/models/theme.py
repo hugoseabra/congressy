@@ -5,10 +5,12 @@
 from django.db import models
 
 from base.models import EntityMixin
+from core.model import track_data
 from gatheros_event.models import Event
 from gatheros_event.models.mixins import GatherosModelMixin
 
 
+@track_data('name', 'limit')
 class Theme(GatherosModelMixin, EntityMixin, models.Model):
 
     class Meta:

@@ -34,7 +34,8 @@ def get_image_path(instance, filename):
     )
 
 
-@track_data('banner', 'date_end_sub', 'liquid_price')
+@track_data('lot_category_id', 'date_end_sub', 'published', 'liquid_price',
+            'description', 'quantity', 'release_days', 'banner', )
 class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
     """
         Opcional é um item adicional (add-on) à inscrição de um evento que
@@ -202,6 +203,8 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
         return round(self.liquid_price + congressy_amount, 2)
 
 
+@track_data('name', 'optional_type_id', 'schedule_start',
+            'schedule_end', 'place', 'restrict_unique', 'tag')
 class Product(AbstractOptional):
     """
         Opcional de produto é um adicional de produto a ser comprado no ato da
@@ -261,7 +264,8 @@ class Product(AbstractOptional):
         super().save(*args, **kwargs)
 
 
-@track_data('schedule_start', 'schedule_end')
+@track_data('name', 'optional_type_id', 'theme_id', 'schedule_start',
+            'schedule_end', 'place', 'restrict_unique', 'tag')
 class Service(AbstractOptional):
     """
         Opcional de Serviço é um serviço a ser adquirido no ato da inscrição
