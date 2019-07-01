@@ -21,7 +21,14 @@ from . import Occupation
 from .mixins import GatherosModelMixin
 
 
-@track_data('name', 'user', 'email')
+@track_data('name', 'gender', 'email', 'zip_code', 'street', 'number',
+            'complement', 'village', 'phone', 'avatar', 'cpf', 'birth_date',
+            'rg', 'orgao_expedidor', 'city_id', 'occupation_id', 'user_id',
+            'function', 'institution', 'institution_cnpj', 'pne',
+            'city_international', 'country', 'ddi', 'international_doc',
+            'state_international', 'state_international',
+            'zip_code_international', 'address_international',
+            'international_doc_type')
 class Person(models.Model, EntityMixin, GatherosModelMixin):
     """Pessoa"""
 
