@@ -24,7 +24,8 @@ class QuestionManager(models.Manager):
         return 1
 
 
-@track_data('order')
+@track_data('survey', 'type', 'name', 'label', 'required', 'help_text',
+            'active', 'intro', 'order', 'order')
 class Question(Entity, models.Model):
     """
         Question domain model implementation.

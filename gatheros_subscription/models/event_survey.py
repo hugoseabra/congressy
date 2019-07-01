@@ -6,11 +6,15 @@
 
 
 from django.db import models
+
+from base.models import EntityMixin
+from core.model import track_data
 from gatheros_event.models import Event
 from survey.models import Survey
 
 
-class EventSurvey(models.Model):
+@track_data('event', 'survey')
+class EventSurvey(models.Model, EntityMixin):
     """Modelo de formularios de evento"""
 
     event = models.ForeignKey(

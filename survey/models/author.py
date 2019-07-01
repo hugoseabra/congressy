@@ -5,10 +5,12 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from core.model import track_data
 from survey.models import Survey
 from survey.models.mixins import Entity
 
 
+@track_data('survey_id', 'user', 'name')
 class Author(Entity, models.Model):
     """
         Author domain model implementation.

@@ -83,6 +83,7 @@ api_urls = [
     url(r'^', include('mix_boleto.api_urls', 'mix_boleto')),
     url(r'^', include('installment.api_urls', 'installment')),
     url(r'^', include('kanu_locations.urls', 'city')),
+    url(r'^', include('sync.api_urls', 'sync')),
 ]
 
 api_urlpatterns = [url(r'^api/', include(api_urls, 'api'))]

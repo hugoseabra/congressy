@@ -10,6 +10,8 @@ DEBUG = True
 ABSOLUTEURI_PROTOCOL = 'http'
 # ================================= APPS ==================================== #
 INSTALLED_APPS.extend([
+    # CONGRESSY - Sincronização de servidores offline
+    'sync_client',
     'debug_toolbar',
     'django_extensions',
 ])

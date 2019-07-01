@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models import Max
 from django.utils.functional import cached_property
 
+from base.models import EntityMixin
 from core.model import track_data
 from gatheros_event.models import Event, Person
 from gatheros_event.models.constants import (
@@ -51,7 +52,7 @@ class SubscriptionManager(models.Manager):
 
 
 @track_data('lot_id')
-class Subscription(models.Model, GatherosModelMixin):
+class Subscription(models.Model, EntityMixin, GatherosModelMixin):
     """ Modelo de inscrição """
 
     DEVICE_ORIGIN_HOTSITE = 'hotsite'
