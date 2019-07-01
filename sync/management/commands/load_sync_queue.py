@@ -1,11 +1,11 @@
 import json
 import os
 from collections import OrderedDict
+from datetime import datetime
 
 from django.conf import settings
 from django.core import serializers
 from django.core.management.base import BaseCommand
-from django.db.transaction import atomic
 
 from core.cli.mixins import CliInteractionMixin
 from sync.entity_keys import sync_file_keys
@@ -33,10 +33,8 @@ class Command(BaseCommand, CliInteractionMixin):
 
         for model_key in sync_file_keys:
             for key, items in all_data.items():
-                if key not in model_key:
-                    continue
-
-                ordered_data[model_key] = items
+                if model_key == key:
+                    ordered_data[model_key] = items
 
         additions = OrderedDict()
         num_additions = 0
@@ -49,7 +47,6 @@ class Command(BaseCommand, CliInteractionMixin):
 
         self.stdout.write('REGISTROS:')
         for key, items in ordered_data.items():
-            # data_item = serializers.deserialize("json", data)
             self.stdout.write(' {}: {}'.format(
                 self.style.SUCCESS(str(len(items)).zfill(5)),
                 key
@@ -94,25 +91,24 @@ class Command(BaseCommand, CliInteractionMixin):
 
         self.confirmation_yesno('Continuar?', default=False)
 
-        with atomic():
-            if num_additions:
-                print()
-                self.stdout.write('ADICIONANDO REGISTROS:')
-                self.process(additions.items(), process_type='save')
+        if num_additions:
+            print()
+            self.stdout.write('ADICIONANDO REGISTROS:')
+            self.process(additions.items(), process_type='save')
 
-            if num_editions:
-                print()
-                self.stdout.write('EDITANDO REGISTROS:')
-                self.process(editions.items(), process_type='save')
+        if num_editions:
+            print()
+            self.stdout.write('EDITANDO REGISTROS:')
+            self.process(editions.items(), process_type='save')
 
-                print()
+            print()
 
-            if num_deletions:
-                print()
-                self.stdout.write('EXCLUINDO REGISTROS:')
-                self.process(deletions.items(), process_type='delete')
+        if num_deletions:
+            print()
+            self.stdout.write('EXCLUINDO REGISTROS:')
+            self.process(deletions.items(), process_type='delete')
 
-                print()
+            print()
 
     def get_item(self):
         items = SyncQueue.objects.filter(
@@ -129,6 +125,7 @@ class Command(BaseCommand, CliInteractionMixin):
         return sync_item['item']
 
     def process(self, collection, process_type='save'):
+        errors = dict()
         for key, items in collection:
             print()
             num = len(items)
@@ -149,12 +146,18 @@ class Command(BaseCommand, CliInteractionMixin):
             processed = 0
 
             for item in serializers.deserialize("json", data_json):
-                if process_type == 'save':
-                    item.save()
-                elif process_type == 'delete':
-                    item.delete()
-                else:
-                    raise Exception('No process type provided')
+                try:
+                    if process_type == 'save':
+                        item.save()
+                    elif process_type == 'delete':
+                        item.delete()
+                    else:
+                        raise Exception('No process type provided')
+                except Exception as e:
+                    if key not in errors:
+                        errors[key] = list()
+
+                    errors[key].append(str(e))
 
                 processed += 1
 
@@ -165,3 +168,23 @@ class Command(BaseCommand, CliInteractionMixin):
                     suffix='Complete',
                     length=40
                 )
+
+        content = ""
+        for key, errs in errors.items():
+            content += key + "\n"
+
+            for err in errs:
+                content += "  - {}\n".format(err)
+
+            content += "\n"
+
+        error_file_path = os.path.join(
+            settings.BASE_DIR,
+            'sync_errors-{}.txt'.format(
+                datetime.now().strftime('%Y%m%d_%H%M%S')
+            )
+        )
+
+        with open(error_file_path, 'w') as f:
+            f.write(content)
+            f.close()
