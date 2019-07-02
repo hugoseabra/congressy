@@ -13,6 +13,12 @@ INSTALLED_APPS.extend([
     'debug_toolbar',
     'django_extensions',
 ])
+
+if os.getenv('OFFLINE_SERVER') == 'True':
+    # CONGRESSY - Sincronização de servidores offline
+    INSTALLED_APPS.extend([
+        'sync_client',
+    ])
 # ============================== DATABASE =================================== #
 DATABASES = {
     'default': {

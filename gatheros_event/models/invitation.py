@@ -24,7 +24,7 @@ class InvitationManager(models.Manager):
         return self.filter(organization=organization).all
 
 
-@track_data('author', 'to')
+@track_data('author_id', 'to_id')
 class Invitation(models.Model, GatherosModelMixin):
     """ Convite para organização """
 

@@ -6,12 +6,13 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.utils import IntegrityError
 
+from base.models import EntityMixin
 from core.model import track_data
 from gatheros_subscription.models import Lot, Subscription
 
 
 @track_data('status', 'boleto_url', )
-class Transaction(models.Model):
+class Transaction(models.Model, EntityMixin):
     PROCESSING = 'processing'
     AUTHORIZED = 'authorized'
     PAID = 'paid'

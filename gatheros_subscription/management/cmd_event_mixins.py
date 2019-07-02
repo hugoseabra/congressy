@@ -24,7 +24,8 @@ class CommandEventMixin:
                     pk = None
                     event = None
 
-            except Exception:
+            except Exception as e:
+                self.stderr.write(str(e))
                 pk = None
                 event = None
 
