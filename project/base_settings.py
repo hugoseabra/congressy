@@ -363,7 +363,7 @@ PARTNER_MAX_PERCENTAGE_IN_EVENT = 60.00
 # Valor mínimo que a congrssy deve receber por transação. Se o valor do recebi
 # devido for menor do que este, o valor da transaçaõ da parte da congressy será
 # este valor.
-CONGRESSY_MINIMUM_AMOUNT = 4.99
+CONGRESSY_MINIMUM_AMOUNT = 3.49
 
 # Taxas de juros de parcelamento de valores da Congressy.
 CONGRESSY_INSTALLMENT_INTERESTS_RATE = 2.29

@@ -203,8 +203,7 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
         return round(self.liquid_price + congressy_amount, 2)
 
 
-@track_data('name', 'optional_type_id', 'schedule_start',
-            'schedule_end', 'place', 'restrict_unique', 'tag')
+@track_data('name', 'optional_type_id', 'tag')
 class Product(AbstractOptional):
     """
         Opcional de produto é um adicional de produto a ser comprado no ato da

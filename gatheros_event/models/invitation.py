@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 from django.db import models
 
+from base.models import EntityMixin
 from core.model import track_data
 from gatheros_event import settings
 from . import Member
@@ -25,7 +26,7 @@ class InvitationManager(models.Manager):
 
 
 @track_data('author_id', 'to_id')
-class Invitation(models.Model, GatherosModelMixin):
+class Invitation(models.Model, GatherosModelMixin, EntityMixin):
     """ Convite para organização """
 
     uuid = models.UUIDField(
