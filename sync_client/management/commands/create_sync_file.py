@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand
 
 from core.cli.mixins import CliInteractionMixin
 from gatheros_subscription.management.cmd_event_mixins import CommandEventMixin
+from sync.entity_keys import sync_file_keys
 from sync_client.models import SyncItem
 
 
@@ -16,6 +17,10 @@ class Command(BaseCommand, CliInteractionMixin, CommandEventMixin):
         items = SyncItem.objects.all()
 
         content = dict()
+
+        # Garantindo todas as chaves no conteúdo do arquivo
+        for model_key in sync_file_keys:
+            content[model_key] = []
 
         for item in items:
             if item.object_type not in content:

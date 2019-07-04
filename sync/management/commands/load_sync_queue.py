@@ -91,24 +91,36 @@ class Command(BaseCommand, CliInteractionMixin):
 
         self.confirmation_yesno('Continuar?', default=False)
 
-        if num_additions:
-            print()
-            self.stdout.write('ADICIONANDO REGISTROS:')
-            self.process(additions.items(), process_type='save')
+        try:
+            item.status = SyncQueue.PROCESSED_STATUS
+            item.save()
 
-        if num_editions:
-            print()
-            self.stdout.write('EDITANDO REGISTROS:')
-            self.process(editions.items(), process_type='save')
+            if num_additions:
+                print()
+                self.stdout.write('ADICIONANDO REGISTROS:')
+                self.process(additions.items(), process_type='save')
 
-            print()
+            if num_editions:
+                print()
+                self.stdout.write('EDITANDO REGISTROS:')
+                self.process(editions.items(), process_type='save')
 
-        if num_deletions:
-            print()
-            self.stdout.write('EXCLUINDO REGISTROS:')
-            self.process(deletions.items(), process_type='delete')
+                print()
 
-            print()
+            if num_deletions:
+                print()
+                self.stdout.write('EXCLUINDO REGISTROS:')
+                self.process(deletions.items(), process_type='delete')
+
+                print()
+
+            item.status = SyncQueue.PROCESSED_STATUS
+            item.save()
+
+        except Exception as e:
+            item.status = SyncQueue.NOT_STARTED_STATUS
+            item.save()
+            raise e
 
     def get_item(self):
         items = SyncQueue.objects.filter(
@@ -125,10 +137,14 @@ class Command(BaseCommand, CliInteractionMixin):
         return sync_item['item']
 
     def process(self, collection, process_type='save'):
+
         errors = dict()
         for key, items in collection:
             print()
             num = len(items)
+
+            if not num:
+                continue
 
             self.stdout.write('{}: {}'.format(
                 self.style.SUCCESS(key),

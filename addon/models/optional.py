@@ -306,6 +306,7 @@ class Service(AbstractOptional):
         verbose_name="programação - início",
         help_text='Data e hora inicial da programação no dia do evento.'
     )
+
     schedule_end = models.DateTimeField(
         verbose_name="programação - fim",
         help_text='Data e hora final da programação no dia do evento.'

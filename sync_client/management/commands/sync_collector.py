@@ -1,17 +1,24 @@
-from datetime import datetime
-
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 
-from addon.models import Product, Service, Theme, SubscriptionService, \
-    SubscriptionProduct
+from addon.models import (
+    Product,
+    Service,
+    SubscriptionService,
+    SubscriptionProduct,
+    Theme,
+)
 from attendance.models import AttendanceService, Checkin, Checkout
 from core.cli.mixins import CliInteractionMixin
 from gatheros_event.models import Person
 from gatheros_subscription.management.cmd_event_mixins import CommandEventMixin
-from gatheros_subscription.models import Subscription, EventSurvey, \
-    LotCategory, Lot
+from gatheros_subscription.models import (
+    EventSurvey,
+    Lot,
+    LotCategory,
+    Subscription,
+)
 from payment.models import Transaction, TransactionStatus
 from survey.models import Author, Question, Option, Answer, Survey
 
@@ -31,8 +38,6 @@ class Command(BaseCommand, CliInteractionMixin, CommandEventMixin):
         self.collect_surveys(event)
         self.collect_addons(event)
         self.collect_attendance_services(event)
-
-        sub_pks = list()
 
         self.collect_subscriptions(event)
 
@@ -123,7 +128,8 @@ class Command(BaseCommand, CliInteractionMixin, CommandEventMixin):
         checkins = Checkin.objects.filter(subscription_id__in=sub_pks)
         self._collect_data('attendance.checkin', checkins)
 
-        checkouts = Checkin.objects.filter(subscription_id__in=sub_pks)
+        checkin_ids = [c.pk for c in checkins]
+        checkouts = Checkout.objects.filter(checkin_id__in=checkin_ids)
         self._collect_data('attendance.checkout', checkouts)
 
     def _collect_data(self, name, collection):

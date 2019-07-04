@@ -32,7 +32,7 @@ class Attendance(models.Model, EntityMixin):
     )
 
 
-@track_data('printed_on', )
+@track_data('attendance_service_id', 'subscription_id', 'printed_on', )
 class Checkin(Attendance):
     class Meta(Attendance.Meta):
         verbose_name = 'entrada'
@@ -59,7 +59,7 @@ class Checkin(Attendance):
     )
 
 
-@track_data('checkin', )
+@track_data('checkin_id', )
 class Checkout(Attendance):
     class Meta(Attendance.Meta):
         verbose_name = 'saída'
