@@ -305,6 +305,38 @@
                         {% endif %}
                     {% endfor %}
 
+                    {% filter_lookup installments lot.pk as installment_items %}
+                    {% if installment_items %}
+                    {% for installment in installment_items %}
+                        {% if installment.paid %}
+                        <tr>
+                            <td class="table-row">
+                                <span>{{ installment.created_on|date:"d/m/Y H\hi" }}</span>
+                            </td>
+                            <td class="table-row">
+                                <div>
+                                    <div class="float-left hidden-sm hidden-xs">
+                                        <i style="font-size:30px" class="fas fa-percentage"></i>
+                                    </div>
+                                    <div class="float-left" style="margin-left:5px">
+                                        <div class="text-bold">Taxas de Parcelamento</div>
+                                        <small class="text-muted text-bold">{{ installment.num }}x R$ {{ installment.amount|intcomma }}</small>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </td>
+                            <td class="table-row text-center text-bold">
+                                <span class="text-danger" data-toggle="tooltip" title="Débito">D</span>
+                            </td>
+                            <td class="table-row text-right">
+                                <span class="text-danger">R$ {{ installment.interests_amount|intcomma }}</span>
+                            </td>
+                            <td class="table-row text-center">-</td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                    {% endif %}
+
                     </tbody>
                     <tfoot>
                     <tr>
