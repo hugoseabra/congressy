@@ -166,7 +166,7 @@ class SubscriptionSurveyDirector(object):
         if kwargs['user'] is not None:
             self.subscription.author, _ = \
                 Author.objects.get_or_create(**kwargs)
-        else:
+        elif not self.subscription.author_id:
             self.subscription.author = Author.objects.create(**kwargs)
 
         self.subscription.save()

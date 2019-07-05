@@ -253,7 +253,7 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
             self.code = Subscription.objects.generate_code(self.event)
 
         # RULE 3 - rule.test_rule_3_numero_inscricao_gerado
-        if self._state.adding is True:
+        if not self.event_count:
             self.event_count = Subscription.objects.next_event_count(
                 self.event
             )
