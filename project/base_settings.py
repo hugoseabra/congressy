@@ -341,6 +341,7 @@ FAILED_RUNS_CRONJOB_EMAIL_PREFIX = "[Server check]: "
 CRON_CLASSES = [
     # "payment.cron.MyCronJob",
     "payment.cron.SubscriptionStatusIrregularityTestJob",
+    "payment.cron.SubscriptionPaidAndIncomplete",
 ]
 # =============================== BITLY ===================================== #
 BITLY_LOGIN = 'congressy'
