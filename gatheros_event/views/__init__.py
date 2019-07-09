@@ -3,6 +3,7 @@
 # EVENT
 from gatheros_event.views.event.delete import EventDeleteView
 from .event.detail import EventDetailView
+from .event.duplicate import EventDuplicateFormView
 from .event.form import (
     EventAddFormView,
     EventDatesFormView,

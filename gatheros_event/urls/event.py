@@ -67,6 +67,11 @@ urls = [
         name='event-add'
     ),
     url(
+        r'^duplicate/(?P<pk>[\d]+)/$',
+        views.EventDuplicateFormView.as_view(),
+        name='event-duplicate'
+    ),
+    url(
         r'^slug/$',
         views.EventSlugUpdaterView.as_view(),
         name='event-slug'

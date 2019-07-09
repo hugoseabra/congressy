@@ -1,0 +1,214 @@
+{% extends "base/base.html" %}
+{% load static i18n queryset_filter base_tags  widget_tweaks form_config_tags  event_tags %}
+
+{% block sidebar %}{% endblock %}
+
+{% block sidebar-bars %}{% endblock %}
+
+{% block messages %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissable">
+                <button type="button" class="close"
+                        data-dismiss="alert" aria-hidden="true">×
+                </button>
+                {{ message|get_first_item }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock messages %}
+
+{% block title %}
+    Dublicar Evento | Congressy
+{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+
+{% block page_title %}
+    Dublicar Evento
+{% endblock %}
+
+{% block content %}
+
+    <form action="" method="post" class="form-horizontal form-border" role="form" name="event_form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="buttonbar">
+                    <div class="float-left">
+                        <a href="{% url 'event:event-list' %}"
+                           class="btn btn-primary">
+                            <i class="fas fa-arrow-circle-left"></i>
+                            Voltar
+                        </a>
+                    </div>
+
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Campos Principais</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.event_name autofocus=True %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="print-url">
+                                                Link do seu evento
+                                            </label>
+                                            <div id="print-url"></div>
+                                        </div>
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.organization %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div id="datepicker-begin"
+                                         class="col-md-6">
+                                        {% render_generic_field form.date_start %}
+                                    </div>
+                                    <div id="datepicker-end"
+                                         class="col-md-6">
+                                        {% render_generic_field form.date_end %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Dados do evento</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.duplicate_categories_lots %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.duplicate_surveys %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.duplicate_certificate %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.duplicate_attendance_services %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.duplicate_addon_services %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.duplicate_addon_products %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="buttonbar bottom">
+                    <div class="float-right">
+                        {% if next_path %}
+                            <a href="{{ next_path|urlencode }}"
+                               class="btn btn-danger">
+                                <i class="fas fa-times-circle"></i>Cancelar</a>
+                            <input type="hidden"
+                                   name="next"
+                                   value="{{ next_path }}"/>
+                        {% else %}
+                            <a href="{% url 'event:event-list' %}"
+                               class="btn btn-danger">
+                                <i class="fas fa-times-circle"></i>Cancelar</a>
+                        {% endif %}
+
+
+                        <button type="submit"
+                                class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static "assets/plugins/moment/moment.js" %}"></script>
+    <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
+    <script src="{% static 'assets/js/event.js' %}"></script>
+    <script src="{% static 'assets/js/date-time.js' %}"></script>
+    <script src="{% static 'assets/js/user_notification.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            var slug_checker = null;
+            var event_name_el = $('#id_event_name');
+            event_name_el.on('keyup', function () {
+                var el = $(this);
+                window.clearTimeout(slug_checker);
+                slug_checker = window.setTimeout(function () {
+                    var eventName = el.val();
+                    $.get("{% url 'event:event-slug' %}", {name: eventName})
+                        .done(function (data) {
+                            document.getElementById('print-url').innerHTML = data;
+                        });
+                }, 300);
+            });
+            event_name_el.focus();
+            event_name_el.trigger('keyup');
+
+            var date = createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
+            createTimePicker();
+
+            {% if event %}
+                date.data("DateTimePicker").minDate(false);
+                window.setTimeout(function () {
+                    $('#datepicker-begin .datapicker input').val('{{ event.date_start|date:'d/m/Y' }}');
+                    $('#datepicker-end .datapicker input').val('{{ event.date_end|date:'d/m/Y' }}');
+                }, 200);
+            {% endif %}
+        });
+
+    </script>
+{% endblock %}
+
+{% block styles %}
+
+    <link rel="stylesheet" href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
+
+{% endblock %}

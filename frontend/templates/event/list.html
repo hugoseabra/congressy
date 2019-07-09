@@ -210,8 +210,15 @@
                                                     >
                                                         <span class="fas fa-cog"></span>
                                                     </button>
-                                                    <ul class="dropdown-menu dropdown-menu-right"
-                                                        role="menu">
+                                                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                        {% if user has 'gatheros_event.add_event' of event %}
+                                                            <li>
+                                                                <a href="{% url 'event:event-duplicate' event.pk %}">
+                                                                    <i class="fas fa-copy"></i>
+                                                                    Duplicar
+                                                                </a>
+                                                            </li>
+                                                        {% endif %}
                                                         {% if user has 'gatheros_event.change_event' of event %}
                                                             <li>
                                                                 <a href="{% url 'event:event-edit' event.pk %}">
