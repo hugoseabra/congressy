@@ -363,7 +363,7 @@ class Lot(models.Model, GatherosModelMixin, EntityMixin):
     def clean(self):
         """ Limpa valores dos campos. """
 
-        if self.category and self.category.event.pk != self.event.pk:
+        if self.category and self.category.event_id != self.event_id:
             raise ValidationError({'category': [
                 'A categoria do lote e o lote não estão no mesmo evento.'
             ]})

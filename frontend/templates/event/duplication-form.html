@@ -19,24 +19,17 @@
 {% endblock messages %}
 
 {% block title %}
-    Novo Evento | Congressy
+    Dublicar Evento | Congressy
 {% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
 
 {% block page_title %}
-    Novo Evento
+    Dublicar Evento
 {% endblock %}
-
-{% block nav_aside_itens %}
-    {% if object %}
-        {% include 'event/event-menu.html' with active='dados-do-evento' %}
-    {% endif %}
-{% endblock %}
-
 
 {% block content %}
 
-    <form action="" method="post" class="form-horizontal form-border"
-          role="form" name="event_form">
+    <form action="" method="post" class="form-horizontal form-border" role="form" name="event_form">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -76,7 +69,7 @@
                             <div class="col-md-12">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        {% render_generic_field form.name autofocus=True %}
+                                        {% render_generic_field form.event_name autofocus=True %}
                                     </div>
                                 </div>
                                 <div class="row">
@@ -94,9 +87,6 @@
                                     <div class="col-md-6">
                                         {% render_generic_field form.organization %}
                                     </div>
-                                    <div class="col-md-6">
-                                        {% render_generic_field form.category %}
-                                    </div>
                                 </div>
                                 <div class="row">
                                     <div id="datepicker-begin"
@@ -110,68 +100,41 @@
                                 </div>
                             </div>
                         </div>
-                        {% if object.has_rsvp %}
-                            <div class="row">
-                                <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-                                    <div class="panel panel-primary">
-                                        <div class="panel-heading">
-                                            <div class="panel-title">
-                                                Restrição de público
-                                            </div>
-                                        </div>
-                                        <div class="panel-body">
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <div class="row">
-                                                        <div class="col-md-12">
-                                                            {% render_generic_field form.rsvp_type %}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Dados do evento</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.duplicate_categories_lots %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.duplicate_surveys %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.duplicate_certificate %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.duplicate_attendance_services %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.duplicate_addon_services %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.duplicate_addon_products %}
                                     </div>
                                 </div>
                             </div>
-                        {% endif %}
-                        {% if not object %}
-                            <div class="row">
-                                <div class="col-md-6">
-                                    {% render_generic_field form.expected_subscriptions %}
-                                </div>
-
-                            </div>
-<!--                            <hr/>-->
-<!--                            <div class="row">-->
-<!--                                <div class="col-md-6">-->
-<!--                                    {% render_switchery_field form.is_scientific %}-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                            <hr/>-->
-                            <div class="row">
-
-                                <div class="col-md-6">
-                                    {% render_switchery_field form.has_optionals %}
-                                </div>
-                                <div class="col-md-6">
-                                    {% render_switchery_field form.has_extra_activities %}
-                                </div>
-                            </div>
-
-                            <div class="row">
-
-                                <div class="col-md-6">
-                                    {% render_switchery_field form.has_certificate %}
-                                </div>
-                                <div class="col-md-6">
-                                    {% render_switchery_field form.has_survey %}
-                                </div>
-                                <div class="col-md-6">
-                                    {% render_switchery_field form.has_checkin %}
-                                </div>
-                            </div>
-
-                        {% endif %}
+                        </div>
                     </div>
                 </div>
                 <div class="buttonbar bottom">
@@ -198,9 +161,8 @@
                     </div>
                     <div class="clearfix"></div>
                 </div>
-
             </div>
-
+        </div>
     </form>
 
 {% endblock %}
@@ -215,18 +177,31 @@
     <script>
         $(document).ready(function () {
             var slug_checker = null;
-            $('#id_name').on('keyup', function () {
+            var event_name_el = $('#id_event_name');
+            event_name_el.on('keyup', function () {
+                var el = $(this);
                 window.clearTimeout(slug_checker);
                 slug_checker = window.setTimeout(function () {
-                    var eventName = $('#id_name').val();
+                    var eventName = el.val();
                     $.get("{% url 'event:event-slug' %}", {name: eventName})
                         .done(function (data) {
                             document.getElementById('print-url').innerHTML = data;
                         });
                 }, 300);
             });
-            createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
+            event_name_el.focus();
+            event_name_el.trigger('keyup');
+
+            var date = createDateStartDateEnd('#datepicker-begin .datapicker', '#datepicker-end  .datapicker');
             createTimePicker();
+
+            {% if event %}
+                date.data("DateTimePicker").minDate(false);
+                window.setTimeout(function () {
+                    $('#datepicker-begin .datapicker input').val('{{ event.date_start|date:'d/m/Y' }}');
+                    $('#datepicker-end .datapicker input').val('{{ event.date_end|date:'d/m/Y' }}');
+                }, 200);
+            {% endif %}
         });
 
     </script>
