@@ -18,10 +18,10 @@ class AttendanceService(models.Model, EntityMixin):
 
     created_on = models.DateTimeField(auto_now_add=True,
                                       verbose_name='criado em',
-                                      editable=False,)
+                                      editable=False, )
     modified_on = models.DateTimeField(auto_now=True,
                                        verbose_name='modificado em',
-                                       editable=False,)
+                                       editable=False, )
 
     checkout_enabled = models.BooleanField(
         default=False,
@@ -58,9 +58,6 @@ class AttendanceService(models.Model, EntityMixin):
         blank=True,
     )
 
-    def __str__(self):
-        return self.name
-
     accreditation = models.BooleanField(
         default=False,
         verbose_name='Credenciamento principal',
@@ -73,3 +70,6 @@ class AttendanceService(models.Model, EntityMixin):
         verbose_name = 'Lista de Check-in/out'
         verbose_name_plural = 'Lista de Check-ins/outs'
         ordering = ['name']
+
+    def __str__(self):
+        return self.name

@@ -181,6 +181,29 @@
 {% block content %}
 
     <div class="row">
+        <div class="col-md-3 float-left">
+            <button type="button" class="btn btn-primary btn-trans dropdown-toggle"
+                    data-toggle="dropdown"
+                    aria-expanded="false">
+                    <span class="fas fa-cog"></span>
+                    Configurações
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                <li>
+                    <a href="{% url 'event:event-edit' event.pk %}">
+                        <i class="fas fa-pencil-alt"></i>
+                        Editar dados do evento
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'event:event-duplicate' event.pk %}">
+                        <i class="fas fa-copy"></i>
+                        Duplicar
+                    </a>
+                </li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
         <div class="col-md-3 float-right">
             <div class="buttonbar">
                 {% if info and info.description_html %}
@@ -192,8 +215,7 @@
                     </a>
                 {% else %}
                     <button type="button"
-                            class="btn btn-default btn-trans
-                                            btn-block disabled"
+                            class="btn btn-default btn-trans disabled"
                             data-toggle="tooltip"
                             data-placement="top"
                             title=""

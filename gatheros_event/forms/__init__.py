@@ -1,6 +1,7 @@
 """Gatheros event forms """
 from .event import (
     EventBannerForm,
+    EventDuplicationForm,
     EventEditDatesForm,
     EventEditSubscriptionTypeForm,
     EventForm,

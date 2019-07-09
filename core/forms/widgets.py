@@ -219,18 +219,20 @@ class SplitDateTimeBootsrapWidget(forms.MultiWidget):
 
         if isinstance(date, datetime):
             date = date.strftime('%Y-%m-%d')
-            date_format = '%Y-%m-%d %H:%M:%S'
 
-        else:
-            date_format = '%d/%m/%Y %H:%M:%S'
+        if isinstance(date, datetime):
+            time = date.strftime('%H:%M:%S')
 
         dt = '{} {}'.format(date, time)
 
         try:
-            return datetime.strptime(dt, date_format)
+            return datetime.strptime(dt, '%d/%m/%Y %H:%M:%S')
 
         except ValueError:
-            pass
+            try:
+                return datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                pass
 
         return [date, time]
 

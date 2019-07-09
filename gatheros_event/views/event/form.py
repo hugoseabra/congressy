@@ -3,7 +3,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
 
@@ -48,7 +47,7 @@ class BaseEventView(EventDraftStateMixin, AccountMixin, View):
 
     def form_valid(self, form):
         try:
-            response = super(BaseEventView, self).form_valid(form)
+            response = super().form_valid(form)
             update_account(
                 request=self.request,
                 organization=form.instance.organization,
@@ -66,6 +65,8 @@ class BaseEventView(EventDraftStateMixin, AccountMixin, View):
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
+
+        context['event'] = self.event
 
         context['next_path'] = self._get_referer_url()
         context['form_title'] = self.get_form_title()
@@ -179,7 +180,6 @@ class EventAddFormView(BaseEventView, generic.CreateView):
             return redirect_to + marketing_type + page_type + next_page
 
         return reverse('event:event-panel', kwargs={'pk': event.pk})
-
 
 
 class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
