@@ -2,7 +2,6 @@ from django import forms
 from django.utils.safestring import mark_safe
 from kanu_locations.models import City
 
-from core.forms.cleaners import clear_string
 from core.forms.widgets import AjaxChoiceField, TelephoneInput
 from gatheros_event.models import Place
 

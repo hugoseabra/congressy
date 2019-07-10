@@ -75,6 +75,5 @@ class EventReadOnlySerializer(serializers.ModelSerializer):
     def get_category(self, obj):
         return obj.category.name
 
-
     def get_organization(self, obj):
         return obj.organization.name

@@ -258,11 +258,12 @@ class Organization(models.Model, GatherosModelMixin):
         if person:
             if isinstance(person, User):
                 try:
-                    person = Person.objects.get(user=person)
+                    person = Person.objects.get(user_id=person.pk)
                 except Person.DoesNotExist:
                     return []
 
-            qs = qs.filter(person=person)
+            qs = qs.filter(person_id=person.pk)
+
         return qs
 
     def get_member(self, person):

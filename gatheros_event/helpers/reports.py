@@ -60,7 +60,7 @@ def get_report_cities(queryset):
 
 def get_report_age(queryset):
     ages = {
-        'under_15' : 0,
+        'under_15': 0,
         'bet_16_20': 0,
         'bet_21_30': 0,
         'bet_31_40': 0,
@@ -75,16 +75,16 @@ def get_report_age(queryset):
         if age <= 15:
             ages['under_15'] += 1
 
-        elif age >15 and age <=20:
+        elif age > 15 and age <= 20:
             ages['bet_16_20'] += 1
 
-        elif age >21 and age <=30:
+        elif age > 21 and age <= 30:
             ages['bet_21_30'] += 1
 
-        elif age >31 and age <=40:
+        elif age > 31 and age <= 40:
             ages['bet_31_40'] += 1
 
-        elif age >41 and age <=60:
+        elif age > 41 and age <= 60:
             ages['bet_41_60'] += 1
 
         elif age > 60:

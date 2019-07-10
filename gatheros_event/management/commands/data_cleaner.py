@@ -23,7 +23,8 @@ from data_cleaner import (
 
 
 class Command(BaseCommand):
-    help = 'Limpar todos os dados e deixar apenas os dados do evento solicitado'
+    help = 'Limpar todos os dados e deixar apenas os dados do evento' \
+           ' solicitado'
 
     def add_arguments(self, parser):
         parser.add_argument('-d', '--debug', action='store_true',
@@ -57,7 +58,8 @@ class Command(BaseCommand):
                                  style=self.style).erase_all()
             ScientificWorkDataCleaner(stdout=self.stdout,
                                       style=self.style).erase_all()
-            PartnerDataCleaner(stdout=self.stdout, style=self.style).erase_all()
+            PartnerDataCleaner(stdout=self.stdout,
+                               style=self.style).erase_all()
             ServiceTagsDataCleaner(stdout=self.stdout,
                                    style=self.style).erase_all()
             ImporterDataCleaner(stdout=self.stdout,

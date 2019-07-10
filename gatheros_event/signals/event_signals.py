@@ -16,7 +16,7 @@ def create_feature_configuration(instance, raw, created, **_):
             instance.feature_configuration
         except AttributeError:
             FeatureConfiguration.objects.create(
-                event=instance,
+                event_id=instance.pk,
                 feature_certificate=True,
                 feature_internal_subscription=True,
                 feature_multi_lots=True,
@@ -34,7 +34,7 @@ def create_feature_management(instance, raw, created, **_):
         try:
             config = instance.feature_management
         except AttributeError:
-            config = FeatureManagement.objects.create(event=instance)
+            config = FeatureManagement.objects.create(event_id=instance.pk)
 
         config.feature_products = instance.has_optionals
         config.feature_services = instance.has_extra_activities

@@ -5,6 +5,7 @@ from gatheros_event.constants import PAID_EVENT_FEATURES, FREE_EVENT_FEATURES
 from gatheros_event.helpers.event_business import is_paid_event, is_free_event
 from gatheros_event.helpers.publishing import event_is_publishable
 from gatheros_event.models import Event
+from ticket.models import Lot
 
 
 def update_event_config_flags(event: Event):
@@ -34,7 +35,7 @@ def update_event_config_flags(event: Event):
         for feature, value in FREE_EVENT_FEATURES.items():
             setattr(feature_config, feature, value)
 
-    if not feature_config.feature_multi_lots and event.lots.count() > 1:
+    if not feature_config.feature_multi_lots is True:
         _deactivate_all_lotes(event)
 
     event.save()
@@ -53,9 +54,6 @@ def update_event_publishing(event: Event):
     if event.published and not event_is_publishable(event):
         event.published = False
         event.save()
-    elif not event.published and event_is_publishable(event):
-        event.published = True
-        event.save()
 
 
 def _event_business_state_has_changed(event: Event):
@@ -71,10 +69,12 @@ def _event_business_state_has_changed(event: Event):
 
 
 def _deactivate_all_lotes(event: Event):
-    lots = event.lots.filter(
-        is_chosen_free_lot=False
+    lots = Lot.objects.filter(
+        ticket__active=True,
+        ticket__event_id=event.pk,
     )
 
-    lots.update(
-        active=False,
-    )
+    if lots.count():
+        lots.update(
+            active=False,
+        )

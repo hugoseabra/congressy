@@ -24,8 +24,8 @@ class Command(BaseCommand):
 
             for org in orgs:
                 Member.objects.create(
-                    person=person,
-                    organization=org,
+                    person_id=person.pk,
+                    organization_id=org.pk,
                     group=Member.ADMIN,
                 )
                 self.stdout.write(self.style.SUCCESS(

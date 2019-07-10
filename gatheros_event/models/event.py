@@ -15,6 +15,7 @@ from stdimage.validators import MaxSizeValidator, MinSizeValidator
 
 from core.model import track_data
 from core.util import model_field_slugify
+from core.util.date import DateTimeRange
 from gatheros_event.helpers import reports
 from gatheros_event.models.constants import (
     CONGRESSY_PERCENTS,
@@ -95,7 +96,8 @@ class Event(models.Model, GatherosModelMixin):
     has_optionals = models.BooleanField(
         default=False,
         verbose_name='Opcionais',
-        help_text="Você irá vender, opcionais como: hospedagem, alimentação, camisetas?"
+        help_text="Você irá vender, opcionais como: hospedagem, alimentação,"
+                  " camisetas?"
     )
 
     has_extra_activities = models.BooleanField(
@@ -310,22 +312,6 @@ class Event(models.Model, GatherosModelMixin):
 
         return round(completed, 2)
 
-    #
-    # @property
-    # def percent_attended(self):
-    #     attended = 0.0
-    #     if hasattr(self, 'subscriptions'):
-    #         queryset = self.subscriptions
-    #         num = queryset.filter(completed=True, test_subscription=False).exclude(
-    #             status='canceled'
-    #         ).count()
-    #
-    #         if num > 0:
-    #             num_attended = queryset.filter(attended=True).count()
-    #             attended = (num_attended * 100) / num
-    #
-    #     return round(attended, 2)
-
     @property
     def status(self):
         """Status do evento de acordo com suas datas."""
@@ -333,7 +319,9 @@ class Event(models.Model, GatherosModelMixin):
         if now >= self.date_end:
             return Event.EVENT_STATUS_FINISHED
 
-        if self.date_start <= now <= self.date_end:
+        dates_range = DateTimeRange(start=self.date_start, stop=self.date_end)
+
+        if now in dates_range:
             return Event.EVENT_STATUS_RUNNING
 
         return Event.EVENT_STATUS_NOT_STARTED

@@ -73,7 +73,7 @@ def member_is_admin(user_obj, organization=None):
     :param organization: Instância de organização
     :return: bool
     """
-    person = Person.objects.get(user=user_obj)
+    person = Person.objects.get(user_id=user_obj.pk)
     is_auth = user_obj.is_authenticated()
     is_admin = organization and organization.is_admin(person)
     is_member_active = organization and organization.is_member_active(person)
@@ -92,7 +92,7 @@ def member_is_admin_not_internal(user_obj, organization=None):
     if not organization or organization.internal:
         return False
 
-    person = Person.objects.get(user=user_obj)
+    person = Person.objects.get(user_id=user_obj.pk)
     is_auth = user_obj.is_authenticated()
     is_admin = organization and organization.is_admin(person)
     is_member_active = organization and organization.is_member_active(person)
@@ -111,7 +111,7 @@ def member_is_admin_and_internal(user_obj, organization=None):
     if not organization or not organization.internal:
         return False
 
-    person = Person.objects.get(user=user_obj)
+    person = Person.objects.get(user_id=user_obj.pk)
     is_auth = user_obj.is_authenticated()
     is_admin = organization and organization.is_admin(person)
     is_member_active = organization and organization.is_member_active(person)
@@ -128,7 +128,7 @@ def member_is_member(user_obj, organization):
     :return: bool
     """
 
-    person = Person.objects.get(user=user_obj)
+    person = Person.objects.get(user_id=user_obj.pk)
     is_auth = user_obj.is_authenticated()
     is_member = organization and organization.is_member(person)
     is_member_active = organization and organization.is_member_active(person)

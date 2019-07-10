@@ -25,9 +25,11 @@ def account(request):
     try:
         person = request.user.person
         subs = Subscription.objects \
-            .filter(person=person, completed=True, test_subscription=False) \
+            .all_completed() \
+            .filter(person_id=person.pk) \
             .exclude(status=Subscription.CANCELED_STATUS) \
             .count()
+
         has_subscriptions = subs > 0
 
     except (AttributeError, ObjectDoesNotExist):

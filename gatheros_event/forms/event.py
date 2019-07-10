@@ -14,7 +14,7 @@ from core.util import model_field_slugify, ReservedSlugException
 from gatheros_event.models import Event, Member, Info, Place
 from gatheros_event.models import Organization
 from gatheros_event.models.constants import CONGRESSY_PERCENT_10_0
-from gatheros_subscription.models import FormConfig, LotCategory
+from gatheros_subscription.models import FormConfig
 
 
 class DateTimeInput(forms.DateTimeInput):
@@ -400,13 +400,6 @@ class EventDuplicationForm(forms.Form):
             place.save()
 
             cat_qs = self.event.lot_categories
-
-            if not cat_qs.count():
-                # Suporte a eventos muitos antigos - 1.3.x
-                LotCategory.objects.create(
-                    name='Geral',
-                    event_id=self.event.pk,
-                )
 
             for cat in cat_qs.all():
 
