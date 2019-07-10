@@ -102,7 +102,7 @@ class Lot(models.Model, GatherosModelMixin, EntityMixin):
     )
     category = models.ForeignKey(
         LotCategory,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         verbose_name='categoria',
         related_name='lots',
         null=True,
