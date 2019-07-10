@@ -217,9 +217,9 @@ def _export_subscriptions(worksheet, subscriptions):
             cached_type='subscriptions',
         ))
 
-        collector[row_idx].append(lot_category.name)
+        collector[row_idx].append(lot_category.name.upper())
 
-        collector[row_idx].append(lot.name)
+        collector[row_idx].append(lot.name.upper())
 
         collector[row_idx].append(sub.get_status_display())
 
@@ -328,7 +328,7 @@ def _export_payments(worksheet, event):
         collector[row_idx].append(get_object_value(sub, 'event_count'))
         collector[row_idx].append(get_object_value(sub, 'code'))
 
-        collector[row_idx].append(person.name)
+        collector[row_idx].append(person.name.upper())
 
         collector[row_idx].append(transaction.get_type_display())
         collector[row_idx].append(transaction.get_status_display())
@@ -409,7 +409,7 @@ def _export_survey_answers(worksheet, event_survey):
 
         collector[row_idx].append(get_object_value(sub, 'event_count'))
         collector[row_idx].append(get_object_value(sub, 'code'))
-        collector[row_idx].append(person.name)
+        collector[row_idx].append(person.name.upper())
         collector[row_idx].append(get_object_value(sub, 'email'))
 
         # Varrer por pergunta para depois encontrar as respostas.
@@ -487,7 +487,7 @@ def _export_addon_products(worksheet, products):
 
             collector[row_idx].append(get_object_value(sub, 'event_count'))
             collector[row_idx].append(get_object_value(sub, 'code'))
-            collector[row_idx].append(person.name)
+            collector[row_idx].append(person.name.upper())
             collector[row_idx].append(get_object_value(sub, 'email'))
             collector[row_idx].append(lot_category.name)
             collector[row_idx].append(optional.name)
@@ -577,7 +577,7 @@ def _export_addon_services(worksheet, services):
 
             collector[row_idx].append(get_object_value(sub, 'event_count'))
             collector[row_idx].append(get_object_value(sub, 'code'))
-            collector[row_idx].append(person.name)
+            collector[row_idx].append(person.name.upper())
             collector[row_idx].append(person.email)
             collector[row_idx].append(lot_category.name)
             collector[row_idx].append(theme.name)

@@ -5,6 +5,7 @@
 """
 from django.db import models
 
+from core.model import track_data
 from survey.models import Author, Question
 from survey.models.mixins import RuleChecker, Entity, RuleIntegrityError
 
@@ -13,13 +14,13 @@ class SameSurveyRule(RuleChecker):
     """ Regra de negócio: pergunta e autor devem ser do mesmo questionário. """
 
     def check(self):
-
         if self.question.survey != self.author.survey:
             raise RuleIntegrityError(
                 'A pergunta e o autor não pertencem ao mesmo questionário.'
             )
 
 
+@track_data('question_id', 'author_id', 'value', 'human_display')
 class Answer(Entity, models.Model):
     """
         Answer domain model implementation.

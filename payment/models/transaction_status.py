@@ -5,10 +5,13 @@ import uuid
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
+from base.models import EntityMixin
+from core.model import track_data
 from .transaction import Transaction
 
 
-class TransactionStatus(models.Model):
+@track_data('date_created')
+class TransactionStatus(models.Model, EntityMixin):
     PROCESSING = 'processing'
     AUTHORIZED = 'authorized'
     PAID = 'paid'

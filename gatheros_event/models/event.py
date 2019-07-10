@@ -33,7 +33,8 @@ def get_image_path(instance, filename):
     )
 
 
-@track_data('subscription_type', 'date_start', 'date_end')
+@track_data('name', 'organization_id', 'category_id', 'subscription_type',
+            'date_start', 'date_end', 'congressy_percent', 'boleto_limit_days')
 class Event(models.Model, GatherosModelMixin):
     """Modelo de Evento"""
 
@@ -308,6 +309,7 @@ class Event(models.Model, GatherosModelMixin):
                 completed = completed / self.lots.count()
 
         return round(completed, 2)
+
     #
     # @property
     # def percent_attended(self):

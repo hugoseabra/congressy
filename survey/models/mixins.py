@@ -44,6 +44,9 @@ class Entity(object):
     def clean(self):
         self._check_rules()
 
+    def is_new(self):
+        return self._state.adding is True
+
     def _check_rules(self):
         """ Verifica as regras de integridade de domínio. """
         # @TODO: verificar se rule é uma instância ou apenas referência da

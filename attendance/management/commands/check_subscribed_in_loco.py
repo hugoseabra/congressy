@@ -15,9 +15,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
-
-    def add_arguments(self, parser):
-        super(Command, self).add_arguments(parser)
         parser.add_argument(
             '--dry-run',
             dest='dry',
@@ -87,7 +84,7 @@ class Command(BaseCommand):
         in_loco_sub_qs = subs_qs.annotate(
             num_checkins=Count('checkins')
         ).filter(
-            created__gte=event.date_start - timedelta(minutes=45),
+            created__gte=event.date_start - timedelta(minutes=60),
             num_checkins=0,
             checkins__checkout__isnull=True,
         )
@@ -140,14 +137,11 @@ class Command(BaseCommand):
                 ))
             return
 
+        num_subs = not_checked_subs_qs.count()
+
         if interact:
             self.report('Inscrições confirmadas', checkins_qs.count())
-            self.report(
-                'Inscrições a confirmar',
-                not_checked_subs_qs.count()
-            )
-
-        num_subs = not_checked_subs_qs.count()
+            self.report('Inscrições a confirmar', num_subs)
 
         if interact:
             self.stdout.write("\n")
@@ -160,11 +154,19 @@ class Command(BaseCommand):
             )
 
         counter = 1
-        for sub in in_loco_sub_qs:
-            Checkin.objects.create(
-                attendance_service=service,
-                subscription=sub,
-            )
+        for sub in not_checked_subs_qs:
+            try:
+                Checkin.objects.get(
+                    subscription_id=str(sub.pk),
+                    attendance_service_id=service.pk,
+                    checkout__isnull=True,
+                )
+            except Checkin.DoesNotExist:
+                Checkin.objects.create(
+                    subscription_id=str(sub.pk),
+                    attendance_service_id=service.pk,
+                )
+
             if interact:
                 progress_bar(
                     counter,
@@ -234,7 +236,6 @@ class Command(BaseCommand):
 
             return event
 
-
         except Event.DoesNotExist:
             if interactive is False:
                 self.stdout.write(self.style.ERROR('Evento não encontrado.'))
@@ -287,7 +288,6 @@ class Command(BaseCommand):
             self.stdout.write('----------------------------------------------')
 
             return service
-
 
         except AttendanceService.DoesNotExist:
             if interactive is False:

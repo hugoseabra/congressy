@@ -12,6 +12,7 @@ from django.views import generic
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 
+from attendance.helpers.attendance import subscription_has_certificate
 from gatheros_event.helpers.publishing import event_is_publishable, \
     get_unpublishable_reason
 from gatheros_event.models import Member, Organization
@@ -84,11 +85,17 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
         context['event_is_publishable'] = publishable
         context['unpublishable_reason'] = unpublishable_reason
         context['has_available_optionals'] = False
+        context['has_certificate'] = False
 
         if sub:
             lot = sub.lot
             context['has_available_optionals'] = self._has_products(lot) or \
                                                  self._has_services(lot)
+
+
+            if event.finished is True:
+                context['has_certificate'] = subscription_has_certificate(
+                    sub.pk)
 
         return context
 

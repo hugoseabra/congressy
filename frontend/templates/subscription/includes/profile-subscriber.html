@@ -474,7 +474,15 @@
     {% endif %}
 </div>
 
-{% if event.feature_configuration.feature_checkin is True and event.feature_management.checkin is True %}
+{% if event.feature_configuration.feature_services is True and event.feature_management.services is True %}
+{% include 'subscription/includes/addon_services.html' %}
+{% endif  %}
+
+{% if event.feature_configuration.feature_products is True and event.feature_management.products is True %}
+{% include 'subscription/includes/addon_products.html' %}
+{% endif  %}
+
+{% if event.feature_configuration.feature_checkin is True and object.status == object.CONFIRMED_STATUS %}
 {% include 'subscription/includes/attendance.html' %}
 {% endif  %}
 
@@ -573,7 +581,7 @@
                                 </div>
                             {% endif %}
                         {% endif %}
-                        {% if config.phone and object.person.phone %}
+                        {% if object.person.phone %}
                             <div class="profile-info col-lg-3 col-md-6">
                                 <div class="profile-info-label">
                                     Celular:
@@ -820,6 +828,60 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{% if survey_answers|length > 0 %}
+    <div class="row">
+        <div class="col-xl-11 col-lg-11 col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel" id="survey-block-hidden">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Respostas
+                                <a href="#"
+                                   onclick="show_block('#survey-block-visible', '#survey-block-hidden');return false;"
+                                   class="btn btn-link"
+                                   style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a>
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="panel panel-primary" style="display:none"
+                         id="survey-block-visible">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Respostas <a href="#"
+                                             onclick="show_block('#survey-block-hidden', '#survey-block-visible');return false;"
+                                             class="btn btn-link"
+                                             style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(ocultar)</a>
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {% for item in survey_answers %}
+                                        <div class="form-group">
+                                            <label>{{ item.question|title }}</label>
+                                            <div>
+                                                {{ item.human_display }}
+                                                {% if item.is_file %}
+                                                    &ensp;&ensp;
+                                                    <a href="/media/{{ item.value }}" class="btn btn-sm btn-primary" target="_blank">
+                                                        <i class="fas fa-eye"></i> Abrir arquivo
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>

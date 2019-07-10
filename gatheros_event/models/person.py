@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from kanu_locations.models import City
 
+from base.models import EntityMixin
 from core.model import track_data
 from core.model.validator import cpf_validator
 from core.util.phone import format_phone_number, get_country_code_by_region
@@ -20,8 +21,15 @@ from . import Occupation
 from .mixins import GatherosModelMixin
 
 
-@track_data('name', 'user', 'email')
-class Person(models.Model, GatherosModelMixin):
+@track_data('name', 'gender', 'email', 'zip_code', 'street', 'number',
+            'complement', 'village', 'phone', 'avatar', 'cpf', 'birth_date',
+            'rg', 'orgao_expedidor', 'city_id', 'occupation_id', 'user_id',
+            'function', 'institution', 'institution_cnpj', 'pne',
+            'city_international', 'country', 'ddi', 'international_doc',
+            'state_international', 'state_international',
+            'zip_code_international', 'address_international',
+            'international_doc_type')
+class Person(models.Model, EntityMixin, GatherosModelMixin):
     """Pessoa"""
 
     RESOURCE_URI = '/api/core/people/'

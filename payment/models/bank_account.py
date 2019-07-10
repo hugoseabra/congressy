@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.validators import RegexValidator
 
+from payment.bank_accounts import BANK_ACCOUNTS
+
 
 class BankAccount(models.Model):
     class Meta:
@@ -12,14 +14,6 @@ class BankAccount(models.Model):
     CONTA_CORRENTE_CONJUNTA = 'conta_corrente_conjunta'
     CONTA_POUPANCA_CONJUNTA = 'conta_poupanca_conjunta'
 
-    BANCO_DO_BRASIL = "001"
-    ITAU = "341"
-    BRADESCO = "237"
-    SANTANDER = "033"
-    CAIXA_ECONOMICA = "104"
-    BANCOOB = "756"
-    SICOOB = "756"
-
     ACCOUNT_TYPES = (
         (CONTA_CORRENTE, 'Conta corrente'),
         (CONTA_POUPANCA, 'Conta poupanca'),
@@ -27,15 +21,7 @@ class BankAccount(models.Model):
         (CONTA_POUPANCA_CONJUNTA, 'Conta poupanca conjunta'),
     )
 
-    BANK_CODES = (
-        (BANCO_DO_BRASIL, 'Banco do Brasil'),
-        (ITAU, 'Itau'),
-        (BRADESCO, 'Bradesco'),
-        (SANTANDER, 'Santander'),
-        (CAIXA_ECONOMICA, 'Caixa Economica'),
-        (BANCOOB, 'BANCOOB - Banco Cooperativo do Brasil'),
-        (SICOOB, 'Sicoob'),
-    )
+    BANK_CODES = BANK_ACCOUNTS
 
     # Obrigatório - Código do banco
     bank_code = models.CharField(

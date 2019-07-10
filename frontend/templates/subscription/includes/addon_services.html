@@ -1,0 +1,31 @@
+{% load addon_subscription_services %}
+{% get_subscription_services object as sub_services %}
+{% if sub_services.0 %}
+<div class="row tooltip-wrapper ">
+    <div class="col-xl-11 col-lg-11 col-md-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="panel-title">
+                    Atividades Extras
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div {% if sub_services.1 %}class="col-md-6"{% else %}class="col-md-12"{% endif %}>
+                        {%  for sub_service in sub_services.0 %}
+                            {% subscription_service_row event sub_service %}
+                        {%  endfor %}
+                    </div>
+                    {% if sub_services.1 %}
+                    <div class="col-md-6">
+                        {%  for sub_service in sub_services.1 %}
+                            {% subscription_service_row event sub_service %}
+                        {%  endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

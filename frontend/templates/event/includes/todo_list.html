@@ -184,21 +184,21 @@
         </tr>
     {% endif %}
 
-    {% if feature_management.checkin and feature_config.feature_checkin %}
+    {% if feature_config.feature_checkin %}
         <tr id=del-checkin class="todo_list_element" role="presentation">
             <td>
-                {% if number_attendances == 0 %}
-                    <button type="button"
-                            class="add_todo_element btn btn-warning btn-trans
-                        btn-sm dropdown-toggle"
-                            data-toggle="tooltip"
-                            data-placement="left"
-                            title=""
-                            data-original-title="Remover">
-                    <span class="fas
-            fa-minus"></span>
-                    </button>
-                {% endif %}
+{#                {% if number_attendances == 0 %}#}
+{#                    <button type="button"#}
+{#                            class="add_todo_element btn btn-warning btn-trans#}
+{#                        btn-sm dropdown-toggle"#}
+{#                            data-toggle="tooltip"#}
+{#                            data-placement="left"#}
+{#                            title=""#}
+{#                            data-original-title="Remover">#}
+{#                    <span class="fas#}
+{#            fa-minus"></span>#}
+{#                    </button>#}
+{#                {% endif %}#}
                 <a>Check-in/out</a>
             </td>
             <td>

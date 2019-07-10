@@ -54,7 +54,7 @@ class EventPanelView(EventDraftStateMixin,
             #             "Evento não possui essa funcionalidade",
             #             status=403)
 
-            elif row_name == 'extra_activities':
+            if row_name == 'extra_activities':
                 if feature_config.feature_services:
                     feature_management.services = val
                     feature_management.save()

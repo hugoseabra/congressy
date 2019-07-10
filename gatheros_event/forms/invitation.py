@@ -6,6 +6,7 @@ import absoluteuri
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.db.transaction import atomic
 
 from gatheros_event.models import Invitation, Member
 from gatheros_event.models.rules import check_invite
@@ -67,13 +68,15 @@ class InvitationCreateForm(forms.Form):
 
     def send_invite(self):
         """ Notifica pessoa convidada """
-        for invite in self._invites:
-            # Convite para um tipo inicialmente.
-            invite.group = Member.HELPER
-            invite.to.save()
-            invite.save()
 
-            send_invitation(invite)
+        with atomic():
+            for invite in self._invites:
+                # Convite para um tipo inicialmente.
+                invite.group = Member.HELPER
+                invite.to.save()
+                invite.save()
+
+                send_invitation(invite)
 
 
 class InvitationDecisionForm(forms.ModelForm):

@@ -47,8 +47,8 @@ class Migration(migrations.Migration):
                 ('raffle', models.BooleanField(default=False, help_text='Seu evento terá sorteios ?', verbose_name='Sorteios')),
             ],
             options={
-                'verbose_name': 'Gestão de Features',
-                'verbose_name_plural': 'Gestões de Features',
+                'verbose_name': 'Gestão de Feature',
+                'verbose_name_plural': 'Gestão de Features',
             },
         ),
         migrations.RemoveField(

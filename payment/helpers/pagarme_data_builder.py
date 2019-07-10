@@ -1,6 +1,6 @@
 import os
 import uuid
-from datetime import timedelta
+from datetime import timedelta, datetime
 from decimal import Decimal
 
 from django.conf import settings
@@ -131,11 +131,43 @@ class PagarmeDataBuilder:
             event_config = event.feature_configuration
 
             if event_config.feature_boleto_expiration_on_lot_expiration:
-                # Pagarme sets to one day before, so we set one day forward.
+                # Pagarme sets to one day before, so we set one day forward
+                # to 2 days after lot ends.
                 next_day = lot.date_end + timedelta(days=1)
                 exp_date = next_day.strftime('%Y-%m-%d')
 
                 data['boleto_expiration_date'] = exp_date
+
+            else:
+                # Deve-se verificar se o evento começou.
+                #   Se sim: não podemos gerar boletos.
+                #   Se não, há quantos dias estamos antes do evento:
+                #     Se 1 dia antes do evento: o boleto deve ter a data de
+                #       vencimento de hoje.
+                #     Se 2 dias, o boleto deve ter a data de vencimento 1 dia
+                #       antes do evento.
+                #   Se mais de 2 dias, processamento padrão: vencimento padrão
+                #     de 2 dia do pagarme.
+                now = datetime.now()
+                diff_days = event.date_start.date() - now.date()
+
+                if diff_days.days <= 0:
+                    raise TransactionDataError(
+                        'Evento já iniciou e não pode gerar novas transações'
+                        ' de boleto.'
+                    )
+
+                expiration_date = None
+
+                if diff_days.days == 1:
+                    expiration_date = now - timedelta(days=1)
+
+                elif diff_days.days == 2:
+                    expiration_date = now
+
+                if expiration_date:
+                    data['boleto_expiration_date'] = \
+                        expiration_date.strftime('%Y-%m-%d')
 
         if transaction_type == Transaction.CREDIT_CARD:
             data['card_hash'] = card_hash

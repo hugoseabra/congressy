@@ -34,6 +34,7 @@ admin_urlpatterns += [
     url(r'^grapelli/', include('grappelli.urls')),
     url(r'^grappelli_custom_autocomplete/',
         include('django_grappelli_custom_autocomplete.urls')),
+    url(r'^cgsy-admin18/doc/', include('django.contrib.admindocs.urls')),
     url(r'^cgsy-admin18/', admin.site.urls)
 ]
 
@@ -85,6 +86,7 @@ api_urls = [
     url(r'^', include('installment.api_urls', 'installment')),
     url(r'^', include('ticket.urls', 'ticket')),
     url(r'^', include('kanu_locations.urls', 'city')),
+    url(r'^', include('sync.api_urls', 'sync')),
 ]
 
 api_urlpatterns = [url(r'^api/', include(api_urls, 'api'))]

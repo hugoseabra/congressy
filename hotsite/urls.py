@@ -13,6 +13,11 @@ public_hotsite_urls = [
     ),
     url(r'^(?P<slug>[\w-]+)/$', views.HotsiteView.as_view(), name='hotsite'),
     url(
+        r'^(?P<slug>[\w-]+)/live-stream/$',
+        views.LiveStreamView.as_view(),
+        name='hotsite-live-stream'
+    ),
+    url(
         r'^(?P<slug>[\w-]+)/subscription/(?P<subscription_pk>[0-9A-Fa-f-]+)/optionals/$',
         views.OptionalWizardView.as_view(OPTIONAL_FORMS),
         name='hotsite-subscription-optionals'

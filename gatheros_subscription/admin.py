@@ -30,6 +30,7 @@ class LotCategoryAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 @admin.register(Lot)
 class LotAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     search_fields = (
+        'pk',
         'event__name',
         'name',
     )
@@ -101,11 +102,11 @@ class LotAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 class SubscriptionAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     search_fields = (
         'uuid',
+        'code',
         'person__uuid',
         'person__name',
         'person__email',
         'person__cpf',
-        'created',
         'event__name',
     )
     list_display = ('person', 'event_count', 'lot', 'code', 'completed',)
@@ -114,7 +115,6 @@ class SubscriptionAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
         'event',
         'code',
         'count',
-        'completed',
         'event_count',
         'synchronized',
         'attended',

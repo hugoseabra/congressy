@@ -11,4 +11,5 @@ logs/
 *.pid
 .pylintrc
 celeryd.pid
+version
 _build/

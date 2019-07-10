@@ -91,6 +91,7 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
         context['transactions'] = self.current_subscription.transactions
 
         context['next_url'] = self.next_url
+        context['has_top_bar'] = True
 
         can_reprocess_payment = True
 

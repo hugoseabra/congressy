@@ -1,9 +1,12 @@
 from django.db import models
 
+from base.models import EntityMixin
+from core.model import track_data
 from gatheros_event.models import Event
 
 
-class AttendanceService(models.Model):
+@track_data('name', 'checkout_enabled', 'with_certificate', 'accreditation')
+class AttendanceService(models.Model, EntityMixin):
     name = models.CharField(max_length=255, verbose_name='nome do atendimento')
 
     event = models.ForeignKey(
@@ -14,7 +17,11 @@ class AttendanceService(models.Model):
     )
 
     created_on = models.DateTimeField(auto_now_add=True,
-                                      verbose_name='criado em')
+                                      verbose_name='criado em',
+                                      editable=False, )
+    modified_on = models.DateTimeField(auto_now=True,
+                                       verbose_name='modificado em',
+                                       editable=False, )
 
     checkout_enabled = models.BooleanField(
         default=False,
@@ -51,9 +58,6 @@ class AttendanceService(models.Model):
         blank=True,
     )
 
-    def __str__(self):
-        return self.name
-
     accreditation = models.BooleanField(
         default=False,
         verbose_name='Credenciamento principal',
@@ -66,3 +70,6 @@ class AttendanceService(models.Model):
         verbose_name = 'Lista de Check-in/out'
         verbose_name_plural = 'Lista de Check-ins/outs'
         ordering = ['name']
+
+    def __str__(self):
+        return self.name

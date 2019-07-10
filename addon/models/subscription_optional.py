@@ -8,11 +8,13 @@ from django.db import models
 
 from addon import rules
 from base.models import EntityMixin
+from core.model import track_data
 from core.util.date import DateTimeRange
 from gatheros_subscription.models import Subscription
 from .optional import Product, Service
 
 
+@track_data('optional_price', 'optional_liquid_price')
 class AbstractSubscriptionOptional(EntityMixin, models.Model):
     """
         Vínculo de uma inscrição com um opcional, registrando,
@@ -46,10 +48,8 @@ class AbstractSubscriptionOptional(EntityMixin, models.Model):
         blank=True,
     )
 
-    def __str__(self):
-        return '{}: {}'.format(__name__, self.subscription.person.name)
 
-
+@track_data('optional_id', 'subscription_id')
 class SubscriptionProduct(AbstractSubscriptionOptional):
     """
         Vínculo de uma inscrição com um Opcional de Produto.
@@ -103,6 +103,7 @@ class SubscriptionProduct(AbstractSubscriptionOptional):
     get_theme.short_description = 'Áreas Temáticas'
 
 
+@track_data('optional_id', 'subscription_id')
 class SubscriptionService(AbstractSubscriptionOptional):
     """
         Vínculo de uma inscrição com um Opcional de Serviço.
@@ -137,7 +138,7 @@ class SubscriptionService(AbstractSubscriptionOptional):
         :type: bool
         """
         return self.optional.subscription_services.exclude(
-            subscription__status='canceled'
+            subscription__status=Subscription.CANCELED_STATUS,
         ).count()
 
     @property

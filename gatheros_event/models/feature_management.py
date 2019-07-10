@@ -4,9 +4,12 @@ from .event import Event
 
 
 class FeatureManagement(models.Model):
+    """
+    Recursos ativados pelo organizador.
+    """
     class Meta:
-        verbose_name = 'Gestão de Features'
-        verbose_name_plural = 'Gestões de Features'
+        verbose_name = 'Gestão de Feature'
+        verbose_name_plural = 'Gestão de Features'
 
     def __str__(self):
         return self.event.name

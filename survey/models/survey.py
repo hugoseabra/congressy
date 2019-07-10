@@ -3,9 +3,12 @@
     Questionário para acumular perguntas diversas de um determinado autor.
 """
 from django.db import models
+
+from core.model import track_data
 from survey.models.mixins import Entity
 
 
+@track_data('name')
 class Survey(Entity, models.Model):
     """
         Survey domain model implementation.
@@ -33,4 +36,3 @@ class Survey(Entity, models.Model):
         verbose_name='criado em',
         auto_now_add=True,
     )
-

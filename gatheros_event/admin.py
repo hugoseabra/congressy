@@ -26,7 +26,7 @@ class EventAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     """
     Admin para Event
     """
-    search_fields = ('name', 'organization__name',)
+    search_fields = ('pk', 'name', 'organization__name',)
     list_filter = ('subscription_type',)
     list_display = (
         'name',
@@ -110,7 +110,7 @@ class PersonAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     """
     Admin para Person
     """
-    search_fields = ('name', 'email',)
+    search_fields = ('pk', 'name', 'email',)
     list_display = ('name', 'gender', 'user', 'created')
     ordering = ('created', 'name')
     readonly_fields = [
@@ -178,11 +178,11 @@ class PersonAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 
 
 @admin.register(Organization)
-class OrganizationAdmin(admin.ModelAdmin):
+class OrganizationAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     """
     Admin para Organization
     """
-    search_fields = ('name',)
+    search_fields = ('pk', 'name',)
     list_display = ('name', 'legal_name', 'active')
     fieldsets = (
         (None, {
@@ -232,7 +232,7 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 
 @admin.register(Place)
-class PlaceAdmin(admin.ModelAdmin):
+class PlaceAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     """
     Admin para Place
     """
@@ -275,13 +275,14 @@ class EventInfoAdmin(admin.ModelAdmin):
 
 
 @admin.register(Member)
-class MemberAdmin(admin.ModelAdmin):
+class MemberAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     """
     Admin para Member
     """
     search_fields = ('person__name', 'person__email', 'organization__name',)
     list_display = ('organization', 'person', 'group', 'pk')
     ordering = ('organization', 'person')
+    raw_id_fields = ['person', 'organization']
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "person":
@@ -350,7 +351,7 @@ class FeatureConfigurationAdmin(admin.ModelAdmin):
     Admin para Configurações de Eventos
     """
     search_fields = ('event__name',)
-    exclude = ('event', 'last_updated_by')
+    exclude = ('event',)
     form = FeatureConfigurationForm
 
     def get_form(self, request, obj=None, **kwargs):
@@ -380,7 +381,7 @@ class FeatureManagementAdmin(admin.ModelAdmin):
     Admin para Configurações de Eventos selecionadas pelos organizadores
     """
     search_fields = ('event__name',)
-    exclude = ('event',)
+    exclude = ('event', 'checkin',)
 
     def has_add_permission(self, request):
         return False

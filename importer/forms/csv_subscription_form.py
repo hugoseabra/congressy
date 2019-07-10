@@ -195,7 +195,7 @@ class CSVSubscriptionForm(forms.Form):
                 'cpf': cleaned_data.get('cpf'),
                 'institution': cleaned_data.get('institution'),
                 'institution_cnpj': cleaned_data.get('institution_cnpj'),
-                'function': cleaned_data.get('institution_function'),
+                'function': cleaned_data.get('function'),
             }
         )
 

@@ -374,8 +374,7 @@
                                         Ver Painel Participante
                                     </button>
                                 </li>
-
-
+                                {% if not object.confirmed and not OFFLINE_SERVER %}
                                 <li>
                                     <button type="button"
                                             class="btn btn-success btn-trans"
@@ -386,9 +385,8 @@
                                         Pagamento com Cartão de Crédito
                                     </button>
                                 </li>
-
+                                {% endif %}
                                 {% if event.feature_configuration.feature_manual_payments %}
-
                                     <li>
                                         <button type="button"
                                                 class="btn btn-success btn-trans"

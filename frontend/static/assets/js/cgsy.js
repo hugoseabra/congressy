@@ -267,8 +267,6 @@ function hotsiteSearchByCep() {
     console.log('going to fetch CEP')
     $.getJSON(url, function (response) {
 
-
-
         if ('erro' in response) {
             alert("CEP não encontrado.");
             hotsiteShowHideCepLoader(false);

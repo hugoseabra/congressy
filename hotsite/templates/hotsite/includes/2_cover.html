@@ -161,6 +161,11 @@
 
                         </div>
 
+                    {% elif event.finished is True %}
+                        <div class="hero-features-right col-md-5" data-animation="fadeIn">
+                            {% include 'hotsite/finished_event_with_certificate.html' %}
+                        </div>
+
                     {% endif %}
 
 

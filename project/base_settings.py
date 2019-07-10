@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'health_check.contrib.celery',
 
     # Django added apps
+    'django.contrib.admindocs',
     'django.contrib.sites',
     'django.forms',
 
@@ -96,6 +97,7 @@ FORMAT_MODULE_PATH = [
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.admindocs.middleware.XViewMiddleware',
     # Middleware para saber de qual host que veio a resposta do Django
     'project.manage.middleware.OriginMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -195,6 +197,7 @@ TEMPLATES = [
                 'project.context_processors.environment_version',
                 'frontend.context_processors.render_app_only',
                 'frontend.context_processors.is_debug_mode',
+                'frontend.context_processors.is_offline_server',
             ],
             'builtins': [
                 'permission.templatetags.permissionif',
@@ -338,6 +341,7 @@ FAILED_RUNS_CRONJOB_EMAIL_PREFIX = "[Server check]: "
 CRON_CLASSES = [
     # "payment.cron.MyCronJob",
     "payment.cron.SubscriptionStatusIrregularityTestJob",
+    "payment.cron.SubscriptionPaidAndIncomplete",
 ]
 # =============================== BITLY ===================================== #
 BITLY_LOGIN = 'congressy'
@@ -360,7 +364,7 @@ PARTNER_MAX_PERCENTAGE_IN_EVENT = 60.00
 # Valor mínimo que a congrssy deve receber por transação. Se o valor do recebi
 # devido for menor do que este, o valor da transaçaõ da parte da congressy será
 # este valor.
-CONGRESSY_MINIMUM_AMOUNT = 4.99
+CONGRESSY_MINIMUM_AMOUNT = 3.49
 
 # Taxas de juros de parcelamento de valores da Congressy.
 CONGRESSY_INSTALLMENT_INTERESTS_RATE = 2.29

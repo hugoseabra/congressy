@@ -4,14 +4,18 @@ from decimal import Decimal
 from payment.models import Transaction
 
 
+def event_starts_in(now: datetime):
+    pass
+
+
 def get_opened_boleto_transactions(subscription):
     """ Verifica se inscrição possui boletos que ainda não venceram. """
 
     now = datetime.now()
 
     return Transaction.objects.filter(
-        subscription=subscription,
-        lot__event=subscription.event,
+        subscription_id=subscription.pk,
+        lot__event_id=subscription.event_id,
         type=Transaction.BOLETO,
         boleto_expiration_date__gt=now.date(),
     ).exclude(
@@ -21,6 +25,10 @@ def get_opened_boleto_transactions(subscription):
             Transaction.REFUSED,
         ],
     )
+
+
+def has_open_boleto(subscription):
+    return get_opened_boleto_transactions(subscription).count()
 
 
 def is_boleto_allowed(event):
@@ -35,10 +43,7 @@ def is_boleto_allowed(event):
     # Se evento permite boletos mediante configuração de mínimo de dias
     # de emissão de boleto configurado em 'boleto_limit_days'
 
-    if datetime.now() >= diff_days_boleto:
-        return False
-
-    return True
+    return datetime.now() < diff_days_boleto
 
 
 def amount_as_decimal(amount):

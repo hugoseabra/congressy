@@ -27,6 +27,7 @@ INSTALLED_APPS += [
     'installment',
     'cgsy_commands',
     'ticket',
+    'sync',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'

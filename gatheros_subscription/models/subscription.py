@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models import Max
 from django.utils.functional import cached_property
 
+from base.models import EntityMixin
 from core.model import track_data
 from gatheros_event.models import Event, Person
 from gatheros_event.models.constants import (
@@ -51,7 +52,7 @@ class SubscriptionManager(models.Manager):
 
 
 @track_data('lot_id')
-class Subscription(models.Model, GatherosModelMixin):
+class Subscription(models.Model, EntityMixin, GatherosModelMixin):
     """ Modelo de inscrição """
 
     DEVICE_ORIGIN_HOTSITE = 'hotsite'
@@ -195,7 +196,6 @@ class Subscription(models.Model, GatherosModelMixin):
         default=False,
         verbose_name='completa',
         help_text='Inscrições que passaram por todo o fluxo de inscrições.',
-        editable=False
     )
 
     test_subscription = models.BooleanField(default=False)
@@ -267,7 +267,7 @@ class Subscription(models.Model, GatherosModelMixin):
             self.code = Subscription.objects.generate_code(self.event)
 
         # RULE 3 - rule.test_rule_3_numero_inscricao_gerado
-        if self._state.adding is True:
+        if not self.event_count:
             self.event_count = Subscription.objects.next_event_count(
                 self.event
             )

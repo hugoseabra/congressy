@@ -142,6 +142,26 @@ class Info(models.Model, GatherosModelMixin):
         help_text="Informações extras que serão impressas junto com o voucher.",
     )
 
+    enable_streaming_page = models.BooleanField(
+        default=False,
+        verbose_name='Habilitar página de streaming de vídeo',
+    )
+
+    stream_page_title = models.CharField(
+        max_length=80,
+        blank=True,
+        default='Transmissão ao vivo',
+        verbose_name='Título da Página de Vídeo',
+    )
+
+    stream_youtube_code = models.CharField(
+        max_length=15,
+        blank=True,
+        null=True,
+        verbose_name='Código do Vídeo (Youtube)',
+        help_text='https://www.youtube.com/watch?v=<strong>CÓDIGO</strong>',
+    )
+
     @property
     def youtube_image(self):
         if not self.youtube_video:

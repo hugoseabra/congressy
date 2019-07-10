@@ -1,0 +1,33 @@
+{% if event.published and subscription.confirmed and event.info.enable_streaming_page and event.info.stream_youtube_code %}
+    <!-- CLOSING
+    ================================= -->
+    <section id="live_streaming" class="closing-section section-gray section" style="padding: 30px 0">
+
+        <div class="section-background">
+
+            <!-- IMAGE BACKGROUND -->
+            <div class="section-background-image parallax" data-stellar-ratio="0.4">
+                {% if info.image_main.default %}
+                <img src="{{ info.image_main.default.url }}" alt="" style="opacity: 0.15;">
+                {% endif %}
+            </div>
+
+
+        </div>
+
+
+        <div class="container">
+
+            <h3 class="closing-shout" style="margin-top:0; margin-bottom: 20px">
+                {{ event.info.stream_page_title|default:"Transmissão ao vivo" }}
+            </h3>
+
+            <div class="closing-buttons" data-animation="tada">
+                <a href="{% url 'public:hotsite-live-stream' event.slug %}" class="btn btn-lg btn-primary">
+                    Acessar vídeo
+                </a>
+            </div>
+        </div>
+
+    </section>
+{% endif %}

@@ -22,7 +22,7 @@ def rule_2_nao_pode_mudar_autor(entity):
     Não pode mudar o autor de um convite
     :param entity:
     """
-    if entity.pk and entity.has_changed('author'):
+    if entity.is_new() is False and entity.has_changed('author'):
         raise ValidationError({'author': [
             'Não é permitido mudar o autor de um convite.']})
 
@@ -32,7 +32,7 @@ def rule_3_nao_pode_mudar_convidado(entity):
     Não pode mudar o convidado de um convite
     :param entity:
     """
-    if entity.pk and entity.has_changed('to'):
+    if entity.is_new() is False and entity.has_changed('to'):
         raise ValidationError({'to': [
             'Não é permitido mudar o convidado de um convite.']})
 
@@ -60,7 +60,7 @@ def rule_5_nao_deve_existir_2_convites_para_mesmo_usuario(entity):
     :param entity:
     """
     # noinspection PyProtectedMember
-    if entity._state.adding is True and entity.has_previous() is True:
+    if entity.is_new() is True and entity.has_previous() is True:
         raise ValidationError(
             {'to': [
                 'Já existe um convite para \'{}\' '
@@ -80,8 +80,7 @@ def rule_6_autor_deve_ser_membro_admin(entity):
     organization = entity.author.organization
     person = entity.author.person
 
-    # noinspection PyProtectedMember
-    if entity._state.adding and not organization.is_admin(person):
+    if entity.is_new() and not organization.is_admin(person):
         raise ValidationError({'author': [
             'Somente administradores podem convidar novos membros.']})
 
@@ -94,8 +93,7 @@ def rule_7_nao_deve_convidar_um_membro_da_organizacao(entity):
     organization = entity.author.organization
     user = entity.to
 
-    # noinspection PyProtectedMember
-    if entity._state.adding and organization.is_member(user):
+    if entity.is_new() and organization.is_member(user):
         raise ValidationError(
             {'to': [
                 'Um membro com o email "{}" já existe na '

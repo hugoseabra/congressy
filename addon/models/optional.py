@@ -34,7 +34,8 @@ def get_image_path(instance, filename):
     )
 
 
-@track_data('banner', 'date_end_sub', 'liquid_price')
+@track_data('lot_category_id', 'date_end_sub', 'published', 'liquid_price',
+            'description', 'quantity', 'release_days', 'banner', )
 class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
     """
         Opcional é um item adicional (add-on) à inscrição de um evento que
@@ -212,6 +213,7 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
         return round(self.liquid_price + congressy_amount, 2)
 
 
+@track_data('name', 'optional_type_id', 'tag')
 class Product(AbstractOptional):
     """
         Opcional de produto é um adicional de produto a ser comprado no ato da
@@ -271,7 +273,8 @@ class Product(AbstractOptional):
         super().save(*args, **kwargs)
 
 
-@track_data('schedule_start', 'schedule_end')
+@track_data('name', 'optional_type_id', 'theme_id', 'schedule_start',
+            'schedule_end', 'place', 'restrict_unique', 'tag')
 class Service(AbstractOptional):
     """
         Opcional de Serviço é um serviço a ser adquirido no ato da inscrição
@@ -313,6 +316,7 @@ class Service(AbstractOptional):
         verbose_name="programação - início",
         help_text='Data e hora inicial da programação no dia do evento.'
     )
+
     schedule_end = models.DateTimeField(
         verbose_name="programação - fim",
         help_text='Data e hora final da programação no dia do evento.'
@@ -364,6 +368,27 @@ class Service(AbstractOptional):
             self.tag = self.tag.replace(' ', '')
 
         super().save(*args, **kwargs)
+
+    def get_period(self):
+        """Recupera string de período de evento de acordo com as datas."""
+        start_date = self.schedule_start.date()
+        end_date = self.schedule_end.date()
+        start_time = self.schedule_start.time()
+        end_time = self.schedule_end.time()
+
+        period = ''
+        if start_date < end_date:
+            period = 'De ' + self.schedule_start.strftime('%d/%m/%Y %Hh%M')
+            period += ' a ' + self.schedule_end.strftime('%d/%m/%Y %Hh%M')
+
+        if start_date == end_date:
+            period = self.schedule_start.strftime('%d/%m/%Y')
+            period += ' das '
+            period += start_time.strftime('%Hh%M')
+            period += ' às '
+            period += end_time.strftime('%Hh%M')
+
+        return period
 
     def __str__(self):
         return '{} - {}'.format(self.name, self.theme.name)

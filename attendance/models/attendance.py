@@ -1,10 +1,12 @@
 from django.db import models
 
+from base.models import EntityMixin
+from core.model import track_data
 from gatheros_subscription.models import Subscription
 from . import AttendanceService
 
 
-class Attendance(models.Model):
+class Attendance(models.Model, EntityMixin):
     class Meta:
         abstract = True
         ordering = ['created_on']
@@ -30,8 +32,9 @@ class Attendance(models.Model):
     )
 
 
+@track_data('attendance_service_id', 'subscription_id', 'printed_on', )
 class Checkin(Attendance):
-    class Meta (Attendance.Meta):
+    class Meta(Attendance.Meta):
         verbose_name = 'entrada'
         verbose_name_plural = 'entradas'
 
@@ -56,8 +59,9 @@ class Checkin(Attendance):
     )
 
 
+@track_data('checkin_id', )
 class Checkout(Attendance):
-    class Meta (Attendance.Meta):
+    class Meta(Attendance.Meta):
         verbose_name = 'saída'
         verbose_name_plural = 'saídas'
 
