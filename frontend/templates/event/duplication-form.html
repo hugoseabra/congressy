@@ -29,7 +29,7 @@
 
 {% block content %}
 
-    <form action="" method="post" class="form-horizontal form-border skip-submition-check" role="form" name="event_duplication_form">
+    <form action="" method="post" class="form-horizontal form-border" role="form" name="event_duplication_form">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -109,28 +109,36 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="row">
+                                    {% if event_config.has_cats_lots %}
                                     <div class="col-md-6">
                                         {% render_switchery_field form.duplicate_categories_lots %}
                                     </div>
+                                    {% endif %}
+                                    {% if event_config.has_surveys %}
                                     <div class="col-md-6">
                                         {% render_switchery_field form.duplicate_surveys %}
                                     </div>
-                                </div>
-                                <div class="row">
+                                    {% endif %}
+                                    {% if event_config.has_certificate %}
                                     <div class="col-md-6">
                                         {% render_switchery_field form.duplicate_certificate %}
                                     </div>
+                                    {% endif %}
+                                    {% if event_config.has_attendance_services %}
                                     <div class="col-md-6">
                                         {% render_switchery_field form.duplicate_attendance_services %}
                                     </div>
-                                </div>
-                                <div class="row">
+                                    {% endif %}
+                                    {% if event_config.has_addon_services %}
                                     <div class="col-md-6">
                                         {% render_switchery_field form.duplicate_addon_services %}
                                     </div>
+                                    {% endif %}
+                                    {% if event_config.has_addon_products %}
                                     <div class="col-md-6">
                                         {% render_switchery_field form.duplicate_addon_products %}
                                     </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -172,7 +180,6 @@
     <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
     <script src="{% static 'assets/js/event.js' %}"></script>
     <script src="{% static 'assets/js/date-time.js' %}"></script>
-    <script src="{% static 'assets/js/user_notification.js' %}"></script>
 
     <script>
         $(document).ready(function () {
