@@ -1,10 +1,9 @@
-from decimal import Decimal
-
 from django.db.models import Count
 
 from addon.models import Product, Service
 from gatheros_event.models import Event, Organization
-from gatheros_subscription.models import Lot, Subscription
+from gatheros_subscription.models import Subscription
+from ticket.models import Lot
 from .mixins import (
     EventCompositeSpecificationMixin,
     LotCompositeSpecificationMixin,
@@ -29,15 +28,20 @@ class EventPayable(EventCompositeSpecificationMixin):
     def is_satisfied_by(self, event: Event):
         super().is_satisfied_by(event)
 
-        for lot in event.lots.all():
+        lots = Lot.objects.filter(
+            ticket__active=True,
+            ticket__event_id=event.pk,
+        )
 
-            if (self.exclude_type and self.exclude) and \
-                    self.exclude_type == 'lot':
+        exc_type = self.exclude_type
+
+        spec = LotPayable(exclude=self.exclude,
+                          exclude_type=self.exclude_type)
+
+        for lot in lots:
+            if exc_type and self.exclude and exc_type == 'lot':
                 if lot == self.exclude:
                     continue
-
-            spec = LotPayable(exclude=self.exclude,
-                              exclude_type=self.exclude_type)
 
             if spec.is_satisfied_by(lot):
                 return True
@@ -64,12 +68,12 @@ class LotPayable(LotCompositeSpecificationMixin):
 
         paid_service_or_product_flag = False
 
-        # Products
-        all_products = self._get_active_products_in_lot(lot)
-        for product in all_products:
+        exc_type = self.exclude_type
 
-            if (self.exclude_type and self.exclude) and \
-                    self.exclude_type == 'product':
+        # Products
+        for product in self._get_active_products_in_lot(lot):
+
+            if exc_type and self.exclude and exc_type == 'product':
                 if product == self.exclude:
                     continue
 
@@ -77,19 +81,16 @@ class LotPayable(LotCompositeSpecificationMixin):
                 paid_service_or_product_flag = True
 
         # Services
-        all_services = self._get_active_services_in_lot(lot)
-        for service in all_services:
+        for service in self._get_active_services_in_lot(lot):
 
-            if (self.exclude_type and self.exclude) and \
-                    self.exclude_type == 'service':
+            if exc_type and self.exclude and exc_type == 'service':
                 if service == self.exclude:
                     continue
 
             if ServicePayable().is_satisfied_by(service):
                 paid_service_or_product_flag = True
 
-        if not paid_service_or_product_flag and (
-                not lot.price or lot.price == 0):
+        if not paid_service_or_product_flag and not lot.price:
             return False
 
         return True
@@ -110,7 +111,7 @@ class ProductPayable(ProductCompositeSpecificationMixin):
                 product.has_sub_end_date_conflict:
             return False
 
-        if product.price == Decimal(0.00):
+        if not product.price:
             return False
 
         return True
@@ -131,7 +132,7 @@ class ServicePayable(ServiceCompositeSpecificationMixin):
                 service.has_sub_end_date_conflict:
             return False
 
-        if service.price == Decimal(0.00):
+        if not service.price:
             return False
 
         return True

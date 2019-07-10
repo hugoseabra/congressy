@@ -66,23 +66,21 @@ class LotCompositeSpecificationMixin(CompositeSpecification):
 
     @staticmethod
     def _get_valid_subs_in_lot(lot):
-        return Subscription.objects.filter(
-            lot=lot,
-            completed=True,
-            test_subscription=False,
+        return Subscription.objects.all_completed().filter(
+            ticket_lot_id=lot.pk
         )
 
     @staticmethod
     def _get_active_products_in_lot(lot):
         return Product.objects.filter(
-            lot_category=lot.category,
+            ticket_id=lot.ticket_id,
             published=True,
         )
 
     @staticmethod
     def _get_active_services_in_lot(lot):
         return Service.objects.filter(
-            lot_category=lot.category,
+            ticket_id=lot.ticket_id,
             published=True,
         )
 

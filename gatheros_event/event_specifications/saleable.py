@@ -1,6 +1,6 @@
 from addon.models import Product, Service
 from core.specification import Specification
-from gatheros_subscription.models import Lot
+from ticket.models import Lot
 
 
 class Saleable(Specification):

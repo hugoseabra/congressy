@@ -20,46 +20,31 @@ class EventPublishable(EventCompositeSpecificationMixin):
     def is_satisfied_by(self, event: Event):
         super().is_satisfied_by(event)
 
-        org = event.organization
-
-        if not hasattr(event, 'info') or not hasattr(event.info, 'description'):
+        if not hasattr(event, 'info'):
             return False
 
-        payable_spec = EventPayable().is_satisfied_by(event)
-        if payable_spec:
-            banking_spec = OrganizationHasBanking().is_satisfied_by(org)
-            if not banking_spec:
-                return False
+        if not event.info.description:
+            return False
 
-        # if event.is_scientific:
-        #
-        #     if not hasattr(event, 'work_config'):
-        #         return False
-        #
-        #     if not event.work_config.is_configured:
-        #         return False
+        if EventPayable().is_satisfied_by(event):
+            org = event.organization
+            if not OrganizationHasBanking().is_satisfied_by(org):
+                return False
 
         return True
 
     @staticmethod
     def get_reason(event: Event):
 
-        org = event.organization
-        if not hasattr(event, 'info') or not hasattr(event.info, 'description'):
+        if not hasattr(event, 'info') or not event.info.description:
             return 'Seu evento não possui uma descrição. ' \
                    'Veja os dados da pagina do evento!'
 
-        payable_spec = EventPayable().is_satisfied_by(event)
-        if payable_spec:
-            banking_spec = OrganizationHasBanking().is_satisfied_by(org)
-            if not banking_spec:
+        if EventPayable().is_satisfied_by(event):
+            org = event.organization
+            if not OrganizationHasBanking().is_satisfied_by(org):
                 return 'Seu evento é pago e não possui dados bancarios para ' \
                        'receber pagamentos. Veja os detalhes da sua ' \
                        'organização!'
-
-        # if event.is_scientific:
-        #     if not event.work_config and event.work_config.is_configured:
-        #         return 'Você ainda não configurou seu evento para receber ' \
-        #                'inscrições cientificas!'
 
         return ''
