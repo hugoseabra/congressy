@@ -25,6 +25,12 @@ from .rules import subscription as rule
 class SubscriptionManager(models.Manager):
     """ Gerenciador de inscrição - Manager"""
 
+    def all_completed(self):
+        return self.filter(
+            test_subscription=False,
+            completed=True,
+        )
+
     def next_event_count(self, event):
         """ Resgata próximo número de inscrição. """
         count_max = self.filter(event=event).aggregate(Max('event_count'))

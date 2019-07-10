@@ -62,15 +62,6 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
         # TODO: Remove this field
     )
 
-    ticket = models.ForeignKey(
-        'ticket.Ticket',
-        on_delete=models.PROTECT,
-        verbose_name='ingresso',
-        related_name='%(class)s_optionals',
-        help_text='Para qual ingresso de participante se destina.',
-        null=True,
-    )
-
     date_end_sub = models.DateTimeField(
         verbose_name="Inscrição - data/hora limite",
         help_text='Data e hora limite para se aceitar inscrições para este'
@@ -228,6 +219,15 @@ class Product(AbstractOptional):
         rules.OptionalMustHaveMinimumDays,
     )
 
+    ticket = models.ForeignKey(
+        'ticket.Ticket',
+        on_delete=models.PROTECT,
+        verbose_name='ingresso',
+        related_name='addon_products',
+        help_text='Para qual ingresso de participante se destina.',
+        null=True,
+    )
+
     name = models.CharField(
         max_length=255,
         verbose_name="nome do produto",
@@ -290,6 +290,15 @@ class Service(AbstractOptional):
         # rules.ServiceMustHaveUniqueDatetimeScheduleInterval,
         rules.ThemeMustBeSameEvent,
         rules.OptionalMustHaveMinimumDays,
+    )
+
+    ticket = models.ForeignKey(
+        'ticket.Ticket',
+        on_delete=models.PROTECT,
+        verbose_name='ingresso',
+        related_name='addon_services',
+        help_text='Para qual ingresso de participante se destina.',
+        null=True,
     )
 
     name = models.CharField(

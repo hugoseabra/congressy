@@ -4,9 +4,15 @@ import absoluteuri
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
-from gatheros_subscription.models import Subscription, Lot
-from survey.forms import SurveyAnswerForm, SurveyBaseForm, \
-    ActiveSurveyAnswerForm
+from gatheros_subscription.models import (
+    Lot,
+    Subscription,
+)
+from survey.forms import (
+    ActiveSurveyAnswerForm,
+    SurveyAnswerForm,
+    SurveyBaseForm,
+)
 from survey.models import Author, Answer, Survey, Question
 
 
@@ -69,8 +75,8 @@ class SubscriptionSurveyDirector(object):
 
         self.subscription.author, _ = Author.objects.get_or_create(
             name=self.subscription.person.name,
-            survey=survey,
-            user=user,
+            survey_id=survey.pk,
+            user_id=user.pk,
         )
         self.subscription.save()
 
@@ -78,7 +84,7 @@ class SubscriptionSurveyDirector(object):
         # SurveyAnswerForm vazio
         if self.subscription is None or self.subscription.author is None:
             return SurveyAnswerForm(
-                survey=survey,
+                survey_id=survey.pk,
                 data=data,
             )
 
@@ -96,9 +102,9 @@ class SubscriptionSurveyDirector(object):
                 """
                 try:
                     answer = Answer.objects.get(
-                        question=question,
-                        author=author,
-                        question__survey=survey,
+                        question_id=question.pk,
+                        author_id=author.pk,
+                        question__survey_id=survey.pk,
                     )
                     answers.update({question.name: answer.value})
                 except Answer.DoesNotExist:
@@ -109,16 +115,16 @@ class SubscriptionSurveyDirector(object):
 
         if any(answers):
             return SurveyAnswerForm(
-                survey=survey,
+                survey_id=survey.pk,
                 initial=answers,
                 data=data,
-                author=author,
+                author_id=author.pk,
             )
 
         return SurveyAnswerForm(
-            survey=survey,
+            survey_id=survey.pk,
             data=data,
-            author=author,
+            author_id=author.pk,
         )
 
     def get_active_form(self, survey: Survey, data=None, files=None,
@@ -218,17 +224,17 @@ class SubscriptionSurveyDirector(object):
 
         if any(answers):
             return ActiveSurveyAnswerForm(
-                survey=survey,
+                survey_id=survey.pk,
                 initial=answers,
                 data=data,
-                author=author,
+                author_id=author.pk,
                 files=files,
             )
 
         return ActiveSurveyAnswerForm(
-            survey=survey,
+            survey_id=survey.pk,
             data=data,
-            author=author,
+            author_id=author.pk,
             files=files,
         )
 
@@ -253,7 +259,7 @@ class SubscriptionSurveyDirector(object):
         # SurveyAnswerForm vazio
         if self.subscription is None or self.subscription.author is None:
             return SurveyBaseForm(
-                survey=survey,
+                survey_id=survey.pk,
                 data=data,
                 files=files,
             )
@@ -272,9 +278,9 @@ class SubscriptionSurveyDirector(object):
                 """
                 try:
                     answer = Answer.objects.get(
-                        question=question,
-                        author=author,
-                        question__survey=survey,
+                        question_id=question.pk,
+                        author_id=author.pk,
+                        question__survey_id=survey.pk,
                     )
 
                     if question.type == question.FIELD_INPUT_FILE_PDF:
@@ -303,16 +309,16 @@ class SubscriptionSurveyDirector(object):
 
         if any(answers):
             return SurveyBaseForm(
-                survey=survey,
+                survey_id=survey.pk,
                 initial=answers,
                 data=data,
-                author=author,
+                author_id=author.pk,
                 files=files,
             )
 
         return SurveyBaseForm(
-            survey=survey,
+            survey_id=survey.pk,
             data=data,
-            author=author,
+            author_id=author.pk,
             files=files,
         )

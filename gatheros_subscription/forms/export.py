@@ -1,9 +1,5 @@
-from datetime import date
-
 from django import forms
 from django.utils.translation import ugettext as _
-
-from gatheros_event.models import Person
 
 
 class RangeField(forms.MultiValueField):
@@ -40,4 +36,3 @@ class RangeField(forms.MultiValueField):
 class SubscriptionFilterForm(forms.Form):
     def __init__(self, event, data=None, *args, **kwargs):
         super().__init__(data=data, *args, **kwargs)
-
