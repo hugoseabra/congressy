@@ -186,7 +186,6 @@
                     data-toggle="dropdown"
                     aria-expanded="false">
                     <span class="fas fa-cog"></span>
-                    <span class="fas fa-cog"></span>
             </button>
             <ul class="dropdown-menu" role="menu">
                 <li>
@@ -198,9 +197,18 @@
                 <li>
                     <a href="{% url 'event:event-duplicate' event.pk %}">
                         <i class="fas fa-copy"></i>
-                        Duplicar
+                        Duplicar este evento
                     </a>
                 </li>
+                {% if event.is_deletable and user has 'gatheros_event.delete_event' of event %}
+                <li>
+                    <a href="javascript:void(0)"
+                       onclick="$('#event-delete-form').attr('action','{% url 'event:event-delete' event.pk %}');$('#event-delete-modal').modal();">
+                        <i class="fas fa-trash-alt"></i>
+                        Excluir
+                    </a>
+                </li>
+                {% endif %}
             </ul>
             <div class="clearfix"></div>
         </div>
@@ -257,4 +265,7 @@
         </div>
     </div>
 
+{% endblock %}
+{% block modals %}
+    {% include 'event/event-delete-modal.html' %}
 {% endblock %}
