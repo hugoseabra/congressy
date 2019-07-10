@@ -1,8 +1,10 @@
+from datetime import datetime
 from decimal import Decimal
 
 from django.db import models
 
 from base.models import EntityMixin
+from core.util.date import DateTimeRange
 from gatheros_event.models.mixins import GatherosModelMixin
 
 
@@ -80,10 +82,23 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
 
     @property
     def is_full(self):
-        if self.limit is None:
+        if not self.limit:
             return False
 
         return self.num_subs >= self.limit
+
+    @property
+    def running(self):
+        now = datetime.now()
+        dates_range = DateTimeRange(start=self.date_start, stop=self.date_end)
+        return now in dates_range
+
+    @property
+    def subscribable(self):
+        return self.running is True \
+               and self.is_full is True \
+               and self.ticket.active is True \
+               and self.ticket.is_full is True
 
     def update_lot_num_subs(self):
         """
@@ -92,12 +107,7 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
            interno
         """
 
-        self.num_subs = self.subscriptions.all().filter(
-            test_subscription=False,
-            completed=True,
-        ).count()
-
+        self.num_subs = self.subscriptions.all_completed().count()
         self.save()
 
         return self
-

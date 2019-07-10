@@ -3,7 +3,6 @@ from datetime import datetime
 from django.db import models
 
 from base.models import EntityMixin
-from core.util.date import DateTimeRange
 from gatheros_event.models.mixins import GatherosModelMixin
 
 
@@ -52,14 +51,6 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
 
     description = models.TextField(
         verbose_name="descrição",
-        # Making field optional
-        blank=True,
-        null=True,
-    )
-
-    paid = models.NullBooleanField(
-        verbose_name="cobrar pela categoria",
-        default=False,
         # Making field optional
         blank=True,
         null=True,
@@ -146,20 +137,14 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
         if self._current_lot:
             return self._current_lot
 
-        now = datetime.now()
         found_lots = list()
 
         for lot in self.lots.all():
-
-            dtr = DateTimeRange(
-                start=lot.date_start,
-                stop=lot.date_end,
-            )
-
-            if now in dtr:
+            if lot.running is True:
                 found_lots.append(lot)
 
-        assert len(found_lots) <= 1, '{} lotes ativos neste momento.'.format(len(found_lots))
+        assert len(found_lots) <= 1, \
+            '{} lotes ativos neste momento.'.format(len(found_lots))
 
         if found_lots:
             self._current_lot = found_lots[0]
@@ -167,30 +152,36 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
         return self._current_lot
 
     @property
-    def display_name(self):
-
-        if self.current_lot:
-            lot = self.current_lot.display_name
-
-            return '{} - {}'.format(self.name, lot)
-
-        return self.name
+    def running(self):
+        return self.current_lot is not None
 
     @property
     def status(self):
-        if self._current_lot is not None:
+        if self.running is True:
             return self.RUNNING_STATUS
 
         now = datetime.now()
 
-        future_lots = self.lots.filter(
-            date_start__gte=now,
-        ).count()
-
-        if future_lots > 0:
+        if self.lots.filter(date_start__gte=now).count() > 0:
             return self.NOT_STARTED_STATUS
 
         return self.ENDED_STATUS
+
+    @property
+    def is_full(self):
+        if not self.limit:
+            return False
+
+        return self.num_subs >= self.limit
+
+    @property
+    def subscribable(self):
+        current_lot = self.current_lot
+
+        if current_lot is None:
+            return False
+
+        return current_lot.subscribable is True
 
     def update_audience_category_num_subs(self):
         """
@@ -201,13 +192,9 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
         counter = 0
 
         for lot in self.lots.all():
-            counter += lot.subscriptions.all().filter(
-                test_subscription=False,
-                completed=True,
-            ).count()
+            counter += lot.subscriptions.all_completed().count()
 
         self.num_subs = counter
-
         self.save()
 
         return self
