@@ -9,7 +9,6 @@ INSTALLED_APPS += [
     'gatheros_subscription',
     'gatheros_front',
     'mailer',
-    'payment_debt',
     'payment',
     'partner',
     'hotsite',
@@ -23,7 +22,6 @@ INSTALLED_APPS += [
     'importer',
     'attendance',
     'service_tags',
-    'mix_boleto',
     'installment',
     'cgsy_commands',
 ]
