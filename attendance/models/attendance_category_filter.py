@@ -9,7 +9,17 @@ class AttendanceCategoryFilter(models.Model):
         LotCategory,
         on_delete=models.CASCADE,
         verbose_name='Categoria',
-        related_name='lot_category_filters'
+        related_name='attendance_service_filters'
+    )
+
+    ticket = models.ForeignKey(
+        'ticket.Ticket',
+        on_delete=models.CASCADE,
+        verbose_name='Ingresso',
+        related_name='attendance_service_filters',
+        # @TODO - REMOVER E TORNAR OBRIGATÓRIO
+        null=True,
+        blank=True,
     )
 
     attendance_service = models.ForeignKey(
@@ -20,6 +30,7 @@ class AttendanceCategoryFilter(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Filtro para lista de Check-In/Out por Categoria de Lote'
-        ordering = ['attendance_service',]
+        verbose_name = 'Filtro para lista de Check-In/Out por Categoria de' \
+                       ' Lote'
+        ordering = ['attendance_service']
 

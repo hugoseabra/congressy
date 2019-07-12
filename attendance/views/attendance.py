@@ -140,8 +140,9 @@ class AttendanceDashboardView(AttendanceFeatureFlagMixin, generic.DetailView):
 
         total = \
             Subscription.objects.filter(
-                event=self.event,
-                completed=True, test_subscription=False,
+                event_id=self.event.pk,
+                completed=True,
+                test_subscription=False,
                 lot__category_id__in=self.get_category_filter()
             ).exclude(status=Subscription.CANCELED_STATUS).count()
 
@@ -152,8 +153,9 @@ class AttendanceDashboardView(AttendanceFeatureFlagMixin, generic.DetailView):
         confirmed = \
             Subscription.objects.filter(
                 status=Subscription.CONFIRMED_STATUS,
-                completed=True, test_subscription=False,
-                event=self.event,
+                completed=True,
+                test_subscription=False,
+                event_id=self.event.pk,
                 lot__category_id__in=self.get_category_filter()
             ).count()
 
@@ -172,8 +174,9 @@ class AttendanceDashboardView(AttendanceFeatureFlagMixin, generic.DetailView):
 
         queryset = Subscription.objects.filter(
             status=Subscription.CONFIRMED_STATUS,
-            completed=True, test_subscription=False,
-            event=self.event
+            completed=True,
+            test_subscription=False,
+            event_id=self.event.pk
         )
 
         queryset = queryset.filter(
