@@ -113,6 +113,9 @@ window.cgsy.installment.service = window.cgsy.installment.part || {};
             }
 
             var num_months = Math.floor(moment.duration(self.limit - self.current_date).asMonths());
+            if (num_months < 0) {
+                num_months = 0;
+            }
 
             // ============================== FIRST MONTH =====================
 

@@ -56,6 +56,7 @@ function getContractForm(subscription_pk, limit_date_str, base_day, amount, mini
         form_el,
         button_el
     );
+
     form_modal.setEl('expiration-day-field', expiration_day_field_el);
     form_modal.setEl('num-installments-field', num_parts_field_el);
     form_modal.setEl('part-table-list', parts_list_el);
