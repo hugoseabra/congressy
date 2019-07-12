@@ -45,15 +45,11 @@ def get_context(subscription, user):
         'now': datetime.now(),
         'by': user.person.name,
         'person': subscription.person,
-        'lot': subscription.lot,
+        'lot': subscription.ticket_lot,
         'organization': event.organization,
         'subscription': subscription,
-        'lots': calculator.lots,
-        'transactions': calculator.transactions,
-        'has_manual': calculator.has_manual,
-        'installments': calculator.installments,
-        'full_prices': calculator.full_prices,
         'object': subscription,
+        'financial_report': calculator,
         'contracts': Contract.objects.filter(
             subscription=subscription
         )

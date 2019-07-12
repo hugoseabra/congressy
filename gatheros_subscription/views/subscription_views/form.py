@@ -115,15 +115,11 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
 
         calculator = PaymentReportCalculator(subscription=self.get_object())
 
+        ctx['financial_report'] = calculator
+
         ctx['object'] = self.object
-        ctx['lots'] = calculator.lots
-        ctx['transactions'] = calculator.transactions
-        ctx['full_prices'] = calculator.full_prices
         ctx['installments'] = calculator.installments
-        ctx['has_manual'] = calculator.has_manual
         ctx['survey_answers'] = self.get_survey_answers()
-        ctx['total_paid'] = calculator.total_paid
-        ctx['dividend_amount'] = calculator.dividend_amount
         ctx['financial'] = self.financial
         ctx['last_transaction'] = self.last_transaction
         ctx['form'] = self.get_checkout_form()

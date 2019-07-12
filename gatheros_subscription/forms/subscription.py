@@ -84,9 +84,6 @@ class SubscriptionPersonForm(PersonForm):
         for field_name in required_fields:
             self.setAsRequired(field_name)
 
-    def save(self, commit=True):
-        return super().save(commit=commit)
-
 
 class SubscriptionForm(forms.ModelForm):
     """ Formulário de lote. """
@@ -97,7 +94,7 @@ class SubscriptionForm(forms.ModelForm):
         model = Subscription
         fields = (
             'origin',
-            'lot',
+            'ticket_lot',
             'person',
             'created_by',
             'tag_info',
@@ -109,19 +106,18 @@ class SubscriptionForm(forms.ModelForm):
         self.event = event
         super().__init__(**kwargs)
 
-    def clean_lot(self):
-        lot = self.cleaned_data.get('lot')
+    def clean_ticket_lot(self):
+        lot = self.cleaned_data.get('ticket_lot')
         if not lot:
             return lot
 
-        if self.instance and self.instance.lot_id \
-                and self.instance.lot_id == lot.pk:
+        if self.instance and self.instance.ticket_lot_id \
+                and self.instance.ticket_lot_id == lot.pk:
             return lot
 
-        num_subs = lot.subscriptions.filter(
-            test_subscription=False,
-            completed=True,
-        ).exclude(status=Subscription.CANCELED_STATUS).count()
+        num_subs = lot.subscriptions.all_completed().exclude(
+            status=Subscription.CANCELED_STATUS
+        ).count()
 
         origin = self.cleaned_data.get('origin')
 
@@ -139,7 +135,10 @@ class SubscriptionForm(forms.ModelForm):
         if not self.instance or not self.instance.pk:
             person = cleaned_data.get('person')
 
-            qs = Subscription.objects.filter(person=person, event=self.event)
+            qs = Subscription.objects.filter(
+                person_id=person.pk,
+                event_id=self.event.pk,
+            )
             if qs.exists():
                 cleaned_data.pop('person')
                 self.add_error(

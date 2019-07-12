@@ -5,10 +5,8 @@ from django.urls import reverse
 
 from core.forms.cleaners import clear_string
 from gatheros_subscription.directors import SubscriptionSurveyDirector
-from gatheros_subscription.models import (
-    Lot,
-)
 from gatheros_subscription.views import SubscriptionFormMixin
+from ticket.models import Lot
 
 
 class SubscriptionEditFormView(SubscriptionFormMixin):
@@ -37,33 +35,35 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
 
         context = super().get_context_data(**kwargs)
 
-        context['stopped_lots'] = [
-            lot
-            for lot in self.get_lots()
-            if lot.status == lot.LOT_STATUS_FINISHED
-        ]
-        context['running_lots'] = [
-            lot
-            for lot in self.get_lots()
-            if lot.status == lot.LOT_STATUS_RUNNING
-        ]
-        context['future_lots'] = [
-            lot
-            for lot in self.get_lots()
-            if lot.status == lot.LOT_STATUS_NOT_STARTED
-        ]
+        tickets = dict()
+        for lot in self.get_lots():
+            if lot.ticket_id not in tickets:
+                tickets[lot.ticket_id] = {
+                    'name': lot.name,
+                    'lots': list()
+                }
 
-        if context['selected_lot'] != 0:
+            tickets[lot.ticket_id]['lots'].append(lot)
+
+        context['tickets'] = tickets
+        if context['selected_lot']:
             try:
 
                 lot_pk = context['selected_lot']
 
-                lot = Lot.objects.get(pk=lot_pk)
-                if lot.event_survey:
+                lot = Lot.objects.get(
+                    ticket__event_id=self.event.pk,
+                    pk=lot_pk
+                )
+
+                ticket = lot.ticket
+                context['selected_ticket_name'] = ticket.name
+
+                if ticket.event_survey_id:
                     if survey_form:
                         context['survey_form'] = survey_form
                     else:
-                        survey = lot.event_survey.survey
+                        survey = ticket.event_survey.survey
                         context['survey_form'] = self.get_survey_form(
                             survey,
                             subscription=self.subscription
@@ -100,7 +100,7 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
 
             lot_pk = self.request.POST.get('subscription-lot')
             if not lot_pk:
-                lot_pk = self.subscription.lot.pk
+                lot_pk = self.subscription.ticket_lot_id
 
             with atomic():
                 self.object = form.save()
@@ -110,15 +110,16 @@ class SubscriptionEditFormView(SubscriptionFormMixin):
                 )
                 if not subscription_form.is_valid():
 
-                    for name, error in subscription_form.errors.items():
-                        form.add_error(field=None, error=error[0])
+                    for name, errors in subscription_form.errors.items():
+                        for error in errors:
+                            form.add_error(field=name, error=error)
 
                     return self.form_invalid(form)
 
                 self.subscription = subscription_form.save()
-                if self.subscription.lot.event_survey:
+                if self.subscription.ticket.event_survey:
 
-                    survey = self.subscription.lot.event_survey.survey
+                    survey = self.subscription.ticket.event_survey.survey
 
                     survey_form = self.get_survey_form(
                         survey=survey,

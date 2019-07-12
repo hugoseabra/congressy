@@ -14,11 +14,12 @@ from core.util import represents_int
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.views.mixins import EventViewMixin
 from gatheros_subscription.forms import EventSurveyForm
-from gatheros_subscription.models import EventSurvey, Lot
+from gatheros_subscription.models import EventSurvey
 from survey.api import SurveySerializer
 from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST, COMPLEX_TYPES
 from survey.forms import QuestionForm, SurveyAnswerForm
 from survey.models import Question
+from ticket.models import Lot
 from .mixins import SurveyFeatureFlagMixin
 
 

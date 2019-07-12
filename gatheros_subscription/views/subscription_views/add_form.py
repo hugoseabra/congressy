@@ -5,11 +5,9 @@ from django.urls import reverse
 
 from core.forms.cleaners import clear_string
 from gatheros_subscription.directors import SubscriptionSurveyDirector
-from gatheros_subscription.models import (
-    Lot,
-)
 from gatheros_subscription.views import SubscriptionFormMixin
 from survey.models import Survey
+from ticket.models import Lot
 
 
 class SubscriptionAddFormView(SubscriptionFormMixin):
@@ -40,17 +38,10 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
         survey_form = kwargs.pop('survey_form', None)
 
-        future_status = Lot.LOT_STATUS_NOT_STARTED
-        finished_status = Lot.LOT_STATUS_FINISHED
-        running_status = Lot.LOT_STATUS_RUNNING
-
         context = super().get_context_data(**kwargs)
-        context['running_lots'] = \
-            self._get_lots_with_status(running_status)
-        context['stopped_lots'] = \
-            self._get_lots_with_status(finished_status)
-        context['future_lots'] = \
-            self._get_lots_with_status(future_status)
+        context['running_lots'] = self._get_running_lots()
+        context['stopped_lots'] = self._get_finished_lots()
+        context['future_lots'] = self._get_not_started_lots()
 
         if context['selected_lot'] != 0:
             try:
@@ -103,7 +94,7 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
         lot_pk = self.request.POST.get('subscription-lot')
         if not lot_pk:
-            lot_pk = self.subscription.lot.pk
+            lot_pk = self.subscription.ticket_lot.pk
 
         with atomic():
             self.object = form.save()
@@ -126,12 +117,12 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
                 self.subscription = subscription_form.save()
 
-                if self.subscription.lot.event_survey:
+                if self.subscription.ticket_lot.event_survey:
 
-                    survey = self.subscription.lot.event_survey.survey
+                    survey = self.subscription.ticket_lot.event_survey.survey
 
                     survey_form = self.get_survey_form(
-                        survey=survey,
+                        survey_id=survey.pk,
                         data=self.request.POST,
                         files=self.request.FILES,
                         subscription=self.subscription,
@@ -174,7 +165,7 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
             lot_pk = self.request.GET.get('lot', 0)
             if not lot_pk and self.subscription:
-                lot_pk = self.subscription.lot.pk
+                lot_pk = self.subscription.ticket_lot.pk
 
             if lot_pk != 0:
                 lot = Lot.objects.get(pk=lot_pk)
@@ -195,11 +186,11 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
         return survey_form
 
-    def _get_lots_with_status(self, status):
-        lot_list = list()
+    def _get_not_started_lots(self):
+        return [lot for lot in self.get_lots() if lot.not_started]
 
-        for lot in self.get_lots().filter():
-            if lot.status == status:
-                lot_list.append(lot)
+    def _get_running_lots(self):
+        return [lot for lot in self.get_lots() if lot.running]
 
-        return lot_list
+    def _get_finished_lots(self):
+        return [lot for lot in self.get_lots() if lot.finished]

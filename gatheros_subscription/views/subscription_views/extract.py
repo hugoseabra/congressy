@@ -38,4 +38,4 @@ class ExtractSubscriptionPDFView(AccountMixin):
         return response
 
     def can_access(self):
-        return self.subscription.lot.price > 0
+        return self.subscription.ticket_lot.price > 0

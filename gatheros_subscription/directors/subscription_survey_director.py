@@ -69,14 +69,15 @@ class SubscriptionSurveyDirector(object):
         :return SurveyAnswerForm: um objeto de SurveyAnswerForm
         """
 
-        user = None
-        if self.subscription.person.user:
-            user = self.subscription.person.user
+        user_pk = None
+        person = self.subscription
+        if person.user_id:
+            user_pk = person.user_id
 
         self.subscription.author, _ = Author.objects.get_or_create(
-            name=self.subscription.person.name,
+            name=person.name,
             survey_id=survey.pk,
-            user_id=user.pk,
+            user_id=user_pk ,
         )
         self.subscription.save()
 
@@ -115,16 +116,16 @@ class SubscriptionSurveyDirector(object):
 
         if any(answers):
             return SurveyAnswerForm(
-                survey_id=survey.pk,
+                survey=survey,
                 initial=answers,
                 data=data,
-                author_id=author.pk,
+                author=author,
             )
 
         return SurveyAnswerForm(
-            survey_id=survey.pk,
+            survey=survey,
             data=data,
-            author_id=author.pk,
+            author=author,
         )
 
     def get_active_form(self, survey: Survey, data=None, files=None,
@@ -224,17 +225,17 @@ class SubscriptionSurveyDirector(object):
 
         if any(answers):
             return ActiveSurveyAnswerForm(
-                survey_id=survey.pk,
+                survey=survey,
                 initial=answers,
                 data=data,
-                author_id=author.pk,
+                author=author,
                 files=files,
             )
 
         return ActiveSurveyAnswerForm(
-            survey_id=survey.pk,
+            survey=survey,
             data=data,
-            author_id=author.pk,
+            author=author,
             files=files,
         )
 
@@ -259,7 +260,7 @@ class SubscriptionSurveyDirector(object):
         # SurveyAnswerForm vazio
         if self.subscription is None or self.subscription.author is None:
             return SurveyBaseForm(
-                survey_id=survey.pk,
+                survey=survey,
                 data=data,
                 files=files,
             )
@@ -309,16 +310,16 @@ class SubscriptionSurveyDirector(object):
 
         if any(answers):
             return SurveyBaseForm(
-                survey_id=survey.pk,
+                survey=survey,
                 initial=answers,
                 data=data,
-                author_id=author.pk,
+                author=author,
                 files=files,
             )
 
         return SurveyBaseForm(
-            survey_id=survey.pk,
+            survey=survey,
             data=data,
-            author_id=author.pk,
+            author=author,
             files=files,
         )

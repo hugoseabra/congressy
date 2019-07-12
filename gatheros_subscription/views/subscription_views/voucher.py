@@ -3,13 +3,18 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
 from gatheros_event.views.mixins import AccountMixin
-from gatheros_subscription.helpers.voucher import create_voucher, get_voucher_file_name
+from gatheros_subscription.helpers.voucher import create_voucher, \
+    get_voucher_file_name
 from gatheros_subscription.models import (
     Subscription,
 )
 
 
 class VoucherSubscriptionPDFView(AccountMixin):
+
+    def __init__(self, *args, **kwargs):
+        self.subscription = None
+        super().__init__(*args, **kwargs)
 
     def pre_dispatch(self, request):
         uuid = self.kwargs.get('pk')

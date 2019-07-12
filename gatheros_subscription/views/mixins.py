@@ -15,7 +15,8 @@ from gatheros_subscription.forms import (
     SubscriptionPersonForm,
     SubscriptionForm,
 )
-from gatheros_subscription.models import FormConfig, Lot, Subscription
+from gatheros_subscription.models import FormConfig, Subscription
+from ticket.models import Lot
 
 
 class FeatureFlagMixinBaseMixin(AccountMixin, generic.View,
@@ -131,9 +132,9 @@ class SubscriptionViewMixin(TemplateNameableMixin,
         return self.event.subscription_type == Event.SUBSCRIPTION_BY_LOTS
 
     def get_lots(self):
-        return self.get_event().lots.filter(
-            internal=False,
-        ).order_by('name', 'date_end')
+        return Lot.objects.filter(
+            ticket__event_id=self.get_event().pk,
+        ).order_by('date_start', 'date_end', 'ticket__name')
 
     def get_num_lots(self):
         """ Recupera número de lotes a serem usados nas inscrições. """
@@ -144,7 +145,7 @@ class SubscriptionViewMixin(TemplateNameableMixin,
         if not self.event:
             return False
 
-        return self.event.organization == self.organization
+        return self.event.organization_id == self.organization.pk
 
 
 class SubscriptionFormMixin(SubscriptionViewMixin, generic.FormView):
@@ -213,11 +214,14 @@ class SubscriptionFormMixin(SubscriptionViewMixin, generic.FormView):
         lot_pk = self.request.GET.get('lot', 0)
 
         if not lot_pk and self.subscription:
-            form.check_requirements(lot=self.subscription.lot)
+            form.check_requirements(lot=self.subscription.ticket_lot)
 
         else:
             try:
-                lot = self.event.lots.get(pk=int(lot_pk) if lot_pk else 0)
+                lot = Lot.objects.get(
+                    ticket__event_id=self.event.pk,
+                    pk=int(lot_pk) if lot_pk else 0
+                )
                 form.check_requirements(lot=lot)
 
             except Lot.DoesNotExist:
@@ -228,7 +232,7 @@ class SubscriptionFormMixin(SubscriptionViewMixin, generic.FormView):
     def get_subscription_form(self, person, lot_pk):
         data = {
             'person': person.pk,
-            'lot': lot_pk,
+            'ticket_lot': lot_pk,
             'created_by': self.request.user.pk,
         }
 
@@ -272,16 +276,16 @@ class SubscriptionFormMixin(SubscriptionViewMixin, generic.FormView):
         context['lots'] = [
             lot
             for lot in self.get_lots()
-            if lot.status == lot.LOT_STATUS_RUNNING
-               or (self.subscription and self.subscription.lot == lot)
+            if lot.running or (
+                        self.subscription and self.subscription.ticket_lot_id == lot.pk)
         ]
 
         context['subscription'] = self.subscription
+        context['selected_ticket_name'] = None
 
         lot_pk = self.request.GET.get('lot', 0)
         if not lot_pk and self.subscription:
-            context['selected_lot'] = self.subscription.lot.pk
-
+            context['selected_lot'] = self.subscription.ticket_lot_id
         else:
             context['selected_lot'] = int(lot_pk) if lot_pk else 0
 

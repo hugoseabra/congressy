@@ -58,7 +58,7 @@ def get_context(subscription):
         'event': event,
         'place': place,
         'person': subscription.person,
-        'lot': subscription.lot,
+        'lot': subscription.ticket_lot,
         'organization': event.organization,
         'subscription': subscription,
     }

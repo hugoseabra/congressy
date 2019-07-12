@@ -2,7 +2,6 @@
 from django import forms
 
 from gatheros_subscription.models import EventSurvey
-from survey.directors import SurveyDirector
 from survey.services import SurveyService
 
 

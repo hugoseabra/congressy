@@ -25,6 +25,7 @@ from gatheros_subscription.serializers import (
     LotSerializer,
     SubscriptionSerializer,
 )
+from gatheros_subscription.tasks import async_subscription_exporter_task
 from .permissions import OrganizerOnly
 
 
@@ -219,15 +220,11 @@ class SubscriptionExporterViewSet(RestrictionViewMixin, APIView):
         if exporter.has_export_lock():
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        exporter.create_export_lock()
-
         lock = True
         lock_count = 0
 
         while lock:
             sleep(2)
-
-            exporter = SubscriptionServiceAsyncExporter(event)
 
             if exporter.has_export_lock():
                 async_subscription_exporter_task.delay(event_pk=event.pk)
