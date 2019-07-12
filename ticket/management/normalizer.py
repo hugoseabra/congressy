@@ -42,12 +42,13 @@ class Normalizer(Base):
                 ticket_lot = self.lot_map[subscription.event_id]
             else:
 
-                msg = "Nenhum ticket encontrado para inscrição {} com lot_id " \
-                      "{} e event_id {}\n".format(
-                    str(subscription.pk),
-                    subscription.lot.id,
-                    subscription.event.id,
-                )
+                msg = \
+                    "Nenhum ticket encontrado para inscrição {} com lot_id" \
+                    " {} e event_id {}\n".format(
+                        str(subscription.pk),
+                        subscription.lot.id,
+                        subscription.event.id,
+                    )
 
                 self.stderr.write(self.style.ERROR(msg))
 
@@ -62,7 +63,7 @@ class Normalizer(Base):
 
         self.stdout.write(
             self.style.SUCCESS(
-                'Normalização das inscrições: OK'
+                '  - Normalização das inscrições: OK'
             )
         )
 
@@ -110,7 +111,7 @@ class Normalizer(Base):
 
         self.stdout.write(
             self.style.SUCCESS(
-                'Normalização das transações: OK'
+                '  - Normalização das transações: OK'
             )
         )
 
@@ -138,7 +139,7 @@ class Normalizer(Base):
 
         self.stdout.write(
             self.style.SUCCESS(
-                'Normalização dos formulários personalizados: OK'
+                '  - Normalização dos formulários personalizados: OK'
             )
         )
 
@@ -170,7 +171,7 @@ class Normalizer(Base):
 
         self.stdout.write(
             self.style.SUCCESS(
-                'Normalização dos addons: OK'
+                '  - Normalização dos addons: OK'
             )
         )
 

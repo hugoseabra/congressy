@@ -81,7 +81,7 @@ class LotMapper:
                         name=lot.category.name + " - #{}".format(count),
                         event=self.event,
                         active=lot.category.active,
-                        paid=lot.price and lot.price > 0,
+                        private=lot.private is True,
                     )
 
                     count += 1
@@ -97,7 +97,7 @@ class LotMapper:
                     ticket, _ = Ticket.objects.get_or_create(
                         event=self.event,
                         name='Geral - #{}'.format(count),
-                        paid=lot.price and lot.price > 0,
+                        private=lot.private is True,
                     )
 
                     count += 1
@@ -147,6 +147,7 @@ class LotMapper:
                     name=ticket_name,
                     active=lot.category.active,
                     limit=lot.limit,
+                    private=lot.private is True,
                     free_installments=lot.num_install_interest_absortion,
                 )
 
@@ -162,8 +163,9 @@ class LotMapper:
                 ticket, _ = Ticket.objects.get_or_create(
                     event=self.event,
                     name=ticket_name,
-                    active=lot.active,
+                    active=lot.activeX,
                     limit=lot.limit,
+                    private=lot.private is True,
                     free_installments=lot.num_install_interest_absortion,
                 )
 

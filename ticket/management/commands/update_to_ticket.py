@@ -60,16 +60,21 @@ class Command(BaseCommand):
         with atomic():
 
             if event:
-                self.update_future(Event.objects.filter(pk=event),
-                                   no_write=no_write)
+                self.update_future(
+                    Event.objects.filter(pk=event),
+                    no_write=no_write,
+                )
+
             elif future:
 
                 self.update_future(future_events, no_write=no_write)
 
             else:
-                self.update_past_and_present(past_events=past_events,
-                                             present_events=live_events,
-                                             no_write=no_write, )
+                self.update_past_and_present(
+                    past_events=past_events,
+                    present_events=live_events,
+                    no_write=no_write,
+                )
 
                 self.update_future(future_events, no_write=no_write)
 
@@ -78,63 +83,66 @@ class Command(BaseCommand):
 
     def update_past_and_present(self, past_events, present_events, **kwargs):
 
-        past_event_orgs = dict()
+        past_ev_orgs = dict()
         present_event_orgs = dict()
 
-        print('==========================================================')
-        print('PAST EVENTS')
-        print('==========================================================')
+        if past_events:
+            print('==========================================================')
+            print('PAST EVENTS')
+            print('==========================================================')
 
-        for event in past_events:
-            lot_map = LotMapper(event, old_map=True).create_map()
+            for event in past_events:
+                lot_map = LotMapper(event, old_map=True).create_map()
 
-            normalizer = Normalizer(event, lot_map)
-            normalizer.normalize()
+                normalizer = Normalizer(event, lot_map)
+                normalizer.normalize()
 
-            if event.organization.name not in past_event_orgs:
-                past_event_orgs[event.organization.name] = {
-                    'organization': event.organization,
-                    'events': list()
-                }
+                if event.organization.name not in past_ev_orgs:
+                    past_ev_orgs[event.organization.name] = {
+                        'organization': event.organization,
+                        'events': list()
+                    }
 
-            for lot in Lot.objects.filter(ticket__event=event):
-                lot.update_lot_num_subs()
+                for lot in Lot.objects.filter(ticket__event=event):
+                    lot.update_lot_num_subs()
 
-            for ticket in Ticket.objects.filter(event=event):
-                ticket.update_audience_category_num_subs()
+                for ticket in Ticket.objects.filter(event=event):
+                    ticket.update_audience_category_num_subs()
 
-            past_event_orgs[event.organization.name]['events'].append(event)
+                past_ev_orgs[event.organization.name]['events'].append(event)
 
-            print('----------------------------------------------------------')
+                print('------------------------------------------------------')
 
-        if kwargs['no_write'] is False:
-            self.logger.write_to_file('eventos_passados.txt', past_event_orgs)
+            if kwargs['no_write'] is False:
+                self.logger.write_to_file('eventos_passados.txt', past_ev_orgs)
 
-        print('==========================================================')
-        print('CURRENT EVENTS')
-        print('==========================================================')
+        if present_events:
+            print('==========================================================')
+            print('CURRENT EVENTS')
+            print('==========================================================')
 
-        for event in present_events:
-            lot_map = LotMapper(event, old_map=True).create_map()
-            normalizer = Normalizer(event, lot_map)
-            normalizer.normalize()
+            for event in present_events:
 
-            if event.organization.name not in present_event_orgs:
-                present_event_orgs[event.organization.name] = {
-                    'organization': event.organization,
-                    'events': list()
-                }
+                lot_map = LotMapper(event, old_map=True).create_map()
+                normalizer = Normalizer(event, lot_map)
+                normalizer.normalize()
 
-            present_event_orgs[event.organization.name]['events'] \
-                .append(event)
+                if event.organization.name not in present_event_orgs:
+                    present_event_orgs[event.organization.name] = {
+                        'organization': event.organization,
+                        'events': list()
+                    }
 
-            for lot in Lot.objects.filter(ticket__event=event):
-                lot.update_lot_num_subs()
+                present_event_orgs[event.organization.name]['events'] \
+                    .append(event)
 
-            for ticket in Ticket.objects.filter(event=event):
-                ticket.update_audience_category_num_subs()
+                for lot in Lot.objects.filter(ticket__event=event):
+                    lot.update_lot_num_subs()
 
-            print('----------------------------------------------------------')
+                for ticket in Ticket.objects.filter(event=event):
+                    ticket.update_audience_category_num_subs()
+
+                print('------------------------------------------------------')
 
         if kwargs['no_write'] is False:
             self.logger.write_to_file('eventos_em_andamento.txt',
