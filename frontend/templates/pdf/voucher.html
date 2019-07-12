@@ -71,20 +71,20 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-xs-{% if subscription.lot.price %}7{% else %}12{% endif %}">
+        <div class="col-xs-{% if subscription.ticket_lot.price %}7{% else %}12{% endif %}">
             <div style="width: 80%;margin:18px auto">
                 <div class="text-muted" style="font-weight: bold">Ingresso:</div>
                 <div style="font-size: 14px">
-                    <div>{{ subscription.lot.name }}</div>
+                    <div>{{ subscription.ticket_lot.name }}</div>
                 </div>
             </div>
         </div>
-        {% if subscription.lot.price %}
+        {% if subscription.ticket_lot.price %}
         <div class="col-xs-5">
             <div style="width: 80%;margin:18px auto">
                 <div class="text-muted" style="font-weight: bold">Valor pago (R$):</div>
                 <div style="font-size: 16px">
-                    <div style="color: blue;font-weight: bold">{{ subscription.lot.get_calculated_price }}</div>
+                    <div style="color: blue;font-weight: bold">{{ subscription.ticket_lot.get_subscriber_price }}</div>
                 </div>
             </div>
         </div>

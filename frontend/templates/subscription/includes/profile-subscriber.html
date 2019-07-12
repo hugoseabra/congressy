@@ -75,8 +75,8 @@
                                     style="cursor: default;overflow:hidden">
                                     <span class="title">Lote</span>
                                     <div data-toggle="tooltip"
-                                         title="{{ object.lot.name }}">
-                                        {{ object.lot.name|truncatechars:29 }}
+                                         title="{{ object.ticket_lot.name }}">
+                                        {{ object.ticket_lot.name|truncatechars:29 }}
                                     </div>
                                 </td>
                             </tr>
@@ -374,7 +374,7 @@
                                             {% else %}
                                                 <span class="title">Valor inscrição</span>
                                                 <strong class="text-danger">
-                                                    R$ {{ object.lot.get_calculated_price|intcomma }}
+                                                    R$ {{ object.ticket_lot.get_subscriber_price|intcomma }}
                                                 </strong>
                                             {% endif %}
                                         </div>
@@ -458,7 +458,7 @@
                                         {% else %}
                                             <span class="title">Valor inscrição</span>
                                             <strong class="text-danger">
-                                                R$ {{ object.lot.get_calculated_price|intcomma }}
+                                                R$ {{ object.ticket_lot.get_subscriber_price|intcomma }}
                                             </strong>
                                         {% endif %}
                                     </div>

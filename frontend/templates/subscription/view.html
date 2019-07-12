@@ -95,8 +95,8 @@
             var subscription = new window.cgsy.attendance.Subscription(
                 '{{ object.pk }}',
                 '{{ object.person.name }}',
-                '{{ object.lot.name }}',
-                '{{ object.lot.category.name }}',
+                '{{ object.ticket_lot.name }}',
+                '{{ object.ticket_lot.category.name }}',
                 '{{ object.person.email }}',
                 {{ object.event_count }},
                 '{{ object.code }}',
@@ -139,8 +139,8 @@
             var subscription = new window.cgsy.attendance.Subscription(
                 '{{ object.pk }}',
                 '{{ object.person.name }}',
-                '{{ object.lot.name }}',
-                '{{ object.lot.category.name }}',
+                '{{ object.ticket_lot.name }}',
+                '{{ object.ticket_lot.category.name }}',
                 '{{ object.person.email }}',
                 {{ object.event_count }},
                 '{{ object.code }}',
@@ -288,7 +288,7 @@
                 '{{ object.pk }}',
                 'Inscrição: {{ event.name }}',
                 1,
-                parseFloat('{{ object.lot.get_calculated_price|unlocalize }}')
+                parseFloat('{{ object.ticket_lot.get_subscriber_price|unlocalize }}')
             );
             {% if products %}
                 // Adiciona billing de opcionais de produtos/serviços

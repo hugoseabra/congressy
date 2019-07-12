@@ -1,7 +1,6 @@
 {% load static humanize l10n base_tags subscription_tags %}
 {% now "Y-m-d" as today %}
 {% is_subscription_free object as is_free %}
-{% filter_lookup full_prices object.lot_id as remaining_price %}
 
 <div class="row tooltip-wrapper">
     <div class="col-xl-11 col-lg-11 col-md-12">
@@ -16,13 +15,14 @@
                     Inscrições
                 </button>
             </div>
-            {% if object.lot.price > 0 %}
+            {% if object.ticket_lot.price > 0 %}
                 <div class="float-right">
                     <button onclick='window.open("{% url 'subscription:subscription-extract' event.pk object.pk %}", "_blank")'
                             class="btn btn-success btn-trans"
                             data-toggle="tooltip"
                             title="Extrato">
-                        <i class="fas fa-file-download"></i> Extrato Financeiro
+                        <i class="fas fa-file-download"></i>
+                    Extrato Financeiro
                     </button>
                 </div>
             {% endif %}
@@ -54,24 +54,25 @@
                         </div>
                         <div class="float-right">
                             {% if last_transaction %}
-                                {% if dividend_amount < 0 %}
+                                {% if financial_report.cash_amount > 0 %}
                                     <i class="fas fa-exclamation-triangle text-warning animated shake"
                                        style="margin-left:20px"
                                        data-toggle="tooltip"
                                        title="Participante com pendências."
                                     ></i>
-                                {% elif dividend_amount > 0 %}
+                                {% elif financial_report.cash_amount < 0 %}
                                     <i class="fas fa-exclamation-triangle text-warning animated shake"
                                        style="margin-left:20px"
                                        data-toggle="tooltip"
                                        title="Participante com valor em ver com o evento."
                                     ></i>
-                                {% elif dividend_amount == 0 %}
+                                {% elif financial_report.cash_amount == 0 %}
                                     <i class="fas fa-check text-success" style="margin-left:20px"
                                        data-toggle="tooltip"
                                        title="Participante sem pendências."
                                     ></i>
                                 {% endif %}
+
                             {% elif is_free is False %}
                                 <i class="fas fa-exclamation-triangle text-warning animated shake"
                                    style="margin-left:20px"
@@ -112,7 +113,6 @@
                                                        style="color: #d9534f"></i>
                                                 {% endif %}
                                                 {{ object.get_status_display|title }}
-                                                {# Confirmado <small class="text-muted"> - 27/05/2018 17h03</small>#}
                                             </div>
                                             {% if object.status == object.CONFIRMED_STATUS %}
                                                 <div class="float-right"
@@ -139,9 +139,9 @@
                                 <tr class="unread">
                                     <td class="message" style="border-top:0">
                                         <div class="float-left">
-                                            <span class="title">Valor inscrição</span>
+                                            <span class="title">Valor a pagar</span>
                                             <strong class="text-info">
-                                                R$ {{ object.lot.get_calculated_price|intcomma }}
+                                                R$ {{ financial_report.total_debts|intcomma }}
                                             </strong>
                                         </div>
                                         <div class="clearfix"></div>
@@ -150,7 +150,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        {% if total_paid > 0 %}
+                        {% if financial_report.paid_amounts %}
                             <div class="col-sm-4 col-md-3" style="border-right:1px solid #CCC">
                                 <table class="table table-inbox table-hover" style="margin-bottom:0">
                                     <tbody>
@@ -159,7 +159,7 @@
                                             <div class="float-left">
                                                 <span class="title">Valor pago</span>
                                                 <strong class="text-success">
-                                                    R$ {{ total_paid|intcomma }} (pago)
+                                                    R$ {{ financial_report.total_paid|intcomma }}
                                                 </strong>
                                             </div>
                                             <div class="clearfix"></div>
@@ -374,7 +374,7 @@
                                         Ver Painel Participante
                                     </button>
                                 </li>
-                                {% if not object.confirmed and not OFFLINE_SERVER %}
+                                {% if object.awaiting and not OFFLINE_SERVER %}
                                 <li>
                                     <button type="button"
                                             class="btn btn-success btn-trans"
@@ -397,15 +397,14 @@
                                             Receber pagamento
                                         </button>
                                     </li>
-
-                                    {% if has_open_installment_contract is False and remaining_price and remaining_price < 0 %}
+                                    {% if has_open_installment_contract is False and financial_report.cash_amount < 0 %}
                                         <li>
                                             <button type="button"
                                                     class="btn btn-success btn-trans"
                                                     style="display: none;"
                                                     title="Criar novo contrato de parcelamento"
                                                     id="new-contract-btn"
-                                                    onclick="getContractForm('{{ object.pk }}', '{{ installment_limit_date }}', parseInt({{ base_expiration_day }}), parseFloat('{{ remaining_price|unlocalize }}'), parseFloat('{{ minimum_amount }}'))">
+                                                    onclick="getContractForm('{{ object.pk }}', '{{ installment_limit_date }}', parseInt({{ base_expiration_day }}), parseFloat('{{ financial_report.amount_to_pay|unlocalize }}'), parseFloat('{{ minimum_amount }}'))">
                                                 <span class="fas fa-file-contract"></span>
                                                 Novo parcelamento
                                             </button>
@@ -451,8 +450,6 @@
 </div>
 
 <!-- SCRIPT Payment -->
-<!-- SCRIPT PAGAR.ME -->
-<script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
 <script src="{% static "assets/js/internal-payment.js" %}"></script>
 <script type="application/javascript">
 
@@ -460,35 +457,28 @@
 
     var processPayment = function () {
 
-
         payment_obj = new window.cgsy.payment.Payment();
 
-        {% if subscription.lot.allow_installment is False %}
-            // disable installment
-            payment_obj.disable_installment();
-        {% endif %}
-
-
         payment_obj.set_interest_rate(2.29);
-        payment_obj.set_max_installments('{{ subscription.lot.installment_limit }}');
-        payment_obj.set_free_rate_installments('{{ subscription.lot.num_install_interest_absortion }}');
+        payment_obj.set_max_installments(10);
+        payment_obj.set_free_rate_installments('{{ subscription.ticket.free_installments }}');
 
 
-        {% if subscription.lot.get_calculated_price %}
+        {% if subscription.ticket_lot.price %}
             // Adiciona billing de inscrição
             payment_obj.add_item(
                 'subscription',
                 '{{ subscription.pk }}',
-                'Inscrição: {{ subscription.lot.event.name }}',
+                'Inscrição: {{ subscription.event.name }}',
                 1,
-                parseFloat('{{ subscription.lot.get_calculated_price|unlocalize }}')
+                parseFloat('{{ subscription.ticket_lot.get_subscriber_price|unlocalize }}')
             );
         {% endif %}
 
         {% if products %}
             // Adiciona billing de opcionais de produtos/serviços
             {% for product in products %}
-                {% if product.optional_price %}
+                {% if product.optional.price %}
                     payment_obj.add_item(
                         'optional-product',
                         '{{ subscription.pk }}',
@@ -503,7 +493,7 @@
         {% if services %}
             // Adiciona billing de opcionais de atividades extras
             {% for service in services %}
-                {% if service.optional_price %}
+                {% if service.optional.price %}
                     payment_obj.add_item(
                         'optional-service',
                         '{{ subscription.pk }}',
@@ -516,7 +506,6 @@
         {% endif %}
 
         window.cgsy.pagarme.process_payment('{{ encryption_key }}', payment_obj);
-
 
     };
 </script>

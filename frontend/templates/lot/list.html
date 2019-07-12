@@ -167,7 +167,7 @@
                                 </td>
                                 <td>
                                     {% if lot.price and lot.price > 0 %}
-                                        R$ {{ lot.get_calculated_price }}
+                                        R$ {{ lot.get_subscriber_price }}
                                     {% else %}
                                         ----
                                     {% endif %}
