@@ -57,7 +57,7 @@
                                 </div>
                                 <ul>
                                     {% if lot.price %}
-                                        <strong>R$ {{ lot.get_calculated_price|intcomma }}</strong>
+                                        <strong>R$ {{ lot.get_subscriber_price|intcomma }}</strong>
                                     {% endif %}
                                 </ul>
                                 {% if products %}
@@ -209,14 +209,14 @@
                 payment_obj.set_max_installments('{{ lot.installment_limit }}');
                 payment_obj.set_free_rate_installments('{{ lot.num_install_interest_absortion }}');
 
-                {% if lot.get_calculated_price %}
+                {% if lot.get_subscriber_price %}
                 // Adiciona billing de inscrição
                 payment_obj.add_item(
                     'subscription',
                     '{{ subscription.pk }}',
                     'Inscrição: {{ lot.event.name }}',
                     1,
-                    parseFloat('{{ lot.get_calculated_price|unlocalize }}')
+                    parseFloat('{{ lot.get_subscriber_price|unlocalize }}')
                 );
                 {% endif %}
 

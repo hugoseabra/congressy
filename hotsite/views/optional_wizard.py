@@ -145,19 +145,19 @@ def _has_products(lot):
 
 
 def has_products(wizard):
-    lot = wizard.subscription.lot
+    lot = wizard.subscription.ticket_lot
 
     return _has_products(lot)
 
 
 def has_services(wizard):
-    lot = wizard.subscription.lot
+    lot = wizard.subscription.ticket_lot
 
     return _has_services(lot)
 
 
 def has_paid_products(wizard):
-    lot = wizard.subscription.lot
+    lot = wizard.subscription.ticket_lot
 
     try:
         optionals = lot.category.product_optionals
@@ -173,7 +173,7 @@ def has_paid_products(wizard):
 
 
 def has_paid_services(wizard):
-    lot = wizard.subscription.lot
+    lot = wizard.subscription.ticket_lot
 
     try:
         optionals = lot.category.service_optionals
@@ -228,7 +228,7 @@ class OptionalWizardView(SessionWizardView, SelectLotMixin):
         if not self.current_event.subscription_enabled():
             return redirect('public:hotsite', slug=self.event.slug)
 
-        lot = self.current_subscription.lot
+        lot = self.current_subscription.ticket_lot
 
         if not _has_services(lot) and not _has_products(lot):
             messages.warning(
@@ -468,7 +468,7 @@ class OptionalWizardView(SessionWizardView, SelectLotMixin):
         person = self.subscription.person
         context['person'] = person
 
-        lot = self.subscription.lot
+        lot = self.subscription.ticket_lot
         context['selected_lot'] = lot
 
         opened_boletos = self.get_open_boleto()
@@ -509,7 +509,8 @@ class OptionalWizardView(SessionWizardView, SelectLotMixin):
             subscription = self.subscription
             context['subscription'] = subscription
 
-            total = subscription.lot.get_calculated_price() or Decimal(0.00)
+            total = \
+                subscription.ticket_lot.get_subscriber_price() or Decimal(0.00)
 
             products = [x for x in subscription.subscription_products.all()]
             context['products'] = products
@@ -533,7 +534,7 @@ class OptionalWizardView(SessionWizardView, SelectLotMixin):
     def done(self, form_list, **kwargs):
 
         subscription = self.subscription
-        subscription.lot = self.get_lot()
+        subscription.ticket_lot = self.get_lot()
 
         with atomic():
             try:
@@ -602,14 +603,14 @@ class OptionalWizardView(SessionWizardView, SelectLotMixin):
 
                 else:
                     has_transactions = transactions_qs.exclude(
-                        subscription__lot=subscription.lot
+                        subscription__ticket_lot_id=subscription.ticket_lot_id
                     ).count() > 0
 
                     if has_transactions is True:
                         paid_transaction = transactions_qs.filter(
                             status=Transaction.PAID
                         ).exclude(
-                            subscription__lot=subscription.lot
+                            subscription__ticket_lot_id=subscription.ticket_lot_id
                         ).count() > 0
 
                         if paid_transaction is True:

@@ -138,7 +138,7 @@
 
         {% for lot in paid_lots %}
             {% if lot.price and lot.price > 0 %}
-                amounts[['{{ lot.pk }}']] = '{{ lot.get_calculated_price|unlocalize|intcomma }}';
+                amounts[['{{ lot.pk }}']] = '{{ lot.get_subscriber_price|unlocalize|intcomma }}';
                 lots['{{ lot.pk }}'] = {
                     'allow_installment': {% if lot.allow_installment %}
                         true{% else %}false{% endif %},
@@ -149,7 +149,7 @@
         {% endfor %}
         {% for lot in private_lots %}
             {% if lot.price and lot.price > 0 %}
-                amounts[['{{ lot.pk }}']] = '{{ lot.get_calculated_price|unlocalize|intcomma }}';
+                amounts[['{{ lot.pk }}']] = '{{ lot.get_subscriber_price|unlocalize|intcomma }}';
                 lots['{{ lot.pk }}'] = {
                     'allow_installment': {% if lot.allow_installment %}
                         true{% else %}false{% endif %},

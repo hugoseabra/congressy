@@ -138,7 +138,7 @@ class SubscriptionMixin(EventMixin):
 
         person = self.current_subscription.person
         sub = self.current_subscription.subscription
-        sub_lot = self.current_subscription.lot
+        sub_lot = self.current_subscription.ticket_lot
 
         context['person'] = person
 
@@ -204,7 +204,7 @@ class SelectLotMixin(SubscriptionFormMixin):
         else:
             # se não há PK de lote, vamos verificar se usuário já possui
             # inscrição
-            sub_lot = self.current_subscription.lot
+            sub_lot = self.current_subscription.ticket_lot
 
             if sub_lot:
                 self.selected_lot = sub_lot

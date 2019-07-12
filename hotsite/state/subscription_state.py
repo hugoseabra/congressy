@@ -15,12 +15,12 @@ class CurrentSubscriptionState(object):
 
         # As vezes a inscrição não possui lote por estar em processo de
         # finalização de inscrição.
-        self.lot = subscription.lot
+        self.lot = subscription.ticket_lot
 
     def _get_transactions(self):
 
         all_transactions = self.subscription.transactions.filter(
-            lot=self.subscription.lot
+            ticket_lot_id=self.subscription.ticket_lot.pk
         )
 
         now = datetime.now().date()

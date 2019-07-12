@@ -6,7 +6,8 @@ from datetime import datetime
 
 from django import forms
 
-from gatheros_subscription.models import Lot, Subscription
+from gatheros_subscription.models import Subscription
+from ticket.models import Lot
 
 
 class SubscriptionForm(forms.Form):
@@ -36,19 +37,19 @@ class SubscriptionForm(forms.Form):
 
         try:
             self.subscription = Subscription.objects.get(
-                person=person,
-                event=event
+                person_id=person.pk,
+                event_id=event.pk,
             )
 
         except Subscription.DoesNotExist:
             self.subscription = Subscription(
-                person=person,
-                event=event,
+                person_id=person.pk,
+                event_id=event.pk,
                 created_by=person.user.pk,
                 origin=Subscription.DEVICE_ORIGIN_HOTSITE,
             )
 
-        if self.subscription.lot_id == lot_pk:
+        if self.subscription.ticket_lot_id == lot_pk:
             # Lote não mudou
             return cleaned_data
 
@@ -71,7 +72,7 @@ class SubscriptionForm(forms.Form):
             raise forms.ValidationError('Lote está lotado e não permite novas '
                                         'inscrições')
 
-        self.subscription.lot = lot
+        self.subscription.ticket_lot = lot
 
         return cleaned_data
 

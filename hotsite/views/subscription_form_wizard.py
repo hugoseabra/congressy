@@ -588,7 +588,7 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
             # persistir lote selecionado para ser usado posteriormente.
             self.request.session['lot_pk'] = lot_pk
             self.subscription = self.current_subscription.subscription
-            self.subscription.lot = self.get_lot()
+            self.subscription.ticket_lot = self.get_lot()
 
             # Se nova inscrição, não há problemas em setar o lote por aqui.
             # Se inscrição preexistente, o lote não pode ser setado porque
@@ -780,7 +780,8 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
             subscription = self.subscription
             context['subscription'] = subscription
 
-            total = subscription.lot.get_calculated_price() or Decimal(0.00)
+            total = \
+                subscription.ticket_lot.get_subscriber_price() or Decimal(0.00)
 
             products = [x for x in subscription.subscription_products.all()]
             context['products'] = products
@@ -807,7 +808,7 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
             del self.request.session['has_private_subscription']
 
         subscription = self.subscription
-        subscription.lot = self.get_lot()
+        subscription.ticket_lot = self.get_lot()
 
         with atomic():
             try:
@@ -876,14 +877,14 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
 
                 else:
                     has_transactions = transactions_qs.exclude(
-                        subscription__lot=subscription.lot
+                        subscription__ticket_lot_id=subscription.ticket_lot_id
                     ).count() > 0
 
                     if has_transactions is True:
                         paid_transaction = transactions_qs.filter(
                             status=Transaction.PAID
                         ).exclude(
-                            subscription__lot=subscription.lot
+                            subscription__ticket_lot_id=subscription.ticket_lot_id
                         ).count() > 0
 
                         if paid_transaction is True:

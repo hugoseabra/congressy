@@ -117,7 +117,7 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
         context['is_private_event'] = self.current_event.is_private_event()
         context['lot_is_still_valid'] = False
 
-        sub_lot = self.subscription.lot
+        sub_lot = self.subscription.ticket_lot
         lot_running = self.current_event.is_lot_running(sub_lot)
 
         if sub_lot.private is True and lot_running:
@@ -133,7 +133,7 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
         action = request.POST.get('action')
 
         if action == 'force-coupon':
-            lot = self.subscription.lot
+            lot = self.subscription.ticket_lot
 
             if lot.private is True:
                 self.request.session['has_private_subscription'] = \
