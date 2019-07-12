@@ -179,8 +179,8 @@ class EventDuplicationForm(forms.Form):
         choices=list(),
     )
 
-    duplicate_categories_lots = forms.BooleanField(
-        label='Duplicar Categorias / Lotes',
+    duplicate_tickets = forms.BooleanField(
+        label='Duplicar ingressos',
         required=False,
     )
 
@@ -218,7 +218,7 @@ class EventDuplicationForm(forms.Form):
             'organization': event.organization_id,
             'date_start': event.date_start,
             'date_end': event.date_end,
-            'duplicate_categories_lots': True,
+            'duplicate_tickets': True,
             'duplicate_surveys': True,
             'duplicate_certificate': True,
             'duplicate_attendance_services': True,
@@ -314,7 +314,7 @@ class EventDuplicationForm(forms.Form):
                 feat_addon_serv is True \
                 and c_data.get('duplicate_addon_services') is True
 
-            dup_cat_lots = c_data.get('duplicate_categories_lots') is True
+            dup_tickets = c_data.get('duplicate_tickets') is True
 
             # Buscando referência nova para evento
             event = Event.objects.get(pk=self.event.pk)
@@ -331,10 +331,9 @@ class EventDuplicationForm(forms.Form):
 
             event.save()
 
-            if dup_cat_lots is True:
+            if dup_tickets is True:
                 # Exclui categoria e lote criado por padrão.
-                event.lots.first().delete()
-                event.lot_categories.first().delete()
+                event.tickets.first().delete()
 
             # FEATURE CONFIGURATION
             feature_config2 = event.feature_configuration
@@ -399,27 +398,26 @@ class EventDuplicationForm(forms.Form):
 
             place.save()
 
-            cat_qs = self.event.lot_categories
+            ticket_qs = self.event.tickets
 
-            for cat in cat_qs.all():
+            for ticket in ticket_qs.all():
 
-                lots = cat.lots.all()
+                lots = ticket.lots.all()
 
                 if dup_addon_serv:
-                    services = cat.service_optionals.all()
+                    services = ticket.addon_services.all()
 
                 if dup_addon_prod:
-                    products = cat.product_optionals.all()
+                    products = ticket.addon_products.all()
 
-                if dup_cat_lots is True:
-                    cat.pk = None
-                    cat.event_id = event.pk
-                    cat.save()
+                if dup_tickets is True:
+                    ticket.pk = None
+                    ticket.event_id = event.pk
+                    ticket.save()
 
                     for lot in lots:
                         lot.pk = None
-                        lot.category_id = cat.pk
-                        lot.event_id = event.pk
+                        lot.ticket_id = ticket.pk
                         # Se for privado, renova o código
                         lot.exhibition_code = None
                         lot.save()

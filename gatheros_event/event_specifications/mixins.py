@@ -1,7 +1,8 @@
 from addon.models import Product, Service
 from core.specification import CompositeSpecification, AndSpecification
 from gatheros_event.models import Event, Organization
-from gatheros_subscription.models import Subscription, Lot
+from gatheros_subscription.models import Subscription
+from ticket.models import Lot
 
 
 class EventCompositeSpecificationMixin(CompositeSpecification):
