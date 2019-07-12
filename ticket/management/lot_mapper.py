@@ -34,14 +34,34 @@ class LotMapper:
             self.map_type = 'old_map'
 
         self.event = event
-
         self._transfer_tax()
 
     def create_map(self):
+        lot_map = None
+
         if self.map_type == 'new_map':
-            return self._create_new_map()
+            lot_map = self._create_new_map()
         elif self.map_type == 'old_map':
-            return self._create_old_map()
+            lot_map = self._create_old_map()
+
+        with open('lot_map.txt', 'a+') as f:
+            lot_map_content = ''
+
+            for lot_pk, new_lot in lot_map.items():
+                lot = self.event.lots.get(pk=lot_pk)
+
+                lot_map_content += 'event: {} -> '.format(
+                    new_lot.ticket.event_id,
+                )
+                lot_map_content += 'cat: {} -> '.format(lot.category_id)
+                lot_map_content += 'sub.lot: {} -> '.format(lot_pk)
+                lot_map_content += 'ticket_lot: {} -> '.format(new_lot.pk)
+                lot_map_content += 'ticket: {}\n'.format(new_lot.ticket_id)
+
+            lot_map_content += '\n'
+            f.write(lot_map_content)
+
+        return lot_map
 
     def _create_old_map(self):
         lots = self.event.lots.all()
@@ -60,7 +80,6 @@ class LotMapper:
 
             Lot.objects.create(
                 ticket=ticket,
-                # name='Lote 1',
                 date_start=self.event.date_start - timedelta(days=30),
                 date_end=self.event.date_start - timedelta(minutes=1),
             )
@@ -68,11 +87,11 @@ class LotMapper:
             return lot_map
 
         for lot in lots:
-            date_conflict = \
-                self._has_date_conflict(lot.pk, lot.date_start, lot.date_end)
+            date_conflict = self._has_date_conflict(lot.pk,
+                                                    lot.date_start,
+                                                    lot.date_end)
 
             if lot.category_id:
-
                 if lot.category_id in ticket_map and date_conflict is False:
                     ticket = ticket_map[lot.category_id]
 
@@ -105,11 +124,10 @@ class LotMapper:
                     ticket_map[self.event.pk] = ticket
 
             if lot.event_survey_id:
-                ticket.event_survey = lot.event_survey
+                ticket.event_survey_id = lot.event_survey_id
                 ticket.save()
 
             new_lot, _ = Lot.objects.get_or_create(
-                # name=lot.name[0:79],
                 date_start=lot.date_start,
                 date_end=lot.date_end,
                 ticket=ticket,
@@ -119,7 +137,8 @@ class LotMapper:
 
             if lot.price:
                 new_lot.price = lot.price
-                new_lot.save()
+
+            new_lot.save()
 
         return lot_map
 
@@ -134,9 +153,9 @@ class LotMapper:
 
         for lot in lots:
 
-            if lot.category:
+            if lot.category_id:
 
-                ticket_name = lot.category.name[:254]
+                ticket_name = lot.category.name[:246]
 
                 if ticket_name in ticket_map:
                     ticket_name = ticket_name + " - #{}".format(count)
@@ -155,7 +174,8 @@ class LotMapper:
 
             else:
 
-                ticket_name = lot.name[:254]
+                ticket_name = lot.name[:246]
+
                 if ticket_name in ticket_map:
                     ticket_name = ticket_name + " - #{}".format(count)
                     count += 1
@@ -163,7 +183,7 @@ class LotMapper:
                 ticket, _ = Ticket.objects.get_or_create(
                     event=self.event,
                     name=ticket_name,
-                    active=lot.activeX,
+                    active=lot.active,
                     limit=lot.limit,
                     private=lot.private is True,
                     free_installments=lot.num_install_interest_absortion,
@@ -171,17 +191,15 @@ class LotMapper:
 
                 ticket_map[self.event.pk] = ticket
 
-            if lot.event_survey:
-                ticket.event_survey = lot.event_survey
+            if lot.event_survey_id:
+                ticket.event_survey_id = lot.event_survey_id
                 ticket.save()
 
-            if lot.private and lot.exhibition_code:
-                ticket.exhibition_code = lot.exhibition_code
+            if lot.private:
                 ticket.active = False
                 ticket.save()
 
             nl, _ = Lot.objects.get_or_create(
-                # name=lot.name[0:79],
                 date_start=lot.date_start,
                 date_end=lot.date_end,
                 ticket=ticket,
@@ -190,10 +208,9 @@ class LotMapper:
             lot_map[lot.pk] = nl
 
             if lot.price:
-                ticket.paid = True
                 nl.price = lot.price
-                nl.save()
-                ticket.save()
+
+            nl.save()
 
         return lot_map
 
@@ -203,12 +220,13 @@ class LotMapper:
         session_range_one = DateTimeRange(start=date_start, stop=date_end)
 
         for lot_date_data in self.lot_dates:
-            ds = lot_date_data['ds']
-            de = lot_date_data['de']
             pk = lot_date_data['pk']
 
             if pk == lot_pk:
                 continue
+
+            ds = lot_date_data['ds']
+            de = lot_date_data['de']
 
             session_range_two = DateTimeRange(start=ds, stop=de, )
 

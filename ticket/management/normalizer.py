@@ -38,16 +38,14 @@ class Normalizer(Base):
 
             if subscription.lot_id in self.lot_map.keys():
                 ticket_lot = self.lot_map[subscription.lot_id]
-            elif subscription.event_id in self.lot_map.keys():
-                ticket_lot = self.lot_map[subscription.event_id]
             else:
 
                 msg = \
                     "Nenhum ticket encontrado para inscrição {} com lot_id" \
                     " {} e event_id {}\n".format(
                         str(subscription.pk),
-                        subscription.lot.id,
-                        subscription.event.id,
+                        subscription.lot_id,
+                        subscription.event_id,
                     )
 
                 self.stderr.write(self.style.ERROR(msg))
@@ -75,9 +73,7 @@ class Normalizer(Base):
             )
         )
 
-        subscriptions = Subscription.objects.filter(
-            event_id=self.event.pk,
-        )
+        subscriptions = Subscription.objects.filter(event_id=self.event.pk)
 
         for subscription in subscriptions:
             transactions = subscription.transactions.all()
@@ -85,17 +81,13 @@ class Normalizer(Base):
 
                 if subscription.lot_id in self.lot_map.keys():
                     ticket_lot = self.lot_map[subscription.lot_id]
-                elif subscription.event_id in self.lot_map.keys():
-                    ticket_lot = self.lot_map[subscription.event_id]
                 else:
-
                     msg = "Nenhum ticket encontrado para insc {}  e " \
-                          "transação {} com lot_id {} e event_id {}\n".format(
-                        str(subscription.pk),
-                        transaction.pk,
-                        subscription.lot.id,
-                        subscription.event.id,
-                    )
+                          "transação {} com lot_id {}" \
+                          " e event_id {}\n".format(str(subscription.pk),
+                                                    transaction.pk,
+                                                    subscription.lot_id,
+                                                    subscription.event_id)
 
                     with open('errs.txt', 'a+') as f:
                         f.write(msg)

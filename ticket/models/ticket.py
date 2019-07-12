@@ -232,4 +232,4 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
         super().save(*args, **kwargs)
 
         if self.private and not self.exhibition_code:
-            self.exhibition_code = self.objects.generate_exhibition_code()
+            self.exhibition_code = Ticket.objects.generate_exhibition_code()

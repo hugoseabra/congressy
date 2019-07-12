@@ -45,17 +45,17 @@ class Command(BaseCommand):
         past_events = Event.objects.filter(
             date_start__lt=datetime.now(),
             date_end__lt=datetime.now(),
-        )
+        ).order('pk')
 
         future_events = Event.objects.filter(
             date_start__gt=datetime.now(),
             date_end__gt=datetime.now(),
-        )
+        ).order('pk')
 
         live_events = Event.objects.filter(
             date_start__lte=datetime.now(),
             date_end__gt=datetime.now(),
-        )
+        ).order('pk')
 
         with atomic():
 
@@ -103,10 +103,10 @@ class Command(BaseCommand):
                         'events': list()
                     }
 
-                for lot in Lot.objects.filter(ticket__event=event):
+                for lot in Lot.objects.filter(ticket__event_id=event.pk):
                     lot.update_lot_num_subs()
 
-                for ticket in Ticket.objects.filter(event=event):
+                for ticket in Ticket.objects.filter(event_id=event.pk):
                     ticket.update_audience_category_num_subs()
 
                 past_ev_orgs[event.organization.name]['events'].append(event)
@@ -136,10 +136,10 @@ class Command(BaseCommand):
                 present_event_orgs[event.organization.name]['events'] \
                     .append(event)
 
-                for lot in Lot.objects.filter(ticket__event=event):
+                for lot in Lot.objects.filter(ticket__event_id=event.pk):
                     lot.update_lot_num_subs()
 
-                for ticket in Ticket.objects.filter(event=event):
+                for ticket in Ticket.objects.filter(event_id=event.pk):
                     ticket.update_audience_category_num_subs()
 
                 print('------------------------------------------------------')
