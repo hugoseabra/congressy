@@ -30,7 +30,7 @@ def get_subscriptions_situations(lot):
 
 def get_situations(subscription):
     """ Resgata uma lista de situações de transações de uma inscrição. """
-    lot = subscription.lot
+    lot = subscription.ticket_lot
 
     if lot.price is None or (lot.price is not None and int(lot.price) == 0):
         raise TransactionNotFound()

@@ -41,11 +41,15 @@ class ManualTransactionForm(forms.ModelForm):
     def save(self, commit=True):
 
         self.instance.subscription = self.subscription
-        self.instance.lot = self.subscription.lot
-        self.instance.lot_price = self.subscription.lot.get_calculated_price()
+
+        # @Todo remover lot
+        self.instance.ticket_lot = self.subscription.ticket_lot
+
         self.instance.manual = True
         self.instance.date_created = datetime.now()
         self.instance.liquid_amount = self.instance.amount
+
+        self.instance.lot_price = self.subscription.ticket_lot.get_subscriber_price()
 
         self.instance.type = Transaction.MANUAL
 
@@ -112,8 +116,9 @@ class PartManualTransactionForm(forms.ModelForm):
         self.instance.subscription = self.subscription
 
         self.instance.part = Part.objects.get(pk=self.cleaned_data['part'])
-        self.instance.lot = self.subscription.lot
-        self.instance.lot_price = self.subscription.lot.get_calculated_price()
+        self.instance.ticket_lot = self.subscription.ticket_lot
+        self.instance.lot_price = \
+            self.subscription.ticket_lot.get_subscriber_price()
         self.instance.manual = True
         self.instance.date_created = datetime.now()
         self.instance.liquid_amount = self.instance.amount

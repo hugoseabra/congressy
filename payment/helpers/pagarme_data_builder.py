@@ -38,7 +38,7 @@ class PagarmeDataBuilder:
 
         event = subscription.event
 
-        lot = subscription.lot
+        lot = subscription.ticket_lot
         self.metadata_items = {
             'organização': event.organization.name,
             'evento': event.name,
@@ -80,7 +80,7 @@ class PagarmeDataBuilder:
 
     def build(self, amount, transaction_type, installments=1, card_hash=None):
 
-        lot = self.subscription.lot
+        lot = self.subscription.ticket_lot
         event = self.subscription.event
 
         self._check_transaction_type(transaction_type, card_hash)
@@ -119,7 +119,7 @@ class PagarmeDataBuilder:
             # Instrução 2: 47 caracteres
             instructions += 'Ev.: {}. Lote: {}. Insc.: {}.'.format(
                 self.subscription.event.name[:8],
-                self.subscription.lot.name[:8],
+                self.subscription.ticket_lot.name[:8],
                 self.subscription.code,  # 8 caracteres
             )
 

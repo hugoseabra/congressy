@@ -87,12 +87,10 @@ class ReceiverPublisher(object):
             float(settings.CONGRESSY_INSTALLMENT_INTERESTS_RATE) / 100
         )
 
-        lot = self.subscription.lot
-
         self.installment_calculator = Calculator(
             interests_rate=self.interests_rate,
-            total_installments=int(lot.installment_limit),
-            free_installments=int(lot.num_install_interest_absortion),
+            total_installments=10,
+            free_installments=self.subscription.ticket.free_installments,
         )
 
     def create_and_publish_subscription(self):
@@ -101,7 +99,7 @@ class ReceiverPublisher(object):
         inscrição.
         """
         event = self.subscription.event
-        lot = self.subscription.lot
+        lot = self.subscription.ticket_lot
 
         # ==== CONGRESSY AMOUNT
         # Valor proporcional da Congressy, independente de transferência ou

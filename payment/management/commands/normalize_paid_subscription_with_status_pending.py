@@ -64,8 +64,8 @@ class Command(BaseCommand):
             "    E-mail do Participante: {}\n".format(
                 subscription.pk,
                 subscription.event.name,
-                subscription.lot.name,
-                subscription.lot.pk,
+                subscription.ticket_lot.name,
+                subscription.ticket_lot.pk,
                 subscription.event.pk,
                 subscription.person.name,
                 subscription.person.pk,

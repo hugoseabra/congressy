@@ -12,7 +12,6 @@ from rest_framework.response import Response
 
 from core.helpers import sentry_log
 from payment.email_notifications import PaymentNotification
-from payment.forms import PaymentForm
 from payment.helpers import TransactionLog
 from payment.models import Transaction, TransactionStatus
 from payment.postback import Postback
@@ -136,39 +135,6 @@ def postback_url_view(request, uidb64):
         )
 
         subscription.save()
-
-        # ==================================================================
-
-        # ================= PAYMENT ========================================
-
-        if new_status == Transaction.PAID:
-
-            try:
-                transaction.payment.paid = True
-                transaction.payment.save()
-
-            except AttributeError:
-                payment_form = PaymentForm(
-                    subscription=subscription,
-                    transaction=transaction,
-                    data={
-                        'cash_type': transaction.type,
-                        'amount': transaction.amount,
-                    },
-                )
-
-                if not payment_form.is_valid():
-                    error_msgs = []
-                    for field, errs in payment_form.errors.items():
-                        error_msgs.append(str(errs))
-
-                    msg = 'Erro ao criar pagamento de uma transação:' \
-                          ' {}'.format("".join(error_msgs))
-
-                    raise Exception(msg)
-
-                # por agora, não vamos vincular pagamento a nada.
-                payment_form.save()
 
         # ==================================================================
         # Registra inscrição como notificada.
