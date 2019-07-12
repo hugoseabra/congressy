@@ -147,7 +147,7 @@ class SubscriptionListViewSet(RestrictionViewMixin,
         if column == "0":
             field = 'person__name'
         elif column == "2":
-            field = 'lot__name'
+            field = 'ticket_lot__ticket__name'
         elif column == "3":
             field = 'event_count'
         else:
@@ -164,7 +164,7 @@ class SubscriptionListViewSet(RestrictionViewMixin,
 
         search_param = request.query_params.get("search")
         tag_group_param = request.query_params.get("tag_group")
-        category_param = request.query_params.get("category")
+        ticket_param = request.query_params.get("ticket")
         lot_param = request.query_params.get("lot")
 
         if tag_group_param and tag_group_param != '':
@@ -172,9 +172,9 @@ class SubscriptionListViewSet(RestrictionViewMixin,
                 tag_group=tag_group_param,
             )
 
-        if category_param and category_param != '':
+        if ticket_param and ticket_param != '':
             queryset = queryset.filter(
-                lot__category__id=category_param,
+                ticket_lot__ticket_id=ticket_param,
             )
 
         if lot_param and lot_param != '':
@@ -187,8 +187,7 @@ class SubscriptionListViewSet(RestrictionViewMixin,
 
         return queryset.filter(
             Q(code=search_param, ) |
-            Q(lot__name__icontains=search_param, ) |
-            Q(lot__category__name__icontains=search_param, ) |
+            Q(ticket_lot__ticket__name__icontains=search_param, ) |
             Q(person__name__icontains=search_param, ) |
             Q(person__email__icontains=search_param, ) |
             Q(person__cpf__icontains=clear_string(search_param), ) |
@@ -219,6 +218,8 @@ class SubscriptionExporterViewSet(RestrictionViewMixin, APIView):
 
         if exporter.has_export_lock():
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+        exporter.create_export_lock()
 
         lock = True
         lock_count = 0

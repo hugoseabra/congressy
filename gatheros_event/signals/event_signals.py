@@ -2,7 +2,11 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from gatheros_event.models import Event, FeatureConfiguration, FeatureManagement
+from gatheros_event.models import (
+    Event,
+    FeatureConfiguration,
+    FeatureManagement,
+)
 from mailer.services import notify_new_event
 
 

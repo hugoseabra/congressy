@@ -150,14 +150,13 @@ class SubscriptionSerializer(serializers.BaseSerializer):
             'code': obj.code,
             'accredited': obj.accredited,
             'accredited_on': obj.accredited_on,
-            'lot_name': obj.lot.name,
+            'ticket_name': obj.ticket_lot.name,
             'event_count': obj.event_count,
             'test_subscription': obj.test_subscription,
             'status': obj.status,
             'created': obj.created,
             'tag_info': obj.tag_info,
             'tag_group': obj.tag_group,
-            'category_name': None,
             'institution': None,
             'link': reverse(
                 'subscription:subscription-view', kwargs={

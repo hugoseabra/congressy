@@ -9,6 +9,7 @@ from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_subscription.models import (
     Subscription, LotCategory, Lot)
 from gatheros_subscription.views import SubscriptionViewMixin
+from ticket.models import Ticket
 
 
 class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
@@ -22,14 +23,11 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
         cxt = super().get_context_data(**kwargs)
 
         cxt.update({
-            'has_subs': Subscription.objects.filter(
+            'has_subs': Subscription.objects.all_completed().filter(
                 event_id=self.event.id,
-                completed=True,
-                test_subscription=False,
             ).count() > 0,
             'group_tags': self.get_group_tags(),
-            'categories': self.get_categories(),
-            'lots': self.get_lots(),
+            'tickets': self.get_tickets(),
             'has_filter': self.has_filter,
             'event_is_paid': is_paid_event(self.event),
             'has_inside_bar': True,
@@ -60,42 +58,18 @@ class SubscriptionListView(SubscriptionViewMixin, generic.TemplateView):
 
         return sorted(group_tags, key=cmp_to_key(locale.strcoll))
 
-    def get_categories(self):
+    def get_tickets(self):
 
-        categories = dict()
+        tickets = \
+            Ticket.objects.filter(
+                event_id=self.event.pk,
+                num_subs__gt=0,
+            ).order_by('name')
 
-        for cat in LotCategory.objects.filter(event=self.event):
-            if cat.pk not in categories.values():
-                categories[cat.name] = cat.pk
+        if self.has_filter is False:
+            self.has_filter = tickets.count() > 0
 
-        sorted_categories = OrderedDict()
-
-        for name in sorted(categories.keys(), key=cmp_to_key(locale.strcoll)):
-            for _name, pk in categories.items():
-                if name == _name:
-                    sorted_categories[name] = pk
-
-        self.has_filter = len(sorted_categories) > 0
-
-        return sorted_categories
-
-    def get_lots(self):
-
-        categories = dict()
-
-        for cat in LotCategory.objects.filter(event=self.event):
-            if cat.pk not in categories.keys():
-                categories[cat.pk] = dict()
-
-        for lot in Lot.objects.filter(event=self.event, internal=False):
-
-            if lot.category.pk not in categories.keys():
-                categories[lot.category.pk] = dict()
-
-            if lot.pk not in categories[lot.category.pk].keys():
-                categories[lot.category.pk][lot.pk] = lot.name
-
-        return categories
+        return tickets
 
     def get_accreditation_service(self):
         try:
