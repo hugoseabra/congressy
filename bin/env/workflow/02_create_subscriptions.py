@@ -32,9 +32,9 @@ for event in events:
 
     for person in all_persons:
         Subscription.objects.create(
-            person=person,
-            event=event,
-            lot=lot,
+            person_id=person.pk,
+            event_id=event.pk,
+            ticket_lot_id=lot.pk,
             origin=Subscription.DEVICE_ORIGIN_WEB,
             created_by=1,
             completed=True,
