@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
+from django.conf import settings
 from django.db import models
 
 from base.models import EntityMixin
@@ -80,12 +81,37 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
         verbose_name='modificado em'
     )
 
+    def __init__(self, *args, **kwargs):
+        self._event = None
+        super().__init__(*args, **kwargs)
+
+    @property
+    def event(self):
+        if not self._event:
+            self._event = self.ticket.event
+
+        return self._event
+
+    @property
+    def name(self):
+        return self.ticket.name
+
     @property
     def is_full(self):
         if not self.limit:
             return False
 
         return self.num_subs >= self.limit
+
+    @property
+    def not_started(self):
+        now = datetime.now()
+        return now < self.date_start
+
+    @property
+    def finished(self):
+        now = datetime.now()
+        return now >= self.date_end
 
     @property
     def running(self):
@@ -111,3 +137,24 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
         self.save()
 
         return self
+
+    def get_subscriber_price(self):
+        """
+        Resgata o valor calculado do preço do lote de acordo com as regras
+        da Congressy.
+        """
+        if not self.price:
+            return Decimal(0.00)
+
+        if self.event.transfer_tax is False:
+            return round(self.price, 2)
+
+        minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
+        congressy_plan_percent = \
+            Decimal(self.event.congressy_percent) / 100
+
+        congressy_amount = self.price * congressy_plan_percent
+        if congressy_amount < minimum:
+            congressy_amount = minimum
+
+        return round(self.price + congressy_amount, 2)

@@ -1,9 +1,25 @@
+import uuid
 from datetime import datetime
+from decimal import Decimal
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 from base.models import EntityMixin
 from gatheros_event.models.mixins import GatherosModelMixin
+
+
+class TicketManager(models.Manager):
+    """ Manager - Gerenciador de lote. """
+
+    def generate_exhibition_code(self):
+        """ Gera código de exibição para o lote. """
+        while True:
+            code = str(uuid.uuid4()).split('-')[0].upper()
+            try:
+                self.get(exhibition_code=code)
+            except ObjectDoesNotExist:
+                return code
 
 
 class Ticket(GatherosModelMixin, EntityMixin, models.Model):
@@ -21,11 +37,13 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
         verbose_name = 'ingresso'
         verbose_name_plural = 'ingressos'
 
+    objects = TicketManager()
+
     event = models.ForeignKey(
         'gatheros_event.Event',
         on_delete=models.CASCADE,
         verbose_name='evento',
-        related_name="audience_categories",
+        related_name="tickets",
         # Making field required
         blank=False,
         null=False,
@@ -35,7 +53,7 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
         'gatheros_subscription.EventSurvey',
         on_delete=models.SET_NULL,
         verbose_name='formulário personalizado',
-        related_name='audience_categories',
+        related_name='tickets',
         # Making field optional
         blank=True,
         null=True
@@ -56,8 +74,8 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
         null=True,
     )
 
-    free_installments = models.IntegerField(
-        verbose_name="absorver taxas de parcelamento",
+    free_installments = models.PositiveIntegerField(
+        verbose_name="absorver juros de parcelamento",
         default=0,
         # Making field optional
         blank=True,
@@ -102,6 +120,7 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
         null=True,
         blank=True,
         verbose_name='código de exibição',
+        unique=True,
     )
 
     created = models.DateTimeField(
@@ -198,3 +217,19 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
         self.save()
 
         return self
+
+    def get_subscriber_price(self):
+        """
+        Resgata o valor calculado do preço do lote de acordo com as regras
+        da Congressy.
+        """
+        if not self.current_lot:
+            return Decimal(0.00)
+
+        return self.current_lot.get_subscriber_price()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.private and not self.exhibition_code:
+            self.exhibition_code = self.objects.generate_exhibition_code()
