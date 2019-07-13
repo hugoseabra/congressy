@@ -4,10 +4,8 @@ from gatheros_subscription.models import Subscription
 
 def subscription_has_certificate(subscription_pk):
     try:
-        subscription = Subscription.objects.get(
+        subscription = Subscription.objects.all_completed().get(
             pk=subscription_pk,
-            test_subscription=False,
-            completed=True,
             event__published=True,
             status=Subscription.CONFIRMED_STATUS,
         )
@@ -64,11 +62,10 @@ def subscription_is_checked(subscription_pk):
 def get_all_attended_in_event(attendance_pk):
     attendance = AttendanceService.objects.get(pk=attendance_pk)
 
-    queryset = Subscription.objects.filter(
+    queryset = Subscription.objects.all_completed().filter(
         event_id=attendance.event_id,
         checkins__attendance_service__pk=attendance_pk,
         status=Subscription.CONFIRMED_STATUS,
-        completed=True, test_subscription=False,
     )
 
     if attendance.checkout_enabled is False:

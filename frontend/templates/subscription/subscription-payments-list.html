@@ -98,7 +98,7 @@
                                                         </div>
                                                         {% if event.feature_configuration.feature_manual_payments %}
                                                             <div class="float-right" style="margin-top:5px">
-                                                                <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ item.transaction_pk }}', '{{ item.transaction.amount|intcomma }}')">
+                                                                <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ item.transaction.pk }}', '{{ item.transaction.amount|intcomma }}')">
                                                                     <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
                                                                 </a>
                                                             </div>

@@ -111,8 +111,7 @@ def export_attendance_checkins(worksheet, subscriptions, attendance):
     worksheet.append([
         'NÚMERO DE INSCRIÇÃO',
         'CÓDIGO DA INSCRIÇÃO',
-        'CATEGORIA DE PARTICIPANTE',
-        'LOTE',
+        'INGRESSO',
         'STATUS',
         'SEXO',
         'NOME',
@@ -159,16 +158,10 @@ def export_attendance_checkins(worksheet, subscriptions, attendance):
             cached_type='subscriptions',
         )
 
-        lot = get_object_value(
+        ticket_lot = get_object_value(
             obj=sub,
-            attr='lot',
+            attr='ticket_lot',
             cached_type='subscriptions',
-        )
-
-        lot_category = get_object_value(
-            obj=lot,
-            attr='category',
-            cached_type='lots',
         )
 
         city = get_object_value(
@@ -189,9 +182,7 @@ def export_attendance_checkins(worksheet, subscriptions, attendance):
             cached_type='subscriptions',
         ))
 
-        collector[row_idx].append(lot_category.name)
-
-        collector[row_idx].append(lot.name)
+        collector[row_idx].append(ticket_lot.name)
 
         collector[row_idx].append(sub.get_status_display())
         collector[row_idx].append(person.get_gender_display())
@@ -296,8 +287,7 @@ def export_attendance_checkouts(worksheet, subscriptions, attendance):
     worksheet.append([
         'NÚMERO DE INSCRIÇÃO',
         'CÓDIGO DA INSCRIÇÃO',
-        'CATEGORIA DE PARTICIPANTE',
-        'LOTE',
+        'INGRESSO',
         'STATUS',
         'SEXO',
         'NOME',
@@ -343,16 +333,10 @@ def export_attendance_checkouts(worksheet, subscriptions, attendance):
             cached_type='subscriptions',
         )
 
-        lot = get_object_value(
+        ticket_lot = get_object_value(
             obj=sub,
-            attr='lot',
+            attr='ticket_lot',
             cached_type='subscriptions',
-        )
-
-        lot_category = get_object_value(
-            obj=lot,
-            attr='category',
-            cached_type='lots',
         )
 
         city = get_object_value(
@@ -373,9 +357,7 @@ def export_attendance_checkouts(worksheet, subscriptions, attendance):
             cached_type='subscriptions',
         ))
 
-        collector[row_idx].append(lot_category.name)
-
-        collector[row_idx].append(lot.name)
+        collector[row_idx].append(ticket_lot.name)
 
         collector[row_idx].append(sub.get_status_display())
         collector[row_idx].append(person.get_gender_display())
@@ -517,5 +499,5 @@ def export_attendance_auditing(worksheet, subscriptions, attendance):
 
 def sort_subscriptions(subscriptions: list) -> QuerySet:
     return Subscription.objects.filter(
-        uuid__in=[str(sub.pk) for sub in subscriptions]).order_by(
-        'person__name')
+        uuid__in=[str(sub.pk) for sub in subscriptions]
+    ).order_by('person__name')
