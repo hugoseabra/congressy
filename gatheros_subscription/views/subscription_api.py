@@ -1,19 +1,24 @@
 import re
+
 from rest_framework import generics
 from rest_framework.response import Response
 
+from attendance.helpers.attendance import subscription_has_certificate
 from gatheros_subscription.models import Subscription
 from gatheros_subscription.serializers import CheckInSubscriptionSerializer
-from attendance.helpers.attendance import subscription_has_certificate
 
 
 class SubscriptionSearchViewSet(generics.ListAPIView):
     """
         API endpoint that allows Subscriptions to be viewed.
     """
-    query = None
 
     serializer_class = CheckInSubscriptionSerializer
+
+    def __init__(self, **kwargs):
+        self.query = None
+        super().__init__(**kwargs)
+
 
     def get(self, request, *args, **kwargs):
         if 'query' in request.GET:
@@ -30,10 +35,8 @@ class SubscriptionSearchViewSet(generics.ListAPIView):
         if self.query is not None and self.query != '':
 
             # All subscriptions in the event
-            queryset = Subscription.objects.filter(
-                event=event_pk,
-                completed=True,
-                test_subscription=False,
+            queryset = Subscription.objects.all_completed().filter(
+                event_id=event_pk,
             )
 
             # Fetch by event code
@@ -86,9 +89,8 @@ class SubscriptionUpdateAttendedAPIView(generics.GenericAPIView):
 
     def get_queryset(self):
         event_pk = self.kwargs.get('event_pk')
-        queryset = Subscription.objects.filter(
-            event=event_pk,
-            completed=True,
+        queryset = Subscription.objects.all_completed().filter(
+            event_id=event_pk,
         ).exclude(status=Subscription.CANCELED_STATUS)
         return queryset
 

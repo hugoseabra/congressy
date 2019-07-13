@@ -80,7 +80,7 @@ class LotSerializer(serializers.ModelSerializer):
 
 class SubscriptionExportSerializer(serializers.ModelSerializer):
     person = PersonExportSerializer()
-    lot = serializers.CharField(source='lot.name')
+    lot = serializers.CharField(source='ticket_lot.name')
 
     @staticmethod
     def setup_prefetch(queryset):
@@ -99,7 +99,7 @@ class SubscriptionExportSerializer(serializers.ModelSerializer):
         model = Subscription
         fields = [
             'count',
-            'lot',
+            'ticket_lot',
             'code',
             'person',
         ]
@@ -118,7 +118,7 @@ class CheckInPersonSerializer(serializers.ModelSerializer):
 
 class CheckInSubscriptionSerializer(serializers.ModelSerializer):
     person = CheckInPersonSerializer()
-    lot = serializers.CharField(source='lot.name')
+    ticket_lot = serializers.CharField(source='ticket_lot.name')
 
     class Meta:
         model = Subscription
@@ -126,7 +126,7 @@ class CheckInSubscriptionSerializer(serializers.ModelSerializer):
             'pk',
             'code',
             'person',
-            'lot',
+            'ticket_lot',
             'status',
             'event_count',
         ]
