@@ -6,6 +6,7 @@ apresentar informações ligadas a ela a pessoa que possam se interessar em
 participar do evento.
 """
 import os
+import uuid
 from datetime import datetime
 
 from django.db import models
@@ -75,6 +76,12 @@ class Event(models.Model, GatherosModelMixin):
         (RSVP_DISABLED, 'Aberto'),
         (RSVP_OPEN, 'Convidados associados terão um lote especial.'),
         (RSVP_RESTRICTED, 'Somente associados poderão se inscrever.'),
+    )
+
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
     )
 
     name = models.CharField(max_length=255, verbose_name='Nome do evento')

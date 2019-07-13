@@ -44,11 +44,13 @@ class Info(models.Model, GatherosModelMixin):
         help_text="Descreva as normas de seu evento, como a programação, "
                   "regras, reembolsos, palestrantes, atrações"
     )
+
     event = models.OneToOneField(
         Event,
         on_delete=models.CASCADE,
         primary_key=True,
-        verbose_name='evento'
+        to_field='uuid',
+        verbose_name='evento',
     )
 
     config_type = models.CharField(

@@ -25,9 +25,11 @@ class Place(models.Model, GatherosModelMixin):
     event = models.OneToOneField(
         Event,
         on_delete=models.CASCADE,
+        primary_key=True,
+        to_field='uuid',
         verbose_name='evento',
-        related_name='place'
     )
+
     show_location = models.BooleanField(
         default=False,
         verbose_name='ativar localização no site',

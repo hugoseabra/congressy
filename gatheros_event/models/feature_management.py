@@ -18,6 +18,7 @@ class FeatureManagement(models.Model):
         Event,
         on_delete=models.CASCADE,
         primary_key=True,
+        to_field='uuid',
         verbose_name='evento',
         related_name='feature_management',
     )
