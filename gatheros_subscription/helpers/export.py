@@ -7,7 +7,7 @@ from six import BytesIO
 from attendance.helpers.attendance import subscription_is_checked
 from gatheros_event.helpers.event_business import is_paid_event
 from payment.models import Transaction
-from survey.models import Answer
+from survey.models import Answer, Survey
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
@@ -87,53 +87,54 @@ def export_event_data(event):
     ws1 = wb.active
     ws1.title = clean_sheet_title('Participantes')
 
-    _export_subscriptions(
-        ws1,
-        event.subscriptions.filter(
-            completed=True,
-            test_subscription=False,
-        ))
+    subscriptions = event.subscriptions.all_completed()
+    sub_pks = [s.pk for s in subscriptions]
+
+    _export_subscriptions(ws1, subscriptions)
 
     if is_paid_event(event):
-        _export_payments(wb.create_sheet(title='Pagamentos'), event)
+        _export_payments(wb.create_sheet(title='Pagamentos'), subscriptions)
 
-    for ev_survey in event.surveys.all():
+    surveys = Survey.objects.filter(event__event_id=event.pk)
+
+    for survey in surveys:
         title = clean_sheet_title(
-            'Formulário-{}'.format(ev_survey.survey.name)
+            'Formulário-{}'.format(survey.name)
         )
-        _export_survey_answers(wb.create_sheet(title=title), ev_survey)
+        _export_survey_answers(wb.create_sheet(title=title), event, survey)
 
-    for lot_category in event.lot_categories.all():
-        cat_name = lot_category.name
-
-        products_queryset = lot_category.product_optionals
-        services_queryset = lot_category.service_optionals
+    for ticket in event.tickets.all():
+        products_queryset = ticket.addon_products
+        services_queryset = ticket.addon_services
 
         if products_queryset.count():
             num_subs = products_queryset.filter(
-                subscription_products__subscription__completed=True,
-                subscription_products__subscription__test_subscription=False
+                subscription_products__subscription_id__in=sub_pks,
             ).count()
 
             if num_subs > 0:
-                sheet_name = 'Opcionais - {}'.format(cat_name)
+                sheet_name = 'Opcionais - {}'.format(ticket.name)
                 title = clean_sheet_title(sheet_name)
                 worksheet = wb.create_sheet(title=title)
 
-                _export_addon_products(worksheet, products_queryset.all())
+                _export_addon_products(worksheet,
+                                       sub_pks,
+                                       products_queryset.all())
 
         if services_queryset.count():
             num_subs = services_queryset.filter(
-                subscription_services__subscription__completed=True,
-                subscription_services__subscription__test_subscription=False
+                subscription_services__subscription_id__in=sub_pks,
             ).count()
 
             if num_subs > 0:
-                sheet_name = 'Ativ. Extras - {}'.format(cat_name)
+                sheet_name = 'Ativ. Extras - {}'.format(ticket.name)
+                # sheet_name = 'Ativ. Extras - {}'.format(lot_category.name)
                 title = clean_sheet_title(sheet_name)
                 worksheet = wb.create_sheet(title=title)
 
-                _export_addon_services(worksheet, services_queryset.all())
+                _export_addon_services(worksheet,
+                                       sub_pks,
+                                       services_queryset.all())
 
     wb.save(stream)
 
@@ -146,8 +147,8 @@ def _export_subscriptions(worksheet, subscriptions):
     worksheet.append([
         'NÚMERO DE INSCRIÇÃO',
         'CÓDIGO DA INSCRIÇÃO',
-        'CATEGORIA DE PARTICIPANTE',
-        'LOTE',
+        'INGRESSO',
+        'VALOR DO INGRESSO',
         'STATUS',
         'ATENDIDO',
         'SEXO',
@@ -187,16 +188,10 @@ def _export_subscriptions(worksheet, subscriptions):
             cached_type='subscriptions',
         )
 
-        lot = get_object_value(
+        ticket_lot = get_object_value(
             obj=sub,
-            attr='lot',
+            attr='ticket_lot',
             cached_type='subscriptions',
-        )
-
-        lot_category = get_object_value(
-            obj=lot,
-            attr='category',
-            cached_type='lots',
         )
 
         city = get_object_value(
@@ -217,9 +212,9 @@ def _export_subscriptions(worksheet, subscriptions):
             cached_type='subscriptions',
         ))
 
-        collector[row_idx].append(lot_category.name.upper())
+        collector[row_idx].append(ticket_lot.name.upper())
 
-        collector[row_idx].append(lot.name.upper())
+        collector[row_idx].append(ticket_lot.get_subscriber_price())
 
         collector[row_idx].append(sub.get_status_display())
 
@@ -291,7 +286,7 @@ def _export_subscriptions(worksheet, subscriptions):
         worksheet.append(collector[row])
 
 
-def _export_payments(worksheet, event):
+def _export_payments(worksheet, subscriptions):
     worksheet.append([
         'NÚMERO DE INSCRIÇÃO',
         'CÓDIGO DA INSCRIÇÃO',
@@ -303,7 +298,8 @@ def _export_payments(worksheet, event):
         'VALOR A RECEBER (R$)',
     ])
 
-    transactions = Transaction.objects.filter(subscription__event_id=event.pk)
+    sub_pks = [s.pk for s in subscriptions]
+    transactions = Transaction.objects.filter(subscription_id__in=sub_pks)
 
     collector = {}
     row_idx = 1
@@ -342,7 +338,7 @@ def _export_payments(worksheet, event):
         worksheet.append(collector[row])
 
 
-def _export_survey_answers(worksheet, event_survey):
+def _export_survey_answers(worksheet, event, survey):
     """
     Exporta as respostas de survey.
     """
@@ -353,9 +349,6 @@ def _export_survey_answers(worksheet, event_survey):
         'NOME',
         'E-MAIL',
     ]
-
-    survey = event_survey.survey
-    event = event_survey.event
 
     questions = survey.questions.all().order_by('order')
 
@@ -423,7 +416,7 @@ def _export_survey_answers(worksheet, event_survey):
         worksheet.append(collector[row])
 
 
-def _export_addon_products(worksheet, products):
+def _export_addon_products(worksheet, sub_pks, products):
     """
     Exporta Insrições de Opcionais de um evento.
     """
@@ -432,7 +425,7 @@ def _export_addon_products(worksheet, products):
         'CÓDIGO DA INSCRIÇÃO',
         'NOME',
         'E-MAIL',
-        'CATEGORIA',
+        'INGRESSO',
         'NOME DO OPCIONAL',
         'STATUS',
         'DATA PAGAMENTO',
@@ -445,8 +438,7 @@ def _export_addon_products(worksheet, products):
 
     for product in products:
         subs = product.subscription_products.filter(
-            subscription__completed=True,
-            subscription__test_subscription=False,
+            subscription_id__in=sub_pks,
         )
 
         for addon_sub in subs:
@@ -462,16 +454,10 @@ def _export_addon_products(worksheet, products):
                 cached_type='subscriptions',
             )
 
-            lot = get_object_value(
+            ticket_lot = get_object_value(
                 obj=sub,
-                attr='lot',
+                attr='ticket_lot',
                 cached_type='subscriptions',
-            )
-
-            lot_category = get_object_value(
-                obj=lot,
-                attr='category',
-                cached_type='lots',
             )
 
             optional = get_object_value(
@@ -489,7 +475,7 @@ def _export_addon_products(worksheet, products):
             collector[row_idx].append(get_object_value(sub, 'code'))
             collector[row_idx].append(person.name.upper())
             collector[row_idx].append(get_object_value(sub, 'email'))
-            collector[row_idx].append(lot_category.name)
+            collector[row_idx].append(ticket_lot.name)
             collector[row_idx].append(optional.name)
             collector[row_idx].append(sub.get_status_display())
             collector[row_idx].append(created)
@@ -505,7 +491,7 @@ def _export_addon_products(worksheet, products):
         [worksheet.append(collector[row]) for row in rows]
 
 
-def _export_addon_services(worksheet, services):
+def _export_addon_services(worksheet, sub_pks, services):
     """
     Exporta Insrições de atividades extras.
     """
@@ -514,7 +500,7 @@ def _export_addon_services(worksheet, services):
         'CÓDIGO DA INSCRIÇÃO',
         'NOME',
         'E-MAIL',
-        'CATEGORIA',
+        'INGRESSO',
         'TEMA',
         'NOME DA ATIVIDADE EXTRA',
         'STATUS',
@@ -528,8 +514,7 @@ def _export_addon_services(worksheet, services):
 
     for service in services:
         subs = service.subscription_services.filter(
-            subscription__completed=True,
-            subscription__test_subscription=False,
+            subscription_id__in=sub_pks,
         )
 
         for addon_sub in subs:
@@ -546,16 +531,10 @@ def _export_addon_services(worksheet, services):
                 cached_type='subscriptions',
             )
 
-            lot = get_object_value(
+            ticket_lot = get_object_value(
                 obj=sub,
-                attr='lot',
+                attr='ticket_lot',
                 cached_type='subscriptions',
-            )
-
-            lot_category = get_object_value(
-                obj=lot,
-                attr='category',
-                cached_type='lots',
             )
 
             optional = get_object_value(
@@ -579,7 +558,7 @@ def _export_addon_services(worksheet, services):
             collector[row_idx].append(get_object_value(sub, 'code'))
             collector[row_idx].append(person.name.upper())
             collector[row_idx].append(person.email)
-            collector[row_idx].append(lot_category.name)
+            collector[row_idx].append(ticket_lot.name)
             collector[row_idx].append(theme.name)
             collector[row_idx].append(optional.name)
             collector[row_idx].append(sub.get_status_display())
