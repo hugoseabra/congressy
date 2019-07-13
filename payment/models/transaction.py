@@ -54,6 +54,7 @@ class Transaction(models.Model, EntityMixin):
     MANUAL_PAYMENT_TYPES = (
         (MANUAL_PAYMENT_MONEY, 'Dinheiro'),
         (MANUAL_PAYMENT_PAYCHECK, 'Cheque'),
+        (MANUAL_PAYMENT_PAYCHECK, 'Boleto'),
         (MANUAL_PAYMENT_DEBIT_CARD, 'Cartão de Débito'),
         (MANUAL_PAYMENT_CREDIT_CARD, 'Cartão de Crédito'),
         (MANUAL_PAYMENT_BANK_DEPOSIT, 'Depósito'),
