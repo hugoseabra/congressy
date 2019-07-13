@@ -728,8 +728,6 @@
         $(document).ready(function () {
             customCheckbox();
 
-            var lots = {% jsonify lots %};
-
             var url = '{% url 'api:subscription:subscription-list-api' event.pk %}';
 
             var table = $('#subscription_table').DataTable({
@@ -740,10 +738,8 @@
                 "searchDelay": 500,
                 "ajax": function (data, callback, settings) {
 
-                    var tag_group = $('#tag_group_filter option:selected').val();
-                    var category = $('#category_filter option:selected').val();
-                    var lot = $('#lot_filter option:selected').val();
-
+                    var tag_group = $('#tag_group_filter').val();
+                    var ticket = $('#ticket_filter').val();
 
                     var payload = {
                         limit: data.length,
@@ -753,19 +749,13 @@
                         search: data.search['value']
                     };
 
-
                     if (tag_group !== "---") {
                         payload['tag_group'] = tag_group
                     }
 
-                    if (category !== "---") {
-                        payload['category'] = category
+                    if (ticket) {
+                        payload['ticket'] = ticket
                     }
-
-                    if (lot !== "---") {
-                        payload['lot'] = lot
-                    }
-
 
                     $.ajax({
                         url: url,
@@ -810,15 +800,6 @@
                                 + dateCreated;
                         }
                     },
-                    {
-                        data: 'code', "render": function (data, type, row, meta) {
-
-
-                            var hidden = get_hidden_person(row);
-
-                            return data + hidden
-                        }
-                    },
                     {% if event.feature_configuration.feature_checkin is True %}
                         {
                             data: 'accredited', "render": function (data, type, row, meta) {
@@ -826,7 +807,7 @@
                             }
                         },
                     {% endif %}
-                    {data: 'lot_name'},
+                    {data: 'ticket_name'},
                     {data: 'event_count'},
                     {
                         data: 'link', "render": function (data, type, row, meta) {
@@ -865,38 +846,31 @@
                         "orderable": false,
                         "targets": [-1]
                     },
-                    {
-                        "targets": 1,
-                        "orderable": false
-                    },
-                    {
-                        "targets": 2,
-                        "orderable": false,
-                        "class": "text-center"
-                    },
                     {% if event.feature_configuration.feature_checkin is True %}
                         {
-                            "targets": 4,
-                            "orderable": true,
+                            "targets": 1,
+                            "orderable": false,
                             "class": "text-center"
                         },
                         {
-                            "targets": 5,
+                            "targets": 2,
                             "orderable": true,
-                            "type": 'date-euro'
                         },
-                    {% else %}
                         {
                             "targets": 3,
                             "orderable": true,
-                            "class": 'text-center'
+                            "class": "text-center"
+                        }
+                    {% else %}
+                        {
+                            "targets": 1,
+                            "orderable": true,
                         },
                         {
-                            "targets": 4,
+                            "targets": 2,
                             "orderable": true,
-                            "class": 'text-center',
-                            "type": 'date-euro'
-                        },
+                            "class": "text-center"
+                        }
                     {% endif %}
                 ],
                 // Default order
@@ -904,28 +878,8 @@
                 responsive: true
             });
 
-            $('#tag_group_filter,#category_filter,#lot_filter').on("change", function () {
+            $('#tag_group_filter,#ticket_filter').on("change", function () {
                 table.ajax.reload();
-            });
-
-            $('#category_filter').on("change", function () {
-
-                var select = $("#lot_filter");
-
-                select.empty()
-                    .append('<option selected>---</option>');
-
-                var id = $(this).val();
-
-                if (lots.hasOwnProperty(id)) {
-
-                    Object.keys(lots[id]).forEach(function (k) {
-                        select.append($("<option>").val(k).html(lots[id][k]));
-                    });
-
-                } else {
-                    console.log('Nenhum lote.')
-                }
             });
         });
 
@@ -1064,34 +1018,23 @@
                                         {% endif %}
 
 
-                                        {% if categories|length > 0 %}
+                                        {% if tickets %}
 
 
 
                                             <div class="col-xs-3">
 
-                                                <label class="control-label" for="category_filter">
-                                                    Categorias:
+                                                <label class="control-label" for="ticket_filter">
+                                                    Ingresso:
                                                 </label>
-                                                <select class="form-control input-sm" id="category_filter">
-                                                    <option selected>---</option>
-                                                    {% for category_name, category_pk in categories.items %}
-                                                        <option value="{{ category_pk }}">{{ category_name }}</option>
+                                                <select class="form-control input-sm" id="ticket_filter">
+                                                    <option value="" selected>- Todos -</option>
+                                                    {% for ticket in tickets %}
+                                                        <option value="{{ ticket.pk }}">{{ ticket.name }}</option>
                                                     {% endfor %}
                                                 </select>
 
                                             </div>
-
-
-                                            <div class="col-xs-3">
-
-                                                <label for="lot_filter" class="control-label">Lotes:</label>
-                                                <select class="form-control input-sm" id="lot_filter">
-                                                    <option selected>---</option>
-                                                </select>
-
-                                            </div>
-
 
 
                                         {% endif %}
@@ -1135,13 +1078,11 @@
                             <tr>
 
                                 <th>Nome do Participante</th>
-
-                                <th width="10%">Código</th>
                                 {% if event.feature_configuration.feature_checkin is True %}
-                                    <th width="10%">Credenciado</th>
+                                    <th width="10%" class="text-center">Credenciado</th>
                                 {% endif %}
 
-                                <th width="18%">Lote</th>
+                                <th width="20%">Ingresso</th>
 
                                 <th width="10%" class="text-center"># Insc.</th>
 
