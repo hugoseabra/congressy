@@ -45,17 +45,17 @@ class Command(BaseCommand):
         past_events = Event.objects.filter(
             date_start__lt=datetime.now(),
             date_end__lt=datetime.now(),
-        ).order('pk')
+        ).order_by('pk')
 
         future_events = Event.objects.filter(
             date_start__gt=datetime.now(),
             date_end__gt=datetime.now(),
-        ).order('pk')
+        ).order_by('pk')
 
         live_events = Event.objects.filter(
             date_start__lte=datetime.now(),
             date_end__gt=datetime.now(),
-        ).order('pk')
+        ).order_by('pk')
 
         with atomic():
 
