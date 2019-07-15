@@ -118,6 +118,7 @@ AUTHENTICATION_BACKENDS = [
     'permission.backends.PermissionBackend',
 ]
 REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         # 'rest_framework.authentication.BasicAuthentication',
@@ -125,9 +126,8 @@ REST_FRAMEWORK = {
     ),
     'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S",
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100
+    'PAGE_SIZE': 100,
 }
-
 # ============================ VALIDATORS =================================== #
 AUTH_PASSWORD_VALIDATORS = [
     {
