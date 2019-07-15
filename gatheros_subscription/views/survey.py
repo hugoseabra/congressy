@@ -5,9 +5,8 @@ from django.contrib import messages
 from django.db.models.functions import Lower
 from django.db.transaction import atomic
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect, get_object_or_404
-from django.urls import reverse_lazy, reverse
-from django.utils.text import slugify
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse, reverse_lazy
 from django.views import generic
 
 from core.util import represents_int
@@ -16,10 +15,10 @@ from gatheros_event.views.mixins import EventViewMixin
 from gatheros_subscription.forms import EventSurveyForm
 from gatheros_subscription.models import EventSurvey
 from survey.api import SurveySerializer
-from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST, COMPLEX_TYPES
+from survey.constants import COMPLEX_TYPES, TYPE_LIST as QUESTION_TYPE_LIST
 from survey.forms import QuestionForm, SurveyAnswerForm
 from survey.models import Question
-from ticket.models import Lot
+from ticket.models import Ticket
 from .mixins import SurveyFeatureFlagMixin
 
 
@@ -58,7 +57,7 @@ class SurveyEditView(SurveyFeatureFlagMixin,
         context['has_inside_bar'] = True
         context['active'] = 'form-personalizado'
         context['form'] = QuestionForm(survey=self.survey)
-        context['lots'] = self._get_selected_lots()
+        context['tickets'] = self._get_tickets()
         context['full_survey_form'] = SurveyAnswerForm(
             survey=self.survey)
 
@@ -299,18 +298,18 @@ class SurveyEditView(SurveyFeatureFlagMixin,
             'survey_pk': self.event_survey.pk,
         }))
 
-    def _get_selected_lots(self):
-        lots_list = []
-        all_lots = self.event.lots.all().order_by(Lower('name'))
-        selected_lots = self.event_survey.lots.all()
+    def _get_tickets(self):
+        tickets_list = []
+        all_tickets = self.event.tickets.all().order_by(Lower('name'))
+        selected_tickets = self.event_survey.tickets.all()
 
-        for lot in all_lots:
-            if lot in selected_lots:
-                lots_list.append({'lot': lot, 'selected': True})
-            else:
-                lots_list.append({'lot': lot, 'selected': False})
+        for ticket in all_tickets:
+            tickets_list.append({
+                'ticket': ticket,
+                'selected': ticket in selected_tickets,
+            })
 
-        return lots_list
+        return tickets_list
 
 
 class SurveyListView(SurveyFeatureFlagMixin,
@@ -473,8 +472,8 @@ class EventSurveyEditAjaxView(SurveyFeatureFlagMixin,
         return HttpResponse(status=500)
 
 
-class EventSurveyLotsEditAjaxView(SurveyFeatureFlagMixin,
-                                  EventViewMixin):
+class EventSurveyTicketsEditAjaxView(SurveyFeatureFlagMixin,
+                                     EventViewMixin):
     event_survey = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -495,24 +494,25 @@ class EventSurveyLotsEditAjaxView(SurveyFeatureFlagMixin,
         # TODO: add a pre-check to validate if all lot ids are valid.
 
         data = dict(request.POST)
-        lots = []
+        tickets = []
         for key, item in data.items():
-            if 'lots' in key:
-                lot_pk = key.replace('lots[', '').replace(']', '')
+            if 'tickets' in key:
+                ticket_pk = key.replace('tickets[', '').replace(']', '')
                 status = item[0].replace('[', '').replace(']', '')
                 status = status == 'true'
-                lots.append({'lot': lot_pk, 'status': status})
+                tickets.append({'ticket': ticket_pk, 'status': status})
 
-        for item in lots:
-            lot = Lot.objects.get(pk=item['lot'], event=self.event.pk)
+        for item in tickets:
+            ticket = Ticket.objects.get(pk=item['ticket'],
+                                        event_id=self.event.pk)
 
             if item['status'] is True:
-                lot.event_survey = self.event_survey
-                lot.save()
+                ticket.event_survey = self.event_survey
+                ticket.save()
 
             if item['status'] is False and \
-                    lot.event_survey == self.event_survey:
-                lot.event_survey = None
-                lot.save()
+                            ticket.event_survey == self.event_survey:
+                ticket.event_survey = None
+                ticket.save()
 
         return HttpResponse(status=200)

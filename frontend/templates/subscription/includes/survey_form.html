@@ -28,12 +28,12 @@
                             Nome
                         </th>
                         <th style="width: 40%">
-                            Lotes
+                            Ingressos
                             <small>
                                 <i class="fas fa-question-circle" data-toggle="tooltip"
-                                   data-placement="right" title="Todos os
-                                   lotes que este formulário está
-                                   vinculado."></i>
+                                   data-placement="right"
+                                   title="Todos os
+                                   ingressos no quais o formulário está vinculado."></i>
                             </small>
                         </th>
                         <th></th>
@@ -52,10 +52,10 @@
                                 </a>
                             </td>
                             <td>
-                                {% if item.lots %}
-                                    {% for lot in item.lots %}
+                                {% if item.tickets %}
+                                    {% for ticket in item.tickets %}
                                     <div style="{% if not forloop.last %}border-bottom:1px solid #DDD;{% endif %}padding:8px 4px">
-                                        - {{ lot.name }}
+                                        - {{ ticket.name }}
                                     </div>
                                     {% endfor %}
                                 {% else %}
@@ -86,11 +86,11 @@
                                         </li>
 
                                         <li>
-                                            <a href="javascript:void(0)" class="open-lotModal"
+                                            <a href="javascript:void(0)" class="open-ticketModal"
                                                data-id="{{ item.event_survey.pk }}"
                                                data-title="{{ item.event_survey.survey.name }}">
                                                 <i class="fas fa-th-large"></i>
-                                                Lotes
+                                                Ingressos
                                             </a>
                                         </li>
                                         <li>

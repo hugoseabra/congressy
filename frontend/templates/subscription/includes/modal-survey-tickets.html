@@ -1,9 +1,9 @@
 {% load form_config_tags %}
 
-<div class="modal" id="survey-lots-form-modal" role="dialog" data-backdrop="true">
+<div class="modal" id="survey-tickets-form-modal" role="dialog" data-backdrop="true">
     <div class="modal-dialog " role="document">
         <div class="modal-content">
-            <form class="form-horizontal" role="form" name="survey-lots-form" onsubmit="processSurveyLot();return false;">
+            <form class="form-horizontal" role="form" name="survey-lots-form" onsubmit="processSurveyTicket();return false;">
                 <div class="modal-header">
                     <button type="button" class="close"
                             data-dismiss="modal"
@@ -12,7 +12,7 @@
                     </button>
                     <h4 class="modal-title text-bold">
                         {% if survey %}
-                            Lotes vinculados ao formulario personalizado:
+                            Ingressos vinculados ao formulario personalizado:
                             <strong>{{ survey.name }}</strong>
                         {% else %}
                             Erro ao buscar os dados do formulario solicitado.
@@ -24,7 +24,7 @@
                     <div class="row">
                         <div class="alert alert-info">
                             <i><strong>Lembrete:</strong></i>
-                            Um lote pode conter apenas um questionário.
+                            Um ingresso pode conter apenas um formulário vinculado.
                         </div>
                     </div>
 
@@ -44,18 +44,18 @@
                                    value="{{ event_survey.pk }}"
                                    id="survey-being-changed">
 
-                            {% for item in lots %}
+                            {% for item in tickets %}
 
                                 <tbody>
                                 <tr>
                                     <td>
-                                        {{ item.lot.name }}
+                                        {{ item.ticket.name }}
                                     </td>
                                     <td>
                                         <input
                                             type="checkbox"
                                             class="js-switch change-lot"
-                                            data-lot-id="{{ item.lot.pk }}"
+                                            data-ticket-id="{{ item.ticket.pk }}"
                                             {% if  item.selected %}checked{% endif %}/>
                                     </td>
 

@@ -10,14 +10,14 @@ router.register(r'lots', viewsets.LotViewSet)
 
 urls = [
     url(
-        r'^(?P<lot_pk>[\d]+)/survey/(?P<survey_pk>[\d]+)$',
-        views.LotChangeSurveyAPIView.as_view(),
-        name='lot-change-survey-api'
+        r'^(?P<ticket_pk>[\d]+)/survey/(?P<survey_pk>[\d]+)$',
+        views.TicketChangeSurveyAPIView.as_view(),
+        name='ticket-change-survey-api'
     ),
     url(
-        r'^(?P<lot_pk>[\d]+)/survey/$',
-        views.LotChangeSurveyAPIView.as_view(),
-        name='lot-change-survey-api'
+        r'^(?P<ticket_pk>[\d]+)/survey/$',
+        views.TicketChangeSurveyAPIView.as_view(),
+        name='ticket-change-surveys-api'
     ),
 ]
 

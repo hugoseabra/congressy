@@ -279,7 +279,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     {% if survey.questions.count > 0 %}
-                                        {% include 'subscription/includes/lot_event_survey_change_panel.html' %}
+                                        {% include 'subscription/includes/ticket_event_survey_change_panel.html' %}
                                     {% else %}
                                         <div>
                                             <strong>Não é permitido vincular formulários sem perguntas a lotes</strong>
@@ -908,7 +908,7 @@
             $(this).find(':submit').attr('disabled', 'disabled');
         });
 
-        $('.change-lot').on('change', function () {
+        $('.change-ticket').on('change', function () {
 
 
             var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
@@ -926,7 +926,7 @@
                     },
                     success: function () {
                         Messenger().post({
-                            message: 'Vínculo com lote inserido com sucesso!',
+                            message: 'Vínculo com ingresso inserido com sucesso!',
                             type: 'success'
                         });
                     },
@@ -934,7 +934,7 @@
                         console.error(err);
                         Messenger().post({
                             message: 'Não foi possivel vincular seu ' +
-                            'questionario.',
+                            'questionario com ingresso selecionado.',
                             type: 'error'
                         });
                     }
@@ -951,7 +951,7 @@
                     },
                     success: function () {
                         Messenger().post({
-                            message: 'Vínculo com lote removido com sucesso!',
+                            message: 'Vínculo com ingresso removido com sucesso!',
                             type: 'success'
                         });
                     },
@@ -959,7 +959,7 @@
                         console.error(err);
                         Messenger().post({
                             message: 'Não foi possivel desvincular seu ' +
-                            'questionario.',
+                            'questionario com o ingresso selecionado.',
                             type: 'error'
                         });
                     }

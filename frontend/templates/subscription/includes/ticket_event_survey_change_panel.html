@@ -11,18 +11,18 @@
 
     </tr>
     </thead>
-    {% for item in lots %}
+    {% for item in tickets %}
         <tbody>
         <tr>
             <td>
-                {{ item.lot.name }}
+                {{ item.ticket.name }}
             </td>
             <td>
                 <input
                         type="checkbox"
-                        class="js-switch change-lot"
-                        data-selected-url="{% url 'api:subscription:lot-change-survey-api' event.pk item.lot.pk survey.pk %}"
-                        data-url="{% url 'api:subscription:lot-change-survey-api' event.pk item.lot.pk %}"
+                        class="js-switch change-ticket"
+                        data-selected-url="{% url 'api:subscription:ticket-change-survey-api' event.pk item.ticket.pk survey.pk %}"
+                        data-url="{% url 'api:subscription:ticket-change-surveys-api' event.pk item.ticket.pk %}"
                         {% if  item.selected %} checked{% endif %}/>
             </td>
         </tr>

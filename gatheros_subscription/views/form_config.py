@@ -26,14 +26,14 @@ class FormConfigView(SurveyFeatureFlagMixin,
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.object = None
-        self.survey = None
+        self.event_survey = None
 
     def dispatch(self, request, *args, **kwargs):
 
-        get_survey = request.GET.get('survey')
+        survey_pk = request.GET.get('survey')
 
-        if get_survey and represents_int(get_survey):
-            self.survey = get_object_or_404(EventSurvey, pk=get_survey)
+        if survey_pk:
+            self.event_survey = get_object_or_404(EventSurvey, pk=survey_pk)
 
         self.event = self.get_event()
         try:
@@ -58,9 +58,10 @@ class FormConfigView(SurveyFeatureFlagMixin,
                 'email': True,
                 'phone': True,
                 'city': True,
-                'cpf': FormConfigForm.Meta.model.CPF_REQUIRED,
-                'birth_date': FormConfigForm.Meta.model.BIRTH_DATE_REQUIRED,
-                'address': FormConfigForm.Meta.model.ADDRESS_SHOW,
+                'cpf': FormConfigForm.Meta.model.CPF_REQUIRED is True,
+                'birth_date':
+                    FormConfigForm.Meta.model.BIRTH_DATE_REQUIRED is True,
+                'address': FormConfigForm.Meta.model.ADDRESS_SHOW is True,
             })
 
         return initial
@@ -92,10 +93,11 @@ class FormConfigView(SurveyFeatureFlagMixin,
 
         cxt.update(self.get_event_state_context_data(self.event))
 
-        if self.survey is not None:
-            cxt['survey'] = self.survey.survey
-        cxt['event_survey'] = self.survey
-        cxt['lots'] = self._get_selected_lots()
+        if self.event_survey is not None:
+            cxt['survey'] = self.event_survey.survey
+            cxt['event_survey'] = self.event_survey
+
+        cxt['tickets'] = self._get_tickets()
 
         return cxt
 
@@ -103,28 +105,31 @@ class FormConfigView(SurveyFeatureFlagMixin,
 
         survey_list = []
         all_surveys = EventSurvey.objects.all().filter(
-            event=self.event).order_by(Lower('survey__name'))
+            event_id=self.event.pk
+        ).order_by(Lower('survey__name'))
 
         for event_survey in all_surveys:
-            lots = event_survey.lots.all().order_by(Lower('name'))
+            tickets = event_survey.tickets.all().order_by(Lower('name'))
             survey_list.append({
                 'event_survey': event_survey,
-                'lots': list(lots),
+                'tickets': list(tickets),
             })
 
         return survey_list
 
-    def _get_selected_lots(self):
-        lots_list = []
-        selected_lots = []
-        all_lots = self.event.lots.all().order_by(Lower('name'))
-        if self.survey:
-            selected_lots = self.survey.lots.all()
+    def _get_tickets(self):
+        tickets_list = list()
+        selected_tickets = list()
 
-        for lot in all_lots:
-            if lot in selected_lots:
-                lots_list.append({'lot': lot, 'selected': True})
-            else:
-                lots_list.append({'lot': lot, 'selected': False})
+        if self.event_survey:
 
-        return lots_list
+            all_tickets = self.event.tickets.all().order_by(Lower('name'))
+            selected_tickets = self.event_survey.tickets.all()
+
+            for ticket in all_tickets:
+                tickets_list.append({
+                    'ticket': ticket,
+                    'selected': ticket in selected_tickets,
+                })
+
+        return tickets_list

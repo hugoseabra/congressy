@@ -150,10 +150,6 @@
                         <div id="survey-list">
                             {% include 'subscription/includes/survey_form.html' %}
                         </div>
-                        <small class="text-muted">Você deve adicionar o
-                            formulário no lote desejado.
-                            Ir para <strong><a href="{% url 'subscription:lot-list' event.pk %}">Lotes</a></strong>.
-                        </small>
                     </div>
                 </div>
 
@@ -505,9 +501,9 @@
                     });
             });
 
-            $('.open-lotModal').on('click', function () {
+            $('.open-ticketModal').on('click', function () {
                 var survey_id = $(this).data('id');
-                var existing_modal = $("#survey-lots-form-modal");
+                var existing_modal = $("#survey-tickets-form-modal");
 
                 if (typeof(existing_modal[0]) !== 'undefined') {
                     existing_modal.remove()
@@ -515,7 +511,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: '?survey=' + survey_id + '&template_name=subscription/includes/modal-survey-lots',
+                    url: '?survey=' + survey_id + '&template_name=subscription/includes/modal-survey-tickets',
                     error: function (err) {
                         Messenger().post({
                             message: 'Não foi possivel buscar os dados deste ' +
@@ -530,7 +526,7 @@
                         new_modal = $(new_modal[1]);
                         $('.modals').append(new_modal);
                         app.switcheryToggle();
-                        $('#survey-lots-form-modal').modal('show');
+                        $('#survey-tickets-form-modal').modal('show');
 
                     }
                 });
@@ -544,18 +540,18 @@
 
         }
 
-        function processSurveyLot() {
-            $('#survey-lots-form-modal').modal('hide');
+        function processSurveyTicket() {
+            $('#survey-tickets-form-modal').modal('hide');
             var changed_data = {};
             changed_data['event_survey'] = $('#survey-being-changed').val();
-            changed_data['lots'] = {};
+            changed_data['tickets'] = {};
             $('.change-lot').each(function (i, obj) {
-                changed_data['lots'][$(obj).data('lot-id')] = obj.checked;
+                changed_data['tickets'][$(obj).data('ticket-id')] = obj.checked;
             });
 
             $.ajax({
                 type: "POST",
-                url: '{% url 'subscription:survey-ajax-lots' event.pk%}',
+                url: '{% url 'subscription:survey-ajax-tickets' event.pk%}',
                 beforeSend: function (request) {
                     request.setRequestHeader("X-CSRFToken", csrftoken);
                 },

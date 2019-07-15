@@ -13,8 +13,8 @@ from .lot import (
     LotListView,
     LotSurveyView,
 )
-from .lot_api import (
-    LotChangeSurveyAPIView,
+from .ticket_api import (
+    TicketChangeSurveyAPIView,
 )
 from .payment import PaymentDeleteView
 from .subscription_views import (
@@ -37,7 +37,7 @@ from .survey import (
     EventSurveyDeleteAjaxView,
     EventSurveyDuplicateView,
     EventSurveyEditAjaxView,
-    EventSurveyLotsEditAjaxView,
+    EventSurveyTicketsEditAjaxView,
     SurveyEditView,
     SurveyListView,
 )

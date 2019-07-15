@@ -25,9 +25,9 @@ urls = [
         name='survey-ajax-delete'
     ),
     url(
-        r'^event-survey/edit/lots$',
-        views.EventSurveyLotsEditAjaxView.as_view(),
-        name='survey-ajax-lots'
+        r'^event-survey/edit/tickets$',
+        views.EventSurveyTicketsEditAjaxView.as_view(),
+        name='survey-ajax-tickets'
     ),
     url(
         r'^event-survey/edit$',
