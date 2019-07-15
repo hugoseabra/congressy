@@ -1,58 +1,31 @@
-from decimal import Decimal
-
 from django.contrib import messages
-from django.shortcuts import redirect
 from django.urls import reverse
 from django.views import generic
+from django.db.models import Count
 
 from addon import services
 from addon.models import Product, Service
 from core.views.mixins import TemplateNameableMixin
-from gatheros_event.helpers.event_business import is_paid_event
-from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin
-from gatheros_subscription.models import LotCategory
+from gatheros_event.views.mixins import EventViewMixin
+from ticket.models import Ticket
 from .mixins import (
     ProductFeatureFlagMixin,
     ServiceFeatureFlagMixin,
 )
 
 
-class EventOptionalMixin(AccountMixin, generic.View):
-    event = None
-
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            self.event = Event.objects.get(pk=self.kwargs.get('event_pk'))
-        except Event.DoesNotExist:
-            messages.warning(
-                request,
-                "Evento não informado."
-            )
-            return redirect('event:event-list')
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        # noinspection PyUnresolvedReferences
-        context = super().get_context_data(**kwargs)
-        context['event'] = self.event
-        context['is_paid_event'] = is_paid_event(self.event)
-        context['themes'] = self.event.themes.all()
-        context['cgsy_percent'] = Decimal(self.event.congressy_percent) / 100
-        return context
-
-
 class OptionalServiceListView(ServiceFeatureFlagMixin,
                               TemplateNameableMixin,
-                              EventOptionalMixin,
+                              EventViewMixin,
                               generic.ListView):
-    queryset = LotCategory.objects.all()
+    queryset = Ticket.objects.all()
     template_name = 'addon/optional/manage-service.html'
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(event=self.event)
+        return queryset.annotate(
+            num_services=Count('addon_services'),
+        ).filter(event_id=self.event.pk, num_services__gt=0)
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
@@ -69,10 +42,10 @@ class OptionalServiceListView(ServiceFeatureFlagMixin,
             'num': {},
             'remaining': {},
         }
-        queryset = self.event.lot_categories
+        queryset = self.event.tickets
 
-        for cat in queryset.all():
-            for optional in cat.service_optionals.all():
+        for ticket in queryset.all():
+            for optional in ticket.addon_services.all():
                 sub_queryset = optional.subscription_services.filter(
                     subscription__test_subscription=False,
                     subscription__completed=True,
@@ -92,14 +65,16 @@ class OptionalServiceListView(ServiceFeatureFlagMixin,
 
 class OptionalProductListView(ProductFeatureFlagMixin,
                               TemplateNameableMixin,
-                              EventOptionalMixin,
+                              EventViewMixin,
                               generic.ListView):
-    queryset = LotCategory.objects.all()
+    queryset = Ticket.objects.all()
     template_name = 'addon/optional/manage-product.html'
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(event=self.event)
+        return queryset.annotate(
+            num_products=Count('addon_products'),
+        ).filter(event_id=self.event.pk, num_products__gt=0)
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
@@ -117,10 +92,10 @@ class OptionalProductListView(ProductFeatureFlagMixin,
             'num': {},
             'remaining': {},
         }
-        queryset = self.event.lot_categories
+        queryset = self.event.tickets
 
-        for cat in queryset.all():
-            for optional in cat.product_optionals.all():
+        for ticket in queryset.all():
+            for optional in ticket.addon_products.all():
                 sub_queryset = optional.subscription_products.filter(
                     subscription__test_subscription=False,
                     subscription__completed=True,
@@ -139,7 +114,7 @@ class OptionalProductListView(ProductFeatureFlagMixin,
 
 
 class OptionalAddProductView(ProductFeatureFlagMixin,
-                             EventOptionalMixin,
+                             EventViewMixin,
                              generic.CreateView):
     form_class = services.ProductService
     template_name = 'addon/optional/form-product.html'
@@ -150,7 +125,7 @@ class OptionalAddProductView(ProductFeatureFlagMixin,
         })
 
         if self.object and self.object.pk:
-            url += '#cat=' + str(self.object.lot_category.pk)
+            url += '#ticket=' + str(self.object.ticket_id)
 
         return url
 
@@ -173,32 +148,20 @@ class OptionalAddProductView(ProductFeatureFlagMixin,
         try:
             response = super().form_valid(form)
 
+            messages.success(
+                self.request,
+                'Produto/Serviço opcional criado com sucesso.'
+            )
+
         except Exception as e:
             messages.error(self.request, str(e))
             return self.form_invalid(form)
 
-        messages.success(
-            self.request,
-            'Produto/Serviço opcional criado com sucesso.'
-        )
         return response
-
-    # def get_initial(self):
-    #     from datetime import timedelta
-    # 
-    #     initial = super().get_initial()
-    #     initial.update({
-    #         'name': 'Optional test',
-    #         'optional_type': 1,
-    #         'lot_category': 1,
-    #         'price': '22,00',
-    #         'date_end_sub': self.event.date_start - timedelta(minutes=1),
-    #     })
-    #     return initial
 
 
 class OptionalAddServiceView(ServiceFeatureFlagMixin,
-                             EventOptionalMixin,
+                             EventViewMixin,
                              generic.CreateView):
     form_class = services.ServiceService
     template_name = 'addon/optional/form-service.html'
@@ -209,13 +172,14 @@ class OptionalAddServiceView(ServiceFeatureFlagMixin,
         })
 
         if self.object and self.object.pk:
-            url += '#cat=' + str(self.object.lot_category.pk)
+            url += '#ticket=' + str(self.object.ticket_id)
 
         return url
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['optional_active'] = 'service'
+        context['themes'] = self.event.themes.all()
         return context
 
     def post(self, request, *args, **kwargs):
@@ -232,37 +196,20 @@ class OptionalAddServiceView(ServiceFeatureFlagMixin,
         try:
             response = super().form_valid(form)
 
+            messages.success(
+                self.request,
+                'Atividade extra Opcional criado com sucesso.'
+            )
+
         except Exception as e:
             messages.error(self.request, str(e))
             return self.form_invalid(form)
 
-        messages.success(
-            self.request,
-            'Atividade extra Opcional criado com sucesso.'
-        )
         return response
-
-        # def get_initial(self):
-        #     from datetime import datetime, timedelta
-        #
-        #     initial = super().get_initial()
-        #     initial.update({
-        #         'name': 'Optional test',
-        #         'optional_type': 1,
-        #         'lot_category': 1,
-        #         'theme': 1,
-        #         'schedule_start': datetime.now() + timedelta(days=30),
-        #         'schedule_end': datetime.now() + timedelta(days=30, hours=2),
-        #         'place': 'Auditório 1 Madre Teresa',
-        #         'price': '22,00',
-        #         'date_end_sub': self.event.date_start - timedelta(minutes=1),
-        #         'restrict_unique': True,
-        #     })
-        #     return initial
 
 
 class OptionalProductEditView(ProductFeatureFlagMixin,
-                              EventOptionalMixin,
+                              EventViewMixin,
                               generic.UpdateView):
     form_class = services.ProductService
     model = Product
@@ -275,7 +222,7 @@ class OptionalProductEditView(ProductFeatureFlagMixin,
         })
 
         if self.object and self.object.pk:
-            url += '#cat=' + str(self.object.lot_category.pk)
+            url += '#ticket=' + str(self.object.ticket_id)
 
         return url
 
@@ -314,7 +261,7 @@ class OptionalProductEditView(ProductFeatureFlagMixin,
 
 
 class OptionalServiceEditView(ServiceFeatureFlagMixin,
-                              EventOptionalMixin,
+                              EventViewMixin,
                               generic.UpdateView):
     form_class = services.ServiceService
     model = Service
@@ -327,7 +274,7 @@ class OptionalServiceEditView(ServiceFeatureFlagMixin,
         })
 
         if self.object and self.object.pk:
-            url += '#cat=' + str(self.object.lot_category.pk)
+            url += '#ticket=' + str(self.object.ticket_id)
 
         return url
 
@@ -335,6 +282,7 @@ class OptionalServiceEditView(ServiceFeatureFlagMixin,
         context = super().get_context_data(**kwargs)
         context['object'] = self.get_object()
         context['optional_active'] = 'service'
+        context['themes'] = self.event.themes.all()
         context['has_subscriptions'] = \
             self.object.subscription_services.filter(
                 subscription__completed=True,
@@ -356,6 +304,6 @@ class OptionalServiceEditView(ServiceFeatureFlagMixin,
     def form_valid(self, form):
         messages.success(
             self.request,
-            'Atividae Extra Opcional alterado com sucesso.'
+            'Atividade Extra alterada com sucesso.'
         )
         return super().form_valid(form)

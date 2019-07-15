@@ -1,5 +1,7 @@
 """ Mixins de views. """
 
+from decimal import Decimal
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import redirect_to_login
@@ -307,6 +309,7 @@ class EventViewMixin(AccountMixin):
         context['event'] = self.get_event()
         context['is_paid_event'] = is_paid_event(self.event)
         context['event_is_payable'] = is_payable
+        context['cgsy_percent'] = Decimal(self.event.congressy_percent) / 100
 
         return context
 

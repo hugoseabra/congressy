@@ -22,7 +22,7 @@ class AbstractSubscriptionOptional(EntityMixin, models.Model):
         auditoria.
     """
     rule_instances = (
-        rules.MustBeSameOptionalLotCategory,
+        rules.MustBeSameOptionalTicket,
     )
 
     class Meta:

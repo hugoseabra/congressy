@@ -23,8 +23,8 @@ class ThemeAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 @admin.register(Service)
 class OptionalServiceAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     search_fields = (
-        'lot_category__event__name',
-        'lot_category__lots__name',
+        'ticket__event__name',
+        'ticket__name',
         'theme__name',
         'optional_type__name',
         'name',
@@ -33,16 +33,16 @@ class OptionalServiceAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
     list_display = (
         'name',
         'theme',
-        'lot_category',
+        'ticket',
         'quantity',
         'liquid_price',
     )
-    raw_id_fields = ['theme', 'optional_type', 'lot_category']
+    raw_id_fields = ['theme', 'optional_type', 'ticket']
     fieldsets = (
         (None, {
             'fields': (
                 'optional_type',
-                'lot_category',
+                'ticket',
                 'theme',
                 'name',
                 'schedule_start',

@@ -31,7 +31,7 @@ class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         ]
 
         queryset = super().get_queryset()
-        return queryset.filter(lot_category__event__organization__in=org_pks)
+        return queryset.filter(ticket__event__organization__in=org_pks)
 
 
 class ProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
@@ -52,7 +52,7 @@ class ProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         ]
 
         queryset = super().get_queryset()
-        return queryset.filter(lot_category__event__organization__in=org_pks)
+        return queryset.filter(ticket__event__organization__in=org_pks)
 
 
 class SubscriptionServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):

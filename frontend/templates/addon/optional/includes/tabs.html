@@ -3,35 +3,55 @@
         <div class="panel panel-primary">
             <div class="panel-heading">
                 {% if optional_active == 'service' %}
-                <h3 class="panel-title">Atividades extras por categoria</h3>
+                <h3 class="panel-title">Atividades extras por Ingresso</h3>
                 {% endif %}
                 {% if optional_active == 'product' %}
-                <h3 class="panel-title">Produtos / Serviços por categoria</h3>
+                <h3 class="panel-title">Produtos / Serviços por Ingresso</h3>
                 {% endif %}
             </div>
             <div class="panel-body">
                 {% if optional_active == 'service' %}
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="row cat-tabs">
-                            <div class="col-md-12" id="main-service-list-block">
-                                {% include 'addon/optional/includes/service.html' %}
+                    {% if object_list %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row ticket-tabs">
+                                <div class="col-md-12" id="main-service-list-block">
+                                    {% include 'addon/optional/includes/service.html' %}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    {% else %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="text-center" style="border:1px solid whitesmoke;padding: 40px 20px">
+                                <a href="{% url 'addon:optional-service-add' event.pk %}">Adicionar Atividade</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 {% endif %}
 
                 {% if optional_active == 'product' %}
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="row cat-tabs">
-                            <div class="col-md-12" id="main-product-list-block">
-                                {% include 'addon/optional/includes/product.html' %}
+                    {% if object_list %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row ticket-tabs">
+                                <div class="col-md-12" id="main-product-list-block">
+                                    {% include 'addon/optional/includes/product.html' %}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    {% else %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="text-center" style="border:1px solid whitesmoke;padding: 40px 20px">
+                                <a href="{% url 'addon:optional-product-add' event.pk %}">Adicionar Produto / Serviço</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>

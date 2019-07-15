@@ -40,9 +40,9 @@ class ProductService(services.ApplicationService):
         super().__init__(**kwargs)
 
         # Filtra categorias de lote por evento
-        lot_cat_queryset = self.manager.fields['lot_category'].queryset
-        self.manager.fields['lot_category'].queryset = lot_cat_queryset.filter(
-            event=event
+        ticket_queryset = self.manager.fields['ticket'].queryset
+        self.manager.fields['ticket'].queryset = ticket_queryset.filter(
+            event_id=event.pk,
         )
 
 
@@ -65,16 +65,16 @@ class ServiceService(services.ApplicationService):
 
         super().__init__(**kwargs)
 
-        # Filtra temas por evento
+        # Filtra por evento
         theme_queryset = self.manager.fields['theme'].queryset
         self.manager.fields['theme'].queryset = theme_queryset.filter(
-            event=event
+            event_id=event.pk,
         )
 
-        # Filtra categorias de lote por evento
-        lot_cat_queryset = self.manager.fields['lot_category'].queryset
-        self.manager.fields['lot_category'].queryset = lot_cat_queryset.filter(
-            event=event
+        # Filtra por evento
+        ticket_queryset = self.manager.fields['ticket'].queryset
+        self.manager.fields['ticket'].queryset = ticket_queryset.filter(
+            event_id=event.pk,
         )
 
 

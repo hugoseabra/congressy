@@ -27,14 +27,14 @@ def get_image_path(instance, filename):
 
     return os.path.join(
         'event',
-        str(instance.lot_category.event_id),
+        str(instance.ticket.event_id),
         'addon_{}'.format(addon_type),
         str(instance.id),
         os.path.basename(filename)
     )
 
 
-@track_data('lot_category_id', 'date_end_sub', 'published', 'liquid_price',
+@track_data('ticket_id', 'date_end_sub', 'published', 'liquid_price',
             'description', 'quantity', 'release_days', 'banner', )
 class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
     """
@@ -60,6 +60,8 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
         related_name='%(class)s_optionals',
         help_text='Para qual categoria de participante se destina.',
         # TODO: Remove this field
+        null=True,
+        blank=True,
     )
 
     date_end_sub = models.DateTimeField(
@@ -192,7 +194,7 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
         if self.liquid_price is None or self.liquid_price == 0:
             return Decimal(0)
 
-        event = self.lot_category.event
+        event = self.ticket.event
 
         # minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
         congressy_plan_percent = Decimal(event.congressy_percent) / 100
@@ -288,7 +290,7 @@ class Service(AbstractOptional):
     rule_instances = (
         rules.MustScheduleDateEndAfterDateStart,
         # rules.ServiceMustHaveUniqueDatetimeScheduleInterval,
-        rules.ThemeMustBeSameEvent,
+        rules.ThemeMustBeSameTicketEvent,
         rules.OptionalMustHaveMinimumDays,
     )
 

@@ -27,7 +27,7 @@ class Command(BaseCommand, CliInteractionMixin, CommandEventMixin):
 
         print('==============================================================')
         addons = Service.objects.filter(
-            lot_category__event_id=event.pk,
+            ticket__event_id=event.pk,
             tag__in=tags,
         ).order_by('tag', 'schedule_start')
 
@@ -46,7 +46,7 @@ class Command(BaseCommand, CliInteractionMixin, CommandEventMixin):
             line = [
                 str(addon.pk),
                 addon.name,
-                addon.lot_category.name,
+                addon.ticket.name,
                 addon.theme.name,
                 str(subs_qs.count()),
             ]

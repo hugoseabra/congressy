@@ -19,7 +19,7 @@ from gatheros_event.signals.helpers import (
 def set_feature_flags_on_event_type_change(instance, **_):
     """ Altera as flags de fatures quando um evento muda de tipo """
 
-    event = instance.lot_category.event
+    event = instance.ticket.event
     update_event_config_flags(event)
     update_event_publishing(event)
 

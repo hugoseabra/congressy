@@ -1,18 +1,18 @@
 function selectFromHash() {
     var hash = window.location.hash.substring(1);
-    var cat_id = hash.replace('cat=', '');
+    var cat_id = hash.replace('ticket=', '');
     if (cat_id) {
         select(cat_id);
     }
 }
 
 function select(cat_id) {
-    $('.cat-tabs .nav-tabs').find('li').removeClass('active');
-    $('.cat-tabs .tab-pane').removeClass('active');
+    $('.ticket-tabs .nav-tabs').find('li').removeClass('active');
+    $('.ticket-tabs .tab-pane').removeClass('active');
 
-    $('#cat-super-' + cat_id).addClass('active');
-    $('#cat-' + cat_id).addClass('active');
-    window.location.hash = '#cat=' + cat_id;
+    $('#ticket-super-' + cat_id).addClass('active');
+    $('#ticket-' + cat_id).addClass('active');
+    window.location.hash = '#ticket=' + cat_id;
 }
 
 function send(url, method, data, success_callback, error_callback) {
@@ -193,8 +193,8 @@ function delete_optional(url, msg) {
 }
 
 function createAnchorEvents() {
-    $('.cat-tab-link').on('click', function () {
-        window.location.hash = '#cat=' + $(this).data('cat-id');
+    $('.ticket-tab-link').on('click', function () {
+        window.location.hash = '#ticket=' + $(this).data('ticket-id');
     });
 }
 

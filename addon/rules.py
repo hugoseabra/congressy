@@ -47,10 +47,10 @@ class ServiceMustHaveUniqueDatetimeScheduleInterval(RuleChecker):
             if not schedule_start_changed and not schedule_end_changed:
                 return
 
-        lot_category = model_instance.lot_category
+        ticket = model_instance.ticket
 
         optional = model_instance
-        other_optionals = lot_category.service_optionals.all()
+        other_optionals = ticket.addon_services.all()
 
         conflict_prices = []
         for o_optional in other_optionals:
@@ -98,7 +98,7 @@ class OptionalMustHaveMinimumDays(RuleChecker):
 
 
 # ============================= OPTIONAL SERVICE =+========================== #
-class ThemeMustBeSameEvent(RuleChecker):
+class ThemeMustBeSameTicketEvent(RuleChecker):
     """
     Regra: o Opcional e o tema devem ser do mesmo evento
     """
@@ -106,17 +106,18 @@ class ThemeMustBeSameEvent(RuleChecker):
     def check(self, model_instance, *args, **kwargs):
         theme = model_instance.theme
 
-        event = model_instance.lot_category.event
-
-        if theme.event.pk != event.pk:
+        if theme.event_id != model_instance.ticket.event_id:
             raise RuleIntegrityError(
-                'Conflito de evento entre o tema "{}" e '
-                'o serviço "{}".'.format(theme.event.name, event.name)
+                'O tema da atividade extra não é o mesmo do ingresso.'
+                ' Ingresso: event #ID {}. Tema: evento #ID: {}'.format(
+                    model_instance.ticket.event_id,
+                    theme.event_id,
+                )
             )
 
 
 # ===================== SUBSCRIPTION OPTIONAL =============================== #
-class MustBeSameOptionalLotCategory(RuleChecker):
+class MustBeSameOptionalTicket(RuleChecker):
     """
     Regra: a Inscrição com o Opcional devem pertencener ao mesmo LotCategory.
     """
@@ -126,8 +127,8 @@ class MustBeSameOptionalLotCategory(RuleChecker):
 
         sub = model_instance.subscription
 
-        if optional.lot_category.pk != sub.lot.category.pk:
+        if optional.ticket_id != sub.ticket_id:
             raise RuleIntegrityError(
-                'Você deve informar uma categoria de lote que já esteja'
-                ' inserida no opcional "{}".'.format(optional.name)
+                'Você deve informar um ingresso válido para'
+                ' o opcional "{}".'.format(optional.name)
             )
