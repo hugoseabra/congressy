@@ -4,16 +4,14 @@ import absoluteuri
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
-from gatheros_subscription.models import (
-    Lot,
-    Subscription,
-)
+from gatheros_subscription.models import Subscription
 from survey.forms import (
     ActiveSurveyAnswerForm,
     SurveyAnswerForm,
     SurveyBaseForm,
 )
-from survey.models import Author, Answer, Survey, Question
+from survey.models import Answer, Author, Question, Survey
+from ticket.models import Ticket
 
 
 class InitialStorage(object):
@@ -31,8 +29,7 @@ class SubscriptionSurveyDirector(object):
         serve como interface a Survey, o SubscriptionAuthor
     """
 
-    def __init__(self, subscription: Subscription = None,
-                 lot: Lot = None) -> None:
+    def __init__(self, subscription: Subscription = None) -> None:
         """
 
         Este construtor tem como intenção buscar todos os objetos de survey
@@ -42,7 +39,6 @@ class SubscriptionSurveyDirector(object):
         """
 
         self.subscription = subscription
-        self.lot = lot
 
         if subscription is not None:
             if not isinstance(subscription, Subscription):
@@ -128,7 +124,10 @@ class SubscriptionSurveyDirector(object):
             author=author,
         )
 
-    def get_active_form(self, survey: Survey, data=None, files=None,
+    def get_active_form(self,
+                        survey: Survey,
+                        data=None,
+                        files=None,
                         update=False) -> ActiveSurveyAnswerForm:
         """
 
@@ -142,6 +141,8 @@ class SubscriptionSurveyDirector(object):
         :param survey: uma instância de um objeto de formulário
         :param data: um dict contendo as novas respostas que serão
                 vinculadas ao form
+        :param files: arquivos enviados para o formulário
+        :param update: se processamento será para atualização de registros
 
         :return SurveyAnswerForm: um objeto de SurveyAnswerForm
         """
@@ -196,9 +197,9 @@ class SubscriptionSurveyDirector(object):
             """
             try:
                 answer = Answer.objects.get(
-                    question=question,
-                    author=author,
-                    question__survey=survey,
+                    question_id=question.pk,
+                    author_id=author.pk,
+                    question__survey_id=survey.pk,
                 )
 
                 if question.type in file_types:
@@ -239,7 +240,10 @@ class SubscriptionSurveyDirector(object):
             files=files,
         )
 
-    def get_base_form(self, survey: Survey, data=None, files=None,
+    def get_base_form(self,
+                      survey: Survey,
+                      data=None,
+                      files=None,
                       update=False) -> SurveyBaseForm:
         """
 
@@ -253,6 +257,8 @@ class SubscriptionSurveyDirector(object):
         :param survey: uma instância de um objeto de formulário
         :param data: um dict contendo as novas respostas que serão
                 vinculadas ao form
+        :param files: arquivos enviados para o formulário
+        :param update: se processamento será para atualização de registros
 
         :return SurveyAnswerForm: um objeto de SurveyAnswerForm
         """

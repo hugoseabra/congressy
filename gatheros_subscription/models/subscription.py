@@ -57,7 +57,14 @@ class SubscriptionManager(models.Manager):
                 return code
 
 
-@track_data('lot_id')
+@track_data(
+    'ticket_lot_id',
+    'status',
+    'notified',
+    'author_id',
+    'tag_group',
+    'obs',
+)
 class Subscription(models.Model, EntityMixin, GatherosModelMixin):
     """ Modelo de inscrição """
 
