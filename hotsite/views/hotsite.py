@@ -26,7 +26,6 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.has_private_subscription = False
-        self.private_still_available = False
 
     def dispatch(self, request, *args, **kwargs):
         self.pre_dispatch()
@@ -56,7 +55,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
             try:
                 Subscription.objects.get(
                     pk=subscription_id,
-                    ticket_lot__private=True,
+                    ticket_lot__ticket__private=True,
                     event__slug=self.kwargs.get('slug')
                 )
                 self.has_private_subscription = True
@@ -74,9 +73,14 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
 
         # Força verificação se está inscrito apenas para inscrições completas.
         context['is_subscribed'] = sub.completed is True if sub else False
+        context['has_transactions'] = \
+            self.current_subscription.has_transactions()
 
         context['has_private_subscription'] = self.has_private_subscription
-        context['private_still_available'] = self.has_private_subscription
+
+        sub_ticket = self.current_subscription.subscription.ticket
+        context['ticket_still_available'] = \
+            sub_ticket.running is True if sub_ticket else False
 
         publishable = False
         unpublishable_reason = None

@@ -29,15 +29,6 @@
             <button type="submit" class="btn btn-primary">
                 Definir minha senha
             </button>
-            {% if event.is_scientific and is_subscribed and event.work_config and event.work_config.is_submittable %}
-                <div><strong>Científico:</strong></div>
-                <div>
-                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
-                       class="btn btn-success btn-block" style="margin-top: 15px">
-                        Enviar Resumo
-                    </a>
-                </div>
-            {% endif %}
 
             {% if has_available_optionals %}
 
@@ -138,7 +129,7 @@
                 </div>
             </div>
 
-        {% elif is_subscribed and has_private_subscription and lot_still_available %}
+        {% elif is_subscribed and has_private_subscription and ticket_still_available %}
 
             <p class="text-muted">
                 Preencha os dados seguintes para refazer sua inscrição.
@@ -168,7 +159,7 @@
             </div>
             <hr/>
 
-            {% if not subscription.ticket_lot.price or subscription.ticket_lot.price and subscription.transactions.count > 0 %}
+            {% if not subscription.ticket_lot.price or subscription.ticket_lot.price and has_transactions %}
                 <p style="font-size: 18px">
                     Você já está inscrito(a) neste evento.
                 </p>
@@ -202,18 +193,9 @@
                 <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
                     {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                 </div>
-                {% if event.is_scientific and is_subscribed and event.work_config and event.work_config.is_submittable %}
-                    <div style="margin-top: 15px;text-align: center">TRABALHOS CIENTÍFICOS</div>
-                    <div>
-                        <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
-                           class="btn btn-success btn-block">
-                            Enviar Resumo
-                        </a>
-                    </div>
-                {% endif %}
             </div>
 
-        {% elif is_subscribed and has_private_subscription and not lot_still_available %}
+        {% elif is_subscribed and has_private_subscription and not ticket_still_available %}
 
             <p class="text-muted">
                 Preencha os dados seguintes para refazer sua inscrição.
@@ -279,7 +261,7 @@
             {% endif %}
 
             {% comment %}Possui somente lotes privados{% endcomment %}
-            {% if not lots and private_lots %}
+            {% if not tickets and private_tickets %}
                 <div class="form-group">
                     <label for="id_exhibition_code">Cupom:
                         <small style="color:#C9302C">*</small>
@@ -300,17 +282,8 @@
                 <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
                     {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                 </div>
-                {% if event.is_scientific and is_subscribed %}
-                    <div style="margin-top: 15px;text-align: center">TRABALHOS CIENTÍFICOS</div>
-                    <div>
-                        <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
-                           class="btn btn-success btn-block">
-                            Enviar Resumo
-                        </a>
-                    </div>
-                {% endif %}
             </div>
-            {% if person and person.is_new is False %}
+            {% if person and person.brand_new is False %}
                 <div class="form-group">
                     <div class="text-center">
                         <a href="{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}"

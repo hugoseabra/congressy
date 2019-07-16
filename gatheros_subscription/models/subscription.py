@@ -257,6 +257,9 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
 
     @property
     def ticket(self):
+        if not self.ticket_lot_id:
+            return None
+
         if not self._ticket:
             self._ticket = self.ticket_lot.ticket
 

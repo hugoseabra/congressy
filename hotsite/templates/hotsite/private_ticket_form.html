@@ -6,122 +6,109 @@
     {% include 'hotsite/includes/2_cover_no_form.html' %}
 
     <section id="about" class="about-section section">
+        <form method="post" action="" onsubmit="next_page();">
+            <div class="container">
 
-        <div class="container">
+                <h2 class="section-heading text-center">Inscrição</h2>
 
-            <h2 class="section-heading text-center">Inscrição</h2>
+                <div class="about-row row">
 
-            <div class="about-row row">
+                    <div class="col-md-9 col-md-offset-2">
 
-                <div class="col-md-9 col-md-offset-2">
+                        {% include "hotsite/includes/greetings.html" %}
 
-                    {% include "hotsite/includes/greetings.html" %}
-
-                    {% if form.non_field_errors %}
-                        {% render_errors form.non_field_errors %}
-                    {% endif %}
-
-                    {% for hidden_field in form.hidden_fields %}
-                        {% if hidden_field.errors %}
-                            {% render_errors hidden_field.errors %}
+                        {% if form.non_field_errors %}
+                            {% render_errors form.non_field_errors %}
                         {% endif %}
-                    {% endfor %}
 
-                    {% block messages %}
-                        {% if messages %}
-                            <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                            {% for message in messages %}
+                        {% for hidden_field in form.hidden_fields %}
+                            {% if hidden_field.errors %}
+                                {% render_errors hidden_field.errors %}
+                            {% endif %}
+                        {% endfor %}
 
-                                {% if message.tags %}
-                                    <div class="alert alert-{{ message.tags }} alert-dismissible"
-                                         role="alert">
+                        {% block messages %}
+                            {% if messages %}
+                                <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        {{ message|capfirst }}
+                                    </div>
+                                {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endblock %}
 
-                                {% else %}
-                                    <div class="alert alert-warning alert-dismissible"
-                                         role="alert">
-                                {% endif %}
+                        <div class="form-validation alert"></div>
 
-                            <button type="button" class="close"
-                                    data-dismiss="alert"
-                                    aria-label="Close"><span
-                                    aria-hidden="true">&times;</span>
-                            </button>
-                            {{ message|capfirst }}
-                            </div>
+                        <div style="margin-bottom: 20px">
 
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    {% endblock messages %}
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="panel-title">Ingresso</div>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% csrf_token %}
+                                            {{ wizard.management_form }}
 
-                    <div class="form-validation alert"></div>
+                                            <div id="original-lots-field">
+                                                {% render_generic_field form.ticket %}
 
-                    <div style="margin-bottom: 20px">
-
-
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="panel-title">Ingresso</div>
-                            </div>
-                            <div class="panel-body">
-                                <div class="row">
-                                    <div class="col-md-12">
-
-                                            <form method="post" action="">
-
-                                                {% csrf_token %}
-                                                {{ wizard.management_form }}
-
-                                                <div id="original-lots-field">
-
-                                                         {% render_generic_field form.lots %}
-                                                            <h4 style="font-weight: bold;padding-bottom:0;margin-bottom:0">
-                                                                CUPOM
-                                                                VÁLIDO</h4>
-                                                            <div class="text-muted"
-                                                                 style="padding-right:20px"
-                                                                 id="lot_exhibition_code">{{ lot.exhibition_code }}</div>
-                                                            <div>
-                                                            <span style="color:darkgreen;font-weight: bold;" id="lot_display_publicly">
-                                                                {{ lot.display_publicly}}
-                                                            </span>
-                                                            </div>
+                                                <div id="lots-field">
+                                                    <h4 style="font-weight: bold;padding-bottom:0;margin-bottom:0">CUPOM VÁLIDO</h4>
+                                                    <div class="text-muted" style="padding-right:20px" id="lot_exhibition_code">
+                                                        {{ selected_ticket.exhibition_code }}
+                                                    </div>
+                                                    <div>
+                                                        <span style="color:darkgreen;font-weight: bold;" id="lot_display_publicly">
+                                                            {{ selected_ticket.display_name_and_price }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="small" style="margin-top: 10px;">
+                                                        <a href="javascript:void(0)" onclick='hide_coupon()' style='margin-top:2px'> Retirar / Trocar cupom</a>
+                                                    </div>
                                                 </div>
 
-
-                                                <br/>
-
-
-                                                <a href="{% url 'public:hotsite' event.slug %}"
-                                                   class="btn btn-primary pull-left"
-                                                   style="margin-top: 5px;">
-                                                    <i class="fas fa-chevron-circle-left"></i>
-                                                    Início
-                                                </a>
-                                                <button style="margin-top: 5px;"
-                                                        class="btn
-                                                        btn-primary pull-right"
-                                                        type="submit">
-                                                    Próximo
-                                                    <i class="fas fa-chevron-circle-right"></i>
-                                                </button>
-                                            </form>
+                                                {% if has_coupon %}
+                                                    <div class="text-right small" style="margin-top: 8px;">
+                                                        {% include 'hotsite/includes/coupon_explicit.html' with coupon_block_hidden=True %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="wizard_next_btn">
+                                <a href="{% url 'public:hotsite' event.slug %}" class="btn btn-primary pull-left">
+                                    <i class="fas fa-chevron-circle-left"></i>
+                                    Início
+                                </a>
+                                <button type="submit" class="btn btn-primary pull-right">
+                                    Próximo
+                                    <i class="fas fa-chevron-circle-right"></i>
+                                </button>
+                            </div>
+                            <div class="wizard_next_loader text-center" style="display: none">
+                                <i class="fas info-color fa-circle-notch fa-spin fa-2x" style="color: #1F7BB6;"></i>
+                            </div>
                         </div>
                     </div>
+                </div>
+                <div class="col-md-9 col-md-offset-2" style="margin-top: 10px">
                     <div class="text-right cgsy-footer footer-wrapper text-muted"
                          style="font-size:12px;color:lightgrey">
                         {% include "base/footer.html" %}
                     </div>
-
-
-                    </div>
-
                 </div>
-
             </div>
+        </form>
 
     </section>
 

@@ -323,7 +323,9 @@ class SubscriptionWizardView(SessionWizardView, SelectTicketMixin):
 
             if self.current_event.is_private_event():
 
-                if not self.has_previous_valid_code():
+                code = self.get_exhibition_code()
+
+                if self.is_valid_exhibition_code(code) is False:
                     messages.error(
                         request,
                         "Você deve informar um código válido para se inscrever"
@@ -667,7 +669,7 @@ class SubscriptionWizardView(SessionWizardView, SelectTicketMixin):
                     exhibition_code=code.upper(),
                 )
                 if tickets:
-                    context['selected_ticket'] = ticket.first()
+                    context['selected_ticket'] = tickets.first()
 
         else:
             context['selected_ticket'] = self.get_ticket()
