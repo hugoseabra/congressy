@@ -13,4 +13,4 @@ class EventVisible(EventCompositeSpecificationMixin):
         super().is_satisfied_by(event)
 
         qs = Ticket.objects.filter(event_id=event.pk, private=False)
-        return qs.count() > 0
+        return len([t.pk for t in qs if t.running is True]) > 0
