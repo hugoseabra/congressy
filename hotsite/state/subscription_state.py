@@ -15,12 +15,19 @@ class CurrentSubscriptionState(object):
 
         # As vezes a inscrição não possui lote por estar em processo de
         # finalização de inscrição.
-        self.lot = subscription.ticket_lot
+        self.ticket_lot = subscription.ticket_lot
 
     def _get_transactions(self):
 
         all_transactions = self.subscription.transactions.filter(
-            ticket_lot_id=self.subscription.ticket_lot.pk
+            ticket_lot_id=self.subscription.ticket_lot_id,
+        ).exclude(
+            status__in=[
+                Transaction.REFUSED,
+                Transaction.REFUNDED,
+                Transaction.PENDING_REFUND,
+                Transaction.CHARGEDBACK,
+            ]
         )
 
         now = datetime.now().date()
@@ -58,7 +65,7 @@ class CurrentSubscriptionState(object):
 
         prods_qs = self.subscription.subscription_products
         servs_qs = self.subscription.subscription_products
-        has_prods = prods_qs.filter(optional_price__gt=0).count() > 0
-        has_servs = servs_qs.filter(optional_price__gt=0).count() > 0
+        has_prods = prods_qs.filter(optional__price__gt=0).count() > 0
+        has_servs = servs_qs.filter(optional__price__gt=0).count() > 0
 
         return has_prods is True or has_servs is True

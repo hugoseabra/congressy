@@ -101,31 +101,23 @@
 
 
                         {% if event.future is True %}
-
-                            {% if lots %}
+                            {% if public_tickets %}
                                 <ul class="icon-list">
-                                    {% for lot in lots %}
-                                        {% if lot.status != lot.LOT_STATUS_NOT_STARTED %}
-                                            <li>
-                                        <span class="icon-list-icon "
-                                              data-animation="bounceIn"
-                                              {% if lot.status == lot.LOT_STATUS_FINISHED %}style="background-color:#515050"{% endif %}>
+                                    {% for ticket in public_tickets %}
+                                    <li>
+                                        <span class="icon-list-icon" data-animation="bounceIn">
                                             <strong>{{ forloop.counter }}</strong>
                                         </span>
-                                                <h4 class="icon-list-title">
-                                                    <strong {% if lot.status == lot.LOT_STATUS_FINISHED %}style="text-decoration: line-through"{% endif %}>
-                                                        {{ lot.display_publicly }}
-                                                    </strong>
-                                                </h4>
-                                                <p>
-                                                    <small class="text-muted">{{ lot.get_period }}</small>
-                                                </p>
-                                            </li>
-                                        {% endif %}
+                                        <h4 style="font-size: 16px;margin: 9px 0 0;font-weight: bold" class="icon-list-title">
+                                            {{ ticket.display_name_and_price }}
+                                        </h4>
+                                        <p>
+                                            <span class="text-muted text-bold">{{ ticket.get_period }}</span>
+                                        </p>
+                                    </li>
                                     {% endfor %}
                                 </ul>
-                            {% elif private_lots %}
-
+                            {% elif private_tickets %}
                                 <p style="font-size: 20px;font-style: italic;">
                                     Este é um evento restrito a convidados.</p>
                             {% else %}
@@ -152,7 +144,7 @@
 
                     </div>
 
-                    {% if event.future is True %}
+                    {% if event.future is True and public_tickets or private_tickets %}
 
                         <div class="hero-features-right col-md-5"
                              data-animation="fadeIn">

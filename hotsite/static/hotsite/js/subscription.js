@@ -236,23 +236,19 @@ function load_coupon() {
 
             response = JSON.parse(response);
 
-            var lot = response.lot;
-            var lot_select = $('#id_lot-lots');
-
-            console.log(response);
+            var ticket = response.ticket;
+            var ticket_select = $('#id_ticket-ticket');
 
             button.removeClass('disabled').removeAttr('disabled').text('Aplicar');
             coupon_block.fadeOut(function() {
-                lot_select.append(lot.option);
-                lot_select.val(lot.id);
-                lot_select.css("pointer-events", "none");
-                $('#lot_display_publicly').text(lot.public_display + lot.is_free);
-                $('#lot_exhibition_code').text(lot.exhibition_code);
+                ticket_select.append(ticket.option);
+                ticket_select.val(ticket.id);
+                ticket_select.css("pointer-events", "none");
+                $('#lot_display_publicly').text(ticket.public_display);
+                $('#lot_exhibition_code').text(ticket.exhibition_code);
 
                 lot_fields.show();
             });
-
-
 
             // window.setTimeout(function () {
             //     start_popover();
@@ -289,14 +285,14 @@ function hide_coupon() {
     coupon_block.fadeIn();
     $('#id_coupon').val('');
 
-    $.each($('option', '#id_lot-lots'), function() {
+    $.each($('option', '#id_ticket-ticket'), function() {
         var el = $(this);
         if (el.attr('value'), el.data('coupon-type')) {
             el.remove();
         }
     });
 
-    $('#id_lot-lots').removeAttr('style');
+    $('#id_ticket-ticket').removeAttr('style');
 }
 
 function start_popover() {

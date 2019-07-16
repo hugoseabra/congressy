@@ -47,7 +47,7 @@
     });
 
     function render_available_optional_services_list(alert_add) {
-        var url = '{% url 'public:hotsite_services' selected_lot.category.pk subscription.pk  %}';
+        var url = '{% url 'public:hotsite_services' selected_ticket.pk subscription.pk  %}';
 
         send(
             url,
@@ -67,7 +67,7 @@
     }
 
     function render_currently_selected_service_list() {
-        var url = '{% url 'public:hotsite_services' selected_lot.category.pk subscription.pk  %}';
+        var url = '{% url 'public:hotsite_services' selected_ticket.pk subscription.pk  %}';
 
         send(
             url,
@@ -92,7 +92,7 @@
         $('.optional-action-buttons').find('button').attr('disabled', '');
         insertLoaderIntoButton(button_el);
 
-        var url = '{% url 'public:hotsite_services' selected_lot.category.pk subscription.pk %}';
+        var url = '{% url 'public:hotsite_services' selected_ticket.pk subscription.pk %}';
 
         send(
             url,
@@ -120,7 +120,7 @@
         $('.optional-action-buttons').find('button').attr('disabled', '');
         insertLoaderIntoButton(button_el);
 
-        var url = '{% url 'public:hotsite_services' selected_lot.category.pk subscription.pk %}';
+        var url = '{% url 'public:hotsite_services' selected_ticket.pk subscription.pk %}';
 
         send(
             url,

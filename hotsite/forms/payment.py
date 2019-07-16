@@ -56,32 +56,29 @@ class PaymentForm(forms.Form):
         required=False,
     )
 
-    def __init__(self, subscription, selected_lot, **kwargs):
+    def __init__(self, subscription, selected_ticket, **kwargs):
 
         self.subscription = subscription
         self.event = subscription.event
         self.person = subscription.person
-        self.lot_instance = selected_lot
+        self.ticket_instance = selected_ticket
 
         self.subscription_debt_form = None
         self.product_debt_forms = list()
         self.service_debt_forms = list()
 
         # Caso a inscrição exista e o lote for diferente, altera o lote.
-        self.subscription.ticket_lot = self.lot_instance
+        self.subscription.ticket_lot = self.ticket_instance.current_lot
 
         super().__init__(**kwargs)
 
-        lot = copy(self.lot_instance)
-        lot.price = lot.get_subscriber_price()
-
-        lot_obj_as_json = serializers.serialize('json', [lot, ])
+        lot_obj_as_json = serializers.serialize(
+            'json',
+            [self.ticket_instance.current_lot, ]
+        )
         json_obj = json.loads(lot_obj_as_json)
         json_obj = json_obj[0]
         json_obj = json_obj['fields']
-
-        del json_obj['exhibition_code']
-        del json_obj['private']
 
         lot_obj_as_json = json.dumps(json_obj)
 
@@ -90,9 +87,7 @@ class PaymentForm(forms.Form):
     def clean_transaction_type(self):
         transaction_type = self.cleaned_data['transaction_type']
 
-        boleto_allowed = payment_helpers.is_boleto_allowed(
-            self.subscription.event
-        )
+        boleto_allowed = payment_helpers.is_boleto_allowed(self.event)
         if transaction_type == 'boleto' and boleto_allowed is False:
             raise forms.ValidationError(
                 'Transação com boleto não é permitida.'

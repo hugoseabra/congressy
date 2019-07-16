@@ -11,14 +11,13 @@ from gatheros_subscription.models import FormConfig
 
 class SubscriptionPersonForm(PersonForm):
 
-    def __init__(self, user, lot, event, is_chrome=False, **kwargs):
+    def __init__(self, user, event, is_chrome=False, **kwargs):
 
         self.user = user
-        self.lot = lot
         self.event = event
 
         try:
-            person = Person.objects.get(user=user)
+            person = Person.objects.get(user_id=user.pk)
             kwargs.update({'instance': person})
         except Person.DoesNotExist:
             pass
@@ -123,5 +122,5 @@ class SubscriptionPersonForm(PersonForm):
             self.setAsRequired(field_name)
 
     def save(self, commit=True):
-        self.instance.user = self.user
+        self.instance.user_id = self.user.pk
         return super().save(commit=commit)

@@ -17,7 +17,7 @@ from core.util.string import clear_string
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_subscription.models import Subscription
 from hotsite import forms
-from hotsite.views.mixins import SelectLotMixin
+from hotsite.views.mixins import SelectTicketMixin
 from mailer.services import (
     notify_new_free_subscription,
     notify_new_user_and_free_subscription,
@@ -188,7 +188,7 @@ def has_paid_services(wizard):
     return False
 
 
-class OptionalWizardView(SessionWizardView, SelectLotMixin):
+class OptionalWizardView(SessionWizardView, SelectTicketMixin):
     condition_dict = {
         'payment': can_process_payment,
         'service': has_services,

@@ -5,12 +5,12 @@
 from django.http import Http404
 from django.views import generic
 
-from gatheros_subscription.models import Lot
 from hotsite.views import EventMixin
+from ticket.models import Ticket
 
 
 class CouponView(EventMixin, generic.TemplateView):
-    template_name = 'hotsite/includes/form_lots_coupon.json'
+    template_name = 'hotsite/includes/form_ticket_coupon.json'
     http_method_names = ['post']
 
     def post(self, request, *args, **kwargs):
@@ -21,18 +21,18 @@ class CouponView(EventMixin, generic.TemplateView):
         if code:
             try:
 
-                lot = Lot.objects.get(
+                ticket = Ticket.objects.get(
                     exhibition_code=str(code).upper(),
                     event_id=self.current_event.event.pk
                 )
 
-                if lot.status != Lot.LOT_STATUS_RUNNING:
+                if ticket.running is False:
                     raise Http404
 
-                cxt['lot'] = lot
+                cxt['ticket'] = ticket
                 return self.render_to_response(cxt)
 
-            except Lot.DoesNotExist:
+            except Ticket.DoesNotExist:
                 pass
 
         raise Http404

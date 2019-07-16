@@ -22,8 +22,11 @@ from hotsite.views import SubscriptionFormMixin
 
 class HotsiteView(SubscriptionFormMixin, generic.FormView):
     template_name = 'hotsite/main.html'
-    has_private_subscription = False
-    private_still_available = False
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.has_private_subscription = False
+        self.private_still_available = False
 
     def dispatch(self, request, *args, **kwargs):
         self.pre_dispatch()
@@ -53,7 +56,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
             try:
                 Subscription.objects.get(
                     pk=subscription_id,
-                    lot__private=True,
+                    ticket_lot__private=True,
                     event__slug=self.kwargs.get('slug')
                 )
                 self.has_private_subscription = True
@@ -200,7 +203,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
 
             return redirect(
                 'public:hotsite-subscription',
-                slug=self.current_event.slug
+                slug=self.current_event.event.slug
             )
 
         # CONDIÇÃO 2

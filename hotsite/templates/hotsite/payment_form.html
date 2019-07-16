@@ -14,7 +14,7 @@
                 <div class="col-md-9 col-md-offset-2">
 
                     {% include "hotsite/includes/greetings.html" %}
-                    {% include "hotsite/includes/selected-lot.html" %}
+                    {% include "hotsite/includes/selected-ticket.html" %}
 
                     <div class="panel panel-default">
 
@@ -56,21 +56,21 @@
                                     </strong>
                                 </div>
                                 <ul>
-                                    {% if lot.price %}
-                                        <strong>R$ {{ lot.get_subscriber_price|intcomma }}</strong>
+                                    {% if selected_ticket.price %}
+                                        <strong>R$ {{ selected_ticket.get_subscriber_price|intcomma }}</strong>
                                     {% endif %}
                                 </ul>
                                 {% if products %}
                                     <div><strong>Produtos:</strong></div>
                                     <ul>
                                         {% for product in products %}
-                                            <ol>{{ product.optional.name }}:
-                                                <strong>
-                                                    {% if product.optional.price > 0.00 %}
-                                                        R$
-                                                        {{ product.optional.price|intcomma }}
-                                                    {% endif %}
-                                                </strong>
+                                            <ol>
+                                                {{ product.optional.name }}
+                                                {% if product.optional.price > 0.00 %}
+                                                    : <strong>
+                                                        R$ {{ product.optional.price|intcomma }}
+                                                    </strong>
+                                                {% endif %}
                                             </ol>
                                         {% endfor %}
                                     </ul>
@@ -80,13 +80,13 @@
                                     <div><strong>Serviços:</strong></div>
                                     <ul>
                                         {% for service in services %}
-                                            <ol>{{ service.optional.name }}:
-                                                <strong>
-                                                    {% if service.optional.price > 0.00 %}
-                                                        R$
-                                                        {{ service.optional.price|intcomma }}
-                                                    {% endif %}
-                                                </strong>
+                                            <ol>
+                                                {{ service.optional.name }}
+                                                {% if service.optional.price > 0.00 %}
+                                                    : <strong>
+                                                    R$ {{ service.optional.price|intcomma }}
+                                                    </strong>
+                                                {% endif %}
                                             </ol>
                                         {% endfor %}
                                     </ul>
@@ -200,51 +200,46 @@
                 payment_obj.enable_boleto();
                 {% endif %}
 
-                {% if lot.allow_installment is False %}
-                // disable installment
-                payment_obj.disable_installment();
-                {% endif %}
-
                 payment_obj.set_interest_rate(2.29);
-                payment_obj.set_max_installments('{{ lot.installment_limit }}');
-                payment_obj.set_free_rate_installments('{{ lot.num_install_interest_absortion }}');
+                payment_obj.set_max_installments(10);
+                payment_obj.set_free_rate_installments('{{ selected_ticket.free_installments }}');
 
-                {% if lot.get_subscriber_price %}
+                {% if selected_ticket.price %}
                 // Adiciona billing de inscrição
                 payment_obj.add_item(
                     'subscription',
                     '{{ subscription.pk }}',
-                    'Inscrição: {{ lot.event.name }}',
+                    'Inscrição: {{ event.name }}',
                     1,
-                    parseFloat('{{ lot.get_subscriber_price|unlocalize }}')
+                    parseFloat('{{ selected_ticket.get_subscriber_price|unlocalize }}')
                 );
                 {% endif %}
 
             {% if products %}
-                    // Adiciona billing de opcionais de produtos/serviços
-                    {% for product in products %}
-                        {% if product.optional_price %}
-                        payment_obj.add_item(
-                            'optional-product',
-                            '{{ subscription.pk }}',
-                            'Produto/Serviço: {{ product.optional.name }}',
-                            1,
-                            parseFloat('{{ product.optional_price|unlocalize }}')
-                        );
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
+                // Adiciona billing de opcionais de produtos/serviços
+                {% for product in products %}
+                    {% if product.optional.price %}
+                    payment_obj.add_item(
+                        'optional-product',
+                        '{{ subscription.pk }}',
+                        'Produto/Serviço: {{ product.optional.name }}',
+                        1,
+                        parseFloat('{{ product.optional.price|unlocalize }}')
+                    );
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
 
                 {% if services %}
                     // Adiciona billing de opcionais de atividades extras
                     {% for service in services %}
-                        {% if service.optional_price %}
+                        {% if service.optional.price %}
                         payment_obj.add_item(
                             'optional-service',
                             '{{ subscription.pk }}',
                             'Atividade extra: {{ service.optional.name }}',
                             1,
-                            parseFloat('{{ service.optional_price|unlocalize }}')
+                            parseFloat('{{ service.optional.price|unlocalize }}')
                         );
                         {% endif %}
                     {% endfor %}

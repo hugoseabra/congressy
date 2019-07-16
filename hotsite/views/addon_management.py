@@ -11,7 +11,8 @@ from addon.models import (
     SubscriptionProduct,
     SubscriptionService,
 )
-from gatheros_subscription.models import Subscription, LotCategory
+from gatheros_subscription.models import Subscription
+from ticket.models import Ticket
 
 """
 DEV NOTES: 
@@ -48,17 +49,17 @@ class ProductOptionalManagementView(generic.TemplateView):
 
         subscription_pk = kwargs.get('subscription_pk')
         subscription = get_object_or_404(Subscription, pk=subscription_pk)
-        category_pk = kwargs.get('lot_category_pk')
-        category = get_object_or_404(LotCategory, pk=category_pk)
+        ticket_pk = kwargs.get('ticket_pk')
+        ticket = get_object_or_404(Ticket, pk=ticket_pk)
 
-        self.available_options = []
+        self.available_options = list()
 
         self.fetch_in_storage = self.request.GET.get('fetch_in_storage')
         # @TODO add user validation here, only if request.user == sub.user
 
         all_products_selected_by_the_user = \
             subscription.subscription_products.filter(
-                optional__lot_category=category,
+                optional__ticket_id=ticket.pk,
                 optional__date_end_sub__gt=datetime.now()
             ).order_by(
                 "optional__optional_type__name",
@@ -71,11 +72,11 @@ class ProductOptionalManagementView(generic.TemplateView):
 
         else:
             event_optionals_products = Product.objects.filter(
-                lot_category=category,
+                ticket_id=ticket.pk,
                 published=True,
                 date_end_sub__gt=datetime.now()
             ).exclude(
-                subscription_products__subscription=subscription
+                subscription_products__subscription_id=subscription.pk
             ).order_by(
                 "optional_type__name",
                 "name",
@@ -135,8 +136,8 @@ class ProductOptionalManagementView(generic.TemplateView):
 
         if action == 'add':
             _, created = SubscriptionProduct.objects.get_or_create(
-                optional=product,
-                subscription=subscription,
+                optional_id=product.pk,
+                subscription_id=subscription.pk,
                 optional_price=product.price,
                 optional_liquid_price=product.liquid_price,
             )
@@ -163,14 +164,14 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
         subscription_pk = kwargs.get('subscription_pk')
         subscription = get_object_or_404(Subscription, pk=subscription_pk)
-        category_pk = kwargs.get('lot_category_pk')
-        category = get_object_or_404(LotCategory, pk=category_pk)
+        ticket_pk = kwargs.get('ticket_pk')
+        ticket = get_object_or_404(Ticket, pk=ticket_pk)
 
-        self.available_options = []
+        self.available_options = list()
 
         self.fetch_in_storage = self.request.GET.get('fetch_in_storage')
         all_selected_services = subscription.subscription_services.filter(
-            optional__lot_category=category,
+            optional__ticket_id=ticket.pk,
             optional__date_end_sub__gt=datetime.now()
         ).order_by(
             "optional__theme__name",
@@ -206,11 +207,11 @@ class ServiceOptionalManagementView(generic.TemplateView):
         else:
             # All service optionals
             all_services = Service.objects.filter(
-                lot_category=category,
+                ticket_id=ticket.pk,
                 published=True,
                 date_end_sub__gt=datetime.now(),
             ).exclude(
-                subscription_services__subscription=subscription
+                subscription_services__subscription_id=subscription.pk
             ).order_by(
                 'theme__name',
                 "optional_type__name",
@@ -282,14 +283,15 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
         if action == 'add':
             _, created = SubscriptionService.objects.get_or_create(
-                optional=service,
-                subscription=subscription,
+                optional_id=service.pk,
+                subscription_id=subscription.pk,
                 optional_price=service.price,
                 optional_liquid_price=service.liquid_price,
             )
 
             if created:
                 return HttpResponse('201 OK', status=201)
+
         elif action == 'remove':
             subscription_service = get_object_or_404(SubscriptionService,
                                                      optional=service,

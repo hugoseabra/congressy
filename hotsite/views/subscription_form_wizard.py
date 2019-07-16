@@ -17,9 +17,9 @@ from core.helpers import sentry_log
 from core.util.string import clear_string
 from gatheros_event.helpers.event_business import is_paid_event
 from gatheros_subscription.directors import SubscriptionSurveyDirector
-from gatheros_subscription.models import Lot, Subscription
+from gatheros_subscription.models import Subscription
 from hotsite import forms
-from hotsite.views.mixins import SelectLotMixin
+from hotsite.views.mixins import SelectTicketMixin
 from mailer.services import (
     notify_new_free_subscription,
     notify_new_user_and_free_subscription,
@@ -32,10 +32,11 @@ from payment.helpers.payment_helpers import (
 from payment.models import Transaction
 # from survey.directors import SurveyDirector - TODO: Depreciate this director
 from survey.models import Question
+from ticket.models import Ticket
 
 FORMS = [
-    ("private_lot", forms.PrivateLotForm),
-    ("lot", forms.LotsForm),
+    ("private_ticket", forms.PrivateTicketForm),
+    ("ticket", forms.TicketForm),
     ("service", forms.ServiceForm),
     ("product", forms.ProductForm),
     ("person", forms.SubscriptionPersonForm),
@@ -44,8 +45,8 @@ FORMS = [
 ]
 
 TEMPLATES = {
-    "private_lot": "hotsite/private_lot_form.html",
-    "lot": "hotsite/lot_form.html",
+    "private_ticket": "hotsite/private_ticket_form.html",
+    "ticket": "hotsite/ticket_form.html",
     "service": "hotsite/service_form.html",
     "product": "hotsite/product_form.html",
     "person": "hotsite/person_form.html",
@@ -60,33 +61,34 @@ class InvalidStateStepError(Exception):
     pass
 
 
-def is_paid_lot(wizard):
-    """Return true if user opts for  a paid lot"""
-
+def get_selected_ticket(wizard):
     # Get cleaned data from lots step
-    cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
+    cleaned_data = wizard.get_cleaned_data_for_step('private_ticket')
     if not cleaned_data:
-        cleaned_data = wizard.get_cleaned_data_for_step('lot')
+        cleaned_data = wizard.get_cleaned_data_for_step('ticket')
 
     # Return true if lot has price and price > 0
     if not cleaned_data:
-        return False
+        return None
 
-    lot = cleaned_data['lots']
-    if not lot:
-        return False
+    ticket = cleaned_data.get('ticket')
+    if not ticket:
+        return None
 
-    if not isinstance(lot, Lot):
+    if not isinstance(ticket, Ticket):
         try:
-            lot = Lot.objects.get(pk=lot)
+            ticket = Ticket.objects.get(pk=ticket)
 
-        except Lot.DoesNotExist:
-            return False
+            return ticket
 
-    if lot.price and lot.price > 0:
-        return True
+        except Ticket.DoesNotExist:
+            return None
 
-    return False
+
+def is_paid_ticket(wizard):
+    """Return true if user opts for  a paid lot"""
+    ticket = get_selected_ticket(wizard)
+    return ticket.price > 0 if ticket else False
 
 
 def has_pending_payment(wizard):
@@ -130,9 +132,9 @@ def can_process_payment(wizard):
     # Verifica se existe inscrições e existe necessidade de processamento
     # de pagamento.
     ##########################################################################
-    is_selected_paid_lot = is_paid_lot(wizard)
+    paid_ticket = is_paid_ticket(wizard)
 
-    if is_selected_paid_lot is False:
+    if paid_ticket is False:
         # Se é de um lote gratuito:
         ev_has_paid_products = has_paid_products(wizard)
         ev_has_paid_services = has_paid_services(wizard)
@@ -145,10 +147,10 @@ def can_process_payment(wizard):
         # Verificando se inscrição possui vínculo com alguma das atividades
         # extras e/ou opcionais.
         num_paid_products = subscription.subscription_products.filter(
-            optional_price__gt=0
+            optional__price__gt=0
         ).count()
         num_paid_services = subscription.subscription_services.filter(
-            optional_price__gt=0
+            optional__price__gt=0
         ).count()
 
         if num_paid_products == 0 and num_paid_services == 0:
@@ -170,28 +172,15 @@ def can_process_payment(wizard):
 def has_survey(wizard):
     """ Return true if user opts for a lot with survey"""
 
-    # Get cleaned data from lots step
-    cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
-    if not cleaned_data:
-        cleaned_data = wizard.get_cleaned_data_for_step('lot')
-
-    if not cleaned_data:
+    ticket = get_selected_ticket(wizard)
+    if not ticket:
         return False
 
-    lot = cleaned_data['lots']
-    if not lot:
+    if ticket.event.feature_configuration.feature_survey is False:
         return False
 
-    if not isinstance(lot, Lot):
-        try:
-            lot = Lot.objects.get(pk=lot)
-
-        except Lot.DoesNotExist:
-            return False
-
-    return lot.event.feature_configuration.feature_survey and \
-           lot.event_survey and \
-           lot.event_survey.survey.questions.count()
+    return ticket.event_survey_id and \
+           ticket.event_survey.survey.questions.count()
 
 
 def is_private_event(wizard):
@@ -203,29 +192,15 @@ def is_not_private_event(wizard):
 
 
 def has_products(wizard):
-    # Get cleaned data from lots step
-    cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
-    if not cleaned_data:
-        cleaned_data = wizard.get_cleaned_data_for_step('lot')
-
-    # Return true if lot has price and price > 0
-    if not cleaned_data:
+    ticket = get_selected_ticket(wizard)
+    if not ticket:
         return False
 
-    lot = cleaned_data['lots']
-    if not lot:
+    if ticket.event.feature_configuration.feature_products is False:
         return False
-
-    if not isinstance(lot, Lot):
-        try:
-            lot = Lot.objects.get(pk=lot)
-
-        except Lot.DoesNotExist:
-            return False
 
     try:
-        optionals = lot.category.product_optionals
-        return optionals.filter(
+        return ticket.addon_products.filter(
             published=True,
             date_end_sub__gte=datetime.now(),
         ).count() > 0
@@ -235,113 +210,64 @@ def has_products(wizard):
 
 
 def has_services(wizard):
-    # Get cleaned data from lots step
-    cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
-    if not cleaned_data:
-        cleaned_data = wizard.get_cleaned_data_for_step('lot')
-
-    # Return true if lot has price and price > 0
-    if not cleaned_data:
+    ticket = get_selected_ticket(wizard)
+    if not ticket:
         return False
 
-    lot = cleaned_data['lots']
-    if not lot:
+    if ticket.event.feature_configuration.feature_services is False:
         return False
-
-    if not isinstance(lot, Lot):
-        try:
-            lot = Lot.objects.get(pk=lot)
-
-        except Lot.DoesNotExist:
-            return False
 
     try:
-        optionals = lot.category.service_optionals
-        return optionals.filter(
+        return ticket.addon_services.filter(
             published=True,
             date_end_sub__gte=datetime.now(),
-        ).count() > 0 and \
-               lot.event.feature_configuration.feature_services
+        ).count() > 0
 
     except AttributeError:
         return False
 
 
 def has_paid_products(wizard):
-    # Get cleaned data from lots step
-    cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
-    if not cleaned_data:
-        cleaned_data = wizard.get_cleaned_data_for_step('lot')
-
-    # Return true if lot has price and price > 0
-    if not cleaned_data:
+    ticket = get_selected_ticket(wizard)
+    if not ticket:
         return False
 
-    lot = cleaned_data['lots']
-    if not lot:
+    if ticket.event.feature_configuration.feature_products is False:
         return False
-
-    if not isinstance(lot, Lot):
-        try:
-            lot = Lot.objects.get(pk=lot)
-
-        except Lot.DoesNotExist:
-            return False
 
     try:
-        optionals = lot.category.product_optionals
-        for optional in optionals.all():
-            if optional.price and optional.price > 0 and \
-                    lot.event.feature_configuration.feature_products:
-                return True
+        return ticket.addon_services.filter(
+            published=True,
+            liquid_price__gt=0,
+            date_end_sub__gte=datetime.now(),
+        ).count() > 0
 
     except AttributeError:
         return False
-
-    return False
 
 
 def has_paid_services(wizard):
-    # Get cleaned data from lots step
-    cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
-    if not cleaned_data:
-        cleaned_data = wizard.get_cleaned_data_for_step('lot')
-
-    # Return true if lot has price and price > 0
-    if not cleaned_data:
+    ticket = get_selected_ticket(wizard)
+    if not ticket:
         return False
 
-    lot = cleaned_data['lots']
-    if not lot:
+    if ticket.event.feature_configuration.feature_services is False:
         return False
 
-    if not isinstance(lot, Lot):
-        try:
-            lot = Lot.objects.get(pk=lot)
-
-        except Lot.DoesNotExist:
-            return False
-
-    try:
-        optionals = lot.category.service_optionals
-        for optional in optionals.all():
-            if optional.price and optional.price > 0 and \
-                    lot.event.feature_configuration.feature_services:
-                return True
-
-    except AttributeError:
-        return False
-
-    return False
+    return ticket.addon_services.filter(
+        published=True,
+        liquid_price__gt=0,
+        date_end_sub__gte=datetime.now(),
+    ).count() > 0
 
 
-class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
+class SubscriptionWizardView(SessionWizardView, SelectTicketMixin):
     # file_storage = FileSystemStorage(
     #     location=os.path.join(settings.MEDIA_ROOT, 'survey', 'pdfs')
     # )
     condition_dict = {
-        'private_lot': is_private_event,
-        'lot': is_not_private_event,
+        'private_ticket': is_private_event,
+        'ticket': is_not_private_event,
         'payment': can_process_payment,
         'survey': has_survey,
         'service': has_services,
@@ -406,15 +332,6 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
                     self.clear_session_exhibition_code()
                     return redirect('public:hotsite', slug=self.event.slug)
 
-            if self.event.is_scientific and hasattr(self.event, 'work_config'):
-                if not self.event.work_config.is_configured:
-                    messages.warning(
-                        request,
-                        "Este evento científico ainda não está permitindo "
-                        "inscrições"
-                    )
-                    return redirect('public:hotsite', slug=self.event.slug)
-
             return super().dispatch(request, *args, **kwargs)
 
         except InvalidStateStepError as e:
@@ -427,10 +344,8 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
                 " as informações de sua inscrição."
             )
 
-            return redirect(
-                'public:hotsite-subscription',
-                slug=self.event.slug
-            )
+            return redirect('public:hotsite-subscription',
+                            slug=self.event.slug)
 
     def post(self, *args, **kwargs):
         """
@@ -517,6 +432,11 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
             if form.data is None:
                 return self.loaded_forms[step]
 
+        # Submissão a partir da seleção de ingresso
+        if step in ['ticket', 'private_ticket'] and data:
+            if data.get('coupon'):
+                self.request.session['exhibition_code'] = data.get('coupon')
+
         form = super().get_form(step, data, files)
         self.loaded_forms[step] = form
         return form
@@ -524,38 +444,34 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
     def get_form_kwargs(self, step=None):
         kwargs = super().get_form_kwargs(step)
 
-        if step == "private_lot":
+        if step in ['private_ticket', 'ticket']:
             kwargs.update({
                 'event': self.event,
-                'code': self.request.session.get('exhibition_code'),
-                'excluded_lot_pk': None,
-            })
-
-        if step == 'lot':
-            kwargs.update({
-                'event': self.event,
-                'excluded_lot_pk': None,
+                'code': self.get_exhibition_code(),
+                'excluded_ticket_pk': None,
             })
 
         if step == 'person':
             kwargs.update({
                 'user': self.request.user,
-                'lot': self.get_lot(),
                 'event': self.event,
             })
 
         if step == 'survey':
-            lot = self.get_lot()
+            ticket = self.get_ticket()
 
             kwargs.update({
                 'subscription': self.current_subscription.subscription,
-                'lot': lot,
-                'event_survey': lot.event_survey,
+                'ticket': self.get_ticket(),
+                'event_survey':
+                    ticket.event_survey
+                    if ticket and ticket.event_survey_id
+                    else None,
             })
 
         if step == 'payment':
             kwargs.update({
-                'selected_lot': self.get_lot(),
+                'selected_ticket': self.get_ticket(),
                 'subscription': self.current_subscription.subscription,
             })
 
@@ -570,38 +486,37 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
         form_files = self.get_form_step_files(form)
 
         # Creating a subscription.
-        if isinstance(form, forms.LotsForm) or \
-                isinstance(form, forms.PrivateLotForm):
+        if isinstance(form, forms.TicketForm) or \
+                isinstance(form, forms.PrivateTicketForm):
 
-            lot_pk = None
-            if isinstance(form, forms.PrivateLotForm):
-                lot_pk = form_data.get('private_lot-lots')
+            ticket_pk = None
+            if isinstance(form, forms.PrivateTicketForm):
+                ticket_pk = form_data.get('private_ticket-ticket')
 
-            elif isinstance(form, forms.LotsForm):
-                lot_pk = form_data.get('lot-lots')
+            elif isinstance(form, forms.TicketForm):
+                ticket_pk = form_data.get('ticket-ticket')
 
-            if not lot_pk:
+            try:
+                ticket = Ticket.objects.get(pk=ticket_pk)
+            except Ticket.DoesNotExist:
                 raise InvalidStateStepError(
-                    'Não foi possivel pegar uma referencia de lote.'
+                    'Não foi possivel pegar uma referencia de ingresso.'
                 )
 
             # persistir lote selecionado para ser usado posteriormente.
-            self.request.session['lot_pk'] = lot_pk
+            self.request.session['ticket_pk'] = ticket_pk
             self.subscription = self.current_subscription.subscription
-            self.subscription.ticket_lot = self.get_lot()
+            self.subscription.ticket_lot = ticket.current_lot
 
             # Se nova inscrição, não há problemas em setar o lote por aqui.
             # Se inscrição preexistente, o lote não pode ser setado porque
             # seria uma edição precoce do processo. O lote deve ser firmado
             # no 'done'.
-            if self.subscription.is_new is True:
+            if self.subscription.brand_new is True:
                 self.subscription.save()
 
         # Persisting person
         if isinstance(form, forms.SubscriptionPersonForm):
-            # Resgata lote apenas para saber se ele está na session
-            self.get_lot()
-
             if not form.is_valid():
                 raise ValidationError(form.errors)
 
@@ -610,17 +525,23 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
         # Persisting survey
         if isinstance(form, forms.SurveyForm):
 
-            survey_director = SubscriptionSurveyDirector(self.current_subscription.subscription)
+            ticket = self.get_ticket()
+            survey = ticket.event_survey.survey \
+                if ticket.event_survey_id \
+                else None
 
-            lot = self.get_lot()
+            if survey is None:
+                raise Exception(
+                    'Uma tentaiva de processar formulário de perguntas foi'
+                    ' realizada, porém não há formulários disponíveis..'
+                )
 
             # Tratamento especial para extrair as respostas do form_data,
             # causado pelo uso do FormWizard que adiciona prefixos nas
             # respostas
-
             questions_that_need_parsing = Question.objects.filter(
-                survey=lot.event_survey.survey,
                 type=Question.FIELD_CHECKBOX_GROUP,
+                survey_id=survey.pk,
             ).values_list("name")
 
             needs_parsing = [x[0] for x in questions_that_need_parsing]
@@ -655,8 +576,10 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
                         form_question.replace('survey-', ''): uploaded_file
                     })
 
+            survey_director = SubscriptionSurveyDirector(self.subscription)
+
             survey_form = survey_director.get_active_form(
-                survey=lot.event_survey.survey,
+                survey=survey,
                 data=survey_data,
                 files=survey_files,
                 update=self.request.method in ['POST', 'PUT']
@@ -666,9 +589,11 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
                 raise ValidationError(survey_form.errors)
 
             survey_form.save()
-            subscription = self.subscription
-            subscription.author = survey_form.author
-            subscription.save()
+
+            if self.subscription.brand_new is True:
+                subscription.author_id = survey_form.author.pk
+                subscription.save()
+
 
         # Persisting payments:
         if isinstance(form, forms.PaymentForm):
@@ -716,7 +641,9 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
         context = super().get_context_data(**kwargs)
         context['remove_preloader'] = True
 
-        context['num_lots'] = len(self.current_event.get_all_lots())
+        context['num_tickets'] = \
+            len(self.current_event.get_available_tickets())
+        context['exhibition_code'] = self.get_exhibition_code()
         context['subscription'] = self.subscription
         context['is_last'] = self.steps.current == self.steps.last
         context['has_top_bar'] = self.top_bar
@@ -725,31 +652,30 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
         person = self.subscription.person
         context['person'] = person
 
-        if self.storage.current_step not in ['lot', 'private_lot']:
-            lot = self.get_lot()
-            context['selected_lot'] = lot
+        opened_boletos = self.get_open_boleto()
+        context['has_open_boleto'] = has_open_boleto
 
-            opened_boletos = self.get_open_boleto()
+        if self.storage.current_step == 'ticket':
             has_open_boleto = \
                 opened_boletos.count() > 0 if opened_boletos else False
 
-        context['has_open_boleto'] = has_open_boleto
-
-        if self.storage.current_step == 'private_lot':
+        elif self.storage.current_step == 'private_ticket':
             code = self.request.session.get('exhibition_code')
             if self.is_valid_exhibition_code(code):
-                lots = Lot.objects.filter(
+                tickets = Ticket.objects.filter(
                     private=True,
-                    exhibition_code=code.upper()
+                    exhibition_code=code.upper(),
                 )
-                if lots:
-                    context['lot'] = lots.first()
+                if tickets:
+                    context['selected_ticket'] = ticket.first()
 
-        if self.storage.current_step == 'lot':
+        else:
+            context['selected_ticket'] = self.get_ticket()
+
+        if self.storage.current_step == 'ticket':
             context['has_coupon'] = self.current_event.has_coupon()
 
         if self.storage.current_step == 'person':
-
             config = self.current_event.form_config
 
             if is_paid_event(self.current_event.event):
@@ -765,7 +691,6 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
 
         if self.storage.current_step == 'payment':
             context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
-            context['lot'] = self.get_lot()
 
             allowed_types = [Transaction.CREDIT_CARD]
             is_brazilian = person.country == 'BR'
@@ -783,17 +708,17 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
             total = \
                 subscription.ticket_lot.get_subscriber_price() or Decimal(0.00)
 
-            products = [x for x in subscription.subscription_products.all()]
+            products = subscription.subscription_products.all()
             context['products'] = products
 
-            services = [x for x in subscription.subscription_services.all()]
+            services = subscription.subscription_services.all()
             context['services'] = services
 
             for product in products:
-                total += product.optional_price
+                total += product.optional.price
 
             for service in services:
-                total += service.optional_price
+                total += service.optional.price
 
             context['total'] = total
 
@@ -808,7 +733,7 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
             del self.request.session['has_private_subscription']
 
         subscription = self.subscription
-        subscription.ticket_lot = self.get_lot()
+        subscription.ticket_lot = self.selected_ticket.current_lot
 
         with atomic():
             try:
@@ -816,14 +741,8 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
                 subscription.save()
                 transactions_qs = self.subscription.transactions
 
-                has_paid_products = subscription.subscription_products.filter(
-                    optional_price__gt=0
-                ).count() > 0
-                has_paid_services = subscription.subscription_services.filter(
-                    optional_price__gt=0
-                ).count() > 0
-
-                has_paid_optionals = has_paid_products or has_paid_services
+                has_paid_optionals = \
+                    self.current_subscription.has_paid_optionals()
                 is_free = has_paid_optionals is False and subscription.free
 
                 new_account = self.request.user.last_login is None
@@ -832,24 +751,22 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
                     subscription.status = Subscription.CONFIRMED_STATUS
                     subscription.save()
 
-                    has_transactions = transactions_qs.count() > 0
+                    if self.current_subscription.has_payments() is True:
 
-                    if has_transactions is True:
-                        paid_transaction = transactions_qs.filter(
-                            status=Transaction.PAID
-                        ).count() > 0
-
-                        if paid_transaction is True:
-                            msg_trans = 'Você já possui pagamento de' \
-                                        ' de outro lote.'
-                            messages.warning(self.request, msg_trans)
-
-                        msg_trans = 'Por favor, ignore os boletos que ainda' \
-                                    ' não estejam vencidos.'
-
+                        msg_trans = 'Você possui pagamento de outro ingresso.'
                         messages.warning(self.request, msg_trans)
 
-                    if subscription.notified is False:
+                    elif self.current_subscription.has_transactions() is True:
+                        msg_trans = 'Por favor, ignore os boletos que ainda' \
+                                    ' não estejam vencidos.'
+                        messages.warning(self.request, msg_trans)
+
+                    notified = self.subscription.brand_new \
+                               or self.subscription.has_changed('ticket_lot')
+
+                    if notified is False \
+                            or self.subscription.notified is False:
+
                         if new_account is True:
                             notify_new_user_and_free_subscription(
                                 self.event,
@@ -876,6 +793,7 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
                         msg = 'Inscrição salva com sucesso!'
 
                 else:
+
                     has_transactions = transactions_qs.exclude(
                         subscription__ticket_lot_id=subscription.ticket_lot_id
                     ).count() > 0
@@ -897,7 +815,11 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
 
                         messages.warning(self.request, msg_trans)
 
-                    if subscription.notified is False:
+                    notified = self.subscription.brand_new \
+                               or self.subscription.has_changed('ticket_lot')
+
+                    if notified is False \
+                            or self.subscription.notified is False:
                         msg = 'Inscrição realizada com sucesso! Nós lhe' \
                               ' enviamos um e-mail de confirmação de sua' \
                               ' inscrição. Após a confirmação de seu' \
@@ -923,28 +845,23 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
 
                 raise InvalidStateStepError('Algum erro ocorreu: {}'.format(e))
 
-    def get_lot(self):
-        selected_lot = self.get_selected_lot()
+    def get_ticket(self):
+        selected_ticket = get_selected_ticket(self)
 
-        if not selected_lot:
-            raise InvalidStateStepError(
-                'Nenhum lote selecionado foi encontrado.')
+        if not selected_ticket:
+            raise InvalidStateStepError('Nenhum ingresso selecionado.')
 
-        return selected_lot
+        return selected_ticket
 
     def get_exhibition_code(self):
-        if 'exhibition_code' not in self.request.session:
-            return None
-
         return self.request.session.get('exhibition_code')
 
-    def get_exhibition_code_lot(self, code):
+    def get_exhibition_code_ticket(self, code):
         if code:
-            for lot in self.event.lots.filter(private=True, active=True):
-                running = lot.status == lot.LOT_STATUS_RUNNING
-                lot_code = lot.exhibition_code
-                if lot_code and lot_code.upper() == code.upper() and running:
-                    return lot
+            for ticket in self.current_event.get_available_tickets():
+                ticket_code = ticket.exhibition_code
+                if ticket_code and ticket_code.upper() == code.upper():
+                    return ticket
 
         return None
 
@@ -952,23 +869,11 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
         """
         Verifica se código de exibição informado é válido para o evento.
         """
-        if code:
-            return self.get_exhibition_code_lot(code) is not None
-
-        return False
-
-    def has_previous_valid_code(self):
-        """
-        Verifica se código de exibição previamente enviado na sessão é válido.
-        """
-        code = self.get_exhibition_code()
-        return self.is_valid_exhibition_code(code) if code else False
+        return self.get_exhibition_code_ticket(code) is not None
 
     def clear_session_exhibition_code(self):
-        if 'exhibition_code' not in self.request.session:
-            return
-
-        del self.request.session['exhibition_code']
+        if 'exhibition_code' in self.request.session:
+            del self.request.session['exhibition_code']
 
     def clear_session(self):
         def remove_session_key(key):
@@ -977,7 +882,7 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
 
         self.clear_session_exhibition_code()
         remove_session_key('has_private_subscription')
-        remove_session_key('lot_pk')
+        remove_session_key('ticket_pk')
 
     def get_open_boleto(self):
         return get_opened_boleto_transactions(self.subscription)

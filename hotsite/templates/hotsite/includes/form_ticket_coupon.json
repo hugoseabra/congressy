@@ -1,0 +1,8 @@
+{
+	"ticket": {
+		"public_display": "{{ ticket.display_name_and_price }}",
+		"exhibition_code": "{{ ticket.exhibition_code }}",
+		"option": "<option value='{{ ticket.pk }}' data-coupon-type='1'>{{ ticket.display_name_and_price }} (cupom: {{ ticket.exhibition_code }})</option>",
+        "id": "{{ ticket.pk }}"
+	}
+}

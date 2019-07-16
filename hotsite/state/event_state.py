@@ -1,7 +1,7 @@
 from gatheros_event.models import Event
 from gatheros_subscription.models import FormConfig
 from service_tags.models import CustomServiceTag
-
+from gatheros_event.event_specifications.visible import EventVisible
 
 class CurrentEventState(object):
     def __init__(self, event: Event) -> None:
@@ -19,10 +19,8 @@ class CurrentEventState(object):
         self.active_bank_account_configured = \
             self.organization.active_recipient
 
-        self._lot_statuses = {}
-
-        self.public_lots = []
-        self.private_lots = []
+        self.public_tickets = list()
+        self.private_tickets = list()
 
     def _get_info(self):
         if hasattr(self.event, 'info') and self.event.info is not None:
@@ -44,94 +42,78 @@ class CurrentEventState(object):
 
         return CustomServiceTag(event=self.event)
 
-    def is_lot_running(self, lot):
-        status = self.get_lot_status(lot)
-        return status == lot.LOT_STATUS_RUNNING
+    def get_ticket_queryset(self):
+        return self.event.tickets.order_by('name')
 
-    def get_lots_queryset(self):
-        return self.event.lots.order_by('date_end', 'name', 'price')
+    def get_public_tickets(self):
+        if self.public_tickets:
+            return self.public_tickets
 
-    def get_public_lots(self):
-        if self.public_lots:
-            return self.public_lots
-
-        queryset = self.get_lots_queryset().filter(private=False, active=True)
-        self.public_lots = [
-            lot
-            for lot in queryset
-            if self.is_lot_running(lot)
+        queryset = self.get_ticket_queryset().filter(private=False,
+                                                      active=True)
+        self.public_tickets = [
+            ticket
+            for ticket in queryset
+            if ticket.running is True
         ]
-        return self.public_lots
+        return self.public_tickets
 
-    def get_private_lots(self):
-        if self.private_lots:
-            return self.private_lots
+    def get_private_tickets(self):
+        if self.private_tickets:
+            return self.private_tickets
 
-        queryset = self.get_lots_queryset().filter(private=True, active=True)
-        self.private_lots = [
-            lot
-            for lot in queryset
-            if self.is_lot_running(lot)
+        queryset = self.get_ticket_queryset().filter(private=True,
+                                                      active=True)
+        self.private_tickets = [
+            ticket
+            for ticket in queryset
+            if ticket.running is True
         ]
-        return self.private_lots
+        return self.private_tickets
 
-    def get_all_lots(self):
-        return self.get_public_lots() + self.get_private_lots()
+    def get_all_tickets(self):
+        return self.get_ticket_queryset().filter(active=True)
 
-    def get_paid_lots(self):
-        paid_lots = []
-        for lot in self.get_all_lots():
-            if lot.price and lot.price > 0:
-                paid_lots.append(lot)
+    def get_available_tickets(self):
+        return self.get_public_tickets() + self.get_private_tickets()
 
-        return paid_lots
+    def get_paid_tickets(self):
+        return [
+            ticket
+            for ticket in self.get_ticket_queryset()
+            if ticket.price > 0
+        ]
 
-    def get_lot_status(self, lot):
-        if lot.pk not in self._lot_statuses:
-            self._lot_statuses[lot.pk] = lot.status
+    def has_available_tickets(self):
+        return len(self.get_available_tickets()) > 0
 
-        return self._lot_statuses[lot.pk]
+    def has_available_private_tickets(self):
+        return len(self.get_private_tickets()) > 0
 
-    def has_available_lots(self):
-        lots = self.get_all_lots()
-        return len(lots) > 0
+    def has_available_public_tickets(self):
+        return len(self.get_public_tickets()) > 0
 
-    def has_available_private_lots(self):
-        lots = self.get_private_lots()
-        return len(lots) > 0
-
-    def has_available_public_lots(self):
-        lots = self.get_public_lots()
-        return len(lots) > 0
-
-    def has_paid_lots(self):
+    def has_paid_tickets(self):
         """ Retorna se evento possui algum lote pago. """
-        return len(self.get_paid_lots()) > 0
+        return len(self.get_paid_tickets()) > 0
 
     def has_coupon(self):
         """ Retorna se possui cupom, seja qual for. """
-        for lot in self.get_private_lots():
-            # cÃ³digo de exibiÃ§Ã£o
-            if lot.private and lot.exhibition_code:
+        for ticket in self.get_private_tickets():
+            # código de exibição
+            if ticket.private and ticket.exhibition_code:
                 return True
 
         return False
 
     def subscription_enabled(self):
-        if self.has_available_lots() is False:
+        if self.has_available_tickets() is False:
             return False
 
         return self.event.status == Event.EVENT_STATUS_NOT_STARTED
 
-    def subscription_finished(self):
-        for lot in self.get_all_lots():
-            if self.is_lot_running(lot):
-                return False
-
-        return True
-
     def is_private_event(self):
         """ Verifica se evento Ã© privado possuindo apenas lotes privados. """
-        public_lots = self.get_public_lots()
-        private_lots = self.get_private_lots()
-        return len(public_lots) == 0 and len(private_lots) > 0
+        public_tickets = self.get_public_tickets()
+        private_tickets = self.get_private_tickets()
+        return len(public_tickets) == 0 and len(private_tickets) > 0
