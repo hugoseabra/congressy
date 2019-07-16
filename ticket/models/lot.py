@@ -147,7 +147,7 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
             return Decimal(0.00)
 
         if self.event.transfer_tax is False:
-            return round(self.price, 2)
+            return round(Decimal(self.price), 2)
 
         minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
         congressy_plan_percent = \
@@ -157,4 +157,32 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
         if congressy_amount < minimum:
             congressy_amount = minimum
 
-        return round(self.price + congressy_amount, 2)
+        price = self.price + congressy_amount
+
+        return round(Decimal(price), 2)
+
+    def get_period(self):
+        """ Recupera string formatada de periodo do lote, de acordo com suas
+        datas, deivamente formatada.
+        """
+
+        start_date = self.date_start.date()
+        end_date = self.date_end.date()
+        start_time = self.date_start.time()
+        end_time = self.date_end.time()
+
+        period = ''
+        if start_date < end_date:
+            period = 'De ' + self.date_start.strftime('%d/%m/%Y %Hh%M')
+            period += ' a ' + self.date_end.strftime('%d/%m/%Y %Hh%M')
+
+        if start_date == end_date:
+            period = self.date_start.strftime('%d/%m/%Y')
+            period += ' das '
+            period += start_time.strftime('%Hh%M')
+            period += ' às '
+            period += end_time.strftime('%Hh%M')
+
+        return period
+
+

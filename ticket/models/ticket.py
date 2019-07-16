@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.utils.formats import localize
 
 from base.models import EntityMixin
 from gatheros_event.models.mixins import GatherosModelMixin
@@ -148,6 +149,15 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
         super().__init__(*args, **kwargs)
 
     @property
+    def display_name_and_price(self):
+        return '{}{}'.format(
+            self.name,
+            ' - R$ {}'.format(
+                localize(self.get_subscriber_price())
+            ) if self.price else '',
+        )
+
+    @property
     def current_lot(self):
         """
             Resgatar o lote vigente no ingresso, caso possua.
@@ -202,6 +212,20 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
 
         return current_lot.subscribable is True
 
+    @property
+    def price(self):
+        return self.current_lot.price if self.current_lot else 0
+
+    @property
+    def get_period(self):
+        return self.current_lot.get_period() if self.current_lot else None
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.private and not self.exhibition_code:
+            self.exhibition_code = Ticket.objects.generate_exhibition_code()
+
     def update_audience_category_num_subs(self):
         """
         Número de inscrições em num_subs deve ser controlado e centralizado por
@@ -227,9 +251,3 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
             return Decimal(0.00)
 
         return self.current_lot.get_subscriber_price()
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-        if self.private and not self.exhibition_code:
-            self.exhibition_code = Ticket.objects.generate_exhibition_code()
