@@ -163,13 +163,10 @@ class SubscriptionSurveyDirector(object):
         if self.subscription.person.user:
             kwargs['user'] = self.subscription.person.user
 
-        if kwargs['user'] is not None:
-            self.subscription.author, _ = \
-                Author.objects.get_or_create(**kwargs)
-        elif not self.subscription.author_id:
+        if not self.subscription.author_id:
             self.subscription.author = Author.objects.create(**kwargs)
+            self.subscription.save()
 
-        self.subscription.save()
 
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
         author = self.subscription.author
