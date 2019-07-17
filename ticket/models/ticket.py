@@ -251,3 +251,15 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
             return Decimal(0.00)
 
         return self.current_lot.get_subscriber_price()
+
+    def get_liquid_amount(self):
+        if not self.current_lot:
+            return Decimal(0.00)
+
+        return self.current_lot.get_liquid_amount()
+
+    def get_congressy_amount(self):
+        if not self.current_lot:
+            return Decimal(0.00)
+
+        return self.current_lot.get_congressy_amount()

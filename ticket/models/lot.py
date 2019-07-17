@@ -1,12 +1,12 @@
 from datetime import datetime
 from decimal import Decimal
 
-from django.conf import settings
 from django.db import models
 
 from base.models import EntityMixin
 from core.util.date import DateTimeRange
 from gatheros_event.models.mixins import GatherosModelMixin
+from ticket.congressy import CongressyPlan
 
 
 class Lot(GatherosModelMixin, EntityMixin, models.Model):
@@ -42,13 +42,12 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
     )
 
     price = models.DecimalField(
-        verbose_name="preço",
-        max_digits=8,
-        decimal_places=2,
         default=Decimal(0.00),
-        # Making field optional
+        verbose_name='preço',
+        decimal_places=10,
+        max_digits=25,
         blank=True,
-        null=True,
+        null=False,
     )
 
     limit = models.PositiveIntegerField(
@@ -147,19 +146,45 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
             return Decimal(0.00)
 
         if self.event.transfer_tax is False:
-            return round(Decimal(self.price), 2)
+            return self.price
 
-        minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
-        congressy_plan_percent = \
-            Decimal(self.event.congressy_percent) / 100
+        plan = CongressyPlan(amount=self.price,
+                             percent=Decimal(self.event.congressy_percent))
 
-        congressy_amount = self.price * congressy_plan_percent
-        if congressy_amount < minimum:
-            congressy_amount = minimum
+        return plan.get_subscriber_price()
 
-        price = self.price + congressy_amount
+    def get_liquid_amount(self):
+        """
+        Resgata o valor calculado do preço do lote de acordo com as regras
+        da Congressy.
+        """
+        if not self.price:
+            return Decimal(0.00)
 
-        return round(Decimal(price), 2)
+        if self.event.transfer_tax is True:
+            return self.price
+
+        plan = CongressyPlan(
+            amount=self.price,
+            percent=Decimal(self.event.congressy_percent) / 100
+        )
+
+        return plan.get_organizer_amount()
+
+    def get_congressy_amount(self):
+        """
+        Resgata o valor destinado à parte da Congressy.
+        """
+        if not self.price:
+            return Decimal(0.00)
+
+        plan = CongressyPlan(
+            amount=self.price,
+            percent=Decimal(self.event.congressy_percent) / 100
+        )
+
+        return plan.get_congressy_amount()
+
 
     def get_period(self):
         """ Recupera string formatada de periodo do lote, de acordo com suas
