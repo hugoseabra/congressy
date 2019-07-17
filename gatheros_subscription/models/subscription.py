@@ -248,10 +248,6 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
             # ("event", "event_count"),
         )
 
-    def __init__(self, *args, **kwargs):
-        self._ticket = None
-        super().__init__(*args, **kwargs)
-
     def __str__(self):
         return '{} - {}'.format(self.person.name, self.event.name)
 
@@ -260,10 +256,7 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
         if not self.ticket_lot_id:
             return None
 
-        if not self._ticket:
-            self._ticket = self.ticket_lot.ticket
-
-        return self._ticket
+        return self.ticket_lot.ticket
 
     @property
     def confirmed(self):

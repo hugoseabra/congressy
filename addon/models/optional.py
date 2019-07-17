@@ -100,8 +100,8 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
     liquid_price = models.DecimalField(
         default=Decimal(0.00),
         verbose_name='preço líquido',
-        decimal_places=2,
-        max_digits=10,
+        decimal_places=10,
+        max_digits=25,
         blank=True,
         help_text='Qual o valor liquido que você espera receber pela venda'
                   ' deste item opcional?'
@@ -202,8 +202,9 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
         congressy_amount = self.liquid_price * congressy_plan_percent
         # if congressy_amount < minimum:
         #     congressy_amount = minimum
+        price = self.liquid_price + congressy_amount
 
-        return round(self.liquid_price + congressy_amount, 2)
+        return round(Decimal(price), 2)
 
 
 @track_data('name', 'optional_type_id', 'tag')
