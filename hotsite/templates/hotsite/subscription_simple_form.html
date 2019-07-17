@@ -261,9 +261,10 @@
             {% endif %}
 
             {% comment %}Possui somente lotes privados{% endcomment %}
-            {% if not tickets and private_tickets %}
+            {% if not public_tickets and private_tickets %}
                 <div class="form-group">
-                    <label for="id_exhibition_code">Cupom:
+                    <label for="id_exhibition_code">
+                        Cupom:
                         <small style="color:#C9302C">*</small>
                     </label>
                     <div>
