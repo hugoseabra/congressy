@@ -133,22 +133,52 @@ class PaymentForm(forms.Form):
         with atomic():
             self.subscription.save()
 
-            # Novo ou edição de pendência financeira
-            sub_debt = self.subscription_debt_form.save()
+            ticket = self.subscription.ticket
 
             try:
                 # Construção de dados para transaçao do Pagarme
                 builder = PagarmeDataBuilder(subscription=self.subscription)
 
-                builder.add_debt(sub_debt)
+                builder.add_debt(
+                    debt_type='sub',
+                    debt_pk=str(self.subscription.pk),
+                    title='Inc: {}, Evento: {}, Ingresso: {}'.format(
+                        self.subscription.code,
+                        self.event.name,
+                        self.subscription.ticket.name,
+                    ),
+                    amount=ticket.get_subscriber_price(),
+                    liquid_amount=ticket.get_liquid_amount(),
+                )
 
-                for debt_form in self.service_debt_forms:
-                    serv_debt = debt_form.save()
-                    builder.add_debt(serv_debt)
+                products = self.subscription.subscription_products.filter(
+                    optional__liquid_price__gt=0
+                )
+                for sub_prod in products:
+                    prod = sub_prod.optional
 
-                for debt_form in self.product_debt_forms:
-                    prod_debt = debt_form.save()
-                    builder.add_debt(prod_debt)
+                    builder.add_debt(
+                        debt_type='addon-prod',
+                        debt_pk=str(prod.pk),
+                        title='Opcional: {} ({})'.format(prod.name, prod.pk),
+                        amount=prod.price,
+                        liquid_amount=prod.liquid_price,
+                    )
+
+                services = self.subscription.subscription_services.filter(
+                    optional__liquid_price__gt=0
+                )
+                for sub_serv in services:
+                    serv = sub_serv.optional
+
+                    builder.add_debt(
+                        debt_type='addon-serv',
+                        debt_pk=str(serv.pk),
+                        title='Atividade extra: {} ({})'.format(serv.name,
+                                                                serv.pk),
+                        amount=serv.price,
+                        liquid_amount=serv.liquid_price,
+                    )
 
                 installment_part = self.cleaned_data.get('installment_part', 1)
                 trans_type = self.cleaned_data.get('transaction_type')

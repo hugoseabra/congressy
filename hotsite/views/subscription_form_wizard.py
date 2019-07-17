@@ -599,17 +599,11 @@ class SubscriptionWizardView(SessionWizardView, SelectTicketMixin):
 
         # Persisting payments:
         if isinstance(form, forms.PaymentForm):
-            # Resgata lote apenas para saber se ele está na session
-            self.get_lot()
-
             if not form.is_valid():
                 raise ValidationError(form.errors)
 
             try:
                 form.save()
-
-            # except DebtAlreadyPaid as e:
-            #     raise ValidationError(str(e))
 
             except TransactionError as e:
                 raise ValidationError(str(e))
