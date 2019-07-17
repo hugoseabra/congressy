@@ -729,7 +729,6 @@ class SubscriptionWizardView(SessionWizardView, SelectTicketMixin):
             del self.request.session['has_private_subscription']
 
         subscription = self.subscription
-        subscription.ticket_lot = self.selected_ticket.current_lot
 
         with atomic():
             try:
