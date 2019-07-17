@@ -29,21 +29,22 @@ class PagarmeDataBuilder:
 
     def __init__(self, subscription):
 
+        self.event = subscription.event
+        self.organization = self.event.organization
         self.subscription = subscription
-        self.debts = []
-        self.debt_items = {}
+        self.ticket = subscription.ticket
+
+        self.debt_items = dict()
         self.debt_amount = Decimal(0)
         self.liquid_amount = Decimal(0)
         self.has_expiration_date = False
 
-        event = subscription.event
-
-        lot = subscription.ticket_lot
         self.metadata_items = {
-            'organização': event.organization.name,
-            'evento': event.name,
-            'lote': '{} ({})'.format(lot.display_publicly, lot.pk),
-            'código': subscription.code,
+            'organização': self.organization.name,
+            'evento': self.event.name,
+            'código': self.subscription.code,
+            'ingresso': '{} ({})'.format(self.ticket.display_name_and_price,
+                                         self.ticket.pk),
         }
 
         # Estabelecer uma referência de qual o estado sistema houve a transação
@@ -54,37 +55,29 @@ class PagarmeDataBuilder:
                 'environment': 'production'
             }
 
-    def add_debt(self, debt):
-        if debt.id in self.debt_items:
+    def add_debt(self, debt_type, debt_pk, title, amount, liquid_amount):
+
+        debt_id = '{}-{}'.format(debt_type, debt_pk)
+
+        if debt_id in self.debt_items:
             return
 
-        if not debt.amount:
+        if not amount:
             return
 
-        if debt.subscription != self.subscription:
-            raise TransactionDataError(
-                'A pendência financeira "{}" não pertence à inscrição'
-                ' "{}"'.format(debt, self.subscription)
-            )
-
-        self.debts.append(debt)
-        self.debt_items[debt.id] = {
-            "id": debt.item_id,
-            "title": debt.name,
-            "unit_price": self.as_payment_format(debt.amount),
+        self.debt_items[debt_id] = {
+            "id": debt_id,
+            "title": title,
+            "unit_price": self.as_payment_format(amount),
             "quantity": 1,
             "tangible": False
         }
-        self.debt_amount += debt.amount
-        self.liquid_amount += debt.liquid_amount
+        self.debt_amount += amount
+        self.liquid_amount += liquid_amount
 
     def build(self, amount, transaction_type, installments=1, card_hash=None):
 
-        lot = self.subscription.ticket_lot
-        event = self.subscription.event
-
         self._check_transaction_type(transaction_type, card_hash)
-        self._check_debts(amount, installments)
 
         transaction_id = str(uuid.uuid4())
 
@@ -93,7 +86,7 @@ class PagarmeDataBuilder:
             'transaction_id': transaction_id,
             'postback_url': get_postback_url(transaction_id),
             # 13 caracteres
-            'soft_descriptor': lot.event.organization.name[:13],
+            'soft_descriptor': self.organization.name[:13],
             'amount': self.as_payment_format(amount),
             'liquid_amount': self.as_payment_format(self.liquid_amount),
             'price': self.as_payment_format(amount),
@@ -118,15 +111,15 @@ class PagarmeDataBuilder:
 
             # Instrução 2: 47 caracteres
             instructions += 'Ev.: {}. Lote: {}. Insc.: {}.'.format(
-                self.subscription.event.name[:8],
-                self.subscription.ticket_lot.name[:8],
+                self.event.name[:8],
+                self.ticket.name[:8],
                 self.subscription.code,  # 8 caracteres
             )
 
             data['boleto_instructions'] = instructions
 
-            assert len(instructions) <= 255, 'boleto_instructions len({})' \
-                                             ''.format(len(instructions))
+            assert len(instructions) <= 255, \
+                'boleto_instructions len({})'.format(len(instructions))
 
             event_config = event.feature_configuration
 
@@ -263,9 +256,8 @@ class PagarmeDataBuilder:
 
             # se o evento permite boleto e se a inscrição não possui boletos
             # em aberto (não-vencidos)
-            bolleto_allowed = is_boleto_allowed(
-                self.subscription.event
-            ) is True and open_boleto_queryset.count() == 0
+            bolleto_allowed = is_boleto_allowed(self.event) is True \
+                              and open_boleto_queryset.count() == 0
 
             if bolleto_allowed is False:
                 raise TransactionDataError(
@@ -275,28 +267,6 @@ class PagarmeDataBuilder:
         is_credit_card = transaction_type == Transaction.CREDIT_CARD
         if is_credit_card and not card_hash:
             raise TransactionDataError('O hash do cartão não foi encontrado.')
-
-    def _check_debts(self, amount, installments):
-        assert isinstance(amount, Decimal)
-
-        for debt in self.debts:
-            if debt.installments != installments:
-                raise TransactionDataError(
-                    'A pendência "{}" possui parcelamento em "{}x", mas a'
-                    ' os dados de transação a serem criados é de'
-                    ' "{}x".'.format(
-                        debt,
-                        debt.installments,
-                        installments
-                    )
-                )
-
-        # if self.debt_amount > amount:
-        #     raise TransactionDataError(
-        #         'Valor de transações de pendências inseridas ultrapassa'
-        #         ' o montante principal a ser transacionado. Débitos: {}.'
-        #         ' Transação: {}'.format(self.debt_amount, amount)
-        #     )
 
     def _create_split_rules(self, amount, transaction_type, installments=1):
         """

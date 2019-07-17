@@ -11,6 +11,8 @@ from gatheros_subscription.models import Subscription
 from payment import receivers, exception
 from payment.installments import Calculator, InstallmentResult
 
+from ticket.congressy import CongressyPlan
+
 RECEIVER_TYPE_SUBSCRIPTION = 'receiver_subscription'
 RECEIVER_TYPE_PRODUCT = 'receiver_product'
 RECEIVER_TYPE_SERVICE = 'receiver_service'
@@ -46,14 +48,14 @@ class ReceiverSubscriber(object):
         self.added_amount += receiver.amount
 
         diff_amount = self.added_amount - self.amount
-        diff_amount = round(diff_amount, 2)
+        diff_amount = round(Decimal(diff_amount), 2)
 
         if diff_amount > 0.02:
             raise exception.ReceiverTotalAmountExceeded(
                 'O valor dos recebedores já ultrapassa o valor a ser'
                 ' transacionado. Valor da transação: {}. Valor somado'
                 ' dos recebedores: {}.'.format(
-                    round(self.amount, 2),
+                    round(Decimal(self.amount), 2),
                     round(self.added_amount, 2),
                 )
             )
@@ -76,10 +78,12 @@ class ReceiverPublisher(object):
         self.transaction_type = transaction_type
         self.subscription = subscription
 
-        assert isinstance(amount, Decimal)
         self.amount = amount
         self.installments = installments
-        self.organization = subscription.event.organization
+
+        self.ticket = subscription.ticket
+        self.event = subscription.event
+        self.organization = self.event.organization
 
         self._check_criterias()
 
@@ -90,7 +94,7 @@ class ReceiverPublisher(object):
         self.installment_calculator = Calculator(
             interests_rate=self.interests_rate,
             total_installments=10,
-            free_installments=self.subscription.ticket.free_installments,
+            free_installments=self.ticket.free_installments,
         )
 
     def create_and_publish_subscription(self):
@@ -98,112 +102,78 @@ class ReceiverPublisher(object):
         Cria e publica recebedores que irã participar do rateamente de uma
         inscrição.
         """
-        event = self.subscription.event
-        lot = self.subscription.ticket_lot
-
-        # ==== CONGRESSY AMOUNT
-        # Valor proporcional da Congressy, independente de transferência ou
-        # não de taxas. O valor é calculado em cima do preço informado pelo
-        # organizador ao criar o lote.
-        cgsy_percent = Decimal(float(event.congressy_percent) / 100)
-
-        if self.transaction_type == 'boleto' and self.installments > 1:
-            # Por causa do parcalamento de boletos, o valor chegando de fora
-            # pode ser menor do que o preço líquido do lote que a Congressy
-            # deve captar de acrodo com o percentual.
-            cgsy_amount = (lot.price/self.installments) * cgsy_percent
-
-        else:
-            cgsy_amount = lot.price * cgsy_percent
-
-        minimum_amount = Decimal(
-            getattr(settings, 'CONGRESSY_MINIMUM_AMOUNT', 0)
+        sub_plan = CongressyPlan(
+            amount=self.ticket.get_subscriber_price(),
+            percent=Decimal(self.event.congressy_percent) / 100
         )
 
-        # Mínimo aplicável apenas para inscrição.
-        if minimum_amount and cgsy_amount < minimum_amount:
-            cgsy_amount = minimum_amount
-
-        # ==== ORGANIZATION AMOUNT
-        # Se houve transferência de taxas, o valor da Congressy já está
-        # no montante da transação.
-        if lot.transfer_tax is True:
-            # Se há transferência, o organizador sempre receberá o valor
-            # informado no lote.
-            if self.transaction_type == 'boleto' and self.installments > 1:
-                org_amount = self.amount
-            else:
-                org_amount = lot.price
-
-        else:
-            # Caso, ele assumirá o valor da Congressy e o montante a ser
-            # transacionado já está com o valor sem as taxas da Congressy.
-            if self.transaction_type == 'boleto' and self.installments > 1:
-                org_amount = self.amount - cgsy_amount
-            else:
-                org_amount = lot.price - cgsy_amount
+        cgsy_amount = sub_plan.get_congressy_amount()
+        org_amount = sub_plan.get_organizer_amount()
 
         # Verifica se há atividades extras.
-        for service in self.subscription.subscription_services.all():
-            price_diff = service.optional_price - service.optional_liquid_price
-            cgsy_amount += price_diff
+        for sub_serv in self.subscription.subscription_services.all():
+            optional = sub_serv.optional
+
+            serv_plan = CongressyPlan(
+                amount=optional.price,
+                percent=Decimal(self.event.congressy_percent) / 100
+            )
+            cgsy_amount += serv_plan.get_congressy_amount()
+            org_amount += serv_plan.get_organizer_amount()
 
         # Verifica se há opcionais.
-        for product in self.subscription.subscription_products.all():
-            price_diff = product.optional_price - product.optional_liquid_price
-            cgsy_amount += price_diff
+        for sub_prod in self.subscription.subscription_products.all():
+            optional = sub_prod.optional
 
-        # Verifica se há atividades extras.
-        for service in self.subscription.subscription_services.all():
-            org_amount += service.optional_liquid_price
+            prod_plan = CongressyPlan(
+                amount=optional.price,
+                percent=Decimal(self.event.congressy_percent) / 100
+            )
+            cgsy_amount += prod_plan.get_congressy_amount()
+            org_amount += prod_plan.get_organizer_amount()
 
-        # Verifica se há opcionais.
-        for product in self.subscription.subscription_products.all():
-            org_amount += product.optional_liquid_price
 
         # Soma do montante distribuído entre as partes.
-        total_splitable_amount = round(org_amount + cgsy_amount, 2)
+        total = Decimal(org_amount + cgsy_amount)
 
-        if round(self.amount, 2) > round(total_splitable_amount, 2):
+        if round(Decimal(self.amount), 2) > round(total, 2):
             # A diferença que há no montante a ser transacionado irá para a
             # Congressy, por já estar embutidas taxas e juros de parcelamento,
             # se houver.
-            diff_amount = self.amount - total_splitable_amount
-            cgsy_amount += diff_amount
+            cgsy_amount += Decimal(self.amount - total)
 
-            # Soma do montante distribuído entre as partes.
-            total_splitable_amount = org_amount + cgsy_amount
-
+        if self.installments > 1:
             # Se o organizador assumiu juros de parcelamento, o montante a ser
             # transacionado estará sem o valor de juros de parcelamento. Então,
             # vamos recalcula-los.
-            free_installments = lot.num_install_interest_absortion
-            if 1 < int(self.installments) <= int(free_installments):
-                interests_amount = \
-                    self.installment_calculator.get_absorbed_interests_amount(
-                        amount=self.amount,
-                        installments=self.installments,
-                    )
+            free_installments = self.ticket.free_installments
+            if 1 < self.installments <= free_installments:
+                free_installment_plan = CongressyPlan(
+                    amount=self.amount,
+                    percent=Decimal(self.event.congressy_percent) / 100
+                )
+                calculator = free_installment_plan.get_installment(
+                    num_parts=self.installments,
+                    free_parts=free_installments,
+                )
+                interests = calculator.get_installment_interests_amount()
 
-                assert round(diff_amount, 2) == round(interests_amount, 2)
+                if interests > 0:
+                    # Retira valor e juros assumido e o coloca sob competência
+                    # da Congressy.
+                    org_amount -= interests
+                    cgsy_amount += interests
 
-                # Retira valor e juros assumido e o coloca sob competência da
-                # Congressy.
-                org_amount -= interests_amount
-                cgsy_amount += interests_amount
-
-                # Soma do montante distribuído entre as partes.
-                total_splitable_amount = org_amount + cgsy_amount
+        # total novamente.
+        total = Decimal(org_amount + cgsy_amount)
 
         # Depois de todos os valores distribuídos, o valor entre a Congressy
         # e organizador tem de ser de acordo com o montante a ser
         # transacionado.
-        diff_amount = round(total_splitable_amount, 2) - round(self.amount, 2)
-        diff_amount = round(diff_amount, 2)
-        assert diff_amount > 0.02 or diff_amount < 0.02, \
+        assert round(total, 2) == round(Decimal(self.amount), 2), \
             "total splitable amount: {}. Amount: {}".format(
-                round(total_splitable_amount, 2),
-                round(self.amount, 2)
+                round(total, 2),
+                round(Decimal(self.amount), 2)
             )
 
         # ==== RECEIVERS
@@ -215,6 +185,8 @@ class ReceiverPublisher(object):
             processing_fee_responsible=True,
         )
 
+        self.receiver_subscriber.publish(cgsy_receiver)
+
         # Parceiros irão participar do rateamento de inscrições
         partner_receivers = \
             cgsy_receiver.create_and_publish_partners(self.subscription)
@@ -223,13 +195,11 @@ class ReceiverPublisher(object):
             for partner_receiver in partner_receivers:
                 self.receiver_subscriber.publish(partner_receiver)
 
-        self.receiver_subscriber.publish(cgsy_receiver)
-
         org_receiver = receivers.OrganizerReceiver(
             type=RECEIVER_TYPE_SUBSCRIPTION,
             id=self.organization.recipient_id,
             amount=org_amount,
-            transfer_taxes=lot.transfer_tax is True,
+            transfer_taxes=self.event.transfer_tax is True,
             chargeback_responsible=True,
             processing_fee_responsible=False,
             installment_result=InstallmentResult(

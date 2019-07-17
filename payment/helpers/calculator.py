@@ -1,4 +1,3 @@
-from code import interact
 from decimal import Decimal
 
 
