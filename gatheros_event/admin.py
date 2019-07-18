@@ -38,6 +38,7 @@ class EventAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
         'pk'
     )
     ordering = ['name']
+    readonly_fields = ['slug']
     raw_id_fields = ['organization']
 
     fieldsets = (
