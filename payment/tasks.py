@@ -14,7 +14,7 @@ from payment.exception import (
     TransactionApiError,
 )
 from payment.helpers import payment_helpers
-from payment.models import Transaction, TransactionStatus
+from payment.models import Payable, Transaction, TransactionStatus
 
 pagarme.authentication_key(settings.PAGARME_API_KEY)
 
@@ -32,7 +32,10 @@ def create_pagarme_transaction(subscription,
                                installments=None,
                                installment_part=None):
     try:
-        trx = pagarme.transaction.create(data)
+        trans_trx = pagarme.transaction.create(data)
+
+        payables_trx = pagarme.transaction.payables(trans_trx['id'])
+
     except Exception as e:
 
         pprint(e)
@@ -72,18 +75,18 @@ def create_pagarme_transaction(subscription,
     cartão;
     """
 
-    amount = payment_helpers.amount_as_decimal(str(trx['amount']))
+    amount = payment_helpers.amount_as_decimal(str(trans_trx['amount']))
     liquid_amount = payment_helpers.amount_as_decimal(
         str(data['liquid_amount'])
     )
 
     if not installments:
-        installments = int(trx['installments'])
+        installments = int(trans_trx['installments'])
 
     # por padrão
     installment_amount = round((amount / installments), 2)
 
-    if trx['payment_method'] == Transaction.BOLETO and installments > 1:
+    if trans_trx['payment_method'] == Transaction.BOLETO and installments > 1:
         # Se compra parcelada no boleto, vamos igualar amount e
         # intallment_amount, pois no modelo atual, installment_amount registra
         # o valor da parcela e o amount registra o conjunto de parcelas, o que
@@ -97,20 +100,21 @@ def create_pagarme_transaction(subscription,
         transaction = Transaction(
             uuid=data['transaction_id'],
             subscription=subscription,
-            data=trx,
-            status=trx['status'],
-            type=trx['payment_method'],
-            date_created=trx['date_created'],
+            data=trans_trx,
+            status=trans_trx['status'],
+            type=trans_trx['payment_method'],
+            date_created=trans_trx['date_created'],
             amount=amount,
             lot_price=subscription.lot.price,
             liquid_amount=liquid_amount,
             installments=installments,
             installment_part=installment_part,
             installment_amount=installment_amount,
+            pagarme_id=trans_trx['id'],
         )
 
         if transaction.type == Transaction.BOLETO:
-            boleto_exp_date = trx.get('boleto_expiration_date')
+            boleto_exp_date = trans_trx.get('boleto_expiration_date')
             if boleto_exp_date:
                 transaction.boleto_expiration_date = datetime.strptime(
                     boleto_exp_date,
@@ -118,7 +122,7 @@ def create_pagarme_transaction(subscription,
                 )
 
         if transaction.type == Transaction.CREDIT_CARD:
-            card = trx['card']
+            card = trans_trx['card']
             transaction.credit_card_holder = card['holder_name']
             transaction.credit_card_first_digits = card['first_digits']
             transaction.credit_card_last_digits = card['last_digits']
@@ -127,10 +131,47 @@ def create_pagarme_transaction(subscription,
 
         TransactionStatus.objects.create(
             transaction=transaction,
-            data=trx,
-            status=trx['status'],
-            date_created=trx['date_created'],
+            data=trans_trx,
+            status=trans_trx['status'],
+            date_created=trans_trx['date_created'],
         )
+
+        for payable_trx in payables_trx:
+            amount = payment_helpers.amount_as_decimal(
+                str(payable_trx['amount'])
+            )
+
+            fee = payment_helpers.amount_as_decimal(
+                str(payable_trx['fee'])
+            ) if payable_trx['fee'] else None
+
+            antecipation_fee = payment_helpers.amount_as_decimal(
+                str(payable_trx['anticipation_fee'])
+            ) if payable_trx['anticipation_fee'] else None
+
+            payment_date = datetime.strptime(
+                payable_trx['payment_date'],
+                "%Y-%m-%dT%H:%M:%S.%fZ"
+            ) if payable_trx['payment_date'] else None
+
+            created = datetime.strptime(
+                payable_trx['date_created'],
+                "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
+
+            Payable.objects.create(
+                transaction=transaction,
+                pagarme_id=payable_trx['id'],
+                type=payable_trx['type'],
+                status=payable_trx['status'],
+                installment=payable_trx['installment'],
+                amount=amount,
+                fee=fee,
+                antecipation_fee=antecipation_fee,
+                recipient_id=payable_trx['recipient_id'],
+                created=created,
+                payment_date=payment_date,
+            )
 
         return transaction
 
@@ -140,6 +181,7 @@ def create_pagarme_organizer_recipient(organization=None):
     if not organization:
         return
 
+    # @TODO: RECIPIENT POSSUEM POSTBACKS - IMPLEMENTAR
     params = {
         'transfer_enabled': 'true',
         'automatic_anticipation_enabled': 'true',

@@ -88,12 +88,14 @@ class PagarmeDataBuilder:
 
         transaction_id = str(uuid.uuid4())
 
+        soft_desc = lot.event.organization.name[:13].strip()
+
         data = {
             'api_key': settings.PAGARME_API_KEY,
             'transaction_id': transaction_id,
             'postback_url': get_postback_url(transaction_id),
             # 13 caracteres
-            'soft_descriptor': lot.event.organization.name[:13],
+            'soft_descriptor': soft_desc,
             'amount': self.as_payment_format(amount),
             'liquid_amount': self.as_payment_format(self.liquid_amount),
             'price': self.as_payment_format(amount),

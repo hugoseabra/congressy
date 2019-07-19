@@ -219,6 +219,12 @@ class Transaction(models.Model, EntityMixin):
         blank=True,
     )
 
+    pagarme_id = models.PositiveIntegerField(
+        null=True,
+        editable=False,
+        verbose_name='ID da transação (pagar.me)',
+    )
+
     def save(self, *args, **kwargs):
         if self._state.adding is True:
             self.lot = self.subscription.lot
