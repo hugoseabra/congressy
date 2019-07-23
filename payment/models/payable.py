@@ -8,7 +8,8 @@ from base.models import EntityMixin
 from core.model import track_data
 
 
-@track_data('status')
+@track_data('status', 'pagarme_id', 'fee', 'antecipation_fee',
+            'payment_date', 'next_check')
 class Payable(models.Model, EntityMixin):
     WAITING_FUNDS = 'waiting_funds'
     AVAILABLE = 'available'
@@ -44,16 +45,17 @@ class Payable(models.Model, EntityMixin):
         primary_key=True
     )
 
-    transaction = models.ForeignKey(
-        'payment.Transaction',
+    split_rule = models.ForeignKey(
+        'payment.SplitRule',
         on_delete=models.CASCADE,
         related_name='payables',
         null=False,
         editable=False,
-        verbose_name='transação',
+        verbose_name='regra de rateamento',
     )
 
-    pagarme_id = models.PositiveIntegerField(
+    pagarme_id = models.CharField(
+        max_length=28,
         null=False,
         editable=False,
         verbose_name='ID de recebível (pagar.me)',
@@ -75,7 +77,6 @@ class Payable(models.Model, EntityMixin):
     )
 
     installment = models.PositiveIntegerField(
-        default=1,
         verbose_name='parcela',
         null=False,
         editable=False,
@@ -108,6 +109,7 @@ class Payable(models.Model, EntityMixin):
     recipient_id = models.CharField(
         max_length=28,
         null=False,
+        editable=False,
         verbose_name='ID recebedor (pagar.me)',
     )
 
