@@ -14,7 +14,9 @@ from payment.exception import (
     TransactionApiError,
 )
 from payment.helpers import payment_helpers
-from payment.models import Payable, Transaction, TransactionStatus
+from payment.models import Transaction, TransactionStatus, SplitRule
+from payment.pagarme_sdk.transaction import get_split_rules
+from payment.payable.updater import update_payables
 
 pagarme.authentication_key(settings.PAGARME_API_KEY)
 
@@ -33,8 +35,7 @@ def create_pagarme_transaction(subscription,
                                installment_part=None):
     try:
         trans_trx = pagarme.transaction.create(data)
-
-        payables_trx = pagarme.transaction.payables(trans_trx['id'])
+        split_rules_trx = get_split_rules(trans_trx['id'])
 
     except Exception as e:
 
@@ -96,6 +97,11 @@ def create_pagarme_transaction(subscription,
 
     with atomic():
 
+        created = datetime.strptime(
+            trans_trx['date_created'],
+            "%Y-%m-%dT%H:%M:%S.%fZ"
+        )
+
         # ============================ TRANSACTION ========================== #
         transaction = Transaction(
             uuid=data['transaction_id'],
@@ -103,7 +109,7 @@ def create_pagarme_transaction(subscription,
             data=trans_trx,
             status=trans_trx['status'],
             type=trans_trx['payment_method'],
-            date_created=trans_trx['date_created'],
+            date_created=created,
             amount=amount,
             lot_price=subscription.lot.price,
             liquid_amount=liquid_amount,
@@ -136,42 +142,27 @@ def create_pagarme_transaction(subscription,
             date_created=trans_trx['date_created'],
         )
 
-        for payable_trx in payables_trx:
-            amount = payment_helpers.amount_as_decimal(
-                str(payable_trx['amount'])
-            )
+        for sr in split_rules_trx:
 
-            fee = payment_helpers.amount_as_decimal(
-                str(payable_trx['fee'])
-            ) if payable_trx['fee'] else None
-
-            antecipation_fee = payment_helpers.amount_as_decimal(
-                str(payable_trx['anticipation_fee'])
-            ) if payable_trx['anticipation_fee'] else None
-
-            payment_date = datetime.strptime(
-                payable_trx['payment_date'],
-                "%Y-%m-%dT%H:%M:%S.%fZ"
-            ) if payable_trx['payment_date'] else None
+            fee_resp = sr['charge_processing_fee']
+            amount = payment_helpers.amount_as_decimal(str(sr['amount']))
 
             created = datetime.strptime(
-                payable_trx['date_created'],
+                sr['date_created'],
                 "%Y-%m-%dT%H:%M:%S.%fZ"
             )
 
-            Payable.objects.create(
+            split_rule = SplitRule.objects.create(
                 transaction=transaction,
-                pagarme_id=payable_trx['id'],
-                type=payable_trx['type'],
-                status=payable_trx['status'],
-                installment=payable_trx['installment'],
+                pagarme_id=sr['id'],
+                is_congressy=fee_resp is True,
+                charge_processing_fee=fee_resp is True,
                 amount=amount,
-                fee=fee,
-                antecipation_fee=antecipation_fee,
-                recipient_id=payable_trx['recipient_id'],
+                recipient_id=sr['recipient_id'],
                 created=created,
-                payment_date=payment_date,
             )
+
+            update_payables(split_rule)
 
         return transaction
 
