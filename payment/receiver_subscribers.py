@@ -3,6 +3,7 @@ Gerenciamento de coleções de Receivers que serão usados para diferentes
 operações de processamento para obter regras de rateamento de pagamento.
 """
 from collections import OrderedDict
+from datetime import date
 from decimal import Decimal
 
 from django.conf import settings
@@ -10,6 +11,7 @@ from django.conf import settings
 from gatheros_subscription.models import Subscription
 from payment import receivers, exception
 from payment.installments import Calculator, InstallmentResult
+from payment.payable.credit_card import get_payables
 
 RECEIVER_TYPE_SUBSCRIPTION = 'receiver_subscription'
 RECEIVER_TYPE_PRODUCT = 'receiver_product'
@@ -113,7 +115,7 @@ class ReceiverPublisher(object):
             # Por causa do parcalamento de boletos, o valor chegando de fora
             # pode ser menor do que o preço líquido do lote que a Congressy
             # deve captar de acrodo com o percentual.
-            cgsy_amount = (lot.price/self.installments) * cgsy_percent
+            cgsy_amount = (lot.price / self.installments) * cgsy_percent
 
         else:
             cgsy_amount = lot.price * cgsy_percent
@@ -185,10 +187,34 @@ class ReceiverPublisher(object):
                     )
 
                 if interests_amount > 0:
-                    # Retira valor e juros assumido e o coloca sob competência da
-                    # Congressy.
+                    # Retira valor e juros assumido e o coloca sob competência
+                    # da Congressy.
                     org_amount -= interests_amount
                     cgsy_amount += interests_amount
+
+            if self.transaction_type == 'credit_card' \
+                    and self.installments > 1:
+                # Agora vamos verificar possíveis valores de taxa de
+                # antecipação paga pelo participante no parcelamento e repassar
+                # à organização para quando houver a antecipação, o valor final
+                # ser o valor líquido esperado pela organização
+                payables = get_payables(
+                    recipient_id=self.organization.recipient_id,
+                    transaction_amount=self.amount,
+                    transaction_date=date.today(),
+                    payable_amount=org_amount,
+                    installments=self.installments,
+                    fee_percent=None,
+                    antecipation_fee_percent=Decimal(1.99),
+                )
+
+                antecipation_fee = 0
+                for payable in payables:
+                    antecipation_fee += payable.get_antecipation_amount()
+
+                if antecipation_fee:
+                    org_amount += antecipation_fee
+                    cgsy_amount -= antecipation_fee
 
         # total novamente.
         total = Decimal(org_amount + cgsy_amount)
