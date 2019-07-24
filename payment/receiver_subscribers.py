@@ -3,6 +3,7 @@ Gerenciamento de coleções de Receivers que serão usados para diferentes
 operações de processamento para obter regras de rateamento de pagamento.
 """
 from collections import OrderedDict
+from datetime import date
 from decimal import Decimal
 
 from django.conf import settings
@@ -10,6 +11,7 @@ from django.conf import settings
 from gatheros_subscription.models import Subscription
 from payment import receivers, exception
 from payment.installments import Calculator, InstallmentResult
+from payment.payable.credit_card import get_payables
 
 RECEIVER_TYPE_SUBSCRIPTION = 'receiver_subscription'
 RECEIVER_TYPE_PRODUCT = 'receiver_product'
@@ -113,7 +115,7 @@ class ReceiverPublisher(object):
             # Por causa do parcalamento de boletos, o valor chegando de fora
             # pode ser menor do que o preço líquido do lote que a Congressy
             # deve captar de acrodo com o percentual.
-            cgsy_amount = (lot.price/self.installments) * cgsy_percent
+            cgsy_amount = (lot.price / self.installments) * cgsy_percent
 
         else:
             cgsy_amount = lot.price * cgsy_percent
@@ -164,18 +166,15 @@ class ReceiverPublisher(object):
             org_amount += product.optional_liquid_price
 
         # Soma do montante distribuído entre as partes.
-        total_splitable_amount = round(org_amount + cgsy_amount, 2)
+        total = Decimal(org_amount + cgsy_amount)
 
-        if round(self.amount, 2) > round(total_splitable_amount, 2):
+        if round(Decimal(self.amount), 2) > round(total, 2):
             # A diferença que há no montante a ser transacionado irá para a
             # Congressy, por já estar embutidas taxas e juros de parcelamento,
             # se houver.
-            diff_amount = self.amount - total_splitable_amount
-            cgsy_amount += diff_amount
+            cgsy_amount += Decimal(self.amount - total)
 
-            # Soma do montante distribuído entre as partes.
-            total_splitable_amount = org_amount + cgsy_amount
-
+        if self.installments > 1:
             # Se o organizador assumiu juros de parcelamento, o montante a ser
             # transacionado estará sem o valor de juros de parcelamento. Então,
             # vamos recalcula-los.
@@ -183,29 +182,50 @@ class ReceiverPublisher(object):
             if 1 < int(self.installments) <= int(free_installments):
                 interests_amount = \
                     self.installment_calculator.get_absorbed_interests_amount(
-                        amount=self.amount,
+                        amount=Decimal(self.amount),
                         installments=self.installments,
                     )
 
-                assert round(diff_amount, 2) == round(interests_amount, 2)
+                if interests_amount > 0:
+                    # Retira valor e juros assumido e o coloca sob competência
+                    # da Congressy.
+                    org_amount -= interests_amount
+                    cgsy_amount += interests_amount
 
-                # Retira valor e juros assumido e o coloca sob competência da
-                # Congressy.
-                org_amount -= interests_amount
-                cgsy_amount += interests_amount
+            if self.transaction_type == 'credit_card' \
+                    and self.installments > 1:
+                # Agora vamos verificar possíveis valores de taxa de
+                # antecipação paga pelo participante no parcelamento e repassar
+                # à organização para quando houver a antecipação, o valor final
+                # ser o valor líquido esperado pela organização
+                payables = get_payables(
+                    recipient_id=self.organization.recipient_id,
+                    transaction_amount=self.amount,
+                    transaction_date=date.today(),
+                    payable_amount=org_amount,
+                    installments=self.installments,
+                    fee_percent=None,
+                    antecipation_fee_percent=Decimal(1.99),
+                )
 
-                # Soma do montante distribuído entre as partes.
-                total_splitable_amount = org_amount + cgsy_amount
+                antecipation_fee = 0
+                for payable in payables:
+                    antecipation_fee += payable.get_antecipation_amount()
+
+                if antecipation_fee:
+                    org_amount += antecipation_fee
+                    cgsy_amount -= antecipation_fee
+
+        # total novamente.
+        total = Decimal(org_amount + cgsy_amount)
 
         # Depois de todos os valores distribuídos, o valor entre a Congressy
         # e organizador tem de ser de acordo com o montante a ser
         # transacionado.
-        diff_amount = round(total_splitable_amount, 2) - round(self.amount, 2)
-        diff_amount = round(diff_amount, 2)
-        assert diff_amount > 0.02 or diff_amount < 0.02, \
+        assert round(total, 2) == round(Decimal(self.amount), 2), \
             "total splitable amount: {}. Amount: {}".format(
-                round(total_splitable_amount, 2),
-                round(self.amount, 2)
+                round(total, 2),
+                round(Decimal(self.amount), 2)
             )
 
         # ==== RECEIVERS
@@ -236,7 +256,7 @@ class ReceiverPublisher(object):
             processing_fee_responsible=False,
             installment_result=InstallmentResult(
                 calculator=self.installment_calculator,
-                amount=self.amount,
+                amount=Decimal(self.amount),
                 num_installments=int(self.installments),
             ),
         )

@@ -92,7 +92,7 @@
                     {% endif %}
                 </td>
                 <td class="text-right">
-                    R$ {{ transaction.amount|intcomma }}
+                    {{ transaction.lot.display_price }}
                 </td>
                 <td class="text-center">
                     {% if transaction.status == transaction.PAID %}

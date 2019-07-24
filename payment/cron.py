@@ -1,10 +1,13 @@
+from datetime import datetime
+
 from django.core.management import call_command
 from django.db.transaction import atomic
 from django_cron import CronJobBase, Schedule
 
 from core.helpers import sentry_log
 from gatheros_subscription.models import Subscription
-from payment.models import Transaction
+from payment.models import Transaction, SplitRule
+from payment.payable.updater import update_payables
 
 
 class SubscriptionStatusIrregularityTestJob(CronJobBase):
@@ -113,3 +116,27 @@ class SubscriptionPaidAndIncomplete(CronJobBase):
             print(msg1 + msg2)
 
             return msg1
+
+
+class CheckPayables(CronJobBase):
+    """
+    Verifica recebíveis que não irão mais ser processados por postback.
+    """
+    RUN_EVERY_MINS = 15  # every 15 minutes
+    RETRY_AFTER_FAILURE_MINS = 5
+
+    code = 'payment.cron.CheckPayables'
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS,
+                        retry_after_failure_mins=RETRY_AFTER_FAILURE_MINS)
+
+    def do(self):
+        # Verifica todas as regras que estejam com recebíveis agendadas para
+        # verificação, excluindo as regras que não possuem recebíveis agendados
+        split_rule_qs = SplitRule.objects.filter(
+            payables__next_check__lte=datetime.now(),
+        ).exclude(
+            payables__next_check__isnull=True,
+        )
+
+        for split_rule in split_rule_qs[:50]:
+            update_payables(split_rule)

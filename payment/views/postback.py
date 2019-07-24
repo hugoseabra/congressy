@@ -15,6 +15,7 @@ from payment.email_notifications import PaymentNotification
 from payment.forms import PaymentForm
 from payment.helpers import TransactionLog
 from payment.models import Transaction, TransactionStatus
+from payment.payable.updater import update_payables
 from payment.postback import Postback
 from payment.subscription_status_manager import SubscriptionStatusManager
 from payment.transaction_status_collection import TransactionStatusCollection
@@ -102,6 +103,10 @@ def postback_url_view(request, uidb64):
             transaction.boleto_url = boleto_url
 
         transaction.save()
+
+        # ===================== PAYABLES ===================================
+        for split_rule in transaction.split_rules.all():
+            update_payables(split_rule)
 
         # ================= SUBSCRIPTION ===================================
 
