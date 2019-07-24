@@ -1,10 +1,13 @@
+from datetime import datetime
+
 from django.core.management import call_command
 from django.db.transaction import atomic
 from django_cron import CronJobBase, Schedule
 
 from core.helpers import sentry_log
 from gatheros_subscription.models import Subscription
-from payment.models import Transaction
+from payment.models import Transaction, SplitRule, Payable
+from payment.payable.updater import update_payables
 
 
 class SubscriptionStatusIrregularityTestJob(CronJobBase):
@@ -124,4 +127,15 @@ class CheckPayables(CronJobBase):
                         retry_after_failure_mins=RETRY_AFTER_FAILURE_MINS)
 
     def do(self):
-        pass
+        split_rule_qs = SplitRule.objects.filter(
+            payables__next_check__lte=datetime.now(),
+            payables__status__in=(
+                Payable.STATUS_WAITING_FUNDS,
+                Payable.STATUS_PREPAID,
+            )
+        ).exclude(
+            payables__next_check__isnull=True,
+        )
+
+        for split_rule in split_rule_qs[:50]:
+            update_payables(split_rule)

@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 from pprint import pprint
 
@@ -131,7 +131,6 @@ def update_payables(split_rule: SplitRule):
                 split_rule=split_rule,
                 pagarme_id=item['id'],
                 type=item['type'],
-                status=item['status'],
                 installment=item['installment'] or 1,
                 recipient_id=item['recipient_id'],
                 created=created,
@@ -140,6 +139,21 @@ def update_payables(split_rule: SplitRule):
             payable.antecipation_fee = antecipation_fee
             payable.payment_date = payment_date
             payable.amount = amount
+
+            now = datetime.now()
+
+            if item['status'] in (Payable.STATUS_WAITING_FUNDS,
+                                  Payable.STATUS_PREPAID):
+
+                # noinspection PyTypeChecker
+                if payable.next_check <= now:
+                    payable.next_check = now + timedelta(hours=12)
+            else:
+                # como o status do recebível é final, vamos cancelar futuras
+                # checagens
+                payable.next_check = None
+
+            payable.status = item['status']
 
             payable.save()
 
@@ -156,4 +170,5 @@ def update_payables(split_rule: SplitRule):
                 fee=fee,
                 antecipation_fee=antecipation_fee,
                 payment_date=payment_date,
+                next_check=datetime.now() + timedelta(days=30 if is_cc else 2),
             )
