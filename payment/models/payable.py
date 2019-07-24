@@ -8,24 +8,45 @@ from base.models import EntityMixin
 from core.model import track_data
 
 
-@track_data('status')
+@track_data('status', 'pagarme_id', 'fee', 'antecipation_fee',
+            'payment_date', 'next_check')
 class Payable(models.Model, EntityMixin):
-    WAITING_FUNDS = 'waiting_funds'
-    AVAILABLE = 'available'
-    TRANSFERRED = 'transferred'
+    # Esse status significa que o cliente final ainda não realizou o pagamento.
+    STATUS_WAITING_FUNDS = 'waiting_funds'
+
+    # Significa que o valor da transação atrelada a esse recebível foi paga e,
+    # portanto, esse valor está disponível para saque
+    STATUS_PAID = 'paid'
+
+    # Status intermediário antes do momento do pagamento
+    STATUS_PREPAID = 'prepaid'
+
+    # Recebível pertence à uma transação que está com status chargedback.
+    # Sendo que o status só vai mudar caso o chargeback seja revertido.
+    STATUS_SUSPENDED = 'suspended'
 
     STATUSES = (
-        (WAITING_FUNDS, 'Aguardando saldo'),
-        (AVAILABLE, 'Disponível'),
-        (TRANSFERRED, 'Transferido'),
+        (STATUS_WAITING_FUNDS, 'Aguardando saldo'),
+        (STATUS_PREPAID, 'Em processo de pagamento'),
+        (STATUS_PAID, 'Pago (disponível)'),
+        (STATUS_SUSPENDED, 'Suspenso'),
     )
 
     TYPE_CREDIT = 'credit'
     TYPE_REFUND = 'refund'
+    TYPE_CHARGEBACK = 'chargeback'
+    TYPE_CHARGEBACK_REFUND = 'chargeback_refund'
+    TYPE_REFUND_REVERSAL = 'refund_reversal'
+    TYPE_BLOCK = 'block'
+    TYPE_UNBLOCK = 'unblock'
 
     TYPES = (
         (TYPE_CREDIT, 'Crédito'),
         (TYPE_REFUND, 'Estono'),
+        (TYPE_CHARGEBACK, 'Chargeback'),
+        (TYPE_CHARGEBACK_REFUND, 'Estono de chargeback'),
+        (TYPE_BLOCK, 'Bloqueado'),
+        (TYPE_UNBLOCK, 'Desbloqueado'),
     )
 
     class Meta:
@@ -33,9 +54,12 @@ class Payable(models.Model, EntityMixin):
         verbose_name_plural = 'Itens pagáveis'
 
     def __str__(self):
-        return 'ID: {}, Transaction: {} - {}'.format(self.pk,
-                                                 self.transaction_id,
-                                                 self.get_status_display())
+        return 'ID: {}, Transaction: {} - {} - {}'.format(
+            self.pk,
+            self.transaction_id,
+            self.get_type_display(),
+            self.get_status_display(),
+        )
 
     uuid = models.UUIDField(
         default=uuid.uuid4,
@@ -44,38 +68,39 @@ class Payable(models.Model, EntityMixin):
         primary_key=True
     )
 
-    transaction = models.ForeignKey(
-        'payment.Transaction',
+    split_rule = models.ForeignKey(
+        'payment.SplitRule',
         on_delete=models.CASCADE,
         related_name='payables',
         null=False,
         editable=False,
-        verbose_name='transação',
+        verbose_name='regra de rateamento',
     )
 
-    pagarme_id = models.PositiveIntegerField(
+    pagarme_id = models.CharField(
+        max_length=28,
         null=False,
         editable=False,
         verbose_name='ID de recebível (pagar.me)',
     )
 
     status = models.CharField(
-        default=WAITING_FUNDS,
+        default=STATUS_WAITING_FUNDS,
         max_length=15,
         choices=STATUSES,
         null=False,
+        blank=True,
         verbose_name='status',
     )
 
     type = models.CharField(
-        max_length=8,
+        max_length=15,
         choices=TYPES,
         null=False,
         verbose_name='tipo',
     )
 
     installment = models.PositiveIntegerField(
-        default=1,
         verbose_name='parcela',
         null=False,
         editable=False,
@@ -108,6 +133,7 @@ class Payable(models.Model, EntityMixin):
     recipient_id = models.CharField(
         max_length=28,
         null=False,
+        editable=False,
         verbose_name='ID recebedor (pagar.me)',
     )
 
@@ -127,7 +153,7 @@ class Payable(models.Model, EntityMixin):
         null=True,
     )
 
-    next_check = models.DateField(
+    next_check = models.DateTimeField(
         verbose_name='próxima verificação em',
         null=True,
     )
