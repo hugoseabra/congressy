@@ -6,7 +6,7 @@ from django_cron import CronJobBase, Schedule
 
 from core.helpers import sentry_log
 from gatheros_subscription.models import Subscription
-from payment.models import Transaction, SplitRule, Payable
+from payment.models import Transaction, SplitRule
 from payment.payable.updater import update_payables
 
 
@@ -119,7 +119,10 @@ class SubscriptionPaidAndIncomplete(CronJobBase):
 
 
 class CheckPayables(CronJobBase):
-    RUN_EVERY_MINS = 60  # every hours
+    """
+    Verifica recebíveis que não irão mais ser processados por postback.
+    """
+    RUN_EVERY_MINS = 15  # every 15 minutes
     RETRY_AFTER_FAILURE_MINS = 5
 
     code = 'payment.cron.CheckPayables'
@@ -127,12 +130,10 @@ class CheckPayables(CronJobBase):
                         retry_after_failure_mins=RETRY_AFTER_FAILURE_MINS)
 
     def do(self):
+        # Verifica todas as regras que estejam com recebíveis agendadas para
+        # verificação, excluindo as regras que não possuem recebíveis agendados
         split_rule_qs = SplitRule.objects.filter(
             payables__next_check__lte=datetime.now(),
-            payables__status__in=(
-                Payable.STATUS_WAITING_FUNDS,
-                Payable.STATUS_PREPAID,
-            )
         ).exclude(
             payables__next_check__isnull=True,
         )

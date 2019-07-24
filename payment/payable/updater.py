@@ -145,9 +145,8 @@ def update_payables(split_rule: SplitRule):
             if item['status'] in (Payable.STATUS_WAITING_FUNDS,
                                   Payable.STATUS_PREPAID):
 
-                # noinspection PyTypeChecker
-                if payable.next_check <= now:
-                    payable.next_check = now + timedelta(hours=12)
+                payable.next_check = now + timedelta(hours=12)
+
             else:
                 # como o status do recebível é final, vamos cancelar futuras
                 # checagens
