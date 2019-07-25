@@ -2,7 +2,7 @@
 from project.base_settings import *
 
 # ========================== BASE CONFIGURATION ============================= #
-ROOT_URLCONF = 'project.manage.urls'
+ROOT_URLCONF = 'project.admin_intranet.urls'
 # ================================= APPS ==================================== #
 INSTALLED_APPS += [
     'gatheros_event',
@@ -26,6 +26,7 @@ INSTALLED_APPS += [
     'mix_boleto',
     'installment',
     'cgsy_commands',
+    'sync',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'
