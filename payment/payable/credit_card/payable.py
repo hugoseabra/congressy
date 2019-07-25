@@ -43,7 +43,7 @@ class Payable:
     def get_antecipation_amount(self,
                                 antecipation_date: date = None) -> Decimal:
 
-        if self.antecipation_fee_percent:
+        if not self.antecipation_fee_percent:
             return Decimal(0)
 
         if not antecipation_date:
