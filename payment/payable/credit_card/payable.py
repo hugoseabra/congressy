@@ -43,6 +43,9 @@ class Payable:
     def get_antecipation_amount(self,
                                 antecipation_date: date = None) -> Decimal:
 
+        if self.antecipation_fee_percent:
+            return Decimal(0)
+
         if not antecipation_date:
             antecipation_date = self.antecipation_date
 
@@ -57,6 +60,8 @@ class Payable:
 
         if antecipation_date > self.payment_date:
             return Decimal(0)
+
+        fee_amount = 0
 
         # Taxa diária de antecipação. Padrão de 30 dias.
         fee_decimal_per_day = \
