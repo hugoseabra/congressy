@@ -52,7 +52,7 @@ class Login(auth_views.LoginView):
         ctx = super().get_context_data(**kwargs)
 
         ctx['allow_account_registration'] = \
-            LOGIN_SUPERUSER_ONLY or ALLOW_ACCOUNT_REGISTRATION
+            LOGIN_SUPERUSER_ONLY is False or ALLOW_ACCOUNT_REGISTRATION
 
         ctx['is_embeded'] = self.request.GET.get('embeded') == '1'
         if 'show_captcha' in self.request.session \

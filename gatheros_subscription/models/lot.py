@@ -11,8 +11,9 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import numberformat
 from django.utils.encoding import force_text
-from django.utils.formats import localize
+from django.utils.formats import localize, number_format
 
 from base.models import EntityMixin
 from core.model import track_data
@@ -277,7 +278,13 @@ class Lot(models.Model, GatherosModelMixin, EntityMixin):
 
             return content.format(
                 self.name,
-                localize(self.get_calculated_price()),
+                numberformat.format(
+                    self.get_calculated_price(),
+                    decimal_sep=',',
+                    thousand_sep='.',
+                    grouping=[3, 3, 2],
+                    force_grouping=True,
+                ),
                 self.places_remaining
             )
 
@@ -293,9 +300,17 @@ class Lot(models.Model, GatherosModelMixin, EntityMixin):
         """ Exibição pública de infomações do lote. """
 
         if self.price and self.price > 0:
-            return 'R$ {}'.format(localize(self.price))
+            return 'R$ {}'.format(
+                numberformat.format(
+                    self.get_calculated_price(),
+                    decimal_sep=',',
+                    thousand_sep='.',
+                    grouping=[3, 3, 2],
+                    force_grouping=True,
+                ),
+            )
 
-        return localize(0.00)
+        return 'R$ 0,00'
 
     @property
     def places_remaining(self):
@@ -459,6 +474,26 @@ class Lot(models.Model, GatherosModelMixin, EntityMixin):
             congressy_amount = minimum
 
         return round(self.price + congressy_amount, 2)
+
+    def display_calculated_price(self):
+        """
+        Resgata o valor calculado do preço do lote de acordo com as regras
+        da Congressy.
+        """
+        price = self.get_calculated_price()
+
+        if not price:
+            return 'R$ 0,00'
+
+        return 'R$ {}'.format(
+            numberformat.format(
+                price,
+                decimal_sep=',',
+                thousand_sep='.',
+                grouping=[3, 3, 2],
+                force_grouping=True,
+            ),
+        )
 
     def get_liquid_price(self):
         """
