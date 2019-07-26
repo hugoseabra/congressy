@@ -151,7 +151,7 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
         plan = CongressyPlan(amount=self.price,
                              percent=Decimal(self.event.congressy_percent))
 
-        return plan.get_subscriber_price()
+        return round(plan.get_subscriber_price(), 2)
 
     def get_liquid_amount(self):
         """
@@ -169,7 +169,7 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
             percent=Decimal(self.event.congressy_percent) / 100
         )
 
-        return plan.get_organizer_amount()
+        return round(plan.get_organizer_amount(), 2)
 
     def get_congressy_amount(self):
         """
@@ -183,11 +183,11 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
             percent=Decimal(self.event.congressy_percent) / 100
         )
 
-        return plan.get_congressy_amount()
-
+        return round(plan.get_congressy_amount(), 2)
 
     def get_period(self):
-        """ Recupera string formatada de periodo do lote, de acordo com suas
+        """
+        Recupera string formatada de periodo do lote, de acordo com suas
         datas, deivamente formatada.
         """
 
@@ -209,5 +209,3 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
             period += end_time.strftime('%Hh%M')
 
         return period
-
-

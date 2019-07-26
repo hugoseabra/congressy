@@ -21,7 +21,7 @@ from ticket.helpers import (
     get_max_installments_allowed_for_price,
 )
 from ticket.models import Ticket, Lot
-from ticket.serializers import TicketSerializer, LotSerializer
+from ticket.serializers import TicketSerializer, TicketLotSerializer
 from .permissions import TicketOrganizerOnly, LotOrganizerOnly
 
 
@@ -79,7 +79,8 @@ class TicketViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
                 event_id = int(event_id)
             except ValueError:
                 content = {
-                    'errors': ["event_id in query is not int: '{}' ".format(event_id), ]
+                    'errors': ["event_id in query is not int: '{}' ".format(
+                        event_id), ]
                 }
 
                 return Response(content, status=status.HTTP_400_BAD_REQUEST)
@@ -213,7 +214,7 @@ class TicketCalculatorAPIView(TicketRestrictionMixin, APIView):
 
 
 class TicketCurrentLotView(TicketRestrictionMixin, RetrieveAPIView):
-    serializer_class = LotSerializer
+    serializer_class = TicketLotSerializer
 
     def retrieve(self, request, *args, **kwargs):
 
@@ -259,7 +260,7 @@ class TicketCurrentLotView(TicketRestrictionMixin, RetrieveAPIView):
 
 class LotViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, LotOrganizerOnly)
-    serializer_class = LotSerializer
+    serializer_class = TicketLotSerializer
     queryset = Lot.objects.all()
 
     def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
@@ -301,7 +302,8 @@ class LotViewSet(TicketRestrictionMixin, viewsets.ModelViewSet):
                 ticket_id = int(ticket_id)
             except ValueError:
                 content = {
-                    'errors': ["ticket_id in query is not int: '{}' ".format(ticket_id), ]
+                    'errors': ["ticket_id in query is not int: '{}' ".format(
+                        ticket_id), ]
                 }
 
                 return Response(content, status=status.HTTP_400_BAD_REQUEST)

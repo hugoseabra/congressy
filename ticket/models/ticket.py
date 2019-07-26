@@ -220,6 +220,21 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
     def get_period(self):
         return self.current_lot.get_period() if self.current_lot else None
 
+    @property
+    def subscriptions(self):
+        if not self.lots.count():
+            return None
+
+        subscriptions_qs = None
+
+        for lot in self.lots.all():
+            if subscriptions_qs is None:
+                subscriptions_qs = lot.subscriptions.get_queryset()
+
+            subscriptions_qs = subscriptions_qs | lot.subscriptions.get_queryset()
+
+        return subscriptions_qs
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 

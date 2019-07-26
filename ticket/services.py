@@ -6,5 +6,5 @@ class TicketService(ApplicationService):
     manager_class = managers.TicketManager
 
 
-class LotService(ApplicationService):
+class TicketLotService(ApplicationService):
     manager_class = managers.LotManager
