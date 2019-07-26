@@ -65,7 +65,7 @@ class CurrentSubscriptionState(object):
 
         prods_qs = self.subscription.subscription_products
         servs_qs = self.subscription.subscription_products
-        has_prods = prods_qs.filter(optional__price__gt=0).count() > 0
-        has_servs = servs_qs.filter(optional__price__gt=0).count() > 0
+        has_prods = prods_qs.filter(optional__liquid_price__gt=0).count() > 0
+        has_servs = servs_qs.filter(optional__liquid_price__gt=0).count() > 0
 
         return has_prods is True or has_servs is True

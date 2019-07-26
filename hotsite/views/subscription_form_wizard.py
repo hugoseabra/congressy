@@ -314,40 +314,40 @@ class SubscriptionWizardView(SessionWizardView, SelectTicketMixin):
             )
             return redirect('public:hotsite', slug=self.event.slug)
 
-        try:
-            if self.current_subscription.has_payments():
-                messages.warning(
-                    request,
-                    "Você já possui uma inscrição paga neste evento."
-                )
-
-            if self.current_event.is_private_event():
-
-                code = self.get_exhibition_code()
-
-                if self.is_valid_exhibition_code(code) is False:
-                    messages.error(
-                        request,
-                        "Você deve informar um código válido para se inscrever"
-                        " neste evento."
-                    )
-                    self.clear_session_exhibition_code()
-                    return redirect('public:hotsite', slug=self.event.slug)
-
-            return super().dispatch(request, *args, **kwargs)
-
-        except InvalidStateStepError as e:
-
-            sentry_log(str(e), type='error', notify_admins=True)
-
+        # try:
+        if self.current_subscription.has_payments():
             messages.warning(
                 request,
-                "Por favor, informe os dados do início para validarmos"
-                " as informações de sua inscrição."
+                "Você já possui uma inscrição paga neste evento."
             )
 
-            return redirect('public:hotsite-subscription',
-                            slug=self.event.slug)
+        if self.current_event.is_private_event():
+
+            code = self.get_exhibition_code()
+
+            if self.is_valid_exhibition_code(code) is False:
+                messages.error(
+                    request,
+                    "Você deve informar um código válido para se inscrever"
+                    " neste evento."
+                )
+                self.clear_session_exhibition_code()
+                return redirect('public:hotsite', slug=self.event.slug)
+
+        return super().dispatch(request, *args, **kwargs)
+
+        # except InvalidStateStepError as e:
+        #
+        #     sentry_log(str(e), type='error', notify_admins=True)
+        #
+        #     messages.warning(
+        #         request,
+        #         "Por favor, informe os dados do início para validarmos"
+        #         " as informações de sua inscrição."
+        #     )
+        #
+        #     return redirect('public:hotsite-subscription',
+        #                     slug=self.event.slug)
 
     def post(self, *args, **kwargs):
         """
@@ -593,9 +593,8 @@ class SubscriptionWizardView(SessionWizardView, SelectTicketMixin):
             survey_form.save()
 
             if self.subscription.brand_new is True:
-                subscription.author_id = survey_form.author.pk
-                subscription.save()
-
+                self.subscription.author_id = survey_form.author.pk
+                self.subscription.save()
 
         # Persisting payments:
         if isinstance(form, forms.PaymentForm):
