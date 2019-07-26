@@ -13,7 +13,6 @@ from rest_framework.response import Response
 from core.helpers import sentry_log
 from payment.email_notifications import PaymentNotification
 from payment.forms import PaymentForm
-from payment.helpers import TransactionLog
 from payment.models import Transaction, TransactionStatus
 from payment.payable.updater import update_payables
 from payment.postback import Postback
@@ -24,25 +23,19 @@ from .helpers import notify_admins_postback
 
 @api_view(['POST'])
 def postback_url_view(request, uidb64):
-    transaction_log = TransactionLog(uidb64)
 
     if not uidb64:
         msg = 'Houve uma tentativa de postback sem identificador do postback.'
-        transaction_log.add_message(msg, save=True)
         sentry_log(message=msg, type='warning', notify_admins=True, )
         raise Http404
 
-    transaction_log.add_message('Buscando transação na persistência.', True)
     transaction = Transaction.objects.get(uuid=uidb64)
-    transaction_log.add_message('Transação encontrada.')
 
     data = request.data.copy()
 
     if not data:
         msg = 'Houve uma tentativa de postback sem dados de transação para a' \
               ' transação "{}"'.format(uidb64)
-
-        transaction_log.add_message(msg, save=True)
 
         sentry_log(
             message=msg,
