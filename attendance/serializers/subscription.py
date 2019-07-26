@@ -2,8 +2,8 @@ from rest_framework import serializers
 
 from gatheros_event.serializers import PersonSerializer, EventSerializer
 from gatheros_subscription.models import Subscription
+from ticket.serializers import TicketLotSerializer, TicketSerializer
 from .fields import CheckinsField, AttendedStatusField
-from .lot import LotSerializer
 
 REST_FRAMEWORK = {
     'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S",
@@ -37,7 +37,8 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 
 class SubscriptionAttendanceSerializer(DynamicFieldsModelSerializer):
     event = EventSerializer()
-    lot = LotSerializer()
+    ticket = TicketSerializer()
+    ticket_lot = TicketLotSerializer()
     person = PersonSerializer()
     checkins = CheckinsField()
     attendance_status = AttendedStatusField(source='*')
@@ -52,7 +53,8 @@ class SubscriptionAttendanceSerializer(DynamicFieldsModelSerializer):
             'created',
             'modified',
             'event',
-            'lot',
+            'ticket',
+            'ticket_lot',
             'person',
             'checkins',
             'attendance_status',

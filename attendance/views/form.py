@@ -82,7 +82,8 @@ class AddAttendanceServiceView(BaseAttendanceServiceView, generic.CreateView):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
 
-        context['category_list'] = self.event.lot_categories.all()
+        # context['tickets'] = self.event.tickets.filter(active=True)
+
         return context
 
 
@@ -99,18 +100,18 @@ class EditAttendanceServiceView(BaseAttendanceServiceView, generic.UpdateView):
                     'pk': self.object.pk}
         )
 
-    def get_lot_categories(self):
+    def get_tickets(self):
         items = []
-        lc_filter_pks = []
+        ticket_filter_pks = []
         for item in AttendanceCategoryFilter.objects.filter(
                 attendance_service_id=self.object.pk):
-            lc_filter_pks.append(item.lot_category_id)
+            ticket_filter_pks.append(item.ticket_id)
 
-        for lc in self.event.lot_categories.all().order_by('name'):
+        for ticket in self.event.tickets.filter(active=True).order_by('name'):
             items.append({
-                'name': lc.name,
-                'value': lc.pk,
-                'checked': lc.pk in lc_filter_pks
+                'name': ticket.name,
+                'value': ticket.pk,
+                'checked': ticket.pk in ticket_filter_pks
             })
 
         return items
@@ -118,13 +119,14 @@ class EditAttendanceServiceView(BaseAttendanceServiceView, generic.UpdateView):
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
-        context['lot_categories'] = self.get_lot_categories()
+        # context['tickets'] = self.get_tickets()
         return context
 
 
 class DeleteAttendanceServiceView(BaseAttendanceServiceView, generic.DeleteView):
     model = AttendanceServiceForm.Meta.model
-    delete_message = "Tem certeza que deseja excluir a lista de checkin \"{name}\"?"
+    delete_message = "Tem certeza que deseja excluir a lista de" \
+                     " checkin \"{name}\"?"
     success_message = "Lista de checkin excluída com sucesso!"
 
     def get_success_url(self):

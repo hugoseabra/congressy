@@ -1,12 +1,13 @@
 from django import forms
+
 from attendance.models import AttendanceService, AttendanceCategoryFilter
-from gatheros_subscription.models import LotCategory
+from ticket.models import Ticket
 
 
 class AttendanceServiceForm(forms.ModelForm):
-    lot_categories = forms.CharField(
+    tickets = forms.CharField(
         widget=forms.CheckboxSelectMultiple,
-        label='Categorias de Lotes',
+        label='Ticket',
         required=False,
     )
 
@@ -15,7 +16,7 @@ class AttendanceServiceForm(forms.ModelForm):
         fields = (
             'name',
             'event',
-            'lot_categories',
+            'tickets',
             'checkout_enabled',
             'with_certificate',
             'printing_queue_webhook',
@@ -24,7 +25,7 @@ class AttendanceServiceForm(forms.ModelForm):
         )
 
     def clean_lot_category_filter(self):
-        category_pks = self.cleaned_data.get('lot_categories')
+        category_pks = self.cleaned_data.get('tickets')
         if not category_pks:
             return category_pks
 
@@ -47,37 +48,36 @@ class AttendanceServiceForm(forms.ModelForm):
         return accreditation
 
     def _create_lot_category_filters(self, service):
-        lc_pks = self.data.getlist('category_list', [])
-        lc_pks = list(map(int, lc_pks))
+        ticket_pks = self.data.getlist('ticket_list', []) or []
         existing_cat_filters = []
 
-        if lc_pks:
+        if ticket_pks:
             for cat_filter in service.lot_category_filters.all():
-                if cat_filter.lot_category.pk in lc_pks:
-                    existing_cat_filters.append(cat_filter.lot_category.pk)
+                if cat_filter.ticket_id in ticket_pks:
+                    existing_cat_filters.append(cat_filter.ticket_id)
                     continue
 
                 cat_filter.delete()
 
             cat_filters = service.lot_category_filters
 
-            for cf in cat_filters.exclude(lot_category__pk__in=lc_pks):
+            for cf in cat_filters.exclude(ticket_id__in=ticket_pks):
                 cf.delete()
 
-            for lot_category in LotCategory.objects.filter(pk__in=lc_pks):
-                if lot_category.pk in existing_cat_filters:
+            for ticket in Ticket.objects.filter(pk__in=ticket_pks):
+                if ticket.pk in existing_cat_filters:
                     continue
 
                 AttendanceCategoryFilter.objects.create(
-                    attendance_service=service,
-                    lot_category=lot_category
+                    attendance_service_id=service.pk,
+                    ticket_id=ticket.pk,
                 )
         else:
-            for lot_category in LotCategory.objects.filter(
+            for ticket in Ticket.objects.filter(
                     event_id=service.event_id):
                 AttendanceCategoryFilter.objects.create(
-                    attendance_service=service,
-                    lot_category=lot_category
+                    attendance_service_id=service.pk,
+                    ticket_id=ticket.pk,
                 )
 
     def save(self, commit=True):

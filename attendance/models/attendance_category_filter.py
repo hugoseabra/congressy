@@ -9,7 +9,9 @@ class AttendanceCategoryFilter(models.Model):
         LotCategory,
         on_delete=models.CASCADE,
         verbose_name='Categoria',
-        related_name='attendance_service_filters'
+        related_name='attendance_service_filters',
+        null=True,
+        blank=True,
     )
 
     ticket = models.ForeignKey(
