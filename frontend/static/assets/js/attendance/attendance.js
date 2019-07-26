@@ -66,8 +66,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
 (function (AjaxSender, attendance) {
     attendance.Subscription = function (uuid,
                                         name,
-                                        lot_name,
-                                        category_name,
+                                        ticket_name,
                                         email,
                                         event_count,
                                         code,
@@ -75,15 +74,19 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                                         attendance_status) {
         var self = this;
         this.uuid = uuid;
-        this.name = name.substring(0, 22);
-        this.lot_name = lot_name.substring(0, 30);
-        this.category_name = category_name.substring(0, 30);
+        this.name = name.substring(0, 15);
 
-        if (email) {
-            this.email = email.substring(0, 30);
-        } else {
-            this.email = null;
+        if (name.length > 15) {
+            this.name += '...';
         }
+
+        this.ticket_name = ticket_name.substring(0, 15);
+
+        if (this.ticket_name.length > 15) {
+            this.ticket_name += '...';
+        }
+
+        this.email = email;
 
         this.event_count = event_count;
         this.code = code;
@@ -121,10 +124,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
                     console.log('1. Fetch - status anterior: ' + response['attendance_status']);
 
                     self.name = response['person']['name'].substring(0, 22);
-                    self.lot_name = response['lot']['name'].substring(0, 30);
-                    if (response['lot']['category']) {
-                        self.category_name = response['lot']['category'].substring(0, 30);
-                    }
+                    self.ticket = response['ticket']['name'].substring(0, 30);
 
                     if (response['person']['email']) {
                         self.email = response['person']['email'].substring(0, 30);
@@ -198,8 +198,7 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             var subscription = new Subscription(
                 data['uuid'],
                 data['person']['name'],
-                data['lot']['name'],
-                data['lot']['category'],
+                data['ticket']['name'],
                 data['person']['email'],
                 data['event_count'],
                 data['code'],
@@ -588,19 +587,15 @@ window.cgsy.attendance = window.cgsy.attendance || {};
             card_html += "<div class=\"row\" style=\"padding-top: 8px\">";
             card_html += "<div class=\"col-md-12\" style=\"overflow: hidden\">";
             card_html += "<div class=\"divider-card\"></div>";
-            card_html += "<h3 class=\"secondary-informations\" >";
+            card_html += "<h3 class=\"secondary-informations\" style=\"overflow-x:hidden\">";
             if (subscription.email) {
                 card_html += "<i class=\"far fa-envelope\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Email\"></i>";
                 card_html += "<span> " + subscription.email + "</span>";
             }
             card_html += "</h3>";
-            card_html += "<h3 class=\"secondary-informations\" >";
-            card_html += "<i class=\"fas fa-th-list\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Categoria\"></i>";
-            card_html += "<span> " + subscription.category_name + "</span>";
-            card_html += "</h3>";
-            card_html += "<h3 class=\"secondary-informations\" >";
-            card_html += "<i class=\"fas fa-th-large\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Lote\"></i>";
-            card_html += "<span> " + subscription.lot_name + "</span>";
+            card_html += "<h3 class=\"secondary-informations\" style=\"overflow-x:hidden\">";
+            card_html += "<i class=\"fas fa-th-large\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Ingresso\"></i>";
+            card_html += "<span> " + subscription.ticket_name + "</span>";
             card_html += "</h3>";
             card_html += "<div style=\" text-align: center\">" + button.prop('outerHTML') + "<div>";
             card_html += "</div>";

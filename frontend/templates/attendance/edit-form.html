@@ -83,26 +83,6 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group lot-category-filter"
-                                             style="margin-top: 20px">
-                                            <label>Categoria de lotes</label>
-                                            <div>
-                                                {% for category in lot_categories %}
-                                                    <input type="checkbox"
-                                                           name="category_list"
-                                                           value="{{ category.value }}"
-                                                           style="padding-bottom: 5px"
-                                                            {% if category.checked %}
-                                                           checked {% endif %}>
-                                                    {{ category.name }}<br>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <div class="row">
                                     <div class="col-md-6">
                                         {% render_switchery_field form.accreditation %}
                                     </div>
@@ -173,7 +153,7 @@
 {% block scripts %}
 
     <script>
-        var radios = $('.lot-category-filter input[type=checkbox]');
+        var radios = $('.ticket-filter input[type=checkbox]');
 
         radios.iCheck({
             checkboxClass: 'icheckbox_flat-grey',

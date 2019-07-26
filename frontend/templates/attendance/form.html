@@ -76,24 +76,6 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group lot-category-filter"
-                                             style="margin-top: 20px">
-                                            <label>Categoria de lotes</label>
-                                            <div>
-                                                {% for category in category_list %}
-
-                                                    <input type="checkbox"
-                                                           name="category_list"
-                                                           value="{{ category.pk }}"
-                                                           style="padding-bottom: 5px">
-                                                    {{ category.name }}<br>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
                                     <div class="col-md-6">
                                         {% render_switchery_field form.accreditation %}
                                     </div>

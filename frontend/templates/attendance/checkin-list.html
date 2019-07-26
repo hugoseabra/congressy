@@ -33,9 +33,8 @@
                         <thead>
                         <tr>
                             <th>Nome</th>
-                            <th>Lote</th>
+                            <th>Ingresso</th>
                             <th>Código</th>
-                            <th>CPF/CNPJ</th>
                             <th>Horário</th>
                         </tr>
                         </thead>
@@ -61,23 +60,9 @@
                                 </td>
                                 <td class="col-md-1">
                                     {{ att.subscription.ticket_lot.name }}
-
                                 </td>
                                 <td>
                                     {{ att.subscription.code }}
-                                </td>
-                                <td>
-                                    {% if  att.subscription.person.cpf %}
-                                        <div class="cpf">
-                                            {{ att.subscription.person.cpf }}
-                                        </div>
-                                    {% elif  att.subscription.person.institution_cnpj %}
-                                        <div class="cnpj">
-                                            {{ att.subscription.person.institution_cnpj }}
-                                        </div>
-                                    {% else %}
-                                        ...
-                                    {% endif %}
                                 </td>
                                 <td>
                                     {% if att.created_on %}
@@ -86,8 +71,6 @@
                                         Não disponivel.
                                     {% endif %}
                                 </td>
-
-
                             </tr>
                         {% endfor %}
                         </tbody>
