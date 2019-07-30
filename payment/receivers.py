@@ -19,6 +19,7 @@ class Receiver(object):
     """
     level = None
     congressy_receiver = False
+    org_receiver = False
 
     def __init__(self,
                  type: str,
@@ -121,6 +122,7 @@ class CongressyReceiver(Receiver):
 
 class OrganizerReceiver(Receiver):
     level = RECEIVER_LEVEL0
+    org_receiver = True
 
     def __init__(self,
                  installment_result,

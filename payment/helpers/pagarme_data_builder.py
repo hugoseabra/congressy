@@ -30,9 +30,8 @@ class PagarmeDataBuilder:
     def __init__(self, subscription):
 
         self.subscription = subscription
-        self.debts = []
-        self.debt_items = {}
-        self.debt_amount = Decimal(0)
+        self.debts = list()
+        self.debt_items = dict()
         self.liquid_amount = Decimal(0)
         self.has_expiration_date = False
 
@@ -75,8 +74,6 @@ class PagarmeDataBuilder:
             "quantity": 1,
             "tangible": False
         }
-        self.debt_amount += debt.amount
-        self.liquid_amount += debt.liquid_amount
 
     def build(self, amount, transaction_type, installments=1, card_hash=None):
 
@@ -90,6 +87,10 @@ class PagarmeDataBuilder:
 
         soft_desc = lot.event.organization.name[:13].strip()
 
+        split_rules = self._create_split_rules(amount,
+                                               transaction_type,
+                                               installments)
+
         data = {
             'api_key': settings.PAGARME_API_KEY,
             'transaction_id': transaction_id,
@@ -102,12 +103,8 @@ class PagarmeDataBuilder:
             'payment_method': transaction_type,
             "installments": installments,
             "metadata": self.metadata_items,
-            "items": [item for id, item in self.debt_items.items()],
-            "split_rules": self._create_split_rules(
-                amount,
-                transaction_type,
-                installments
-            ),
+            "items": [item for _, item in self.debt_items.items()],
+            "split_rules": split_rules,
         }
 
         if transaction_type == Transaction.BOLETO:
@@ -265,11 +262,11 @@ class PagarmeDataBuilder:
 
             # se o evento permite boleto e se a inscrição não possui boletos
             # em aberto (não-vencidos)
-            bolleto_allowed = is_boleto_allowed(
+            boleto_allowed = is_boleto_allowed(
                 self.subscription.event
             ) is True and open_boleto_queryset.count() == 0
 
-            if bolleto_allowed is False:
+            if boleto_allowed is False:
                 raise TransactionDataError(
                     'Pagamento com boleto não permitido.'
                 )
@@ -292,13 +289,6 @@ class PagarmeDataBuilder:
                         installments
                     )
                 )
-
-        # if self.debt_amount > amount:
-        #     raise TransactionDataError(
-        #         'Valor de transações de pendências inseridas ultrapassa'
-        #         ' o montante principal a ser transacionado. Débitos: {}.'
-        #         ' Transação: {}'.format(self.debt_amount, amount)
-        #     )
 
     def _create_split_rules(self, amount, transaction_type, installments=1):
         """
@@ -332,8 +322,11 @@ class PagarmeDataBuilder:
 
         split_rules = []
         for _, receiver in subscriber.receivers.items():
-
             r_amount = receiver.amount
+
+            if receiver.org_receiver is True:
+                self.liquid_amount = r_amount
+
             if diff != 0 and receiver.congressy_receiver is True:
                 r_amount -= diff
 
