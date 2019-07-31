@@ -40,8 +40,17 @@ class CertificateConfigView(CertificateFeatureFlagMixin, generic.DetailView):
         ref_object.text_content = ref_object.text_content \
             .replace("{{EVENTO}}", self.event.name)
 
+        if settings.DEBUG:
+            base_path = os.path.join(
+                settings.BASE_DIR,
+                'frontend',
+                'static',
+            )
+        else:
+            base_path = settings.STATIC_ROOT
+
         premium_path = os.path.join(
-            settings.STATIC_ROOT,
+            base_path,
             'assets',
             'img',
             'default_certificates',
@@ -49,15 +58,16 @@ class CertificateConfigView(CertificateFeatureFlagMixin, generic.DetailView):
             'default.jpg'
         )
 
-        with open(premium_path, 'rb') as f:
-            premium = f.read()
-            f.close()
+        if os.path.exists(premium_path):
+            with open(premium_path, 'rb') as f:
+                premium = f.read()
+                f.close()
 
-        encoded_premium = b64encode(premium).decode("utf-8")
+            encoded_premium = b64encode(premium).decode("utf-8")
+            context['premium_template_image'] = encoded_premium
 
         context['has_inside_bar'] = True
         context['active'] = 'certificate'
-        context['premium_template_image'] = encoded_premium
         context['object'] = ref_object
         context['has_city'] = self.object.event_has_city
         context['has_event_location'] = self.object.event_has_location
