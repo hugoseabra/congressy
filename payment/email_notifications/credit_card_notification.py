@@ -70,7 +70,6 @@ class CreditCardPaymentNotification(object):
             )
 
         elif self.transaction.status == Transaction.CHARGEDBACK:
-
             notify_chargedback_subscription(
                 self.subscription.event,
                 self.transaction,
@@ -85,7 +84,20 @@ class CreditCardPaymentNotification(object):
             )
 
     def _notify_confirmed_subscription(self):
-        notify_new_user_and_paid_subscription_credit_card(
-            self.subscription.event,
-            self.transaction,
-        )
+        if self.transaction.status == Transaction.PAID:
+            notify_new_user_and_paid_subscription_credit_card(
+                self.subscription.event,
+                self.transaction,
+            )
+        elif self.transaction.status == Transaction.CHARGEDBACK:
+            notify_chargedback_subscription(
+                self.subscription.event,
+                self.transaction,
+            )
+        else:
+            raise PostbackNotificationError(
+                message="Status de transação desconhecido para notificar "
+                        "inscrição confirmada: {}"
+                        "".format(self.transaction.status),
+                transaction_pk=str(self.transaction.pk),
+            )
