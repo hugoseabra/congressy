@@ -1,19 +1,18 @@
 """
     Mixins usados no módulo de hotsite.
 """
-from datetime import datetime, timedelta
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.forms import PersonForm
-from gatheros_event.models import Event, Person
-from gatheros_subscription.models import Lot, Subscription
-from hotsite.state import CurrentEventState, CurrentSubscriptionState
 from gatheros_event.helpers.event_business import is_paid_event
-from gatheros_event.models import Event, Info
-from gatheros_subscription.models import FormConfig, Subscription
-from ticket.models import Lot, Ticket
+from gatheros_event.models import Event
+from gatheros_event.models import Person
+from gatheros_subscription.models import Subscription
+from hotsite.state import CurrentEventState, CurrentSubscriptionState
+from ticket.models import Ticket
+
 
 class EventMixin(TemplateNameableMixin):
 
@@ -93,6 +92,7 @@ class SubscriptionMixin(EventMixin):
         self.current_subscription = CurrentSubscriptionState(
             subscription=self._get_subscription()
         )
+
     def _get_subscription(self):
 
         person = None

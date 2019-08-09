@@ -32,7 +32,7 @@
                 </td>
                 <td>
                     <div data-toggle="tooltip" title="{{ transaction.lot.name }}">
-                        {{ transaction.lot.name|truncatechars:50 }}
+                        {{ transaction.ticket_lot.name|truncatechars:50 }}
                     </div>
                 </td>
                 <td>
@@ -92,7 +92,7 @@
                     {% endif %}
                 </td>
                 <td class="text-right">
-                    {{ transaction.lot.display_price }}
+                    {{ transaction.ticket_lot.display_price }}
                 </td>
                 <td class="text-center">
                     {% if transaction.status == transaction.PAID %}

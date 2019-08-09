@@ -118,14 +118,14 @@ class SubscriptionStatusView(SubscriptionFormMixin, generic.TemplateView):
         context['lot_is_still_valid'] = False
 
         sub_lot = self.subscription.ticket_lot
-        lot_running = self.current_event.is_lot_running(sub_lot)
+        lot_running = sub_lot.running is True
 
-        if sub_lot.private is True and lot_running:
+        if sub_lot.ticket.private is True and lot_running:
             context['lot_is_still_valid'] = True
             self.request.session['exhibition_code'] = sub_lot.exhibition_code
 
-        context['has_available_optionals'] = self._has_products(sub_lot) or \
-                                             self._has_services(sub_lot)
+        context['has_available_optionals'] = \
+            self._has_products(sub_lot) or self._has_services(sub_lot)
 
         return context
 

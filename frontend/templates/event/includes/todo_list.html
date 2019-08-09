@@ -84,20 +84,13 @@
     {% endif %}
 
 
-    <tr class="todo_list_element {% if not event_is_subscribable %}
-                    warning {% endif %}"
-        role="presentation"
-            {% if not event_is_subscribable %}
-        data-toggle="tooltip"
-        data-placement="top"
-        title=""
-        data-original-title="Para que seu evento receba inscrições você deve ter pelo menos um lote disponivel"
-            {% endif %}>
+    <tr class="todo_list_element {% if not event_is_subscribable %}warning {% endif %}" role="presentation" {% if not event_is_subscribable %}data-toggle="tooltip" data-placement="top" title="" data-original-title="Para que seu evento receba inscrições você deve ter pelo menos um lote disponivel"{% endif %}>
         <td>
-            <a>Configurar lote(s)</a>
+            <a>Configurar Ingressos</a>
         </td>
         <td>
             <button type="button"
+                    disabled
                     class="btn btn-success btn-trans btn-sm dropdown-toggle"
                     data-toggle="dropdown"
                     onclick="location.href='{% url 'subscription:lot-list' event.pk %}'"
