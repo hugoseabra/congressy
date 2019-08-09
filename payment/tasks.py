@@ -142,6 +142,8 @@ def create_pagarme_transaction(subscription,
             date_created=trans_trx['date_created'],
         )
 
+    with atomic():
+
         for sr in split_rules_trx:
 
             fee_resp = sr['charge_processing_fee']

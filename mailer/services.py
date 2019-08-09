@@ -1051,6 +1051,43 @@ def notify_pending_refund_subscription(event, transaction):
                 ' Andamento: {}'.format(event.name),
     )
 
+def notify_pending_chargeback_subscription(event, transaction):
+    """
+    Notifica participante de reembolso de um lote pago pelo método de
+    boleto.
+    """
+    subscription = transaction.subscription
+
+    person = subscription.person
+
+    event_url = absoluteuri.reverse('public:hotsite', kwargs={
+        'slug': event.slug,
+    })
+
+    # @TODO set event.date_start to period
+    template_name = \
+        'mailer/subscription/notify_pending_chargedback_subscription.html'
+
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': False,
+        'boleto_url': None,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+    })
+
+    return send(
+        event=event,
+        body=body,
+        to=person.email,
+        subject='Chargedback de Inscrição: {}'.format(event.name),
+    )
+
+
 
 def notify_chargedback_subscription(event, transaction):
     """

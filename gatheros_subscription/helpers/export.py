@@ -1,13 +1,16 @@
 """ Helper para inscrições. """
 import locale
+import os
 
+import absoluteuri
+from django.conf import settings
 from openpyxl import Workbook
 from six import BytesIO
 
 from attendance.helpers.attendance import subscription_is_checked
 from gatheros_event.helpers.event_business import is_paid_event
 from payment.models import Transaction
-from survey.models import Answer, Survey
+from survey.models import Answer, Question, Survey
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
@@ -93,7 +96,7 @@ def export_event_data(event):
     _export_subscriptions(ws1, subscriptions)
 
     if is_paid_event(event):
-        _export_payments(wb.create_sheet(title='Pagamentos'), subscriptions)
+        _export_payments(wb.create_sheet(title='Pagamentos'), event)
 
     surveys = Survey.objects.filter(event__event_id=event.pk)
 
@@ -396,9 +399,31 @@ def _export_survey_answers(worksheet, event, survey):
         if not answers:
             continue
 
+        upload_file_types = dict()
+        upload_file_types[Question.FIELD_INPUT_FILE_PDF] = 'pdfs'
+        upload_file_types[Question.FIELD_INPUT_FILE_IMAGE] = 'images'
+
         answers_values = {}
         for answer in answers:
-            answers_values[answer.question.pk] = answer.human_display
+            question = answer.question
+            answer_value = answer.human_display
+            if not answer_value:
+                answers_values[question.pk] = answer_value
+                continue
+
+            if question.type in upload_file_types:
+                file_url = os.path.join(
+                    settings.MEDIA_URL,
+                    'survey',
+                    upload_file_types[question.type],
+                    str(question.pk),
+                    answer_value,
+                )
+                file_url = absoluteuri.build_absolute_uri(file_url)
+                answers_values[question.pk] = \
+                    '=HYPERLINK("{}")'.format(file_url)
+            else:
+                answers_values[question.pk] = answer_value
 
         collector[row_idx].append(get_object_value(sub, 'event_count'))
         collector[row_idx].append(get_object_value(sub, 'code'))

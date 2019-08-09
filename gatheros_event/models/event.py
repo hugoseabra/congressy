@@ -141,7 +141,7 @@ class Event(models.Model, GatherosModelMixin):
     )
 
     slug = models.SlugField(
-        max_length=128,
+        max_length=255,
         null=True,
         blank=True,
         unique=True,
@@ -366,11 +366,12 @@ class Event(models.Model, GatherosModelMixin):
         return str(self.name)
 
     def _create_unique_slug(self):
-        self.slug = model_field_slugify(
+        slug = model_field_slugify(
             model_class=self.__class__,
             instance=self,
             string=self.name
         )
+        self.slug = slug[:255]
 
     def get_period(self):
         """Recupera string de período de evento de acordo com as datas."""

@@ -15,6 +15,9 @@ def subscription_has_certificate(subscription_pk):
 
     event = subscription.event
 
+    if event.finished is False:
+        return False
+
     if event.has_certificate_config is False \
             or event.feature_configuration.feature_certificate is False:
         return False
