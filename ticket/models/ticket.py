@@ -158,6 +158,12 @@ class Ticket(GatherosModelMixin, EntityMixin, models.Model):
         )
 
     @property
+    def display_price(self):
+        return 'R$ {}'.format(
+            localize(self.get_subscriber_price())
+        ) if self.price else ''
+
+    @property
     def current_lot(self):
         """
             Resgatar o lote vigente no ingresso, caso possua.

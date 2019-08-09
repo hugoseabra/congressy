@@ -2,6 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from django.db import models
+from django.utils.formats import localize
 
 from base.models import EntityMixin
 from core.util.date import DateTimeRange
@@ -94,6 +95,21 @@ class Lot(GatherosModelMixin, EntityMixin, models.Model):
     @property
     def name(self):
         return self.ticket.name
+
+    @property
+    def display_name_and_price(self):
+        return '{}{}'.format(
+            self.name,
+            ' - R$ {}'.format(
+                localize(self.get_subscriber_price())
+            ) if self.price else '',
+        )
+
+    @property
+    def display_price(self):
+        return 'R$ {}'.format(
+            localize(self.get_subscriber_price())
+        ) if self.price else ''
 
     @property
     def is_full(self):
