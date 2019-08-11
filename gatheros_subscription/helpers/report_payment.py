@@ -50,14 +50,14 @@ class PaymentReportCalculator(object):
 
                 self.lots[lot.pk] = lot
 
-                if trans.status != Transaction.WAITING_PAYMENT:
-                    # Calculo reverso para refletir o fluxo de caixa:
-                    # O valor de inscrição é um DÉBITO do fluxo.
-                    self.full_prices[lot.pk] = -trans.amount
-                else:
-                    # Calculo reverso para refletir o fluxo de caixa:
-                    # O valor de inscrição é um DÉBITO do fluxo.
-                    self.full_prices[lot.pk] = -(lot.get_calculated_price())
+                # if trans.status != Transaction.WAITING_PAYMENT:
+                #     # Calculo reverso para refletir o fluxo de caixa:
+                #     # O valor de inscrição é um DÉBITO do fluxo.
+                #     self.full_prices[lot.pk] = -trans.amount
+                # else:
+                #     # Calculo reverso para refletir o fluxo de caixa:
+                #     # O valor de inscrição é um DÉBITO do fluxo.
+                self.full_prices[lot.pk] = -(lot.get_calculated_price())
 
                 if trans.paid and trans.installments > 1:
                     price = lot.get_calculated_price()
@@ -79,10 +79,8 @@ class PaymentReportCalculator(object):
                         'num': trans.installments
                     })
 
-                    # for lot_pk, items in self.installments.items():
-                    #     for installment_item in items:
-                    #         self.full_prices[lot.pk] += \
-                    #             installment_item['interests_amount']
+                    self.full_prices[lot.pk] -= interests_amount
+                    self.total_paid -= interests_amount
 
                 if trans.manual is True and lot.pk not in self.has_manual:
                     self.has_manual[lot.pk] = True
@@ -129,8 +127,10 @@ class PaymentReportCalculator(object):
             if is_waiting is False and paid is True:
                 # Calculo reverso para refletir o fluxo de caixa:
                 # O pagamento é um CRÉDITO do fluxo.
+
                 self.full_prices[trans.lot_id] += trans.amount
-                self.total_paid += trans.lot.get_calculated_price()
+                # self.total_paid += trans.lot.get_calculated_price()
+                self.total_paid += trans.amount
 
         self.transactions = transactions
 

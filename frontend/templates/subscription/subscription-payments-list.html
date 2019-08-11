@@ -258,29 +258,17 @@
                                         {% if transaction.manual is False %}
                                             {% if transaction.type == transaction.CREDIT_CARD %}
                                                 <div class="{% if transaction.status == transaction.REFUSED or transaction.status == transaction.REFUNDED %}cancelled{% endif %}">
-                                                    {% if transaction.status == transaction.PAID %}
-                                                        <span class="text-success" data-toggle="tooltip" title="Entrada">C</span>
-                                                    {% else %}
-                                                        <span class="text-default" data-toggle="tooltip" title="Entrada">C</span>
-                                                    {% endif %}
+                                                    <span class="text-default" data-toggle="tooltip" title="Crédito/Entrada">C</span>
                                                 </div>
                                             {% else %}
                                                 <div class="{% if transaction.status != transaction.PAID and today > transaction.boleto_expiration_date|date:'Y-m-d' %}cancelled{% endif %}">
-                                                    {% if transaction.status == transaction.PAID %}
-                                                        <span class="text-success" data-toggle="tooltip" title="Entrada">C</span>
-                                                    {% else %}
-                                                        <span class="text-default" data-toggle="tooltip" title="Saída">D</span>
-                                                    {% endif %}
+                                                    <span class="text-success" data-toggle="tooltip" title="Crédito/Entrada">C</span>
                                                 </div>
                                             {% endif %}
 
                                         {% else %}
                                             <div>
-                                                {% if transaction.status == transaction.PAID %}
-                                                    <span class="text-success" data-toggle="tooltip" title="Entrada">C</span>
-                                                {% else %}
-                                                    <span class="text-danger" data-toggle="tooltip" title="Saída">D</span>
-                                                {% endif %}
+                                                <span class="text-success" data-toggle="tooltip" title="Crédito/Entrada">C</span>
                                             </div>
                                         {% endif %}
                                     </td>

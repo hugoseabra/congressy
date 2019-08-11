@@ -325,7 +325,7 @@ class PagarmeDataBuilder:
             r_amount = receiver.amount
 
             if receiver.org_receiver is True:
-                self.liquid_amount = r_amount
+                self.liquid_amount = receiver.liquid_amount
 
             if diff != 0 and receiver.congressy_receiver is True:
                 r_amount -= diff

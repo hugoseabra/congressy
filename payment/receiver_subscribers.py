@@ -174,6 +174,11 @@ class ReceiverPublisher(object):
             # se houver.
             cgsy_amount += Decimal(self.amount - total)
 
+        # Organização irá receber o valor até aqui. Qualquer valor adicionado
+        # devido a cobrança de juros e taxas do pagar.me, será apenas uma
+        # adequação para que o valor final seja exatamente esse valor.
+        org_liquid_amount = org_amount
+
         if self.installments > 1:
             # Se o organizador assumiu juros de parcelamento, o montante a ser
             # transacionado estará sem o valor de juros de parcelamento. Então,
@@ -251,6 +256,7 @@ class ReceiverPublisher(object):
             type=RECEIVER_TYPE_SUBSCRIPTION,
             id=self.organization.recipient_id,
             amount=org_amount,
+            liquid_amount=org_liquid_amount,
             transfer_taxes=lot.transfer_tax is True,
             chargeback_responsible=True,
             processing_fee_responsible=False,

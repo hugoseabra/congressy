@@ -126,12 +126,14 @@ class OrganizerReceiver(Receiver):
 
     def __init__(self,
                  installment_result,
+                 liquid_amount: Decimal,
                  transfer_taxes=False,
                  *args,
                  **kwargs):
 
-        self.transfer_taxes = transfer_taxes
         self.installment_result = installment_result
+        self.liquid_amount = liquid_amount
+        self.transfer_taxes = transfer_taxes
 
         kwargs.update({
             'processing_fee_responsible': False,
@@ -154,6 +156,7 @@ class OrganizerReceiver(Receiver):
         iters.update({
             'transfer_taxes': self.transfer_taxes is True,
             'installment_result': dict(self.installment_result),
+            'liquid_amount': self.liquid_amount,
         })
 
         for x, y in iters.items():
