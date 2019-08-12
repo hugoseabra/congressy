@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from django.core.management.base import BaseCommand
+from django.db.models import Count, Sum
 from django.db.transaction import atomic
 
 from gatheros_subscription.models import Subscription
-from payment.email_notifications import PaymentNotification
 from payment.models import Transaction
 
 
@@ -10,47 +12,57 @@ class Command(BaseCommand):
     help = 'Atualiza as inscrições pagas mas que ainda constam como pendentes.'
 
     def handle(self, *args, **options):
+        now = datetime.now()
 
-        types = [
-            Transaction.BOLETO,
-            Transaction.CREDIT_CARD,
-        ]
-
-        transactions = Transaction.objects.filter(
-            subscription__status=Subscription.AWAITING_STATUS,
-            subscription__origin=Subscription.DEVICE_ORIGIN_HOTSITE,
-            status=Transaction.PAID,
-            manual=False,
-            type__in=types
+        subs = Subscription.objects.annotate(
+            num_trans=Count('transactions')
+        ).filter(
+            status=Subscription.AWAITING_STATUS,
+            origin=Subscription.DEVICE_ORIGIN_HOTSITE,
+            lot__price__gt=0,
+            num_trans__gt=0,
+            transactions__status=Transaction.PAID,
         )
 
-        self.stdout.write(self.style.SUCCESS(
-            'Inscrições pagas e pendentes: {}'.format(transactions.count())
-        ))
-
         with atomic():
-            notifiers = list()
-            for transaction in transactions:
-                subscription = transaction.subscription
+            num = 0
+            processed_subs = list()
 
-                subscription.status = Subscription.CONFIRMED_STATUS
-                subscription.save()
-                # Mantem referência no objeto
-                transaction.subscription = subscription
+            for sub in subs:
+                price_to_pay = sub.lot.get_calculated_price()
 
-                if subscription.notified is False:
-                    notifiers.append(PaymentNotification(transaction))
+                trans = sub.transactions.aggregate(total_amount=Sum('amount'))
 
-                self._print_subscription(subscription)
+                paid = trans['total_amount'] or 0
 
-            self.stdout.write(self.style.SUCCESS('Enviando vouchers ...'))
+                # Se não há pagamentos, tudo certo.
+                # Se há pagamento e valor pago é menor do que o que se tem
+                # de pagar
+                if not paid and paid < price_to_pay:
+                    continue
 
-            # Notificação mudanças na inscrição para notificação correta.
-            [n.notify() for n in notifiers]
+                # Se há pagamentos suficientes, devemos confirmar a inscrição.
 
-        self.stdout.write(self.style.SUCCESS('Vouchers enviados com sucesso.'))
+                num += 1
+                sub.status = Subscription.CONFIRMED_STATUS
+                sub.save()
 
-    def _print_subscription(self, subscription: Subscription):
+                processed_subs.append({
+                    'sub': sub,
+                    'to_pay': price_to_pay,
+                    'paid': paid,
+                })
+
+            self.stdout.write(self.style.SUCCESS(
+                'Inscrições pagas e pendentes: {}'.format(num)
+            ))
+
+            for item in processed_subs:
+                self._print_subscription(item['sub'],
+                                         item['to_pay'],
+                                         item['paid'])
+
+    def _print_subscription(self, subscription: Subscription, to_pay, paid):
         self.stdout.write(self.style.SUCCESS(
             " Atualizando inscrição PK: {}\n"
             "    Evento: {} ({})\n"
@@ -58,10 +70,12 @@ class Command(BaseCommand):
             "    Nome do Participante: {} (ID: {})\n"
             "    Horario de criação da inscrição: {}\n"
             "    Horario de modificação da inscrição: {}\n"
-            "    Origem: {}\n"            
-            "    Completed: {}\n"            
-            "    Notificado: {}\n"            
-            "    E-mail do Participante: {}\n".format(
+            "    Origem: {}\n"
+            "    Completed: {}\n"
+            "    Notificado: {}\n"
+            "    E-mail do Participante: {}\n"
+            "    A pagar: {}\n"
+            "    Pago: {}\n".format(
                 subscription.pk,
                 subscription.event.name,
                 subscription.lot.name,
@@ -75,5 +89,7 @@ class Command(BaseCommand):
                 subscription.completed,
                 subscription.notified,
                 subscription.person.email,
+                to_pay,
+                paid,
             )
         ))

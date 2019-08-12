@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.core.management import call_command
+from django.db.models import Count
 from django.db.transaction import atomic
 from django_cron import CronJobBase, Schedule
 
@@ -19,11 +20,14 @@ class SubscriptionStatusIrregularityTestJob(CronJobBase):
                         retry_after_failure_mins=RETRY_AFTER_FAILURE_MINS)
 
     def do(self):
-        irregularities = Subscription.objects.filter(
+        irregularities = Subscription.objects.annotate(
+            num_trans=Count('transactions')
+        ).filter(
             status=Subscription.AWAITING_STATUS,
-            transactions__status=Transaction.PAID,
-            transactions__manual=False,
             origin=Subscription.DEVICE_ORIGIN_HOTSITE,
+            transactions__status=Transaction.PAID,
+            lot__price__gt=0,
+            num_trans__gt=0,
         )
 
         if irregularities.count() == 0:
