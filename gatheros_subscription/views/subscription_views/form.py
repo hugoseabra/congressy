@@ -284,7 +284,8 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
                 survey_id=survey.pk,
             )
             if authors.count():
-                author = authors.count()
+                author = authors.last()
+
         elif not author and self.object.author_id:
             author = self.object.author
 
