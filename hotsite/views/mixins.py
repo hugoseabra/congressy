@@ -141,14 +141,11 @@ class SubscriptionMixin(EventMixin):
         sub_lot = self.current_subscription.lot
 
         context['person'] = person
-
-        if person:
-            context['subscription'] = sub
-            context['is_subscribed'] = sub is not None
-            context['lot_still_available'] = \
-                sub_lot and self.current_event.is_lot_running(sub_lot)
-        else:
-            context['is_subscribed'] = sub is not None
+        context['subscription'] = sub
+        context['lot'] = sub_lot
+        context['is_subscribed'] = True
+        context['lot_still_available'] = \
+            sub_lot and self.current_event.is_lot_running(sub_lot)
 
         return context
 
