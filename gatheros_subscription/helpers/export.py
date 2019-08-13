@@ -90,12 +90,12 @@ def export_event_data(event):
     ws1 = wb.active
     ws1.title = clean_sheet_title('Participantes')
 
-    _export_subscriptions(
-        ws1,
-        event.subscriptions.filter(
-            completed=True,
-            test_subscription=False,
-        ))
+    subscriptions = event.subscriptions.filter(
+        completed=True,
+        test_subscription=False,
+    )
+
+    _export_subscriptions(ws1, subscriptions)
 
     if is_paid_event(event):
         _export_payments(wb.create_sheet(title='Pagamentos'), event)
@@ -104,7 +104,9 @@ def export_event_data(event):
         title = clean_sheet_title(
             'Formulário-{}'.format(ev_survey.survey.name)
         )
-        _export_survey_answers(wb.create_sheet(title=title), ev_survey)
+        _export_survey_answers(wb.create_sheet(title=title),
+                               ev_survey,
+                               subscriptions)
 
     for lot_category in event.lot_categories.all():
         cat_name = lot_category.name
@@ -345,7 +347,7 @@ def _export_payments(worksheet, event):
         worksheet.append(collector[row])
 
 
-def _export_survey_answers(worksheet, event_survey):
+def _export_survey_answers(worksheet, event_survey, subscriptions):
     """
     Exporta as respostas de survey.
     """
@@ -381,10 +383,6 @@ def _export_survey_answers(worksheet, event_survey):
 
     worksheet.append(columns)
 
-    subscriptions = event.subscriptions.filter(completed=True,
-                                               test_subscription=False,
-                                               author_id__isnull=False)
-
     collector = {}
     row_idx = 1
     for sub in subscriptions:
@@ -398,9 +396,22 @@ def _export_survey_answers(worksheet, event_survey):
         if row_idx not in collector:
             collector[row_idx] = []
 
+        author = None
+        if person.user_id:
+            authors = person.user.authors.filter(
+                survey_id=survey.pk
+            )
+            if authors.count():
+                author = authors.last()
+        elif sub.author_id:
+            author = sub.author
+
+        if not author:
+            continue
+
         answers = Answer.objects.filter(
             question__survey_id=survey.pk,
-            author_id=sub.author_id,
+            author_id=author.pk,
         ).order_by('question__order')
 
         if not answers:
