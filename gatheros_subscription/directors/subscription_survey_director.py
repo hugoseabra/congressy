@@ -2,6 +2,7 @@ import os
 
 import absoluteuri
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import FileSystemStorage
 
 from gatheros_subscription.models import Subscription, Lot
@@ -64,19 +65,31 @@ class SubscriptionSurveyDirector(object):
         """
 
         user = None
-        if self.subscription.person.user:
+        author = None
+        if self.subscription.person.user_id:
             user = self.subscription.person.user
+            try:
+                author = user.authors.get(survey_id=survey.pk)
+            except ObjectDoesNotExist:
+                pass
+        else:
+            author, _ = Author.objects.get_or_create(
+                name=self.subscription.person.name,
+                survey=survey,
+                user=user,
+            )
 
-        self.subscription.author, _ = Author.objects.get_or_create(
-            name=self.subscription.person.name,
-            survey=survey,
-            user=user,
-        )
-        self.subscription.save()
+        if author:
+            self.subscription.author, _ = Author.objects.get_or_create(
+                name=self.subscription.person.name,
+                survey=survey,
+                user=user,
+            )
+            self.subscription.save()
 
         # Caso não seja passado uma inscrição, resgatar apenas um
         # SurveyAnswerForm vazio
-        if self.subscription is None or self.subscription.author is None:
+        if self.subscription is None or author is None:
             return SurveyAnswerForm(
                 survey=survey,
                 data=data,
@@ -160,16 +173,19 @@ class SubscriptionSurveyDirector(object):
             'user': None,
         }
 
-        if self.subscription.person.user:
-            kwargs['user'] = self.subscription.person.user
-
-        if not self.subscription.author_id:
-            self.subscription.author = Author.objects.create(**kwargs)
+        if self.subscription.person.user_id:
+            user = self.subscription.person.user
+            kwargs['user'] = user
+            try:
+                author = user.authors.get(survey_id=survey.pk)
+            except ObjectDoesNotExist:
+                author = Author.objects.create(**kwargs)
+        else:
+            author = Author.objects.create(**kwargs)
+            self.subscription.author = author
             self.subscription.save()
 
-
         answers = {}  # lista que guarda as respostas dessa autoria caso haja.
-        author = self.subscription.author
 
         """
             Resgatar a autoria para poder popular as respostas dos

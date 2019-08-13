@@ -103,7 +103,7 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
         lot_pk = self.request.POST.get('subscription-lot')
         if not lot_pk:
-            lot_pk = self.subscription.lot.pk
+            lot_pk = self.subscription.lot_id
 
         with atomic():
             self.object = form.save()
@@ -126,7 +126,7 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
                 self.subscription = subscription_form.save()
 
-                if self.subscription.lot.event_survey:
+                if self.subscription.lot.event_survey_id:
 
                     survey = self.subscription.lot.event_survey.survey
 
@@ -174,7 +174,7 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
             lot_pk = self.request.GET.get('lot', 0)
             if not lot_pk and self.subscription:
-                lot_pk = self.subscription.lot.pk
+                lot_pk = self.subscription.lot_pk
 
             if lot_pk != 0:
                 lot = Lot.objects.get(pk=lot_pk)

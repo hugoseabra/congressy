@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views import generic
@@ -272,14 +273,25 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
     def get_survey_answers(self):
         survey_answers = list()
 
-        if not self.object.lot.event_survey:
+        if not self.object.lot.event_survey_id:
             return survey_answers
 
         survey = self.object.lot.event_survey.survey
 
-        if self.object.author:
-            questions = Question.objects.filter(survey=survey).order_by(
-                'order')
+        author = None
+        if self.object.person.user_id:
+            try:
+                author = self.object.person.user.authors.get(
+                    survey_id=survey.pk,
+                )
+            except ObjectDoesNotExist:
+                pass
+        elif not author and self.object.author_id:
+            author = self.object.author
+
+        if author:
+            questions = \
+                Question.objects.filter(survey_id=survey.pk).order_by('order')
 
             file_types = [
                 Question.FIELD_INPUT_FILE_PDF,
@@ -291,8 +303,8 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
                 answer = '-'
 
                 answers = Answer.objects.filter(
-                    question=question,
-                    author=self.object.author,
+                    question_id=question.pk,
+                    author_id=author.pk,
                 )
 
                 if answers.count() == 1:
@@ -301,8 +313,8 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
                     raise Exception('Temos ambiguidade de respostas')
                 elif answers.count() == 0:
                     try:
-                        answer = Answer.objects.get(question=question,
-                                                    author=self.object.author)
+                        answer = Answer.objects.get(question_id=question.pk,
+                                                    author_id=author.pk)
                     except Answer.DoesNotExist:
                         continue
 

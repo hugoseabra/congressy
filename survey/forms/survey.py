@@ -149,13 +149,13 @@ class SurveyAnswerForm(SurveyBaseForm):
 
             if not self.author and self.user:
                 self.author = Author.objects.get_or_create(
-                    survey=self.survey,
-                    user=self.user
+                    survey_id=self.survey.pk,
+                    user_id=self.user.pk,
                 )[0]
 
             if self.author is None and self.name:
                 self.author = Author.objects.create(
-                    survey=self.survey,
+                    survey_id=self.survey.pk,
                     name=self.name,
                 )
 
@@ -166,7 +166,7 @@ class SurveyAnswerForm(SurveyBaseForm):
 
             question = Question.objects.get(
                 name=question,
-                survey=self.survey,
+                survey_id=self.survey.pk,
             )
 
             answer_service_kwargs = {
@@ -180,8 +180,8 @@ class SurveyAnswerForm(SurveyBaseForm):
             try:
                 answer_instance = Answer.objects.get(
                     question=question.pk,
-                    question__survey=self.survey,
-                    author=self.author,
+                    question__survey_id=self.survey.pk,
+                    author_id=self.author.pk,
                 )
 
                 if question.type in file_types:
