@@ -64,14 +64,14 @@ class SubscriptionSurveyDirector(object):
         :return SurveyAnswerForm: um objeto de SurveyAnswerForm
         """
 
-        user = None
         author = None
+        user = None
+
         if self.subscription.person.user_id:
             user = self.subscription.person.user
-            try:
-                author = user.authors.get(survey_id=survey.pk)
-            except ObjectDoesNotExist:
-                pass
+            authors = user.authors.get(survey_id=survey.pk)
+            if authors.count():
+                author = authors.last()
         else:
             author, _ = Author.objects.get_or_create(
                 name=self.subscription.person.name,
@@ -176,10 +176,13 @@ class SubscriptionSurveyDirector(object):
         if self.subscription.person.user_id:
             user = self.subscription.person.user
             kwargs['user'] = user
-            try:
-                author = user.authors.get(survey_id=survey.pk)
-            except ObjectDoesNotExist:
+            authors = user.authors.filter(survey_id=survey.pk)
+
+            if authors.count():
+                author = authors.last()
+            else:
                 author = Author.objects.create(**kwargs)
+
         else:
             author = Author.objects.create(**kwargs)
             self.subscription.author = author

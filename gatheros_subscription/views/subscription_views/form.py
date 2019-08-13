@@ -280,12 +280,11 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
 
         author = None
         if self.object.person.user_id:
-            try:
-                author = self.object.person.user.authors.get(
-                    survey_id=survey.pk,
-                )
-            except ObjectDoesNotExist:
-                pass
+            authors = self.object.person.user.authors.filter(
+                survey_id=survey.pk,
+            )
+            if authors.count():
+                author = authors.count()
         elif not author and self.object.author_id:
             author = self.object.author
 
