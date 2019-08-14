@@ -427,6 +427,7 @@ class EventDuplicationForm(forms.Form):
                         lot.pk = None
                         lot.category_id = cat.pk
                         lot.event_id = event.pk
+                        lot.event_survey_id = None
                         # Se for privado, renova o código
                         lot.exhibition_code = None
                         lot.save()
