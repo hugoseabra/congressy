@@ -2,8 +2,9 @@ from django.core.management.base import BaseCommand
 from django.db.models import Count
 from django.db.transaction import atomic
 
-from gatheros_subscription.models import Lot, EventSurvey, Subscription
 from core.cli.mixins import CliInteractionMixin
+from gatheros_subscription.models import EventSurvey, Subscription
+
 
 class Command(BaseCommand, CliInteractionMixin):
     def handle(self, *args, **options):
@@ -131,10 +132,8 @@ class Command(BaseCommand, CliInteractionMixin):
                 length=50
             )
 
-
         self.process_to_transfer(to_transfer)
         self.process_potential_to_transfer(potential_to_transfer)
-
 
     def process_to_transfer(self, to_transfer: list):
 
@@ -218,7 +217,6 @@ class Command(BaseCommand, CliInteractionMixin):
 
     def process_potential_to_transfer(self, potential_to_transfer: list):
         print(potential_to_transfer)
-
 
     def check_and_transfer_authors(self, authors_to_check: dict):
 

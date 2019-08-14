@@ -2,14 +2,31 @@ from django.core.management.base import BaseCommand
 from django.db.models import Count, ObjectDoesNotExist
 from django.db.transaction import atomic
 
+from core.cli.mixins import CliInteractionMixin
 from gatheros_subscription.models import Lot
 
 
-class Command(BaseCommand):
+class Command(BaseCommand, CliInteractionMixin):
     def handle(self, *args, **options):
         lots = Lot.objects.filter(
             event_survey_id__isnull=False,
         ).order_by('name')
+
+        num_lots = lots.count() or 1
+
+        self.stdout.write(self.style.SUCCESS('Lotes: {}'.format(
+            num_lots or '0'
+        )))
+
+        lots_counter = 0
+
+        self.progress_bar(
+            lots_counter,
+            num_lots,
+            prefix='Lots (#{}):'.format(lots_counter),
+            suffix='Complete',
+            length=50
+        )
 
         ev_surveys = list()
 
@@ -22,7 +39,6 @@ class Command(BaseCommand):
             # Quanto não é o mesmo, o Lote é o correto (evento novo, copiado)
             # mas o survey não.
             if ev_survey.event_id != l.event_id:
-
                 # Formulário do mesmo lote encontrado, lote do evento novo.
                 # Só temos um survey por enquanto
                 to_ev_survey = l.event.surveys.last()
@@ -37,6 +53,17 @@ class Command(BaseCommand):
                     'to_ev_survey': to_ev_survey,
                 })
 
+            lots_counter += 1
+            self.progress_bar(
+                lots_counter,
+                num_lots,
+                prefix='Lots (#{}):'.format(lots_counter),
+                suffix='Complete',
+                length=50
+            )
+
+        print()
+
         # EventSurveys coletados cujos lotes vinculados não estão com vínculos
         # corretos.
         for item in ev_surveys:
@@ -47,7 +74,6 @@ class Command(BaseCommand):
 
             print('Origem: {} ({})'.format(from_event.name, from_event.pk))
             print('  Para: {} ({})'.format(to_event.name, to_event.pk))
-
 
             # Vamos preparar o formulário errado para coletar autores e
             # respostas
@@ -77,7 +103,7 @@ class Command(BaseCommand):
                     # Não possui usuário mas autor possui inscrição que não é
                     # do evento de origem
                     if hasattr(a, 'subscription') \
-                        and a.subscription.event_id == to_event.pk:
+                            and a.subscription.event_id == to_event.pk:
                         person = a.subscription.person
                         print(' >> {}: {}'.format(person.name, 1))
                         authors_to_transfer.append(a)
@@ -153,7 +179,6 @@ class Command(BaseCommand):
                     except ObjectDoesNotExist:
                         # Se o formulário destino não possui a pergunta
                         # que existe no formulário de origem, vamos ignorar.
-                        print('ignorando: {}'.format(question.name))
                         continue
 
                     answers_to_transfer.append({
@@ -163,40 +188,65 @@ class Command(BaseCommand):
                         'answer': answer,
                     })
 
-            # with atomic():
-            #     print()
-            #     print('= Ajustando')
-            #     for item in answers_to_transfer:
-            #         answer = item['answer']
-            #         old_question = answer.question
-            #         to_question = item['to_question']
-            #
-            #         author = item['author']
-            #         author.survey = to_survey
-            #         author.save()
-            #
-            #         print(' > author: {} -> {}'.format(
-            #             from_survey.pk,
-            #             to_survey.pk,
-            #         ))
-            #
-            #         answer.question = to_question
-            #         answer.save()
-            #
-            #         print(' > question: {} -> {}'.format(
-            #             old_question.pk,
-            #             to_question.pk,
-            #         ))
-            #
-            #     old_ev_survey = to_lot.event_survey
-            #
-            #     to_lot.event_survey = to_ev_survey
-            #     to_lot.save()
-            #
-            #     print()
-            #     print(' > survey: {} -> {}'.format(
-            #         old_ev_survey.pk,
-            #         to_ev_survey.pk,
-            #     ))
+            with atomic():
+                print()
+                print('= Ajustando')
+
+                num_answers = len(answers_to_transfer) or 1
+
+                self.stdout.write(self.style.SUCCESS('Answers: {}'.format(
+                    num_answers or '0'
+                )))
+
+                answers_counter = 0
+
+                self.progress_bar(
+                    answers_counter,
+                    num_answers,
+                    prefix='Answers (#{}):'.format(answers_counter),
+                    suffix='Complete',
+                    length=50
+                )
+
+                for item in answers_to_transfer:
+                    answer = item['answer']
+                    # old_question = answer.question
+                    to_question = item['to_question']
+
+                    author = item['author']
+                    author.survey = to_survey
+                    author.save()
+
+                    # print(' > author: {} -> {}'.format(
+                    #     from_survey.pk,
+                    #     to_survey.pk,
+                    # ))
+
+                    answer.question = to_question
+                    answer.save()
+
+                    # print(' > question: {} -> {}'.format(
+                    #     old_question.pk,
+                    #     to_question.pk,
+                    # ))
+                    answers_counter += 1
+                    self.progress_bar(
+                        answers_counter,
+                        num_answers,
+                        prefix='Answers (#{}):'.format(answers_counter),
+                        suffix='Complete',
+                        length=50
+                    )
+
+                # old_ev_survey = to_lot.event_survey
+
+                to_lot.event_survey = to_ev_survey
+                to_lot.save()
+
+                # print()
+                # print(' > survey: {} -> {}'.format(
+                #     old_ev_survey.pk,
+                #     to_ev_survey.pk,
+                # ))
 
             print()
