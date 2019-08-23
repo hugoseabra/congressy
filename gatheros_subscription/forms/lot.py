@@ -41,6 +41,8 @@ class LotForm(forms.ModelForm):
             'installment_limit',
             'num_install_interest_absortion',
             'rsvp_restrict',
+            'description',
+            'hide_dates',
             # 'event_survey',
         ]
 
