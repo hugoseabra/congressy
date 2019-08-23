@@ -48,88 +48,132 @@
                                 {% endif %}
                             {% endfor %}
 
-                            <div class="well well-sm" style="text-align: justify">
-                                <h3>Checkout: {{ subscription.person.name}}</h3>
-                                <div>
-                                    <strong>
-                                        Inscrição:
-                                    </strong>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="well well-sm" style="text-align: justify">
+                                        <h3>Checkout: {{ subscription.person.name}}</h3>
+                                        <div>
+                                            <strong>
+                                                Inscrição:
+                                            </strong>
+                                        </div>
+                                        <ul>
+                                            {% if lot.price %}
+                                                <strong>R$ {{ lot.get_calculated_price|intcomma }}</strong>
+                                            {% endif %}
+                                        </ul>
+                                        {% if products %}
+                                            <div><strong>Produtos:</strong></div>
+                                            <ul>
+                                                {% for product in products %}
+                                                    <ol>{{ product.optional.name }}:
+                                                        <strong>
+                                                            {% if product.optional.price > 0.00 %}
+                                                                R$
+                                                                {{ product.optional.price|intcomma }}
+                                                            {% endif %}
+                                                        </strong>
+                                                    </ol>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+
+                                        {% if services %}
+                                            <div><strong>Serviços:</strong></div>
+                                            <ul>
+                                                {% for service in services %}
+                                                    <ol>{{ service.optional.name }}:
+                                                        <strong>
+                                                            {% if service.optional.price > 0.00 %}
+                                                                R$
+                                                                {{ service.optional.price|intcomma }}
+                                                            {% endif %}
+                                                        </strong>
+                                                    </ol>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+
+                                        <h4> Total: R$ {{ total|intcomma }} </h4>
+                                    </div>
                                 </div>
-                                <ul>
-                                    {% if lot.price %}
-                                        <strong>R$ {{ lot.get_calculated_price|intcomma }}</strong>
+                            </div>
+
+                            <div class="row" style="display:none">
+                                <div class="col-md-12">
+                                    <div id="payment_buttons" class="text-center"
+                                         style="display: none">
+                                        <button id="id_boleto" type="button" style="text-align: center;display: none">
+                                            Boleto
+                                            <br/>
+                                            <img class="img-responsive" style="height: 153px; height: 153px" src="{% static 'hotsite/logos/boleto.svg' %}">
+                                        </button>
+                                        <button id="id_credit_card" type="button" style="display: none">
+                                            Cartão de Credito
+                                            <br/>
+                                            <img class="img-responsive" src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
+                                        </button>
+                                        <br />
+                                        <br />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr />
+                            {% if 'boleto' in allowed_transaction_types %}
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="text-center">
+                                        <h4 class="text-bold">Aceitamos pagamentos com:</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="text-center">
+                                                <h5 class="text-bold" style="margin:0">Cartão de crédito</h5>
+                                                <div class="text-left">
+                                                    <img class="img-responsive" src="{% static 'hotsite/images/logos/payment_type_credit_card.jpg' %}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <div class="text-center">
+                                                <h5 class="text-bold" style="margin:0">Boleto bancário</h5>
+                                                <div class="text-right">
+                                                    <img class="img-responsive" src="{% static 'hotsite/images/logos/payment_type_barcode.jpeg' %}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    {% if has_open_boleto %}
+                                    <div class="col-md-12">
+                                        <div class="alert alert-info text-center">
+                                            Somente pagamento com <strong>Cartão de Crédito</strong>
+                                            está disponível, pois você já possui um boleto em aberto.
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="col-md-12">
+                                        <div class="alert alert-info text-center">
+                                            Somente pagamento com <strong>Cartão de Crédito</strong> está disponível.
+                                        </div>
+                                    </div>
                                     {% endif %}
-                                </ul>
-                                {% if products %}
-                                    <div><strong>Produtos:</strong></div>
-                                    <ul>
-                                        {% for product in products %}
-                                            <ol>{{ product.optional.name }}:
-                                                <strong>
-                                                    {% if product.optional.price > 0.00 %}
-                                                        R$
-                                                        {{ product.optional.price|intcomma }}
-                                                    {% endif %}
-                                                </strong>
-                                            </ol>
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-
-                                {% if services %}
-                                    <div><strong>Serviços:</strong></div>
-                                    <ul>
-                                        {% for service in services %}
-                                            <ol>{{ service.optional.name }}:
-                                                <strong>
-                                                    {% if service.optional.price > 0.00 %}
-                                                        R$
-                                                        {{ service.optional.price|intcomma }}
-                                                    {% endif %}
-                                                </strong>
-                                            </ol>
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-
-                                <h4> Total: R$ {{ total|intcomma }} </h4>
-                            </div>
-
-
-                            <div id="payment_buttons" class="text-center"
-                                 style="display: none">
-                                <button id="id_boleto" type="button" style="text-align: center;display: none">
-                                    Boleto
-                                    <br/>
-                                    <img class="img-responsive" style="height: 153px; height: 153px" src="{% static 'hotsite/logos/boleto.svg' %}">
-                                </button>
-                                <button id="id_credit_card" type="button" style="display: none">
-                                    Cartão de Credito
-                                    <br/>
-                                    <img class="img-responsive" src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
-                                </button>
-                                <br />
-                                <br />
-                            </div>
-                            {% if 'boleto' not in allowed_transaction_types %}
-                                {% if has_open_boleto %}
-                                <div class="col-md-12">
-                                    <div class="alert alert-info text-center">
-                                        Somente pagamento com <strong>Cartão de Crédito</strong>
-                                        está disponível, pois você já possui um boleto em aberto.
-                                    </div>
                                 </div>
-                                {% else %}
-                                <div class="col-md-12">
-                                    <div class="alert alert-info text-center">
-                                        Somente pagamento com <strong>Cartão de Crédito</strong> está disponível.
-                                    </div>
-                                </div>
-                                {% endif %}
+                            </div>
                             {% endif %}
-
-                            <div class="text-center">
-                                <img style="width: 80%; margin-top: 20px" src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="text-center">
+                                        <br />
+                                        <h5 class="text-bold" style="margin-bottom:0">Bandeiras aceitas:</h5>
+                                        <img width="80%" src="{% static 'hotsite/images/logos/bandeiras_pagarme2.png' %}">
+                                    </div>
+                                </div>
                             </div>
                             <br/>
 

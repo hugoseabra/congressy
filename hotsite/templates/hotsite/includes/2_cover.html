@@ -107,19 +107,31 @@
                                     {% for lot in lots %}
                                         {% if lot.status != lot.LOT_STATUS_NOT_STARTED %}
                                             <li>
-                                        <span class="icon-list-icon "
-                                              data-animation="bounceIn"
-                                              {% if lot.status == lot.LOT_STATUS_FINISHED %}style="background-color:#515050"{% endif %}>
-                                            <strong>{{ forloop.counter }}</strong>
-                                        </span>
-                                                <h4 class="icon-list-title">
+                                                <span class="icon-list-icon "
+                                                      data-animation="bounceIn"
+                                                      {% if lot.status == lot.LOT_STATUS_FINISHED %}style="background-color:#515050"{% endif %}>
+                                                    <strong>{{ forloop.counter }}</strong>
+                                                </span>
+                                                <h4 class="icon-list-title" style="margin-bottom:0">
                                                     <strong {% if lot.status == lot.LOT_STATUS_FINISHED %}style="text-decoration: line-through"{% endif %}>
                                                         {{ lot.display_publicly }}
                                                     </strong>
                                                 </h4>
-                                                <p>
+                                                {% if lot.description %}
+                                                <p style="margin-top:0;margin-bottom:0">
+                                                    <small>{{ lot.description }}</small>
+                                                </p>
+                                                {% endif %}
+                                                {% if lot.hide_dates is False %}
+                                                <p style="margin-top:0;margin-bottom:0">
                                                     <small class="text-muted">{{ lot.get_period }}</small>
                                                 </p>
+                                                {% endif %}
+                                                {% if lot.get_warning_limit %}
+                                                <p style="margin-top:0;margin-bottom:0">
+                                                    <small class="text-danger">{{ lot.get_warning_limit }}</small>
+                                                </p>
+                                                {% endif %}
                                             </li>
                                         {% endif %}
                                     {% endfor %}

@@ -457,6 +457,16 @@
                                 {% render_generic_field form.date_end %}
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-xl-10 col-xl-push-1 col-md-12">
+                                {% render_generic_field form.description %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xl-10 col-xl-push-1 col-md-12">
+                                {% render_switchery_field form.hide_dates %}
+                            </div>
+                        </div>
                         {% if object.event.rsvp_type != object.event.RSVP_DISABLED and object.event.has_rsvp %}
                             <div class="row">
                                 <div class="col-xl-10 col-xl-push-1 col-md-12">

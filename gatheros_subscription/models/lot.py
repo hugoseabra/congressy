@@ -13,7 +13,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import numberformat
 from django.utils.encoding import force_text
-from django.utils.formats import localize, number_format
 
 from base.models import EntityMixin
 from core.model import track_data
@@ -226,6 +225,20 @@ class Lot(models.Model, GatherosModelMixin, EntityMixin):
         help_text='Somente associados podem se inscrever neste lote.'
     )
 
+    description = models.CharField(
+        max_length=60,
+        verbose_name='descrição rápida',
+        help_text='Informações adicionais sobre o lote (60 caracteres).',
+        null=True,
+        blank=True,
+    )
+
+    hide_dates = models.BooleanField(
+        default=False,
+        verbose_name='ocultar datas do lote',
+        help_text='Ocultar data inicial e final do lote.'
+    )
+
     active = models.BooleanField(
         default=True,
         verbose_name='ativo',
@@ -237,6 +250,10 @@ class Lot(models.Model, GatherosModelMixin, EntityMixin):
         verbose_name = 'lote'
         verbose_name_plural = 'lotes'
         ordering = ['date_start', 'date_end', 'pk', 'name']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._warning_limit = ''
 
     @property
     def percent_completed(self):
@@ -515,3 +532,30 @@ class Lot(models.Model, GatherosModelMixin, EntityMixin):
             congressy_amount = minimum
 
         return round(self.price - congressy_amount, 2)
+
+    def get_warning_limit(self) -> str:
+        if self._warning_limit:
+            return self._warning_limit
+
+        total_subs_event = self.event.expected_subscriptions
+        total_subs_lot = self.limit
+
+        if not total_subs_event and not total_subs_lot:
+            return self._warning_limit
+
+        perc = None
+
+        if total_subs_lot:
+            num_subs_lot = self.subscriptions.count()
+            if num_subs_lot > 0:
+                perc = (num_subs_lot * 100) / total_subs_lot
+
+        elif total_subs_event:
+            num_subs_event = self.event.subscriptions.count()
+            if num_subs_event > 0:
+                perc = (num_subs_event * 100) / total_subs_event
+
+        if perc and perc > 80:
+            self._warning_limit = 'Últimas vagas'
+
+        return self._warning_limit
