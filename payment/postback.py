@@ -55,7 +55,7 @@ class Postback(object):
             # mudou o status que pode não ser conforme a máquina de estado
             # de status de transação.
             last_status = self.transaction_history.last()
-            saved_payload_id = last_status['data']['id']
+            saved_payload_id = last_status['data']
             payload_id = payload.get('id')
 
             if saved_payload_id != payload_id:
