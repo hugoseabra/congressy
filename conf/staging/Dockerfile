@@ -38,9 +38,6 @@ ENV LC_ALL=pt_BR.UTF-8 LANG=pt_BR.UTF-8
 RUN localedef -i pt_BR -c -f UTF-8 -A /usr/share/locale/locale.alias pt_BR.UTF-8
 
 # -----------------------------------------------------------------------------
-RUN mkdir -p /root/.pip
-COPY ./conf/deploy/pip.conf /root/.pip/.
-
 # Requirements - includes dev packages
 COPY ./requirements.pip /requirements.pip
 COPY ./requirements_staging.pip /requirements_staging.pip

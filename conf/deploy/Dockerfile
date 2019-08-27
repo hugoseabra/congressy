@@ -38,9 +38,6 @@ ENV LC_ALL=pt_BR.UTF-8 LANG=pt_BR.UTF-8
 RUN localedef -i pt_BR -c -f UTF-8 -A /usr/share/locale/locale.alias pt_BR.UTF-8
 
 # -----------------------------------------------------------------------------
-RUN mkdir -p /root/.pip
-COPY ./conf/deploy/pip.conf /root/.pip/.
-
 COPY ./requirements.pip /requirements.pip
 
 # Install build deps, then run `pip install`, then remove unneeded build deps all in a single step.
