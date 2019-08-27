@@ -346,10 +346,12 @@ class EventDuplicationForm(forms.Form):
             feature_config2.feature_internal_subscription = feat_internal_sub
             feature_config2.feat_boleto_exp_lot_exp = feat_boleto_exp_lot_exp
 
+            # Features ativadas por padrão
+            feature_config2.feature_multi_lots = True
+
             # Features desativadas por padrão
             feature_config2.feature_import_via_csv = False
             feature_config2.feature_manual_payments = False
-            feature_config2.feature_multi_lots = False
             feature_config2.feature_raffle = False
 
             feature_config2.save()
