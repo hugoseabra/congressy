@@ -1,0 +1,299 @@
+[
+  {
+    "model": "kanu_locations.city",
+    "pk": 2246,
+    "fields": {
+      "name": "ABADIA DOS DOURADOS",
+      "name_ascii": "ABADIA DOS DOURADOS",
+      "uf": "MG"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5319,
+    "fields": {
+      "name": "ABADIA DE GOI\u00c1S",
+      "name_ascii": "ABADIA DE GOIAS",
+      "uf": "GO"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5334,
+    "fields": {
+      "name": "AN\u00c1POLIS",
+      "name_ascii": "ANAPOLIS",
+      "uf": "GO"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5337,
+    "fields": {
+      "name": "APARECIDA DE GOI\u00c2NIA",
+      "name_ascii": "APARECIDA DE GOIANIA",
+      "uf": "GO"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5342,
+    "fields": {
+      "name": "ARAGOI\u00c2NIA",
+      "name_ascii": "ARAGOIANIA",
+      "uf": "GO"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5413,
+    "fields": {
+      "name": "GOI\u00c2NIA",
+      "name_ascii": "GOIANIA",
+      "uf": "GO"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5414,
+    "fields": {
+      "name": "GOIANIRA",
+      "name_ascii": "GOIANIRA",
+      "uf": "GO"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5475,
+    "fields": {
+      "name": "NER\u00d3POLIS",
+      "name_ascii": "NEROPOLIS",
+      "uf": "GO"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5516,
+    "fields": {
+      "name": "RIO VERDE",
+      "name_ascii": "RIO VERDE",
+      "uf": "GO"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5530,
+    "fields": {
+      "name": "SANTO ANT\u00d4NIO DE GOI\u00c1S",
+      "name_ascii": "SANTO ANTONIO DE GOIAS",
+      "uf": "GO"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5542,
+    "fields": {
+      "name": "SENADOR CANEDO",
+      "name_ascii": "SENADOR CANEDO",
+      "uf": "GO"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5551,
+    "fields": {
+      "name": "TRINDADE",
+      "name_ascii": "TRINDADE",
+      "uf": "GO"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 72,
+    "fields": {
+      "name": "RIO BRANCO",
+      "name_ascii": "RIO BRANCO",
+      "uf": "AC"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 1699,
+    "fields": {
+      "name": "MACEI\u00d3",
+      "name_ascii": "MACEIO",
+      "uf": "AL"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 308,
+    "fields": {
+      "name": "MACAP\u00c1",
+      "name_ascii": "MACAPA",
+      "uf": "AP"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 117,
+    "fields": {
+      "name": "MANAUS",
+      "name_ascii": "MANAUS",
+      "uf": "AM"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 2164,
+    "fields": {
+      "name": "SALVADOR",
+      "name_ascii": "SALVADOR",
+      "uf": "BA"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 953,
+    "fields": {
+      "name": "FORTALEZA",
+      "name_ascii": "FORTALEZA",
+      "uf": "CE"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5565,
+    "fields": {
+      "name": "BRAS\u00cdLIA",
+      "name_ascii": "BRASILIA",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 3175,
+    "fields": {
+      "name": "VIT\u00d3RIA",
+      "name_ascii": "VITORIA",
+      "uf": "ES"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 640,
+    "fields": {
+      "name": "S\u00c3O LU\u00cdS",
+      "name_ascii": "SAO LUIS",
+      "uf": "MA"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5215,
+    "fields": {
+      "name": "CUIAB\u00c1",
+      "name_ascii": "CUIABA",
+      "uf": "MT"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 1599,
+    "fields": {
+      "name": "RECIFE",
+      "name_ascii": "RECIFE",
+      "uf": "PE"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 886,
+    "fields": {
+      "name": "TERESINA",
+      "name_ascii": "TERESINA",
+      "uf": "PI"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 3243,
+    "fields": {
+      "name": "RIO DE JANEIRO",
+      "name_ascii": "RIO DE JANEIRO",
+      "uf": "RJ"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 1167,
+    "fields": {
+      "name": "NATAL",
+      "name_ascii": "NATAL",
+      "uf": "RN"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 4928,
+    "fields": {
+      "name": "PORTO ALEGRE",
+      "name_ascii": "PORTO ALEGRE",
+      "uf": "RS"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 22,
+    "fields": {
+      "name": "PORTO VELHO",
+      "name_ascii": "PORTO VELHO",
+      "uf": "RO"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 144,
+    "fields": {
+      "name": "BOA VISTA",
+      "name_ascii": "BOA VISTA",
+      "uf": "RR"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 4398,
+    "fields": {
+      "name": "FLORIAN\u00d3POLIS",
+      "name_ascii": "FLORIANOPOLIS",
+      "uf": "SC"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 3830,
+    "fields": {
+      "name": "S\u00c3O PAULO",
+      "name_ascii": "SAO PAULO",
+      "uf": "SP"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 1757,
+    "fields": {
+      "name": "ARACAJU",
+      "name_ascii": "ARACAJU",
+      "uf": "SE"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 448,
+    "fields": {
+      "name": "PALMAS",
+      "name_ascii": "PALMAS",
+      "uf": "TO"
+    }
+  }
+]
