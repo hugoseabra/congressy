@@ -1,6 +1,6 @@
 -r requirements_staging.pip
-django-debug-toolbar
-django-extensions
+django-debug-toolbar==1.11
+django-extensions==2.2.1
 django-bootstrap-datepicker-plus
 Faker==0.8.12
 flower==0.9.3
