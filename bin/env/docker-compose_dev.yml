@@ -15,6 +15,18 @@ services:
       - POSTGRES_USER=congressy
       - POSTGRES_PASSWORD=congressy
 
+  pgadmin:
+    image: thajeztah/pgadmin4
+    container_name: pgadmin_dev
+    ports:
+      - "5050:5050"
+    depends_on:
+      - postgres
+    networks:
+      - postgres
+    volumes:
+      - /tmp/bkp:/pgadmin
+
   mailhog:
     image: blueimp/mailhog
     container_name: mailhog
