@@ -338,8 +338,8 @@ def _export_payments(worksheet, event):
         collector[row_idx].append(transaction.get_type_display())
         collector[row_idx].append(transaction.get_status_display())
         collector[row_idx].append(created)
-        collector[row_idx].append(transaction.amount)
-        collector[row_idx].append(transaction.liquid_amount)
+        collector[row_idx].append(transaction.transaction_amount)
+        collector[row_idx].append(transaction.transaction_liquid_amount)
 
         row_idx += 1
 

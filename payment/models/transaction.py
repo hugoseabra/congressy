@@ -225,6 +225,10 @@ class Transaction(models.Model, EntityMixin):
         verbose_name='ID da transação (pagar.me)',
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._transaction_liquid_amount = None
+
     def save(self, *args, **kwargs):
         if self._state.adding is True:
             self.lot = self.subscription.lot
@@ -262,7 +266,8 @@ class Transaction(models.Model, EntityMixin):
         O valor total pago pelo participante
         :return: DecimalField
         """
-        return self.amount + self.optional_amount
+        # return self.amount + self.optional_amount
+        return self.amount
 
     @property
     def transaction_liquid_amount(self):
@@ -270,7 +275,28 @@ class Transaction(models.Model, EntityMixin):
         O valor total que o organizador irá receber
         :return: DecimalField
         """
-        return self.liquid_amount + self.optional_liquid_amount
+        if self._transaction_liquid_amount:
+            return self._transaction_liquid_amount
+
+        liquid_amount = self.liquid_amount
+
+        split_rules = self.split_rules.filter(is_congressy=False)
+        if split_rules.count():
+            split_rule = split_rules[0]
+
+            payables = split_rule.payables.filter(type='credit')
+
+            if payables.count():
+                amount = sum([p.amount for p in payables])
+                fee = sum([p.antecipation_fee for p in payables])
+                liquid_amount = amount - fee if fee else amount
+            else:
+                liquid_amount = split_rule.amount
+
+        self._transaction_liquid_amount = round(liquid_amount, 2)
+
+        # return self.liquid_amount + self.optional_liquid_amount
+        return self._transaction_liquid_amount
 
 # class Transaction(models.Model):
 #     class Meta:

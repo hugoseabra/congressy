@@ -101,7 +101,7 @@ class EventPaymentView(AccountMixin,
                 'is_part': trans.part_id is not None,
                 'is_pending': trans.status == Transaction.WAITING_PAYMENT,
                 'status_name': trans.get_status_display(),
-                'liquid_amount': trans.liquid_amount,
+                'liquid_amount': trans.transaction_liquid_amount,
                 'part_info': None,
             }
 
@@ -307,7 +307,7 @@ class EventPaymentView(AccountMixin,
         )
 
         for trans in transactions_qs.filter(status=Transaction.PAID, ):
-            amount = trans.liquid_amount
+            amount = trans.transaction_liquid_amount
             paid_amounts.append(amount)
 
             if trans.manual is True:
