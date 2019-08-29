@@ -233,6 +233,8 @@ class PaymentForm(forms.Form):
                     'Um erro aconteceu enquanto se tentava construir os dados'
                     ' de uma transação. Detalhes: {}'.format(e)
                 )
+                from pprint import pprint
+                pprint(e)
                 raise TransactionError(
                     'Erro interno ao realizar transação. A equipe técnica já'
                     ' foi informada e este erro será resolvido dentro de'
