@@ -9,7 +9,7 @@ from core.model import track_data
 
 
 @track_data('status', 'pagarme_id', 'fee', 'antecipation_fee',
-            'payment_date', 'next_check')
+            'payment_date', 'synced')
 class Payable(models.Model, EntityMixin):
     # Esse status significa que o cliente final ainda não realizou o pagamento.
     STATUS_WAITING_FUNDS = 'waiting_funds'
@@ -153,7 +153,8 @@ class Payable(models.Model, EntityMixin):
         null=True,
     )
 
-    next_check = models.DateTimeField(
-        verbose_name='próxima verificação em',
-        null=True,
+    synced = models.BooleanField(
+        default=False,
+        verbose_name='sincronizado com provedor',
+        editable=False,
     )

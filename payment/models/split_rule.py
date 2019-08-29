@@ -91,3 +91,15 @@ class SplitRule(models.Model, EntityMixin):
         null=False,
         verbose_name='criado em',
     )
+
+    next_check = models.DateTimeField(
+        editable=False,
+        null=True,
+        verbose_name='última checagem',
+    )
+
+    checkable = models.BooleanField(
+        editable=False,
+        default=True,
+        verbose_name='regra passível de sincronização',
+    )
