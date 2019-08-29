@@ -25,7 +25,7 @@ services:
     networks:
       - postgres
     volumes:
-      - /tmp/bkp:/pgadmin
+      - pgadmin_data:/pgadmin
 
   mailhog:
     image: blueimp/mailhog
@@ -81,6 +81,9 @@ services:
       - 5555:5555
     networks:
       - rabbitmq
+
+volumes:
+  pgadmin_data:
 
 networks:
   postgres:
