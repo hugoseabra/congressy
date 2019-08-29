@@ -147,14 +147,15 @@ class PagarmeDataBuilder:
                 #       antes do evento.
                 #   Se mais de 2 dias, processamento padrão: vencimento padrão
                 #     de 2 dia do pagarme.
-                now = datetime.now()
-                diff_days = event.date_start.date() - now.date()
 
-                if diff_days.days <= 0:
+                if event.running is True:
                     raise TransactionDataError(
                         'Evento já iniciou e não pode gerar novas transações'
                         ' de boleto.'
                     )
+
+                now = datetime.now()
+                diff_days = event.date_start - now
 
                 expiration_date = None
 
