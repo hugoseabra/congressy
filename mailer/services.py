@@ -1051,6 +1051,7 @@ def notify_pending_refund_subscription(event, transaction):
                 ' Andamento: {}'.format(event.name),
     )
 
+
 def notify_pending_chargeback_subscription(event, transaction):
     """
     Notifica participante de reembolso de um lote pago pelo método de
@@ -1086,7 +1087,6 @@ def notify_pending_chargeback_subscription(event, transaction):
         to=person.email,
         subject='Chargedback de Inscrição: {}'.format(event.name),
     )
-
 
 
 def notify_chargedback_subscription(event, transaction):

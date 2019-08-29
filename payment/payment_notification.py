@@ -13,7 +13,7 @@ from mailer.services import (
     notify_new_user_and_unpaid_subscription_boleto,
     notify_new_user_and_unpaid_subscription_credit_card,
     notify_paid_subscription_boleto, notify_refunded_subscription_boleto,
-    notify_pending_refund_subscription_boleto,
+    notify_pending_refund_subscription,
     notify_refunded_subscription_credit_card,
 )
 from payment.models import Transaction
@@ -202,7 +202,7 @@ class BoletoPaymentNotification(object):
                                                 transaction)
 
         elif is_pending_refund:
-            notify_pending_refund_subscription_boleto(
+            notify_pending_refund_subscription(
                 event,
                 transaction
             )
