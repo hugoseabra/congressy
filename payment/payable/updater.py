@@ -16,27 +16,67 @@ def __notify_error(message, extra_data=None):
     logger.error(message, extra=extra_data)
 
 
-def update_payables(split_rule: SplitRule):
+def update_payables(split_rule: SplitRule, check_hours_delay=8):
     """
     Atualiza recebíveis de uma transação
 
     :param split_rule: Model de Regra de rateamento do Pagar.me
+    :param check_hours_delay: Delay de próxima checagem em horas
     """
+    if split_rule.checkable is False:
+        return
+
+    now = datetime.now()
+    next_check = now + timedelta(hours=check_hours_delay)
+
     transaction = split_rule.transaction
+
+    event = transaction.subscription.event
+
+    if event.finished is True:
+        diff_days = event.date_end.date() - now.date()
+
+        if diff_days.days > 3:
+            # Terminou há mais de 3 dias
+            split_rule.checkable = False
+            split_rule.next_check = None
+            split_rule.save()
+            return
 
     is_boleto = transaction.type == Transaction.BOLETO
     is_cc = transaction.type == Transaction.CREDIT_CARD
-    paid = transaction.paid
+    is_paid = transaction.paid
 
-    if is_boleto is True and paid is False:
+    if is_boleto is True and is_paid is False:
         # Boleto não pago não possuem recebíveis
+
+        if transaction.boleto_expiration_date >= now.date():
+            # boleto vencido.
+            split_rule.checkable = False
+            split_rule.next_check = None
+            split_rule.save()
+            return
+
+        split_rule.next_check = next_check
+        split_rule.save()
         return
 
     payable_qs = split_rule.payables
 
-    if is_boleto is True and paid is True and payable_qs.count():
+    if is_boleto is True and is_paid is True and payable_qs.count():
         # Boleto pago que já possui recebível já foi processado
+        split_rule.checkable = False
+        split_rule.next_check = None
+        split_rule.save()
         return
+
+    # NESTE PONTO EM DIANTE:
+    # - Evento não inicado, em andamento ou finalizado em menos de 3 dias
+    # - Transação ainda não sincronizada
+    # - Regras de split com next_check hábil para o momento
+    # - Cartão de crédito que já possui recebível previsto e poderá ser
+    #   confirmado;
+    # - Boleto pago que irá atualizar seus recebíveis;
 
     try:
         payables_trx = pagarme.transaction.payables(transaction.pagarme_id)
@@ -91,6 +131,7 @@ def update_payables(split_rule: SplitRule):
     for item in payables_trx:
 
         if item['recipient_id'] != split_rule.recipient_id:
+            # Quem é você?
             continue
 
         simulator = get_simulator(
@@ -139,20 +180,10 @@ def update_payables(split_rule: SplitRule):
             payable.antecipation_fee = antecipation_fee
             payable.payment_date = payment_date
             payable.amount = amount
-
-            now = datetime.now()
-
-            if item['status'] in (Payable.STATUS_WAITING_FUNDS,
-                                  Payable.STATUS_PREPAID):
-
-                payable.next_check = now + timedelta(hours=12)
-
-            else:
-                # como o status do recebível é final, vamos cancelar futuras
-                # checagens
-                payable.next_check = None
-
             payable.status = item['status']
+
+            if item['status'] == Payable.STATUS_PAID:
+                payable.synced = True
 
             payable.save()
 
@@ -169,5 +200,10 @@ def update_payables(split_rule: SplitRule):
                 fee=fee,
                 antecipation_fee=antecipation_fee,
                 payment_date=payment_date,
-                next_check=datetime.now() + timedelta(days=30 if is_cc else 2),
+                synced=item['status'] == Payable.STATUS_PAID,
             )
+
+        if item['status'] == Payable.STATUS_PAID:
+            split_rule.checkable = False
+            split_rule.next_check = None
+            split_rule.save()

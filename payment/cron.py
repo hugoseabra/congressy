@@ -134,13 +134,4 @@ class CheckPayables(CronJobBase):
                         retry_after_failure_mins=RETRY_AFTER_FAILURE_MINS)
 
     def do(self):
-        # Verifica todas as regras que estejam com recebíveis agendadas para
-        # verificação, excluindo as regras que não possuem recebíveis agendados
-        split_rule_qs = SplitRule.objects.filter(
-            payables__next_check__lte=datetime.now(),
-        ).exclude(
-            payables__next_check__isnull=True,
-        )
-
-        for split_rule in split_rule_qs[:50]:
-            update_payables(split_rule)
+        call_command('update_payables')

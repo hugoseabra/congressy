@@ -57,7 +57,7 @@ def amount_as_decimal(amount):
     # Separar centavos
     amount = str(amount)
     size = len(amount)
-    if size > 3:
+    if size >= 3:
         cents = amount[-2] + amount[-1]
         amount = '{}.{}'.format(amount[0:size - 2], cents)
     elif size == 2:
