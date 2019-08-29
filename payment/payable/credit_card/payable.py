@@ -61,8 +61,6 @@ class Payable:
         if antecipation_date > self.payment_date:
             return Decimal(0)
 
-        fee_amount = 0
-
         # Taxa diária de antecipação. Padrão de 30 dias.
         fee_decimal_per_day = \
             (round(self.antecipation_fee_percent, 2) / 30) / 100

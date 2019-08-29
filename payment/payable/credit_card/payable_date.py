@@ -25,17 +25,24 @@ class CreditCardPayableDate:
 
         self.holidays = self.get_brasilian_holidays()
 
-    def get_antecipation_date(self, elapsed_days=30) -> date:
+    def get_antecipation_date(self, elapsed_days=None) -> date:
         """
         Resgata data de antecipação a partir da data de transação.
 
         :param elapsed_days: Dias corridos
         :return: Data de antecipação
         """
-        antecipation_date = \
-            self.transaction_date + timedelta(days=elapsed_days)
+        if elapsed_days is None:
+            elapsed_days = self.FIRST_PAYMENT_DAYS
 
-        return self.get_next_business_day(antecipation_date)
+        antec_date = self.transaction_date + timedelta(days=elapsed_days)
+
+        while True:
+            if self.is_business_day(antec_date) is False:
+                antec_date = self.get_next_business_day(antec_date)
+                continue
+
+            return antec_date
 
     def get_dates(self, additional_business_days=None) -> List[date]:
         """
@@ -49,7 +56,7 @@ class CreditCardPayableDate:
             days=self.FIRST_PAYMENT_DAYS
         )
 
-        if additional_business_days > 0:
+        if additional_business_days and additional_business_days > 0:
             for additional_day in range(additional_business_days):
                 # 2 diais úteis úteis
                 first_payment = self.get_next_business_day(first_payment)
@@ -65,7 +72,7 @@ class CreditCardPayableDate:
             interval_date = \
                 self.transaction_date + timedelta(days=interval_days)
 
-            if additional_business_days > 0:
+            if additional_business_days and additional_business_days > 0:
                 for additional_day in range(additional_business_days):
                     # 2 diais úteis úteis
                     interval_date = self.get_next_business_day(interval_date)
