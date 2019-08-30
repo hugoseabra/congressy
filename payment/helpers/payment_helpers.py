@@ -28,7 +28,7 @@ def get_opened_boleto_transactions(subscription):
 
 
 def has_open_boleto(subscription):
-    return get_opened_boleto_transactions(subscription).count()
+    return get_opened_boleto_transactions(subscription).count() > 0
 
 
 def is_boleto_allowed(event):
