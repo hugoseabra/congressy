@@ -280,7 +280,10 @@ class Transaction(models.Model, EntityMixin):
 
         liquid_amount = self.liquid_amount
 
-        split_rules = self.split_rules.filter(is_congressy=False)
+        split_rules = self.split_rules.filter(
+            is_congressy=False,
+            recipient_id=self.lot.event.organization.recipient_id,
+        )
         if split_rules.count():
             split_rule = split_rules[0]
 
