@@ -68,6 +68,8 @@ public_urlpatterns = [
 ]
 
 public_urlpatterns += [
+    url(r'^favicon\.ico$',
+        RedirectView.as_view(url='/static/favicon.ico', permantent=True)),
     url(r'^', include(public_urls, 'public')),
 
     # Patterns do Django não podem estar sob um 'namespace'
