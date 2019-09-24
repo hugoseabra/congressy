@@ -1,3 +1,5 @@
+import absoluteuri
+
 from django.urls import reverse
 from kanu_locations.models import City
 from rest_framework import serializers
@@ -159,29 +161,97 @@ class SubscriptionSerializer(serializers.BaseSerializer):
             'tag_group': obj.tag_group,
             'category_name': None,
             'institution': None,
-            'link': reverse(
+            'link': absoluteuri.build_absolute_uri(reverse(
                 'subscription:subscription-view', kwargs={
                     'event_pk': obj.event.pk,
                     'pk': obj.pk,
                 }
-            ),
+            )),
             'edit_link': None,
             'voucher_link': None,
         }
 
         if obj.confirmed:
-            rep['voucher_link'] = reverse(
+            rep['voucher_link'] = absoluteuri.build_absolute_uri(reverse(
                 'subscription:subscription-voucher', kwargs={
                     'event_pk': obj.event.pk,
                     'pk': obj.pk,
-                }),
+                })),
 
         if obj.event.allow_internal_subscription:
-            rep['edit_link'] = reverse(
+            rep['edit_link'] = absoluteuri.build_absolute_uri(reverse(
                 'subscription:subscription-edit', kwargs={
                     'event_pk': obj.event.pk,
                     'pk': obj.pk,
-                }),
+                })),
+
+        if obj.lot.category:
+            rep['category_name'] = obj.lot.category.name
+
+        if obj.person.city:
+            rep['person_city'] = obj.person.city.name
+            rep['person_uf'] = obj.person.city.uf
+
+        if obj.person.institution:
+            rep['institution'] = obj.person.institution
+
+        return rep
+
+
+class SubscriptionModelSerializer(SubscriptionSerializer,
+                                  serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = [
+            'pk',
+            'person',
+            'lot',
+            'completed',
+        ]
+
+    def to_representation(self, obj):
+        rep = {
+            'pk': obj.pk,
+            'person_pk': obj.person.pk,
+            'person_name': obj.person.name,
+            'person_email': obj.person.email,
+            'person_cpf': obj.person.cpf,
+            'person_city': None,
+            'person_uf': None,
+            'person_phone': obj.person.phone,
+            'person_city_international': obj.person.city_international,
+            'person_international_doc': obj.person.international_doc,
+            'origin': obj.origin,
+            'code': obj.code,
+            'accredited': obj.accredited,
+            'accredited_on': obj.accredited_on,
+            'lot_name': obj.lot.name,
+            'event_count': obj.event_count,
+            'completed': obj.test_subscription,
+            'notified': obj.test_subscription,
+            'test_subscription': obj.test_subscription,
+            'status': obj.status,
+            'created': obj.created,
+            'tag_info': obj.tag_info,
+            'tag_group': obj.tag_group,
+            'category_name': None,
+            'institution': None,
+            'link': absoluteuri.build_absolute_uri(reverse(
+                'subscription:subscription-view', kwargs={
+                    'event_pk': obj.event.pk,
+                    'pk': obj.pk,
+                }
+            )),
+            'edit_link': None,
+            'voucher_link': None,
+        }
+
+        if obj.confirmed:
+            rep['voucher_link'] = absoluteuri.build_absolute_uri(reverse(
+                'subscription:subscription-voucher', kwargs={
+                    'event_pk': obj.event.pk,
+                    'pk': obj.pk,
+                })),
 
         if obj.lot.category:
             rep['category_name'] = obj.lot.category.name

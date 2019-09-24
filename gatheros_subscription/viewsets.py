@@ -3,7 +3,7 @@ from time import sleep
 
 from django.db.models import Q
 from django.http import HttpResponse
-from rest_framework import viewsets, generics, pagination, status
+from rest_framework import viewsets, generics, pagination, status, permissions
 from rest_framework.authentication import (
     BasicAuthentication,
     SessionAuthentication,
@@ -24,7 +24,7 @@ from gatheros_subscription.serializers import (
     Lot,
     LotSerializer,
     SubscriptionSerializer,
-)
+    SubscriptionModelSerializer)
 from gatheros_subscription.tasks import async_subscription_exporter_task
 from .permissions import OrganizerOnly
 
@@ -277,3 +277,24 @@ class SubscriptionExporterViewSet(RestrictionViewMixin, APIView):
         response['Content-Disposition'] = 'attachment; filename=%s' % name
 
         return response
+
+
+class SubscriptionViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+    serializer_class = SubscriptionModelSerializer
+    queryset = Subscription.objects.all()
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+
+    def get_queryset(self):
+        user = self.request.user
+
+        org_pks = list()
+
+        if hasattr(user, 'person'):
+
+            for m in user.person.members.filter(active=True):
+                org_pks.append(m.organization_id)
+
+        queryset = super().get_queryset()
+        return queryset.filter(event__organization_id__in=org_pks)
