@@ -59,6 +59,11 @@ class EventSerializer(serializers.ModelSerializer):
         fields = (
             'name',
             'slug',
+            'published',
+            'boleto_limit_days',
+            'congressy_percent',
+            'expected_subscriptions',
+            'business_status',
             'date_start',
             'date_end',
             'created',
