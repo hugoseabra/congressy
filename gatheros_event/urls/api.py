@@ -8,4 +8,8 @@ router.register(r'event/organizations',
                 viewsets.OrganizationReadOnlyViewSet,
                 base_name="organization",)
 
+router.register(r'event/events',
+                viewsets.EventReadOnlyViewSet,
+                base_name="event",)
+
 urlpatterns = router.urls

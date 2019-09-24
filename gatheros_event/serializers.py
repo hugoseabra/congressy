@@ -1,7 +1,7 @@
 from kanu_locations.serializers import CitySerializer
 from rest_framework import serializers
 
-from gatheros_event.models import Person, Event, Organization, Category
+from gatheros_event.models import Person, Event, Organization, Category, Info
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -36,9 +36,23 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('id', 'name',)
 
 
+class InfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Info
+        fields = (
+            'description',
+            'description_html',
+            'lead',
+            'image_main',
+            'youtube_video',
+            'voucher_extra_info',
+        )
+
+
 class EventSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     organization = OrganizationSerializer()
+    info = InfoSerializer()
 
     class Meta:
         model = Event
@@ -51,4 +65,5 @@ class EventSerializer(serializers.ModelSerializer):
             'is_scientific',
             'category',
             'organization',
+            'info',
         )
