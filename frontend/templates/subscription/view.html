@@ -436,6 +436,14 @@
         <input type="hidden" name="next_url" value=""/>
     </form>
 
+    <form action="" method="post" id="subscriber-notify-voucher"
+          style="display:none"
+          onsubmit="this.next_url.value=window.location.pathname">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="notify_voucher"/>
+        <input type="hidden" name="next_url" value=""/>
+    </form>
+
     {% include 'subscription/includes/form-installment-contract.html' %}
 {% endblock %}
 

@@ -190,6 +190,19 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
 
             return redirect(url)
 
+        elif action == 'notify_voucher':
+            if next_url:
+                url = next_url
+
+            try:
+                mailer.notify_voucher(subscription=self.object)
+                messages.success(request, 'Voucher enviado com sucesso.')
+
+            except mailer_exception.NotifcationError as e:
+                messages.error(request, str(e))
+
+            return redirect(url)
+
         if not self.event.feature_configuration.feature_manual_payments:
             self.permission_denied_url = reverse(
                 'subscription:subscription-list', kwargs={

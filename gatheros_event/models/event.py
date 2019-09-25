@@ -374,7 +374,7 @@ class Event(models.Model, GatherosModelMixin):
             instance=self,
             string=self.name
         )
-        self.slug = slug[:255]
+        self.slug = slug[:254]
 
     def get_period(self):
         """Recupera string de período de evento de acordo com as datas."""

@@ -50,7 +50,11 @@ def update_payables(split_rule: SplitRule, check_hours_delay=8):
     if is_boleto is True and is_paid is False:
         # Boleto não pago não possuem recebíveis
 
-        if transaction.boleto_expiration_date >= now.date():
+        exp_date = transaction.boleto_expiration_date
+        if exp_date and isinstance(exp_date, datetime):
+            exp_date = exp_date.date()
+
+        if exp_date and exp_date >= now.date():
             # boleto vencido.
             split_rule.checkable = False
             split_rule.next_check = None

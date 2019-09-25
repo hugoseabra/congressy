@@ -189,6 +189,14 @@ def check_notification_transaction_refunded_credit_card(transaction):
         )
 
 
+def check_voucher_notification(subscription):
+    if subscription.confirmed is False:
+        raise exception.NotifcationError(
+            "Não é possível enviar voucher para uma inscrição que não esteja"
+            " confirmada."
+        )
+
+
 def _check_unpaid_transaction(transaction):
     """ Verifica transações não pagas. """
     subscription = transaction.subscription

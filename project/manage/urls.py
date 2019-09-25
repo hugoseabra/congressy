@@ -68,6 +68,8 @@ public_urlpatterns = [
 ]
 
 public_urlpatterns += [
+    url(r'^favicon\.ico$',
+        RedirectView.as_view(url='/static/favicon.ico', permanent=True)),
     url(r'^', include(public_urls, 'public')),
 
     # Patterns do Django não podem estar sob um 'namespace'
@@ -76,6 +78,7 @@ public_urlpatterns += [
 
 # API
 api_urls = [
+    url(r'^', include('gatheros_event.urls.api', 'event')),
     url(r'^', include(urlpatterns_public_payments_api, 'payment')),
     url(r'^', include('gatheros_subscription.api_urls', 'subscription')),
     url(r'^', include('addon.api_urls', 'addon')),
