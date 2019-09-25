@@ -117,13 +117,38 @@
                                             {% if object.status == object.CONFIRMED_STATUS %}
                                                 <div class="float-right"
                                                      style="margin-left:10px;margin-top:5px;">
+                                                    {% if event.finished is False %}
+                                                    <div class="btn-group">
+                                                        <button type="button"
+                                                                data-toggle="tooltip"
+                                                                title="Abrir voucher"
+                                                                onclick='window.open("{% url 'subscription:subscription-voucher' event.pk object.pk %}", "_blank")'
+                                                                class="btn btn-info btn-sm btn-trans">
+                                                            Voucher
+                                                        </button>
+                                                        <button type="button" class="btn btn-info btn-trans btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                            <span class="caret"></span>
+                                                            <span class="sr-only">Toggle Dropdown</span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" role="menu">
+                                                            <li><a data-toggle="tooltip"
+                                                                   title="Abrir voucher"
+                                                                   href="javascript:void(0)" onclick='window.open("{% url 'subscription:subscription-voucher' event.pk object.pk %}", "_blank")'>Abrir</a></li>
+                                                            <li><a data-toggle="tooltip"
+                                                                   title="Enviar voucher para o participante"
+                                                                   onclick="if(!$(this).hasClass('disabled') && confirm('Confirme para enviar o voucher ao participante!')){$(this).addClass('disabled').text('aguarde ...');$('#subscriber-notify-voucher').submit();}"
+                                                                   href="#">Reenviar</a></li>
+                                                        </ul>
+                                                    </div>
+                                                    {% else %}
                                                     <button type="button"
                                                             data-toggle="tooltip"
                                                             title="Abrir voucher"
-                                                            onclick="window.open('{% url 'subscription:subscription-voucher' event.pk object.pk %}', '_blank')"
+                                                            onclick='window.open("{% url 'subscription:subscription-voucher' event.pk object.pk %}", "_blank")'
                                                             class="btn btn-info btn-sm btn-trans">
-                                                        voucher
+                                                        Voucher
                                                     </button>
+                                                    {% endif %}
                                                 </div>
                                             {% endif %}
                                             <div class="clearfix"></div>
