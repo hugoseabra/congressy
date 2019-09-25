@@ -1473,6 +1473,62 @@ def notify_open_boleto(transaction):
     )
 
 
+def notify_voucher(subscription):
+    """
+    Notifica participante sobre novo boleto disponível para pagamento.
+    """
+
+    checks.check_voucher_notification(subscription)
+
+    person = subscription.person
+    event = subscription.event
+
+    paid = subscription.lot.price > 0
+
+    # Precisamos de outros serviços para gerar qrcode, barcode e PDF
+    # Vamos saber se esses serviços possuem delay e/ou estão disponíveis. Caso
+    # não, vamos levantar uma exceção.
+    voucher_file = ''
+    counter = 1
+    while os.path.isfile(voucher_file) is False:
+        if counter == 50:  # 50 tentativas
+            raise Exception('Não foi possível criar arquivo de voucher.')
+
+        elif counter > 1:
+            time.sleep(secs=5)
+
+        voucher_file = create_voucher(subscription, save=True)
+        counter += 1
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    # @TODO set event.date_start to period
+    template_name = 'mailer/subscription/notify_voucher.html'
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'period': event.date_start,
+        'paid': paid,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': True,
+        'boleto_url': None,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+        'password_set_url': None,
+    })
+
+    return send(event=event,
+                body=body,
+                to=person.email,
+                subject='Voucher de Inscrição: {}'.format(event.name),
+                attachment_file_path=voucher_file)
+
 # =========================== ORGANIZATION  EMAILS ========================== #
 def notify_invite(organization, link, inviter, invited_person, email):
     """
