@@ -1497,7 +1497,7 @@ def notify_voucher(subscription):
         elif counter > 1:
             time.sleep(secs=5)
 
-        voucher_file = create_voucher(subscription, save=True)
+        voucher_file = create_voucher(subscription, save=True, force=True)
         counter += 1
 
     event_url = absoluteuri.reverse(
