@@ -1,16 +1,26 @@
-def clear_string(string):
+def clear_string(string, exclude_list=None):
+    if exclude_list is None:
+        exclude_list = list()
+
+    patterns_to_be_cleaned = [
+        '.',
+        '-',
+        '/',
+        '/',
+        '(',
+        ')',
+        '+',
+        ' ',
+    ]
 
     if not string:
         return string
 
-    return string \
-        .replace('.', '') \
-        .replace('-', '') \
-        .replace('/', '') \
-        .replace('(', '') \
-        .replace(')', '') \
-        .replace('+', '') \
-        .replace(' ', '')
+    for pattern in patterns_to_be_cleaned:
+        if pattern not in exclude_list:
+            string = string.replace(pattern, '')
+
+    return string
 
 
 def represents_int(s):

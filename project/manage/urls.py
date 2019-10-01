@@ -19,7 +19,6 @@ from hotsite.urls import urlpatterns_public_hotsite
 from payment.urls import (
     private_payment_urls,
     urlpatterns_public_payments,
-    urlpatterns_public_payments_api,
 )
 from raffle.urls import urlpatterns_private_raffles
 from service_tags.urls import service_tags_urlpatterns
@@ -79,11 +78,11 @@ public_urlpatterns += [
 # API
 api_urls = [
     url(r'^', include('gatheros_event.urls.api', 'event')),
-    url(r'^', include(urlpatterns_public_payments_api, 'payment')),
     url(r'^', include('gatheros_subscription.api_urls', 'subscription')),
     url(r'^', include('addon.api_urls', 'addon')),
     url(r'^', include('attendance.api_urls', 'attendance')),
     url(r'^', include('mix_boleto.api_urls', 'mix_boleto')),
+    url(r'^', include('payment.api_urls', 'payment')),
     url(r'^', include('installment.api_urls', 'installment')),
     url(r'^', include('kanu_locations.urls', 'city')),
     url(r'^', include('sync.api_urls', 'sync')),
