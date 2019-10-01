@@ -11,12 +11,11 @@ from rest_framework.viewsets import ModelViewSet
 
 from gatheros_event.models import Person
 from gatheros_subscription.models import Subscription
-from payment.models import Benefactor
+from payment.models import Benefactor, Payer
 from payment.serializers import (
     BenefactorSerializer,
     SubscriptionSerializer,
-)
-
+    PayerSerializer)
 
 
 class RestrictionViewMixin(object):
@@ -28,16 +27,15 @@ class RestrictionViewMixin(object):
     permission_classes = (permissions.IsAuthenticated,)
 
 
-class BenefactorViewSet(RestrictionViewMixin, ModelViewSet):
-    serializer_class = BenefactorSerializer
+class PayerVieSet(RestrictionViewMixin, ModelViewSet):
+    serializer_class = PayerSerializer
 
     def get_queryset(self):
+        sub_pk = self.kwargs.get('subscription_pk')
+        queryset = Payer.objects.get_queryset()
 
-        queryset = Benefactor.objects.get_queryset()
-
-        beneficiary_pk = self.kwargs.get('person_pk')
-        if beneficiary_pk:
-            queryset = queryset.filter(beneficiary_id=beneficiary_pk)
+        if sub_pk:
+            queryset = queryset.filter(subscription_id=sub_pk)
 
         return queryset
 
@@ -61,7 +59,8 @@ class BenefactorViewSet(RestrictionViewMixin, ModelViewSet):
                     {
                         'detail': 'beneficiary not found'
                     },
-                    status=status.HTTP_404_NOT_FOUND, )
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
         return super().create(request, *args, **kwargs)
 
@@ -93,7 +92,6 @@ class BenefactorPersonListView(RestrictionViewMixin, ListAPIView):
     serializer_class = BenefactorSerializer
 
     def get_queryset(self):
-
         company_only = False
 
         if 'type' in self.request.query_params:

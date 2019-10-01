@@ -84,6 +84,7 @@ api_urls = [
     url(r'^', include('addon.api_urls', 'addon')),
     url(r'^', include('attendance.api_urls', 'attendance')),
     url(r'^', include('mix_boleto.api_urls', 'mix_boleto')),
+    url(r'^', include('payment.api_urls', 'payment')),
     url(r'^', include('installment.api_urls', 'installment')),
     url(r'^', include('kanu_locations.urls', 'city')),
     url(r'^', include('sync.api_urls', 'sync')),
