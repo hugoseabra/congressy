@@ -1,4 +1,4 @@
-from django.forms import ValidationError
+from django.forms import ValidationError, forms
 
 from base import managers
 from payment.models import Payer
@@ -10,6 +10,15 @@ class PayerManager(managers.Manager):
     class Meta:
         model = Payer
         fields = '__all__'
+
+    def clean_benefactor(self):
+        benefactor_id = self.cleaned_data.get('benefactor')
+
+        if self.instance.pk and self.instance.benefactor_id != benefactor_id:
+            raise forms.ValidationError('Você não pode editar autor do'
+                                        ' pagamento.')
+
+        return benefactor_id
 
     def clean(self):
         """

@@ -71,6 +71,14 @@ class BenefactorManager(managers.Manager):
 
         return cnpj
 
+    def clean_beneficiary(self):
+        beneficiary_id = self.cleaned_data.get('beneficiary')
+
+        if self.instance.pk and self.instance.beneficiary_id != beneficiary_id:
+            raise forms.ValidationError('Você não pode editar benfeitor.')
+
+        return beneficiary_id
+
     def clean(self):
         clean_data = super().clean()
         msg = "Este campo é obrigatório."
