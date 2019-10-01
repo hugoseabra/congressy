@@ -1,5 +1,1 @@
-from .benefactor import (
-    BenefactorPersonListView,
-    BenefactorSubscriptionsListView,
-    BenefactorViewSet,
-)
+from .benefactor import BenefactorViewSet
