@@ -57,13 +57,14 @@ class Payer(EntityMixin, models.Model):
     subscription = models.ForeignKey(
         'gatheros_subscription.Subscription',
         on_delete=models.CASCADE,
-        verbose_name='benfeitor',
+        verbose_name='inscrição',
         related_name='payers',
     )
 
     lot = models.ForeignKey(
         'gatheros_subscription.Lot',
         on_delete=models.PROTECT,
+        verbose_name='lote',
         related_name='payers',
         # Making field write once
         editable=False,

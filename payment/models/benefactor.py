@@ -1,6 +1,7 @@
 from django.db import models
 
-from base.models import EntityMixin
+from base.models import EntityMixin, RuleChecker, RuleIntegrityError
+from core.model import track_data
 from core.model.validators import cpf_validator, cnpj_validator
 from core.util.phone import format_phone_number, get_country_code_by_region
 from core.util.string import clear_string
@@ -9,7 +10,26 @@ from gatheros_event.locale.country_choices import get_country_choices
 from gatheros_event.locale.phone_choices import get_phone_choices
 
 
+class BeneficiaryEditionRule(RuleChecker):
+    """
+    Regra: A pessoa da inscrição é a mesma beneficiária do pagador.
+    """
+
+    def check(self, model_instance, *args, **kwargs):
+        is_edition = model_instance.is_new is False
+
+        if is_edition and model_instance.has_changed('beneficiary'):
+            raise RuleIntegrityError(
+                'Você não pode editar o beneficiário.'
+            )
+
+
+@track_data('beneficiary')
 class Benefactor(EntityMixin, models.Model):
+    rule_instances = (
+        BeneficiaryEditionRule,
+    )
+
     class Meta:
         verbose_name = 'benfeitor'
         verbose_name_plural = 'benfeitores'
