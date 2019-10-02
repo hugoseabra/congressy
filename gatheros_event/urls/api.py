@@ -4,7 +4,7 @@ from gatheros_event import viewsets
 
 router = routers.DefaultRouter()
 
-router.register(r'event/peoples',
+router.register(r'peoples',
                 viewsets.PersonViewSet,
                 base_name="person",)
 

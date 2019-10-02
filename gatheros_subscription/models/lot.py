@@ -61,7 +61,7 @@ class RunningLots(models.Manager):
 @track_data('name', 'category_id', 'date_start', 'date_end', 'limit', 'price',
             'tax', 'transfer_tax', 'allow_installment', 'allow_installments',
             'installment_limit', 'num_install_interest_absortion', 'private',
-            'exhibition_code', 'event_survey_id', 'active')
+            'exhibition_code', 'event_id', 'event_survey_id', 'active')
 class Lot(models.Model, GatherosModelMixin, EntityMixin):
     """ Modelo de Lote """
 
@@ -395,6 +395,25 @@ class Lot(models.Model, GatherosModelMixin, EntityMixin):
     def clean(self):
         """ Limpa valores dos campos. """
 
+        if self.is_new() is False:
+            if self.has_changed('event_id') is True:
+                raise ValidationError({'event': [
+                    'Você não pode editar o evento do lote.'
+                ]})
+
+            if self.subscriptions.count() > 0:
+                if self.has_changed('price'):
+                    raise ValidationError({'price': [
+                        'Preço não pode ser alterado após haverem inscrições'
+                        ' no lote.'
+                    ]})
+
+                if self.has_changed('tax'):
+                    raise ValidationError({'tax': [
+                        'Transferência de taxa não pode ser alterada após'
+                        ' haverem inscrições no lote.'
+                    ]})
+
         if self.category and self.category.event_id != self.event_id:
             raise ValidationError({'category': [
                 'A categoria do lote e o lote não estão no mesmo evento.'
@@ -402,6 +421,7 @@ class Lot(models.Model, GatherosModelMixin, EntityMixin):
 
     def check_rules(self):
         """ Verifica regras de negócio. """
+
         if self.private and not self.exhibition_code:
             self.exhibition_code = Lot.objects.generate_exhibition_code()
 

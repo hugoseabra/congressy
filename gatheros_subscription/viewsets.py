@@ -1,5 +1,6 @@
 from datetime import datetime
 from time import sleep
+from typing import Any
 
 from django.db.models import Q
 from django.http import HttpResponse
@@ -11,6 +12,7 @@ from rest_framework.authentication import (
 )
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -298,3 +300,48 @@ class SubscriptionViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
         queryset = super().get_queryset()
         return queryset.filter(event__organization_id__in=org_pks)
+
+    def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+
+        event_id = request.query_params.get('event', None)
+
+        if event_id is None:
+            content = {
+                'errors': ['missing event_id in query', ]
+            }
+
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            event_id = int(event_id)
+        except ValueError:
+            content = {
+                'errors': ["event in query is not int: '{}' ".format(
+                    event_id), ]
+            }
+
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        qs = self.get_queryset()
+        qs = qs.filter(event_id=event_id)
+
+        incompleted = request.query_params.get('incompleted')
+        test_subscription = request.query_params.get('test_subscription')
+
+        if incompleted is None:
+            qs = qs.filter(completed=True)
+        else:
+            qs = qs.filter(completed=False)
+
+        if test_subscription is None:
+            qs = qs.filter(test_subscription=False)
+
+        queryset = self.filter_queryset(qs)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

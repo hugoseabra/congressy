@@ -6,8 +6,8 @@ from rest_framework import routers
 from gatheros_subscription import viewsets, views
 
 router = routers.DefaultRouter()
-router.register(r'lots', viewsets.LotViewSet)
-router.register(r'subscriptions', viewsets.SubscriptionViewSet)
+router.register(r'subscription/lots', viewsets.LotViewSet)
+router.register(r'subscription/subscriptions', viewsets.SubscriptionViewSet)
 
 urls = [
     url(
