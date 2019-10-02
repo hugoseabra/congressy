@@ -11,6 +11,19 @@ router.register(r'payer/benefactors',
                 viewsets.BenefactorViewSet,
                 base_name='benefactor')
 
+router.register(r'payment/transactions',
+                viewsets.TransactionReadOnlyViewSet,
+                base_name="transactions", )
+
+api_single_endpoints = [
+    url(r'^payment/transactions/(?P<pk>[\d]+)/statuses/',
+        viewsets.TransactionStatusListView.as_view(),
+        name='transactions-statuses'),
+    url(r'^payment/checkout/',
+        viewsets.SubscriptionCheckoutView.as_view(),
+        name='checkout'),
+]
+
 public_payment_api_urls = [
     url(
         r'pagarme/postback/'
@@ -22,3 +35,4 @@ public_payment_api_urls = [
 
 urlpatterns = router.urls
 urlpatterns += public_payment_api_urls
+urlpatterns += api_single_endpoints

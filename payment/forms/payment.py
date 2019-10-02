@@ -23,11 +23,21 @@ class PaymentForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
     def clean(self):
-        if self.transaction and self.transaction.paid is False:
-            raise forms.ValidationError(
-                'Transações não pagas não podem ser usadas para serem'
-                ' vinculadas a pagamento.'
-            )
+        cleaned_data = super().clean()
+
+        if self.transaction:
+            if self.transaction.paid is False:
+                raise forms.ValidationError(
+                    'Transações não pagas não podem ser usadas para serem'
+                    ' vinculadas a pagamento.'
+                )
+
+            if self.transaction.subscription_id != self.subscription.pk:
+                raise forms.ValidationError(
+                    'Transação não pertence à inscrição informada.'
+                )
+
+        return cleaned_data
 
     def clean_amount(self):
         amount = self.cleaned_data.get('amount')
@@ -40,7 +50,6 @@ class PaymentForm(forms.ModelForm):
 
     def save(self, commit=True):
         with atomic():
-            self.instance.subscription = self.subscription
             self.instance.transaction = self.transaction
             self.instance.paid = True
 
@@ -84,7 +93,7 @@ class PaymentForm(forms.ModelForm):
 
             # A pendência de inscriçãoe estará com crédito.
             sub_debt = self.subscription.debts.filter(
-                    type=Debt.DEBT_TYPE_SUBSCRIPTION
+                type=Debt.DEBT_TYPE_SUBSCRIPTION
             ).first()
 
             sub_debt.status = Debt.DEBT_STATUS_CREDIT

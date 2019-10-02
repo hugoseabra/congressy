@@ -8,6 +8,9 @@ class SubscriptionCheckoutSerializer(FormSerializerMixin,
                                      serializers.Serializer):
     transaction_id = serializers.SerializerMethodField()
 
+    class Meta:
+        form = SubscriptionCheckoutForm
+
     def to_internal_value(self, data):
         return {
             'transaction_type': data.get('transaction_type'),
@@ -25,9 +28,6 @@ class SubscriptionCheckoutSerializer(FormSerializerMixin,
 
     def create(self, validated_data):
         raise NotImplementedError
-
-    class Meta:
-        form = SubscriptionCheckoutForm
 
     def get_transaction_id(self, obj):
         pass
