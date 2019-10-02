@@ -1,13 +1,10 @@
 from abc import ABCMeta, abstractmethod
-from datetime import timedelta, date, datetime
+from datetime import timedelta, date
 from decimal import Decimal
-from typing import List
-
-from django.utils.formats import localize
 
 from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
-from payment.helpers.postback_url import get_subscription_postback_url
+from payment.helpers.postback_url import get_postback_url
 from payment.pagarme.transaction.billing import Billing
 from payment.pagarme.transaction.customer import Customer
 from payment.pagarme.transaction.item import Item
@@ -82,7 +79,7 @@ class AbstractPagarmeTransactionBuilder:
     def set_postback_url(self, url):
         if self._processed is True:
             raise Exception(
-                'Não é possível dados de postbac url ao builder que já foi'
+                'Não é possível inserir url de postack a um builder que já foi'
                 ' processado.'
             )
 
@@ -226,13 +223,17 @@ class AbstractPagarmeTransactionBuilder:
             total_receivers_amount - round(self.pagarme_transaction.amount, 2)
 
         for receiver in receiver_creator.get_receivers():
-            amount = receiver.amount
+            r_amount = receiver.amount
+
+            if receiver.org_receiver is True:
+                self.liquid_amount = receiver.liquid_amount
+
             if diff != 0 and receiver.congressy_receiver is True:
-                amount -= diff
+                r_amount -= diff
 
             self.pagarme_transaction.add_split_rule(SplitRule(
                 recipient_id=receiver.identifier,
-                amount=round(amount, 2),
+                amount=round(r_amount, 2),
                 liable=receiver.chargeback_responsible,
                 charge_processing_fee=receiver.processing_fee_responsible,
             ))
@@ -250,9 +251,7 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
         super().__init__(*args, **kwargs)
 
         self.set_postback_url(
-            url=get_subscription_postback_url(
-                self.pagarme_transaction.transaction_id
-            )
+            url=get_postback_url(self.pagarme_transaction.transaction_id)
         )
 
         self._set_metadata_items()
@@ -305,38 +304,54 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
                 )
             )
 
-        if self.subscription.category_coupon_id:
-
-            coupon = self.subscription.category_coupon
-            coupon_value = 'Cupom de categoria: {}'.format(coupon.name)
-
-            if coupon.value:
-                if coupon.discount_type == coupon.VALUE:
-                    coupon_value += ' (R$ {})'.format(localize(coupon.value))
-                elif coupon.discount_type == coupon.PERCENT:
-                    coupon_value += ' ({}%)'.format(coupon.value)
-
-            self.pagarme_transaction.add_metadata('Cupom de categoria',
-                                                  coupon_value)
-            self.pagarme_transaction.add_metadata('ID Cupom de categoria',
-                                                  coupon.pk)
+        # if self.subscription.category_coupon_id:
+        #
+        #     coupon = self.subscription.category_coupon
+        #     coupon_value = 'Cupom de categoria: {}'.format(coupon.name)
+        #
+        #     if coupon.value:
+        #         if coupon.discount_type == coupon.VALUE:
+        #             coupon_value += ' (R$ {})'.format(localize(coupon.value))
+        #         elif coupon.discount_type == coupon.PERCENT:
+        #             coupon_value += ' ({}%)'.format(coupon.value)
+        #
+        #     self.pagarme_transaction.add_metadata('Cupom de categoria',
+        #                                           coupon_value)
+        #     self.pagarme_transaction.add_metadata('ID Cupom de categoria',
+        #                                           coupon.pk)
 
     def _get_boleto_instructions(self):
-        instructions = 'Após o vencimento não há garantia de que haverá' \
-                       ' vagas disponíveis. Isso pode mudar o preço de sua' \
-                       ' inscrição.'
+        """ Não pode ultrapassar mais de 255 caracteres """
 
-        # Instrução 2: 97 caracteres
-        instructions += ' IMPORTANTE: após 3 dias de vencimento do' \
-                        ' boleto, sua vaga será liberada para outro' \
-                        ' participante.'
+        # Instrução 1: 86 caracteres
+        instructions1 = 'Após o vencimento não há garantia de vaga disponível' \
+                        ' e o preço pode sofrer alterações.'
 
-        # Instrução 3: 47 caracteres
-        instructions += 'Ev.: {}. Lote: {}. Insc.: {}.'.format(
+        # Instrução 2: 83 caracteres
+        instructions2 = ' 1 dia após o vencimento do boleto, sua vaga será' \
+                        ' liberada para outro participante.'
+
+        # Instrução 3: 30 + 10 + 4 (possivel) + 8 (id da categoria) = 52
+        instructions3 = ' Ev.: {}. Lote: {}. Insc.: {}.'.format(
             self.event.name[:10],
             self.subscription.audience_lot.audience_category_id,
             self.subscription.code,  # 8 caracteres
         )
+
+        num_chars = len(instructions1) \
+                    + len(instructions2) \
+                    + len(instructions3)
+
+        if num_chars > 255:
+            # Só vai acontecer se
+            diff = num_chars - 255
+            # Diminuir a instrução 2
+            instructions2 = instructions2[0:len(instructions2)-diff]
+
+        instructions = instructions1 + instructions2 + instructions3
+
+        assert len(instructions) <= 255, 'boleto_instructions len({})' \
+                                         ''.format(len(instructions))
 
         return instructions
 

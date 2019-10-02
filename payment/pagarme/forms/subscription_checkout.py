@@ -21,6 +21,8 @@ from payment.models import Benefactor, Transaction, Payer
 from payment.pagarme.transaction.builder import SubscriptionTransactionBuilder
 from payment.pagarme.transaction.service import PagarmeAPISubscriptionService
 from payment.pagarme.transaction.transaction import PagarmeTransaction
+from payment_debt.forms import DebtForm
+from payment_debt.models import Debt
 from .mixins import CheckoutValidationForm
 
 LOGGER = logging.getLogger(__name__)
@@ -41,6 +43,13 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
         self.subscription_instance = None
         self.event_instance = None
 
+        self.person = None
+        self.lot_instance = None
+
+        self.subscription_debt_form = None
+        self.product_debt_forms = list()
+        self.service_debt_forms = list()
+
         super().__init__(*args, **kwargs)
 
     def clean_subscription_pk(self):
@@ -57,7 +66,8 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                 pk=subscription_pk,
                 event_id=self.event_instance.pk,
             )
-            self.event_instance = self.subscription_instance.event
+            self.person = self.subscription_instance.person
+            self.lot_instance = self.subscription_instance.lot
 
         except Subscription.DoesNotExist:
             raise forms.ValidationError('Inscrição não existe.')
@@ -84,6 +94,49 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                 raise forms.ValidationError('Possível pagador não existe')
 
         return benefactor_pk
+
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        self.subscription_debt_form = self._create_subscription_debt_form()
+
+        if not self.subscription_debt_form.is_valid():
+            error_msgs = []
+            for field, errs in self.subscription_debt_form.errors.items():
+                error_msgs.append(str(errs))
+
+            raise forms.ValidationError(
+                'Dados de pendência inválidos: {}'.format("".join(error_msgs))
+            )
+
+        self.product_debt_forms = self._create_product_debt_forms()
+
+        for debt_form in self.product_debt_forms:
+            if not debt_form.is_valid():
+                error_msgs = []
+                for field, errs in debt_form.items():
+                    error_msgs.append(str(errs))
+
+                raise forms.ValidationError(
+                    'Dados de pendência de opcionais inválidos:'
+                    ' {}'.format("".join(error_msgs))
+                )
+
+        self.service_debt_forms = self._create_service_debt_forms()
+
+        for debt_form in self.service_debt_forms:
+            if not debt_form.is_valid():
+                error_msgs = []
+                for field, errs in debt_form.items():
+                    error_msgs.append(str(errs))
+
+                raise forms.ValidationError(
+                    'Dados de pendência de atividades extras inválidos:'
+                    ' {}'.format("".join(error_msgs))
+                )
+
+        return cleaned_data
 
     def save(self, *_, **__):
         with atomic():
@@ -325,3 +378,130 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
         else:
             self.payer_is_company = False
             self.payer_instance = self.subscription_instance.person
+
+    def _create_subscription_debt_form(self):
+        """ Cria formulário de pendência financeira de inscrição. """
+
+        debt_kwargs = {
+            'subscription': self.subscription,
+            'data': {
+                'name': 'Inscrição: {} ({})'.format(
+                    self.subscription.event.name,
+                    self.subscription.pk,
+                ),
+                'item_id': str(self.subscription.pk),
+                'amount': self.subscription.lot.get_calculated_price(),
+                'installments': self.cleaned_data.get('installments'),
+                'status': Debt.DEBT_STATUS_DEBT,
+                'type': Debt.DEBT_TYPE_SUBSCRIPTION,
+            }
+        }
+
+        try:
+            debt = self.subscription.debts.get(
+                type=Debt.DEBT_TYPE_SUBSCRIPTION,
+                subscription=self.subscription,
+                status=Debt.DEBT_STATUS_DEBT,
+            )
+
+            debt_kwargs['instance'] = debt
+
+            # # Se é possível processar pendência, somente débito não estiver
+            # # pago e não possuindo crédito.
+            # debt_allowed = debt.paid is False and debt.has_credit is False
+            #
+            # if debt_allowed is False:
+            #     # Pendência financeira já está paga ou com crédito.
+            #     raise DebtAlreadyPaid(
+            #         'Esta pendência já está paga. Não é necessário realizar'
+            #         ' novo registro de pendência.'
+            #     )
+
+        except Debt.DoesNotExist:
+            pass
+
+        return DebtForm(**debt_kwargs)
+
+    def _create_service_debt_forms(self):
+        """ Cria formulário de pendência financeira de atividade extra. """
+
+        services = self.subscription.subscription_services.all()
+
+        service_forms = []
+        for service in services:
+            optional = service.optional
+
+            if not optional.price:
+                continue
+
+            debt_kwargs = {
+                'subscription': self.subscription,
+                'data': {
+                    'name': 'Atividade extra: {} ({})'.format(
+                        optional.name,
+                        optional.pk,
+                    ),
+                    'item_id': str(optional.pk),
+                    'amount': optional.price,
+                    'installments': self.cleaned_data.get('installments'),
+                    'status': Debt.DEBT_STATUS_DEBT,
+                    'type': Debt.DEBT_TYPE_SERVICE,
+                }
+            }
+
+            try:
+                debt = self.subscription.debts.get(
+                    type=Debt.DEBT_TYPE_SERVICE,
+                    item_id=str(optional.pk),
+                )
+
+                debt_kwargs['instance'] = debt
+
+            except Debt.DoesNotExist:
+                pass
+
+            service_forms.append(DebtForm(**debt_kwargs))
+
+        return service_forms
+
+    def _create_product_debt_forms(self):
+        """ Cria formulário de pendência financeira de opcionais. """
+
+        products = self.subscription.subscription_products.all()
+
+        prod_forms = []
+        for product in products:
+            optional = product.optional
+
+            if not optional.price:
+                continue
+
+            debt_kwargs = {
+                'subscription': self.subscription,
+                'data': {
+                    'name': 'Produto/Serviço: {} ({})'.format(
+                        optional.name,
+                        optional.pk,
+                    ),
+                    'item_id': str(optional.pk),
+                    'amount': optional.price,
+                    'installments': self.cleaned_data.get('installments'),
+                    'status': Debt.DEBT_STATUS_DEBT,
+                    'type': Debt.DEBT_TYPE_PRODUCT,
+                }
+            }
+
+            try:
+                debt = self.subscription.debts.get(
+                    type=Debt.DEBT_TYPE_PRODUCT,
+                    item_id=str(optional.pk),
+                )
+
+                debt_kwargs['instance'] = debt
+
+            except Debt.DoesNotExist:
+                pass
+
+            prod_forms.append(DebtForm(**debt_kwargs))
+
+        return prod_forms
