@@ -4,6 +4,7 @@ Inscrições de pessoas em eventos.
 """
 
 import uuid
+from decimal import Decimal
 
 from django.db import models
 from django.db.models import Max
@@ -229,8 +230,45 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
         return self.status == Subscription.CONFIRMED_STATUS
 
     @property
+    def awaiting(self):
+        return self.status == Subscription.AWAITING_STATUS
+
+    @property
     def free(self):
         return self.lot is not None and not self.lot.price
+
+    @property
+    def debts_list(self):
+        return list(self.debts.all().order_by('-paid', 'type'))
+
+    @property
+    def debts_amount(self):
+        amount = Decimal(0)
+        for debt in self.debts_list:
+            amount += debt.amount
+
+        return amount
+
+    @property
+    def debts_liquid_amount(self):
+        amount = Decimal(0)
+        for debt in self.debts_list:
+            amount += debt.liquid_amount
+
+        return amount
+
+    @property
+    def accredited(self):
+        return self.accreditation_checkin is not None
+
+    @property
+    def accredited_on(self):
+        checkin = self.accreditation_checkin
+
+        if not checkin:
+            return None
+
+        return checkin.registration or checkin.created_on
 
     def save(self, *args, **kwargs):
         """ Salva entidade. """
@@ -295,16 +333,3 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
             return None
 
         return checkins.last()
-
-    @property
-    def accredited(self):
-        return self.accreditation_checkin is not None
-
-    @property
-    def accredited_on(self):
-        checkin = self.accreditation_checkin
-
-        if not checkin:
-            return None
-
-        return checkin.registration or checkin.created_on
