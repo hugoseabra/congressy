@@ -13,6 +13,9 @@ CONGRESSY_PERCENT_10_0 = '10.00'
 # @TODO remover. INserido provisionariamente - GYM Brasil
 CONGRESSY_PERCENT_18_5 = '18.50'
 
+# Plano para parceiros de integração.
+CONGRESSY_PERCENT_25_0 = '25.0'
+
 CONGRESSY_PERCENTS = (
     (CONGRESSY_PERCENT_4_99, '4,99%'),
     (CONGRESSY_PERCENT_6_00, '6%'),
@@ -25,4 +28,5 @@ CONGRESSY_PERCENTS = (
     (CONGRESSY_PERCENT_9_5, '9,5%'),
     (CONGRESSY_PERCENT_10_0, '10%'),
     (CONGRESSY_PERCENT_18_5, '18,5%'),
+    (CONGRESSY_PERCENT_25_0, '25,0%'),
 )
