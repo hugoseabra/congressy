@@ -5,8 +5,6 @@ from gatheros_event.models import Person, Event, Organization, Category, Info
 
 
 class PersonSerializer(serializers.ModelSerializer):
-    city = CitySerializer()
-
     class Meta:
         model = Person
         fields = '__all__'
@@ -18,6 +16,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
         fields = (
             'pk',
             'name',
+            'description',
             'description_html',
             'slug',
             'email',

@@ -31,7 +31,9 @@ class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         ]
 
         queryset = super().get_queryset()
-        return queryset.filter(lot_category__event__organization__in=org_pks)
+        return queryset.filter(
+            lot_category__event__organization_id__in=org_pks
+        )
 
 
 class ProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
@@ -52,7 +54,9 @@ class ProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         ]
 
         queryset = super().get_queryset()
-        return queryset.filter(lot_category__event__organization__in=org_pks)
+        return queryset.filter(
+            lot_category__event__organization_id__in=org_pks
+        )
 
 
 class SubscriptionServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
@@ -64,7 +68,9 @@ class SubscriptionServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(subscription=self.kwargs.get('subscription_pk'))
+        return queryset.filter(
+            subscription_id=self.kwargs.get('subscription_pk')
+        )
 
 
 class SubscriptionProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
@@ -76,4 +82,6 @@ class SubscriptionProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(subscription=self.kwargs.get('subscription_pk'))
+        return queryset.filter(
+            subscription_id=self.kwargs.get('subscription_pk')
+        )

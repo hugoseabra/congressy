@@ -22,7 +22,7 @@ def rule_2_nao_pode_mudar_autor(entity):
     Não pode mudar o autor de um convite
     :param entity:
     """
-    if entity.is_new() is False and entity.has_changed('author'):
+    if entity.is_new() is False and entity.has_changed('author_id') is True:
         raise ValidationError({'author': [
             'Não é permitido mudar o autor de um convite.']})
 
@@ -32,7 +32,7 @@ def rule_3_nao_pode_mudar_convidado(entity):
     Não pode mudar o convidado de um convite
     :param entity:
     """
-    if entity.is_new() is False and entity.has_changed('to'):
+    if entity.is_new() is False and entity.has_changed('to_id'):
         raise ValidationError({'to': [
             'Não é permitido mudar o convidado de um convite.']})
 

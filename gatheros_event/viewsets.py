@@ -6,10 +6,33 @@ from rest_framework.authentication import (
 )
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 
-from gatheros_event.models import Organization, Event
-from gatheros_event.serializers import OrganizationSerializer, EventSerializer
+from gatheros_event.models import Organization, Event, Person
+from gatheros_event.serializers import (
+    EventSerializer,
+    OrganizationSerializer,
+    PersonSerializer,
+)
+
+
+class PersonViewSet(ModelViewSet):
+    queryset = Person.objects.all()
+    serializer_class = PersonSerializer
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    authentication_classes = (
+        BasicAuthentication,
+        SessionAuthentication,
+        TokenAuthentication,
+    )
+
+    def list(self, request, *args, **kwargs):
+        content = {
+            'status': 'request is not allowed.'
+        }
+        return Response(content, status=405)
 
 
 class OrganizationReadOnlyViewSet(ReadOnlyModelViewSet):

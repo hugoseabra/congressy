@@ -131,7 +131,7 @@
                                     {% if object.status == object.CONFIRMED_STATUS %}
                                         <div class="float-right"
                                              style="margin-left:10px;margin-top:5px;">
-                                            {% if event.finished is False %}
+                                            {% if event.finished is False and object.origin == object.DEVICE_ORIGIN_HOTSITE %}
                                             <div class="btn-group">
                                                 <button type="button"
                                                         data-toggle="tooltip"
