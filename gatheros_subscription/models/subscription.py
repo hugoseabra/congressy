@@ -239,7 +239,9 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
 
     @property
     def debts_list(self):
-        return list(self.debts.all().order_by('-paid', 'type'))
+        return list(self.debts.exclude(
+            status='debt',
+        ).order_by('type'))
 
     @property
     def debts_amount(self):
@@ -272,13 +274,10 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
 
     def save(self, *args, **kwargs):
         """ Salva entidade. """
-        self.check_rules()
-        self.congressy_percent = self.event.congressy_percent
-        super(Subscription, self).save(*args, **kwargs)
-
-    def clean(self):
-        """ Limpa dados dos campos. """
         self.event = self.lot.event
+        self.congressy_percent = self.event.congressy_percent
+        self.check_rules()
+        super(Subscription, self).save(*args, **kwargs)
 
     def check_rules(self):
         """ Verifica regras de negócios de inscrição """
