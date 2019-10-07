@@ -1529,6 +1529,7 @@ def notify_voucher(subscription):
                 subject='Voucher de Inscrição: {}'.format(event.name),
                 attachment_file_path=voucher_file)
 
+
 # =========================== ORGANIZATION  EMAILS ========================== #
 def notify_invite(organization, link, inviter, invited_person, email):
     """
