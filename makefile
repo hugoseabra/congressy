@@ -30,10 +30,17 @@ broker_debug:
 	ps x --no-header -o pid,cmd | awk '!/awk/&&/celery/{print $$1}' | xargs -r kill;
 	celery -E -A attendance -A mailer -A gatheros_subscription worker --loglevel=INFO;
 
+services:
+	docker-compose -f bin/env/docker-compose_dev.yml ps
 
 logs:
 	docker-compose -f bin/env/docker-compose_dev.yml logs -f
 
+restart_ngrok:
+	docker-compose -f bin/env/docker-compose_dev.yml stop ngrok
+	docker-compose -f bin/env/docker-compose_dev.yml rm ngrok
+	docker-compose -f bin/env/docker-compose_dev.yml up -d
+	docker-compose -f bin/env/docker-compose_dev.yml logs -f ngrok
 
 pgadmin:
 	docker network inspect pg &>/dev/null || docker network create pg;
