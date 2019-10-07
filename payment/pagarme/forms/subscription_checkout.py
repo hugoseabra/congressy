@@ -95,54 +95,21 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
 
         return benefactor_pk
 
-    def clean(self):
-
-        cleaned_data = super().clean()
-
-        self.subscription_debt_form = self._create_subscription_debt_form()
-
-        if not self.subscription_debt_form.is_valid():
-            error_msgs = []
-            for field, errs in self.subscription_debt_form.errors.items():
-                error_msgs.append(str(errs))
-
-            raise forms.ValidationError(
-                'Dados de pendência inválidos: {}'.format("".join(error_msgs))
-            )
-
-        self.product_debt_forms = self._create_product_debt_forms()
-
-        for debt_form in self.product_debt_forms:
-            if not debt_form.is_valid():
-                error_msgs = []
-                for field, errs in debt_form.items():
-                    error_msgs.append(str(errs))
-
-                raise forms.ValidationError(
-                    'Dados de pendência de opcionais inválidos:'
-                    ' {}'.format("".join(error_msgs))
-                )
-
-        self.service_debt_forms = self._create_service_debt_forms()
-
-        for debt_form in self.service_debt_forms:
-            if not debt_form.is_valid():
-                error_msgs = []
-                for field, errs in debt_form.items():
-                    error_msgs.append(str(errs))
-
-                raise forms.ValidationError(
-                    'Dados de pendência de atividades extras inválidos:'
-                    ' {}'.format("".join(error_msgs))
-                )
-
-        return cleaned_data
-
     def save(self, *_, **__):
         with atomic():
-            try:
-                self.subscription_instance.save()
+            self.subscription_instance.save()
 
+            # Novo ou edição de pendência financeira
+            self.subscription_debt_form.save()
+
+            for debt_form in self.service_debt_forms:
+                debt_form.save()
+
+            for debt_form in self.product_debt_forms:
+                debt_form.save()
+
+        with atomic():
+            try:
                 interests_amount = self.cleaned_data.get('interests_amount')
                 amount_to_transact = self.amount_to_transact
 
@@ -210,7 +177,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                     try:
                         transaction = \
                             self.subscription_instance.transactions.get(
-                                amount=amount_to_transact,
+                                amount=amount_to_transact + interests_amount,
                                 liquid_amount=self.liquid_amount,
                                 audience_lot_id=audience_lot_id,
                                 type=Transaction.CREDIT_CARD,
@@ -322,32 +289,53 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
             )
 
     def _set_amount_to_transact(self):
-        if not self.installment_part_instance:
-            return
 
-        part_amount = self.installment_part_instance.original_amount
-        part_liquid_amount = \
-            self.installment_part_instance.liquid_amount
+        self.subscription_debt_form = self._create_subscription_debt_form()
 
-        if part_amount:
-            self.amount_to_transact = part_amount
-            self.liquid_amount = part_liquid_amount
+        if not self.subscription_debt_form.is_valid():
+            error_msgs = []
+            for field, errs in self.subscription_debt_form.errors.items():
+                error_msgs.append(str(errs))
 
-        else:
-            # O valor a transacionar é referente ao balance_amount negativo
-            self.amount_to_transact = \
-                -self.subscription_instance.balance_amount
-            self.liquid_amount = \
-                -self.subscription_instance.balance_liquid_amount
-
-        if round(self.amount_to_transact, 2) < round(part_amount, 2):
-            forms.ValidationError(
-                'Valor a ser pago é menor do que o valor devido para a parcela'
-                ' em aberto: {} < {}.'.format(
-                    self.amount_to_transact,
-                    round(part_amount, 2),
-                )
+            raise forms.ValidationError(
+                'Dados de pendência inválidos: {}'.format("".join(error_msgs))
             )
+
+        self.amount_to_transact = \
+            self.subscription_instance.lot.get_liquid_price()
+        self.liquid_amount = self.subscription_instance.lot.get_liquid_price()
+
+        self.product_debt_forms = self._create_product_debt_forms()
+
+        for debt_form in self.product_debt_forms:
+            if not debt_form.is_valid():
+                error_msgs = []
+                for field, errs in debt_form.items():
+                    error_msgs.append(str(errs))
+
+                raise forms.ValidationError(
+                    'Dados de pendência de opcionais inválidos:'
+                    ' {}'.format("".join(error_msgs))
+                )
+
+            self.amount_to_transact += debt_form.cleaned_data.get('amount')
+            self.liquid_amount += debt_form.cleaned_data.get('liquid_amount')
+
+        self.service_debt_forms = self._create_service_debt_forms()
+
+        for debt_form in self.service_debt_forms:
+            if not debt_form.is_valid():
+                error_msgs = []
+                for field, errs in debt_form.items():
+                    error_msgs.append(str(errs))
+
+                raise forms.ValidationError(
+                    'Dados de pendência de atividades extras inválidos:'
+                    ' {}'.format("".join(error_msgs))
+                )
+
+            self.amount_to_transact += debt_form.cleaned_data.get('amount')
+            self.liquid_amount += debt_form.cleaned_data.get('liquid_amount')
 
     def _create_builder_instance(self, payer, is_company, liquid_amount):
         # Construção de dados para transação do Pagarme
@@ -369,12 +357,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
 
         if self.benefactor_instance:
             self.payer_instance = self.benefactor_instance
-
-            if self.benefactor_instance.is_company:
-                self.payer_is_company = True
-            else:
-                self.payer_is_company = False
-
+            self.payer_is_company = self.benefactor_instance.is_company
         else:
             self.payer_is_company = False
             self.payer_instance = self.subscription_instance.person
@@ -383,24 +366,24 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
         """ Cria formulário de pendência financeira de inscrição. """
 
         debt_kwargs = {
-            'subscription': self.subscription,
+            'subscription': self.subscription_instance,
             'data': {
                 'name': 'Inscrição: {} ({})'.format(
-                    self.subscription.event.name,
-                    self.subscription.pk,
+                    self.subscription_instance.event.name,
+                    self.subscription_instance.pk,
                 ),
-                'item_id': str(self.subscription.pk),
-                'amount': self.subscription.lot.get_calculated_price(),
-                'installments': self.cleaned_data.get('installments'),
+                'item_id': str(self.subscription_instance.pk),
+                'amount': self.subscription_instance.lot.get_calculated_price(),
+                'installments': self.cleaned_data.get('num_installments'),
                 'status': Debt.DEBT_STATUS_DEBT,
                 'type': Debt.DEBT_TYPE_SUBSCRIPTION,
             }
         }
 
         try:
-            debt = self.subscription.debts.get(
+            debt = self.subscription_instance.debts.get(
                 type=Debt.DEBT_TYPE_SUBSCRIPTION,
-                subscription=self.subscription,
+                subscription=self.subscription_instance,
                 status=Debt.DEBT_STATUS_DEBT,
             )
 
@@ -425,7 +408,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
     def _create_service_debt_forms(self):
         """ Cria formulário de pendência financeira de atividade extra. """
 
-        services = self.subscription.subscription_services.all()
+        services = self.subscription_instance.subscription_services.all()
 
         service_forms = []
         for service in services:
@@ -435,7 +418,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                 continue
 
             debt_kwargs = {
-                'subscription': self.subscription,
+                'subscription': self.subscription_instance,
                 'data': {
                     'name': 'Atividade extra: {} ({})'.format(
                         optional.name,
@@ -443,14 +426,14 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                     ),
                     'item_id': str(optional.pk),
                     'amount': optional.price,
-                    'installments': self.cleaned_data.get('installments'),
+                    'installments': self.cleaned_data.get('num_installments'),
                     'status': Debt.DEBT_STATUS_DEBT,
                     'type': Debt.DEBT_TYPE_SERVICE,
                 }
             }
 
             try:
-                debt = self.subscription.debts.get(
+                debt = self.subscription_instance.debts.get(
                     type=Debt.DEBT_TYPE_SERVICE,
                     item_id=str(optional.pk),
                 )
@@ -467,7 +450,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
     def _create_product_debt_forms(self):
         """ Cria formulário de pendência financeira de opcionais. """
 
-        products = self.subscription.subscription_products.all()
+        products = self.subscription_instance.subscription_products.all()
 
         prod_forms = []
         for product in products:
@@ -477,7 +460,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                 continue
 
             debt_kwargs = {
-                'subscription': self.subscription,
+                'subscription': self.subscription_instance,
                 'data': {
                     'name': 'Produto/Serviço: {} ({})'.format(
                         optional.name,
@@ -485,14 +468,14 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                     ),
                     'item_id': str(optional.pk),
                     'amount': optional.price,
-                    'installments': self.cleaned_data.get('installments'),
+                    'installments': self.cleaned_data.get('num_installments'),
                     'status': Debt.DEBT_STATUS_DEBT,
                     'type': Debt.DEBT_TYPE_PRODUCT,
                 }
             }
 
             try:
-                debt = self.subscription.debts.get(
+                debt = self.subscription_instance.debts.get(
                     type=Debt.DEBT_TYPE_PRODUCT,
                     item_id=str(optional.pk),
                 )

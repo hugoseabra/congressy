@@ -3,8 +3,8 @@
     "model": "sites.site",
     "pk": 1,
     "fields": {
-      "domain": "0.0.0.0:8000",
-      "name": "0.0.0.0:8000"
+      "domain": "localhost:8000",
+      "name": "localhost:8000"
     }
   }
 ]

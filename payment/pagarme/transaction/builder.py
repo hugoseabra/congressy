@@ -44,7 +44,7 @@ class AbstractPagarmeTransactionBuilder:
         )
         self.pagarme_transaction.add_metadata(
             'transferência de taxa',
-            1 if self.event.transfer_tax is True else 0
+            1 if self.lot.transfer_tax is True else 0
         )
 
         # organização
@@ -242,8 +242,8 @@ class AbstractPagarmeTransactionBuilder:
 class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
     def __init__(self, subscription: Subscription, *args, **kwargs):
         self.subscription = subscription
-        self.audience_lot = subscription.audience_lot
-        self.audience_category = self.audience_lot.audience_category
+        self.lot = subscription.lot
+        self.category = self.lot.category if self.lot.category_id else None
         self.person = subscription.person
 
         kwargs['event'] = subscription.event
@@ -269,16 +269,16 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
         # sobre inscrição
         self.pagarme_transaction.add_metadata(
             'inscrição categoria',
-            self.audience_category.name
+            self.category.name
         )
         self.pagarme_transaction.add_metadata(
             'ID categoria',
-            self.audience_category.pk
+            self.category.pk
         )
 
         self.pagarme_transaction.add_metadata(
             'ID lote',
-            self.audience_lot.pk
+            self.lot.pk
         )
 
         self.pagarme_transaction.add_metadata('ID inscrição',
@@ -362,7 +362,7 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
             return None
 
         # Pagarme sets to one day before, so we set one day forward.
-        next_day = self.audience_lot.date_end + timedelta(days=1)
+        next_day = self.lot.date_end + timedelta(days=1)
         return next_day.date()
 
     def _add_items(self):
@@ -379,19 +379,17 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
         if self.installment_part is not None:
             total_amount = self.installment_part.amount
 
-        else:
-            total_amount = -self.subscription.balance_amount
-
-        if not total_amount:
-            raise Exception('Não há valor a transacionar no builder.')
-
-        if total_amount < debts_amount:
             perc = (total_amount * 100) / debts_amount
 
             self.pagarme_transaction.add_metadata(
                 'valor pago proporcional',
                 '{}%'.format(round(perc, 2))
             )
+        else:
+            total_amount = debts_amount
+
+        if not total_amount:
+            raise Exception('Não há valor a transacionar no builder.')
 
         for debt in self.subscription.debts_list:
             # Pagamento é parcial ao montante total a pagar.
