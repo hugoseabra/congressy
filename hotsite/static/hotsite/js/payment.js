@@ -122,6 +122,8 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
 
                 if (free_rate_installments) {
                     params['freeInstallments'] = parseInt(free_rate_installments);
+                } else {
+                    params['freeInstallments'] = 1;
                 }
             }
 
