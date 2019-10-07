@@ -13,14 +13,15 @@ class SubscriptionCheckoutSerializer(FormSerializerMixin,
 
     def to_internal_value(self, data):
         return {
+            'event_pk': data.get('event'),
             'transaction_type': data.get('transaction_type'),
-            'installments': data.get('installments'),
-            'installment_part': data.get('installment_part'),
-            'amount': data.get('amount'),
+            'num_installments': data.get('num_installments'),
+            'installment_part_pk': data.get('installment_part'),
+            'interests_amount': data.get('interests_amount'),
+            'boleto_expiration_date': data.get('boleto_expiration_date'),
             'card_hash': data.get('card_hash'),
-            'subscription': data.get('subscription'),
-            'selected_lot': data.get('selected_lot'),
-            'benefactor': data.get('benefactor'),
+            'subscription_pk': data.get('subscription'),
+            'benefactor_pk': data.get('benefactor'),
         }
 
     def update(self, instance, validated_data):
