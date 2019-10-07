@@ -1,11 +1,12 @@
-import absoluteuri
+from typing import Any
 
+import absoluteuri
 from django.urls import reverse
-from kanu_locations.models import City
 from rest_framework import serializers
 
 from gatheros_event.models import Person, Event
 from gatheros_subscription.models import Subscription, Lot
+from kanu_locations.models import City
 
 
 class SerializerDinamicField(serializers.Field):
@@ -160,29 +161,32 @@ class SubscriptionSerializer(serializers.BaseSerializer):
             'tag_group': obj.tag_group,
             'category_name': None,
             'institution': None,
-            'link': absoluteuri.build_absolute_uri(reverse(
+            'link': absoluteuri.reverse(
                 'subscription:subscription-view', kwargs={
                     'event_pk': obj.event.pk,
                     'pk': obj.pk,
                 }
-            )),
+            ),
             'edit_link': None,
             'voucher_link': None,
+            'debts_amount': obj.debts_amount,
         }
 
         if obj.confirmed:
-            rep['voucher_link'] = absoluteuri.build_absolute_uri(reverse(
+            rep['voucher_link'] = absoluteuri.reverse(
                 'subscription:subscription-voucher', kwargs={
                     'event_pk': obj.event.pk,
                     'pk': obj.pk,
-                })),
+                }
+            ),
 
         if obj.event.allow_internal_subscription:
-            rep['edit_link'] = absoluteuri.build_absolute_uri(reverse(
+            rep['edit_link'] = absoluteuri.reverse(
                 'subscription:subscription-edit', kwargs={
                     'event_pk': obj.event.pk,
                     'pk': obj.pk,
-                })),
+                }
+            )
 
         if obj.lot.category:
             rep['category_name'] = obj.lot.category.name
@@ -197,8 +201,7 @@ class SubscriptionSerializer(serializers.BaseSerializer):
         return rep
 
 
-class SubscriptionModelSerializer(SubscriptionSerializer,
-                                  serializers.ModelSerializer):
+class SubscriptionModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = [
@@ -206,25 +209,29 @@ class SubscriptionModelSerializer(SubscriptionSerializer,
             'person',
             'lot',
             'completed',
+            'test_subscription',
+            'accredited',
+            'accredited_on',
+            'created_by',
+            'origin',
         ]
 
     def to_representation(self, obj):
         rep = {
             'pk': obj.pk,
-            'person_pk': obj.person.pk,
-            'person_name': obj.person.name,
-            'person_email': obj.person.email,
-            'person_cpf': obj.person.cpf,
-            'person_city': None,
-            'person_uf': None,
-            'person_phone': obj.person.phone,
-            'person_city_international': obj.person.city_international,
-            'person_international_doc': obj.person.international_doc,
+            'name': obj.person.name,
+            'email': obj.person.email,
+            'person': obj.person_id,
             'origin': obj.origin,
             'code': obj.code,
+            'event': obj.event_id,
+            'event_slug': obj.event.slug,
+            'category': None,
+            'category_name': None,
+            'lot': obj.lot_id,
+            'lot_name': obj.lot.name,
             'accredited': obj.accredited,
             'accredited_on': obj.accredited_on,
-            'lot_name': obj.lot.name,
             'event_count': obj.event_count,
             'completed': obj.test_subscription,
             'notified': obj.test_subscription,
@@ -233,16 +240,8 @@ class SubscriptionModelSerializer(SubscriptionSerializer,
             'created': obj.created,
             'tag_info': obj.tag_info,
             'tag_group': obj.tag_group,
-            'category_name': None,
-            'institution': None,
-            'link': absoluteuri.build_absolute_uri(reverse(
-                'subscription:subscription-view', kwargs={
-                    'event_pk': obj.event.pk,
-                    'pk': obj.pk,
-                }
-            )),
-            'edit_link': None,
             'voucher_link': None,
+            'debts_amount': obj.debts_amount,
         }
 
         if obj.confirmed:
@@ -252,14 +251,8 @@ class SubscriptionModelSerializer(SubscriptionSerializer,
                     'pk': obj.pk,
                 })),
 
-        if obj.lot.category:
+        if obj.lot.category_id:
+            rep['category'] = obj.lot.category_id
             rep['category_name'] = obj.lot.category.name
-
-        if obj.person.city:
-            rep['person_city'] = obj.person.city.name
-            rep['person_uf'] = obj.person.city.uf
-
-        if obj.person.institution:
-            rep['institution'] = obj.person.institution
 
         return rep
