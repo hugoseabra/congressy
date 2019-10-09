@@ -123,7 +123,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                 )
 
                 transaction_type = self.cleaned_data['transaction_type']
-                audience_lot_id = self.subscription_instance.audience_lot_id
+                lot_id = self.subscription_instance.lot_id
 
                 if transaction_type == Transaction.BOLETO:
 
@@ -143,7 +143,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                         transaction_filter = {
                             'amount': amount_to_transact,
                             'liquid_amount': self.liquid_amount,
-                            'audience_lot_id': audience_lot_id,
+                            'lot_id': lot_id,
                             'type': Transaction.BOLETO,
                             'status': Transaction.WAITING_PAYMENT,
                             'admin_cancelled': False,
@@ -179,7 +179,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                             self.subscription_instance.transactions.get(
                                 amount=amount_to_transact + interests_amount,
                                 liquid_amount=self.liquid_amount,
-                                audience_lot_id=audience_lot_id,
+                                audience_lot_id=lot_id,
                                 type=Transaction.CREDIT_CARD,
                                 status=Transaction.PROCESSING,
                                 admin_cancelled=False,
@@ -365,6 +365,8 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
     def _create_subscription_debt_form(self):
         """ Cria formulário de pendência financeira de inscrição. """
 
+        price = self.subscription_instance.lot.get_calculated_price()
+
         debt_kwargs = {
             'subscription': self.subscription_instance,
             'data': {
@@ -373,7 +375,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                     self.subscription_instance.pk,
                 ),
                 'item_id': str(self.subscription_instance.pk),
-                'amount': self.subscription_instance.lot.get_calculated_price(),
+                'amount': price,
                 'installments': self.cleaned_data.get('num_installments'),
                 'status': Debt.DEBT_STATUS_DEBT,
                 'type': Debt.DEBT_TYPE_SUBSCRIPTION,
