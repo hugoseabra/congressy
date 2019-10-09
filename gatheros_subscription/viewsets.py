@@ -57,6 +57,61 @@ class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         queryset = super().get_queryset()
         return queryset.filter(event__organization__in=org_pks)
 
+    def list(self, request, *args, **kwargs):
+        event_pk = request.query_params.get('event_id', None)
+
+        if event_pk is None:
+            content = {
+                'errors': ['missing event_id in query', ]
+            }
+
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            event_pk = int(event_pk)
+        except ValueError:
+            content = {
+                'errors': [
+                    "event_id in query is not int: '{}' ".format(event_pk),
+                ]
+            }
+
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        queryset = self.get_queryset()
+        queryset = queryset.filter(event_id=event_pk)
+
+        page = self.paginate_queryset(self.filter_queryset(queryset))
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+
+        exhibition_code = self.request.query_params.get('exhibition_code',
+                                                        None)
+
+        show_inactive = self.request.query_params.get('show_inactive', None)
+
+        if show_inactive is None \
+                or (show_inactive != '1' and show_inactive != 'true'):
+            queryset = queryset.filter(active=True)
+
+        if exhibition_code:
+            exhibition_qs = queryset.filter(
+                exhibition_code=exhibition_code,
+                private=True,
+            )
+            queryset = exhibition_qs | queryset.filter(private=False, )
+        else:
+            queryset = queryset.filter(private=False, )
+
+        return queryset
+
     def check_permissions(self, request):
         """
         Check if the request should be permitted.
@@ -307,7 +362,7 @@ class SubscriptionViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
         if event_id is None:
             content = {
-                'errors': ['missing event_id in query', ]
+                'errors': ['missing event in query string', ]
             }
 
             return Response(content, status=status.HTTP_400_BAD_REQUEST)

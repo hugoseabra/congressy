@@ -137,7 +137,7 @@ function publishLot(lot_id) {
         return;
     }
     var data = {'active': true};
-    save_lot('/api/lots/' + lot_id + '/', data, 'Lote publicado com sucesso!');
+    save_lot('/api/subscription/lots/' + lot_id + '/', data, 'Lote publicado com sucesso!');
 
 }
 
@@ -148,7 +148,7 @@ function unpublishLot(lot_id) {
         return;
     }
     var data = {'active': false};
-    save_lot('/api/lots/' + lot_id + '/', data, 'Lote despublicado com sucesso!');
+    save_lot('/api/subscription/lots/' + lot_id + '/', data, 'Lote despublicado com sucesso!');
 
 }
 
@@ -177,7 +177,7 @@ function save_survey() {
     }
 
     save_lot(
-        '/api/lots/' + lot_id + '/',
+        '/api/subscription/lots/' + lot_id + '/',
         {'event_survey': survey_id},
         'Formulário vinculado ao lote com sucesso!'
     );
@@ -199,7 +199,7 @@ function save_limit() {
     limit = (limit) ? parseInt(limit) : 0;
 
     save_lot(
-        '/api/lots/' + lot_id + '/',
+        '/api/subscription/lots/' + lot_id + '/',
         {'limit': limit},
         'Limite de vagas configurado com sucesso!'
     );
@@ -241,7 +241,7 @@ function save_privacy() {
     }
 
     save_lot(
-        '/api/lots/' + lot_id + '/',
+        '/api/subscription/lots/' + lot_id + '/',
         {
             'private': is_private,
             'exhibition_code': code

@@ -30,9 +30,22 @@ class PersonViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         content = {
-            'status': 'request is not allowed.'
+            'detail': 'request is not allowed.'
         }
         return Response(content, status=405)
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+
+        user = self.request.user
+        person = user.person if hasattr(user, 'person') else None
+        person_pk = self.kwargs.get('pk')
+
+        if not person or str(person.pk) != person_pk:
+            self.permission_denied(
+                request,
+                message='Permissão negada'
+            )
 
 
 class OrganizationReadOnlyViewSet(ReadOnlyModelViewSet):
@@ -101,7 +114,6 @@ class EventReadOnlyViewSet(ReadOnlyModelViewSet):
     def list(self, request, *args, **kwargs):
 
         org_pks = list()
-        event_pks = list()
 
         if hasattr(request.user, 'person'):
             for m in request.user.person.members.filter(active=True):
