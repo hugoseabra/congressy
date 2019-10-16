@@ -8,6 +8,14 @@ router = routers.DefaultRouter()
 
 router.register(r'addon/optionals/services', viewsets.ServiceViewSet)
 router.register(r'addon/optionals/products', viewsets.ProductViewSet)
+router.register(
+    r'addon/subscriptions/(?P<subscription_pk>[0-9A-Fa-f-]+)/services',
+    viewsets.SubscriptionServiceViewSet
+)
+router.register(
+    r'addon/subscriptions/(?P<subscription_pk>[0-9A-Fa-f-]+)/products',
+    viewsets.SubscriptionProductViewSet
+)
 
 router.register(
     r'addon/subscriptions/(?P<subscription_pk>[0-9A-Fa-f-]+)'
