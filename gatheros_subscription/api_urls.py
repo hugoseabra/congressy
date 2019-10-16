@@ -6,8 +6,15 @@ from rest_framework import routers
 from gatheros_subscription import viewsets, views
 
 router = routers.DefaultRouter()
-router.register(r'subscription/lots', viewsets.LotViewSet)
-router.register(r'subscription/subscriptions', viewsets.SubscriptionViewSet)
+router.register('subscription/lots', viewsets.LotViewSet)
+router.register('subscription/subscriptions', viewsets.SubscriptionViewSet)
+router.register('survey/surveys', viewsets.EventSurveyViewSet)
+router.register('survey/questions', viewsets.QuestionViewSet)
+
+# router.register(
+#     'subscription/surveys/{survey_pk}/questions',
+#     viewsets.QuestionViewSet
+# )
 
 urls = [
     url(
@@ -28,6 +35,14 @@ subs_urls = [
 
 ]
 
+survey_urls = [
+    url(
+        r'^survey/surveys/(?P<survey_pk>[\d]+)/questions',
+        viewsets.QuestionViewSet.as_view({'get': 'list'}),
+        name='survey'
+    ),
+]
+
 single_endpoints = [url(r'^events/(?P<event_pk>[\d]+)/lots/', include(urls))]
 sub_single_endpoints = [
     url(r'^events/(?P<event_pk>[\d]+)/subsriptions/', include(subs_urls)),
@@ -38,3 +53,4 @@ sub_single_endpoints = [
 urlpatterns = router.urls
 urlpatterns += single_endpoints
 urlpatterns += sub_single_endpoints
+urlpatterns += survey_urls
