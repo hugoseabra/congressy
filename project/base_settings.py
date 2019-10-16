@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'core',
     'base',
     'frontend',
+    'buzzlead',
 ]
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
 LANGUAGE_CODE = 'pt-br'
@@ -371,3 +372,6 @@ CONGRESSY_INSTALLMENT_INTERESTS_RATE = 2.29
 
 # Valor minimo para cada parcela
 CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS = 10
+
+# ============================ BUZZLEAD ===================================== #
+BUZZLEAD_MANAGER_EMAIL = 'cto@buzzlead.com.br'

@@ -26,6 +26,11 @@
             });
         });
     </script>
+
+    {% if event.buzzlead_campaign and event.buzzlead_campaign.enabled is True %}
+
+    {% include 'buzzlead/buzzlead-tracker.html' %}
+    {% endif %}
 {% endblock %}
 {% block content %}
 
