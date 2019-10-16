@@ -1,0 +1,9 @@
+{% load static %}
+{% if event.buzzlead_campaign and event.buzzlead_campaign.enabled is True %}
+<script>window.campaignId = '{{ event.buzzlead_campaign.campaign_id }}';</script>
+{% if not debug %}
+<script src="https://app.buzzlead.com.br/widget-v2.js"></script>
+{% else %}
+<script src="https://test.buzzlead.com.br/widget-v2.js"></script>
+{% endif %}
+{% endif %}
