@@ -1,3 +1,5 @@
+{% load static %}
+
 <!-- DESCRIPTION
 ================================= -->
 <section id="about" class="about-section section">
@@ -7,11 +9,23 @@
         <h2 class="section-heading text-center">Sobre o evento</h2>
 
         <div class="about-row row">
-            {% if info.image_main.default %}
+            {% if info.image_main.default or event.buzzlead_campaigns.count and event.buzzlead_campaigns.first.enabled %}
                 <!-- DESCRIPTION IMAGE -->
                 <div class="about-image col-md-6" data-animation="fadeIn">
+                    {% if info.image_main.default %}
+                    <div>
                     <img src="{{ info.image_main.default.url }}" alt=""
                          class="img-responsive">
+                    </div>
+                    {% endif %}
+                    {% if event.buzzlead_campaigns.count and event.buzzlead_campaigns.first.enabled %}
+                    <div style="margin-top: 5px">
+                    <a href="{% url 'public:hotsite-buzzlead-referral' event.slug %}">
+                        <img src="{% static 'hotsite/images/indique-evento-congressy.png' %}" alt="" class="img-responsive">
+                    </a>
+                    </div>
+                    {% endif %}
+
                 </div>
 
                 <!-- DESCRIPTION TEXT -->
