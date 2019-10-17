@@ -375,3 +375,6 @@ CONGRESSY_MINIMUM_AMOUNT_FOR_INSTALLMENTS = 10
 
 # ============================ BUZZLEAD ===================================== #
 BUZZLEAD_MANAGER_EMAIL = 'cto@buzzlead.com.br'
+BUZZLEAD_API_BASE_URL = 'https://test.buzzlead.com.br/api'
+BUZZLEAD_API_KEY = 'buzzleadkey-SDFLKJAWEROI342'
+BUZZLEAD_INTEGRATION_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.Imh1Z29AY29uZ3Jlc3N5LmNvbSI.WEj-q83H9lQXX8eGi63kqHOFWrou6kRWMSSkFD7Svo8'

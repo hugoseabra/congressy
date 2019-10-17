@@ -1,0 +1,45 @@
+{% extends 'hotsite/base.html' %}
+{% load static base_tags humanize l10n %}
+
+{% block scripts %}
+    {% include 'buzzlead/buzzlead-referral.html' %}
+{% endblock %}
+{% block content %}
+
+    {% include 'hotsite/includes/2_cover_no_form.html' %}
+
+    <!-- FORM
+    ================================= -->
+    <section id="owner" class="footer-section section tooltip-wrapper">
+        <h2 class="section-heading text-center">RECEBA BÔNUS POR INDICAÇÃO</h2>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div id="buzzlead-root"></div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-left">
+                        <h4 class="title"> Regulamento </h4>
+                        {{ event.buzzlead_campaigns.first.terms|safe }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="text-right cgsy-footer footer-wrapper text-muted"
+                         style="font-size:12px;color:lightgrey">
+                        {% include "base/footer.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div style="display:none">
+        <form action="" method="post" id="force-coupon-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="force-coupon">
+        </form>
+    </div>
+{% endblock %}
