@@ -40,9 +40,9 @@ class BaseResource(object):
         }
         return self.transporter.request(
             method,
-            self.get_uri(),
+            uri=self.get_uri(),
             headers=headers,
-            **kwargs,
+            **kwargs
         )
 
     def _translate_endpoint(self):

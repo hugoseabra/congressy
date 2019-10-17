@@ -1,8 +1,7 @@
-{% load static %}
-{% if event.buzzlead_campaign and event.buzzlead_campaign.enabled is True %}
+{% if event.buzzlead_campaigns.count and event.buzzlead_campaigns.first.enabled is True %}
 {% if not debug %}
-    <script src="https://app.buzzlead.com.br/tracker.js"></script>
+<script src="https://app.buzzlead.com.br/tracker.js"></script>
 {% else %}
-    <script src="https://test.buzzlead.com.br/tracker.js"></script>
+<script src="https://test.buzzlead.com.br/tracker.js"></script>
 {% endif %}
 {% endif %}

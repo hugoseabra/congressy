@@ -1,8 +1,8 @@
-{% if event.buzzlead_campaign and event.buzzlead_campaign.enabled is True %}
+{% if event.buzzlead_campaigns.count and event.buzzlead_campaigns.first.enabled is True %}
 <script>
 	window.Tracker({
 		_event : "bonus",
-		campaignId: "{{ event.buzzlead_campaign.campaign_id }}",
+		campaignId: "{{ event.buzzlead_campaigns.first.campaign_id }}",
 		total  : {% if subscription.lot.price %}"{{ subscription.lot.get_calculated_price }}"{% else %}null{% endif %},
 		numeroPedido : "{{ subscription.code }}",
 		cliente: {

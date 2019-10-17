@@ -1,8 +1,9 @@
-from .base import CreateResource
+from .base import BaseResource
 
 
-class Bonus(CreateResource):
-    endpoint = '/service/{email_user}/bonus/{order_id}/{status}'
+class Bonus(BaseResource):
+    endpoint = '/service/{email_user}/bonus/status/{order_id}/{status}'
 
-    def create(self, data):
-        return self.request(method='POST', data=data)
+    def confirm(self):
+        self.context_data['status'] = 'confirmado'
+        return self.request(method='POST')

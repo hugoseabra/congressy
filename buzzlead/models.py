@@ -17,11 +17,10 @@ class BuzzLeadCampaign(models.Model, EntityMixin):
         verbose_name_plural = 'campanhas buzzlead'
         ordering = ('event__name', 'event__date_start', 'pk')
 
-    event = models.OneToOneField(
+    event = models.ForeignKey(
         'gatheros_event.Event',
         on_delete=models.CASCADE,
-        primary_key=True,
-        related_name='buzzlead_campaign',
+        related_name='buzzlead_campaigns',
         verbose_name='evento'
     )
 
@@ -64,9 +63,17 @@ class BuzzLeadCampaign(models.Model, EntityMixin):
         null=False,
         blank=False,
     )
+    terms = models.TextField(
+        verbose_name='regulamento de indicação',
+        help_text="Regulamento do evento de indicação, feito pelo organizador."
+                  " A BuzzLead em si possui outros critérios de uso.",
+        null=True,
+        blank=True,
+    )
 
     active = models.BooleanField(default=False, verbose_name='ativo')
     paid = models.BooleanField(default=False, verbose_name='pago')
+    confirmed = models.BooleanField(default=False, verbose_name='confirmado')
 
     created = models.DateTimeField(auto_now_add=True,
                                    verbose_name='criado em')
@@ -79,7 +86,10 @@ class BuzzLeadCampaign(models.Model, EntityMixin):
 
     @property
     def enabled(self):
-        return self.active is True and self.paid is True and self.campaign_id
+        return self.campaign_id \
+               and self.active is True \
+               and self.paid is True \
+               and self.confirmed is True
 
     def __str__(self):
         return self.event.name + ' - ' + self.campaign_id
