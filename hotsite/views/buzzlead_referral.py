@@ -21,12 +21,12 @@ class BuzzLeadReferralView(SubscriptionMixin, TemplateView):
         event = self.current_event.event
         subscription = self.current_subscription.subscription
 
-        if subscription.completed is False:
-            messages.warning(
-                request,
-                "Página restrita a participantes."
-            )
-            return redirect('public:hotsite', slug=event.slug)
+        # if subscription.completed is False:
+        #     messages.warning(
+        #         request,
+        #         "Página restrita a participantes."
+        #     )
+        #     return redirect('public:hotsite', slug=event.slug)
 
         if not event.buzzlead_campaigns.count():
             messages.warning(
