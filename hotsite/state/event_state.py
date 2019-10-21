@@ -10,6 +10,7 @@ class CurrentEventState(object):
         self.organization = event.organization
 
         self.custom_service_tag = self._get_custom_script_tags()
+        self.buzzlead_campaign = self._get_buzzlead_campaign()
         self.info = self._get_info()
         self.form_config = self._get_form_config()
         self.period = event.get_period()
@@ -39,10 +40,18 @@ class CurrentEventState(object):
 
     def _get_custom_script_tags(self):
         if hasattr(self.event, 'custom_service_tag') and \
-                        self.event.custom_service_tag is not None:
+                self.event.custom_service_tag is not None:
             return self.event.custom_service_tag
 
         return CustomServiceTag(event=self.event)
+
+    def _get_buzzlead_campaign(self):
+        if not self.event.buzzlead_campaigns.count():
+            return False
+
+        buzzlead_campaign = self.event.buzzlead_campaigns.first()
+
+        return buzzlead_campaign
 
     def is_lot_running(self, lot):
         status = self.get_lot_status(lot)
