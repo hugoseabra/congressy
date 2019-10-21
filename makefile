@@ -1,11 +1,3 @@
-
-broker_kill:
-	ps x --no-header -o pid,cmd | awk '!/awk/&&/celery/{print $$1}' | xargs -r kill;
-
-
-clean:
-	sudo rm -rf /tmp/exporter
-
 up: broker_kill
 	mkdir -p /tmp/bkp;
 	sudo cp bin/env/extension_installer.sh /tmp/bkp/;
@@ -28,6 +20,14 @@ broker_create: broker_kill
 
 broker_debug: broker_kill
 	celery -E -A attendance -A mailer -A gatheros_subscription -A buzzlead worker --loglevel=INFO;
+
+
+broker_kill:
+	ps x --no-header -o pid,cmd | awk '!/awk/&&/celery/{print $$1}' | xargs -r kill;
+
+
+clean:
+	sudo rm -rf /tmp/exporter
 
 
 logs:

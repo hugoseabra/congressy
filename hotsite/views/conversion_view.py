@@ -17,6 +17,7 @@ class SubscriptionDoneView(SubscriptionFormMixin, generic.TemplateView):
         self.subscription = None
         self.next_url = None
         self.conversion_script = None
+        self.buzzlead_campaign = None
 
         super().__init__(**initkwargs)
 
@@ -27,6 +28,7 @@ class SubscriptionDoneView(SubscriptionFormMixin, generic.TemplateView):
         self.subscription = self.current_subscription.subscription
         self.conversion_script = \
             self.current_event.custom_service_tag.conversion_script
+        self.buzzlead_campaign = self.current_event.buzzlead_campaign
 
     def dispatch(self, request, *args, **kwargs):
 
@@ -55,8 +57,12 @@ class SubscriptionDoneView(SubscriptionFormMixin, generic.TemplateView):
         if not conversion_id:
             return redirect('public:hotsite', slug=slug)
 
+        buzzlead_enabled = \
+            self.buzzlead_campaign and self.buzzlead_campaign.enabled
+        has_convertion = self.conversion_script is not None or buzzlead_enabled
+
         if self.current_subscription.has_transactions():
-            if self.conversion_script:
+            if buzzlead_enabled or has_convertion:
                 self.next_url = reverse(
                     'public:hotsite-subscription-status',
                     kwargs={'slug': slug}
@@ -69,7 +75,7 @@ class SubscriptionDoneView(SubscriptionFormMixin, generic.TemplateView):
                 )
 
         else:
-            if self.conversion_script:
+            if buzzlead_enabled or has_convertion:
                 self.next_url = reverse(
                     'public:hotsite',
                     kwargs={'slug': slug}
