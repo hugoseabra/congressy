@@ -178,7 +178,7 @@ def postback_url_view(request, uidb64):
                     confirm_bonus(
                         token=buzzlead_campaign.campaign_owner_token,
                         email_campaign_owner=buzzlead_campaign.signature_email,
-                        order_id=buzzlead_campaign.campaign_id,
+                        order_id=subscription.code,
                     )
 
         # ==================================================================
