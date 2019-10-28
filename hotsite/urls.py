@@ -18,6 +18,11 @@ public_hotsite_urls = [
         name='hotsite-live-stream'
     ),
     url(
+        r'^(?P<slug>[\w-]+)/indique/$',
+        views.BuzzLeadReferralView.as_view(),
+        name='hotsite-buzzlead-referral'
+    ),
+    url(
         r'^(?P<slug>[\w-]+)/subscription/(?P<subscription_pk>[0-9A-Fa-f-]+)/optionals/$',
         views.OptionalWizardView.as_view(OPTIONAL_FORMS),
         name='hotsite-subscription-optionals'

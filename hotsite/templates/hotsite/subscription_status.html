@@ -26,6 +26,9 @@
             });
         });
     </script>
+
+    {% include 'buzzlead/buzzlead-referral.html' %}
+
 {% endblock %}
 {% block content %}
 
@@ -82,10 +85,30 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-12">
-                <div class="text-right cgsy-footer footer-wrapper text-muted"
-                     style="font-size:12px;color:lightgrey">
-                    {% include "base/footer.html" %}
+            {% if event.buzzlead_campaigns.count and event.buzzlead_campaigns.first.enabled is True %}
+            <hr />
+            <div class="row">
+                <h3  class="section-heading text-center">RECEBA BÔNUS POR INDICAÇÃO</h3>
+                <div class="col-md-{% if event.buzzlead_campaigns.first.terms %}6{% else %}12{% endif %}">
+                    <div id="buzzlead-root"></div>
+                    <div class="clearfix"></div>
+                </div>
+                {% if event.buzzlead_campaigns.first.terms %}
+                <div class="col-md-6">
+                    <div class="text-left">
+                        <h4 class="title"> Regulamento </h4>
+                        {{ event.buzzlead_campaigns.first.terms|safe }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="text-right cgsy-footer footer-wrapper text-muted"
+                         style="font-size:12px;color:lightgrey">
+                        {% include "base/footer.html" %}
+                    </div>
                 </div>
             </div>
         </div>

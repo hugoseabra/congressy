@@ -10,6 +10,7 @@ from django.http import (
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from buzzlead.services import confirm_bonus
 from core.helpers import sentry_log
 from payment.email_notifications import PaymentNotification
 from payment.forms import PaymentForm
@@ -111,6 +112,8 @@ def postback_url_view(request, uidb64):
             transaction_value=transaction.amount,
         )
 
+        event = subscription.event
+
         total_debt = Decimal(0)
         existing_amount = Decimal(0)
 
@@ -167,6 +170,16 @@ def postback_url_view(request, uidb64):
 
                 # por agora, não vamos vincular pagamento a nada.
                 payment_form.save()
+
+            if event.buzzlead_campaigns.count():
+                buzzlead_campaign = event.buzzlead_campaigns.first()
+
+                if buzzlead_campaign.enabled is True:
+                    confirm_bonus(
+                        token=buzzlead_campaign.campaign_owner_token,
+                        email_campaign_owner=buzzlead_campaign.signature_email,
+                        order_id=subscription.code,
+                    )
 
         # ==================================================================
         # Registra inscrição como notificada.

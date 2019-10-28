@@ -209,6 +209,15 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
         help_text="Observações Gerais"
     )
 
+    buzzlead_campaign = models.ForeignKey(
+        'buzzlead.BuzzLeadCampaign',
+        verbose_name='campanha buzzlead',
+        related_name='subscriptions',
+        null=True,
+        blank=True,
+        editable=False
+    )
+
     objects = SubscriptionManager()
 
     class Meta:
