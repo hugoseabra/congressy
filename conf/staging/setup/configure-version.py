@@ -22,6 +22,7 @@ env_dict = {
     'BUILD': read_file('/code/build_number'),
     'BUILD_LINK': read_file('/code/build_link'),
     'AUTHOR': read_file('/code/build_author'),
+    'AUTHOR_AVATAR': read_file('/code/build_author_avatar'),
 }
 
 setup(

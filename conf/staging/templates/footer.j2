@@ -1,1 +1,4 @@
-v{{ APP_VERSION }}RC - <a href="{{ BUILD_LINK }}" target="_blank">build #{{ BUILD }}</a>, por {{ AUTHOR }}
+ v{{ APP_VERSION }}RC - <a href="{{ BUILD_LINK }}" target="_blank">build #{{ BUILD }}</a>, por {{ AUTHOR }}
+ {% if AUTHOR_AVATAR %}
+ <img class="img-circle" style="width:25px;height:25px;border:50%" src="{{ AUTHOR_AVATAR }}" />
+ {% endif %}
