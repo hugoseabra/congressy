@@ -92,15 +92,13 @@ depends_on:
   - infra
 
 trigger:
-  status:
-    # Only runs if the first pipeline was fully successful
-    - success
-
-trigger:
   branch:
     - hotfix/*
     - bugfix/*
     - feature/*
+  status:
+    # Only runs if the first pipeline was fully successful
+    - success
 
 # Custom definition for cloning, adding tags and depth
 clone:
