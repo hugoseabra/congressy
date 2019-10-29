@@ -18,7 +18,7 @@ trigger:
   branch:
     - hotfix/*
     - bugfix/*
-    - feature/*
+    - release/*
 
 steps:
   - name: create-tmp-dirs
@@ -95,7 +95,7 @@ trigger:
   branch:
     - hotfix/*
     - bugfix/*
-    - feature/*
+    - release/*
   status:
     # Only runs if the first pipeline was fully successful
     - success
