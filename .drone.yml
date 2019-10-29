@@ -9,18 +9,22 @@
 #=============================================================================#
 kind: pipeline
 type: exec
-name: infra
+name: infra-staging
+
+clone:
+  disable: true
+
+trigger:
+  branch:
+    - hotfix/*
+    - bugfix/*
+    - feature/*
 
 steps:
   - name: create-tmp-dirs
     commands:
       - mkdir -p /tmp/bkp
       - mkdir -p /tmp/staging-files
-    when:
-      branch:
-        - hotfix/*
-        - bugfix/*
-        - feature/*
   - name: save-staging-version
     commands:
       - basename ${DRONE_COMMIT_BRANCH} > /tmp/staging-files/version
@@ -28,11 +32,6 @@ steps:
       - echo "${DRONE_COMMIT_AUTHOR_NAME}" > /tmp/staging-files/build_author
       - echo "${DRONE_COMMIT_AUTHOR_AVATAR}" > /tmp/staging-files/build_author_avatar
       - echo "${DRONE_BUILD_LINK}" > /tmp/staging-files/build_link
-    when:
-      branch:
-        - hotfix/*
-        - bugfix/*
-        - feature/*
   - name: create-staging-env-file
     environment:
       AWS_KEY:
@@ -79,11 +78,6 @@ steps:
       - echo "RABBITMQ_USER=cgsy" >> /tmp/staging-files/env-manage-staging
       - echo "RABBITMQ_PASS=cgsy" >> /tmp/staging-files/env-manage-staging
       - echo "RABBITMQ_SERVER=rabbitmq" >> /tmp/staging-files/env-manage-staging
-    when:
-      branch:
-        - hotfix/*
-        - bugfix/*
-        - feature/*
 
 #=============================================================================#
 # STAGING
@@ -101,6 +95,12 @@ trigger:
   status:
     # Only runs if the first pipeline was fully successful
     - success
+
+trigger:
+  branch:
+    - hotfix/*
+    - bugfix/*
+    - feature/*
 
 # Custom definition for cloning, adding tags and depth
 clone:
@@ -125,11 +125,6 @@ steps:
       - cp /tmp/staging-files/build_author .
       - cp /tmp/staging-files/build_author_avatar .
       - cp /tmp/staging-files/build_link .
-    when:
-      branch:
-        - hotfix/*
-        - bugfix/*
-        - feature/*
   - name: backup-db-staging
     image: postgres:9.6-alpine
     pull: if-not-exists
@@ -151,11 +146,6 @@ steps:
         path: /etc/localtime
     commands:
       - ./bin/env/staging/01_backup-db-staging.sh
-    when:
-      branch:
-        - hotfix/*
-        - bugfix/*
-        - feature/*
 
   - name: recreate-staging-db
     image: tmaier/docker-compose
@@ -193,9 +183,6 @@ steps:
         docker build --rm \
           -t cgsy-staging \
           -f ./conf/staging/Dockerfile .
-    when:
-      branch:
-        - feature/drone-v1
 
   - name: deploy-staging
     image: tmaier/docker-compose
@@ -212,11 +199,6 @@ steps:
     commands:
       - sh ./bin/env/staging/03_start-cgsy-staging.sh
       - docker system prune -a -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
-    when:
-      branch:
-        - hotfix/*
-        - bugfix/*
-        - feature/*
 
   - name: notify-staging-on-telegram
     image: appleboy/drone-telegram
@@ -258,10 +240,6 @@ steps:
       status:
         - success
         - failure
-      branch:
-        - hotfix/*
-        - bugfix/*
-        - feature/*
 
 volumes:
   - name: main_cache
