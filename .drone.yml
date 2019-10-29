@@ -89,7 +89,7 @@ name: staging
 
 depends_on:
   # Must run after the first pipeline
-  - infra
+  - infra-staging
 
 trigger:
   branch:
