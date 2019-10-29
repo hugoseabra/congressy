@@ -125,6 +125,11 @@ steps:
       - cp /tmp/staging-files/build_author .
       - cp /tmp/staging-files/build_author_avatar .
       - cp /tmp/staging-files/build_link .
+    when:
+      branch:
+        - hotfix/*
+        - bugfix/*
+        - feature/*
   - name: backup-db-staging
     image: postgres:9.6-alpine
     pull: if-not-exists
@@ -253,11 +258,10 @@ steps:
       status:
         - success
         - failure
-      when:
-        branch:
-          - hotfix/*
-          - bugfix/*
-          - feature/*
+      branch:
+        - hotfix/*
+        - bugfix/*
+        - feature/*
 
 volumes:
   - name: main_cache
