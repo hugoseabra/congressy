@@ -55,7 +55,8 @@ class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         ]
 
         queryset = super().get_queryset()
-        return queryset.filter(event__organization__in=org_pks)
+        queryset = queryset.filter(event__organization__in=org_pks)
+        return queryset.order_by('name')
 
     def list(self, request, *args, **kwargs):
         event_pk = request.query_params.get('event', None)
