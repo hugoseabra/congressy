@@ -97,11 +97,6 @@ class SubscriptionProduct(AbstractSubscriptionOptional):
 
     get_optional_name.short_description = 'Produto'
 
-    def get_theme(self):
-        return self.optional.theme.name
-
-    get_theme.short_description = 'Áreas Temáticas'
-
 
 @track_data('optional_id', 'subscription_id')
 class SubscriptionService(AbstractSubscriptionOptional):

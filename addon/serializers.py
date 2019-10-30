@@ -7,6 +7,8 @@ from django.core.files.base import ContentFile
 from rest_framework import serializers
 
 from addon import models
+from addon.services import SubscriptionServiceService
+from core.serializers import FormSerializerMixin
 from gatheros_subscription.models import LotCategory
 
 
@@ -148,7 +150,9 @@ class ServiceSerializer(serializers.ModelSerializer):
         return ret
 
 
-class SubscriptionServiceSerializer(serializers.ModelSerializer):
+class SubscriptionServiceSerializer(FormSerializerMixin,
+                                    serializers.ModelSerializer):
     class Meta:
+        form = SubscriptionServiceService
         model = models.SubscriptionService
         fields = ('subscription', 'optional',)

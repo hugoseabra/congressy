@@ -1,5 +1,3 @@
-from typing import Any
-
 from rest_framework import viewsets, status
 from rest_framework.authentication import (
     BasicAuthentication,
@@ -126,7 +124,7 @@ class ProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class SubscriptionServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+class SubscriptionServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet ):
     """
          Essa view é responsavel por retornar
     """
