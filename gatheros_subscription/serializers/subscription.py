@@ -126,3 +126,89 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
             }
 
         return rep
+
+
+class SubscriptionBillingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = [
+            'lot',
+        ]
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+
+        lot = instance.lot
+        amounts = list()
+
+        rep['lot_data'] = {
+            'pk': lot.pk,
+            'name': lot.name,
+            'event': lot.event_id,
+            'price': lot.get_calculated_price(),
+        }
+        amounts.append(lot.get_calculated_price())
+
+        if lot.category_id:
+            rep['lot_data'].update({
+                'category': lot.category_id,
+                'category_data': {
+                    'pk': lot.category_id,
+                    'name': lot.category.name,
+                    'description': lot.category.description,
+                }
+            })
+
+        addon_products = instance.subscription_products.all()
+
+        if addon_products.count():
+            rep['addon_products'] = list()
+            for addon_sub in addon_products:
+                optional = addon_sub.optional
+                rep['addon_products'].append({
+                    'pk': optional.pk,
+                    'name': optional.name,
+                    'published': optional.published,
+                    'date_end_sub':
+                        optional.date_end_sub.strftime('%Y-%m-%d %Hh%m'),
+                    'banner': optional.banner.url if optional.banner else None,
+                    'lot_category': optional.lot_category_id,
+                    "optional_type": 1,
+                    "optional_type_data": {
+                        "name": optional.optional_type.name,
+                        "id": optional.optional_type_id,
+                    },
+                    'price': optional.price,
+                })
+                amounts.append(optional.price)
+
+        addon_services = instance.subscription_services.all()
+
+        if addon_services.count():
+            rep['addon_services'] = list()
+            for addon_sub in addon_services:
+                optional = addon_sub.optional
+                rep['addon_services'].append({
+                    'pk': optional.pk,
+                    'name': optional.name,
+                    'date_start':
+                        optional.schedule_start.strftime('%Y-%m-%d %Hh%m'),
+                    'date_end':
+                        optional.schedule_end.strftime('%Y-%m-%d %Hh%m'),
+                    'date_end_sub':
+                        optional.date_end_sub.strftime('%Y-%m-%d %Hh%m'),
+                    'published': optional.published,
+                    'banner': optional.banner.url if optional.banner else None,
+                    'lot_category': optional.lot_category_id,
+                    "optional_type": 1,
+                    "optional_type_data": {
+                        "name": optional.optional_type.name,
+                        "id": optional.optional_type_id,
+                    },
+                    'price': optional.price,
+                })
+                amounts.append(optional.price)
+
+            rep['total_amount'] = sum(amounts)
+
+        return rep

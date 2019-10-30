@@ -5,11 +5,18 @@ from typing import Any
 from django.db.models import Q
 from django.http import HttpResponse
 from rest_framework import viewsets, generics, pagination, status, permissions
+from rest_framework.authentication import (
+    BasicAuthentication,
+    SessionAuthentication,
+    TokenAuthentication,
+)
 from rest_framework.exceptions import APIException
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet
 
 from core.util.string import clear_string
 from gatheros_event.models import Event
@@ -21,6 +28,8 @@ from gatheros_subscription.serializers import (
     SubscriptionSerializer,
     SubscriptionModelSerializer,
 )
+from gatheros_subscription.serializers.subscription import \
+    SubscriptionBillingSerializer
 from gatheros_subscription.tasks import async_subscription_exporter_task
 from .mixins import RestrictionViewMixin
 
@@ -292,3 +301,67 @@ class SubscriptionViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        """ Só se cria person vinculado ao usuário. """
+        person_pk = request.data.get('person')
+        lot_pk = request.data.get('lot')
+
+        serializer = self.get_serializer(data=request.data)
+        is_new = True
+
+        if person_pk:
+            try:
+                instance = Subscription.objects.get(person_id=person_pk)
+                self.check_object_permissions(self.request, instance)
+
+                if instance.lot_id != int(lot_pk):
+                    content = {
+                        'detail': [
+                            'Esta pessoa já está inscrita neste evento e'
+                            ' você está tentando alterar o lote por este'
+                            ' método. Isso não é possível.'
+                        ]
+                    }
+                    return Response(content, status=status.HTTP_403_FORBIDDEN)
+
+                serializer = self.get_serializer(instance=instance,
+                                                 data=request.data,
+                                                 partial=True, )
+                is_new = False
+
+            except Subscription.DoesNotExist:
+                pass
+
+        serializer.is_valid(raise_exception=True)
+
+        if is_new:
+            self.perform_create(serializer)
+            resp_status = status.HTTP_201_CREATED
+        else:
+            self.perform_update(serializer)
+            resp_status = status.HTTP_200_OK
+
+            if getattr(serializer.instance, '_prefetched_objects_cache', None):
+                # If 'prefetch_related' has been applied to a queryset,
+                # we need forcibly invalidate the prefetch cache on the
+                # instance.
+                serializer.instance._prefetched_objects_cache = {}
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data,
+                        status=resp_status,
+                        headers=headers)
+
+
+class SubscriptionBillingViewSet(GenericViewSet, RetrieveModelMixin):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionBillingSerializer
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    authentication_classes = (
+        BasicAuthentication,
+        SessionAuthentication,
+        TokenAuthentication,
+    )
