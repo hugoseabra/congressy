@@ -25,16 +25,8 @@ class TransactionReadOnlyViewSet(RestrictionViewMixin, ReadOnlyModelViewSet):
             for m in user.person.members.filter(active=True)
         ]
 
-    def get_queryset(self):
-        # Fetch transactions for user in request
-        user_transactions = self.get_user_transactions()
-
-        # Fetch transactions for subscriptions in the user in the requests
-        # organization
-        organizations_transactions = self.get_organizations_transactions()
-
-        # Merging querysets
-        qs = user_transactions | organizations_transactions
+    def filter_queryset(self, queryset):
+        qs = super().filter_queryset(queryset)
 
         if 'event' in self.request.query_params:
             event_pk = self.request.query_params.get('event')
@@ -50,7 +42,20 @@ class TransactionReadOnlyViewSet(RestrictionViewMixin, ReadOnlyModelViewSet):
                     subscription_id=subscription_pk,
                 )
 
-        return qs.order_by("date_created")
+        return qs
+
+    def get_queryset(self):
+        # Fetch transactions for user in request
+        user_transactions = self.get_user_transactions()
+
+        # Fetch transactions for subscriptions in the user in the requests
+        # organization
+        organizations_transactions = self.get_organizations_transactions()
+
+        # Merging querysets
+        qs = user_transactions | organizations_transactions
+
+        return qs
 
     def get_user_transactions(self):
         return Transaction.objects.filter(
@@ -61,6 +66,34 @@ class TransactionReadOnlyViewSet(RestrictionViewMixin, ReadOnlyModelViewSet):
         return Transaction.objects.filter(
             subscription__event__organization_id__in=self.get_organizer_pks(),
         )
+
+    def list(self, request, *args, **kwargs):
+
+        required_query_stings = ['subscription', 'event']
+
+        allowed = False
+
+        for query_param in required_query_stings:
+            if query_param in self.request.query_params:
+                allowed = True
+
+        if allowed is False:
+            content = {
+                'errors': ['missing event or subscription in query string', ]
+            }
+
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        qs = self.get_queryset()
+        qs = self.filter_queryset(qs.order_by("date_created"))
+
+        page = self.paginate_queryset(qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
 
 
 class TransactionStatusListView(RestrictionViewMixin, ListAPIView):
