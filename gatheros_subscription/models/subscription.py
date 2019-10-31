@@ -7,7 +7,7 @@ import uuid
 from decimal import Decimal
 
 from django.db import models
-from django.db.models import Max
+from django.db.models import Max, Sum
 from django.utils.functional import cached_property
 
 from base.models import EntityMixin
@@ -249,24 +249,20 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
     @property
     def debts_list(self):
         return list(self.debts.exclude(
-            status='debt',
+            status='paid',
         ).order_by('type'))
 
     @property
     def debts_amount(self):
-        amount = Decimal(0)
-        for debt in self.debts_list:
-            amount += debt.amount
-
-        return amount
+        debts_amount = self.debts.aggregate(total=Sum('amount'))
+        return debts_amount['total'] or Decimal(0)
 
     @property
     def debts_liquid_amount(self):
-        amount = Decimal(0)
-        for debt in self.debts_list:
-            amount += debt.liquid_amount
-
-        return amount
+        debts_amount = self.debts.aggregate(
+            total=Sum('liquid_amount')
+        )
+        return debts_amount['total'] or Decimal(0)
 
     @property
     def accredited(self):
