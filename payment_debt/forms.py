@@ -70,6 +70,7 @@ class DebtForm(forms.ModelForm):
 
     def save(self, commit=True):
         self.instance.subscription = self.subscription
+        self.instance.amount = self.amount
         self.instance.liquid_amount = self.liquid_amount
         self.instance.installment_amount = self.installment_amount
         self.instance.installment_interests_amount = \
@@ -86,7 +87,7 @@ class DebtForm(forms.ModelForm):
                 optional_id=self.cleaned_data.get('item_id')
         ):
             self.liquid_amount += sub_addon.optional.liquid_price
-            self.original_amount += sub_addon.optional.price
+            self.amount += sub_addon.optional.price
 
     def _set_product_amounts(self):
         """
@@ -97,10 +98,7 @@ class DebtForm(forms.ModelForm):
                 optional_id=self.cleaned_data.get('item_id')
         ):
             self.liquid_amount += sub_addon.optional.liquid_price
-            self.original_amount += sub_addon.optional.price
-
-        self.liquid_amount = round(self.liquid_amount, 2)
-        self.original_amount = round(self.original_amount, 2)
+            self.amount += sub_addon.optional.price
 
     def _set_installments_amount(self):
         """ Seta montante por parcela. """
