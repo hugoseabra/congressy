@@ -2,6 +2,7 @@ from django import forms
 from django.utils.translation import gettext as _
 
 from base import managers
+from gatheros_event.models import Person
 from payment.models import Benefactor
 
 
@@ -72,12 +73,17 @@ class BenefactorManager(managers.Manager):
         return cnpj
 
     def clean_beneficiary(self):
-        beneficiary_id = self.cleaned_data.get('beneficiary')
+        beneficiary = self.cleaned_data.get('beneficiary')
+
+        if isinstance(beneficiary, Person):
+            beneficiary_id = beneficiary.pk
+        else:
+            beneficiary_id = beneficiary
 
         if self.instance.pk and self.instance.beneficiary_id != beneficiary_id:
             raise forms.ValidationError('Você não pode editar benfeitor.')
 
-        return beneficiary_id
+        return beneficiary
 
     def clean(self):
         clean_data = super().clean()

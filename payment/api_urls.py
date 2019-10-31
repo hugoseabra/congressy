@@ -16,7 +16,7 @@ router.register(r'payment/transactions',
                 base_name="transactions", )
 
 api_single_endpoints = [
-    url(r'^payment/transactions/(?P<pk>[\d]+)/statuses/',
+    url(r'^payment/transactions/(?P<pk>[0-9A-Za-z_\-]+)/statuses/',
         viewsets.TransactionStatusListView.as_view(),
         name='transactions-statuses'),
     url(r'^payment/checkout/',
