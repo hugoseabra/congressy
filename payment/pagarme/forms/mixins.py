@@ -186,7 +186,7 @@ class CheckoutValidationForm(forms.Form):
             customer_data['phones'] = [clear_string(
                 payer.get_phone_display(),
                 exclude_list=['+'],
-            )],
+            )]
 
         if is_company:
             if payer.country.lower() == 'br':

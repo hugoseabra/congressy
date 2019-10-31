@@ -108,160 +108,158 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
             for debt_form in self.product_debt_forms:
                 debt_form.save()
 
-        with atomic():
-            try:
-                interests_amount = self.cleaned_data.get('interests_amount')
-                amount_to_transact = self.amount_to_transact
+        try:
+            interests_amount = self.cleaned_data.get('interests_amount')
+            amount_to_transact = self.amount_to_transact
 
-                if interests_amount and interests_amount > 0:
-                    amount_to_transact += interests_amount
+            if interests_amount and interests_amount > 0:
+                amount_to_transact += interests_amount
 
-                builder = self._create_builder(
-                    payer=self.payer_instance,
-                    liquid_amount=self.liquid_amount,
-                    is_company=self.payer_is_company,
-                )
+            builder = self._create_builder(
+                payer=self.payer_instance,
+                liquid_amount=self.liquid_amount,
+                is_company=self.payer_is_company,
+            )
 
-                transaction_type = self.cleaned_data['transaction_type']
-                lot_id = self.subscription_instance.lot_id
+            transaction_type = self.cleaned_data['transaction_type']
+            lot_id = self.subscription_instance.lot_id
 
-                if transaction_type == Transaction.BOLETO:
+            if transaction_type == Transaction.BOLETO:
+
+                if self.installment_part_instance:
+                    exp_date = \
+                        self.installment_part_instance.expiration_date
+
+                else:
+                    exp_date = \
+                        self.cleaned_data.get('boleto_expiration_date') or None
+
+                builder.set_as_boleto(expiration_date=exp_date)
+
+                # Se existe boleto aberta com o mesmo valor.
+                try:
+                    transaction_filter = {
+                        'amount': amount_to_transact,
+                        'liquid_amount': self.liquid_amount,
+                        'lot_id': lot_id,
+                        'type': Transaction.BOLETO,
+                        'status': Transaction.WAITING_PAYMENT,
+                        # 'admin_cancelled': False,
+                    }
 
                     if self.installment_part_instance:
-                        exp_date = \
-                            self.installment_part_instance.expiration_date
+                        transaction_filter['part_id'] = \
+                            self.installment_part_instance.pk
 
-                    else:
-                        exp_date = \
-                            self.cleaned_data.get(
-                                'boleto_expiration_date') or None
+                    if isinstance(self.payer_instance, Benefactor):
+                        transaction_filter['payer__benefactor_id'] = \
+                            self.payer_instance.pk
+                        transaction_filter['payer__subscription_id'] = \
+                            self.subscription_instance.pk
 
-                    builder.set_as_boleto(expiration_date=exp_date)
+                    transaction = \
+                        self.subscription_instance.transactions.get(
+                            **transaction_filter
+                        )
 
-                    # Se existe boleto aberta com o mesmo valor.
-                    try:
-                        transaction_filter = {
-                            'amount': amount_to_transact,
-                            'liquid_amount': self.liquid_amount,
-                            'lot_id': lot_id,
-                            'type': Transaction.BOLETO,
-                            'status': Transaction.WAITING_PAYMENT,
-                            'admin_cancelled': False,
-                        }
+                    return transaction
 
-                        if self.installment_part_instance:
-                            transaction_filter['part_id'] = \
-                                self.installment_part_instance.pk
+                except ObjectDoesNotExist:
+                    pass
 
-                        if isinstance(self.payer_instance, Benefactor):
-                            transaction_filter['payer__benefactor_id'] = \
-                                self.payer_instance.pk
-                            transaction_filter['payer__subscription_id'] = \
-                                self.subscription_instance.pk
+            elif transaction_type == Transaction.CREDIT_CARD:
 
-                        transaction = \
-                            self.subscription_instance.transactions.get(
-                                **transaction_filter
-                            )
+                builder.set_as_credit_card(self.cleaned_data['card_hash'])
 
-                        return transaction
+                # Se existe par aberta com o mesmo valor.
+                try:
+                    transaction = \
+                        self.subscription_instance.transactions.get(
+                            amount=amount_to_transact + interests_amount,
+                            liquid_amount=self.liquid_amount,
+                            lot_id=lot_id,
+                            type=Transaction.CREDIT_CARD,
+                            status=Transaction.PROCESSING,
+                            # admin_cancelled=False,
+                        )
 
-                    except ObjectDoesNotExist:
-                        pass
+                    return transaction
 
-                elif transaction_type == Transaction.CREDIT_CARD:
+                except ObjectDoesNotExist:
+                    pass
 
-                    builder.set_as_credit_card(self.cleaned_data['card_hash'])
+            builder.build()
 
-                    # Se existe par aberta com o mesmo valor.
-                    try:
-                        transaction = \
-                            self.subscription_instance.transactions.get(
-                                amount=amount_to_transact + interests_amount,
-                                liquid_amount=self.liquid_amount,
-                                audience_lot_id=lot_id,
-                                type=Transaction.CREDIT_CARD,
-                                status=Transaction.PROCESSING,
-                                admin_cancelled=False,
-                            )
+            # Cria transação.
+            pagarme_service = PagarmeAPISubscriptionService(
+                pagarme_transaction=builder.pagarme_transaction,
+                subscription=self.subscription_instance,
+            )
 
-                        return transaction
+            transaction = pagarme_service.create_transaction(
+                num_installment_part=self.cleaned_data.get(
+                    'installment_part',
+                    1
+                ),
+                installment_interests_amount=self.cleaned_data.get(
+                    'interests_amount'
+                ),
+                contract_part=self.installment_part_instance,
+            )
 
-                    except ObjectDoesNotExist:
-                        pass
-
-                builder.build()
-
-                # Cria transação.
-                pagarme_service = PagarmeAPISubscriptionService(
-                    pagarme_transaction=builder.transaction,
+            if self.benefactor_instance:
+                Payer.objects.create(
                     subscription=self.subscription_instance,
+                    benefactor=self.benefactor_instance,
+                    transaction=transaction,
                 )
 
-                transaction = pagarme_service.create_transaction(
-                    num_installment_part=self.cleaned_data.get(
-                        'installment_part',
-                        1
+            return transaction
+
+        except TransactionDataError as e:
+            LOGGER.error(
+                'Um erro aconteceu enquanto se tentava construir os dados'
+                ' de uma transação. Detalhes: {}'.format(e)
+            )
+            raise TransactionError(
+                'Erro interno ao realizar transação. A equipe técnica já'
+                ' foi informada e este erro será resolvido dentro de'
+                ' alguns minutos.'
+            )
+
+        except TransactionMisconfiguredError as e:
+            person = self.subscription_instance.person
+
+            LOGGER.warning(
+                'O evento "{}" não pode realizar transações não pode'
+                ' completar uma transação para a inscrição "{}".'
+                ' Detalhes: {}'.format(
+                    '{} ({})'.format(
+                        self.event_instance.name,
+                        self.event_instance.pk,
                     ),
-                    installment_interests_amount=self.cleaned_data.get(
-                        'interests_amount'
+                    '{} ({})'.format(
+                        person.name,
+                        self.subscription_instance.pk,
                     ),
-                    contract_part=self.installment_part_instance,
+                    str(e)
                 )
+            )
+            raise TransactionError(
+                'O evento não pode realizar transações. Por favor,'
+                ' entre em contato com o organizador do evento informando'
+                ' sobre o ocorrido.'
+            )
 
-                if self.benefactor_instance:
-                    Payer.objects.create(
-                        subscription=self.subscription_instance,
-                        benefactor=self.benefactor_instance,
-                        transaction=transaction,
-                    )
+        except TransactionApiError as e:
+            LOGGER.error(
+                'Um erro aconteceu enquanto se tentava realizar uma'
+                ' transação. Detalhes: {}'.format(e)
+            )
+            raise TransactionError(str(e))
 
-                return transaction
-
-            except TransactionDataError as e:
-                LOGGER.error(
-                    'Um erro aconteceu enquanto se tentava construir os dados'
-                    ' de uma transação. Detalhes: {}'.format(e)
-                )
-                raise TransactionError(
-                    'Erro interno ao realizar transação. A equipe técnica já'
-                    ' foi informada e este erro será resolvido dentro de'
-                    ' alguns minutos.'
-                )
-
-            except TransactionMisconfiguredError as e:
-                person = self.subscription_instance.person
-
-                LOGGER.warning(
-                    'O evento "{}" não pode realizar transações não pode'
-                    ' completar uma transação para a inscrição "{}".'
-                    ' Detalhes: {}'.format(
-                        '{} ({})'.format(
-                            self.event_instance.name,
-                            self.event_instance.pk,
-                        ),
-                        '{} ({})'.format(
-                            person.name,
-                            self.subscription_instance.pk,
-                        ),
-                        str(e)
-                    )
-                )
-                raise TransactionError(
-                    'O evento não pode realizar transações. Por favor,'
-                    ' entre em contato com o organizador do evento informando'
-                    ' sobre o ocorrido.'
-                )
-
-            except TransactionApiError as e:
-                LOGGER.error(
-                    'Um erro aconteceu enquanto se tentava realizar uma'
-                    ' transação. Detalhes: {}'.format(e)
-                )
-                raise TransactionError(str(e))
-
-            except TransactionError as e:
-                raise e
+        except TransactionError as e:
+            raise e
 
     def _set_installment_data(self):
         if not self.subscription_instance:
@@ -301,9 +299,8 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                 'Dados de pendência inválidos: {}'.format("".join(error_msgs))
             )
 
-        self.amount_to_transact = \
-            self.subscription_instance.lot.get_liquid_price()
-        self.liquid_amount = self.subscription_instance.lot.get_liquid_price()
+        self.amount_to_transact = self.subscription_debt_form.amount
+        self.liquid_amount = self.subscription_debt_form.liquid_amount
 
         self.product_debt_forms = self._create_product_debt_forms()
 
@@ -318,8 +315,8 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                     ' {}'.format("".join(error_msgs))
                 )
 
-            self.amount_to_transact += debt_form.cleaned_data.get('amount')
-            self.liquid_amount += debt_form.cleaned_data.get('liquid_amount')
+            self.amount_to_transact += debt_form.amount
+            self.liquid_amount += debt_form.liquid_amount
 
         self.service_debt_forms = self._create_service_debt_forms()
 
@@ -334,8 +331,8 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                     ' {}'.format("".join(error_msgs))
                 )
 
-            self.amount_to_transact += debt_form.cleaned_data.get('amount')
-            self.liquid_amount += debt_form.cleaned_data.get('liquid_amount')
+            self.amount_to_transact += debt_form.amount
+            self.liquid_amount += debt_form.liquid_amount
 
     def _create_builder_instance(self, payer, is_company, liquid_amount):
         # Construção de dados para transação do Pagarme
@@ -365,17 +362,16 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
     def _create_subscription_debt_form(self):
         """ Cria formulário de pendência financeira de inscrição. """
 
-        price = self.subscription_instance.lot.get_calculated_price()
-
         debt_kwargs = {
             'subscription': self.subscription_instance,
             'data': {
-                'name': 'Inscrição: {} ({})'.format(
-                    self.subscription_instance.event.name,
-                    self.subscription_instance.pk,
-                ),
-                'item_id': str(self.subscription_instance.pk),
-                'amount': price,
+                'name':
+                    'Inscrição: {}, Ingresso: {} ({})'.format(
+                        self.subscription_instance.code,
+                        self.subscription_instance.lot.name[:10],
+                        self.subscription_instance.lot_id,
+                    ),
+                'item_id': str(self.subscription_instance.lot_id),
                 'installments': self.cleaned_data.get('num_installments'),
                 'status': Debt.DEBT_STATUS_DEBT,
                 'type': Debt.DEBT_TYPE_SUBSCRIPTION,
@@ -427,7 +423,6 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                         optional.pk,
                     ),
                     'item_id': str(optional.pk),
-                    'amount': optional.price,
                     'installments': self.cleaned_data.get('num_installments'),
                     'status': Debt.DEBT_STATUS_DEBT,
                     'type': Debt.DEBT_TYPE_SERVICE,
@@ -469,7 +464,6 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                         optional.pk,
                     ),
                     'item_id': str(optional.pk),
-                    'amount': optional.price,
                     'installments': self.cleaned_data.get('num_installments'),
                     'status': Debt.DEBT_STATUS_DEBT,
                     'type': Debt.DEBT_TYPE_PRODUCT,

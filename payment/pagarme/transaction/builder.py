@@ -3,7 +3,7 @@ from datetime import timedelta, date
 from decimal import Decimal
 
 from gatheros_event.models import Event
-from gatheros_subscription.models import Subscription
+from gatheros_subscription.models import Subscription, Lot
 from payment.helpers.postback_url import get_postback_url
 from payment.pagarme.transaction.billing import Billing
 from payment.pagarme.transaction.customer import Customer
@@ -19,12 +19,15 @@ class AbstractPagarmeTransactionBuilder:
 
     def __init__(self,
                  event: Event,
+                 lot: Lot,
                  pagarme_transaction: PagarmeTransaction,
                  installment_part=None):
 
         self.pagarme_transaction = pagarme_transaction
 
         self.event = event
+        self.lot = lot
+        self.category = self.lot.category if self.lot.category_id else None
         self.organization = event.organization
 
         if installment_part is not None:
@@ -208,6 +211,7 @@ class AbstractPagarmeTransactionBuilder:
         receiver_creator = TransactionReceiverCreator(
             transaction_type=self.pagarme_transaction.payment_method,
             event=self.event,
+            lot=self.lot,
             amount=self.pagarme_transaction.amount,
             installments=self.pagarme_transaction.installments,
             interests_amount=self.pagarme_transaction.interests_amount,
@@ -242,11 +246,11 @@ class AbstractPagarmeTransactionBuilder:
 class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
     def __init__(self, subscription: Subscription, *args, **kwargs):
         self.subscription = subscription
-        self.lot = subscription.lot
-        self.category = self.lot.category if self.lot.category_id else None
+
         self.person = subscription.person
 
         kwargs['event'] = subscription.event
+        kwargs['lot'] = subscription.lot
 
         super().__init__(*args, **kwargs)
 
@@ -267,14 +271,15 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
                                               str(self.person.pk))
 
         # sobre inscrição
-        self.pagarme_transaction.add_metadata(
-            'inscrição categoria',
-            self.category.name
-        )
-        self.pagarme_transaction.add_metadata(
-            'ID categoria',
-            self.category.pk
-        )
+        if self.category:
+            self.pagarme_transaction.add_metadata(
+                'categoria do lote',
+                self.category.name
+            )
+            self.pagarme_transaction.add_metadata(
+                'ID categoria do lote',
+                self.category.pk
+            )
 
         self.pagarme_transaction.add_metadata(
             'ID lote',
@@ -334,7 +339,7 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
         # Instrução 3: 30 + 10 + 4 (possivel) + 8 (id da categoria) = 52
         instructions3 = ' Ev.: {}. Lote: {}. Insc.: {}.'.format(
             self.event.name[:10],
-            self.subscription.audience_lot.audience_category_id,
+            self.subscription.lot.name[:10],
             self.subscription.code,  # 8 caracteres
         )
 
@@ -346,7 +351,7 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
             # Só vai acontecer se
             diff = num_chars - 255
             # Diminuir a instrução 2
-            instructions2 = instructions2[0:len(instructions2)-diff]
+            instructions2 = instructions2[0:len(instructions2) - diff]
 
         instructions = instructions1 + instructions2 + instructions3
 
@@ -392,20 +397,24 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
             raise Exception('Não há valor a transacionar no builder.')
 
         for debt in self.subscription.debts_list:
-            # Pagamento é parcial ao montante total a pagar.
-            perc = ((total_amount * 100) / debt.amount) / 100
+            if self.installment_part is not None:
+                # Pagamento é parcial ao montante total a pagar.
+                perc = ((debt.amount * 100) / total_amount) / 100
 
-            assert perc <= 100, \
-                'Percentual maior do que o pagamento:' \
-                ' {} > 100'.format(round(perc, 2))
+                assert perc <= 100, \
+                    'Percentual maior do que o pagamento:' \
+                    ' {} > 100'.format(round(perc, 2))
 
-            amount = debt.amount * perc
-            liquid_amount = debt.liquid_amount * perc
+                amount = debt.amount * perc
+                liquid_amount = debt.liquid_amount * perc
+            else:
+                amount = debt.amount
+                liquid_amount = debt.liquid_amount
 
             self.add_item(
                 identifier=debt.item_id,
-                title=debt.title,
+                title=debt.name,
                 amount=amount,
                 liquid_amount=liquid_amount,
-                quantity=debt.quantity,
+                quantity=1,  # @TODO - dar suporte a quantidade em Debt.
             )

@@ -19,6 +19,7 @@ class Receiver(object):
     """
     level = None
     congressy_receiver = False
+    org_receiver = False
 
     def __init__(self,
                  receiver_type: str,
