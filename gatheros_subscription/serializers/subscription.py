@@ -136,12 +136,12 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        rep = super().to_representation(instance)
-
         lot = instance.lot
         amounts = list()
 
-        rep['lot_data'] = {
+        rep = dict()
+
+        rep['lot'] = {
             'pk': lot.pk,
             'name': lot.name,
             'event': lot.event_id,
@@ -150,9 +150,8 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
         amounts.append(lot.get_calculated_price())
 
         if lot.category_id:
-            rep['lot_data'].update({
-                'category': lot.category_id,
-                'category_data': {
+            rep['lot'].update({
+                'category': {
                     'pk': lot.category_id,
                     'name': lot.category.name,
                     'description': lot.category.description,
@@ -172,11 +171,14 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                     'date_end_sub':
                         optional.date_end_sub.strftime('%Y-%m-%d %Hh%m'),
                     'banner': optional.banner.url if optional.banner else None,
-                    'lot_category': optional.lot_category_id,
-                    "optional_type": 1,
-                    "optional_type_data": {
+                    'category': {
+                        'pk': optional.lot_category_id,
+                        'name': optional.lot_category.name,
+                        'description': optional.lot_category.description,
+                    },
+                    "optional_type": {
                         "name": optional.optional_type.name,
-                        "id": optional.optional_type_id,
+                        "pk": optional.optional_type_id,
                     },
                     'price': optional.price,
                 })
@@ -199,11 +201,14 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                         optional.date_end_sub.strftime('%Y-%m-%d %Hh%m'),
                     'published': optional.published,
                     'banner': optional.banner.url if optional.banner else None,
-                    'lot_category': optional.lot_category_id,
-                    "optional_type": 1,
-                    "optional_type_data": {
+                    'category': {
+                        'pk': optional.lot_category_id,
+                        'name': optional.lot_category.name,
+                        'description': optional.lot_category.description,
+                    },
+                    "optional_type": {
                         "name": optional.optional_type.name,
-                        "id": optional.optional_type_id,
+                        "pk": optional.optional_type_id,
                     },
                     'price': optional.price,
                 })
