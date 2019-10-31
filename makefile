@@ -38,6 +38,7 @@ update_db:
 	mkdir -p /tmp/bkp;
 	sudo cp bin/env/extension_installer.sh /tmp/bkp/;
 	python manage.py makemigrations; python manage.py migrate
+	python manage.py loaddata 000_site_dev
 
 
 restart_ngrok:
