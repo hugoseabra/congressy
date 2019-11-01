@@ -122,16 +122,7 @@ def postback_url_view(request, uidb64):
         if transaction.amount > Decimal(0):
 
             # Pegar o valor da divida
-            debts = subscription.debts.all()
-            for debt in debts:
-                total_debt += debt.amount
-
-            # Pegar qualquer dinheiro já pago
-            existing_amount = subscription.payments.filter(
-                paid=True
-            ).aggregate(total=Sum('amount'))
-
-            existing_amount = existing_amount['total']
+            existing_amount = subscription.debts_amount
 
         subscription.status = subscription_status_manager.get_new_status(
             debt=total_debt,
