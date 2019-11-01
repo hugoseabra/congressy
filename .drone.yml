@@ -156,12 +156,7 @@ steps:
       - name: docker-sock
         path: /var/run/docker.sock
     commands:
-      - sh ./bin/env/staging/02_recreate-db-staging.sh
-    when:
-      branch:
-        - hotfix/*
-        - bugfix/*
-        - feature/*
+      - ./bin/env/staging/02_recreate-db-staging.sh
 
   - name: build-staging-image
     image: docker
