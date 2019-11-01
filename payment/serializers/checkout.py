@@ -19,9 +19,13 @@ class SubscriptionCheckoutSerializer(FormSerializerMixin,
             'installment_part_pk': data.get('installment_part'),
             'interests_amount': data.get('interests_amount'),
             'boleto_expiration_date': data.get('boleto_expiration_date'),
-            'card_hash': data.get('card_hash'),
             'subscription_pk': data.get('subscription'),
             'benefactor_pk': data.get('benefactor'),
+            'card_number': data.get('card_number'),
+            'card_cvv': data.get('card_cvv'),
+            'card_expiration_date': data.get('card_expiration_date'),
+            'card_holder_name': data.get('card_holder_name'),
+            'card_hash': data.get('card_hash'),
         }
 
     def update(self, instance, validated_data):

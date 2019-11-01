@@ -117,7 +117,6 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
 
             builder = self._create_builder(
                 payer=self.payer_instance,
-                liquid_amount=self.liquid_amount,
                 is_company=self.payer_is_company,
             )
 
@@ -334,7 +333,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
             self.amount_to_transact += debt_form.amount
             self.liquid_amount += debt_form.liquid_amount
 
-    def _create_builder_instance(self, payer, is_company, liquid_amount):
+    def _create_builder_instance(self):
         # Construção de dados para transação do Pagarme
 
         transaction = PagarmeTransaction(
@@ -353,8 +352,8 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
     def _set_payer_instance(self):
 
         if self.benefactor_instance:
-            self.payer_instance = self.benefactor_instance
             self.payer_is_company = self.benefactor_instance.is_company
+            self.payer_instance = self.benefactor_instance
         else:
             self.payer_is_company = False
             self.payer_instance = self.subscription_instance.person

@@ -57,6 +57,26 @@ class CheckoutValidationForm(forms.Form):
         ]
     )
 
+    card_number = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    card_cvv = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    card_expiration_date = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    card_holder_name = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
     card_hash = forms.CharField(
         widget=forms.HiddenInput(),
         required=False,
@@ -188,7 +208,7 @@ class CheckoutValidationForm(forms.Form):
                 exclude_list=['+'],
             )]
 
-        if is_company:
+        if is_company is True:
             if payer.country.lower() == 'br':
                 customer_data['doc_type'] = 'cnpj'
                 customer_data['doc_number'] = str(payer.cnpj).zfill(14)
@@ -243,11 +263,9 @@ class CheckoutValidationForm(forms.Form):
 
         return billing_data
 
-    def _create_builder(self, payer, is_company, liquid_amount):
+    def _create_builder(self, payer, is_company):
 
-        builder = self._create_builder_instance(payer=payer,
-                                                is_company=is_company,
-                                                liquid_amount=liquid_amount)
+        builder = self._create_builder_instance()
         customer_data = self._create_customer_data(payer, is_company)
 
         builder.set_customer(**customer_data)
@@ -276,5 +294,5 @@ class CheckoutValidationForm(forms.Form):
     def _set_installment_data(self):
         raise NotImplementedError()
 
-    def _create_builder_instance(self, payer, is_company, liquid_amount):
+    def _create_builder_instance(self):
         raise NotImplementedError()
