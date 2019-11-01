@@ -58,8 +58,9 @@
 <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
 {% if not debug %}
     {% if marketing_type == 'adwords' %}
-
+        <script async src='https://www.google-analytics.com/analytics.js'></script>
         <script async src="https://www.googletagmanager.com/gtag/js?id=AW-827903122"></script>
+        <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=new Date;</script>
         <script>
             window.dataLayer = window.dataLayer || [];
 
@@ -74,10 +75,10 @@
                     {
                         'send_to': 'AW-827903122/ydKjCO_gh4cBEJKZ44oD'
                     });
+                <script type="text/javascript">ga('gtm1.send', 'event', 'cro', 'registro', 'conversao_novaconta', '1');</script>
 
 
             {% elif page_type == 'new_event' %}
-
 
                 gtag('event',
                     'conversion',
@@ -85,7 +86,7 @@
                         'send_to': 'AW-827903122/3mskCIzdh4cBEJKZ44oD',
                         'transaction_id': ''
                     });
-
+                <script type="text/javascript">ga('gtm1.send', 'event', 'cro', 'registro', 'conversao_novoevento, '1');</script>
 
             {% endif %}
         </script>
