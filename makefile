@@ -1,5 +1,5 @@
 
-up:
+up: export_settings
 	@make broker_create
 	docker-compose -f bin/env/docker-compose_dev.yml up -d --remove-orphans;
 	@make update_db
@@ -46,6 +46,10 @@ restart_ngrok:
 	docker-compose -f bin/env/docker-compose_dev.yml rm ngrok
 	docker-compose -f bin/env/docker-compose_dev.yml up -d
 	docker-compose -f bin/env/docker-compose_dev.yml logs -f ngrok
+
+
+export_settings:
+	export DJANGO_SETTINGS_MODULE=project.manage.settings.dev
 
 
 clean:

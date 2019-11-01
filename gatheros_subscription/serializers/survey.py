@@ -16,12 +16,15 @@ class EventSurveySerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance: Any) -> Any:
-        rep = super().to_representation(instance)
-
         from django.forms import model_to_dict
 
         survey = instance.survey
-        rep['survey_data'] = model_to_dict(survey)
+        rep = {
+            'pk': instance.pk,
+        }
+
+        rep.update(model_to_dict(survey))
+        del rep['id']
 
         event = instance.event
         rep['event_data'] = {
