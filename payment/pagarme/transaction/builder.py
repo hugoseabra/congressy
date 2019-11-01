@@ -65,8 +65,20 @@ class AbstractPagarmeTransactionBuilder:
         # self.pagarme_transaction.
         self._processed = False
 
-    def set_as_credit_card(self, card_hash: str):
-        self.pagarme_transaction.set_credit_card_data(card_hash)
+    def set_as_credit_card_hash(self, card_hash: str):
+        self.pagarme_transaction.set_as_credit_card_hash(card_hash)
+
+    def set_as_credit_card_data(self,
+                                card_number: str,
+                                card_cvv: str,
+                                card_expiration_date: str,
+                                card_holder_name: str):
+        self.pagarme_transaction.set_as_credit_card_data(
+            card_number=card_number,
+            card_cvv=card_cvv,
+            card_expiration_date=card_expiration_date,
+            card_holder_name=card_holder_name
+        )
 
     def set_as_boleto(self, expiration_date: date = None):
 
@@ -269,6 +281,10 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
                                               self.person.email)
         self.pagarme_transaction.add_metadata('ID participante',
                                               str(self.person.pk))
+        self.pagarme_transaction.add_metadata(
+            'Fone participante',
+            str(self.person.get_phone_display()),
+        )
 
         # sobre inscrição
         if self.category:

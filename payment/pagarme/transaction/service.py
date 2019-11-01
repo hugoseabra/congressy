@@ -269,10 +269,12 @@ class PagarmeAPISubscriptionService(PagarmeTransactionCreatorMixin):
 
         if self.pagarme_transaction.is_credit_card():
             card = response_data['card']
-            self.transaction.credit_card_brand = card['card_brand']
-            self.transaction.credit_card_holder = card['holder_name']
-            self.transaction.credit_card_first_digits = card['first_digits']
-            self.transaction.credit_card_last_digits = card['last_digits']
+            self.transaction.credit_card_brand = card.get('card_brand')
+            self.transaction.credit_card_holder = card.get('holder_name')
+            self.transaction.credit_card_first_digits = \
+                card.get('first_digits')
+            self.transaction.credit_card_last_digits = \
+                card.get('last_digits')
 
         self.transaction_status = TransactionStatus.objects.create(
             transaction=self.transaction,

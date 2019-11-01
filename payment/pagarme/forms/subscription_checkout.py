@@ -168,7 +168,19 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
 
             elif transaction_type == Transaction.CREDIT_CARD:
 
-                builder.set_as_credit_card(self.cleaned_data['card_hash'])
+                card_hash = self.cleaned_data['card_hash']
+                if card_hash:
+                    builder.set_as_credit_card_hash(card_hash)
+                else:
+                    card_data = {
+                        'card_number': self.cleaned_data.get('card_number'),
+                        'card_cvv': self.cleaned_data.get('card_cvv'),
+                        'card_expiration_date':
+                            self.cleaned_data.get('card_expiration_date'),
+                        'card_holder_name':
+                            self.cleaned_data.get('card_holder_name'),
+                    }
+                    builder.set_as_credit_card_data(**card_data)
 
                 # Se existe par aberta com o mesmo valor.
                 try:
@@ -338,7 +350,6 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
 
         transaction = PagarmeTransaction(
             transaction_id=str(uuid.uuid4()),
-            payment_method=self.cleaned_data.get('transaction_type'),
             interests_amount=self.cleaned_data.get('interests_amount'),
             installments=self.cleaned_data.get('num_installments'),
         )

@@ -166,20 +166,24 @@ class CheckoutValidationForm(forms.Form):
 
         return exp_date
 
-    def clean_card_hash(self):
-        card_hash = self.cleaned_data.get('card_hash')
-        transaction_type = self.cleaned_data.get('transaction_type')
-
-        if transaction_type == Transaction.CREDIT_CARD and not card_hash:
-            raise forms.ValidationError(
-                'Não é permitida a criação de transação de cartão de'
-                ' credito sem um card_hash'
-            )
-
-        return card_hash
-
     def clean(self):
         cleaned_data = super().clean()
+
+        transaction_type = self.cleaned_data.get('transaction_type')
+
+        if transaction_type == Transaction.CREDIT_CARD:
+            if not self.cleaned_data.get('card_hash'):
+                card_data = list(filter(None, [
+                    self.cleaned_data.get('card_number'),
+                    self.cleaned_data.get('card_cvv'),
+                    self.cleaned_data.get('card_expiration_date'),
+                    self.cleaned_data.get('card_holder_name'),
+                ]))
+                if len(card_data) < 4:
+                    raise forms.ValidationError(
+                        'Para transações de cartão você deve informar o'
+                        ' card_hash ou dados do cartão.'
+                    )
 
         if not self.errors:
             self._set_installment_data()
