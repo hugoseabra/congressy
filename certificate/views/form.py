@@ -45,7 +45,8 @@ class CertificateFormView(CertificateFeatureFlagMixin, generic.FormView):
     def post(self, request, *args, **kwargs):
 
         form = forms.CertificatePartialForm(
-            instance=self.event.certificate, data=self.request.POST,
+            instance=self.event.certificate,
+            data=self.request.POST,
             files=self.request.FILES)
 
         if form.is_valid():

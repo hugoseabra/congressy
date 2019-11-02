@@ -12,6 +12,7 @@ from .mixins import CertificateFeatureFlagMixin
 class CertificateConfigView(CertificateFeatureFlagMixin, generic.DetailView):
     template_name = 'certificate/certificado_.html'
     long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
+    ticket_name = "Lote 1 - Especial"
 
     def get_object(self, queryset=None):
 
@@ -31,14 +32,30 @@ class CertificateConfigView(CertificateFeatureFlagMixin, generic.DetailView):
         # Objeto de referencia criado para não manipular o self.object que o
         # objeto de fato que é usado na instancia do form;
 
-        ref_object.text_content = ref_object.text_content \
-            .replace("{{NOME}}", self.long_name)
+        ref_object.text_content = ref_object.text_content.replace(
+            "{{NOME}}",
+            self.long_name
+        )
 
-        ref_object.text_content = ref_object.text_content \
-            .replace(self.long_name, "<strong>" + self.long_name + "</strong>")
+        ref_object.text_content = ref_object.text_content.replace(
+            "{{TICKET_NAME}}",
+            self.ticket_name
+        )
 
-        ref_object.text_content = ref_object.text_content \
-            .replace("{{EVENTO}}", self.event.name)
+        ref_object.text_content = ref_object.text_content.replace(
+            self.long_name,
+            "<strong>" + self.long_name + "</strong>"
+        )
+
+        ref_object.text_content = ref_object.text_content.replace(
+            self.ticket_name,
+            "<strong>" + self.ticket_name + "</strong>"
+        )
+
+        ref_object.text_content = ref_object.text_content.replace(
+            "{{EVENTO}}",
+            self.event.name
+        )
 
         if settings.DEBUG:
             base_path = os.path.join(

@@ -78,12 +78,15 @@ class CertificatePDFView(CertificateFeatureFlagMixin):
     def get_text(self):
         text = self.event.certificate.text_content
         text = text.replace("{{NOME}}", "<strong>{{NOME}}</strong>")
+        text = text.replace("{{TICKET_NAME}}",
+                            "<strong>{{TICKET_NAME}}</strong>")
 
         text_template = Template(text)
         context = Context(
             {
                 'NOME': self.subscription.person.name.upper(),
                 'EVENTO': self.subscription.event.name,
+                'TICKET_NAME': self.subscription.lot.name,
             }
         )
         res = text_template.render(context)
@@ -149,6 +152,7 @@ class CertificatePDFExampleView(CertificateFeatureFlagMixin):
     template_name = 'pdf/certificate.html'
     event = None
     long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
+    ticket_name = "Lote 1 - Especial"
     wkhtml_ws_url = settings.WKHTMLTOPDF_WS_URL
 
     def get_filename(self):
@@ -194,6 +198,7 @@ class CertificatePDFExampleView(CertificateFeatureFlagMixin):
             {
                 'NOME': self.long_name,
                 'EVENTO': self.event.name,
+                'TICKET_NAME': self.ticket_name,
                 'CPF': "629.162.880-58",
             }
         )
