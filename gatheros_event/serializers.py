@@ -1,3 +1,5 @@
+from typing import Any
+
 from kanu_locations.serializers import CitySerializer
 from rest_framework import serializers
 
@@ -8,6 +10,29 @@ class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
         fields = '__all__'
+
+    def to_representation(self, instance: Any) -> Any:
+        ret = super().to_representation(instance)
+
+        if instance.city_id:
+            city = instance.city
+            ret['city_data'] = {
+                'id': city.pk,
+                'name': city.name,
+                'uf': city.uf,
+            }
+
+        if instance.user_id:
+            user = instance.user
+            ret['user_data'] = {
+                'id': user.pk,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'last_login': user.last_login,
+            }
+
+        return ret
 
 
 class OrganizationSerializer(serializers.ModelSerializer):

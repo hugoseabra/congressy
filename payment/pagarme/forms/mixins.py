@@ -57,6 +57,26 @@ class CheckoutValidationForm(forms.Form):
         ]
     )
 
+    card_number = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    card_cvv = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    card_expiration_date = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    card_holder_name = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
     card_hash = forms.CharField(
         widget=forms.HiddenInput(),
         required=False,
@@ -146,20 +166,24 @@ class CheckoutValidationForm(forms.Form):
 
         return exp_date
 
-    def clean_card_hash(self):
-        card_hash = self.cleaned_data.get('card_hash')
-        transaction_type = self.cleaned_data.get('transaction_type')
-
-        if transaction_type == Transaction.CREDIT_CARD and not card_hash:
-            raise forms.ValidationError(
-                'Não é permitida a criação de transação de cartão de'
-                ' credito sem um card_hash'
-            )
-
-        return card_hash
-
     def clean(self):
         cleaned_data = super().clean()
+
+        transaction_type = self.cleaned_data.get('transaction_type')
+
+        if transaction_type == Transaction.CREDIT_CARD:
+            if not self.cleaned_data.get('card_hash'):
+                card_data = list(filter(None, [
+                    self.cleaned_data.get('card_number'),
+                    self.cleaned_data.get('card_cvv'),
+                    self.cleaned_data.get('card_expiration_date'),
+                    self.cleaned_data.get('card_holder_name'),
+                ]))
+                if len(card_data) < 4:
+                    raise forms.ValidationError(
+                        'Para transações de cartão você deve informar o'
+                        ' card_hash ou dados do cartão.'
+                    )
 
         if not self.errors:
             self._set_installment_data()
@@ -186,9 +210,9 @@ class CheckoutValidationForm(forms.Form):
             customer_data['phones'] = [clear_string(
                 payer.get_phone_display(),
                 exclude_list=['+'],
-            )],
+            )]
 
-        if is_company:
+        if is_company is True:
             if payer.country.lower() == 'br':
                 customer_data['doc_type'] = 'cnpj'
                 customer_data['doc_number'] = str(payer.cnpj).zfill(14)
@@ -243,11 +267,9 @@ class CheckoutValidationForm(forms.Form):
 
         return billing_data
 
-    def _create_builder(self, payer, is_company, liquid_amount):
+    def _create_builder(self, payer, is_company):
 
-        builder = self._create_builder_instance(payer=payer,
-                                                is_company=is_company,
-                                                liquid_amount=liquid_amount)
+        builder = self._create_builder_instance()
         customer_data = self._create_customer_data(payer, is_company)
 
         builder.set_customer(**customer_data)
@@ -276,5 +298,5 @@ class CheckoutValidationForm(forms.Form):
     def _set_installment_data(self):
         raise NotImplementedError()
 
-    def _create_builder_instance(self, payer, is_company, liquid_amount):
+    def _create_builder_instance(self):
         raise NotImplementedError()

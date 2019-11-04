@@ -15,11 +15,12 @@ class DebtForm(forms.ModelForm):
             'type',
             'status',
             'installments',
-            'amount',
         )
 
     def __init__(self, subscription, *args, **kwargs):
         self.subscription = subscription
+
+        self.amount = Decimal(0)
 
         # O valor líquido é quanto o organizador irá receber, que pode variar
         # de acordo com a configuração do lote da inscrição.
@@ -50,7 +51,8 @@ class DebtForm(forms.ModelForm):
         # Calcula valor líquido.
         debt_type = cleaned_data.get('type', Debt.DEBT_TYPE_SUBSCRIPTION)
         if debt_type == Debt.DEBT_TYPE_SUBSCRIPTION:
-            self._set_lot_amounts()
+            self.amount = self.subscription.lot.get_calculated_price()
+            self.liquid_amount = self.subscription.lot.get_liquid_price()
 
         elif debt_type == Debt.DEBT_TYPE_SERVICE:
             self._set_service_amounts()
@@ -66,15 +68,9 @@ class DebtForm(forms.ModelForm):
     def clean_installments(self):
         return int(self.cleaned_data.get('installments', 1) or 1)
 
-    def clean_amount(self):
-        amount = self.data.get('amount')
-        if not amount:
-            return amount
-
-        return payment_helpers.amount_as_decimal(amount)
-
     def save(self, commit=True):
         self.instance.subscription = self.subscription
+        self.instance.amount = self.amount
         self.instance.liquid_amount = self.liquid_amount
         self.instance.installment_amount = self.installment_amount
         self.instance.installment_interests_amount = \
@@ -82,36 +78,27 @@ class DebtForm(forms.ModelForm):
 
         return super().save(commit)
 
-    def _set_lot_amounts(self):
-        """
-        Seta valores líquidos e a ser pago esperados de acordo com a
-        configuração do lote.
-        """
-        lot = self.subscription.lot
-
-        self.liquid_amount = lot.get_liquid_price()
-        self.original_amount = lot.price
-
     def _set_service_amounts(self):
         """
         Seta valores líquidos e a ser pago esperados de acordo com a
         configuração do lote.
         """
-        for service in self.subscription.subscription_services.all():
-            self.liquid_amount += service.optional.liquid_price
-            self.original_amount += service.optional.price
+        for sub_addon in self.subscription.subscription_services.filter(
+                optional_id=self.cleaned_data.get('item_id')
+        ):
+            self.liquid_amount += sub_addon.optional.liquid_price
+            self.amount += sub_addon.optional.price
 
     def _set_product_amounts(self):
         """
         Seta valores líquidos e a ser pago esperados de acordo com a
         configuração do lote.
         """
-        for product in self.subscription.subscription_products.all():
-            self.liquid_amount += product.optional.liquid_price
-            self.original_amount += product.optional.price
-
-        self.liquid_amount = round(self.liquid_amount, 2)
-        self.original_amount = round(self.original_amount, 2)
+        for sub_addon in self.subscription.subscription_products.filter(
+                optional_id=self.cleaned_data.get('item_id')
+        ):
+            self.liquid_amount += sub_addon.optional.liquid_price
+            self.amount += sub_addon.optional.price
 
     def _set_installments_amount(self):
         """ Seta montante por parcela. """

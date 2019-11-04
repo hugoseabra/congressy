@@ -23,11 +23,21 @@ class PaymentForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
     def clean(self):
-        if self.transaction and self.transaction.paid is False:
-            raise forms.ValidationError(
-                'Transações não pagas não podem ser usadas para serem'
-                ' vinculadas a pagamento.'
-            )
+        cleaned_data = super().clean()
+
+        if self.transaction:
+            if self.transaction.paid is False:
+                raise forms.ValidationError(
+                    'Transações não pagas não podem ser usadas para serem'
+                    ' vinculadas a pagamento.'
+                )
+
+            if self.transaction.subscription_id != self.subscription.pk:
+                raise forms.ValidationError(
+                    'Transação não pertence à inscrição informada.'
+                )
+
+        return cleaned_data
 
     def clean_amount(self):
         amount = self.cleaned_data.get('amount')
@@ -40,7 +50,6 @@ class PaymentForm(forms.ModelForm):
 
     def save(self, commit=True):
         with atomic():
-            self.instance.subscription = self.subscription
             self.instance.transaction = self.transaction
             self.instance.paid = True
 
@@ -66,42 +75,24 @@ class PaymentForm(forms.ModelForm):
         if not payments_amount:
             return
 
-        debts_amount = self.subscription.debts.aggregate(total=Sum('amount'))
-        debts_amount = debts_amount['total'] or Decimal(0)
+        debts_amount = self.subscription.debts_amount
 
-        if payments_amount > debts_amount:
+        if payments_amount >= debts_amount:
             # Número de pagamentos é maior do que as pendências. Então, vamos
             # Atualizar todas pendências como pagas e a pendência de inscrição
             # como CRÉDITO.
 
             # Todas pendências que não de inscrição estarão pagas.
-            debts = self.subscription.debts.exclude(
-                type=Debt.DEBT_TYPE_SUBSCRIPTION
-            )
-            for debt in debts:
+            for debt in self.subscription.debts_list:
                 debt.status = Debt.DEBT_STATUS_PAID
                 debt.save()
 
-            # A pendência de inscriçãoe estará com crédito.
-            sub_debt = self.subscription.debts.filter(
-                    type=Debt.DEBT_TYPE_SUBSCRIPTION
-            ).first()
-
-            sub_debt.status = Debt.DEBT_STATUS_CREDIT
-            sub_debt.save()
-
-        if payments_amount == debts_amount:
-            # Todas as pendências estão pagas. Atualiza pendências como PAGAS.
-            for debt in self.subscription.debts.all():
-                debt.status = Debt.DEBT_STATUS_PAID
-                debt.save()
-
-        if payments_amount < debts_amount:
+        elif payments_amount < debts_amount:
             # Se há pagamento, mas as pendências são maiores, verificar se
             # alguma dos pagamentos cobre alguma das pendências.
             processed_payment_amount = payments_amount
 
-            for debt in self.subscription.debts.all():
+            for debt in self.subscription.debts_list:
                 if round(processed_payment_amount, 2) >= debt.amount:
                     debt.status = Debt.DEBT_STATUS_PAID
                     debt.save()

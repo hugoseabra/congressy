@@ -7,7 +7,6 @@
 import re
 
 from .common import *
-import raven
 
 # ========================== BASE CONFIGURATION ============================= #
 DEBUG = False
@@ -58,7 +57,8 @@ LOGGING = {
     },
     'handlers': {
         'sentry': {
-            'level': 'ERROR', # To capture more than ERROR, change to WARNING, INFO, etc.
+            'level': 'ERROR',
+            # To capture more than ERROR, change to WARNING, INFO, etc.
             'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
         },
         'console': {
@@ -92,6 +92,23 @@ SPARKPOST_API_KEY = '6dacd78f4c49080da7bbe942d4f36dc95d0c110a'
 PAGARME_API_KEY = 'ak_live_7Rxgr3GlxWycVDMNeeG2InzwPsoPrM'
 PAGARME_ENCRYPTION_KEY = 'ek_live_Hlpg45VTiyNOnAE4dmkEBbQDEtUZCX'
 PAGARME_RECIPIENT_ID = 're_cjaskozwr01u1of5zo7kc962u'
+
+# Usado para gerar card hash de cartões de crédito.
+PAGARME_PUBLIC_KEY = '-----BEGIN PUBLIC KEY-----\n'
+PAGARME_PUBLIC_KEY += \
+    'MIIBIDANBgkqhkiG9w0BAQEFAAOCAQ0AMIIBCAKCAQEA00Nq1oNzuvcuRYppBo24\n'
+PAGARME_PUBLIC_KEY += \
+    'hGxV2zEtKA90CmtOm94rzHYFnbZnQyYPhwYeGDTdPKkjnayeiNrZTnYkq6dTKefd\n'
+PAGARME_PUBLIC_KEY += \
+    '67qXiz5T76BpZ6axMGtZfaS9Dn4RpBwy5OnfspElmMI5tYMNq96gSDbnj2hA1qZr\n'
+PAGARME_PUBLIC_KEY += \
+    'S0FET5+DTT23nn+HtVYJ23boU8fuIRJkJj4jlBBKLQQ9Z1Kw20wWiSN0XzktLzzx\n'
+PAGARME_PUBLIC_KEY += \
+    'KePqU3mXUCFE2oWJ15Ul+IibAcF2QWPKU8BBXMtrjG7Z7FkKrtWwsksgI6Iq/cgo\n'
+PAGARME_PUBLIC_KEY += \
+    'QkXoRc7hgSQgnoFkF30KOg6OQRG6lj7qg1p+KqFyAD9KlFKq1ICYnSngNsKSNIhm\n'
+PAGARME_PUBLIC_KEY += '9wIBAw==\n'
+PAGARME_PUBLIC_KEY += '-----END PUBLIC KEY-----\n'
 # ============================== SENTRY ===================================== #
 # Sentry integration
 RAVEN_CONFIG = {

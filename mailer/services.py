@@ -1483,7 +1483,7 @@ def notify_voucher(subscription):
     person = subscription.person
     event = subscription.event
 
-    paid = subscription.lot.price > 0
+    paid = subscription.lot.price and subscription.lot.price > 0
 
     # Precisamos de outros serviços para gerar qrcode, barcode e PDF
     # Vamos saber se esses serviços possuem delay e/ou estão disponíveis. Caso

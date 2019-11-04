@@ -7,6 +7,7 @@ from decimal import Decimal
 from django.conf import settings
 
 from gatheros_event.models import Event
+from gatheros_subscription.models import Lot
 from payment.installments import Calculator, InstallmentResult
 from payment.pagarme.transaction.receivers import (
     CongressyReceiver,
@@ -26,6 +27,7 @@ class TransactionReceiverCreator(object):
     def __init__(self,
                  transaction_type: str,
                  event: Event,
+                 lot: Lot,
                  amount: Decimal,
                  installments: int,
                  interests_amount=Decimal(0)) -> None:
@@ -33,6 +35,7 @@ class TransactionReceiverCreator(object):
         self.transaction_type = transaction_type
 
         self.event = event
+        self.lot = lot
         self.organization = event.organization
 
         self.amount = amount
@@ -49,7 +52,7 @@ class TransactionReceiverCreator(object):
         self.installment_calculator = Calculator(
             interests_rate=self.interests_rate,
             total_installments=10,
-            free_installments=int(self.event.free_installments),
+            free_installments=int(self.lot.num_install_interest_absortion),
         )
 
         self._check_criterias()
@@ -62,7 +65,7 @@ class TransactionReceiverCreator(object):
 
         total_proportional = Decimal(100)
 
-        if self.event.transfer_tax is True:
+        if self.lot.transfer_tax is True:
             total_proportional = Decimal(100 + (self.cgsy_percent * 100))
 
         total_percent = round(total_proportional / 100, 1)
@@ -75,7 +78,7 @@ class TransactionReceiverCreator(object):
 
     def get_congressy_amount(self):
         original_amount = self.get_original_amount()
-        cgsy_amount = original_amount * round(self.cgsy_percent, 2)
+        cgsy_amount = original_amount * self.cgsy_percent
 
         minimum_amount = Decimal(
             getattr(settings, 'CONGRESSY_MINIMUM_AMOUNT', 0)
@@ -91,7 +94,7 @@ class TransactionReceiverCreator(object):
         # transacionado estará sem o valor de juros de parcelamento. Então,
         # vamos recalcula-los e repassar os juros para a Congressy.
 
-        if 1 < self.installments <= self.event.free_installments:
+        if 1 < self.installments <= self.lot.num_install_interest_absortion:
             if not self.interests_amount:
                 free_interests_amount = \
                     self.installment_calculator.get_absorbed_interests_amount(
@@ -112,8 +115,8 @@ class TransactionReceiverCreator(object):
         Cria e publica recebedores que irã participar do rateamente de uma
         inscrição.
         """
-        cgsy_amount = self.get_congressy_amount()
-        org_amount = self.get_organizer_amount()
+        cgsy_amount = round(self.get_congressy_amount(), 2)
+        org_amount = round(self.get_organizer_amount(), 2)
 
         # ==== RECEIVERS
         receivers = list()
@@ -139,7 +142,7 @@ class TransactionReceiverCreator(object):
             receiver_type=RECEIVER_TYPE_SUBSCRIPTION,
             identifier=self.organization.recipient_id,
             amount=org_amount,
-            transfer_taxes=self.event.transfer_tax is True,
+            transfer_taxes=self.lot.transfer_tax is True,
             chargeback_responsible=True,
             processing_fee_responsible=False,
             installment_result=InstallmentResult(

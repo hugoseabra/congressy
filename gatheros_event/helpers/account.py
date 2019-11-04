@@ -2,8 +2,8 @@
 Helper para configuração de contexto de usuário mediante sessão e organização
 ativa do usuário na sessão.
 """
-from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 from gatheros_event.models import Organization, Person
 
@@ -102,6 +102,33 @@ def is_manager(request):
 
     request.cache_user_is_member = is_member
     return is_member
+
+
+def is_organization_member(request, organization):
+    """
+    Verifica se o usuário logado é Organizador da organização informada.
+
+    :param request: django.http.HttpRequest
+    :param organization: Organization object
+    :return: Boolean
+        Se False, significa que o usuario logado não é membro da organização
+    """
+
+    if hasattr(request, 'cache_user_is_member'):
+        return request.cache_user_is_member
+
+    if organization.active is False:
+        return False
+
+    if not is_eligible(request):
+        return False
+
+    member_qs = organization.members.filter(
+        active=True,
+        person__user_id=request.user.pk,
+    )
+
+    return member_qs.count() > 0
 
 
 def clean_account(request):

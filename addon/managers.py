@@ -210,26 +210,35 @@ class SubscriptionServiceManager(managers.Manager):
         optional_service = cleaned_data['optional']
         subscription = cleaned_data['subscription']
 
+        self.instance.subscription = subscription
+        self.instance.optional = optional_service
+
         # Regra 1
-        if optional_service.has_quantity_conflict:
+        if optional_service.lot_category.event_id != subscription.event_id:
+            self.add_error(
+                'optional',
+                'O opcional informado não pertence ao evento da inscrição,'
+            )
+
+        # Regra 1
+        elif optional_service.has_quantity_conflict:
             raise forms.ValidationError(
                 'Quantidade de inscrições já foi atingida, '
                 'novas inscrições não poderão ser realizadas')
 
-        # Regra 2:
-        if optional_service.has_schedule_conflicts:
-            conflicting_service = \
-                optional_service.get_schedule_conflict_service
+        # Regra 3:
+        elif self.instance.has_schedule_conflicts:
+            conflicting_serv = self.instance.get_schedule_conflict_service
             raise forms.ValidationError(
                 'Conflito de horário - o opcional "{}" '
                 'está em conflito com o opcional "{}".'.format(
                     optional_service.name,
-                    conflicting_service.name
+                    conflicting_serv.name
                 )
             )
 
-        # Regra 3:
-        if optional_service.theme.limit:
+        # Regra 4:
+        elif optional_service.theme.limit:
 
             total = 0
 
@@ -244,9 +253,10 @@ class SubscriptionServiceManager(managers.Manager):
                     'atingido'.format(optional_service.theme.name)
                 )
 
-        # Regra 4
-        if optional_service.has_sub_end_date_conflict:
-            raise forms.ValidationError(
+        # Regra 5
+        elif optional_service.has_sub_end_date_conflict:
+            self.add_error(
+                'optional',
                 'Este opcional já expirou e não aceita mais inscrições.'
             )
 
@@ -274,18 +284,30 @@ class SubscriptionProductManager(managers.Manager):
         """
         cleaned_data = super().clean()
 
-        product = cleaned_data['optional']
+        optional = cleaned_data['optional']
+        subscription = cleaned_data['subscription']
+
+        self.instance.subscription = subscription
+        self.instance.optional = optional
 
         # Regra 1
-        if product.has_quantity_conflict:
+        if optional.lot_category.event_id != subscription.event_id:
+            self.add_error(
+                'optional',
+                'A atividade extra informada não pertence ao evento da'
+                ' inscrição,'
+            )
+
+        # Regra 2
+        elif optional.has_quantity_conflict:
             raise forms.ValidationError(
                 'Quantidade de inscrições já foi atingida, '
                 'novas inscrições não poderão ser realizadas')
 
-        # Regra 2
-        if product.has_sub_end_date_conflict:
+        # Regra 3
+        elif optional.has_sub_end_date_conflict:
             raise forms.ValidationError(
-                'Este opcional já expirou e não aceita mais inscrições.'
+                'Esta atividade já expirou e não aceita mais inscrições.'
             )
 
         return cleaned_data

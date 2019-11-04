@@ -1,10 +1,14 @@
 import base64
 import binascii
+from typing import Any
 from uuid import uuid4
+
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
 from addon import models
+from addon.services import SubscriptionServiceService
+from core.serializers import FormSerializerMixin
 from gatheros_subscription.models import LotCategory
 
 
@@ -64,11 +68,30 @@ class ProductSerializer(serializers.ModelSerializer):
 
         super().__init__(*args, **kwargs)
 
+    def to_representation(self, instance: Any) -> Any:
+        ret = super().to_representation(instance)
+
+        opt_type = instance.optional_type
+        ret['optional_type_data'] = {
+            'id': opt_type.pk,
+            'name': opt_type.name,
+        }
+
+        lot_cat = instance.lot_category
+        ret['lot_category_data'] = {
+            'id': lot_cat.pk,
+            'name': lot_cat.name,
+            'active': lot_cat.active,
+            'description': lot_cat.description,
+        }
+
+        return ret
+
 
 class SubscriptionProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.SubscriptionProduct
-        fields = '__all__'
+        fields = ('subscription', 'optional',)
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -100,8 +123,36 @@ class ServiceSerializer(serializers.ModelSerializer):
 
         super().__init__(*args, **kwargs)
 
+    def to_representation(self, instance: Any) -> Any:
+        ret = super().to_representation(instance)
 
-class SubscriptionServiceSerializer(serializers.ModelSerializer):
+        theme = instance.theme
+        ret['theme_data'] = {
+            'id': theme.pk,
+            'name': theme.name,
+            'limit': theme.limit,
+        }
+
+        opt_type = instance.optional_type
+        ret['optional_type_data'] = {
+            'id': opt_type.pk,
+            'name': opt_type.name,
+        }
+
+        lot_cat = instance.lot_category
+        ret['lot_category_data'] = {
+            'id': lot_cat.pk,
+            'name': lot_cat.name,
+            'active': lot_cat.active,
+            'description': lot_cat.description,
+        }
+
+        return ret
+
+
+class SubscriptionServiceSerializer(FormSerializerMixin,
+                                    serializers.ModelSerializer):
     class Meta:
+        form = SubscriptionServiceService
         model = models.SubscriptionService
-        fields = '__all__'
+        fields = ('subscription', 'optional',)

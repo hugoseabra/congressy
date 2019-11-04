@@ -6,8 +6,17 @@ from rest_framework import routers
 from gatheros_subscription import viewsets, views
 
 router = routers.DefaultRouter()
-router.register(r'lots', viewsets.LotViewSet)
-router.register(r'subscriptions', viewsets.SubscriptionViewSet)
+router.register('subscription/lots', viewsets.LotViewSet)
+router.register('subscription/subscriptions/billing',
+                viewsets.SubscriptionBillingViewSet)
+router.register('subscription/subscriptions', viewsets.SubscriptionViewSet)
+router.register('survey/surveys', viewsets.EventSurveyViewSet)
+router.register('survey/questions', viewsets.QuestionViewSet)
+
+# router.register(
+#     'subscription/surveys/{survey_pk}/questions',
+#     viewsets.QuestionViewSet
+# )
 
 urls = [
     url(
@@ -23,9 +32,17 @@ urls = [
 ]
 
 subs_urls = [
-    url('^list/$', viewsets.SubscriptionListViewSet.as_view(),
+    url('^list/$',
+        viewsets.SubscriptionListViewSet.as_view(),
         name='subscription-list-api'),
+]
 
+survey_urls = [
+    url(
+        r'^survey/surveys/(?P<survey_pk>[\d]+)/questions',
+        viewsets.QuestionViewSet.as_view({'get': 'list'}),
+        name='survey'
+    ),
 ]
 
 single_endpoints = [url(r'^events/(?P<event_pk>[\d]+)/lots/', include(urls))]
@@ -38,3 +55,4 @@ sub_single_endpoints = [
 urlpatterns = router.urls
 urlpatterns += single_endpoints
 urlpatterns += sub_single_endpoints
+urlpatterns += survey_urls
