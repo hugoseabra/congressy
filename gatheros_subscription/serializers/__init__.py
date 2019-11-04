@@ -3,4 +3,9 @@ from .event import EventSerializer
 from .exporter import SubscriptionExportSerializer
 from .lot import LotSerializer, LotCategorySerializer
 from .subscription import SubscriptionSerializer, SubscriptionModelSerializer
-from .survey import EventSurveySerializer
+from .survey import (
+    AnswerSerializer,
+    EventSurveySerializer,
+    QuestionSerializer,
+    OptionSerializer,
+)

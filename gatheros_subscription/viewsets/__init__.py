@@ -6,6 +6,8 @@ from .subscription import (
     SubscriptionViewSet,
 )
 from .survey import (
+    AnswerViewSet,
     EventSurveyViewSet,
+    OptionViewSet,
     QuestionViewSet,
 )

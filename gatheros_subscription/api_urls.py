@@ -12,6 +12,8 @@ router.register('subscription/subscriptions/billing',
 router.register('subscription/subscriptions', viewsets.SubscriptionViewSet)
 router.register('survey/surveys', viewsets.EventSurveyViewSet)
 router.register('survey/questions', viewsets.QuestionViewSet)
+router.register('survey/options', viewsets.OptionViewSet)
+router.register('survey/answers', viewsets.AnswerViewSet)
 
 # router.register(
 #     'subscription/surveys/{survey_pk}/questions',

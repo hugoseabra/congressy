@@ -1,3 +1,4 @@
+from rest_framework import permissions
 from rest_framework.authentication import (
     SessionAuthentication,
     BasicAuthentication,
@@ -10,4 +11,7 @@ class RestrictionViewMixin:
         SessionAuthentication,
         BasicAuthentication,
         TokenAuthentication,
+    )
+    permission_classes = (
+        permissions.IsAuthenticated,
     )
