@@ -275,12 +275,11 @@ class Certificate(models.Model):
 
     @property
     def event_has_city(self):
+        if hasattr(self.event, 'place'):
+            place = self.event.place
 
-        try:
-            _ = self.event.place.city
-            return True
-        except ObjectDoesNotExist:
-            pass
+            if place and hasattr(place, 'city'):
+                return place.city is not None
 
         return False
 
