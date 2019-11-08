@@ -26,6 +26,8 @@ class LotSerializer(serializers.ModelSerializer):
             'slug': event.slug,
         }
 
+        ret['num_subscriptions'] = instance.subscriptions.count()
+
         lot_cat = instance.category
         ret['category_data'] = {
             'id': lot_cat.pk,

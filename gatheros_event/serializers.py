@@ -96,3 +96,12 @@ class EventSerializer(serializers.ModelSerializer):
             'organization',
             'info',
         )
+
+    def to_representation(self, instance: Event):
+        ret = super().to_representation(instance)
+        ret['num_subscriptions'] = instance.subscriptions.count()
+        ret['num_lots'] = instance.lots.count()
+        ret['num_categories'] = instance.lot_categories.count()
+        ret['num_surveys'] = instance.surveys.count()
+
+        return ret
