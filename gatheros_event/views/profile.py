@@ -116,7 +116,7 @@ class ProfileCreateView(TemplateView, FormView):
     success_url = reverse_lazy('front:start')
     messages = {
         'success': 'Sua conta foi criada com sucesso! '
-                   'Enviamos um email para "%s", click no link do email para'
+                   'Enviamos um email para "%s", clique no link do email para'
                    ' ativar sua conta.'
     }
 
@@ -165,7 +165,11 @@ class ProfileCreateView(TemplateView, FormView):
         response = urllib_request.urlopen(req)
         result = json.loads(response.read().decode())
 
-        if not result['success']:
+        if 'success' not in result or result['success'] is not True:
+            messages.error(
+                self.request,
+                'Informe que você não é um robô para criar uma conta.'
+            )
             form = self.get_form()
             return super().form_invalid(form)
 

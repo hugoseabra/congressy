@@ -7,7 +7,6 @@ import binascii
 from uuid import uuid4
 
 import absoluteuri
-from captcha.fields import CaptchaField
 from django import forms
 from django.contrib.auth import (
     password_validation,
@@ -33,7 +32,7 @@ class ProfileCreateForm(forms.ModelForm):
     email = forms.EmailField(label='E-mail', widget=forms.EmailInput(
         attrs={'class': 'form-control'}
     ))
-    captcha = CaptchaField()
+    # captcha = CaptchaField()
 
     user = None
 

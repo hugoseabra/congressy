@@ -89,10 +89,10 @@ WORKDIR /code/
 COPY ./. ./.
 
 RUN chmod +x /code/bin/env/healthcheck.sh \
-            /deploy/services/volume/container-entry.sh \
-            /deploy/services/migration/container-entry.sh \
-            /deploy/services/celery/container-entry.sh \
-            /deploy/services/cron/container-entry.sh \
+            /staging/services/volume/container-entry.sh \
+            /staging/services/migration/container-entry.sh \
+            /staging/services/celery/container-entry.sh \
+            /staging/services/cron/container-entry.sh \
             /staging/services/web/manage/container-entry.sh
 
 RUN mkdir -p /code/media/; mkdir -p /tmp/exporter; mkdir -p /tmp/barcodes; mkdir -p /tmp/qrcodes;
