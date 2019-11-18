@@ -1,5 +1,4 @@
 from django import forms
-from django.core.exceptions import ObjectDoesNotExist
 
 from certificate.models import Certificate
 from core.forms.widgets import ColorInput
@@ -36,13 +35,13 @@ class CertificatePartialForm(forms.ModelForm):
         # Esse get está fora do bloco de try por que se não achar, é pra dar
         # pau mesmo.
         self.event = Event.objects.get(pk=self.initial.get('event'))
-        try:
-            if self.event.place.city:
-                self.initial[
-                    'event_location'] = self.event.place.city.name.title()
+
+        if hasattr(self.event, 'place'):
+            place = self.event.place
+
+            if place and hasattr(place, 'city') and place.city:
+                self.initial['event_location'] = place.city.name.title()
                 self.fields['event_location'].disabled = True
-        except ObjectDoesNotExist:
-            pass
 
     def clear_background_image(self):
         """ Limpa campo `image4` """
