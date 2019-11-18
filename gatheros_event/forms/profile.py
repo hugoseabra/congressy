@@ -12,7 +12,6 @@ from django import forms
 from django.contrib.auth import (
     password_validation,
 )
-from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
@@ -22,7 +21,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from localflavor.br.forms import BRCPFField, BRCNPJField
 
-from core.forms.cleaners import clear_string, clean_cellphone as phone_cleaner
+from core.forms.cleaners import clear_string
 from core.forms.widgets import AjaxChoiceField, TelephoneInput
 from core.util import create_years_list
 from gatheros_event.models import Person, Organization, Member

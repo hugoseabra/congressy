@@ -1,5 +1,8 @@
 import json
-import urllib
+from urllib import (
+    parse as urllib_parse,
+    request as urllib_request,
+)
 
 import absoluteuri
 from django.conf import settings
@@ -73,9 +76,9 @@ class Login(auth_views.LoginView):
                 'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
                 'response': recaptcha_response
             }
-            data = urllib.parse.urlencode(values).encode()
-            req = urllib.request.Request(url, data=data)
-            response = urllib.request.urlopen(req)
+            data = urllib_parse.urlencode(values).encode()
+            req = urllib_request.Request(url, data=data)
+            response = urllib_request.urlopen(req)
             result = json.loads(response.read().decode())
 
             if result['success']:
