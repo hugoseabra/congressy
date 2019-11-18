@@ -166,6 +166,10 @@ class ProfileCreateView(TemplateView, FormView):
         result = json.loads(response.read().decode())
 
         if 'success' not in result or result['success'] is not True:
+            messages.error(
+                self.request,
+                'Informe que você não é um robô para criar uma conta.'
+            )
             form = self.get_form()
             return super().form_invalid(form)
 
