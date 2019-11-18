@@ -19,7 +19,7 @@ services:
     image: cgsy-staging
     hostname: migration-staging
     entrypoint:
-      - /deploy/services/migration/container-entry.sh
+      - /staging/services/migration/container-entry.sh
     env_file:
       - /tmp/staging-files/env-manage-staging
     networks:
@@ -31,7 +31,7 @@ services:
     depends_on:
       - migration
     entrypoint:
-      - /deploy/services/volume/container-entry.sh
+      - /staging/services/volume/container-entry.sh
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
       - /etc/localtime:/etc/localtime
@@ -48,7 +48,7 @@ services:
       - traefik
     ports:
       - "80:80"
-      - "8080:8080"
+      - "8080:8080"notify_new_user
     volumes:
       - /tmp/staging-files/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
@@ -56,14 +56,14 @@ services:
   celery:
     image: cgsy-staging
     restart: unless-stopped
-    hostname: HOSTNAME-celery
+    hostname: staging-celery
     networks:
       - postgres
       - mailhog
       - wkhtmltopdf
       - rabbitmq
     entrypoint:
-      - /deploy/services/celery/container-entry.sh
+      - /staging/services/celery/container-entry.sh
     volumes:
       - /etc/localtime:/etc/localtime
       - staging_media:/code/media
@@ -80,7 +80,7 @@ services:
       - migration
       - volume
     entrypoint:
-      - /deploy/services/cron/container-entry.sh
+      - /staging/services/cron/container-entry.sh
     networks:
       - postgres
       - mailhog

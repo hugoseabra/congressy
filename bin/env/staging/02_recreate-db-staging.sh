@@ -60,6 +60,11 @@ if [[ -z "$CONTAINER_ACTIVE" ]]; then
         if [[ "$RECREATE" == "0" ]]; then
             echo "Container '${CONTAINER_NAME}' não existe. Criando ..."
             update_postgres_service
+        echo "Container '${CONTAINER_NAME}' já existe. Ativando-o ..."
+        docker-compose -f ./bin/env/docker-compose.yml start
+    fi
+else
+    echo "Container '${CONTAINER_NAME}' está ativo."
         fi
 
     # Se existe, garantir que esteja ativo
