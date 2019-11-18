@@ -1,3 +1,9 @@
+import json
+from urllib import (
+    parse as urllib_parse,
+    request as urllib_request,
+)
+
 import absoluteuri
 from django.conf import settings
 from django.contrib import messages
@@ -110,7 +116,7 @@ class ProfileCreateView(TemplateView, FormView):
     success_url = reverse_lazy('front:start')
     messages = {
         'success': 'Sua conta foi criada com sucesso! '
-                   'Enviamos um email para "%s", click no link do email para'
+                   'Enviamos um email para "%s", clique no link do email para'
                    ' ativar sua conta.'
     }
 
@@ -138,16 +144,31 @@ class ProfileCreateView(TemplateView, FormView):
         )
 
     def form_valid(self, form):
-        form.save(request=self.request)
-
         messages.success(
             self.request,
             self.messages['success'] % form.cleaned_data["email"]
         )
 
-        return redirect(self.get_success_url())
+        form.save(request=self.request)
+        return super().form_valid(form)
 
     def post(self, request, *args, **kwargs):
+        recaptcha_response = self.request.POST.get('g-recaptcha-response')
+        url = 'https://www.google.com/recaptcha/api/siteverify'
+
+        values = {
+            'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+            'response': recaptcha_response
+        }
+        data = urllib_parse.urlencode(values).encode()
+        req = urllib_request.Request(url, data=data)
+        response = urllib_request.urlopen(req)
+        result = json.loads(response.read().decode())
+
+        if 'success' not in result or result['success'] is not True:
+            form = self.get_form()
+            return super().form_invalid(form)
+
         return super().post(request, *args, **kwargs)
 
     def get_success_url(self):
