@@ -57,13 +57,13 @@
 
 <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
 {% if not debug %}
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
     <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=new Date;</script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
     <script>
     {% if page_type == 'new_account' %}
-        ga('gtm1.send', 'event', 'cro', 'registro', 'conversao_novaconta', '1');
+        ga('gtm.send', 'event', 'cro', 'registro', 'conversao_novaconta', '1');
     {% elif page_type == 'new_event' %}
-        ga('gtm1.send', 'event', 'cro', 'registro', 'conversao_novoevento', '1');
+        ga('gtm.send', 'event', 'cro', 'registro', 'conversao_novoevento', '1');
     {% endif %}
     </script>
 
