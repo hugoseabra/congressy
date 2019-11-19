@@ -31,6 +31,7 @@
                        class="form-control"
                        id="name"
                        placeholder="Nome e sobrenome"
+                       value="{{ form.name.value|default_if_none:'' }}"
                 >
                 {% for error in form.name.errors %}
                     <div class="alert alert-danger
@@ -52,7 +53,8 @@
                        required
                        class="form-control"
                        id="email"
-                       placeholder="me@you.com">
+                       placeholder="me@you.com"
+                       value="{{ form.email.value|default_if_none:'' }}">
                 {% for error in form.email.errors %}
                     <div class="alert alert-danger
                                     alert-dismissable">
@@ -67,8 +69,12 @@
         </div>
         <div class="form-group">
             <div class="col-md-12">
-                {{ form.captcha }}
-                <small class="text-danger">{{ form.captcha.errors }}</small>
+<!--        {{ form.captcha }}-->
+<!--        <small class="text-danger">{{ form.captcha.errors }}</small>-->
+                <div class="g-recaptcha"
+                     style="transform:scale(0.77);-webkit-transform:scale(0.77);transform-origin:0 0;-webkit-transform-origin:0 0;"
+                     data-sitekey="6Lerw18UAAAAANaVK-G5QZEM2My-iumnxVFbDrpZ">
+                </div>
             </div>
         </div>
         <div class="form-group">
@@ -101,4 +107,7 @@
 {% block support %}
     {{ block.super }}
     {% include 'hotjar.html' %}
+{% endblock %}
+{% block local_js %}
+    <script src='https://www.google.com/recaptcha/api.js'></script>
 {% endblock %}

@@ -9,7 +9,7 @@ services:
       - /etc/localtime:/etc/localtime
 
   reverse-proxy:
-    image: traefik
+    image: traefik:v1.7.19-alpine
     command: --api --docker
     networks:
       - traefik
