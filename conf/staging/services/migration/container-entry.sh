@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source /scripts.sh
+source /deploy/scripts.sh
 
 # Define settings
 export DJANGO_SETTINGS_MODULE=project.manage.settings.staging
