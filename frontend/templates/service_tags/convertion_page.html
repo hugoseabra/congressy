@@ -25,7 +25,8 @@
     <link rel="stylesheet" href="{% static "assets/css/fontawesome-all.min.css" %}">
     <link rel="stylesheet" href="{% static "assets/css/font-awesome-animation.min.css" %}">
 
-    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+    <script src="{% static 'assets/js/vendor/jquery-1.12.3.min.js' %}"></script>
+    {% include 'google-tag-manager-head.html' %}
 
     <!-- Custom styles for this theme -->
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
@@ -49,6 +50,9 @@
         </div>
     </div>
 </div>
+
+{% include 'google-analytics.html' %}
+{% include 'google-tag-manager-body.html' %}
 
 {% include 'buzzlead/buzzlead-tracker.html' %}
 {% include 'buzzlead/buzzlead-subscription-conversion.html' %}
