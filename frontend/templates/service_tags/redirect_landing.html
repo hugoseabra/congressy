@@ -20,9 +20,9 @@
     <link rel="stylesheet" href="{% static "assets/css/fontawesome-all.min.css" %}">
     <link rel="stylesheet" href="{% static "assets/css/font-awesome-animation.min.css" %}">
 
-    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+    <script src="{% static 'assets/js/vendor/jquery-1.12.3.min.js' %}"></script>
+    {% include 'google-tag-manager-head.html' %}
 
-    <!-- Custom styles for this theme -->
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
 
 </head>
@@ -48,65 +48,50 @@
 
         </div>
     </div>
-
-
 </div>
+    <script src="{% static 'assets/plugins/bootstrap/js/bootstrap.min.js' %}"></script>
+    {% if not debug %}
+        {% include 'google-analytics.html' %}
+        {% include 'google-tag-manager-body.html' %}
 
+        {% if marketing_type == 'adwords' %}
+            <script async src="https://www.googletagmanager.com/gtag/js?id=AW-827903122"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
 
-</body>
+                function gtag() {
+                    dataLayer.push(arguments);
+                }
 
-<script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
-{% if not debug %}
-    <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=new Date;</script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-    <script>
-    {% if page_type == 'new_account' %}
-        ga('gtm.send', 'event', 'cro', 'registro', 'conversao_novaconta', '1');
-    {% elif page_type == 'new_event' %}
-        ga('gtm.send', 'event', 'cro', 'registro', 'conversao_novoevento', '1');
+                {% if page_type == 'new_account' %}
+
+                    gtag('event',
+                        'conversion',
+                        {
+                            'send_to': 'AW-827903122/ydKjCO_gh4cBEJKZ44oD'
+                        });
+                {% elif page_type == 'new_event' %}
+                    gtag('event',
+                        'conversion',
+                        {
+                            'send_to': 'AW-827903122/3mskCIzdh4cBEJKZ44oD',
+                            'transaction_id': ''
+                        });
+                {% endif %}
+            </script>
+
+        {% endif %}
     {% endif %}
+
+    <script>
+        setTimeout(function () {
+            window.location.href = '{{ next }}';
+        }, 5000);
+
+        setTimeout(function () {
+            $('#help_text').fadeIn();
+        }, 15000);
     </script>
 
-    {% if marketing_type == 'adwords' %}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-827903122"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-
-            function gtag() {
-                dataLayer.push(arguments);
-            }
-
-            {% if page_type == 'new_account' %}
-
-                gtag('event',
-                    'conversion',
-                    {
-                        'send_to': 'AW-827903122/ydKjCO_gh4cBEJKZ44oD'
-                    });
-            {% elif page_type == 'new_event' %}
-                gtag('event',
-                    'conversion',
-                    {
-                        'send_to': 'AW-827903122/3mskCIzdh4cBEJKZ44oD',
-                        'transaction_id': ''
-                    });
-            {% endif %}
-        </script>
-
-    {% endif %}
-{% endif %}
-
-
-
-<script>
-    setTimeout(function () {
-        window.location.href = '{{ next }}';
-    }, 5000);
-
-    setTimeout(function () {
-        $('#help_text').fadeIn();
-    }, 15000);
-</script>
-
-
+</body>
 </html>
