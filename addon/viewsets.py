@@ -1,3 +1,5 @@
+from typing import Any
+
 from rest_framework import viewsets, status
 from rest_framework.authentication import (
     BasicAuthentication,
@@ -25,6 +27,10 @@ class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
     """
     queryset = models.Service.objects.all().order_by('name')
     serializer_class = serializers.ServiceSerializer
+
+    def get_serializer(self, *args: Any, **kwargs):
+
+        return super().get_serializer(*args, **kwargs)
 
     def get_queryset(self):
         user = self.request.user

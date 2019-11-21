@@ -100,7 +100,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def __init__(self, *args, **kwargs):
-
+        self.subscription_pk = kwargs.pop('subscription_pk')
         data = kwargs.get('data')
 
         if data:
@@ -123,7 +123,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
         super().__init__(*args, **kwargs)
 
-    def to_representation(self, instance: Any) -> Any:
+    def to_representation(self, instance: models.Service) -> Any:
         ret = super().to_representation(instance)
 
         theme = instance.theme
@@ -132,6 +132,8 @@ class ServiceSerializer(serializers.ModelSerializer):
             'name': theme.name,
             'limit': theme.limit,
         }
+
+        ret['num_subscriptions'] = instance.subscription_services.count()
 
         opt_type = instance.optional_type
         ret['optional_type_data'] = {
