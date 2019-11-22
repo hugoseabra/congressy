@@ -63,6 +63,8 @@
     <link rel="stylesheet"
           href="{% static "assets/plugins/messenger/css/location-sel.css" %}">
 
+    {% include 'google-tag-manager-head.html' %}
+
     <style>
         img.blurred {
             -webkit-filter: blur(18px);
@@ -215,6 +217,7 @@
 {% include 'buzzlead/buzzlead-tracker.html' %}
 {% include 'sentry-javascript-sdk.html' %}
 {% include 'google-analytics.html' %}
+{% include 'google-tag-manager-body.html' %}
 
 </body>
 

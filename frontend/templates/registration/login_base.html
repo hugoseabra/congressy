@@ -48,6 +48,7 @@
 
     <!-- Feature detection -->
     <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
+    {% include 'google-tag-manager-head.html' %}
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -150,7 +151,7 @@
         {% include 'google-analytics.html' %}
         {% include 'google-remarketing.html' %}
         {% include 'google-adwords.html' %}
-        {#{% inclide 'google-tag-manager.html' %}#}
+        {% include 'google-tag-manager-body.html' %}
     {% endif %}
 {% endblock %}
 

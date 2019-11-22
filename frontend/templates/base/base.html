@@ -68,7 +68,8 @@
 
     {% block styles %}{% endblock %}
 
-    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+    <script src="{% static 'assets/js/vendor/jquery-1.12.3.min.js' %}"></script>
+    {% include 'google-tag-manager-head.html' %}
 
     {% block headscripts %}{% endblock %}
 
@@ -344,7 +345,7 @@
         {% include 'google-analytics.html' %}
         {% include 'google-remarketing.html' %}
         {% include 'google-adwords.html' %}
-        {#{% inclide 'google-tag-manager.html' %}#}
+        {% include 'google-tag-manager-body.html' %}
     {% endif %}
 {% endblock %}
 
