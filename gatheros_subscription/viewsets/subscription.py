@@ -22,7 +22,7 @@ from core.util.string import clear_string
 from gatheros_event.models import Event
 from gatheros_subscription.helpers.subscription_async_exporter import \
     SubscriptionServiceAsyncExporter
-from gatheros_subscription.models import Subscription
+from gatheros_subscription.models import Subscription, Lot
 from gatheros_subscription.permissions import OrganizerOnly
 from gatheros_subscription.serializers import (
     SubscriptionSerializer,
@@ -312,7 +312,18 @@ class SubscriptionViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
         if person_pk:
             try:
-                instance = Subscription.objects.get(person_id=person_pk)
+                lot = Lot.objects.get(pk=lot_pk)
+            except Lot.DoesNotExist:
+                content = {
+                    'errors': ["Lote não encontrado: '{}' ".format(lot_pk)]
+                }
+                return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                instance = Subscription.objects.get(
+                    person_id=person_pk,
+                    lot__event_id=lot.event_id,
+                )
                 self.check_object_permissions(self.request, instance)
 
                 if instance.lot_id != int(lot_pk):
