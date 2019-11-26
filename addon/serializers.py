@@ -100,7 +100,11 @@ class ServiceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def __init__(self, *args, **kwargs):
-        self.subscription_pk = kwargs.pop('subscription_pk')
+
+        self.subscription_pk = None
+        if 'subscription' in kwargs:
+            self.subscription_pk = kwargs.pop('subscription')
+
         data = kwargs.get('data')
 
         if data:
