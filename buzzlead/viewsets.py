@@ -3,18 +3,18 @@ from rest_framework import viewsets, status
 from rest_framework.authentication import (
     SessionAuthentication,
     BasicAuthentication,
-    TokenAuthentication,
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from buzzlead.serializers import BuzzLeadCampaignSerializer
+from project.token_authentication import ExpiringTokenAuthentication
 
 
 class RestrictionViewMixin(object):
     authentication_classes = (SessionAuthentication,
                               BasicAuthentication,
-                              TokenAuthentication)
+                              ExpiringTokenAuthentication)
     permission_classes = (IsAuthenticated,)
 
 

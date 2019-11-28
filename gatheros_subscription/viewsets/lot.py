@@ -1,41 +1,24 @@
-from datetime import datetime
-from time import sleep
-from typing import Any
-
-from django.db.models import Q
-from django.http import HttpResponse
-from rest_framework import viewsets, generics, pagination, status, permissions
+from rest_framework import viewsets, status
 from rest_framework.authentication import (
     BasicAuthentication,
     SessionAuthentication,
-    TokenAuthentication,
 )
-from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
-from core.util.string import clear_string
-from gatheros_event.models import Event
-from gatheros_subscription.helpers.subscription_async_exporter import \
-    SubscriptionServiceAsyncExporter
 from gatheros_subscription.lot_api_permissions import MultiLotsAllowed
-from gatheros_subscription.models import Lot, Subscription
+from gatheros_subscription.models import Lot
 from gatheros_subscription.serializers import (
     LotSerializer,
-    SubscriptionSerializer,
-    SubscriptionModelSerializer,
 )
-from gatheros_subscription.tasks import async_subscription_exporter_task
-from gatheros_subscription.permissions import OrganizerOnly
+from project.token_authentication import ExpiringTokenAuthentication
 
 
 class RestrictionViewMixin:
     authentication_classes = (
         SessionAuthentication,
         BasicAuthentication,
-        TokenAuthentication,
+        ExpiringTokenAuthentication,
     )
 
 

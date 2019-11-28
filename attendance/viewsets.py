@@ -8,7 +8,6 @@ from rest_framework import viewsets, status
 from rest_framework.authentication import (
     BasicAuthentication,
     SessionAuthentication,
-    TokenAuthentication,
 )
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
@@ -21,13 +20,14 @@ from attendance.helpers.async_exporter_helpers import \
 from attendance.models import AttendanceService
 from attendance.tasks import async_attendance_exporter_task
 from gatheros_subscription.models import Subscription
+from project.token_authentication import ExpiringTokenAuthentication
 
 
 class RestrictionViewMixin(object):
     authentication_classes = (
         SessionAuthentication,
         BasicAuthentication,
-        TokenAuthentication,
+        ExpiringTokenAuthentication,
     )
     permission_classes = (IsAuthenticated,)
 

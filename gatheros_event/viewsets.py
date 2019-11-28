@@ -2,10 +2,9 @@ from rest_framework import permissions, status
 from rest_framework.authentication import (
     BasicAuthentication,
     SessionAuthentication,
-    TokenAuthentication,
 )
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
+from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import (
     GenericViewSet,
@@ -19,6 +18,7 @@ from gatheros_event.serializers import (
     OrganizationSerializer,
     PersonSerializer,
 )
+from project.token_authentication import ExpiringTokenAuthentication
 
 
 class PersonViewSet(ModelViewSet):
@@ -30,7 +30,7 @@ class PersonViewSet(ModelViewSet):
     authentication_classes = (
         BasicAuthentication,
         SessionAuthentication,
-        TokenAuthentication,
+        ExpiringTokenAuthentication,
     )
 
     def list(self, request, *args, **kwargs):
@@ -102,7 +102,7 @@ class PersonLoggedUserViewSet(GenericViewSet, ListModelMixin):
     authentication_classes = (
         BasicAuthentication,
         SessionAuthentication,
-        TokenAuthentication,
+        ExpiringTokenAuthentication,
     )
 
     def filter_queryset(self, queryset):
@@ -130,7 +130,7 @@ class OrganizationReadOnlyViewSet(ReadOnlyModelViewSet):
     authentication_classes = (
         BasicAuthentication,
         SessionAuthentication,
-        TokenAuthentication,
+        ExpiringTokenAuthentication,
     )
 
     def permission_denied(self, request, message=None):
@@ -172,7 +172,7 @@ class EventReadOnlyViewSet(ReadOnlyModelViewSet):
     authentication_classes = (
         BasicAuthentication,
         SessionAuthentication,
-        TokenAuthentication,
+        ExpiringTokenAuthentication,
     )
 
     def permission_denied(self, request, message=None):

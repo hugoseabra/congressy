@@ -3,12 +3,13 @@ from typing import Any
 from django.core.exceptions import PermissionDenied
 from rest_framework import viewsets, status
 from rest_framework.authentication import SessionAuthentication, \
-    BasicAuthentication, TokenAuthentication
+    BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
 from gatheros_event.models import Event
+from project.token_authentication import ExpiringTokenAuthentication
 from sync.endpoint_permissions import (
     SyncClientOrganizerOnly,
     SyncQueueAllowedClientKey,
@@ -21,7 +22,7 @@ class SyncClientRestrictionMixin:
     authentication_classes = (
         SessionAuthentication,
         BasicAuthentication,
-        TokenAuthentication,
+        ExpiringTokenAuthentication,
     )
 
 

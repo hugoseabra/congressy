@@ -8,10 +8,9 @@ from rest_framework import viewsets, generics, pagination, status, permissions
 from rest_framework.authentication import (
     BasicAuthentication,
     SessionAuthentication,
-    TokenAuthentication,
 )
 from rest_framework.exceptions import APIException
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -31,6 +30,7 @@ from gatheros_subscription.serializers import (
 from gatheros_subscription.serializers.subscription import \
     SubscriptionBillingSerializer
 from gatheros_subscription.tasks import async_subscription_exporter_task
+from project.token_authentication import ExpiringTokenAuthentication
 from .mixins import RestrictionViewMixin
 
 
@@ -374,5 +374,5 @@ class SubscriptionBillingViewSet(GenericViewSet, RetrieveModelMixin):
     authentication_classes = (
         BasicAuthentication,
         SessionAuthentication,
-        TokenAuthentication,
+        ExpiringTokenAuthentication,
     )

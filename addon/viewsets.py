@@ -5,18 +5,18 @@ from rest_framework import viewsets, status
 from rest_framework.authentication import (
     BasicAuthentication,
     SessionAuthentication,
-    TokenAuthentication,
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from addon import models, serializers
+from project.token_authentication import ExpiringTokenAuthentication
 
 
 class RestrictionViewMixin(object):
     authentication_classes = (SessionAuthentication,
                               BasicAuthentication,
-                              TokenAuthentication)
+                              ExpiringTokenAuthentication)
     permission_classes = (IsAuthenticated,)
 
 

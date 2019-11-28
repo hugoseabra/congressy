@@ -2,15 +2,16 @@ from rest_framework import permissions
 from rest_framework.authentication import (
     SessionAuthentication,
     BasicAuthentication,
-    TokenAuthentication,
 )
+
+from project.token_authentication import ExpiringTokenAuthentication
 
 
 class RestrictionViewMixin:
     authentication_classes = (
         SessionAuthentication,
         BasicAuthentication,
-        TokenAuthentication,
+        ExpiringTokenAuthentication,
     )
     permission_classes = (
         permissions.IsAuthenticated,
