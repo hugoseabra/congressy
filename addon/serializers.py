@@ -3,13 +3,14 @@ import binascii
 from typing import Any
 from uuid import uuid4
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
 from addon import models
 from addon.services import SubscriptionServiceService
 from core.serializers import FormSerializerMixin
-from gatheros_subscription.models import LotCategory
+from gatheros_subscription.models import LotCategory, Subscription
 
 
 class LotCategorySerializer(serializers.ModelSerializer):
@@ -101,9 +102,13 @@ class ServiceSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
 
-        self.subscription_pk = None
+        self.subscription = None
         if 'subscription' in kwargs:
-            self.subscription_pk = kwargs.pop('subscription')
+            sub_pk = kwargs.pop('subscription')
+            try:
+                self.subscription = Subscription.objects.get(pk=sub_pk)
+            except Subscription.DoesNotExist:
+                raise Exception('Subscription not found.')
 
         data = kwargs.get('data')
 
@@ -137,7 +142,33 @@ class ServiceSerializer(serializers.ModelSerializer):
             'limit': theme.limit,
         }
 
-        ret['num_subscriptions'] = instance.subscription_services.count()
+        ret['num_subscriptions'] = instance.num_consumed
+        ret['limit'] = instance.quantity
+
+        ret['status'] = instance.status
+        ret['full'] = False
+        ret['conflicted'] = False
+        ret['conflict_reason'] = None
+
+        if instance.has_quantity_conflict:
+            ret['full'] = True
+            ret['conflicted'] = True
+            ret['conflict_reason'] = 'Esta opção está esgotada.'
+
+        elif self.subscription:
+            try:
+                instance.subscription_services.get(pk=self.subscription.pk)
+                if instance.has_tag_conflict is True:
+                    ret['conflicted'] = True
+                    ret['conflict_reason'] = 'Já existe outra opção' \
+                                             ' semelhante selecionada.'
+                elif instance.has_schedule_conflicts is True:
+                    ret['conflicted'] = True
+                    ret['conflict_reason'] = 'Opção em conflito de horário' \
+                                             ' com outra opção previamente' \
+                                             ' selecionada.'
+            except ObjectDoesNotExist:
+                pass
 
         opt_type = instance.optional_type
         ret['optional_type_data'] = {

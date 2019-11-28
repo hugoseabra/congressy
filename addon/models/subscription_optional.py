@@ -84,7 +84,9 @@ class SubscriptionProduct(AbstractSubscriptionOptional):
         :type: bool
         """
         return self.optional.subscription_products.exclude(
-            subscription__status='canceled'
+            subscription__status=Subscription.CANCELED_STATUS,
+            subscription__test_subscription=False,
+            subscription__completed=True,
         ).count()
 
     def get_person_name(self):
@@ -134,6 +136,8 @@ class SubscriptionService(AbstractSubscriptionOptional):
         """
         return self.optional.subscription_services.exclude(
             subscription__status=Subscription.CANCELED_STATUS,
+            subscription__test_subscription=False,
+            subscription__completed=True,
         ).count()
 
     @property
@@ -144,15 +148,15 @@ class SubscriptionService(AbstractSubscriptionOptional):
         is_restricted = self.optional.restrict_unique
 
         for sub_optional in self.subscription.subscription_services.all():
+            optional = sub_optional.optional
 
-            start = sub_optional.optional.schedule_start
-            stop = sub_optional.optional.schedule_end
-            is_sub_restricted = \
-                sub_optional.optional.restrict_unique
+            start = optional.schedule_start
+            stop = optional.schedule_end
+            is_sub_restricted = optional.restrict_unique
 
             session_range = DateTimeRange(start=start, stop=stop)
-            has_conflict = (new_start in session_range or new_end in
-                            session_range)
+            has_conflict = \
+                (new_start in session_range or new_end in session_range)
 
             if has_conflict is True and (is_restricted or is_sub_restricted):
                 return True
@@ -160,27 +164,48 @@ class SubscriptionService(AbstractSubscriptionOptional):
         return False
 
     @property
+    def get_tag_conflict_services(self):
+        sub_serv_qs = self.subscription.subscription_services
+
+        existing_tag_qs = sub_serv_qs.filter(optional__tag=self.optional.tag)
+
+        return existing_tag_qs.all() if existing_tag_qs.count() > 0 else list()
+
+    @property
+    def has_tag_conflict(self):
+        tag_conflict_services = self.get_tag_conflict_services
+        return len(tag_conflict_services) > 0
+
+    @property
     def get_schedule_conflict_service(self):
         new_start = self.optional.schedule_start
         new_end = self.optional.schedule_end
 
+        sub_serv_qs = self.subscription.subscription_services
+
         is_restricted = self.optional.restrict_unique
 
-        for sub_optional in self.subscription.subscription_services.all():
+        for sub_optional in sub_serv_qs.all():
+            optional = sub_optional.optional
 
-            start = sub_optional.schedule_start
-            stop = sub_optional.schedule_end
-            is_sub_restricted = \
-                sub_optional.restrict_unique
+            start = optional.schedule_start
+            stop = optional.schedule_end
+            is_sub_restricted = optional.restrict_unique
 
-            session_range = DateTimeRange(start=start, stop=stop)
-            has_conflict = (new_start in session_range or new_end in
-                            session_range)
+            dates_range = DateTimeRange(start=start, stop=stop)
+            has_conflict = (new_start in dates_range or new_end in dates_range)
 
             if has_conflict is True and (is_restricted or is_sub_restricted):
                 return sub_optional
 
         return None
+
+    @property
+    def has_conflict_services(self):
+        has_tag_conflict = self.has_tag_conflict
+        has_date_conflict = self.has_schedule_conflicts
+
+        return has_tag_conflict is True or has_date_conflict is True
 
     def get_person_name(self):
         return self.subscription.person.name

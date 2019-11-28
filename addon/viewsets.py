@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.db.models import QuerySet
 from rest_framework import viewsets, status
 from rest_framework.authentication import (
     BasicAuthentication,
@@ -44,6 +45,18 @@ class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         return queryset.filter(
             lot_category__event__organization_id__in=org_pks
         )
+
+    def filter_queryset(self, queryset: QuerySet) -> QuerySet:
+        queryset = super().filter_queryset(queryset)
+
+        show_inactive = self.request.query_params.get('show_inactive', None)
+
+        if self.request.method == 'GET':
+            if show_inactive is None \
+                    or (show_inactive != '1' and show_inactive != 'true'):
+                queryset = queryset.filter(published=True)
+
+        return queryset
 
     def list(self, request, *args, **kwargs):
         event_pk = request.query_params.get('event', None)
@@ -99,6 +112,17 @@ class ProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         return queryset.filter(
             lot_category__event__organization_id__in=org_pks
         )
+
+    def filter_queryset(self, queryset: QuerySet) -> QuerySet:
+        queryset = super().filter_queryset(queryset)
+
+        show_inactive = self.request.query_params.get('show_inactive', None)
+
+        if show_inactive is None \
+                or (show_inactive != '1' and show_inactive != 'true'):
+            queryset = queryset.filter(published=True)
+
+        return queryset
 
     def list(self, request, *args, **kwargs):
         event_pk = request.query_params.get('event', None)
