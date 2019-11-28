@@ -201,11 +201,19 @@ class SubscriptionService(AbstractSubscriptionOptional):
         return None
 
     @property
+    def has_theme_conflict(self):
+        return self.optional.theme_full is True
+
+    @property
     def has_conflict_services(self):
         has_tag_conflict = self.has_tag_conflict
         has_date_conflict = self.has_schedule_conflicts
+        has_theme_conflict = self.has_theme_conflict
 
-        return has_tag_conflict is True or has_date_conflict is True
+        return \
+            has_tag_conflict is True or \
+            has_date_conflict is True or \
+            has_theme_conflict is True
 
     def get_person_name(self):
         return self.subscription.person.name

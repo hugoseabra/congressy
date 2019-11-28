@@ -47,6 +47,14 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
 
+        self.subscription = None
+        if 'subscription' in kwargs:
+            sub_pk = kwargs.pop('subscription')
+            try:
+                self.subscription = Subscription.objects.get(pk=sub_pk)
+            except Subscription.DoesNotExist:
+                raise Exception('Subscription not found.')
+
         data = kwargs.get('data')
 
         if data:
@@ -85,6 +93,31 @@ class ProductSerializer(serializers.ModelSerializer):
             'active': lot_cat.active,
             'description': lot_cat.description,
         }
+
+        ret['num_subscriptions'] = instance.num_consumed
+        ret['limit'] = instance.quantity
+
+        ret['status'] = instance.status
+        ret['full'] = False
+        ret['conflicted'] = False
+        ret['conflict_reason'] = None
+
+        if instance.has_quantity_conflict:
+            ret['full'] = True
+            ret['conflicted'] = True
+            ret['conflict_reason'] = 'Esta opção está esgotada.'
+
+        elif self.subscription:
+            try:
+                addon_serv = instance.subscription_services.get(
+                    pk=self.subscription.pk
+                )
+                if addon_serv.has_tag_conflict is True:
+                    ret['conflicted'] = True
+                    ret['conflict_reason'] = 'Já existe outra opção' \
+                                             ' semelhante selecionada.'
+            except ObjectDoesNotExist:
+                pass
 
         return ret
 
@@ -157,16 +190,22 @@ class ServiceSerializer(serializers.ModelSerializer):
 
         elif self.subscription:
             try:
-                instance.subscription_services.get(pk=self.subscription.pk)
-                if instance.has_tag_conflict is True:
+                addon_serv = instance.subscription_services.get(
+                    pk=self.subscription.pk
+                )
+                if addon_serv.has_tag_conflict is True:
                     ret['conflicted'] = True
                     ret['conflict_reason'] = 'Já existe outra opção' \
                                              ' semelhante selecionada.'
-                elif instance.has_schedule_conflicts is True:
+                elif addon_serv.has_schedule_conflicts is True:
                     ret['conflicted'] = True
                     ret['conflict_reason'] = 'Opção em conflito de horário' \
                                              ' com outra opção previamente' \
                                              ' selecionada.'
+                elif addon_serv.has_theme_conflict is True:
+                    ret['conflicted'] = True
+                    ret['conflict_reason'] = 'Opção possui um tema que' \
+                                             ' está esgotado ou indisponível.'
             except ObjectDoesNotExist:
                 pass
 

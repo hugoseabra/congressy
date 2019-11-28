@@ -349,8 +349,12 @@ class Service(AbstractOptional):
         """
         return self.subscription_services.filter(
             subscription__completed=True,
-            subscription__test_subscription=False
+            subscription__test_subscription=False,
         ).exclude(subscription__status=Subscription.CANCELED_STATUS).count()
+
+    @property
+    def theme_full(self):
+        return self.theme.limit >= self.num_consumed
 
     def save(self, *args, **kwargs):
         if self.tag:
