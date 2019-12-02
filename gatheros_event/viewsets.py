@@ -4,6 +4,7 @@ from rest_framework.authentication import (
     SessionAuthentication,
 )
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import ListModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import (
@@ -55,7 +56,7 @@ class PersonViewSet(ModelViewSet):
 
                 serializer = self.get_serializer(instance=instance,
                                                  data=request.data,
-                                                 partial=True,)
+                                                 partial=True, )
                 is_new = False
 
         serializer.is_valid(raise_exception=True)
@@ -165,7 +166,6 @@ class OrganizationReadOnlyViewSet(ReadOnlyModelViewSet):
 class EventReadOnlyViewSet(ReadOnlyModelViewSet):
     serializer_class = EventSerializer
     queryset = Event.objects.all()
-    lookup_field = 'slug'
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
     )
@@ -174,6 +174,19 @@ class EventReadOnlyViewSet(ReadOnlyModelViewSet):
         SessionAuthentication,
         ExpiringTokenAuthentication,
     )
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')  # default
+
+        if str(pk).isdigit():
+            return super().get_object()
+
+        queryset = self.get_queryset()  # Get the base queryset
+        queryset = self.filter_queryset(queryset)  # Apply any filter backends
+
+        obj = get_object_or_404(queryset, slug=pk)  # Lookup the object
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     def permission_denied(self, request, message=None):
         """
