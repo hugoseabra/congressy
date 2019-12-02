@@ -127,7 +127,7 @@ class ProductSerializer(serializers.ModelSerializer):
 class SubscriptionProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.SubscriptionProduct
-        fields = ('subscription', 'optional',)
+        fields = ('pk', 'subscription', 'optional',)
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -238,4 +238,4 @@ class SubscriptionServiceSerializer(FormSerializerMixin,
     class Meta:
         form = SubscriptionServiceService
         model = models.SubscriptionService
-        fields = ('subscription', 'optional',)
+        fields = ('pk', 'subscription', 'optional',)
