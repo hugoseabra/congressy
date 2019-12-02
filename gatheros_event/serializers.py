@@ -81,6 +81,7 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = (
+            'pk',
             'name',
             'slug',
             'published',
