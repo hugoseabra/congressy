@@ -101,6 +101,7 @@ class ProductSerializer(serializers.ModelSerializer):
         ret['full'] = False
         ret['conflicted'] = False
         ret['conflict_reason'] = None
+        ret['subscription_registered'] = False
 
         if instance.has_quantity_conflict:
             ret['full'] = True
@@ -109,10 +110,11 @@ class ProductSerializer(serializers.ModelSerializer):
 
         elif self.subscription:
             try:
-                addon_serv = instance.subscription_services.get(
+                addon_prod = instance.subscription_products.get(
                     pk=self.subscription.pk
                 )
-                if addon_serv.has_tag_conflict is True:
+                ret['subscription_registered'] = True
+                if addon_prod.has_tag_conflict is True:
                     ret['conflicted'] = True
                     ret['conflict_reason'] = 'Já existe outra opção' \
                                              ' semelhante selecionada.'
@@ -175,6 +177,8 @@ class ServiceSerializer(serializers.ModelSerializer):
             'limit': theme.limit,
         }
 
+        ret['price'] = instance.price
+
         ret['num_subscriptions'] = instance.num_consumed
         ret['limit'] = instance.quantity
 
@@ -182,6 +186,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         ret['full'] = False
         ret['conflicted'] = False
         ret['conflict_reason'] = None
+        ret['subscription_registered'] = False
 
         if instance.has_quantity_conflict:
             ret['full'] = True
@@ -191,8 +196,10 @@ class ServiceSerializer(serializers.ModelSerializer):
         elif self.subscription:
             try:
                 addon_serv = instance.subscription_services.get(
-                    pk=self.subscription.pk
+                    subscription_id=self.subscription.pk
                 )
+                ret['subscription_registered'] = True
+
                 if addon_serv.has_tag_conflict is True:
                     ret['conflicted'] = True
                     ret['conflict_reason'] = 'Já existe outra opção' \

@@ -1,3 +1,4 @@
+import uuid
 from typing import Any
 
 from django.db.models import QuerySet
@@ -10,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from addon import models, serializers
+from gatheros_subscription.models import Subscription
 from project.token_authentication import ExpiringTokenAuthentication
 
 
@@ -30,7 +32,9 @@ class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
     serializer_class = serializers.ServiceSerializer
 
     def get_serializer(self, *args: Any, **kwargs):
-
+        sub_pk = self.request.query_params.get('subscription', None)
+        if sub_pk:
+            kwargs.update({'subscription': sub_pk})
         return super().get_serializer(*args, **kwargs)
 
     def get_queryset(self):
@@ -60,6 +64,7 @@ class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         event_pk = request.query_params.get('event', None)
+        sub_pk = request.query_params.get('subscription', None)
 
         if event_pk is None:
             content = {
@@ -78,6 +83,33 @@ class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
             }
 
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        if sub_pk:
+            try:
+                uuid.UUID(sub_pk)
+            except ValueError:
+                content = {
+                    'errors': [
+                        "Subscription provided is a valid uuid",
+                    ]
+                }
+                return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                Subscription.objects.exclude(
+                    status=Subscription.CANCELED_STATUS
+                ).get(
+                    pk=sub_pk,
+                    event_id=event_pk,
+                    test_subscription=False,
+                )
+            except Subscription.DoesNotExist:
+                content = {
+                    'errors': [
+                        "Subscription provided was not found",
+                    ]
+                }
+                return Response(content, status=status.HTTP_404_NOT_FOUND)
 
         queryset = self.get_queryset()
         queryset = queryset.filter(lot_category__event_id=event_pk)
@@ -99,6 +131,12 @@ class ProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
     """
     queryset = models.Product.objects.all().order_by('name')
     serializer_class = serializers.ProductSerializer
+
+    def get_serializer(self, *args: Any, **kwargs):
+        sub_pk = self.request.query_params.get('subscription', None)
+        if sub_pk:
+            kwargs.update({'subscription': sub_pk})
+        return super().get_serializer(*args, **kwargs)
 
     def get_queryset(self):
         user = self.request.user

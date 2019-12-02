@@ -354,7 +354,7 @@ class Service(AbstractOptional):
 
     @property
     def theme_full(self):
-        return self.theme.limit >= self.num_consumed
+        return self.theme.limit and self.theme.limit >= self.num_consumed
 
     def save(self, *args, **kwargs):
         if self.tag:
