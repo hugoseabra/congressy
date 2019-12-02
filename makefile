@@ -2,7 +2,6 @@
 up: export_settings
 	@make broker_create
 	docker-compose -f bin/env/docker-compose_dev.yml up -d --remove-orphans;
-	@make update_db
 	@make logs
 
 

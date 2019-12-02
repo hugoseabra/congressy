@@ -1,9 +1,8 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.authentication import (
     BasicAuthentication,
     SessionAuthentication,
 )
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from gatheros_subscription.lot_api_permissions import MultiLotsAllowed
@@ -32,13 +31,16 @@ class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
-        org_pks = [
-            m.organization.pk
-            for m in user.person.members.filter(active=True)
-        ]
-
         queryset = super().get_queryset()
-        queryset = queryset.filter(event__organization__in=org_pks)
+
+        if hasattr(user, 'person'):
+            org_pks = [
+                m.organization.pk
+                for m in user.person.members.filter(active=True)
+            ]
+
+            queryset = queryset.filter(event__organization__in=org_pks)
+
         return queryset.order_by('name')
 
     def list(self, request, *args, **kwargs):
@@ -106,9 +108,12 @@ class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         """
 
         if request.method == "POST":
-            self.permission_classes = (IsAuthenticated, MultiLotsAllowed)
+            self.permission_classes = (
+                permissions.IsAuthenticated,
+                MultiLotsAllowed,
+            )
         else:
-            self.permission_classes = (IsAuthenticated,)
+            self.permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
         for permission in self.get_permissions():
             if not permission.has_permission(request, self):

@@ -26,6 +26,9 @@ class LotSerializer(serializers.ModelSerializer):
             'slug': event.slug,
         }
 
+        if instance.private is False:
+            ret['exhibition_code'] = None
+
         ret['num_subscriptions'] = instance.subscriptions.count()
 
         lot_cat = instance.category
