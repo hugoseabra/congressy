@@ -31,7 +31,7 @@ class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
     queryset = models.Service.objects.all().order_by('name')
     serializer_class = serializers.ServiceSerializer
 
-    def get_serializer(self, *args: Any, **kwargs):
+    def get_serializer(self, *args, **kwargs):
         sub_pk = self.request.query_params.get('subscription', None)
         if sub_pk:
             kwargs.update({'subscription': sub_pk})

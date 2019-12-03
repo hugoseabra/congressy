@@ -15,11 +15,6 @@ router.register('survey/questions', viewsets.QuestionViewSet)
 router.register('survey/options', viewsets.OptionViewSet)
 router.register('survey/answers', viewsets.AnswerViewSet)
 
-# router.register(
-#     'subscription/surveys/{survey_pk}/questions',
-#     viewsets.QuestionViewSet
-# )
-
 urls = [
     url(
         r'^(?P<lot_pk>[\d]+)/survey/(?P<survey_pk>[\d]+)$',
