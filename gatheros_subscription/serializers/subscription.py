@@ -68,6 +68,9 @@ class SubscriptionSerializer(serializers.BaseSerializer):
         if obj.person.institution:
             rep['institution'] = obj.person.institution
 
+        rep['created'] = obj.created.strftime('%Y-%m-%d %H:%M:%S')
+        rep['modified'] = obj.modified.strftime('%Y-%m-%d %H:%M:%S')
+
         return rep
 
 
@@ -82,6 +85,8 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
             'test_subscription',
             'accredited',
             'accredited_on',
+            'created',
+            'modified',
             'created_by',
             'origin',
         ]
@@ -169,7 +174,7 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                     'name': optional.name,
                     'published': optional.published,
                     'date_end_sub':
-                        optional.date_end_sub.strftime('%Y-%m-%d %Hh%m'),
+                        optional.date_end_sub.strftime('%Y-%m-%d %H:%M:%S'),
                     'banner': optional.banner.url if optional.banner else None,
                     'category': {
                         'pk': optional.lot_category_id,
@@ -194,11 +199,11 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                     'pk': optional.pk,
                     'name': optional.name,
                     'date_start':
-                        optional.schedule_start.strftime('%Y-%m-%d %Hh%m'),
+                        optional.schedule_start.strftime('%Y-%m-%d %H:%M:%S'),
                     'date_end':
-                        optional.schedule_end.strftime('%Y-%m-%d %Hh%m'),
+                        optional.schedule_end.strftime('%Y-%m-%d %H:%M:%S'),
                     'date_end_sub':
-                        optional.date_end_sub.strftime('%Y-%m-%d %Hh%m'),
+                        optional.date_end_sub.strftime('%Y-%m-%d %H:%M:%S'),
                     'published': optional.published,
                     'banner': optional.banner.url if optional.banner else None,
                     'category': {

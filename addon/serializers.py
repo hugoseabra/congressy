@@ -86,6 +86,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'name': opt_type.name,
         }
 
+        ret['price'] = instance.price
+
         lot_cat = instance.lot_category
         ret['lot_category_data'] = {
             'id': lot_cat.pk,
