@@ -2,9 +2,10 @@ from typing import Any
 
 from django.forms import model_to_dict
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from gatheros_subscription.models import EventSurvey, Subscription
-from survey.models import Question, Option, Answer
+from survey.models import Question, Option, Answer, Author
 
 
 class EventSurveySerializer(serializers.ModelSerializer):
@@ -28,6 +29,7 @@ class EventSurveySerializer(serializers.ModelSerializer):
         del rep['id']
 
         event = instance.event
+        rep['event'] = event.pk
         rep['event_data'] = {
             'pk': event.pk,
             'name': event.name,
@@ -130,6 +132,7 @@ class QuestionSerializer(serializers.ModelSerializer):
                     'author_data': model_to_dict(answer.author),
                     'human_display': answer.human_display,
                     'value': answer.value,
+                    'subscription': self.subscription_pk
                 }
                 if answer.author.user_id:
                     user = answer.author.user
@@ -171,9 +174,56 @@ class OptionSerializer(serializers.ModelSerializer):
 
 
 class AnswerSerializer(serializers.ModelSerializer):
+    subscription = serializers.UUIDField(required=True, write_only=True)
+
     class Meta:
         model = Answer
-        fields = '__all__'
+        exclude = ('author', 'human_display')
+
+    def validate_subscription(self, validated_value):
+        try:
+            sub = Subscription.objects.get(pk=validated_value)
+        except Subscription.DoesNotExist:
+            raise ValidationError('Subscription is invalid.')
+
+        return sub
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+
+        subscription = attrs.get('subscription')
+        person = subscription.person
+        question = attrs.get('question')
+
+        user = None
+        author = None
+
+        if person.user_id:
+            user = person.user
+            authors = user.authors.filter(survey_id=question.survey_id)
+            if authors.count():
+                author = authors.last()
+
+        if not author:
+            author, _ = Author.objects.get_or_create(
+                name=person.name,
+                survey=question.survey,
+                user=user,
+            )
+
+        subscription.author = author
+        attrs['author'] = author
+
+        answers = Answer.objects.filter(
+            author=author,
+            question=question,
+        )
+
+        if answers.count():
+            self.instance = answers.last()
+            self.partial = True
+
+        return attrs
 
     def to_representation(self, instance: Any) -> Any:
         rep = super().to_representation(instance)
@@ -182,8 +232,16 @@ class AnswerSerializer(serializers.ModelSerializer):
         rep['author_data'] = model_to_dict(author)
         rep['user_data'] = dict()
 
+        sub = None
+        if hasattr(author, 'subscription'):
+            sub = author.subscription
+
         if author.user_id:
             user = author.user
+
+            if not sub and user.authors.count():
+                sub = user.authors.last()
+
             rep['user_data'].update({
                 'pk': user.pk,
                 'fist_name': user.first_name,
@@ -191,6 +249,8 @@ class AnswerSerializer(serializers.ModelSerializer):
                 'email': user.email,
                 'last_login': user.last_login,
             })
+
+        rep['subscription'] = sub.pk if sub else None
 
         question = instance.question
         survey = question.survey
@@ -206,3 +266,9 @@ class AnswerSerializer(serializers.ModelSerializer):
         }
 
         return rep
+
+    def save(self, **kwargs):
+        subscription = self.validated_data.pop('subscription')
+        instance = super().save(**kwargs)
+        subscription.save()
+        return instance

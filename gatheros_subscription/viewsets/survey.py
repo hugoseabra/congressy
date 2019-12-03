@@ -1,8 +1,5 @@
-from typing import Any
-
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.serializers import BaseSerializer
 
 from gatheros_event.models import Event
 from gatheros_subscription.models import EventSurvey
@@ -38,7 +35,9 @@ class InstanceManagementMixin(object):
             return False
 
     def can_manage_list(self, event_id):
-        return self.is_user_subscribed(event_id) is True
+        return \
+            self.is_user_subscribed(event_id) is True or \
+            self.is_user_event_member(event_id)
 
     def can_manage_object(self, event_id):
         is_member = self.is_user_event_member(event_id)
@@ -148,14 +147,6 @@ class QuestionViewSet(RestrictionViewMixin,
         if survey_id is None:
             content = {
                 'detail': ['Você não pode acessar perguntas por este endpoint']
-            }
-
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
-
-        event_id = self.get_event_id_by_survey(survey_id)
-        if self.can_manage_list(event_id) is False:
-            content = {
-                'detail': ['Você não pode acessar formulários deste evento.']
             }
 
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
