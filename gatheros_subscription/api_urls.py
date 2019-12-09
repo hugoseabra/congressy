@@ -9,6 +9,8 @@ router = routers.DefaultRouter()
 router.register('subscription/lots', viewsets.LotViewSet)
 router.register('subscription/subscriptions/billing',
                 viewsets.SubscriptionBillingViewSet)
+router.register('subscription/subscriptions/payments',
+                viewsets.SubscriptionPaymentViewSet)
 router.register('subscription/subscriptions', viewsets.SubscriptionViewSet)
 router.register('survey/surveys', viewsets.EventSurveyViewSet)
 router.register('survey/questions', viewsets.QuestionViewSet)

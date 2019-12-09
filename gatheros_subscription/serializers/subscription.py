@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 import absoluteuri
+from django.forms import model_to_dict
 from rest_framework import serializers
 
 from gatheros_subscription.models import Subscription
@@ -236,5 +237,65 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                 amounts.append(optional.price)
 
             rep['total_amount'] = round(Decimal(sum(amounts)), 2)
+
+        return rep
+
+
+class SubscriptionPaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = [
+            'lot',
+        ]
+
+    def to_representation(self, instance):
+        amounts = list()
+
+        rep = dict()
+        rep['transactions'] = list()
+        rep['amount'] = Decimal(0)
+
+        for trans in instance.transactions.all():
+            lot = trans.lot
+            lot_cat = lot.category
+            sub = trans.subscription
+
+            item = dict()
+
+            item['lot_data'] = {
+                'pk': lot.pk,
+                'name': lot.name,
+                'event': lot.event_id,
+                'price': lot.get_calculated_price(),
+                'category': lot.category_id,
+                'category_data': {
+                    'id': lot_cat.pk,
+                    'name': lot_cat.name,
+                    'active': lot_cat.active,
+                    'description': lot_cat.description,
+                }
+            }
+
+            person = sub.person
+            item['subscription'] = {
+                'pk': sub.pk,
+                'name': person.name,
+                'email': person.email,
+                'user': person.user if person.user_id else None,
+                'event': sub.event_id,
+                'code': sub.code,
+                'lot': sub.lot_id,
+            }
+
+            item.update(model_to_dict(trans))
+
+            del item['data']
+
+            rep['transactions'].append(item)
+
+            if trans.paid is True:
+                amounts.append(trans.amount)
+
+        rep['paid_amount'] = round(Decimal(sum(amounts)), 2)
 
         return rep

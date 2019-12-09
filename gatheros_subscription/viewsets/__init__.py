@@ -1,8 +1,9 @@
 from .lot import LotViewSet
 from .subscription import (
     SubscriptionBillingViewSet,
-    SubscriptionListViewSet,
     SubscriptionExporterViewSet,
+    SubscriptionListViewSet,
+    SubscriptionPaymentViewSet,
     SubscriptionViewSet,
 )
 from .survey import (

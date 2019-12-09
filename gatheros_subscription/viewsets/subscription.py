@@ -26,9 +26,7 @@ from gatheros_subscription.permissions import OrganizerOnly
 from gatheros_subscription.serializers import (
     SubscriptionSerializer,
     SubscriptionModelSerializer,
-)
-from gatheros_subscription.serializers.subscription import \
-    SubscriptionBillingSerializer
+    SubscriptionBillingSerializer, SubscriptionPaymentSerializer)
 from gatheros_subscription.tasks import async_subscription_exporter_task
 from project.token_authentication import ExpiringTokenAuthentication
 from .mixins import RestrictionViewMixin
@@ -364,10 +362,67 @@ class SubscriptionViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
                         status=resp_status,
                         headers=headers)
 
+    def update(self, request, *args, **kwargs):
+
+        person_pk = request.data.get('person')
+        lot_pk = request.data.get('lot')
+
+        serializer = self.get_serializer(data=request.data)
+        is_new = True
+
+        if person_pk:
+            try:
+                lot = Lot.objects.get(pk=lot_pk)
+            except Lot.DoesNotExist:
+                content = {
+                    'errors': ["Lote não encontrado: '{}' ".format(lot_pk)]
+                }
+                return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                instance = Subscription.objects.get(
+                    person_id=person_pk,
+                    lot__event_id=lot.event_id,
+                )
+                self.check_object_permissions(self.request, instance)
+
+                if instance.lot_id != int(lot_pk):
+                    content = {
+                        'detail': [
+                            'Esta pessoa já está inscrita neste evento e'
+                            ' você está tentando alterar o lote por este'
+                            ' método. Isso não é possível.'
+                        ]
+                    }
+                    return Response(content, status=status.HTTP_403_FORBIDDEN)
+
+                serializer = self.get_serializer(instance=instance,
+                                                 data=request.data,
+                                                 partial=True, )
+                is_new = False
+
+            except Subscription.DoesNotExist:
+                pass
+
+        return super().update(request, *args, **kwargs)
+
 
 class SubscriptionBillingViewSet(GenericViewSet, RetrieveModelMixin):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionBillingSerializer
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    authentication_classes = (
+        BasicAuthentication,
+        SessionAuthentication,
+        ExpiringTokenAuthentication,
+    )
+
+
+class SubscriptionPaymentViewSet(GenericViewSet, RetrieveModelMixin):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionPaymentSerializer
     permission_classes = (
         permissions.IsAuthenticated,
     )
