@@ -1,6 +1,6 @@
 DOCKER_COMPOSE_ENV=bin/env/docker-compose_dev.yml
-
 CELERY_SERVICES=-A attendance -A mailer -A gatheros_subscription -A buzzlead worker
+DJANGO_SETTINGS_MODULE=project.manage.settings.dev
 
 .PHONY: export_settings
 up: export_settings
@@ -60,7 +60,7 @@ restart_ngrok:
 
 .PHONY: export_settings
 export_settings:
-	export DJANGO_SETTINGS_MODULE=project.manage.settings.dev
+	export DJANGO_SETTINGS_MODULE=$(DJANGO_SETTINGS_MODULE)
 
 .PHONY: clean
 clean:

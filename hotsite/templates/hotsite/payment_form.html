@@ -267,13 +267,13 @@
             {% if products %}
                     // Adiciona billing de opcionais de produtos/serviços
                     {% for product in products %}
-                        {% if product.optional_price %}
+                        {% if product.optional.price %}
                         payment_obj.add_item(
                             'optional-product',
                             '{{ subscription.pk }}',
                             'Produto/Serviço: {{ product.optional.name }}',
                             1,
-                            parseFloat('{{ product.optional_price|unlocalize }}')
+                            parseFloat('{{ product.optional.price|unlocalize }}')
                         );
                         {% endif %}
                     {% endfor %}
@@ -282,13 +282,13 @@
                 {% if services %}
                     // Adiciona billing de opcionais de atividades extras
                     {% for service in services %}
-                        {% if service.optional_price %}
+                        {% if service.optional.price %}
                         payment_obj.add_item(
                             'optional-service',
                             '{{ subscription.pk }}',
                             'Atividade extra: {{ service.optional.name }}',
                             1,
-                            parseFloat('{{ service.optional_price|unlocalize }}')
+                            parseFloat('{{ service.optional.price|unlocalize }}')
                         );
                         {% endif %}
                     {% endfor %}

@@ -14,7 +14,6 @@ from gatheros_subscription.models import Subscription
 from .optional import Product, Service
 
 
-@track_data('optional_price', 'optional_liquid_price')
 class AbstractSubscriptionOptional(EntityMixin, models.Model):
     """
         Vínculo de uma inscrição com um opcional, registrando,
@@ -32,20 +31,6 @@ class AbstractSubscriptionOptional(EntityMixin, models.Model):
     created = models.DateTimeField(
         auto_now_add=True,
         verbose_name="data de criação",
-    )
-
-    optional_price = models.DecimalField(
-        decimal_places=2,
-        max_digits=11,
-        null=True,
-        blank=True,
-    )
-
-    optional_liquid_price = models.DecimalField(
-        decimal_places=2,
-        max_digits=11,
-        null=True,
-        blank=True,
     )
 
 

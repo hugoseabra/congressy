@@ -98,10 +98,10 @@ def can_process_payment(wizard):
     # Verificando se inscrição possui vínculo com alguma das atividades
     # extras e/ou opcionais.
     num_paid_products = subscription.subscription_products.filter(
-        optional_price__gt=0
+        optional__liquid_price__gt=0
     ).count()
     num_paid_services = subscription.subscription_services.filter(
-        optional_price__gt=0
+        optional__liquid_price__gt=0
     ).count()
 
     if num_paid_products == 0 and num_paid_services == 0:
@@ -518,10 +518,12 @@ class OptionalWizardView(SessionWizardView, SelectLotMixin):
             context['services'] = services
 
             for product in products:
-                total += product.optional_price
+                if product.optional.price:
+                    total += product.optional.price
 
             for service in services:
-                total += service.optional_price
+                if service.optional.price:
+                    total += service.optional.price
 
             context['total'] = total
 
@@ -542,10 +544,10 @@ class OptionalWizardView(SessionWizardView, SelectLotMixin):
                 transactions_qs = self.subscription.transactions
 
                 paid_products = subscription.subscription_products.filter(
-                    optional_price__gt=0
+                    optional__liquid_price__gt=0
                 ).count() > 0
                 paid_services = subscription.subscription_services.filter(
-                    optional_price__gt=0
+                    optional__liquid_price__gt=0
                 ).count() > 0
 
                 has_paid_optionals = paid_products or paid_services

@@ -210,13 +210,13 @@
 
                 {% for product in products %}
                     //id, name, price, quantity, tangible
-                    var price = parseFloat('{{ product.optional_liquid_price|intcomma|unlocalize }}');
+                    var price = parseFloat('{{ product.optional.liquid_price|intcomma|unlocalize }}');
                     window.cgsy.pagarme.add_items_list({{ product.optional.id }}, '{{ product.optional.name|escapejs }}', price, 1, true);
                 {% endfor %}
 
                 {% for service in services %}
                     //id, name, price, quantity, tangible
-                    var price = parseFloat('{{service.optional_liquid_price|intcomma|unlocalize }}');
+                    var price = parseFloat('{{service.optional.liquid_price|intcomma|unlocalize }}');
                     window.cgsy.pagarme.add_items_list({{ service.optional.id }}, '{{ service.optional.name|escapejs }}', price, 1, false);
                 {% endfor %}
 
