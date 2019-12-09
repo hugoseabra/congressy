@@ -170,22 +170,28 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
             for addon_sub in addon_products:
                 optional = addon_sub.optional
                 rep['addon_products'].append({
-                    'pk': optional.pk,
-                    'name': optional.name,
-                    'published': optional.published,
-                    'date_end_sub':
-                        optional.date_end_sub.strftime('%Y-%m-%d %H:%M:%S'),
-                    'banner': optional.banner.url if optional.banner else None,
-                    'category': {
-                        'pk': optional.lot_category_id,
-                        'name': optional.lot_category.name,
-                        'description': optional.lot_category.description,
-                    },
-                    "optional_type": {
-                        "name": optional.optional_type.name,
-                        "pk": optional.optional_type_id,
-                    },
-                    'price': optional.price,
+                    'pk': addon_sub.pk,
+                    'product_id': addon_sub.optional_id,
+                    'product_data': {
+                        'pk': optional.pk,
+                        'name': optional.name,
+                        'published': optional.published,
+                        'date_end_sub': optional.date_end_sub.strftime(
+                            '%Y-%m-%d %H:%M:%S'
+                        ),
+                        'banner':
+                            optional.banner.url if optional.banner else None,
+                        'category': {
+                            'pk': optional.lot_category_id,
+                            'name': optional.lot_category.name,
+                            'description': optional.lot_category.description,
+                        },
+                        "optional_type": {
+                            "name": optional.optional_type.name,
+                            "pk": optional.optional_type_id,
+                        },
+                        'price': optional.price,
+                    }
                 })
                 amounts.append(optional.price)
 
@@ -196,26 +202,34 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
             for addon_sub in addon_services:
                 optional = addon_sub.optional
                 rep['addon_services'].append({
-                    'pk': optional.pk,
-                    'name': optional.name,
-                    'date_start':
-                        optional.schedule_start.strftime('%Y-%m-%d %H:%M:%S'),
-                    'date_end':
-                        optional.schedule_end.strftime('%Y-%m-%d %H:%M:%S'),
-                    'date_end_sub':
-                        optional.date_end_sub.strftime('%Y-%m-%d %H:%M:%S'),
-                    'published': optional.published,
-                    'banner': optional.banner.url if optional.banner else None,
-                    'category': {
-                        'pk': optional.lot_category_id,
-                        'name': optional.lot_category.name,
-                        'description': optional.lot_category.description,
-                    },
-                    "optional_type": {
-                        "name": optional.optional_type.name,
-                        "pk": optional.optional_type_id,
-                    },
-                    'price': optional.price,
+                    'pk': addon_sub.pk,
+                    'service_id': addon_sub.optional_id,
+                    'service_data': {
+                        'pk': optional.pk,
+                        'name': optional.name,
+                        'date_start': optional.schedule_start.strftime(
+                            '%Y-%m-%d %H:%M:%S'
+                        ),
+                        'date_end': optional.schedule_end.strftime(
+                            '%Y-%m-%d %H:%M:%S'
+                        ),
+                        'date_end_sub': optional.date_end_sub.strftime(
+                            '%Y-%m-%d %H:%M:%S'
+                        ),
+                        'published': optional.published,
+                        'banner':
+                            optional.banner.url if optional.banner else None,
+                        'category': {
+                            'pk': optional.lot_category_id,
+                            'name': optional.lot_category.name,
+                            'description': optional.lot_category.description,
+                        },
+                        "optional_type": {
+                            "name": optional.optional_type.name,
+                            "pk": optional.optional_type_id,
+                        },
+                        'price': optional.price,
+                    }
                 })
                 amounts.append(optional.price)
 
