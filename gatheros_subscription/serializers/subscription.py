@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import absoluteuri
 from rest_framework import serializers
 
@@ -165,8 +167,8 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
 
         addon_products = instance.subscription_products.all()
 
+        rep['addon_products'] = list()
         if addon_products.count():
-            rep['addon_products'] = list()
             for addon_sub in addon_products:
                 optional = addon_sub.optional
                 rep['addon_products'].append({
@@ -197,8 +199,8 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
 
         addon_services = instance.subscription_services.all()
 
+        rep['addon_services'] = list()
         if addon_services.count():
-            rep['addon_services'] = list()
             for addon_sub in addon_services:
                 optional = addon_sub.optional
                 rep['addon_services'].append({
@@ -233,6 +235,6 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                 })
                 amounts.append(optional.price)
 
-            rep['total_amount'] = sum(amounts)
+            rep['total_amount'] = round(Decimal(sum(amounts)), 2)
 
         return rep
