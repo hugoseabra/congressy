@@ -298,6 +298,8 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
             )
 
     def _set_amount_to_transact(self):
+        if not self.subscription_instance:
+            return
 
         self.subscription_debt_form = self._create_subscription_debt_form()
 
@@ -371,6 +373,8 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
 
     def _create_subscription_debt_form(self):
         """ Cria formulário de pendência financeira de inscrição. """
+        if not self.subscription_instance:
+            return
 
         debt_kwargs = {
             'subscription': self.subscription_instance,
