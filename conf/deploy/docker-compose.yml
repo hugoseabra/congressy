@@ -10,7 +10,12 @@ services:
 
   reverse-proxy:
     image: traefik:v1.7.19-alpine
-    command: --api --docker
+    command:
+      - --api
+      - --docker
+      - --accesslog
+      - --accesslog.format=json
+      - --accesslog.fields.names="StartLocal=keep StartUTC=keep"
     networks:
       - traefik
     ports:
@@ -19,6 +24,7 @@ services:
     volumes:
       - ./traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+      - /etc/localtime:/etc/localtime:ro
 
   celery:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
@@ -29,7 +35,6 @@ services:
     entrypoint:
       - /deploy/services/celery/container-entry.sh
     volumes:
-      - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/code/media
       - ./shared-volume/exporter:/tmp/exporter
       - ./shared-volume/qrcodes:/tmp/qrcodes
@@ -58,7 +63,6 @@ services:
     entrypoint:
       - /deploy/services/web/manage/container-entry.sh
     volumes:
-      - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/code/media
       - ./shared-volume/exporter:/tmp/exporter
       - ./shared-volume/qrcodes:/tmp/qrcodes
@@ -97,7 +101,6 @@ services:
     ports:
       - "8000"
     volumes:
-      - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/code/media
       - ./shared-volume/exporter:/tmp/exporter
       - ./shared-volume/qrcodes:/tmp/qrcodes
@@ -139,7 +142,6 @@ services:
     entrypoint:
       - /deploy/services/web/admin_intranet/container-entry.sh
     volumes:
-      - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/code/media
       - ./shared-volume/exporter:/tmp/exporter
       - ./shared-volume/qrcodes:/tmp/qrcodes

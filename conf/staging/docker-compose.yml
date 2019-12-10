@@ -43,7 +43,12 @@ services:
 
   reverse-proxy:
     image: traefik
-    command: --api --docker
+    command:
+      - --api
+      - --docker
+      - --accesslog
+      - --accesslog.format=json
+      - --accesslog.fields.names="StartLocal=keep StartUTC=keep"
     networks:
       - traefik
     ports:
@@ -52,7 +57,7 @@ services:
     volumes:
       - /tmp/staging-files/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
-
+      - /etc/localtime:/etc/localtime:ro
   celery:
     image: cgsy-staging
     restart: unless-stopped
@@ -65,7 +70,6 @@ services:
     entrypoint:
       - /staging/services/celery/container-entry.sh
     volumes:
-      - /etc/localtime:/etc/localtime
       - staging_media:/code/media
       - staging_exporter:/tmp/exporter
       - staging_barcodes:/tmp/barcodes
@@ -88,7 +92,6 @@ services:
       - rabbitmq
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
-      - /etc/localtime:/etc/localtime
       - staging_media:/code/media
       - staging_exporter:/tmp/exporter
       - staging_barcodes:/tmp/barcodes
@@ -118,7 +121,6 @@ services:
       - "8000"
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
-      - /etc/localtime:/etc/localtime
       - staging_media:/code/media
       - staging_exporter:/tmp/exporter
       - staging_barcodes:/tmp/barcodes
