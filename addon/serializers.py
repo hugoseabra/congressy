@@ -123,6 +123,17 @@ class ProductSerializer(serializers.ModelSerializer):
             except ObjectDoesNotExist:
                 pass
 
+        banners = {
+            'default': None,
+            'thumbnail': None,
+        }
+
+        if ret['banner']:
+            banners['default'] = instance.banner.default.url
+            banners['thumbnail'] = instance.banner.thumbnail.url
+
+        ret['banners'] = banners
+
         return ret
 
 
@@ -231,6 +242,17 @@ class ServiceSerializer(serializers.ModelSerializer):
             'active': lot_cat.active,
             'description': lot_cat.description,
         }
+
+        banners = {
+            'default': None,
+            'thumbnail': None,
+        }
+
+        if ret['banner']:
+            banners['default'] = instance.banner.default.url
+            banners['thumbnail'] = instance.banner.thumbnail.url
+
+        ret['banners'] = banners
 
         return ret
 
