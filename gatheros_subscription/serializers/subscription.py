@@ -236,7 +236,7 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                 })
                 amounts.append(optional.price)
 
-            rep['total_amount'] = round(Decimal(sum(amounts)), 2)
+        rep['total_amount'] = round(Decimal(sum(amounts)), 2)
 
         return rep
 
