@@ -2,6 +2,7 @@ from .lot import LotViewSet
 from .subscription import (
     SubscriptionBillingViewSet,
     SubscriptionExporterViewSet,
+    SubscriptionEventViewSet,
     SubscriptionListViewSet,
     SubscriptionPaymentViewSet,
     SubscriptionViewSet,

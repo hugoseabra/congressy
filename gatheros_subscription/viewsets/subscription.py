@@ -431,3 +431,101 @@ class SubscriptionPaymentViewSet(GenericViewSet, RetrieveModelMixin):
         SessionAuthentication,
         ExpiringTokenAuthentication,
     )
+
+
+class SubscriptionEventViewSet(GenericViewSet, RetrieveModelMixin):
+    queryset = Subscription.objects.get_queryset()
+    serializer_class = SubscriptionSerializer
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+    authentication_classes = (
+        BasicAuthentication,
+        SessionAuthentication,
+        ExpiringTokenAuthentication,
+    )
+
+    lookup_field = 'event_pk'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.event = None
+        self.person = None
+
+    def get_person(self):
+        if self.person:
+            return self.person
+
+        user = self.request.user
+
+        if not hasattr(user, 'person'):
+            return None
+
+        self.person = user.person
+        return self.person
+
+    def get_event(self):
+        if self.event:
+            return self.event
+
+        pk = self.kwargs.get('event_pk')  # default
+
+        if str(pk).isdigit():
+            try:
+                self.event = Event.objects.get(pk=pk)
+            except Event.DoesNotExist:
+                pass
+
+        if self.event is None:
+            try:
+                self.event = Event.objects.get(slug=str(pk))
+            except Event.DoesNotExist:
+                pass
+
+        return self.event
+
+    def retrieve(self, request, *args, **kwargs):
+        event = self.get_event()
+        person = self.get_person()
+
+        if not event:
+            content = {
+                'errors': [
+                    "Evento não encontrado: '{}' ".format(
+                        self.kwargs.get('event_pk')
+                    )
+                ]
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        if not person:
+            content = {
+                'errors': ["Usuário não possui pessoa relacionada"]
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        return super().retrieve(request, *args, **kwargs)
+
+    def get_queryset(self):
+        event = self.get_event()
+        person = self.get_person()
+
+        queryset = super().get_queryset()
+
+        try:
+            queryset = queryset.get(
+                event_id=event.pk,
+                person_id=person.pk,
+            )
+        except Subscription.DoesNotExist:
+            return queryset.none()
+
+        return queryset
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, queryset)
+
+        return queryset

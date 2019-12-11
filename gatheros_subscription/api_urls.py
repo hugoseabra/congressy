@@ -31,9 +31,12 @@ urls = [
 ]
 
 subs_urls = [
-    url('^list/$',
+    url(r'^list/$',
         viewsets.SubscriptionListViewSet.as_view(),
         name='subscription-list-api'),
+    url(r'^me/$',
+        viewsets.SubscriptionEventViewSet.as_view({'get': 'retrieve'}),
+        name='subscription-event-logged-user'),
 ]
 
 survey_urls = [
@@ -46,7 +49,7 @@ survey_urls = [
 
 single_endpoints = [url(r'^events/(?P<event_pk>[\d]+)/lots/', include(urls))]
 sub_single_endpoints = [
-    url(r'^events/(?P<event_pk>[\d]+)/subsriptions/', include(subs_urls)),
+    url(r'^events/(?P<event_pk>[\d]+)/subscriptions/', include(subs_urls)),
     url(r'^events/(?P<event_pk>[\d]+)/subscriptions/export/',
         viewsets.SubscriptionExporterViewSet.as_view())
 ]
