@@ -242,18 +242,18 @@ class SubscriptionViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         permissions.IsAuthenticated,
     )
 
-    def get_queryset(self):
-        user = self.request.user
-
-        org_pks = list()
-
-        if hasattr(user, 'person'):
-
-            for m in user.person.members.filter(active=True):
-                org_pks.append(m.organization_id)
-
-        queryset = super().get_queryset()
-        return queryset.filter(event__organization_id__in=org_pks)
+    # def get_queryset(self):
+    #     user = self.request.user
+    #
+    #     org_pks = list()
+    #
+    #     if hasattr(user, 'person'):
+    #
+    #         for m in user.person.members.filter(active=True):
+    #             org_pks.append(m.organization_id)
+    #
+    #     queryset = super().get_queryset()
+    #     return queryset.filter(event__organization_id__in=org_pks)
 
     def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
 
