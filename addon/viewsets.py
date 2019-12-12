@@ -37,18 +37,18 @@ class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
             kwargs.update({'subscription': sub_pk})
         return super().get_serializer(*args, **kwargs)
 
-    def get_queryset(self):
-        user = self.request.user
-
-        org_pks = [
-            m.organization.pk
-            for m in user.person.members.filter(active=True)
-        ]
-
-        queryset = super().get_queryset()
-        return queryset.filter(
-            lot_category__event__organization_id__in=org_pks
-        )
+    # def get_queryset(self):
+    #     user = self.request.user
+    #
+    #     # org_pks = [
+    #     #     m.organization.pk
+    #     #     for m in user.person.members.filter(active=True)
+    #     # ]
+    #
+    #     queryset = super().get_queryset()
+    #     return queryset.filter(
+    #         lot_category__event__organization_id__in=org_pks
+    #     )
 
     def filter_queryset(self, queryset: QuerySet) -> QuerySet:
         queryset = super().filter_queryset(queryset)
