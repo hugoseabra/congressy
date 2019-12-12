@@ -89,7 +89,7 @@ class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
         if exhibition_code:
             queryset = queryset.filter(
-                exhibition_code=exhibition_code,
+                exhibition_code=exhibition_code.upper(),
             )
         else:
             queryset = queryset.filter(private=False, )
