@@ -496,20 +496,20 @@ class SubscriptionEventViewSet(GenericViewSet, RetrieveModelMixin):
                     )
                 ]
             }
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
 
         if not person:
             content = {
                 'errors': ["Usuário não possui pessoa relacionada"]
             }
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
 
         instance = self.get_object()
         if not instance:
             content = {
                 'errors': ["Usuário não possui inscrição neste evento"]
             }
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
