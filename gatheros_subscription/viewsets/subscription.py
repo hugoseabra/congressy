@@ -504,7 +504,15 @@ class SubscriptionEventViewSet(GenericViewSet, RetrieveModelMixin):
             }
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
-        return super().retrieve(request, *args, **kwargs)
+        instance = self.get_object()
+        if not instance:
+            content = {
+                'errors': ["Usuário não possui inscrição neste evento"]
+            }
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
     def get_queryset(self):
         event = self.get_event()
