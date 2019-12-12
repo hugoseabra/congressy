@@ -194,8 +194,19 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                             "pk": optional.optional_type_id,
                         },
                         'price': optional.price,
+                        'banners': {
+                            'default': None,
+                            'thumbnail': None,
+                        }
                     }
                 })
+
+                if optional.banner.name:
+                    rep['addon_services']['banners'] = {
+                        'default': optional.banner.default.url,
+                        'addon_services': optional.banner.thumbnail.url,
+                    }
+
                 amounts.append(optional.price)
 
         addon_services = instance.subscription_services.all()
@@ -232,8 +243,19 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                             "pk": optional.optional_type_id,
                         },
                         'price': optional.price,
+                        'banners': {
+                            'default': None,
+                            'thumbnail': None,
+                        }
                     }
                 })
+
+                if optional.banner.name:
+                    rep['addon_services']['banners'] = {
+                        'default': optional.banner.default.url,
+                        'addon_services': optional.banner.thumbnail.url,
+                    }
+
                 amounts.append(optional.price)
 
         rep['total_amount'] = round(Decimal(sum(amounts)), 2)
