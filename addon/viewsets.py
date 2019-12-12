@@ -7,7 +7,10 @@ from rest_framework.authentication import (
     BasicAuthentication,
     SessionAuthentication,
 )
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 from rest_framework.response import Response
 
 from addon import models, serializers
@@ -30,6 +33,9 @@ class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
     """
     queryset = models.Service.objects.all().order_by('name')
     serializer_class = serializers.ServiceSerializer
+    permission_classes = (
+        IsAuthenticatedOrReadOnly,
+    )
 
     def get_serializer(self, *args, **kwargs):
         sub_pk = self.request.query_params.get('subscription', None)
