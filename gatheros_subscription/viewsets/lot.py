@@ -33,13 +33,13 @@ class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
         queryset = super().get_queryset()
 
-        if hasattr(user, 'person'):
-            org_pks = [
-                m.organization.pk
-                for m in user.person.members.filter(active=True)
-            ]
-
-            queryset = queryset.filter(event__organization__in=org_pks)
+        # if hasattr(user, 'person'):
+        #     org_pks = [
+        #         m.organization.pk
+        #         for m in user.person.members.filter(active=True)
+        #     ]
+        #
+        #     queryset = queryset.filter(event__organization__in=org_pks)
 
         return queryset.order_by('name')
 
