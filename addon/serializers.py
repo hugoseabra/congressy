@@ -3,6 +3,7 @@ import binascii
 from typing import Any
 from uuid import uuid4
 
+import absoluteuri
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from rest_framework import serializers
@@ -129,8 +130,14 @@ class ProductSerializer(serializers.ModelSerializer):
         }
 
         if ret['banner']:
-            banners['default'] = instance.banner.default.url
-            banners['thumbnail'] = instance.banner.thumbnail.url
+            def_banner = absoluteuri.build_absolute_uri(
+                instance.banner.default.url
+            )
+            def_thumbnail = absoluteuri.build_absolute_uri(
+                instance.banner.thumbnail.url
+            )
+            banners['default'] = def_banner
+            banners['thumbnail'] = def_thumbnail
 
         ret['banners'] = banners
 
@@ -249,8 +256,14 @@ class ServiceSerializer(serializers.ModelSerializer):
         }
 
         if ret['banner']:
-            banners['default'] = instance.banner.default.url
-            banners['thumbnail'] = instance.banner.thumbnail.url
+            def_banner = absoluteuri.build_absolute_uri(
+                instance.banner.default.url
+            )
+            def_thumbnail = absoluteuri.build_absolute_uri(
+                instance.banner.thumbnail.url
+            )
+            banners['default'] = def_banner
+            banners['thumbnail'] = def_thumbnail
 
         ret['banners'] = banners
 
