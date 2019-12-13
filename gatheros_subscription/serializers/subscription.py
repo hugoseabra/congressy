@@ -215,9 +215,9 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                 })
 
                 if optional.banner.name:
-                    rep['addon_products']['banners'] = {
+                    rep['addon_products']['product_data']['banners'] = {
                         'default': optional.banner.default.url,
-                        'addon_services': optional.banner.thumbnail.url,
+                        'thumbnail': optional.banner.thumbnail.url,
                     }
 
                 amounts.append(optional.price)
@@ -264,9 +264,9 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                 })
 
                 if optional.banner.name:
-                    rep['addon_services']['banners'] = {
+                    rep['addon_services']['service_data']['banners'] = {
                         'default': optional.banner.default.url,
-                        'addon_services': optional.banner.thumbnail.url,
+                        'thumbnail': optional.banner.thumbnail.url,
                     }
 
                 amounts.append(optional.price)
