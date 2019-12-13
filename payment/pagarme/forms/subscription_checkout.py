@@ -320,7 +320,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
         for debt_form in self.product_debt_forms:
             if not debt_form.is_valid():
                 error_msgs = []
-                for field, errs in debt_form.items():
+                for field, errs in debt_form.errors.items():
                     error_msgs.append(str(errs))
 
                 raise forms.ValidationError(
@@ -336,7 +336,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
         for debt_form in self.service_debt_forms:
             if not debt_form.is_valid():
                 error_msgs = []
-                for field, errs in debt_form.items():
+                for field, errs in debt_form.errors.items():
                     error_msgs.append(str(errs))
 
                 raise forms.ValidationError(
