@@ -319,6 +319,9 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
 
         for debt_form in self.product_debt_forms:
             if not debt_form.is_valid():
+                from pprint import pprint
+                pprint(debt_form.errors)
+
                 error_msgs = []
                 for field, errs in debt_form.errors.items():
                     error_msgs.append(str(errs))
@@ -335,6 +338,9 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
 
         for debt_form in self.service_debt_forms:
             if not debt_form.is_valid():
+                from pprint import pprint
+                pprint(debt_form.errors)
+
                 error_msgs = []
                 for field, errs in debt_form.errors.items():
                     error_msgs.append(str(errs))
@@ -382,7 +388,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                 'name':
                     'Inscrição: {}, Ingresso: {} ({})'.format(
                         self.subscription_instance.code,
-                        self.subscription_instance.lot.name[:10],
+                        self.subscription_instance.lot.name[:20],
                         self.subscription_instance.lot_id,
                     ),
                 'item_id': str(self.subscription_instance.lot_id),
@@ -433,7 +439,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                 'subscription': self.subscription_instance,
                 'data': {
                     'name': 'Atividade extra: {} ({})'.format(
-                        optional.name,
+                        optional.name[:50],
                         optional.pk,
                     ),
                     'item_id': str(optional.pk),
@@ -474,7 +480,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                 'subscription': self.subscription_instance,
                 'data': {
                     'name': 'Produto/Serviço: {} ({})'.format(
-                        optional.name,
+                        optional.name[:50],
                         optional.pk,
                     ),
                     'item_id': str(optional.pk),
