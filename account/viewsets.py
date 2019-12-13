@@ -11,4 +11,4 @@ class AccountCreateViewset(generics.CreateAPIView, viewsets.GenericViewSet):
     )
 
     def perform_create(self, serializer):
-        serializer.create(request=self.request)
+        serializer.save(request=self.request)

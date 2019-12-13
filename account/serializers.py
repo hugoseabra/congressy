@@ -10,6 +10,11 @@ class AccountSerializer(FormSerializerMixin, serializers.Serializer):
     class Meta:
         form = AccountCreateForm
 
+    def save(self, request, **_):
+        assert self.form_instance is not None
+        self.instance = self.form_instance.create(request=request)
+        return self.instance
+
     def to_internal_value(self, data):
         return data
 
