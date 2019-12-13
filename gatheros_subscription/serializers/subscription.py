@@ -149,11 +149,24 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
 
         rep = dict()
 
+        survey = None
+        survey_data = dict()
+
+        if lot.event_survey_id:
+            survey = lot.event_survey.survey
+            survey_data = {
+                'pk': survey.pk,
+                'name': survey.name,
+                'description': survey.description,
+            }
+
         rep['lot'] = {
             'pk': lot.pk,
             'name': lot.name,
             'event': lot.event_id,
             'price': lot.get_calculated_price(),
+            'survey': survey.pk if survey else None,
+            'survey_data': survey_data
         }
         amounts.append(lot.get_calculated_price())
 
@@ -202,7 +215,7 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                 })
 
                 if optional.banner.name:
-                    rep['addon_services']['banners'] = {
+                    rep['addon_products']['banners'] = {
                         'default': optional.banner.default.url,
                         'addon_services': optional.banner.thumbnail.url,
                     }
