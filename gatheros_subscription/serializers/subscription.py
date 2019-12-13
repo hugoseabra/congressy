@@ -185,7 +185,7 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
         if addon_products.count():
             for addon_sub in addon_products:
                 optional = addon_sub.optional
-                rep['addon_products'].append({
+                data = {
                     'pk': addon_sub.pk,
                     'product_id': addon_sub.optional_id,
                     'product_data': {
@@ -212,13 +212,14 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                             'thumbnail': None,
                         }
                     }
-                })
-
+                }
                 if optional.banner.name:
-                    rep['addon_products']['product_data']['banners'] = {
+                    data['product_data']['banners'] = {
                         'default': optional.banner.default.url,
                         'thumbnail': optional.banner.thumbnail.url,
                     }
+
+                rep['addon_products'].append(data)
 
                 amounts.append(optional.price)
 
@@ -228,7 +229,7 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
         if addon_services.count():
             for addon_sub in addon_services:
                 optional = addon_sub.optional
-                rep['addon_services'].append({
+                data = {
                     'pk': addon_sub.pk,
                     'service_id': addon_sub.optional_id,
                     'service_data': {
@@ -261,13 +262,15 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                             'thumbnail': None,
                         }
                     }
-                })
+                }
 
                 if optional.banner.name:
-                    rep['addon_services']['service_data']['banners'] = {
+                    data['service_data']['banners'] = {
                         'default': optional.banner.default.url,
                         'thumbnail': optional.banner.thumbnail.url,
                     }
+
+                rep['addon_services'].append(data)
 
                 amounts.append(optional.price)
 
