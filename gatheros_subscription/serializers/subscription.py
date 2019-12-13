@@ -214,9 +214,15 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                     }
                 }
                 if optional.banner.name:
+                    def_banner = absoluteuri.build_absolute_uri(
+                        optional.banner.default.url
+                    )
+                    def_thumbnail = absoluteuri.build_absolute_uri(
+                        optional.banner.thumbnail.url
+                    )
                     data['product_data']['banners'] = {
-                        'default': optional.banner.default.url,
-                        'thumbnail': optional.banner.thumbnail.url,
+                        'default': def_banner,
+                        'thumbnail': def_thumbnail,
                     }
 
                 rep['addon_products'].append(data)
@@ -265,9 +271,15 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                 }
 
                 if optional.banner.name:
+                    def_banner = absoluteuri.build_absolute_uri(
+                        optional.banner.default.url
+                    )
+                    def_thumbnail = absoluteuri.build_absolute_uri(
+                        optional.banner.thumbnail.url
+                    )
                     data['service_data']['banners'] = {
-                        'default': optional.banner.default.url,
-                        'thumbnail': optional.banner.thumbnail.url,
+                        'default': def_banner,
+                        'thumbnail': def_thumbnail,
                     }
 
                 rep['addon_services'].append(data)
