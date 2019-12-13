@@ -104,12 +104,15 @@ class AccountCreateForm(forms.ModelForm):
         email = cleaned_data.get('email1')
 
         try:
-            self.user = User.objects.get(username=email)
+            self.user = User.objects.get(email=email)
 
             if self.user.last_login:
-                raise forms.ValidationError(
-                    "Esse email já existe em nosso sistema. Tente novamente."
-                )
+                if self.instance and self.instance.user_id:
+                    if self.instance.user_id != self.user.pk:
+                        raise forms.ValidationError(
+                            "Esse email já existe em nosso sistema."
+                            " Tente novamente com outro e-mail."
+                        )
 
             try:
                 self.instance = self.user.person
@@ -121,12 +124,11 @@ class AccountCreateForm(forms.ModelForm):
 
         return cleaned_data
 
-    def save(self, request, *args, **kwargs):
-
+    def create(self, request, *args, **kwargs):
         email = self.cleaned_data.get('email1')
         self.instance.email = email
 
-        super().save(*args, **kwargs)
+        self.save(*args, **kwargs)
 
         # Criando usuário
         if not self.user:
