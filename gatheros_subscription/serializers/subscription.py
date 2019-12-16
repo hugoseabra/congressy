@@ -25,8 +25,15 @@ class SubscriptionSerializer(serializers.BaseSerializer):
             'code': obj.code,
             'accredited': obj.accredited,
             'accredited_on': obj.accredited_on,
+            'lot_pk': obj.lot_id,
             'lot_name': obj.lot.name,
+            'lot_price': obj.lot.get_calculated_price(),
+            'lot_date_start': obj.lot.date_start.strftime('%Y-%m-%d %H:%M:%S'),
+            'lot_date_end': obj.lot.date_end.strftime('%Y-%m-%d %H:%M:%S'),
+            'lot_status': obj.lot.status,
+            'lot_status_name': obj.lot.get_status_display(),
             'event_count': obj.event_count,
+            'completed': obj.completed,
             'test_subscription': obj.test_subscription,
             'status': obj.status,
             'created': obj.created,
@@ -166,8 +173,24 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
             'event': lot.event_id,
             'price': lot.get_calculated_price(),
             'survey': survey.pk if survey else None,
-            'survey_data': survey_data
+            'survey_data': survey_data,
+            
+            'status': lot.status,
+            'status_name': lot.get_status_display(),
         }
+
+        if lot.category_id:
+            lot_cat = lot.category
+            rep['lot'].update({
+                'category': lot.category_id,
+                'category_data': {
+                    'id': lot_cat.pk,
+                    'name': lot_cat.name,
+                    'active': lot_cat.active,
+                    'description': lot_cat.description,
+                }
+            })
+
         amounts.append(lot.get_calculated_price())
 
         if lot.category_id:
@@ -307,7 +330,6 @@ class SubscriptionPaymentSerializer(serializers.ModelSerializer):
 
         for trans in instance.transactions.all():
             lot = trans.lot
-            lot_cat = lot.category
             sub = trans.subscription
 
             item = dict()
@@ -317,14 +339,21 @@ class SubscriptionPaymentSerializer(serializers.ModelSerializer):
                 'name': lot.name,
                 'event': lot.event_id,
                 'price': lot.get_calculated_price(),
-                'category': lot.category_id,
-                'category_data': {
-                    'id': lot_cat.pk,
-                    'name': lot_cat.name,
-                    'active': lot_cat.active,
-                    'description': lot_cat.description,
-                }
+                'status': lot.status,
+                'status_name': lot.get_status_display(),
             }
+
+            if lot.category_id:
+                lot_cat = lot.category
+                item['lot_data'].update({
+                    'category': lot.category_id,
+                    'category_data': {
+                        'id': lot_cat.pk,
+                        'name': lot_cat.name,
+                        'active': lot_cat.active,
+                        'description': lot_cat.description,
+                    }
+                })
 
             person = sub.person
             item['subscription'] = {
