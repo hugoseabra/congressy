@@ -162,6 +162,11 @@ steps:
   - name: download-hotsite-v2
     image: docker
     pull: if-not-exists
+    volumes:
+      - name: localtime
+        path: /etc/localtime
+      - name: docker-sock
+        path: /var/run/docker.sock
     commands:
       - ./bin/env/prod/01_create-awsecr-container.sh
       - ./bin/env/staging/05_download_hotsite.sh
