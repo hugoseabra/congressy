@@ -139,7 +139,7 @@ services:
       - "traefik.frontend.entryPoints=http"
 
   hotsite:
-    image: cgsy-hotsite
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/hotsite-v2:lastest
     container_name: cgsy-hotsite
     ports:
       - 80

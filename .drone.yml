@@ -123,6 +123,7 @@ steps:
       - cp /tmp/staging-files/build_author .
       - cp /tmp/staging-files/build_author_avatar .
       - cp /tmp/staging-files/build_link .
+
   - name: backup-db-staging
     image: postgres:9.6-alpine
     pull: if-not-exists
@@ -157,6 +158,13 @@ steps:
 #        path: /var/run/docker.sock
 #    commands:
 #      - ./bin/env/staging/02_recreate-db-staging.sh
+
+  - name: download-hotsite-v2
+    image: alpine
+    pull: if-not-exists
+    commands:
+      - ./bin/env/prod/01_create-awsecr-container.sh
+      - ./bin/env/staging/05_download_hotsite.sh
 
   - name: build-staging-image
     image: docker
