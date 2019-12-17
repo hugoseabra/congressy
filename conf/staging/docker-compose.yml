@@ -148,11 +148,11 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.passHostHeader=true"
-      - "traefik.weight=10"
+      - "traefik.weight=7"
       - "traefik.backend=cgsy-hotsite"
       - "traefik.protocol=http"
       - "traefik.port=80"
-      - "traefik.frontend.rule=Host:test.congressy.com;PathPrefix:/1"
+      - "traefik.frontend.rule=Host:test.congressy.com;PathPrefix:/1/,/1/{slug}/,/1/{slug}/{step}/"
       - "traefik.docker.network=traefik_default"
       - "traefik.frontend.entryPoints=http"
 
