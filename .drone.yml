@@ -160,7 +160,7 @@ steps:
 #      - ./bin/env/staging/02_recreate-db-staging.sh
 
   - name: download-hotsite-v2
-    image: alpine
+    image: docker
     pull: if-not-exists
     commands:
       - ./bin/env/prod/01_create-awsecr-container.sh
