@@ -35,7 +35,7 @@ echo "Download versão '${VERSION}' sobre a versão '${PREVIOUS_VERSION}'..."
 
 # A versão nunca será a anterior a atual devido ao CI controlar a continuidade
 # dos releases. Sendo assim, basta comparar
-if [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
+if [[ "$VERSION" == 'latest' ]] || [[ "$PREVIOUS_VERSION" != "$VERSION" ]]; then
 
     echo "Baixando ${VERSION}' ..."
     docker exec -i awsecr pull hotsite-v2:${VERSION}
