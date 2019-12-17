@@ -144,7 +144,7 @@ services:
     ports:
       - 80
     networks:
-      - hotsite
+      - traefik
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.passHostHeader=true"
