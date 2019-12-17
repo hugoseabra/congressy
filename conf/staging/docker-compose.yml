@@ -152,8 +152,7 @@ services:
       - "traefik.backend=cgsy-hotsite"
       - "traefik.protocol=http"
       - "traefik.port=80"
-      - "traefik.frontend.rule=Host:test.congressy.com"
-      - "traefik.http.middlewares.test-stripprefix.stripprefix.prefixes=/1"
+      - "traefik.frontend.rule=Host:test.congressy.com;PathPrefix:/1"
       - "traefik.docker.network=traefik_default"
       - "traefik.frontend.entryPoints=http"
 
