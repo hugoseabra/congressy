@@ -134,7 +134,7 @@ services:
       - "traefik.backend=cgsy-staging"
       - "traefik.protocol=http"
       - "traefik.port=8000"
-      - "traefik.frontend.rule=Host:test.congressy.com"
+      - "traefik.frontend.rule=Host:test.congressy.com;PathPrefix:/manage/"
       - "traefik.docker.network=traefik_default"
       - "traefik.frontend.entryPoints=http"
 
@@ -152,7 +152,7 @@ services:
       - "traefik.backend=cgsy-hotsite"
       - "traefik.protocol=http"
       - "traefik.port=80"
-      - "traefik.frontend.rule=Host:test.congressy.com;PathPrefix:/1/,/1/{slug}/,/1/{slug}/{step}/"
+      - "traefik.frontend.rule=Host:test.congressy.com"
       - "traefik.docker.network=traefik_default"
       - "traefik.frontend.entryPoints=http"
 
