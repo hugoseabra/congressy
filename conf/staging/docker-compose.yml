@@ -42,7 +42,7 @@ services:
       - staging_vouchers:/tmp/vouchers
 
   reverse-proxy:
-    image: traefik
+    image: traefik:v1.7.19-alpine
     command:
       - --api
       - --docker
@@ -58,6 +58,7 @@ services:
       - /tmp/staging-files/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
       - /etc/localtime:/etc/localtime:ro
+
   celery:
     image: cgsy-staging
     restart: unless-stopped
@@ -134,6 +135,25 @@ services:
       - "traefik.protocol=http"
       - "traefik.port=8000"
       - "traefik.frontend.rule=Host:test.congressy.com"
+      - "traefik.docker.network=traefik_default"
+      - "traefik.frontend.entryPoints=http"
+
+  hotsite:
+    image: cgsy-hotsite
+    container_name: cgsy-hotsite
+    ports:
+      - 80
+    networks:
+      - hotsite
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.weight=10"
+      - "traefik.backend=cgsy-hotsite"
+      - "traefik.protocol=http"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:test.congressy.com"
+      - "traefik.http.middlewares.test-stripprefix.stripprefix.prefixes=/1"
       - "traefik.docker.network=traefik_default"
       - "traefik.frontend.entryPoints=http"
 
