@@ -5,10 +5,6 @@ from typing import Any
 from django.db.models import Q
 from django.http import HttpResponse
 from rest_framework import viewsets, generics, pagination, status, permissions
-from rest_framework.authentication import (
-    BasicAuthentication,
-    SessionAuthentication,
-)
 from rest_framework.exceptions import APIException
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -28,7 +24,6 @@ from gatheros_subscription.serializers import (
     SubscriptionModelSerializer,
     SubscriptionBillingSerializer, SubscriptionPaymentSerializer)
 from gatheros_subscription.tasks import async_subscription_exporter_task
-from project.token_authentication import ExpiringTokenAuthentication
 from .mixins import RestrictionViewMixin
 
 
@@ -413,11 +408,6 @@ class SubscriptionBillingViewSet(GenericViewSet, RetrieveModelMixin):
     permission_classes = (
         permissions.IsAuthenticated,
     )
-    authentication_classes = (
-        BasicAuthentication,
-        SessionAuthentication,
-        ExpiringTokenAuthentication,
-    )
 
 
 class SubscriptionPaymentViewSet(GenericViewSet, RetrieveModelMixin):
@@ -426,11 +416,6 @@ class SubscriptionPaymentViewSet(GenericViewSet, RetrieveModelMixin):
     permission_classes = (
         permissions.IsAuthenticated,
     )
-    authentication_classes = (
-        BasicAuthentication,
-        SessionAuthentication,
-        ExpiringTokenAuthentication,
-    )
 
 
 class SubscriptionEventViewSet(GenericViewSet, RetrieveModelMixin):
@@ -438,11 +423,6 @@ class SubscriptionEventViewSet(GenericViewSet, RetrieveModelMixin):
     serializer_class = SubscriptionSerializer
     permission_classes = (
         permissions.IsAuthenticated,
-    )
-    authentication_classes = (
-        BasicAuthentication,
-        SessionAuthentication,
-        ExpiringTokenAuthentication,
     )
 
     lookup_field = 'event_pk'

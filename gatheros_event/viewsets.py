@@ -1,8 +1,4 @@
 from rest_framework import permissions, status
-from rest_framework.authentication import (
-    BasicAuthentication,
-    SessionAuthentication,
-)
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import ListModelMixin
@@ -19,7 +15,6 @@ from gatheros_event.serializers import (
     OrganizationSerializer,
     PersonSerializer,
 )
-from project.token_authentication import ExpiringTokenAuthentication
 
 
 class PersonViewSet(ModelViewSet):
@@ -27,11 +22,6 @@ class PersonViewSet(ModelViewSet):
     serializer_class = PersonSerializer
     permission_classes = (
         permissions.IsAuthenticated,
-    )
-    authentication_classes = (
-        BasicAuthentication,
-        SessionAuthentication,
-        ExpiringTokenAuthentication,
     )
 
     def list(self, request, *args, **kwargs):
@@ -100,11 +90,6 @@ class PersonLoggedUserViewSet(GenericViewSet, ListModelMixin):
     permission_classes = (
         permissions.IsAuthenticated,
     )
-    authentication_classes = (
-        BasicAuthentication,
-        SessionAuthentication,
-        ExpiringTokenAuthentication,
-    )
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
@@ -127,11 +112,6 @@ class OrganizationReadOnlyViewSet(ReadOnlyModelViewSet):
     queryset = Organization.objects.all()
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
-    )
-    authentication_classes = (
-        BasicAuthentication,
-        SessionAuthentication,
-        ExpiringTokenAuthentication,
     )
 
     def permission_denied(self, request, message=None):
@@ -168,11 +148,6 @@ class EventReadOnlyViewSet(ReadOnlyModelViewSet):
     queryset = Event.objects.all()
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
-    )
-    authentication_classes = (
-        BasicAuthentication,
-        SessionAuthentication,
-        ExpiringTokenAuthentication,
     )
 
     def get_object(self):

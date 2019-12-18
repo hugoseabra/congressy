@@ -1,8 +1,4 @@
 from rest_framework import viewsets, status, permissions
-from rest_framework.authentication import (
-    BasicAuthentication,
-    SessionAuthentication,
-)
 from rest_framework.response import Response
 
 from gatheros_subscription.lot_api_permissions import MultiLotsAllowed
@@ -10,18 +6,9 @@ from gatheros_subscription.models import Lot
 from gatheros_subscription.serializers import (
     LotSerializer,
 )
-from project.token_authentication import ExpiringTokenAuthentication
 
 
-class RestrictionViewMixin:
-    authentication_classes = (
-        SessionAuthentication,
-        BasicAuthentication,
-        ExpiringTokenAuthentication,
-    )
-
-
-class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+class LotViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """

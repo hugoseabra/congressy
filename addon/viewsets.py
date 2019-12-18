@@ -3,10 +3,6 @@ from typing import Any
 
 from django.db.models import QuerySet
 from rest_framework import viewsets, status
-from rest_framework.authentication import (
-    BasicAuthentication,
-    SessionAuthentication,
-)
 from rest_framework.permissions import (
     IsAuthenticated,
     IsAuthenticatedOrReadOnly,
@@ -15,13 +11,9 @@ from rest_framework.response import Response
 
 from addon import models, serializers
 from gatheros_subscription.models import Subscription
-from project.token_authentication import ExpiringTokenAuthentication
 
 
 class RestrictionViewMixin(object):
-    authentication_classes = (SessionAuthentication,
-                              BasicAuthentication,
-                              ExpiringTokenAuthentication)
     permission_classes = (IsAuthenticated,)
 
 
