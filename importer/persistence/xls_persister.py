@@ -10,7 +10,7 @@ from openpyxl.styles import colors
 from six import BytesIO
 
 from core.util import merge_lists_ignore_duplicates
-from gatheros_subscription.models import Lot
+from gatheros_subscription.models import Lot, FormConfig
 from importer.constants import KEY_MAP
 from importer.helpers import (
     get_mapping_from_csv_key,
@@ -176,7 +176,11 @@ class XLSLotExamplePersister(XLSPersister):
         Header = namedtuple('Header',
                             ['title', 'required', 'possible_options', ])
 
-        form_config = self.lot.event.formconfig
+        if hasattr(self.lot.event, 'formconfig'):
+            form_config = self.lot.event.formconfig
+        else:
+            form_config = FormConfig()
+
         keys_mapping_list = get_keys_mapping_dict(form_config=form_config)
         for item in keys_mapping_list:
             headers.append(Header(
@@ -224,13 +228,13 @@ class XLSLotExamplePersister(XLSPersister):
         ws1 = wb.active
 
         # Some of the printable ASCII characters are invalid:  * : / \ ? [ ]
-        name = self.lot.name\
-            .replace('*', '')\
-            .replace(':', '')\
-            .replace('/', '-')\
-            .replace("\\", '-')\
-            .replace('?', '')\
-            .replace('[', '')\
+        name = self.lot.name \
+            .replace('*', '') \
+            .replace(':', '') \
+            .replace('/', '-') \
+            .replace("\\", '-') \
+            .replace('?', '') \
+            .replace('[', '') \
             .replace(']', '')
 
         ws1.title = 'Planilha de exemplo -  {}'.format(name)

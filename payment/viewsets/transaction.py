@@ -3,15 +3,16 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
+from core.viewsets import AuthenticatedViewSetMixin
 from payment.models import Transaction, TransactionStatus
 from payment.serializers import (
     TransactionSerializer,
     TransactionStatusSerializer,
 )
-from .mixins import RestrictionViewMixin
 
 
-class TransactionReadOnlyViewSet(RestrictionViewMixin, ReadOnlyModelViewSet):
+class TransactionReadOnlyViewSet(AuthenticatedViewSetMixin,
+                                 ReadOnlyModelViewSet):
     serializer_class = TransactionSerializer
 
     def get_organizer_pks(self):
@@ -96,7 +97,7 @@ class TransactionReadOnlyViewSet(RestrictionViewMixin, ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class TransactionStatusListView(RestrictionViewMixin, ListAPIView):
+class TransactionStatusListView(AuthenticatedViewSetMixin, ListAPIView):
     serializer_class = TransactionStatusSerializer
 
     def get_organizer_pks(self):

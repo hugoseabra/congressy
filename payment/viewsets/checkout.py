@@ -2,15 +2,15 @@ from rest_framework import status
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 
+from core.viewsets import AuthenticatedViewSetMixin
 from gatheros_event.helpers.account import is_organization_member
 from payment.serializers import (
     SubscriptionCheckoutSerializer,
     TransactionSerializer,
 )
-from .mixins import RestrictionViewMixin
 
 
-class SubscriptionCheckoutView(RestrictionViewMixin, CreateAPIView):
+class SubscriptionCheckoutView(AuthenticatedViewSetMixin, CreateAPIView):
     serializer_class = SubscriptionCheckoutSerializer
 
     def post(self, request, *args, **kwargs):

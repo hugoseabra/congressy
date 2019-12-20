@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
 
-from gatheros_subscription.lot_api_permissions import MultiLotsAllowed
+from core.viewsets import AuthenticatedViewSetMixin
 from gatheros_subscription.models import Lot
 from gatheros_subscription.serializers import (
     LotSerializer,
@@ -16,7 +16,7 @@ class LotViewSet(viewsets.ModelViewSet):
     serializer_class = LotSerializer
 
     def get_queryset(self):
-        user = self.request.user
+        # user = self.request.user
 
         queryset = super().get_queryset()
 
@@ -67,19 +67,21 @@ class LotViewSet(viewsets.ModelViewSet):
 
         exhibition_code = self.request.query_params.get('exhibition_code',
                                                         None)
-
+        show_private = self.request.query_params.get('show_private', None)
         show_inactive = self.request.query_params.get('show_inactive', None)
-
-        if show_inactive is None \
-                or (show_inactive != '1' and show_inactive != 'true'):
-            queryset = queryset.filter(active=True)
 
         if exhibition_code:
             queryset = queryset.filter(
                 exhibition_code=exhibition_code.upper(),
             )
-        else:
-            queryset = queryset.filter(private=False, )
+
+        elif show_private is None \
+                or (show_private != '1' and show_private != 'true'):
+            queryset = queryset.filter(private=False)
+
+        if show_inactive is None \
+                or (show_inactive != '1' and show_inactive != 'true'):
+            queryset = queryset.filter(active=True)
 
         return queryset
 
@@ -92,12 +94,7 @@ class LotViewSet(viewsets.ModelViewSet):
         the multi-lot flag enabled.
         """
 
-        if request.method == "POST":
-            self.permission_classes = (
-                permissions.IsAuthenticated,
-                MultiLotsAllowed,
-            )
-        else:
+        if request.method not in ("POST", "PATCH"):
             self.permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
         for permission in self.get_permissions():

@@ -350,7 +350,7 @@ class FeatureConfigurationAdmin(admin.ModelAdmin):
     """
     Admin para Configurações de Eventos
     """
-    search_fields = ('event__name',)
+    search_fields = ('event__name', 'event__slug',)
     exclude = ('event',)
     form = FeatureConfigurationForm
 
@@ -380,7 +380,7 @@ class FeatureManagementAdmin(admin.ModelAdmin):
     """
     Admin para Configurações de Eventos selecionadas pelos organizadores
     """
-    search_fields = ('event__name',)
+    search_fields = ('event__name', 'event__name',)
     exclude = ('event', 'checkin',)
 
     def has_add_permission(self, request):

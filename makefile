@@ -5,6 +5,8 @@ DJANGO_SETTINGS_MODULE=project.manage.settings.dev
 .PHONY: export_settings
 up: export_settings
 	@make broker_create
+	mkdir -p /tmp/bkp;
+	sudo cp bin/env/extension_installer.sh /tmp/bkp/;
 	docker-compose -f $(DOCKER_COMPOSE_ENV) up -d --remove-orphans;
 	@make logs
 
@@ -45,9 +47,8 @@ logs:
 
 .PHONY: update_db
 update_db:
-	mkdir -p /tmp/bkp;
-	sudo cp bin/env/extension_installer.sh /tmp/bkp/;
-	python manage.py makemigrations; python manage.py migrate
+	python manage.py makemigrations
+	python manage.py migrate
 	python manage.py loaddata 000_site_dev
 
 .PHONY: restart_ngrok
@@ -65,3 +66,9 @@ export_settings:
 .PHONY: clean
 clean:
 	sudo rm -rf /tmp/exporter
+
+.PHONY: reset_environment
+reset_environment:
+	@make down
+	@make up
+	@make update_db

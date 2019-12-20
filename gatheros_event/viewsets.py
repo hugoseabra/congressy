@@ -84,7 +84,9 @@ class PersonViewSet(ModelViewSet):
                 )
 
 
-class PersonLoggedUserViewSet(GenericViewSet, ListModelMixin):
+class PersonLoggedUserViewSet(AuthenticatedViewSetMixin,
+                              GenericViewSet,
+                              ListModelMixin):
     queryset = Person.objects.all()
     serializer_class = PersonSerializer
     permission_classes = (
@@ -107,7 +109,8 @@ class PersonLoggedUserViewSet(GenericViewSet, ListModelMixin):
         return Response(serializer.data)
 
 
-class OrganizationReadOnlyViewSet(ReadOnlyModelViewSet):
+class OrganizationReadOnlyViewSet(AuthenticatedOrReadOnlyViewSetMixin,
+                                  ReadOnlyModelViewSet):
     serializer_class = OrganizationSerializer
     queryset = Organization.objects.all()
     permission_classes = (
@@ -143,7 +146,8 @@ class OrganizationReadOnlyViewSet(ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class EventReadOnlyViewSet(ReadOnlyModelViewSet):
+class EventReadOnlyViewSet(AuthenticatedOrReadOnlyViewSetMixin,
+                           ReadOnlyModelViewSet):
     serializer_class = EventSerializer
     queryset = Event.objects.all()
     permission_classes = (

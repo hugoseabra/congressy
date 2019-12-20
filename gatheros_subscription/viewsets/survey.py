@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
+from core.viewsets import AuthenticatedViewSetMixin
 from gatheros_event.models import Event
 from gatheros_subscription.models import EventSurvey
 from gatheros_subscription.serializers import (
@@ -10,7 +11,6 @@ from gatheros_subscription.serializers import (
     OptionSerializer,
 )
 from survey.models import Question, Survey, Option, Answer
-from .mixins import RestrictionViewMixin
 
 
 class InstanceManagementMixin(object):
@@ -46,7 +46,7 @@ class InstanceManagementMixin(object):
         return is_member is True or is_subscribed is True
 
 
-class EventSurveyViewSet(RestrictionViewMixin,
+class EventSurveyViewSet(AuthenticatedViewSetMixin,
                          InstanceManagementMixin,
                          viewsets.ModelViewSet):
     serializer_class = EventSurveySerializer
@@ -119,7 +119,7 @@ class EventSurveyViewSet(RestrictionViewMixin,
         return super().destroy(request, *args, **kwargs)
 
 
-class QuestionViewSet(RestrictionViewMixin,
+class QuestionViewSet(AuthenticatedViewSetMixin,
                       InstanceManagementMixin,
                       viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
@@ -207,7 +207,7 @@ class QuestionViewSet(RestrictionViewMixin,
         return super().destroy(request, *args, **kwargs)
 
 
-class OptionViewSet(RestrictionViewMixin,
+class OptionViewSet(AuthenticatedViewSetMixin,
                     InstanceManagementMixin,
                     viewsets.ModelViewSet):
     serializer_class = OptionSerializer
@@ -305,7 +305,7 @@ class OptionViewSet(RestrictionViewMixin,
         return super().destroy(request, *args, **kwargs)
 
 
-class AnswerViewSet(RestrictionViewMixin,
+class AnswerViewSet(AuthenticatedViewSetMixin,
                     InstanceManagementMixin,
                     viewsets.ModelViewSet):
     serializer_class = AnswerSerializer

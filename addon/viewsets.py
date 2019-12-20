@@ -3,21 +3,18 @@ from typing import Any
 
 from django.db.models import QuerySet
 from rest_framework import viewsets, status
-from rest_framework.permissions import (
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-)
 from rest_framework.response import Response
 
 from addon import models, serializers
+from core.viewsets import (
+    AuthenticatedViewSetMixin,
+    AuthenticatedOrReadOnlyViewSetMixin,
+)
 from gatheros_subscription.models import Subscription
 
 
-class RestrictionViewMixin(object):
-    permission_classes = (IsAuthenticated,)
-
-
-class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+class ServiceViewSet(AuthenticatedOrReadOnlyViewSetMixin,
+                     viewsets.ModelViewSet):
     """
          Essa view é responsavel por retornar o usuário, se membro da
          organização, poderá acessar os serviços opcionais de todos os seus
@@ -25,9 +22,6 @@ class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
     """
     queryset = models.Service.objects.all().order_by('name')
     serializer_class = serializers.ServiceSerializer
-    permission_classes = (
-        IsAuthenticatedOrReadOnly,
-    )
 
     def get_serializer(self, *args, **kwargs):
         sub_pk = self.request.query_params.get('subscription', None)
@@ -121,7 +115,8 @@ class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class ProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+class ProductViewSet(AuthenticatedViewSetMixin,
+                     viewsets.ModelViewSet):
     """
          Essa view é responsavel por retornar o usuário, se membro da
          organização, poderá acessar os produtos opcionais de todos os seus
@@ -193,7 +188,8 @@ class ProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class SubscriptionServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+class SubscriptionServiceViewSet(AuthenticatedViewSetMixin,
+                                 viewsets.ModelViewSet):
     """
          Essa view é responsavel por retornar
     """
@@ -207,7 +203,8 @@ class SubscriptionServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         )
 
 
-class SubscriptionProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+class SubscriptionProductViewSet(AuthenticatedViewSetMixin,
+                                 viewsets.ModelViewSet):
     """
          Essa view é responsavel por retornar
     """

@@ -1,13 +1,11 @@
 from rest_framework.viewsets import ModelViewSet
 
+from core.viewsets import AuthenticatedViewSetMixin
 from payment.models import Benefactor
-from payment.serializers import (
-    BenefactorSerializer,
-)
-from .mixins import RestrictionViewMixin
+from payment.serializers import BenefactorSerializer
 
 
-class BenefactorViewSet(RestrictionViewMixin, ModelViewSet):
+class BenefactorViewSet(AuthenticatedViewSetMixin, ModelViewSet):
     serializer_class = BenefactorSerializer
 
     def get_queryset(self):

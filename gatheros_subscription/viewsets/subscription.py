@@ -4,7 +4,7 @@ from typing import Any
 
 from django.db.models import Q
 from django.http import HttpResponse
-from rest_framework import viewsets, generics, pagination, status, permissions
+from rest_framework import viewsets, generics, pagination, status
 from rest_framework.exceptions import APIException
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from core.util.string import clear_string
+from core.viewsets import AuthenticatedViewSetMixin
 from gatheros_event.models import Event
 from gatheros_subscription.helpers.subscription_async_exporter import \
     SubscriptionServiceAsyncExporter
@@ -22,9 +23,10 @@ from gatheros_subscription.permissions import OrganizerOnly
 from gatheros_subscription.serializers import (
     SubscriptionSerializer,
     SubscriptionModelSerializer,
-    SubscriptionBillingSerializer, SubscriptionPaymentSerializer)
+    SubscriptionBillingSerializer,
+    SubscriptionPaymentSerializer,
+)
 from gatheros_subscription.tasks import async_subscription_exporter_task
-from .mixins import RestrictionViewMixin
 
 
 class DatatablePagination(pagination.LimitOffsetPagination):
@@ -42,7 +44,7 @@ class DatatablePagination(pagination.LimitOffsetPagination):
         })
 
 
-class SubscriptionListViewSet(RestrictionViewMixin,
+class SubscriptionListViewSet(AuthenticatedViewSetMixin,
                               generics.GenericAPIView):
     """
     API endpoint for the subscription list view
@@ -154,8 +156,8 @@ class SubscriptionListViewSet(RestrictionViewMixin,
         )
 
 
-class SubscriptionExporterViewSet(RestrictionViewMixin, APIView):
-    permission_classes = (OrganizerOnly,)
+class SubscriptionExporterViewSet(AuthenticatedViewSetMixin, APIView):
+    permission_classes = (IsAuthenticated, OrganizerOnly,)
 
     def post(self, request, *args, **kwargs):
         event_pk = kwargs.get('event_pk')
@@ -230,12 +232,9 @@ class SubscriptionExporterViewSet(RestrictionViewMixin, APIView):
         return response
 
 
-class SubscriptionViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+class SubscriptionViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
     serializer_class = SubscriptionModelSerializer
     queryset = Subscription.objects.all()
-    permission_classes = (
-        permissions.IsAuthenticated,
-    )
 
     # def get_queryset(self):
     #     user = self.request.user
@@ -402,7 +401,9 @@ class SubscriptionViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
 
 
-class SubscriptionBillingViewSet(GenericViewSet, RetrieveModelMixin):
+class SubscriptionBillingViewSet(AuthenticatedViewSetMixin,
+                                 GenericViewSet,
+                                 RetrieveModelMixin):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionBillingSerializer
     permission_classes = (
@@ -410,7 +411,9 @@ class SubscriptionBillingViewSet(GenericViewSet, RetrieveModelMixin):
     )
 
 
-class SubscriptionPaymentViewSet(GenericViewSet, RetrieveModelMixin):
+class SubscriptionPaymentViewSet(AuthenticatedViewSetMixin,
+                                 GenericViewSet,
+                                 RetrieveModelMixin):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionPaymentSerializer
     permission_classes = (
@@ -418,7 +421,9 @@ class SubscriptionPaymentViewSet(GenericViewSet, RetrieveModelMixin):
     )
 
 
-class SubscriptionEventViewSet(GenericViewSet, RetrieveModelMixin):
+class SubscriptionEventViewSet(AuthenticatedViewSetMixin,
+                               GenericViewSet,
+                               RetrieveModelMixin):
     queryset = Subscription.objects.get_queryset()
     serializer_class = SubscriptionSerializer
     permission_classes = (
