@@ -139,20 +139,21 @@ services:
       - "traefik.frontend.entryPoints=http"
 
   hotsite:
-    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/hotsite-v2
+    image: cgsy-hotsite
     container_name: cgsy-hotsite
     ports:
       - 80
     networks:
-      - traefik
+      - hotsite
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.passHostHeader=true"
-      - "traefik.weight=7"
+      - "traefik.weight=10"
       - "traefik.backend=cgsy-hotsite"
       - "traefik.protocol=http"
       - "traefik.port=80"
       - "traefik.frontend.rule=Host:test.congressy.com"
+      - "traefik.http.middlewares.test-stripprefix.stripprefix.prefixes=/1"
       - "traefik.docker.network=traefik_default"
       - "traefik.frontend.entryPoints=http"
 
