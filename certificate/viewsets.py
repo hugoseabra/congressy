@@ -4,10 +4,6 @@ from certificate import models, serializers
 from core.viewsets import AuthenticatedViewSetMixin
 
 
-class RestrictionViewMixin(object):
-    permission_classes = (IsAuthenticated,)
-
-
 class CertificateViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.

@@ -18,10 +18,6 @@ from core.viewsets import AuthenticatedViewSetMixin
 from gatheros_subscription.models import Subscription
 
 
-class RestrictionViewMixin(object):
-    permission_classes = (IsAuthenticated,)
-
-
 def search_subscriptions(queryset, search_criteria):
     if not search_criteria:
         return queryset.none()

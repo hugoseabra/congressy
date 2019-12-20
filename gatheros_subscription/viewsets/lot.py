@@ -8,7 +8,7 @@ from gatheros_subscription.serializers import (
 )
 
 
-class LotViewSet(viewsets.ModelViewSet):
+class LotViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """

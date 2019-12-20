@@ -1,4 +1,8 @@
 from rest_framework import permissions, status
+from rest_framework.authentication import (
+    BasicAuthentication,
+    SessionAuthentication,
+)
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import ListModelMixin
@@ -9,12 +13,17 @@ from rest_framework.viewsets import (
     ReadOnlyModelViewSet,
 )
 
+from core.viewsets import (
+    AuthenticatedViewSetMixin,
+    AuthenticatedOrReadOnlyViewSetMixin,
+)
 from gatheros_event.models import Organization, Event, Person
 from gatheros_event.serializers import (
     EventSerializer,
     OrganizationSerializer,
     PersonSerializer,
 )
+from project.token_authentication import ExpiringTokenAuthentication
 
 
 class PersonViewSet(ModelViewSet):
@@ -22,6 +31,11 @@ class PersonViewSet(ModelViewSet):
     serializer_class = PersonSerializer
     permission_classes = (
         permissions.IsAuthenticated,
+    )
+    authentication_classes = (
+        BasicAuthentication,
+        SessionAuthentication,
+        ExpiringTokenAuthentication,
     )
 
     def list(self, request, *args, **kwargs):
@@ -89,9 +103,6 @@ class PersonLoggedUserViewSet(AuthenticatedViewSetMixin,
                               ListModelMixin):
     queryset = Person.objects.all()
     serializer_class = PersonSerializer
-    permission_classes = (
-        permissions.IsAuthenticated,
-    )
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
@@ -113,9 +124,6 @@ class OrganizationReadOnlyViewSet(AuthenticatedOrReadOnlyViewSetMixin,
                                   ReadOnlyModelViewSet):
     serializer_class = OrganizationSerializer
     queryset = Organization.objects.all()
-    permission_classes = (
-        permissions.IsAuthenticatedOrReadOnly,
-    )
 
     def permission_denied(self, request, message=None):
         """
@@ -150,9 +158,6 @@ class EventReadOnlyViewSet(AuthenticatedOrReadOnlyViewSetMixin,
                            ReadOnlyModelViewSet):
     serializer_class = EventSerializer
     queryset = Event.objects.all()
-    permission_classes = (
-        permissions.IsAuthenticatedOrReadOnly,
-    )
 
     def get_object(self):
         pk = self.kwargs.get('pk')  # default

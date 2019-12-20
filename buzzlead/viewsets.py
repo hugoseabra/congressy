@@ -1,16 +1,13 @@
 from django.conf import settings
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from buzzlead.serializers import BuzzLeadCampaignSerializer
+from core.viewsets import AuthenticatedViewSetMixin
 
 
-class RestrictionViewMixin(object):
-    permission_classes = (IsAuthenticated,)
-
-
-class BuzzLeadCampaignViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+class BuzzLeadCampaignViewSet(AuthenticatedViewSetMixin,
+                              viewsets.ModelViewSet):
     """
         Essa view é responsavel por retornar o usuário, se membro da
         organização, poderá acessar os produtos opcionais de todos os seus
