@@ -406,9 +406,6 @@ class SubscriptionBillingViewSet(AuthenticatedViewSetMixin,
                                  RetrieveModelMixin):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionBillingSerializer
-    permission_classes = (
-        permissions.IsAuthenticated,
-    )
 
 
 class SubscriptionPaymentViewSet(AuthenticatedViewSetMixin,
@@ -416,9 +413,6 @@ class SubscriptionPaymentViewSet(AuthenticatedViewSetMixin,
                                  RetrieveModelMixin):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionPaymentSerializer
-    permission_classes = (
-        permissions.IsAuthenticated,
-    )
 
 
 class SubscriptionEventViewSet(AuthenticatedViewSetMixin,
@@ -426,9 +420,6 @@ class SubscriptionEventViewSet(AuthenticatedViewSetMixin,
                                RetrieveModelMixin):
     queryset = Subscription.objects.get_queryset()
     serializer_class = SubscriptionSerializer
-    permission_classes = (
-        permissions.IsAuthenticated,
-    )
 
     lookup_field = 'event_pk'
 
