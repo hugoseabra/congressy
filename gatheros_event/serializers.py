@@ -121,13 +121,21 @@ class PlaceSerializer(serializers.ModelSerializer):
             'country',
             'city',
             'city_international',
-            'state',
             'state_international',
             'zoom',
             'lat',
             'long',
             'reference',
         )
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+
+        if rep['city']:
+            rep['city_name'] = instance.city.name
+            rep['state'] = instance.city.state
+
+        return rep
 
 
 class EventSerializer(serializers.ModelSerializer):
