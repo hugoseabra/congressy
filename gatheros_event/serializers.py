@@ -3,7 +3,8 @@ from typing import Any
 import absoluteuri
 from rest_framework import serializers
 
-from gatheros_event.models import Person, Event, Organization, Category, Info
+from gatheros_event.models import Person, Event, Organization, Category, Info, \
+    Place
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -112,10 +113,28 @@ class InfoSerializer(serializers.ModelSerializer):
         return rep
 
 
+class PlaceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Place
+        fields = (
+            'name',
+            'country',
+            'city',
+            'city_international',
+            'state',
+            'state_international',
+            'zoom',
+            'lat',
+            'long',
+            'reference',
+        )
+
+
 class EventSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     organization = OrganizationSerializer()
     info = InfoSerializer()
+    place = PlaceSerializer()
 
     class Meta:
         model = Event
@@ -135,6 +154,7 @@ class EventSerializer(serializers.ModelSerializer):
             'category',
             'organization',
             'info',
+            'place',
         )
 
     def to_representation(self, instance: Event):
