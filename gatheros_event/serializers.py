@@ -133,7 +133,7 @@ class PlaceSerializer(serializers.ModelSerializer):
 
         if rep['city']:
             rep['city_name'] = instance.city.name
-            rep['state'] = instance.city.state
+            rep['state'] = instance.city.uf
 
         return rep
 
