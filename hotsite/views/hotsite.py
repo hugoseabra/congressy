@@ -31,6 +31,11 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
         is_in_org = False
         person = None
 
+        event = self.current_event.event
+
+        if event.hotsite_version == 2:
+            return redirect('/' + event.slug)
+
         if not is_anonymous:
             person = self.request.user.person
 
