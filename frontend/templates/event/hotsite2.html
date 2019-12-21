@@ -11,9 +11,7 @@
 {% block page_description %}Configuração da página do evento.{% endblock %}
 
 {% block styles %}
-
     <link href="{% static "assets/plugins/croppie/croppie.css" %}" rel="stylesheet">
-
     <style>
         .event-info-status-item {
             text-align: center;
@@ -394,12 +392,12 @@
         function createCroppieObj() {
             return $('#banner-cropped').croppie({
                 viewport: {
-                    width: 480,
-                    height: 640,
+                    width: 1200,
+                    height: 500,
                     type: 'square'
                 },
                 boundary: {
-                    width: 500,
+                    width: 1200,
                     height: 650
                 }
             });
@@ -432,12 +430,12 @@
                 replaceFile();
                 croppie_obj = $('#banner-cropped').croppie({
                     viewport: {
-                        width: 480,
-                        height: 640,
+                        width: 1200,
+                        height: 500,
                         type: 'square'
                     },
                     boundary: {
-                        width: 500,
+                        width: 1200,
                         height: 650
                     }
                 });
@@ -475,10 +473,6 @@
 
             city_el.change(function () {
                 hidden_city_el.val($(this).val());
-            });
-
-            $('#open_banner_modal').on('click', function () {
-                $('#edit_banner_modal').modal('show');
             });
 
             $('#start_crop').on('click', function () {
@@ -674,11 +668,8 @@
         </script>
 {% endblock %}
 
-{% include 'event/event-menu.html' %}
-
 {% block content %}
-    <form id="hotsite-form" action="" method="post" class="form-horizontal"
-          enctype="multipart/form-data" role="form">
+    <form id="hotsite-form" action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -737,31 +728,28 @@
                                 </div>
 
                                 <div class="row text-center banner">
-                                    <img {% if event.info.image_main %}
-                                        src="{{ event.info.image_main.url }}"
-                                    {% else %}
-                                        src="{% static 'assets/img/480x640.png' %}"
-                                    {% endif %}
-                                        style="width: 150px;"
-                                        id="banner-thumbnail">
+                                    <div class="col-md-12 text-center">
+                                        <img {% if event.info.image_main2 %}
+                                            src="{{ event.info.image_main2.url }}"
+                                        {% else %}
+                                            src="{% static 'assets/img/banner_samples/1920x1006_small.png' %}"
+                                        {% endif %}
+                                            class="img"
+                                             style="border:2px solid #DDD"
+                                            id="banner-thumbnail">
+                                    </div>
                                 </div>
 
                                 <div class="row text-center banner"
                                      style="margin-top: 10px">
 
                                     <div class="col-md-12">
-                                        <button type="button" class="btn
-                                        btn-primary" id="open_banner_modal">
+                                        <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'event:event-hotsite-banner' event.pk %}'">
                                             <i class="fas fa-image"></i>
                                             Configurar seu banner
                                         </button>
                                     </div>
 
-                                </div>
-                                <div class="row" style="margin-top: 15px">
-                                    <div class="col-md-12">
-                                        {% render_generic_field form.lead %}
-                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
@@ -1143,75 +1131,4 @@
             </div>
         </div>
     </form>
-{% endblock %}
-
-
-{% block modals %}
-    <div class="modal fade" id="edit_banner_modal" tabindex="-1" role="dialog"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"
-                            aria-hidden="true">
-                        ×
-                    </button>
-                    <h3 class="modal-title">Editar banner: </h3>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-xs-12 text-center">
-                            <input type="file" style="display: none" id="id_banner_file" accept="image/*">
-                            <img
-                                src="{% if event.info.image_main %}{{ event.info.image_main.url }}{% else %}{% static 'assets/img/480x640.png' %}{% endif %}"
-                                id="banner-cropped">
-                        </div>
-                    </div>
-                    <br />
-                    <div class="row">
-                        <div class="col-xs-8 col-xs-push-1 text-left">
-                            <button class="btn btn-sm btn-info"
-                                    onclick="askForFile();" id="edit_btn"
-                                    type="button">
-                                <i class="fas fa-upload"></i>
-                                Enviar
-                            </button>
-
-                            <button class="btn btn-sm btn-primary"
-                                    id="start_crop"
-                                    type="button">
-                                <i class="fas fa-crop"></i>
-                                Modo de Recorte
-                            </button>
-                        </div>
-                        <div class="col-xs-4 col-xs-pull-1 text-right">
-                            <button type="button"
-                                    class="btn btn-sm btn-danger banner-remove"
-                                    data-dismiss="modal">
-                                <i class="fas fa-trash"></i>
-                                Excluir
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-
-                    <div class="pull-right">
-                        <button type="button" class="btn btn-md btn-default"
-                                data-dismiss="modal">
-                            Fechar
-                        </button>
-                        <button type="button"
-                                class="btn btn-md btn-success banner-save"
-                                data-dismiss="modal"
-                                onclick="submitImage()"
-                                id="edit_banner_modal_btn">
-                            <i class="fas fa-save"></i>
-                            Salvar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 {% endblock %}

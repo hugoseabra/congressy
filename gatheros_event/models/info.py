@@ -66,6 +66,7 @@ class Info(models.Model, GatherosModelMixin):
                   " evento"
     )
     image_main = StdImageField(
+        max_length=255,
         upload_to=get_image_path,
         blank=True,
         null=True,
@@ -78,41 +79,18 @@ class Info(models.Model, GatherosModelMixin):
                   " href='http://via.placeholder.com/480x638'>Exemplo"
                   " </a>"
     )
-    image1 = StdImageField(
+    image_main2 = StdImageField(
+        max_length=255,
         upload_to=get_image_path,
         blank=True,
         null=True,
-        verbose_name='imagem pequena #1',
-        variations={'default': (350, 350), 'thumbnail': (200, 200, True)},
-        validators=[MinSizeValidator(350, 350), MaxSizeValidator(1400, 1400)],
-        help_text="Tamanho: 350px x 350px"
-    )
-    image2 = StdImageField(
-        upload_to=get_image_path,
-        blank=True,
-        null=True,
-        verbose_name='imagem pequena #2',
-        variations={'default': (350, 350), 'thumbnail': (200, 200, True)},
-        validators=[MinSizeValidator(350, 350), MaxSizeValidator(1400, 1400)],
-        help_text="Tamanho: 350px x 350px"
-    )
-    image3 = StdImageField(
-        upload_to=get_image_path,
-        blank=True,
-        null=True,
-        verbose_name='imagem pequena #3',
-        variations={'default': (350, 350), 'thumbnail': (200, 200, True)},
-        validators=[MinSizeValidator(350, 350), MaxSizeValidator(1400, 1400)],
-        help_text="Tamanho: 350px x 350px"
-    )
-    image4 = StdImageField(
-        upload_to=get_image_path,
-        blank=True,
-        null=True,
-        verbose_name='imagem pequena #4',
-        variations={'default': (350, 350), 'thumbnail': (200, 200, True)},
-        validators=[MinSizeValidator(350, 350), MaxSizeValidator(1400, 1400)],
-        help_text="Tamanho: 350px x 350px"
+        verbose_name='imagem principal',
+        variations={'default': (1920, 1006), 'thumbnail': (400, 210, True)},
+        validators=[MinSizeValidator(1200, 629), MaxSizeValidator(2880, 1509)],
+        help_text="Banner com tamanho ideal de 1920px largura x"
+                  " 1006px altura.(png/jpg) e não ultrapasse 10Mb de tamanho"
+                  " - <a target='_blank'"
+                  " href='http://via.placeholder.com/1920x1006'>Exemplo</a>"
     )
 
     youtube_video = models.URLField(
