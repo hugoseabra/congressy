@@ -161,6 +161,7 @@ class EventSerializer(serializers.ModelSerializer):
             'is_scientific',
             'category',
             'organization',
+            'hotsite_version',
             'info',
             'place',
         )
