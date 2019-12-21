@@ -1,6 +1,5 @@
 from typing import Any
 
-from kanu_locations.serializers import CitySerializer
 from rest_framework import serializers
 
 from gatheros_event.models import Person, Event, Organization, Category, Info
@@ -68,6 +67,7 @@ class InfoSerializer(serializers.ModelSerializer):
             'description_html',
             'lead',
             'image_main',
+            'image_main2',
             'youtube_video',
             'voucher_extra_info',
         )
