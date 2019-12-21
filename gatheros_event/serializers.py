@@ -1,5 +1,6 @@
 from typing import Any
 
+import absoluteuri
 from rest_framework import serializers
 
 from gatheros_event.models import Person, Event, Organization, Category, Info
@@ -71,6 +72,44 @@ class InfoSerializer(serializers.ModelSerializer):
             'youtube_video',
             'voucher_extra_info',
         )
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+
+        main_default = None
+        main_thumbnail = None
+
+        if instance.image_main:
+            main_default = absoluteuri.build_absolute_uri(
+                instance.image_main.default.url
+            )
+            main_thumbnail = absoluteuri.build_absolute_uri(
+                instance.image_main.thumbnail.url
+            )
+
+        main2_default = None
+        main2_thumbnail = None
+
+        if instance.image_main2:
+            main2_default = absoluteuri.build_absolute_uri(
+                instance.image_main2.default.url
+            )
+            main2_thumbnail = absoluteuri.build_absolute_uri(
+                instance.image_main2.thumbnail.url
+            )
+
+        rep['banners'] = {
+            'image_main': {
+                'default': main_default if main_default else None,
+                'thumbnail': main_thumbnail if main_thumbnail else None,
+            },
+            'image_main2': {
+                'default': main2_default if main2_default else None,
+                'thumbnail': main2_thumbnail if main2_thumbnail else None,
+            }
+        }
+
+        return rep
 
 
 class EventSerializer(serializers.ModelSerializer):
