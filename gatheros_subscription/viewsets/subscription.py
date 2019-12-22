@@ -1,6 +1,5 @@
 from datetime import datetime
 from time import sleep
-from typing import Any
 
 from django.db.models import Q
 from django.http import HttpResponse
@@ -249,7 +248,7 @@ class SubscriptionViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
     #     queryset = super().get_queryset()
     #     return queryset.filter(event__organization_id__in=org_pks)
 
-    def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+    def list(self, request: Request, *args, **kwargs):
 
         event_id = request.query_params.get('event', None)
 

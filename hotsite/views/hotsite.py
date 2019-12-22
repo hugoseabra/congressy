@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
@@ -33,7 +34,7 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
 
         event = self.current_event.event
 
-        if event.hotsite_version == 2:
+        if settings.DEBUG is False and event.hotsite_version == 2:
             return redirect('/' + event.slug)
 
         if not is_anonymous:
@@ -96,7 +97,6 @@ class HotsiteView(SubscriptionFormMixin, generic.FormView):
             lot = sub.lot
             context['has_available_optionals'] = self._has_products(lot) or \
                                                  self._has_services(lot)
-
 
             if event.finished is True:
                 context['has_certificate'] = subscription_has_certificate(
