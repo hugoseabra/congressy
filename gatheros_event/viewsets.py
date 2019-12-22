@@ -26,17 +26,9 @@ from gatheros_event.serializers import (
 from project.token_authentication import ExpiringTokenAuthentication
 
 
-class PersonViewSet(ModelViewSet):
+class PersonViewSet(AuthenticatedViewSetMixin, ModelViewSet):
     queryset = Person.objects.all()
     serializer_class = PersonSerializer
-    permission_classes = (
-        permissions.IsAuthenticated,
-    )
-    authentication_classes = (
-        BasicAuthentication,
-        SessionAuthentication,
-        ExpiringTokenAuthentication,
-    )
 
     def list(self, request, *args, **kwargs):
         content = {
