@@ -104,24 +104,6 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
 
-        lot = instance.lot
-        rep['lot_data'] = {
-            'pk': lot.pk,
-            'name': lot.name,
-            'event': lot.event_id,
-            'event_data': {
-                'pk': lot.event_id,
-                'name': lot.event.name,
-                'slug': lot.event.slug,
-            },
-            'category': lot.category_id,
-            'category_data': {
-                'pk': lot.category.pk,
-                'name': lot.category.name,
-                'description': lot.category.description,
-            }
-        }
-
         person = instance.person
         rep['person_data'] = {
             'pk': person.pk,
@@ -140,21 +122,10 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
                 'last_login': user.last_login,
             }
 
-        return rep
-
-
-class SubscriptionBillingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Subscription
-        fields = [
-            'lot',
-        ]
-
-    def to_representation(self, instance):
         lot = instance.lot
         amounts = list()
 
-        rep = dict()
+        amounts.append(lot.get_calculated_price())
 
         survey = None
         survey_data = dict()
@@ -167,21 +138,22 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                 'description': survey.description,
             }
 
-        rep['lot'] = {
+        rep['lot_data'] = {
             'pk': lot.pk,
             'name': lot.name,
             'event': lot.event_id,
-            'price': lot.get_calculated_price(),
+            'event_data': {
+                'pk': lot.event_id,
+                'name': lot.event.name,
+                'slug': lot.event.slug,
+            },
             'survey': survey.pk if survey else None,
             'survey_data': survey_data,
-            
-            'status': lot.status,
-            'status_name': lot.get_status_display(),
         }
 
         if lot.category_id:
             lot_cat = lot.category
-            rep['lot'].update({
+            rep['lot_data'].update({
                 'category': lot.category_id,
                 'category_data': {
                     'id': lot_cat.pk,
@@ -191,20 +163,9 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                 }
             })
 
-        amounts.append(lot.get_calculated_price())
-
-        if lot.category_id:
-            rep['lot'].update({
-                'category': {
-                    'pk': lot.category_id,
-                    'name': lot.category.name,
-                    'description': lot.category.description,
-                }
-            })
-
+        rep['addon_products'] = list()
         addon_products = instance.subscription_products.all()
 
-        rep['addon_products'] = list()
         if addon_products.count():
             for addon_sub in addon_products:
                 optional = addon_sub.optional
@@ -252,9 +213,191 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
 
                 amounts.append(optional.price)
 
+        rep['addon_services'] = list()
         addon_services = instance.subscription_services.all()
 
+        if addon_services.count():
+            for addon_sub in addon_services:
+                optional = addon_sub.optional
+                data = {
+                    'pk': addon_sub.pk,
+                    'service_id': addon_sub.optional_id,
+                    'service_data': {
+                        'pk': optional.pk,
+                        'name': optional.name,
+                        'date_start': optional.schedule_start.strftime(
+                            '%Y-%m-%d %H:%M:%S'
+                        ),
+                        'date_end': optional.schedule_end.strftime(
+                            '%Y-%m-%d %H:%M:%S'
+                        ),
+                        'date_end_sub': optional.date_end_sub.strftime(
+                            '%Y-%m-%d %H:%M:%S'
+                        ),
+                        'published': optional.published,
+                        'banner':
+                            optional.banner.url if optional.banner else None,
+                        'category': {
+                            'pk': optional.lot_category_id,
+                            'name': optional.lot_category.name,
+                            'description': optional.lot_category.description,
+                        },
+                        "optional_type": {
+                            "name": optional.optional_type.name,
+                            "pk": optional.optional_type_id,
+                        },
+                        'price': optional.price,
+                        'banners': {
+                            'default': None,
+                            'thumbnail': None,
+                        }
+                    }
+                }
+
+                if optional.banner.name:
+                    def_banner = absoluteuri.build_absolute_uri(
+                        optional.banner.default.url
+                    )
+                    def_thumbnail = absoluteuri.build_absolute_uri(
+                        optional.banner.thumbnail.url
+                    )
+                    data['service_data']['banners'] = {
+                        'default': def_banner,
+                        'thumbnail': def_thumbnail,
+                    }
+
+                rep['addon_services'].append(data)
+
+                amounts.append(optional.price)
+
+        rep['total_amount'] = round(Decimal(sum(amounts)), 2)
+
+        return rep
+
+
+class SubscriptionBillingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = [
+            'lot',
+        ]
+
+    def to_representation(self, instance):
+        rep = dict()
+
+        person = instance.person
+
+        rep['person_data'] = {
+            'pk': person.pk,
+            'name': person.name,
+            'email': person.email,
+            'user': person.user_id,
+        }
+
+        if instance.person.user_id:
+            user = instance.person.user
+            rep['person_data']['user_data'] = {
+                'pk': user.pk,
+                'fist_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'last_login': user.last_login,
+            }
+
+        lot = instance.lot
+        amounts = list()
+
+        amounts.append(lot.get_calculated_price())
+
+        survey = None
+        survey_data = dict()
+
+        if lot.event_survey_id:
+            survey = lot.event_survey.survey
+            survey_data = {
+                'pk': survey.pk,
+                'name': survey.name,
+                'description': survey.description,
+            }
+
+        rep['lot_data'] = {
+            'pk': lot.pk,
+            'name': lot.name,
+            'event': lot.event_id,
+            'event_data': {
+                'pk': lot.event_id,
+                'name': lot.event.name,
+                'slug': lot.event.slug,
+            },
+            'survey': survey.pk if survey else None,
+            'survey_data': survey_data,
+        }
+
+        if lot.category_id:
+            lot_cat = lot.category
+            rep['lot_data'].update({
+                'category': lot.category_id,
+                'category_data': {
+                    'id': lot_cat.pk,
+                    'name': lot_cat.name,
+                    'active': lot_cat.active,
+                    'description': lot_cat.description,
+                }
+            })
+
+        rep['addon_products'] = list()
+        addon_products = instance.subscription_products.all()
+
+        if addon_products.count():
+            for addon_sub in addon_products:
+                optional = addon_sub.optional
+                data = {
+                    'pk': addon_sub.pk,
+                    'product_id': addon_sub.optional_id,
+                    'product_data': {
+                        'pk': optional.pk,
+                        'name': optional.name,
+                        'published': optional.published,
+                        'date_end_sub': optional.date_end_sub.strftime(
+                            '%Y-%m-%d %H:%M:%S'
+                        ),
+                        'banner':
+                            optional.banner.url if optional.banner else None,
+                        'category': {
+                            'pk': optional.lot_category_id,
+                            'name': optional.lot_category.name,
+                            'description': optional.lot_category.description,
+                        },
+                        "optional_type": {
+                            "name": optional.optional_type.name,
+                            "pk": optional.optional_type_id,
+                        },
+                        'price': optional.price,
+                        'banners': {
+                            'default': None,
+                            'thumbnail': None,
+                        }
+                    }
+                }
+                if optional.banner.name:
+                    def_banner = absoluteuri.build_absolute_uri(
+                        optional.banner.default.url
+                    )
+                    def_thumbnail = absoluteuri.build_absolute_uri(
+                        optional.banner.thumbnail.url
+                    )
+                    data['product_data']['banners'] = {
+                        'default': def_banner,
+                        'thumbnail': def_thumbnail,
+                    }
+
+                rep['addon_products'].append(data)
+
+                amounts.append(optional.price)
+
         rep['addon_services'] = list()
+        addon_services = instance.subscription_services.all()
+
         if addon_services.count():
             for addon_sub in addon_services:
                 optional = addon_sub.optional
