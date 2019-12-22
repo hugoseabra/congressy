@@ -113,16 +113,18 @@ class ProductSerializer(serializers.ModelSerializer):
 
         elif self.subscription:
             try:
-                addon_prod = instance.subscription_products.get(
+                instance.subscription_products.get(
                     pk=self.subscription.pk
                 )
                 ret['subscription_registered'] = True
-                if addon_prod.has_tag_conflict is True:
-                    ret['conflicted'] = True
-                    ret['conflict_reason'] = 'Já existe outra opção' \
-                                             ' semelhante selecionada.'
+
             except ObjectDoesNotExist:
                 pass
+
+            if instance.has_tag_conflict(self.subscription) is True:
+                ret['conflicted'] = True
+                ret['conflict_reason'] = 'Já existe outra opção' \
+                                         ' semelhante selecionada.'
 
         banners = {
             'default': None,
@@ -215,26 +217,29 @@ class ServiceSerializer(serializers.ModelSerializer):
 
         elif self.subscription:
             try:
-                addon_serv = instance.subscription_services.get(
+                instance.subscription_services.get(
                     subscription_id=self.subscription.pk
                 )
                 ret['subscription_registered'] = True
 
-                if addon_serv.has_tag_conflict is True:
-                    ret['conflicted'] = True
-                    ret['conflict_reason'] = 'Já existe outra opção' \
-                                             ' semelhante selecionada.'
-                elif addon_serv.has_schedule_conflicts is True:
-                    ret['conflicted'] = True
-                    ret['conflict_reason'] = 'Opção em conflito de horário' \
-                                             ' com outra opção previamente' \
-                                             ' selecionada.'
-                elif addon_serv.has_theme_conflict is True:
-                    ret['conflicted'] = True
-                    ret['conflict_reason'] = 'Opção possui um tema que' \
-                                             ' está esgotado ou indisponível.'
             except ObjectDoesNotExist:
                 pass
+
+            if instance.has_tag_conflict(self.subscription) is True:
+                ret['conflicted'] = True
+                ret['conflict_reason'] = 'Já existe outra opção' \
+                                         ' semelhante selecionada.'
+
+            elif instance.has_schedule_conflict(self.subscription) is True:
+                ret['conflicted'] = True
+                ret['conflict_reason'] = 'Opção em conflito de horário' \
+                                         ' com outra opção previamente' \
+                                         ' selecionada.'
+
+            elif instance.has_theme_conflict(self.subscription) is True:
+                ret['conflicted'] = True
+                ret['conflict_reason'] = 'Opção possui um tema que' \
+                                         ' está esgotado ou indisponível.'
 
         opt_type = instance.optional_type
         ret['optional_type_data'] = {

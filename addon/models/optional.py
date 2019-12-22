@@ -14,6 +14,7 @@ from stdimage.validators import MaxSizeValidator
 from addon import constants, rules
 from base.models import EntityMixin
 from core.model import track_data
+from core.util.date import DateTimeRange
 from gatheros_event.models.mixins import GatherosModelMixin
 from gatheros_subscription.models import LotCategory, Subscription
 from .optional_type import OptionalServiceType, OptionalProductType
@@ -255,6 +256,23 @@ class Product(AbstractOptional):
             subscription__test_subscription=False
         ).exclude(subscription__status=Subscription.CANCELED_STATUS).count()
 
+    def has_tag_conflict(self, subscription):
+        if not self.tag:
+            return False
+
+        sub_subscribed = subscription.subscription_products.filter(
+            optional_id=self.pk,
+        ).count() > 0
+
+        if sub_subscribed is True:
+            # Inscrição já está inscrita no produto
+            return False
+
+        # Inscrições em produto
+        return subscription.subscription_products.filter(
+            optional__tag=self.tag,
+        ).count() > 0
+
     def save(self, *args, **kwargs):
         if self.tag:
             self.tag = self.tag.upper()
@@ -383,6 +401,77 @@ class Service(AbstractOptional):
             period += end_time.strftime('%Hh%M')
 
         return period
+
+    def has_schedule_conflict(self, subscription):
+        sub_subscribed = subscription.subscription_services.filter(
+            optional_id=self.pk,
+        ).count() > 0
+
+        if sub_subscribed is True:
+            # Inscrição já está inscrita no serviço
+            return False
+
+        # Inscrições em serviços
+        sub_services = subscription.subscription_services.all()
+
+        new_start = self.schedule_start
+        new_end = self.schedule_end
+
+        # Este serviço restringe outros serviços
+        is_restricted = self.restrict_unique
+
+        for sub_optional in sub_services:
+            optional = sub_optional.optional
+
+            start = optional.schedule_start
+            end = optional.schedule_end
+
+            # serviço também restrito a outros servios
+            is_sub_restricted = optional.restrict_unique
+
+            dates_range = DateTimeRange(start=start, stop=end)
+            has_conflict = (new_start in dates_range or new_end in dates_range)
+
+            if has_conflict is True and (is_restricted or is_sub_restricted):
+                return True
+
+        return False
+
+    def has_tag_conflict(self, subscription):
+        if not self.tag:
+            return False
+
+        sub_subscribed = subscription.subscription_services.filter(
+            optional_id=self.pk,
+        ).count() > 0
+
+        if sub_subscribed is True:
+            # Inscrição já está inscrita no serviço
+            return False
+
+        # Inscrições em serviços
+        return subscription.subscription_services.filter(
+            optional__tag=self.tag,
+        ).count() > 0
+
+    def has_theme_conflict(self, subscription):
+        if not self.theme.limit:
+            return False
+
+        sub_subscribed = subscription.subscription_services.filter(
+            optional_id=self.pk,
+        ).count() > 0
+
+        if sub_subscribed is True:
+            # Inscrição já está inscrita no serviço
+            return False
+
+        # Número de Inscrições em serviços com o mesmo tema
+        num_sub_services = subscription.subscription_services.filter(
+            theme_id=self.theme.pk,
+        ).count()
+
+        return num_sub_services >= self.theme.limit
 
     def __str__(self):
         return '{} - {}'.format(self.name, self.theme.name)
