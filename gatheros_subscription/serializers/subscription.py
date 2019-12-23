@@ -458,7 +458,12 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
 
                 amounts.append(optional.price)
 
+        paid_amount = Decimal(0)
+        for trans in instance.transactions.filter(status='paid'):
+            paid_amount += trans.amount
+
         rep['total_amount'] = round(Decimal(sum(amounts)), 2)
+        rep['paid_amount'] = round(paid_amount, 2)
 
         return rep
 
