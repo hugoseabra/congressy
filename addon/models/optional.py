@@ -468,7 +468,7 @@ class Service(AbstractOptional):
 
         # Número de Inscrições em serviços com o mesmo tema
         num_sub_services = subscription.subscription_services.filter(
-            theme_id=self.theme.pk,
+            optional__theme_id=self.theme.pk,
         ).count()
 
         return num_sub_services >= self.theme.limit
