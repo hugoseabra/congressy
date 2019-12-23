@@ -147,8 +147,11 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
                 'name': lot.event.name,
                 'slug': lot.event.slug,
             },
+            'price': lot.get_calculated_price(),
             'survey': survey.pk if survey else None,
             'survey_data': survey_data,
+            'status': lot.status,
+            'status_name': lot.get_status_display(),
         }
 
         if lot.category_id:
@@ -329,8 +332,11 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
                 'name': lot.event.name,
                 'slug': lot.event.slug,
             },
+            'price': lot.get_calculated_price(),
             'survey': survey.pk if survey else None,
             'survey_data': survey_data,
+            'status': lot.status,
+            'status_name': lot.get_status_display(),
         }
 
         if lot.category_id:

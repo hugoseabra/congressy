@@ -360,9 +360,6 @@ class SubscriptionViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
         person_pk = request.data.get('person')
         lot_pk = request.data.get('lot')
 
-        serializer = self.get_serializer(data=request.data)
-        is_new = True
-
         if person_pk:
             try:
                 lot = Lot.objects.get(pk=lot_pk)
@@ -378,21 +375,6 @@ class SubscriptionViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
                     lot__event_id=lot.event_id,
                 )
                 self.check_object_permissions(self.request, instance)
-
-                if instance.lot_id != int(lot_pk):
-                    content = {
-                        'detail': [
-                            'Esta pessoa já está inscrita neste evento e'
-                            ' você está tentando alterar o lote por este'
-                            ' método. Isso não é possível.'
-                        ]
-                    }
-                    return Response(content, status=status.HTTP_403_FORBIDDEN)
-
-                serializer = self.get_serializer(instance=instance,
-                                                 data=request.data,
-                                                 partial=True, )
-                is_new = False
 
             except Subscription.DoesNotExist:
                 pass
