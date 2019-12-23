@@ -134,7 +134,7 @@ services:
       - "traefik.backend=cgsy-staging"
       - "traefik.protocol=http"
       - "traefik.port=8000"
-      - "traefik.frontend.rule=Host:test.congressy.com;PathPrefix:/manage,/login,/logout,/hotsite,/api,/static-manage,/media-manage"
+      - "traefik.frontend.rule=Host:test.congressy.com;PathPrefix:/manage,/admin,/remarketing,/account,/invitations,/pagarme,/captcha,/hotsite,/api,/static-manage,/media-manage"
       - "traefik.docker.network=traefik_default"
       - "traefik.frontend.entryPoints=http"
 

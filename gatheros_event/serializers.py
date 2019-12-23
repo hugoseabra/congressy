@@ -163,6 +163,7 @@ class EventSerializer(serializers.ModelSerializer):
             'category',
             'organization',
             'hotsite_version',
+            'show_banner',
             'info',
             'place',
         )

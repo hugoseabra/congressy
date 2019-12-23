@@ -32,8 +32,8 @@ admin_urlpatterns += [
     url(r'^grapelli/', include('grappelli.urls')),
     url(r'^grappelli_custom_autocomplete/',
         include('django_grappelli_custom_autocomplete.urls')),
-    url(r'^cgsy-admin18/doc/', include('django.contrib.admindocs.urls')),
-    url(r'^cgsy-admin18/', admin.site.urls)
+    url(r'^admin/cgsy20/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^admin/cgsy20/', admin.site.urls)
 ]
 
 private_urlpatterns = [
@@ -62,8 +62,8 @@ public_auth_urlpatterns = [url(r'^', include(public_urls, 'public'))]
 
 public_urlpatterns = [
     url(r'^captcha/', include('captcha.urls')),
-    url(r'^healthcheck/', include('health_check.urls')),
-    url(r'^$', RedirectView.as_view(url='/login/'), name='root'),
+    # url(r'^healthcheck/', include('health_check.urls')),
+    url(r'^$', RedirectView.as_view(url='/auth/login/'), name='root'),
 ]
 
 public_urlpatterns += [
