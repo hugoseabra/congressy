@@ -102,9 +102,7 @@ class DebtForm(forms.ModelForm):
 
     def _set_installments_amount(self):
         """ Seta montante por parcela. """
-        amount = self.cleaned_data.get('amount')
-
-        if not amount:
+        if not self.amount:
             self.installment_amount = Decimal(0.00)
 
         installments = self.cleaned_data.get('installments', 1)
@@ -113,13 +111,11 @@ class DebtForm(forms.ModelForm):
             self.installment_amount = self.original_amount
             return
 
-        self.installment_amount = amount / int(installments)
+        self.installment_amount = self.amount / int(installments)
 
     def _set_installment_interests_amount(self):
         """ Seta valor de juros a ser pago ao final de todas as parcelas. """
-        amount = self.cleaned_data.get('amount')
-
-        if not amount:
+        if not self.amount:
             self.installment_amount = Decimal(0.00)
 
         installments = self.cleaned_data.get('installments', 1)
@@ -130,4 +126,4 @@ class DebtForm(forms.ModelForm):
             return
 
         self.installment_interests_amount = \
-            round((amount - self.original_amount), 2)
+            round((self.amount - self.original_amount), 2)
