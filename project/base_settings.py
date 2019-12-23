@@ -326,7 +326,7 @@ SALES_ALERT_EMAILS = [
 # ========================= HEALTH CHECK - PSUTILS ========================== #
 HEALTH_CHECK = {
     'DISK_USAGE_MAX': 90,  # percent
-    'MEMORY_MIN': 100,    # in MB
+    'MEMORY_MIN': 100,  # in MB
 }
 # ============================== LOGGING ==================================== #
 CGSY_LOGS_DIR = os.path.join(BASE_DIR, 'logs')

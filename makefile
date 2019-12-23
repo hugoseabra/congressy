@@ -50,6 +50,8 @@ update_db:
 	python manage.py makemigrations
 	python manage.py migrate
 	python manage.py loaddata 000_site_dev
+	python manage.py loaddata 001_admin_staging
+	python manage.py loaddata 001_authtoken_staging
 
 .PHONY: restart_ngrok
 restart_ngrok:
