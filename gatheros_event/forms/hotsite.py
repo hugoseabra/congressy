@@ -57,6 +57,7 @@ class InfoForm(BaseModelFileForm):
         model = Info
         fields = [
             'lead',
+            'show_banner',
             'description_html',
             'scientific_rules',
             'editorial_body',
@@ -167,6 +168,15 @@ class HotsiteForm(CombinedFormBase):
     }
 
 
+class HotsiteForm2(HotsiteForm):
+    def save_all(self, commit=True):
+        instances = super().save_all(commit=commit)
+        event = self.info.event
+        event.hotsite_version = 2
+        event.save()
+
+        return instances
+
 class BannerForm(BaseModelFileForm):
     remove_image = forms.CharField(
         max_length=10,
@@ -237,6 +247,16 @@ class BannerForm(BaseModelFileForm):
 
     def save(self, commit=True):
         image_main = self.data.get('image_main2')
+
+        update_hotsite_version = False
         if isinstance(image_main, ContentFile):
             self.instance.image_main2 = image_main
-        return super().save(commit)
+            update_hotsite_version = True
+
+        instance = super().save(commit)
+
+        if update_hotsite_version is True:
+            self.event.hotsite_version = 2
+            self.event.save()
+
+        return instance

@@ -19,7 +19,11 @@ class EventHotsiteView(AccountMixin, FormView, EventDraftStateMixin):
         if not self.event:
             return False
 
-        return self.event.organization == self.organization
+        same_org = self.event.organization == self.organization
+
+        hotsite_v1 = self.event.hotsite_version == 1
+
+        return same_org and hotsite_v1
 
     def get_permission_denied_url(self):
         return reverse('event:event-list')
@@ -97,7 +101,7 @@ class EventHotsiteView(AccountMixin, FormView, EventDraftStateMixin):
 
 
 class EventHotsite2View(AccountMixin, FormView, EventDraftStateMixin):
-    form_class = forms.HotsiteForm
+    form_class = forms.HotsiteForm2
     template_name = 'event/hotsite2.html'
     event = None
 
@@ -108,7 +112,7 @@ class EventHotsite2View(AccountMixin, FormView, EventDraftStateMixin):
         return self.event.organization == self.organization
 
     def get_permission_denied_url(self):
-        return reverse('event:event-list')
+        return reverse('event:event-panel', kwargs={'pk': self.event.pk})
 
     def pre_dispatch(self, request):
         event = self._get_event()
@@ -169,15 +173,16 @@ class EventHotsite2View(AccountMixin, FormView, EventDraftStateMixin):
 
         context.update(self.get_event_state_context_data(event))
 
-        try:
+        if hasattr(event, 'info'):
             context['info'] = event.info
-        except Info.DoesNotExist:
-            pass
+
+        if hasattr(event, 'place'):
+            context['place'] = event.place
 
         return context
 
     def get_success_url(self):
-        return reverse('event:event-hotsite', kwargs={
+        return reverse('event:event-hotsite2', kwargs={
             'pk': self.kwargs['pk']
         })
 
@@ -191,7 +196,11 @@ class EventHotsiteBannerView(AccountMixin, FormView, EventDraftStateMixin):
         if not self.event:
             return False
 
-        return self.event.organization == self.organization
+        same_org = self.event.organization == self.organization
+
+        hotsite_v2 = self.event.hotsite_version == 2
+
+        return same_org and hotsite_v2
 
     def get_permission_denied_url(self):
         return reverse('event:event-list')

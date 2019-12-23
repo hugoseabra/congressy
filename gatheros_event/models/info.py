@@ -85,12 +85,17 @@ class Info(models.Model, GatherosModelMixin):
         blank=True,
         null=True,
         verbose_name='imagem principal',
-        variations={'default': (1920, 1006), 'thumbnail': (400, 210, True)},
+        variations={'default': (960, 503), 'thumbnail': (400, 210, True)},
         validators=[MinSizeValidator(1200, 629), MaxSizeValidator(2880, 1509)],
         help_text="Banner com tamanho ideal de 1920px largura x"
                   " 1006px altura.(png/jpg) e não ultrapasse 10Mb de tamanho"
                   " - <a target='_blank'"
                   " href='http://via.placeholder.com/1920x1006'>Exemplo</a>"
+    )
+
+    show_banner = models.BooleanField(
+        default=True,
+        verbose_name='Mostrar banner no hotsite',
     )
 
     youtube_video = models.URLField(

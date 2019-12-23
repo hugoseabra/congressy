@@ -718,7 +718,15 @@
                                 </div>
                             </div>
                             <div class="panel-body">
-
+                                {% if event.hotsite_version != 2 %}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="alert alert-warning">
+                                            Esta versão não está ativa. Você deve salvar o formulário para ativa-la.
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
 
                                 <div class="row text-center banner-loader"
                                      style="margin-top:20px; display: none">
@@ -730,9 +738,9 @@
                                 <div class="row text-center banner">
                                     <div class="col-md-12 text-center">
                                         <img {% if event.info.image_main2 %}
-                                            src="{{ event.info.image_main2.url }}"
+                                            src="{{ event.info.image_main2.thumbnail.url }}"
                                         {% else %}
-                                            src="{% static 'assets/img/banner_samples/1920x1006_small.png' %}"
+                                            src="{% static 'assets/img/banner_samples/960x503.png' %}"
                                         {% endif %}
                                             class="img"
                                              style="border:2px solid #DDD"
@@ -740,8 +748,7 @@
                                     </div>
                                 </div>
 
-                                <div class="row text-center banner"
-                                     style="margin-top: 10px">
+                                <div class="row text-center banner" style="margin-top: 10px">
 
                                     <div class="col-md-12">
                                         <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'event:event-hotsite-banner' event.pk %}'">
@@ -750,6 +757,11 @@
                                         </button>
                                     </div>
 
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_switchery_field form.show_banner help_text="Se desativado, banner será exibido como fundo do título." %}
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
@@ -820,7 +832,6 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-md-12" style="text-align: center">
-
                                 <div class="col-md-12 event-info-status-item">
                                     <div>
                                         <i class="fas fa-check-circle fa-4x
@@ -835,22 +846,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-12 event-info-status-item">
-                                    <div>
-                                        <i class="fas fa-check-circle fa-4x {% if info and info.lead %}success-color{% endif %}"></i>
-                                    </div>
-                                    <div>
-                                        <div class="title">Descrição rápida
-                                        </div>
-                                        <div class="text-muted description">
-                                            Motive o visitante a permanecer no
-                                            site,
-                                            aumentando a possibilidade de
-                                            conclusão de
-                                            sua inscrição.
-                                        </div>
-                                    </div>
-                                </div>
+
 
                                 <div class="col-md-12 event-info-status-item">
                                     <div>
@@ -858,11 +854,7 @@
                                     </div>
                                     <div>
                                         <div class="title">
-                                            {% if event.is_scientific %}
-                                                Apresentação do evento
-                                            {% else %}
-                                                Sobre do evento
-                                            {% endif %}
+                                            Descrição do evento
                                         </div>
                                         <div class="text-muted description">
                                             Deixa claro para o visitante que
@@ -873,47 +865,32 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                {% if event.is_scientific %}
-
-                                    <div class="col-md-12 event-info-status-item">
-                                        <div>
-                                            <i class="fas fa-check-circle fa-4x {% if info and info.editorial_body %}success-color{% endif %}"></i>
+                                <div class="col-md-12 event-info-status-item">
+                                    <div>
+                                        <i class="fas fa-check-circle fa-4x {% if info and info.voucher_extra_info %}success-color{% endif %}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="title">
+                                            Informações extras para o voucher
                                         </div>
-                                        <div>
-                                            <div class="title">
-                                                Corpo editorial
-                                            </div>
-                                            <div class="text-muted description">
-                                                Lorem ipsum dolor sit amet,
-                                                consectetur adipiscing elit.
-                                                Aliquam
-                                                vitae elementum ex, eu ultrices
-                                                massa.
-                                            </div>
+                                        <div class="text-muted description">
+                                            Informações extras para serem exibidos no comprovante de inscrição dos participantes.
                                         </div>
                                     </div>
-
-                                    <div class="col-md-12 event-info-status-item">
-                                        <div>
-                                            <i class="fas fa-check-circle fa-4x {% if info and info.scientific_rules %}success-color{% endif %}"></i>
+                                </div>
+                                <div class="col-md-12 event-info-status-item">
+                                    <div>
+                                        <i class="fas fa-check-circle fa-4x {% if place and place.show_location %}success-color{% endif %}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="title">
+                                            Local do evento
                                         </div>
-                                        <div>
-                                            <div class="title">
-                                                Normas
-                                            </div>
-                                            <div class="text-muted description">
-                                                Lorem ipsum dolor sit amet,
-                                                consectetur adipiscing elit.
-                                                Aliquam
-                                                vitae elementum ex, eu ultrices
-                                                massa.
-                                            </div>
+                                        <div class="text-muted description">
+                                            Informações sobre onde o evento acontecerá, fornecendo informações geeolocalizada aos participantes.
                                         </div>
                                     </div>
-
-                                {% endif %}
-
+                                </div>
 
                             </div>
                         </div>
@@ -1064,71 +1041,5 @@
             </div>
         </div>
 
-         <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <div class="panel-title">
-                            Streaming ao Vivo
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="well well-sm well-info">
-                                    O vídeo só estará disponível para participantes confirmados.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-10">
-                                {% render_switchery_field form.enable_streaming_page %}
-                            </div>
-                            <div class="col-md-2 text-right">
-                                <button type="button"
-                                        class="btn btn-success submit-button">
-                                    <i class="fa fa-save"></i>
-                                    Salvar
-                                </button>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                {% render_generic_field form.stream_page_title %}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                {% render_generic_field form.stream_youtube_code %}
-                                <small class="text-muted">
-                                    <strong>Código do youtube:</strong>
-                                    https://www.youtube.com/watch?v=<strong>Código</strong>
-                                </small>
-                            </div>
-                            <div class="col-md-8">
-                                <h3 class="text-bold" style="margin-left:10px">Pré-visualização</h3>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="videoWrapper" style="margin-left: 12px;display:none">
-                                            <div id="player"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 text-right">
-                                <br />
-                                <button type="button"
-                                        class="btn btn-success submit-button">
-                                    <i class="fa fa-save"></i>
-                                    Salvar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </form>
 {% endblock %}

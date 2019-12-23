@@ -128,20 +128,20 @@ Variáveis:
 <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
 <ul class="nav nav-pills nav-stacked">
     <li {% if active == 'pagina-do-evento' %}class="active"{% endif %}>
+        {% if event.hotsite_version == 2 %}
+        <a class="sidebar-itens" href=
+                "{% url 'event:event-hotsite2' event.pk %}"
+           title="Página do evento">
+            <i class="fas fa-file-alt"></i> Página do evento
+        </a>
+        {% else %}
         <a class="sidebar-itens" href=
                 "{% url 'event:event-hotsite' event.pk %}"
            title="Página do evento">
             <i class="fas fa-file-alt"></i> Página do evento
         </a>
+        {% endif %}
     </li>
-    <li {% if active == 'pagina-do-evento' %}class="active"{% endif %}>
-        <a class="sidebar-itens" href=
-                "{% url 'event:event-hotsite2' event.pk %}"
-           title="Página do evento">
-            <i class="fas fa-file-alt"></i> Página do evento 2
-        </a>
-    </li>
-
     <li {% if active == 'categorias' %}class="active"{% endif %}>
         <a class="sidebar-itens" href="{% url 'subscription:category-list' event.pk %}"
            title="Categorias">
