@@ -1,28 +1,30 @@
 """ Signals do model `addons` """
-import os
-import shutil
 
-from django.db.models.signals import pre_delete, post_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from addon.models import Service, Product
-from gatheros_event.signals.helpers import (
-    update_event_config_flags,
-    update_event_publishing,
-)
-from gatheros_subscription.models import Subscription
+from gatheros_subscription.models import Subscription, Lot
 
 
 @receiver(post_save, sender=Subscription)
-def clean_addon_when_subscription_change(instance, raw, created, **_):
-    """ Limpa inscrições de opcionais se o lote for mudado. """
+def clean_addon_when_lot_cat_subscription_change(instance, raw, created, **_):
+    """
+     Limpa inscrições de opcionais se o categoria vinculada ao lote anterior
+     também mudar.
+     """
 
     if raw is True or created is True:
         return
 
     if instance.has_changed('lot_id') is True:
-        for addon in instance.subscription_products.all():
-            addon.delete()
+        # Se lote mudou
+        old_lot = Lot.objects.get(pk=instance.old_value('lot_id'))
+        new_lot = instance.lot
 
-        for addon in instance.subscription_services.all():
-            addon.delete()
+        # Verificar se a categoria mudou
+        if old_lot.category_id != new_lot.category_id:
+            for addon in instance.subscription_products.all():
+                addon.delete()
+
+            for addon in instance.subscription_services.all():
+                addon.delete()
