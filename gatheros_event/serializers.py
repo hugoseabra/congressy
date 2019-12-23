@@ -69,6 +69,7 @@ class InfoSerializer(serializers.ModelSerializer):
             'description',
             'description_html',
             'lead',
+            'show_banner',
             'image_main',
             'image_main2',
             'youtube_video',
@@ -163,7 +164,6 @@ class EventSerializer(serializers.ModelSerializer):
             'category',
             'organization',
             'hotsite_version',
-            'show_banner',
             'info',
             'place',
         )
