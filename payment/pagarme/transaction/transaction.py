@@ -1,5 +1,6 @@
+import json
 import os
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from decimal import Decimal
 
 from payment.helpers.payment_helpers import as_payment_amount
@@ -223,6 +224,6 @@ class PagarmeTransaction:
         if len(invalid_items):
             msg = "Alguns itens são inválidos:"
             for title, errors in invalid_items.items():
-                msg += ' {}: {}'.format(title, ', '.join(errors))
+                msg += ' {}: {}'.format(title, json.dumps(errors))
 
             self.errors['items'] = msg

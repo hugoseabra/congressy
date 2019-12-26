@@ -382,6 +382,9 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
         if not self.subscription_instance:
             return
 
+        if not self.lot_instance.price:
+            return
+
         debt_kwargs = {
             'subscription': self.subscription_instance,
             'data': {
