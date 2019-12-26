@@ -10,6 +10,7 @@ from gatheros_event.signals.helpers import (
     update_event_config_flags,
     update_event_publishing,
 )
+from payment_debt.models import Debt
 
 
 @receiver(post_save, sender=Product)
@@ -55,3 +56,25 @@ def erase_previous_files(instance, raw, created, **_):
 
             elif os.path.isdir(file_path):
                 shutil.rmtree(file_path)
+
+
+@receiver(pre_delete, sender=Product)
+def remove_product_debts_when_deleted(instance, **_):
+    """ Remove pendências quando opcional é removido """
+    qs = Debt.objects.filter(
+        type=Debt.DEBT_TYPE_PRODUCT,
+        item_id=instance.pk,
+    )
+    if qs.count():
+        qs.delete()
+
+
+@receiver(pre_delete, sender=Service)
+def remove_service_debts_when_deleted(instance, **_):
+    """ Remove pendências quando opcional é removido """
+    qs = Debt.objects.filter(
+        type=Debt.DEBT_TYPE_SERVICE,
+        item_id=instance.pk,
+    )
+    if qs.count():
+        qs.delete()
