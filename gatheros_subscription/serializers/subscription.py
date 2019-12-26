@@ -2,6 +2,7 @@ from decimal import Decimal
 
 import absoluteuri
 from django.forms import model_to_dict
+from django.urls import reverse
 from rest_framework import serializers
 
 from gatheros_subscription.models import Subscription
@@ -273,7 +274,24 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
 
                 amounts.append(optional.price)
 
-        rep['total_amount'] = round(Decimal(sum(amounts)), 2)
+        paid_amount = Decimal(0)
+        for trans in instance.transactions.filter(status='paid'):
+            paid_amount += trans.amount
+
+        total_amount = round(Decimal(sum(amounts)), 2)
+        paid_amount = round(paid_amount, 2)
+
+        if instance.confirmed is True:
+            rep['voucher_link'] = absoluteuri.build_absolute_uri(reverse(
+                'subscription:subscription-voucher',
+                kwargs={
+                    'event_pk': instance.event_id,
+                    'pk': instance.pk,
+                }
+            ))
+
+        rep['total_amount'] = total_amount
+        rep['paid_amount'] = paid_amount
 
         return rep
 
@@ -462,8 +480,20 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
         for trans in instance.transactions.filter(status='paid'):
             paid_amount += trans.amount
 
-        rep['total_amount'] = round(Decimal(sum(amounts)), 2)
-        rep['paid_amount'] = round(paid_amount, 2)
+        total_amount = round(Decimal(sum(amounts)), 2)
+        paid_amount = round(paid_amount, 2)
+
+        if instance.confirmed is True:
+            rep['voucher_link'] = absoluteuri.build_absolute_uri(reverse(
+                'subscription:subscription-voucher',
+                kwargs={
+                    'event_pk': instance.event_id,
+                    'pk': instance.pk,
+                }
+            ))
+
+        rep['total_amount'] = total_amount
+        rep['paid_amount'] = paid_amount
 
         return rep
 
