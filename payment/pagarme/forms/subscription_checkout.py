@@ -100,7 +100,8 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
             self.subscription_instance.save()
 
             # Novo ou edição de pendência financeira
-            self.subscription_debt_form.save()
+            if self.subscription_debt_form:
+                self.subscription_debt_form.save()
 
             for debt_form in self.service_debt_forms:
                 debt_form.save()
@@ -303,17 +304,20 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
 
         self.subscription_debt_form = self._create_subscription_debt_form()
 
-        if not self.subscription_debt_form.is_valid():
-            error_msgs = []
-            for field, errs in self.subscription_debt_form.errors.items():
-                error_msgs.append(str(errs))
+        if self.subscription_debt_form:
 
-            raise forms.ValidationError(
-                'Dados de pendência inválidos: {}'.format("".join(error_msgs))
-            )
+            if not self.subscription_debt_form.is_valid():
+                error_msgs = []
+                for field, errs in self.subscription_debt_form.errors.items():
+                    error_msgs.append(str(errs))
 
-        self.amount_to_transact = self.subscription_debt_form.amount
-        self.liquid_amount = self.subscription_debt_form.liquid_amount
+                raise forms.ValidationError(
+                    'Dados de pendência inválidos:'
+                    ' {}'.format("".join(error_msgs))
+                )
+
+            self.amount_to_transact += self.subscription_debt_form.amount
+            self.liquid_amount += self.subscription_debt_form.liquid_amount
 
         self.product_debt_forms = self._create_product_debt_forms()
 
