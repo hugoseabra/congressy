@@ -3,7 +3,8 @@ from typing import Any
 import absoluteuri
 from rest_framework import serializers
 
-from gatheros_event.helpers.event_business import is_paid_event
+from gatheros_event.helpers.event_business import is_free_event
+from gatheros_event.helpers.event_subscribable import is_event_subscribable
 from gatheros_event.models import Person, Event, Organization, Category, Info, \
     Place
 
@@ -175,7 +176,8 @@ class EventSerializer(serializers.ModelSerializer):
         ret['num_categories'] = instance.lot_categories.count()
         ret['num_surveys'] = instance.surveys.count()
 
-        ret['free'] = is_paid_event(instance) is False
+        ret['free'] = is_free_event(instance) is True
+        ret['subscriptions_enabled'] = is_event_subscribable(instance) is True
 
         prices = list()
         for lot in instance.lots.all():
@@ -183,19 +185,6 @@ class EventSerializer(serializers.ModelSerializer):
                 prices.append(lot.get_calculated_price())
             else:
                 prices.append(0)
-
-        for lot_cat in instance.lot_categories.all():
-            for addon in lot_cat.service_optionals.all():
-                if addon.liquid_price:
-                    prices.append(addon.price)
-                else:
-                    prices.append(0)
-
-            for addon in lot_cat.product_optionals.all():
-                if addon.liquid_price:
-                    prices.append(addon.price)
-                else:
-                    prices.append(0)
 
         ret['min_price'] = round(min(prices), 2) if prices else '0.00'
         ret['max_price'] = round(max(prices), 2) if prices else '0.00'
