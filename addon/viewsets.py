@@ -10,7 +10,7 @@ from core.viewsets import (
     AuthenticatedViewSetMixin,
     AuthenticatedOrReadOnlyViewSetMixin,
 )
-from gatheros_subscription.models import Subscription
+from gatheros_subscription.models import Subscription, LotCategory
 
 
 class ServiceViewSet(AuthenticatedOrReadOnlyViewSetMixin,
@@ -23,9 +23,13 @@ class ServiceViewSet(AuthenticatedOrReadOnlyViewSetMixin,
     queryset = models.Service.objects.all().order_by('name')
     serializer_class = serializers.ServiceSerializer
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.subscription_valid = False
+
     def get_serializer(self, *args, **kwargs):
         sub_pk = self.request.query_params.get('subscription', None)
-        if sub_pk:
+        if sub_pk and self.subscription_valid:
             kwargs.update({'subscription': sub_pk})
         return super().get_serializer(*args, **kwargs)
 
@@ -56,6 +60,7 @@ class ServiceViewSet(AuthenticatedOrReadOnlyViewSetMixin,
 
     def list(self, request, *args, **kwargs):
         event_pk = request.query_params.get('event', None)
+        cat_pk = request.query_params.get('lot_category', None)
         sub_pk = request.query_params.get('subscription', None)
 
         if event_pk is None:
@@ -76,6 +81,23 @@ class ServiceViewSet(AuthenticatedOrReadOnlyViewSetMixin,
 
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
+        queryset = self.get_queryset()
+
+        if cat_pk:
+            try:
+                category = LotCategory.objects.get(pk=cat_pk)
+                queryset = queryset.filter(lot_category=category)
+
+            except LotCategory.DoesNotExist:
+                content = {
+                    'errors': [
+                        "event in query string is not int: '{}' ".format(
+                            event_pk),
+                    ]
+                }
+
+                return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
         if sub_pk:
             try:
                 uuid.UUID(sub_pk)
@@ -95,6 +117,7 @@ class ServiceViewSet(AuthenticatedOrReadOnlyViewSetMixin,
                     event_id=event_pk,
                     test_subscription=False,
                 )
+                self.subscription_valid = True
             except Subscription.DoesNotExist:
                 content = {
                     'errors': [
@@ -103,7 +126,6 @@ class ServiceViewSet(AuthenticatedOrReadOnlyViewSetMixin,
                 }
                 return Response(content, status=status.HTTP_404_NOT_FOUND)
 
-        queryset = self.get_queryset()
         queryset = queryset.filter(lot_category__event_id=event_pk)
 
         page = self.paginate_queryset(self.filter_queryset(queryset))
@@ -125,9 +147,13 @@ class ProductViewSet(AuthenticatedViewSetMixin,
     queryset = models.Product.objects.all().order_by('name')
     serializer_class = serializers.ProductSerializer
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.subscription_valid = False
+
     def get_serializer(self, *args: Any, **kwargs):
         sub_pk = self.request.query_params.get('subscription', None)
-        if sub_pk:
+        if sub_pk and self.subscription_valid:
             kwargs.update({'subscription': sub_pk})
         return super().get_serializer(*args, **kwargs)
 
@@ -157,6 +183,8 @@ class ProductViewSet(AuthenticatedViewSetMixin,
 
     def list(self, request, *args, **kwargs):
         event_pk = request.query_params.get('event', None)
+        cat_pk = request.query_params.get('lot_category', None)
+        sub_pk = request.query_params.get('subscription', None)
 
         if event_pk is None:
             content = {
@@ -177,6 +205,50 @@ class ProductViewSet(AuthenticatedViewSetMixin,
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
         queryset = self.get_queryset()
+
+        if cat_pk:
+            try:
+                category = LotCategory.objects.get(pk=cat_pk)
+                queryset = queryset.filter(lot_category=category)
+
+            except LotCategory.DoesNotExist:
+                content = {
+                    'errors': [
+                        "event in query string is not int: '{}' ".format(
+                            event_pk),
+                    ]
+                }
+
+                return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        if sub_pk:
+            try:
+                uuid.UUID(sub_pk)
+            except ValueError:
+                content = {
+                    'errors': [
+                        "Subscription provided is a valid uuid",
+                    ]
+                }
+                return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                Subscription.objects.exclude(
+                    status=Subscription.CANCELED_STATUS
+                ).get(
+                    pk=sub_pk,
+                    event_id=event_pk,
+                    test_subscription=False,
+                )
+                self.subscription_valid = True
+            except Subscription.DoesNotExist:
+                content = {
+                    'errors': [
+                        "Subscription provided was not found",
+                    ]
+                }
+                return Response(content, status=status.HTTP_404_NOT_FOUND)
+
         queryset = queryset.filter(lot_category__event_id=event_pk)
 
         page = self.paginate_queryset(self.filter_queryset(queryset))
