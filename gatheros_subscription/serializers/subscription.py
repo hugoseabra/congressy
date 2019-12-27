@@ -1,6 +1,8 @@
 from decimal import Decimal
+from typing import Any
 
 import absoluteuri
+from django.db.models import Model
 from django.forms import model_to_dict
 from django.urls import reverse
 from rest_framework import serializers
@@ -37,6 +39,7 @@ class SubscriptionSerializer(serializers.BaseSerializer):
             'completed': obj.completed,
             'test_subscription': obj.test_subscription,
             'status': obj.status,
+            'free': obj.free,
             'created': obj.created,
             'tag_info': obj.tag_info,
             'tag_group': obj.tag_group,
@@ -104,6 +107,8 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
+
+        rep['free'] = instance.free
 
         person = instance.person
         rep['person_data'] = {
@@ -294,6 +299,24 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
         rep['paid_amount'] = paid_amount
 
         return rep
+
+    def create(self, validated_data: Any) -> Any:
+        instance = super().create(validated_data)
+
+        if instance.free is True:
+            instance.status = Subscription.CONFIRMED_STATUS
+            instance.save()
+
+        return instance
+
+    def update(self, instance: Model, validated_data: Any) -> Any:
+        instance = super().update(instance, validated_data)
+
+        if instance.free is True:
+            instance.status = Subscription.CONFIRMED_STATUS
+            instance.save()
+
+        return instance
 
 
 class SubscriptionBillingSerializer(serializers.ModelSerializer):

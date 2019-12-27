@@ -244,7 +244,17 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
 
     @property
     def free(self):
-        return self.lot is not None and not self.lot.price
+        lot_free = not self.lot.price
+
+        serv_free = self.subscription_services.filter(
+            optional__liquid_price__gt=0
+        ).count() > 0
+
+        prod_free = self.subscription_products.filter(
+            optional__liquid_price__gt=0
+        ).count() > 0
+
+        return lot_free and serv_free and prod_free
 
     @property
     def debts_list(self):

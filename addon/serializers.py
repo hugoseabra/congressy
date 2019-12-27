@@ -6,6 +6,7 @@ from uuid import uuid4
 import absoluteuri
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
+from django.db.models import Model
 from rest_framework import serializers
 
 from addon import models
@@ -150,6 +151,26 @@ class SubscriptionProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.SubscriptionProduct
         fields = ('pk', 'subscription', 'optional',)
+
+    def create(self, validated_data: Any) -> Any:
+        instance = super().create(validated_data)
+
+        sub = instance.subscription
+        if sub.free is True:
+            sub.status = Subscription.CONFIRMED_STATUS
+            sub.save()
+
+        return instance
+
+    def update(self, instance: Model, validated_data: Any) -> Any:
+        instance = super().update(instance, validated_data)
+
+        sub = instance.subscription
+        if sub.free is True:
+            sub.status = Subscription.CONFIRMED_STATUS
+            sub.save()
+
+        return instance
 
 
 class ServiceSerializer(serializers.ModelSerializer):
