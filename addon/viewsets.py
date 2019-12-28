@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from typing import Any
 
 from django.db.models import QuerySet
@@ -54,7 +55,11 @@ class ServiceViewSet(AuthenticatedOrReadOnlyViewSetMixin,
         if self.request.method == 'GET':
             if show_inactive is None \
                     or (show_inactive != '1' and show_inactive != 'true'):
-                queryset = queryset.filter(published=True)
+                now = datetime.now()
+                queryset = queryset.filter(
+                    published=True,
+                    date_end_sub__lt=now,
+                )
 
         return queryset
 
@@ -177,7 +182,11 @@ class ProductViewSet(AuthenticatedViewSetMixin,
 
         if show_inactive is None \
                 or (show_inactive != '1' and show_inactive != 'true'):
-            queryset = queryset.filter(published=True)
+            now = datetime.now()
+            queryset = queryset.filter(
+                published=True,
+                date_end_sub__lt=now,
+            )
 
         return queryset
 
