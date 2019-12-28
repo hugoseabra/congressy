@@ -58,7 +58,7 @@ class ServiceViewSet(AuthenticatedOrReadOnlyViewSetMixin,
                 now = datetime.now()
                 queryset = queryset.filter(
                     published=True,
-                    date_end_sub__lt=now,
+                    date_end_sub__gt=now,
                 )
 
         return queryset
@@ -185,7 +185,7 @@ class ProductViewSet(AuthenticatedViewSetMixin,
             now = datetime.now()
             queryset = queryset.filter(
                 published=True,
-                date_end_sub__lt=now,
+                date_end_sub__gt=now,
             )
 
         return queryset
