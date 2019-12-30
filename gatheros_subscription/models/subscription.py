@@ -248,11 +248,11 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
 
         serv_free = self.subscription_services.filter(
             optional__liquid_price__gt=0
-        ).count() > 0
+        ).count() == 0
 
         prod_free = self.subscription_products.filter(
             optional__liquid_price__gt=0
-        ).count() > 0
+        ).count() == 0
 
         return lot_free and serv_free and prod_free
 
