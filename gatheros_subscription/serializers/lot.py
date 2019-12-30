@@ -16,7 +16,7 @@ class LotSerializer(serializers.ModelSerializer):
         model = Lot
         fields = '__all__'
 
-    def to_representation(self, instance: Any) -> Any:
+    def to_representation(self, instance: Lot) -> Dict:
         ret = super().to_representation(instance)
 
         event = instance.event
@@ -46,6 +46,9 @@ class LotSerializer(serializers.ModelSerializer):
                 'name': survey.survey.name,
                 'description': survey.survey.description,
             }
+
+        ret['price'] = instance.get_calculated_price()
+        ret['liquid_price'] = instance.get_liquid_price()
 
         return ret
 
