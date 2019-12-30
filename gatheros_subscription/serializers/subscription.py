@@ -102,6 +102,7 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
             'created',
             'modified',
             'created_by',
+            'status',
             'origin',
         ]
 
