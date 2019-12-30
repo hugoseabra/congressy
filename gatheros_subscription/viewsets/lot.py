@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
 
@@ -82,6 +84,12 @@ class LotViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
         if show_inactive is None \
                 or (show_inactive != '1' and show_inactive != 'true'):
             queryset = queryset.filter(active=True)
+
+        now = datetime.now()
+        queryset = queryset.filter(
+            date_start__gte=now,
+            date_end__lt=now,
+        )
 
         return queryset
 
