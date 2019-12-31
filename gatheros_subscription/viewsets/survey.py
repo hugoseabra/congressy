@@ -1,3 +1,5 @@
+import uuid
+
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
@@ -55,13 +57,6 @@ class EventSurveyViewSet(AuthenticatedViewSetMixin,
     def list(self, request, *args, **kwargs):
 
         event_id = request.query_params.get('event', None)
-
-        if event_id is None:
-            content = {
-                'detail': ['missing event in query string', ]
-            }
-
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
         if self.can_manage_list(event_id) is False:
             content = {
@@ -125,6 +120,10 @@ class QuestionViewSet(AuthenticatedViewSetMixin,
     serializer_class = QuestionSerializer
     queryset = Question.objects.filter(active=True)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.subscription_valid = False
+
     def get_event_id_by_survey(self, survey_id):
         try:
             survey = Survey.objects.get(pk=survey_id)
@@ -134,15 +133,30 @@ class QuestionViewSet(AuthenticatedViewSetMixin,
             return None
 
     def get_serializer(self, *args, **kwargs):
-        subscription_pk = self.request.query_params.get('subscription', None)
-        if subscription_pk:
-            kwargs.update({'subscription_pk': subscription_pk})
+        if self.subscription_valid is True:
+            subscription_pk = \
+                self.request.query_params.get('subscription', None)
+            if subscription_pk:
+                kwargs.update({'subscription_pk': subscription_pk})
 
         return super().get_serializer(*args, **kwargs)
 
     def list(self, request, *args, **kwargs):
 
         survey_id = self.kwargs.get('survey_pk')
+
+        sub_pk = request.query_params.get('subscription', None)
+        if sub_pk:
+            try:
+                uuid.UUID(sub_pk)
+                self.subscription_valid = True
+            except ValueError:
+                content = {
+                    'errors': [
+                        "Subscription provided is a valid uuid",
+                    ]
+                }
+                return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
         if survey_id is None:
             content = {
