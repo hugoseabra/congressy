@@ -63,7 +63,7 @@ public_auth_urlpatterns = [url(r'^', include(public_urls, 'public'))]
 public_urlpatterns = [
     url(r'^captcha/', include('captcha.urls')),
     # url(r'^healthcheck/', include('health_check.urls')),
-    url(r'^$', RedirectView.as_view(url='/auth/login/'), name='root'),
+    url(r'^$', RedirectView.as_view(url='/account/login/'), name='root'),
 ]
 
 public_urlpatterns += [
