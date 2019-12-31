@@ -87,8 +87,8 @@ class LotViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
 
         now = datetime.now()
         queryset = queryset.filter(
-            date_start__gte=now,
-            date_end__lt=now,
+            date_start__lte=now,
+            date_end__gte=now,
         )
 
         return queryset

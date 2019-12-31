@@ -20,7 +20,7 @@ class NotDeletableError(IntegrityError):
 class CheckerCollector(Collector):
     """Collection checker for deletable model"""
     def __init__(self, *args, **kwargs):
-        super(CheckerCollector, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.protected = set()
 
     def collect(self, objs, **kwargs):
