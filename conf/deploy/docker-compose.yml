@@ -5,8 +5,8 @@ services:
     restart: always
     networks:
       - wkhtmltopdf
-    volumes:
-      - /etc/localtime:/etc/localtime
+#    volumes:
+#      - /etc/localtime:/etc/localtime
 
   reverse-proxy:
     image: traefik:v1.7.19-alpine
@@ -24,7 +24,7 @@ services:
     volumes:
       - ./traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
-      - /etc/localtime:/etc/localtime:ro
+#      - /etc/localtime:/etc/localtime:ro
 
   celery:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest

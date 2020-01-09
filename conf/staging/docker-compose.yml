@@ -34,7 +34,7 @@ services:
       - /staging/services/volume/container-entry.sh
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
-      - /etc/localtime:/etc/localtime
+#      - /etc/localtime:/etc/localtime
       - staging_media:/code/media
       - staging_exporter:/tmp/exporter
       - staging_barcodes:/tmp/barcodes
@@ -57,7 +57,7 @@ services:
     volumes:
       - /tmp/staging-files/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
-      - /etc/localtime:/etc/localtime:ro
+#      - /etc/localtime:/etc/localtime:ro
 
   celery:
     image: cgsy-staging
