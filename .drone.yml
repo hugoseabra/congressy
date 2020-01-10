@@ -25,6 +25,7 @@ steps:
     commands:
       - mkdir -p /tmp/bkp
       - mkdir -p /tmp/staging-files
+
   - name: save-staging-version
     commands:
       - basename ${DRONE_COMMIT_BRANCH} > /tmp/staging-files/version
@@ -32,6 +33,22 @@ steps:
       - echo "${DRONE_COMMIT_AUTHOR_NAME}" > /tmp/staging-files/build_author
       - echo "${DRONE_COMMIT_AUTHOR_AVATAR}" > /tmp/staging-files/build_author_avatar
       - echo "${DRONE_BUILD_LINK}" > /tmp/staging-files/build_link
+
+  - name: create-awsecr-service
+    environment:
+      AWS_KEY:
+        from_secret: AWS_KEY
+      AWS_SECRET:
+        from_secret: AWS_SECRET
+      AWS_ACCOUNT_ID:
+        from_secret: AWS_ACCOUNT_ID
+    commands:
+      - echo "AWS_KEY=$${AWS_KEY}" > ~/awsecr/env-awsecr
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/awsecr/env-awsecr
+      - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ~/awsecr/env-awsecr
+      - cp ./bin/env/prod/01_create-awsecr-container.sh ~/awsecr/.
+      - sh ~/awsecr/01_create-awsecr-container.sh
+
   - name: create-staging-env-file
     environment:
       AWS_KEY:
