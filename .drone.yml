@@ -166,18 +166,18 @@ steps:
     commands:
       - ./bin/env/staging/01_backup-db-staging.sh
 
-#  - name: recreate-staging-db
-#    image: tmaier/docker-compose
-#    pull: if-not-exists
-#    volumes:
-#      - name: main_cache
-#        path: /tmp/bkp
-#      - name: localtime
-#        path: /etc/localtime
-#      - name: docker-sock
-#        path: /var/run/docker.sock
-#    commands:
-#      - ./bin/env/staging/02_recreate-db-staging.sh
+  - name: recreate-staging-db
+    image: tmaier/docker-compose
+    pull: if-not-exists
+    volumes:
+      - name: main_cache
+        path: /tmp/bkp
+      - name: localtime
+        path: /etc/localtime
+      - name: docker-sock
+        path: /var/run/docker.sock
+    commands:
+      - ./bin/env/staging/02_recreate-db-staging.sh
 
   - name: download-hotsite-v2
     image: docker
