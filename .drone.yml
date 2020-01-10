@@ -12,7 +12,7 @@ type: exec
 name: infra-staging
 
 clone:
-  disable: true
+  depth: 1
 
 trigger:
   branch:
@@ -47,6 +47,8 @@ steps:
       - echo "AWS_KEY=$${AWS_KEY}" > /tmp/awsecr/env-awsecr
       - echo "AWS_SECRET=$${AWS_SECRET}" >> /tmp/awsecr/env-awsecr
       - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> /tmp/awsecr/env-awsecr
+      - echo "AWS_REGION=us-east-1" >> /tmp/awsecr/env-awsecr
+      - echo "AWS_FORMAT=json" >> /tmp/awsecr/env-awsecr
       - cp ./bin/env/prod/01_create-awsecr-container.sh /tmp/awsecr/.
       - sh /tmp/awsecr/01_create-awsecr-container.sh
 
