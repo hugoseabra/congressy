@@ -43,6 +43,7 @@ steps:
       AWS_ACCOUNT_ID:
         from_secret: AWS_ACCOUNT_ID
     commands:
+      - mkdir -p ~/awsecr
       - echo "AWS_KEY=$${AWS_KEY}" > ~/awsecr/env-awsecr
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/awsecr/env-awsecr
       - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ~/awsecr/env-awsecr
@@ -78,15 +79,6 @@ steps:
       SENTRY_PRIVATE_DSN:
         from_secret: SENTRY_PRIVATE_DSN
     commands:
-      - mkdir -p ~/awsecr
-      # env-file do awsecr
-      - echo "AWS_KEY=$${AWS_KEY}" > ~/awsecr/env-awsecr
-      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/awsecr/env-awsecr
-      - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ~/awsecr/env-awsecr
-      - echo "AWS_REGION=us-east-1" >> ~/awsecr/env-awsecr
-      - echo "AWS_FORMAT=json" >> ~/awsecr/env-awsecr
-
-      # env-file do stack de produção - common
       - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.staging" > /tmp/staging-files/env-manage-staging
       - echo "AWS_KEY=$${AWS_KEY}" >> /tmp/staging-files/env-manage-staging
       - echo "AWS_SECRET=$${AWS_SECRET}" >> /tmp/staging-files/env-manage-staging
