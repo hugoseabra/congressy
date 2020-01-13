@@ -778,9 +778,8 @@
 
                 },
                 "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-
-                    if (aData['category_name']) {
-                        $("td:eq(3)", nRow).attr("data-toggle", "tooltip").attr("title", aData['category_name']);
+                    if (aData['lot_data'] && aData['lot_data']['category_data'] && aData['lot_data']['category_data']['name']) {
+                        $("td:eq(3)", nRow).attr("data-toggle", "tooltip").attr("title", aData['lot_data']['category_data']['name']);
                     }
 
                 },
@@ -791,7 +790,7 @@
                 // constract columns
                 columns: [
                     {
-                        data: 'person_name', "render": function (data, type, row, meta) {
+                        data: 'person_data.name', "render": function (data, type, row, meta) {
                             var statusBall = get_status_el(data, row);
                             var nameWithLink = get_name_as_link_el(data, row);
                             var dateCreated = get_date_el(row);
@@ -826,7 +825,7 @@
                             }
                         },
                     {% endif %}
-                    {data: 'lot_name'},
+                    {data: 'lot_data.name'},
                     {data: 'event_count'},
                     {
                         data: 'link', "render": function (data, type, row, meta) {
