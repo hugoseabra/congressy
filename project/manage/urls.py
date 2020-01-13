@@ -46,8 +46,8 @@ private_urlpatterns = [
     url(r'^manage/', include(urlpatterns_private_raffles, 'raffle')),
     # url(r'^manage/', include('bitly.urls', 'bitly')),
     url(r'^manage/', include('gatheros_event.urls', 'event')),
-    url(r'^manage/', include(gatheros_front_private, 'front')),
     url(r'^manage/', include(private_payment_urls, 'payment')),
+    url(r'^manage/', include(gatheros_front_private, 'front')),
 ]
 
 public_urls = gatheros_front_public
