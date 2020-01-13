@@ -96,7 +96,7 @@ services:
       - "traefik.backend=cgsy-hotsite"
       - "traefik.protocol=http"
       - "traefik.port=80"
-      - "traefik.frontend.rule=Host:test.congressy.com"
+      - "traefik.frontend.rule=Host:ev.congressy.com"
       - "traefik.docker.network=traefik_default"
       - "traefik.frontend.entryPoints=http"
 
