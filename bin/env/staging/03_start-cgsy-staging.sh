@@ -6,19 +6,7 @@ set -ex
 # fazendo.
 ###############################################################################
 # CI-STEP: Destruir e (re)criar container de versão de staging.
-#
-# OBS: deve-se ter certeza que o container subiu.
 ###############################################################################
-function error_msg() {
-    local RED='\033[1;31m'
-    local NC='\033[0m' # No Color
-    echo ;
-    echo ;
-    echo -e "${RED}$1{NC}"
-    echo ;
-    echo ;
-}
-
 docker volume create staging_media
 docker volume create staging_exporter
 docker volume create staging_barcodes
@@ -27,4 +15,4 @@ docker volume create staging_vouchers
 cat ./conf/deploy/traefik.toml
 cp ./conf/deploy/traefik.toml /tmp/staging-files/.
 cp ./conf/staging/docker-compose.yml /tmp/staging-files/.
-docker-compose -f ./conf/staging/docker-compose.yml up -d --force --remove-orphans --scale manage=2
+docker-compose -f /tmp/staging-files/docker-compose.yml up -d --force --remove-orphans --scale manage=2

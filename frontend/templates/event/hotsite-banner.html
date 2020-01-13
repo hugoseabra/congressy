@@ -1,0 +1,211 @@
+{% extends "base/base.html" %}
+{% load static i18n widget_tweaks queryset_filter form_config_tags %}
+
+{% block title %} Página do Evento | Congressy{% endblock %}
+
+{% block page_title %}Página do Evento{% endblock %}
+
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+
+{% block page_description %}Configuração da página do evento.{% endblock %}
+
+{% block styles %}
+    <link href="{% static "assets/plugins/croppie/croppie.css" %}" rel="stylesheet">
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <!-- Script used for cropping -->
+    <script src="{% static 'assets/plugins/croppie/croppie.js' %}"></script>
+
+    <script>
+        var croppie_obj = undefined;
+
+         function askForFile() {
+            // creating input on-the-fly
+            var input = $("#id_banner_file");
+            // add onchange handler if you wish to get the file :)
+            input.trigger("click"); // opening dialog
+            return false; // avoiding navigation
+        }
+
+        function submitImage() {
+            var banner_form_el = $('#id_image_main2');
+            var submit_button = $('.banner-submit');
+            var remove_button = $('.banner-remove');
+
+            submit_button.attr('disabled', true);
+            remove_button.attr('disabled', true);
+            $('span', submit_button).text('aguarde...');
+
+            $('.banner').hide();
+            $('.banner-loader').show();
+
+            if (typeof(croppie_obj) === "undefined") {
+                croppie_obj = createCroppieObj();
+            }
+            croppie_obj.croppie('result', 'base64', 'original', 'png', '1', false).then(function (base64_image) {
+                $('#banner-cropped')[0].src = base64_image;
+                banner_form_el.val(base64_image);
+                $('#hotsite-form').submit();
+            });
+        }
+
+        function createCroppieObj() {
+            return $('#banner-cropped').croppie({
+                viewport: {
+                    width: 960,
+                    height: 503,
+                    type: 'square'
+                },
+                boundary: {
+                    width: 970,
+                    height: 513
+                }
+            });
+        }
+
+        function replaceFile() {
+
+            // Get the first file in the FileList object
+            var imageFile = $('#id_banner_file')[0].files[0];
+
+            // Now use your newly created URL!
+            $('#banner-cropped')[0].src = window.URL.createObjectURL(imageFile);
+        }
+
+        $(document).ready(function () {
+            var banner_file_el = $('#id_banner_file');
+
+            // Listener responsavel por ler o arquivo que foi submetido.
+            // È aqui que começa o processo de crop.
+            banner_file_el.on('change', function () {
+
+                if (typeof(croppie_obj) !== "undefined") {
+                    croppie_obj.croppie("destroy");
+                }
+
+                replaceFile();
+                croppie_obj = $('#banner-cropped').croppie({
+                    viewport: {
+                        width: 960,
+                        height: 503,
+                        type: 'square'
+                    },
+                    boundary: {
+                        width: 970,
+                        height: 513
+                    }
+                });
+            });
+
+            $('.banner-remove').on('click', function () {
+                var submit_button = $('.banner-submit');
+                var remove_button = $('.banner-remove');
+
+                submit_button.attr('disabled', true);
+                remove_button.attr('disabled', true);
+                $('span', remove_button).text('aguarde...');
+
+                $('.banner').hide();
+                $('.banner-loader').show();
+                $('#id_remove_image').val('True');
+                $('#hotsite-form').submit();
+            });
+
+            $('#start_crop').on('click', function () {
+                if (typeof(croppie_obj) === "undefined") {
+                    croppie_obj = createCroppieObj();
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+<form id="hotsite-form" action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        {% render_errors form.non_field_errors %}
+    {% endif %}
+
+    {% for hidden_field in form.hidden_fields %}
+        {% if hidden_field.errors %}
+            {% render_errors hidden_field.errors %}
+        {% endif %}
+        {{ hidden_field }}
+    {% endfor %}
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="buttonbar">
+          <div class="float-left">
+            <a href="{% url 'event:event-hotsite2' event.pk %}"
+              class="btn btn-primary">
+              <i class="fas fa-arrow-circle-left"></i>
+              Voltar
+            </a>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary" id="block-form">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        Configurar banner do evento
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div>
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <input type="file" style="display: none" id="id_banner_file" accept="image/*">
+                                <img
+                                    src="{% if event.info.image_main2 %}{{ event.info.image_main2.url }}{% else %}{% static 'assets/img/banner_samples/960x503.png' %}{% endif %}"
+                                    id="banner-cropped" style="border:2px solid #DDD" />
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-xs-6 col-xs-push-1 text-left">
+                                <button class="btn btn-sm btn-info"
+                                        onclick="askForFile();" id="edit_btn"
+                                        type="button">
+                                    <i class="fas fa-upload"></i>
+                                    Enviar arquivo
+                                </button>
+
+                                <button class="btn btn-sm btn-primary"
+                                        id="start_crop"
+                                        type="button">
+                                    <i class="fas fa-crop"></i>
+                                    Modo de Recorte
+                                </button>
+                            </div>
+                            <div class="col-xs-6 col-xs-pull-1 text-right">
+                                <button type="type" onclick="submitImage()"
+                                        class="btn btn-sm btn-success banner-submit">
+                                    <i class="fas fa-save"></i>
+                                    <span>Salvar</span>
+                                </button>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-danger banner-remove">
+                                    <i class="fas fa-trash"></i>
+                                    <span>Excluir</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

@@ -7,7 +7,8 @@ from django.http import (
     Http404,
     HttpResponseBadRequest,
 )
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from buzzlead.services import confirm_bonus
@@ -23,6 +24,7 @@ from .helpers import notify_admins_postback
 
 
 @api_view(['POST'])
+@permission_classes((AllowAny,))
 def postback_url_view(request, uidb64):
 
     if not uidb64:
@@ -120,21 +122,16 @@ def postback_url_view(request, uidb64):
         if transaction.amount > Decimal(0):
 
             # Pegar o valor da divida
-            debts = subscription.debts.all()
-            for debt in debts:
-                total_debt += debt.amount
-
-            # Pegar qualquer dinheiro já pago
-            existing_amount = subscription.payments.filter(
-                paid=True
-            ).aggregate(total=Sum('amount'))
-
-            existing_amount = existing_amount['total']
+            existing_amount = subscription.debts_amount
 
         subscription.status = subscription_status_manager.get_new_status(
             debt=total_debt,
             existing_payments=existing_amount,
         )
+
+        if subscription.confirmed is True:
+            # Força como completa
+            subscription.completed = True
 
         subscription.save()
 

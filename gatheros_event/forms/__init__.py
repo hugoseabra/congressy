@@ -19,9 +19,13 @@ from .invitation import (
     InvitationCreateForm,
     InvitationDecisionForm,
 )
-from .organization import OrganizationForm, OrganizationManageMembershipForm, OrganizationFinancialForm
+from .organization import (
+    OrganizationForm,
+    OrganizationManageMembershipForm,
+    OrganizationFinancialForm,
+)
 from .person import PersonForm
 from .place import PlaceForm
-from .hotsite import HotsiteForm
+from .hotsite import HotsiteForm, HotsiteForm2, BannerForm
 from .profile import ProfileCreateForm, ProfileForm
 from .feature_configuration import FeatureConfigurationForm

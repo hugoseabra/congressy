@@ -21,6 +21,16 @@ urls = [
         name='event-hotsite'
     ),
     url(
+        r'^(?P<pk>[\d]+)/webpage2/banner/',
+        views.EventHotsiteBannerView.as_view(),
+        name='event-hotsite-banner'
+    ),
+    url(
+        r'^(?P<pk>[\d]+)/webpage2/',
+        views.EventHotsite2View.as_view(),
+        name='event-hotsite2'
+    ),
+    url(
         r'^(?P<pk>[\d]+)/detail/',
         views.EventDetailView.as_view(),
         name='event-detail'

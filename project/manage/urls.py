@@ -32,8 +32,8 @@ admin_urlpatterns += [
     url(r'^grapelli/', include('grappelli.urls')),
     url(r'^grappelli_custom_autocomplete/',
         include('django_grappelli_custom_autocomplete.urls')),
-    url(r'^cgsy-admin18/doc/', include('django.contrib.admindocs.urls')),
-    url(r'^cgsy-admin18/', admin.site.urls)
+    url(r'^admin/cgsy20/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^admin/cgsy20/', admin.site.urls)
 ]
 
 private_urlpatterns = [
@@ -46,8 +46,8 @@ private_urlpatterns = [
     url(r'^manage/', include(urlpatterns_private_raffles, 'raffle')),
     # url(r'^manage/', include('bitly.urls', 'bitly')),
     url(r'^manage/', include('gatheros_event.urls', 'event')),
-    url(r'^manage/', include(gatheros_front_private, 'front')),
     url(r'^manage/', include(private_payment_urls, 'payment')),
+    url(r'^manage/', include(gatheros_front_private, 'front')),
 ]
 
 public_urls = gatheros_front_public
@@ -62,8 +62,8 @@ public_auth_urlpatterns = [url(r'^', include(public_urls, 'public'))]
 
 public_urlpatterns = [
     url(r'^captcha/', include('captcha.urls')),
-    url(r'^healthcheck/', include('health_check.urls')),
-    url(r'^$', RedirectView.as_view(url='/login/'), name='root'),
+    # url(r'^healthcheck/', include('health_check.urls')),
+    url(r'^$', RedirectView.as_view(url='/account/login/'), name='root'),
 ]
 
 public_urlpatterns += [
@@ -77,6 +77,8 @@ public_urlpatterns += [
 
 # API
 api_urls = [
+    url(r'^rest-auth/', include('rest_auth.urls')),
+    url(r'^accounts/', include('account.api_urls', 'account')),
     url(r'^', include('gatheros_event.urls.api', 'event')),
     url(r'^', include('gatheros_subscription.api_urls', 'subscription')),
     url(r'^', include('addon.api_urls', 'addon')),

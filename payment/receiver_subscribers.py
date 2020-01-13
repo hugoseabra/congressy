@@ -149,21 +149,21 @@ class ReceiverPublisher(object):
 
         # Verifica se há atividades extras.
         for service in self.subscription.subscription_services.all():
-            price_diff = service.optional_price - service.optional_liquid_price
+            price_diff = service.optional.price - service.optional.liquid_price
             cgsy_amount += price_diff
 
         # Verifica se há opcionais.
         for product in self.subscription.subscription_products.all():
-            price_diff = product.optional_price - product.optional_liquid_price
+            price_diff = product.optional.price - product.optional.liquid_price
             cgsy_amount += price_diff
 
         # Verifica se há atividades extras.
         for service in self.subscription.subscription_services.all():
-            org_amount += service.optional_liquid_price
+            org_amount += service.optional.liquid_price
 
         # Verifica se há opcionais.
         for product in self.subscription.subscription_products.all():
-            org_amount += product.optional_liquid_price
+            org_amount += product.optional.liquid_price
 
         # Soma do montante distribuído entre as partes.
         total = Decimal(org_amount + cgsy_amount)

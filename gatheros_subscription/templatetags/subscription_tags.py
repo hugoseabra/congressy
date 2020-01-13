@@ -78,14 +78,14 @@ def is_subscription_free(subscription):
         return False
 
     has_products = subscription.subscription_products.filter(
-        optional_price__gt=0
+        optional__liquid_price__gt=0
     ).count() > 0
 
     if has_products is True:
         return False
 
     has_services = subscription.subscription_services.filter(
-        optional_price__gt=0
+        optional__liquid_price__gt=0
     ).count() > 0
 
     if has_services is True:

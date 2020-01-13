@@ -1,0 +1,20 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 5,
+    "fields": {
+      "password": "pbkdf2_sha256$36000$oAoNX4aIcpfx$/d/mTOwsr7JVft7Yy2ORI3svmkjZ8+kbS+wlum1NyMo=",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "hugo@congressy.com",
+      "first_name": "",
+      "last_name": "",
+      "email": "hugo@congressy.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2019-10-10T17:59:31.778Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  }
+]

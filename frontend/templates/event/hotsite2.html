@@ -1,0 +1,1049 @@
+{% extends "base/base.html" %}
+
+{% load static i18n widget_tweaks queryset_filter form_config_tags %}
+
+{% block title %} Página do Evento | Congressy{% endblock %}
+
+{% block page_title %}Página do Evento{% endblock %}
+
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+
+{% block page_description %}Configuração da página do evento.{% endblock %}
+
+{% block styles %}
+    <link href="{% static "assets/plugins/croppie/croppie.css" %}" rel="stylesheet">
+    <style>
+        .event-info-status-item {
+            text-align: center;
+            padding: 10px 20px;
+        }
+
+        .event-info-status-item .title {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .event-info-status-item .description {
+            font-size: 12px;
+        }
+
+        .django-ckeditor-widget {
+            display: block !important;
+        }
+
+        #map, #map_banner {
+            width: 100%;
+            height: 600px;
+            border: 3px solid #DDD;
+        }
+
+        #map_banner div {
+            width: 32%;
+            margin: 15% auto;
+            text-align: center;
+        }
+
+        .address-row {
+        {#            display: none;#}
+        }
+
+        .nav-pills > li.active > a {
+            background-color: #1f7bb6;
+        }
+    </style>
+
+    <style>
+        .videoWrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            padding-top: 25px;
+            height: 0;
+        }
+        .videoWrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+
+    <!-- Script used for cropping -->
+    <script src="{% static "assets/plugins/croppie/croppie.js" %}"></script>
+
+    <script src="{% static "assets/js/messenger.js" %}"></script>
+    <!-- Messenger lib -->
+
+    <!-- ckeditor -->
+    <script type="text/javascript"
+            src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript"
+            src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+
+    <script src="{% static "hotsite/js/subscription.js" %}"></script>
+    <script src="{% static 'assets/js/user_notification.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            if (!$('#id_show_location').is(':checked')) {
+                $('#map-block').hide();
+                $('#address').hide();
+                $('#place-form-block').removeClass('col-md-6');
+                $('#place-form-block').addClass('col-md-12');
+            }
+
+
+            $('.switchery').on('click', function (e) {
+                var chk_id = $(this).parent().find('input[type=checkbox]').attr('id');
+                if (chk_id === 'id_show_location') {
+                    $('#map-block').toggle();
+                    $('#address').toggle();
+                    $('#place-form-block').toggleClass('col-md-6');
+                    $('#place-form-block').toggleClass('col-md-12');
+                }
+            })
+        });
+
+        window.cgsy = window.cgsy || {};
+        cgsy.maps = cgsy.maps || {};
+        var croppie_obj = undefined;
+
+
+        console.log(!$('#id_show_location').is(':checked'));
+        (function ($, window) {
+
+            window.cgsy.maps.retrieveAddress = function () {
+                var name = $('#id_name');
+
+                var address = name.val();
+
+                var map = new window.google.maps.Map(
+                    document.getElementById("map"),
+                    {
+                        zoom: 18,
+                        center: {lat: 40.731, lng: -73.997}
+                    }
+                );
+
+                window.cgsy.maps.searchByAddress(map, address);
+            };
+
+            window.cgsy.maps.hideMap = function () {
+                $('#map').hide();
+                $('#map_banner').show();
+            };
+
+            window.cgsy.maps.showMap = function () {
+                $('#map').show();
+                $('#map_banner').hide();
+            };
+
+            window.cgsy.maps.set_if_international = function () {
+                var country = $('#id_country');
+                if (country.val() === 'BR') {
+                    window.cgsy.maps.set_form_as_national();
+                    return;
+                }
+                window.cgsy.maps.set_form_as_international();
+            };
+            window.cgsy.maps.set_form_as_national = function () {
+                $('#zip-code-block').show();
+                $('#zip-code-international-block').hide();
+                $('#international-address-block').hide();
+                $('#street-block').show();
+                $('#national-address-block').show();
+                $('#village-block').show();
+                $('#national-state-block').show();
+                $('#international-state-block').hide();
+                $('#national-city-block').show();
+                $('#international-city-block').hide();
+
+            };
+
+            window.cgsy.maps.set_form_as_international = function () {
+                $('#zip-code-block').hide();
+                $('#zip-code-international-block').show();
+                $('#international-address-block').show();
+                $('#street-block').hide();
+                $('#national-address-block').hide();
+                $('#village-block').hide();
+                $('#national-state-block').hide();
+                $('#international-state-block').show();
+                $('#national-city-block').hide();
+                $('#international-city-block').show();
+
+            };
+
+            window.cgsy.maps.init = function (lat, long, zoom) {
+                $('#map-loader').show();
+                $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
+
+                var map = new window.google.maps.Map(
+                    document.getElementById("map"),
+                    {
+                        center: {
+                            lat: parseFloat(lat),
+                            lng: parseFloat(long)
+                        },
+                        zoom: parseInt(zoom) || 18
+                    }
+                );
+                window.cgsy.maps.addMarker(
+                    map,
+                    {lat: parseFloat(lat), lng: parseFloat(long)}
+                );
+            };
+
+            window.cgsy.maps.setCenter = function (map, location) {
+                map.setCenter(location);
+            };
+
+            window.cgsy.maps.addMarker = function (map, location) {
+                window.cgsy.maps.showMap();
+
+                window.cgsy.maps.setCenter(map, location);
+
+                var marker = new window.google.maps.Marker({
+                    position: location,
+                    map: map,
+                    draggable: true
+                });
+
+                var lat_el = $('#id_lat');
+                var lng_el = $('#id_long');
+                var zoom_el = $('#id_zoom');
+
+                lat_el.val(marker.position.lat());
+                lng_el.val(marker.position.lng());
+                zoom_el.val(map.getZoom());
+
+                window.google.maps.event.addListener(marker, 'dragend', function () {
+                    lat_el.val(marker.position.lat());
+                    lng_el.val(marker.position.lng());
+                });
+
+                window.google.maps.event.addListener(map, 'zoom_changed', function () {
+                    zoom_el.val(map.getZoom());
+                });
+
+                $('#map-loader').hide();
+                $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
+            };
+
+            window.cgsy.maps.searchByAddress = function (map, address) {
+                if ($('#id_show_location').is(':checked') === true) {
+                    $('#map-loader').show();
+                    $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
+
+                    var geocoder = new window.google.maps.Geocoder;
+                    geocoder.geocode({'address': address}, function (results, status) {
+                        if (status !== 'OK') {
+                            $('#map-loader').hide();
+                            $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
+                            $('#error-maps').show();
+                            $('#id_city_name').prop('disabled', false);
+                            return;
+                        }
+                        var components = results[0].address_components;
+                        if (components.length) {
+                            $('#error-maps').hide();
+                            var uf, city;
+                            $.each(components, function (i, component) {
+                                if ($.inArray('country', component.types) != -1) {
+                                    $('#id_country').val(component.short_name);
+                                }
+                            });
+                            var country = $('#id_country').val();
+                            window.cgsy.maps.set_if_international();
+                            $('#id_address_international').val('');
+                            $.each(components, function (i, component) {
+                                if ($.inArray('postal_code', component.types) != -1) {
+                                    if (country === 'BR') {
+                                        $('#id_zip_code').val(component.short_name);
+                                        searchByCep();
+                                    }
+                                    else {
+                                        $('#id_zip_code_international').val(component.short_name);
+                                    }
+                                }
+                                if (country === 'BR') {
+                                    if ($.inArray('sublocality_level_1', component.types) != -1) {
+                                        $('#id_street').val(component.short_name);
+                                    }
+                                    if ($.inArray('street_number', component.types) != -1) {
+                                        $('#id_number').val(component.short_name);
+                                    }
+                                }
+                                else {
+                                    if ($.inArray('sublocality_level_1', component.types) != -1) {
+                                        $('#id_address_international').val(
+                                            $('#id_address_international').val() +
+                                            component.short_name + ' ');
+                                    }
+                                    if ($.inArray('street_number', component.types) != -1) {
+                                        $('#id_address_international').val(
+                                            $('#id_address_international').val() +
+                                            component.short_name + ' ');
+                                    }
+                                    if ($.inArray('route', component.types) != -1) {
+                                        $('#id_address_international').val(
+                                            $('#id_address_international').val() +
+                                            component.short_name + ' ');
+                                    }
+                                    if ($.inArray('neighborhood', component.types) != -1) {
+                                        $('#id_address_international').val(
+                                            $('#id_address_international').val() +
+                                            component.short_name + ' ');
+                                    }
+
+                                }
+                                if ($.inArray('administrative_area_level_1', component.types) != -1) {
+                                    if (country === 'BR') {
+                                        uf = component.short_name;
+                                    }
+                                    else {
+                                        $('#id_state_international').val(component.short_name)
+                                    }
+                                }
+                                if ($.inArray('locality', component.types) != -1) {
+                                    if (country === 'BR') {
+                                        city = component.short_name.toUpperCase();
+                                    }
+                                    else {
+                                        $('#id_city_international').val(component.short_name);
+                                    }
+                                }
+                            });
+                            if ($('#id_country').val() === 'BR') {
+                                if (uf) {
+                                    $('#id_state').val(uf);
+
+                                    if (city) {
+                                        fetch_cities($('#id_state'), null, function (results) {
+                                            if (!results.length) {
+                                                return;
+                                            }
+                                            $.each(results, function (i, city_obj) {
+                                                if (city_obj.name == city) {
+                                                    var options = $('#id_city_name').find('option:contains(' + city + ')');
+                                                    $.each(options, function (ii, option) {
+                                                        var el = $(option);
+                                                        if (el.text() == city) {
+                                                            $('#id_city_name').val(city_obj.id);
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        });
+                                    }
+                                }
+                            }
+                        }
+
+                        var location = results[0].geometry.location;
+                        window.cgsy.maps.addMarker(map, location);
+                    });
+                }
+            }
+        })(jQuery, window);
+
+
+        function resize_status_block() {
+            var form_height = $('#block-form').height();
+            var icons_height = $('#block-status-icons').height();
+            if (form_height > icons_height) {
+                $('#block-status-icons').height(form_height);
+            }
+
+            if (icons_height > form_height) {
+                $('#block-form').height(icons_height);
+            }
+        }
+
+        function askForFile() {
+            // creating input on-the-fly
+            var input = $("#id_banner_file");
+            // add onchange handler if you wish to get the file :)
+            input.trigger("click"); // opening dialog
+            return false; // avoiding navigation
+        }
+
+        function submitImage() {
+            var banner_form_el = $('#id_image_main');
+
+            $('.banner').hide();
+            $('.banner-loader').show();
+
+            if (typeof(croppie_obj) === "undefined") {
+                croppie_obj = createCroppieObj();
+            }
+            croppie_obj.croppie('result', 'base64', 'original', 'png', '1', false).then(function (base64_image) {
+                $('#banner-cropped')[0].src = base64_image;
+                banner_form_el.val(base64_image);
+                $('#hotsite-form').submit();
+            });
+        }
+
+        function createCroppieObj() {
+            return $('#banner-cropped').croppie({
+                viewport: {
+                    width: 1200,
+                    height: 500,
+                    type: 'square'
+                },
+                boundary: {
+                    width: 1200,
+                    height: 650
+                }
+            });
+        }
+
+        function replaceFile() {
+
+            // Get the first file in the FileList object
+            var imageFile = $('#id_banner_file')[0].files[0];
+
+            // Now use your newly created URL!
+            $('#banner-cropped')[0].src = window.URL.createObjectURL(imageFile);
+        }
+
+        $(document).ready(function () {
+
+            var uf_el = $('#id_state');
+            var city_el = $('#id_city_name');
+            var hidden_city_el = $('#id_city');
+            var banner_file_el = $('#id_banner_file');
+
+            // Listener responsavel por ler o arquivo que foi submetido.
+            // È aqui que começa o processo de crop.
+            banner_file_el.on('change', function () {
+
+                if (typeof(croppie_obj) !== "undefined") {
+                    croppie_obj.croppie("destroy");
+                }
+
+                replaceFile();
+                croppie_obj = $('#banner-cropped').croppie({
+                    viewport: {
+                        width: 1200,
+                        height: 500,
+                        type: 'square'
+                    },
+                    boundary: {
+                        width: 1200,
+                        height: 650
+                    }
+                });
+            });
+
+            $('.banner-remove').on('click', function () {
+                $('.banner').hide();
+                $('.banner-loader').show();
+                $('#id_remove_image').val('True');
+                $('#hotsite-form').submit();
+            });
+
+            $('#id_zip_code').mask("99999-999");
+
+            showHideCepLoader();
+
+            window.setTimeout(function () {
+                {% if event.place and event.place.city %}
+                    uf_el.val('{{ event.place.city.uf }}');
+                    fetch_cities(uf_el, city_el, hidden_city_el, '{{ event.place.city.pk }}');
+                {% else %}
+                    uf_el.val('');
+                    city_el.val('');
+                    city_el.prop('disabled', true);
+                {% endif %}
+            }, 300);
+
+            uf_el.change(function () {
+                city_el.html($('<option>').text('Carregando...'));
+                var that = $(this);
+                window.setTimeout(function () {
+                    fetch_cities($(that), city_el, hidden_city_el);
+                }, 500);
+            });
+
+            city_el.change(function () {
+                hidden_city_el.val($(this).val());
+            });
+
+            $('#start_crop').on('click', function () {
+                if (typeof(croppie_obj) === "undefined") {
+                    croppie_obj = createCroppieObj();
+                }
+            });
+
+        });
+
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&language=pt-BR&region=BR"></script>
+
+    <script>
+        $(document).ready(function () {
+            google.maps.event.addDomListener(
+                window,
+                "load",
+                function () {
+                    {% if event.place.lat and event.place.long %}
+                        window.cgsy.maps.init(
+                            '{{ event.place.lat }}',
+                            '{{ event.place.long }}',
+                            '{{ event.place.zoom|default_if_none:18 }}'
+                        );
+                    {% else %}
+                        {% if event.place.name or event.place.street %}
+                            window.cgsy.maps.retrieveAddress();
+                        {% else %}
+                            window.cgsy.maps.hideMap();
+                        {% endif %}
+                    {% endif %}
+                }
+            );
+
+            (function ($) {
+                var map_reload_timer = null;
+                window.cgsy.maps.set_if_international();
+
+                function reloadMap() {
+                    $('#map-loader').show();
+                    $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
+
+                    window.clearTimeout(map_reload_timer);
+
+                    $('#id_zip_code').val('');
+                    $('#id_street').val('');
+                    $('#id_number').val('');
+                    $('#id_complement').val('');
+                    $('#id_village').val('');
+                    $('#id_state').val('');
+                    $('#id_zip_code_international').val('');
+                    $('#id_address_international').val('');
+                    $('#id_state_international').val(' ');
+                    $('#id_city_international').val('');
+                    {#$('#id_city_name').prop('disabled', true);#}
+
+                    map_reload_timer = window.setTimeout(function () {
+                        window.cgsy.maps.retrieveAddress();
+                    }, 1500);
+                }
+
+                $('#id_name').on('keypress', function (e) {
+                    if (e.which === 13) {
+                        reloadMap();
+                    }
+                });
+                $('#id_country').on('change', function () {
+                    window.cgsy.maps.set_if_international();
+                });
+                $('#reload-map-button').on('click', function () {
+                    reloadMap();
+                });
+                $('.submit-button').on("click", function () {
+                    $('#hotsite-form').submit();
+                });
+
+
+            })(jQuery);
+        });
+    </script>
+
+    <script>
+          // 2. This code loads the IFrame Player API code asynchronously.
+          var tag = document.createElement('script');
+
+          tag.src = "https://www.youtube.com/iframe_api";
+          var firstScriptTag = document.getElementsByTagName('script')[0];
+          firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+          // 3. This function creates an <iframe> (and YouTube player)
+          //    after the API code downloads.
+          var player;
+
+          function onYouTubeIframeAPIReady() {
+              player = new YT.Player('player', {
+                  width: '640',
+                  height: '360',
+                  videoId: $('#id_stream_youtube_code').val(),
+                  playerVars: {
+                      'autoplay': 0,
+                      'controls': 0,
+                      'modestbranding': 1
+                  },
+                  events: {
+                      'onReady': onPlayerReady
+                  }
+              });
+          }
+
+          var done = false;
+
+          // 4. The API will call this function when the video player is ready.
+          function onPlayerReady(event) {
+              done = true;
+              if ($('#id_stream_youtube_code').val()) {
+                  $('.videoWrapper').show();
+              }
+          }
+
+          function stopVideo() {
+              player.stopVideo();
+          }
+
+          $(document).ready(function () {
+              var videoCodeWatcher = null;
+              var youtube_code_el = $('#id_stream_youtube_code');
+              var existingVideo = youtube_code_el.val();
+              youtube_code_el.keyup(function() {
+                  console.log('done', done);
+                  if (!done) {
+                      return;
+                  }
+
+                  var player_el = $('.videoWrapper');
+                  window.clearTimeout(videoCodeWatcher);
+                  videoCodeWatcher = window.setTimeout(function() {
+                      if (!$('#id_stream_youtube_code').val()) {
+                          player_el.fadeOut();
+                          return;
+                      }
+                      player_el.fadeIn(function() {
+                          var isNew = existingVideo !== youtube_code_el.val();
+                          console.log(isNew);
+                          if (isNew) {
+                            existingVideo = youtube_code_el.val();
+                            player.loadVideoById(existingVideo, 0, "large");
+                            stopVideo();
+                          }
+                      });
+
+                  }, 150);
+              });
+
+
+
+              // Find all YouTube videos
+              var $allVideos = $("iframe[src^='//www.youtube.com']"),
+
+              // The element that is fluid width
+              $fluidEl = $("body");
+
+              // Figure out and save aspect ratio for each video
+              $allVideos.each(function () {
+                  $(this)
+                      .data('aspectRatio', this.height / this.width)
+
+                      // and remove the hard coded width/height
+                      .removeAttr('height')
+                      .removeAttr('width');
+              });
+
+              // When the window is resized
+              $(window).resize(function () {
+
+                  var newWidth = $fluidEl.width();
+
+                  // Resize all videos according to their own aspect ratio
+                  $allVideos.each(function () {
+
+                      var $el = $(this);
+                      $el
+                          .width(newWidth)
+                          .height(newWidth * $el.data('aspectRatio'));
+
+                  });
+
+                  // Kick off one resize to fix all videos on page load
+              }).resize();
+          });
+
+        </script>
+{% endblock %}
+
+{% block content %}
+    <form id="hotsite-form" action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-md-3 float-right">
+                <div class="buttonbar">
+                    {% if info and info.description_html %}
+                        <a href="/{{ info.event.slug }}"
+                           target="_blank"
+                           class="btn btn-success btn-block">
+                            <i class="fa fa-globe"></i>
+                            Link do Evento
+                        </a>
+                    {% else %}
+                        <button type="button"
+                                class="btn btn-default btn-trans
+                                            btn-block disabled"
+                                title="Você deve configurar pelo menos a descrição do seu evento.">
+                            <i class="fa fa-globe"></i>
+                            Link do Evento
+                        </button>
+                    {% endif %}
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-9">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary" id="block-form">
+                            <div class="panel-heading">
+                                <div class="panel-title">
+                                    Capa da Página
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-12 text-right">
+                                        <span class="badge badge-warning" title="Esta versão do hotsite pode passar por algumas inconstâncias." data-toggle="tooltip">Versão Beta</span>
+                                    </div>
+                                </div>
+                                {% if event.hotsite_version != 2 %}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="alert alert-warning">
+                                            Esta versão não está ativa. Você deve salvar o formulário para ativa-la.
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <div class="row text-center banner-loader"
+                                     style="margin-top:20px; display: none">
+                                    <h3>Processando, aguarde...</h3>
+                                    <i class="fas info-color fa-circle-notch fa-spin fa-6x" style="margin-top: 20px"></i>
+                                </div>
+
+                                <div class="row text-center banner">
+                                    <div class="col-md-12 text-center">
+                                        <img {% if event.info.image_main2 %}
+                                            src="{{ event.info.image_main2.thumbnail.url }}"
+                                        {% else %}
+                                            src="{% static 'assets/img/banner_samples/960x503.png' %}"
+                                        {% endif %}
+                                            class="img"
+                                             style="border:2px solid #DDD"
+                                            id="banner-thumbnail">
+                                    </div>
+                                </div>
+
+                                <div class="row text-center banner" style="margin-top: 10px">
+
+                                    <div class="col-md-12">
+                                        <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'event:event-hotsite-banner' event.pk %}'">
+                                            <i class="fas fa-image"></i>
+                                            Configurar seu banner
+                                        </button>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_switchery_field form.show_banner help_text="Se desativado, banner será exibido como fundo do título." %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.description_html %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.voucher_extra_info %}
+                                    </div>
+                                </div>
+                                <button type="button"
+                                        class="btn btn-success submit-button"
+                                        style=" float: right; margin-right:
+                                        10px">
+                                    <i class="fa fa-save"></i>
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if event.is_scientific %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <div class="panel-title">
+                                        Configurações científica
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% render_generic_field form.editorial_body %}
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% render_generic_field form.scientific_rules %}
+                                        </div>
+                                    </div>
+
+                                    <button type="button"
+                                            class="btn btn-success submit-button"
+                                            style=" float: right; margin-right:
+                                        10px">
+                                        <i class="fa fa-save"></i>
+                                        Salvar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-3 hidden-xs hidden-sm">
+
+                <div class="panel panel-primary" id="block-status-icons">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Etapas de configuração
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12" style="text-align: center">
+                                <div class="col-md-12 event-info-status-item">
+                                    <div>
+                                        <i class="fas fa-check-circle fa-4x
+                                          {% if info and info.image_main %}success-color{% endif %}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="title">Banner principal
+                                        </div>
+                                        <div class="text-muted description">
+                                            Deixa o site do evento mais
+                                            apresentável.
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-12 event-info-status-item">
+                                    <div>
+                                        <i class="fas fa-check-circle fa-4x {% if info and info.description_html %}success-color{% endif %}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="title">
+                                            Descrição do evento
+                                        </div>
+                                        <div class="text-muted description">
+                                            Deixa claro para o visitante que
+                                            ainda não
+                                            conhece os detalhes do evento e
+                                            gostaria de
+                                            saber do que se trata.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 event-info-status-item">
+                                    <div>
+                                        <i class="fas fa-check-circle fa-4x {% if info and info.voucher_extra_info %}success-color{% endif %}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="title">
+                                            Informações extras para o voucher
+                                        </div>
+                                        <div class="text-muted description">
+                                            Informações extras para serem exibidos no comprovante de inscrição dos participantes.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 event-info-status-item">
+                                    <div>
+                                        <i class="fas fa-check-circle fa-4x {% if place and place.show_location %}success-color{% endif %}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="title">
+                                            Local do evento
+                                        </div>
+                                        <div class="text-muted description">
+                                            Informações sobre onde o evento acontecerá, fornecendo informações geeolocalizada aos participantes.
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Localização
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6" id="place-form-block">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_switchery_field form.show_location %}
+                                    </div>
+                                </div>
+                                <div id="address">
+                                    <div class="row name-row">
+                                        <div class="col-md-12 col-lg-8 col-xl-9">
+                                            {% render_generic_field form.name help_text='Pesquise pelo nome do local.' %}
+                                            <p id="error-maps"
+                                               class="danger-color"
+                                               style="display: none">Local não
+                                                encontrado no Google Maps</p>
+
+                                        </div>
+                                        <div class="col-md-12 col-lg-4 col-xl-3"
+                                             style="padding-left: 30px;padding-right: 30px">
+                                            <button id="reload-map-button"
+                                                    type="button" style="margin-top: 46px"
+                                                    class="btn btn-sm btn-block btn-primary">
+                                                Buscar
+                                            </button>
+                                            <div class="hidden-lg"
+                                                 style="height:32px"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row address-row">
+                                        <div class="col-md-6 col-xl-6">
+                                            <div id="zip-code-block">
+                                                {% render_generic_field form.zip_code help_text='Informe o CEP para encontrar o endereço.' %}
+                                                <div id="cep_loader" style="width: 22px;position: absolute;
+                                             top: 33px;right: 33px;">
+                                                    <img src="{% static 'assets/img/loader.gif' %}"/>
+                                                </div>
+                                            </div>
+                                            <div id="zip-code-international-block">
+                                                {% render_generic_field form.zip_code_international %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xl-6">
+                                            {% render_generic_field form.country %}
+                                        </div>
+                                    </div>
+                                    <div class="row address-row">
+                                        <div class="col-md-12">
+                                            <div id="street-block">
+                                                {% render_generic_field form.street %}
+                                            </div>
+                                            <div id="international-address-block">
+                                                {% render_generic_field form.address_international %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="national-address-block"
+                                         class="row address-row">
+                                        <div class="col-md-6">
+                                            {% render_generic_field form.number %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% render_generic_field form.complement %}
+                                        </div>
+                                    </div>
+                                    <div id="village-block"
+                                         class="row address-row">
+                                        <div class="col-md-12">
+                                            {% render_generic_field form.village %}
+                                        </div>
+                                    </div>
+                                    <div class="row address-row">
+                                        <div class="col-md-4 address-row">
+                                            <div id="national-state-block">
+                                                {% render_generic_field form.state %}
+                                            </div>
+                                            <div id="international-state-block">
+                                                {% render_generic_field form.state_international %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8 address-row">
+                                            <div id="national-city-block">
+                                                {% render_generic_field form.city_name %}
+                                            </div>
+                                            <div id="international-city-block">
+                                                {% render_generic_field form.city_international %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr/>
+                                    <div class="text-center text-muted"
+                                         style="font-size:12px">
+                                        A Congressy não se responsabiliza pelos
+                                        dados de pesquisa advindos
+                                        do Google.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" id="map-block">
+                                <div id="map-loader"
+                                     class="fas info-color fa-2x fa-circle-notch fa-spin"
+                                     style="position:absolute;z-index:1000;top:0;display:none"></div>
+                                <div class="text-center" style="padding:10px;">
+                                    Arraste o marcador para a posição desejada.
+                                </div>
+                                <div id="map" style="display:none"></div>
+                                <div id="map_banner" style="display:none">
+                                    <div class="text-muted">Informe o local
+                                        para ver o mapa.
+                                    </div>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="buttonbar bottom">
+                                <div class="float-right"
+                                     style="margin-right: 20px">
+                                    <button type="button"
+                                            class="btn btn-success submit-button">
+                                        <i class="fa fa-save"></i>
+                                        Salvar
+                                    </button>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+{% endblock %}

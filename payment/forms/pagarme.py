@@ -364,7 +364,7 @@ class PagarMeCheckoutForm(forms.Form):
 
         service_forms = []
         for service in services:
-            if not service.optional_price:
+            if not service.optional.price:
                 continue
 
             debt_kwargs = {
@@ -406,7 +406,7 @@ class PagarMeCheckoutForm(forms.Form):
 
         prod_forms = []
         for product in products:
-            if not product.optional_price:
+            if not product.optional.price:
                 continue
 
             debt_kwargs = {

@@ -1,4 +1,6 @@
 # pylint: skip-file
+from django.urls import reverse_lazy
+
 from project.base_settings import *
 
 # ========================== BASE CONFIGURATION ============================= #
@@ -29,9 +31,9 @@ INSTALLED_APPS += [
     'sync',
 ]
 # =========================== AUTH BACKENDS ================================= #
-LOGIN_URL = '/login/'
+LOGIN_URL = reverse_lazy('public:login')
 LOGIN_REDIRECT_URL = '/manage/'
-LOGOUT_REDIRECT_URL = '/login/'
+LOGOUT_REDIRECT_URL = reverse_lazy('public:login')
 LOGIN_SUPERUSER_ONLY = False
 ACCOUNT_REGISTRATION = True
 # ========================= SERVER CONFIGURATION ============================ #
@@ -40,11 +42,11 @@ WSGI_APPLICATION = 'project.wsgi.application'
 SITE_ID = 1
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATIC_URL = '/static/'
+STATIC_URL = '/static-manage/'
 
 # @TODO Mudar para /media em produção.
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+MEDIA_URL = '/media-manage/'
 # ============================== FIXTURES =================================== #
 FIXTURE_DIRS += [
     os.path.join(BASE_DIR, 'project', 'manage', 'fixtures'),

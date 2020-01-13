@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from payment.helpers.payment_helpers import amount_as_decimal
+from payment.helpers.payment_helpers import as_payment_amount
 
 
 class SplitRule:
@@ -40,7 +40,7 @@ class SplitRule:
 
         iters = {
             'recipient_id': self.recipient_id,
-            'amount': amount_as_decimal(self.amount),
+            'amount': as_payment_amount(self.amount),
             'liable': self.liable is True,
             'charge_processing_fee': self.charge_processing_fee is True,
         }

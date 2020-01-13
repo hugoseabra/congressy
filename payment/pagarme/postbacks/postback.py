@@ -37,22 +37,22 @@ class Postback:
         # Validar se temos todos os dados necessários
         self._validate(payload)
 
-        new_status = payload.get('current_status')
+        incoming_status = payload.get('current_status')
 
         # Se não irá mudar o status de transação, não há o que processar.
-        if self.transaction_status == new_status:
+        if self.transaction_status == incoming_status:
             return self.transaction_status
 
         # Atualizando os status da Transaction
         status = TransactionDirector(
-            status=new_status,
+            status=incoming_status,
             old_status=self.transaction_status,
         ).direct()
 
         # Verifica se o status realmente mudou.
         if self.transaction_status == status:
             # Em caso de ser o mesmo status, vamos verificar se o ID de
-            # transação no pagar.me é a mesma. Caso tenha mudado, significa que
+            # transação no pagar.me é o mesmo. Caso tenha mudado, significa que
             # houve um pedido de transação interna que o pagar.me reprocessou e
             # mudou o status que pode não ser conforme a máquina de estado
             # de status de transação.
@@ -62,7 +62,7 @@ class Postback:
 
             if saved_payload_id != payload_id:
                 # reseta regras de máquinas de status, ignorando a verificação.
-                status = new_status
+                status = incoming_status
 
         return status
 
@@ -89,7 +89,6 @@ class Postback:
             raise e
 
         # Garantindo que temos o valor da compra no payload
-
         key = 'transaction[amount]'
         try:
             amount = payload.get(key)
@@ -100,7 +99,8 @@ class Postback:
             raise e
 
         # Garantindo que temos link de boleto no payload
-        if self.transaction_status == Transaction.WAITING_PAYMENT:
+        is_waiting = self.transaction_status == Transaction.WAITING_PAYMENT
+        if self.is_boleto() and is_waiting:
             try:
                 boleto_url = payload.get('transaction[boleto_url]')
                 self._validate_boleto_url(boleto_url)
@@ -154,3 +154,9 @@ class Postback:
                 existing_amount=self.transaction_amount,
                 new_amount=amount,
             )
+
+    def is_boleto(self):
+        return self.transaction_type == Transaction.BOLETO
+
+    def is_cc(self):
+        return self.transaction_type == Transaction.CREDIT_CARD

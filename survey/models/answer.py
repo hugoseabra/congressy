@@ -66,6 +66,6 @@ class Answer(Entity, models.Model):
     )
 
     created = models.DateTimeField(
-        auto_now=True,
+        auto_now_add=True,
         verbose_name='criado em'
     )

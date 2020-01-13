@@ -14,7 +14,7 @@ services:
       - "15672:15672"
       - "5672:5672"
     volumes:
-      - /etc/localtime:/etc/localtime
+#      - /etc/localtime:/etc/localtime
       - rabbitmq_data:/var/lib/rabbitmq/mnesia
 
   flower:
@@ -28,16 +28,16 @@ services:
       - 5555:5555
     networks:
       - rabbitmq
-    volumes:
-      - /etc/localtime:/etc/localtime
+#    volumes:
+#      - /etc/localtime:/etc/localtime
 
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas
     restart: always
     networks:
       - wkhtmltopdf
-    volumes:
-      - /etc/localtime:/etc/localtime
+#    volumes:
+#      - /etc/localtime:/etc/localtime
 
   cron:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
@@ -48,7 +48,7 @@ services:
     entrypoint:
       - /deploy/services/cron/container-entry.sh
     volumes:
-      - /etc/localtime:/etc/localtime
+#      - /etc/localtime:/etc/localtime
       - ./shared-volume/media:/code/media
       - ./shared-volume/logs:/code/logs
       - ./shared-volume/exporter:/tmp/exporter

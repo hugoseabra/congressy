@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'django_user_agents',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_auth',
     'captcha',
     'wkhtmltopdf',
     'formtools',
@@ -120,15 +121,18 @@ AUTHENTICATION_BACKENDS = [
 ]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+        # 'project.token_authentication.ExpiringTokenAuthentication',
         # 'rest_framework.authentication.BasicAuthentication',
         # 'rest_framework.authentication.SessionAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
     'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S",
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100
+    'DEFAULT_PAGINATION_CLASS':
+        'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 50
 }
-
 # ============================ VALIDATORS =================================== #
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -322,7 +326,7 @@ SALES_ALERT_EMAILS = [
 # ========================= HEALTH CHECK - PSUTILS ========================== #
 HEALTH_CHECK = {
     'DISK_USAGE_MAX': 90,  # percent
-    'MEMORY_MIN': 100,    # in MB
+    'MEMORY_MIN': 100,  # in MB
 }
 # ============================== LOGGING ==================================== #
 CGSY_LOGS_DIR = os.path.join(BASE_DIR, 'logs')
@@ -378,3 +382,7 @@ BUZZLEAD_MANAGER_EMAIL = 'cto@buzzlead.com.br'
 BUZZLEAD_API_BASE_URL = 'https://test.buzzlead.com.br/api'
 BUZZLEAD_API_KEY = 'buzzleadkey-SDFLKJAWEROI342'
 BUZZLEAD_INTEGRATION_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.Imh1Z29AY29uZ3Jlc3N5LmNvbSI.WEj-q83H9lQXX8eGi63kqHOFWrou6kRWMSSkFD7Svo8'
+
+# ========================== DJANTO REST AUTH =============================== #
+# Logout using GET method
+ACCOUNT_LOGOUT_ON_GET = True

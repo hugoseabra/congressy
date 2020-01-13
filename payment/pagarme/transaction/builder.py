@@ -1,13 +1,10 @@
 from abc import ABCMeta, abstractmethod
-from datetime import timedelta, date, datetime
+from datetime import timedelta, date
 from decimal import Decimal
-from typing import List
-
-from django.utils.formats import localize
 
 from gatheros_event.models import Event
-from gatheros_subscription.models import Subscription
-from payment.helpers.postback_url import get_subscription_postback_url
+from gatheros_subscription.models import Subscription, Lot
+from payment.helpers.postback_url import get_postback_url
 from payment.pagarme.transaction.billing import Billing
 from payment.pagarme.transaction.customer import Customer
 from payment.pagarme.transaction.item import Item
@@ -22,12 +19,15 @@ class AbstractPagarmeTransactionBuilder:
 
     def __init__(self,
                  event: Event,
+                 lot: Lot,
                  pagarme_transaction: PagarmeTransaction,
                  installment_part=None):
 
         self.pagarme_transaction = pagarme_transaction
 
         self.event = event
+        self.lot = lot
+        self.category = self.lot.category if self.lot.category_id else None
         self.organization = event.organization
 
         if installment_part is not None:
@@ -47,7 +47,7 @@ class AbstractPagarmeTransactionBuilder:
         )
         self.pagarme_transaction.add_metadata(
             'transferência de taxa',
-            1 if self.event.transfer_tax is True else 0
+            1 if self.lot.transfer_tax is True else 0
         )
 
         # organização
@@ -65,8 +65,20 @@ class AbstractPagarmeTransactionBuilder:
         # self.pagarme_transaction.
         self._processed = False
 
-    def set_as_credit_card(self, card_hash: str):
-        self.pagarme_transaction.set_credit_card_data(card_hash)
+    def set_as_credit_card_hash(self, card_hash: str):
+        self.pagarme_transaction.set_as_credit_card_hash(card_hash)
+
+    def set_as_credit_card_data(self,
+                                card_number: str,
+                                card_cvv: str,
+                                card_expiration_date: str,
+                                card_holder_name: str):
+        self.pagarme_transaction.set_as_credit_card_data(
+            card_number=card_number,
+            card_cvv=card_cvv,
+            card_expiration_date=card_expiration_date,
+            card_holder_name=card_holder_name
+        )
 
     def set_as_boleto(self, expiration_date: date = None):
 
@@ -82,7 +94,7 @@ class AbstractPagarmeTransactionBuilder:
     def set_postback_url(self, url):
         if self._processed is True:
             raise Exception(
-                'Não é possível dados de postbac url ao builder que já foi'
+                'Não é possível inserir url de postack a um builder que já foi'
                 ' processado.'
             )
 
@@ -211,6 +223,7 @@ class AbstractPagarmeTransactionBuilder:
         receiver_creator = TransactionReceiverCreator(
             transaction_type=self.pagarme_transaction.payment_method,
             event=self.event,
+            lot=self.lot,
             amount=self.pagarme_transaction.amount,
             installments=self.pagarme_transaction.installments,
             interests_amount=self.pagarme_transaction.interests_amount,
@@ -226,13 +239,17 @@ class AbstractPagarmeTransactionBuilder:
             total_receivers_amount - round(self.pagarme_transaction.amount, 2)
 
         for receiver in receiver_creator.get_receivers():
-            amount = receiver.amount
+            r_amount = receiver.amount
+
+            if receiver.org_receiver is True:
+                self.liquid_amount = receiver.liquid_amount
+
             if diff != 0 and receiver.congressy_receiver is True:
-                amount -= diff
+                r_amount -= diff
 
             self.pagarme_transaction.add_split_rule(SplitRule(
                 recipient_id=receiver.identifier,
-                amount=round(amount, 2),
+                amount=round(r_amount, 2),
                 liable=receiver.chargeback_responsible,
                 charge_processing_fee=receiver.processing_fee_responsible,
             ))
@@ -241,18 +258,16 @@ class AbstractPagarmeTransactionBuilder:
 class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
     def __init__(self, subscription: Subscription, *args, **kwargs):
         self.subscription = subscription
-        self.audience_lot = subscription.audience_lot
-        self.audience_category = self.audience_lot.audience_category
+
         self.person = subscription.person
 
         kwargs['event'] = subscription.event
+        kwargs['lot'] = subscription.lot
 
         super().__init__(*args, **kwargs)
 
         self.set_postback_url(
-            url=get_subscription_postback_url(
-                self.pagarme_transaction.transaction_id
-            )
+            url=get_postback_url(self.pagarme_transaction.transaction_id)
         )
 
         self._set_metadata_items()
@@ -266,20 +281,25 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
                                               self.person.email)
         self.pagarme_transaction.add_metadata('ID participante',
                                               str(self.person.pk))
+        self.pagarme_transaction.add_metadata(
+            'Fone participante',
+            str(self.person.get_phone_display()),
+        )
 
         # sobre inscrição
-        self.pagarme_transaction.add_metadata(
-            'inscrição categoria',
-            self.audience_category.name
-        )
-        self.pagarme_transaction.add_metadata(
-            'ID categoria',
-            self.audience_category.pk
-        )
+        if self.category:
+            self.pagarme_transaction.add_metadata(
+                'categoria do lote',
+                self.category.name
+            )
+            self.pagarme_transaction.add_metadata(
+                'ID categoria do lote',
+                self.category.pk
+            )
 
         self.pagarme_transaction.add_metadata(
             'ID lote',
-            self.audience_lot.pk
+            self.lot.pk
         )
 
         self.pagarme_transaction.add_metadata('ID inscrição',
@@ -305,38 +325,54 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
                 )
             )
 
-        if self.subscription.category_coupon_id:
-
-            coupon = self.subscription.category_coupon
-            coupon_value = 'Cupom de categoria: {}'.format(coupon.name)
-
-            if coupon.value:
-                if coupon.discount_type == coupon.VALUE:
-                    coupon_value += ' (R$ {})'.format(localize(coupon.value))
-                elif coupon.discount_type == coupon.PERCENT:
-                    coupon_value += ' ({}%)'.format(coupon.value)
-
-            self.pagarme_transaction.add_metadata('Cupom de categoria',
-                                                  coupon_value)
-            self.pagarme_transaction.add_metadata('ID Cupom de categoria',
-                                                  coupon.pk)
+        # if self.subscription.category_coupon_id:
+        #
+        #     coupon = self.subscription.category_coupon
+        #     coupon_value = 'Cupom de categoria: {}'.format(coupon.name)
+        #
+        #     if coupon.value:
+        #         if coupon.discount_type == coupon.VALUE:
+        #             coupon_value += ' (R$ {})'.format(localize(coupon.value))
+        #         elif coupon.discount_type == coupon.PERCENT:
+        #             coupon_value += ' ({}%)'.format(coupon.value)
+        #
+        #     self.pagarme_transaction.add_metadata('Cupom de categoria',
+        #                                           coupon_value)
+        #     self.pagarme_transaction.add_metadata('ID Cupom de categoria',
+        #                                           coupon.pk)
 
     def _get_boleto_instructions(self):
-        instructions = 'Após o vencimento não há garantia de que haverá' \
-                       ' vagas disponíveis. Isso pode mudar o preço de sua' \
-                       ' inscrição.'
+        """ Não pode ultrapassar mais de 255 caracteres """
 
-        # Instrução 2: 97 caracteres
-        instructions += ' IMPORTANTE: após 3 dias de vencimento do' \
-                        ' boleto, sua vaga será liberada para outro' \
-                        ' participante.'
+        # Instrução 1: 86 caracteres
+        instructions1 = 'Após o vencimento não há garantia de vaga disponível' \
+                        ' e o preço pode sofrer alterações.'
 
-        # Instrução 3: 47 caracteres
-        instructions += 'Ev.: {}. Lote: {}. Insc.: {}.'.format(
+        # Instrução 2: 83 caracteres
+        instructions2 = ' 1 dia após o vencimento do boleto, sua vaga será' \
+                        ' liberada para outro participante.'
+
+        # Instrução 3: 30 + 10 + 4 (possivel) + 8 (id da categoria) = 52
+        instructions3 = ' Ev.: {}. Lote: {}. Insc.: {}.'.format(
             self.event.name[:10],
-            self.subscription.audience_lot.audience_category_id,
+            self.subscription.lot.name[:10],
             self.subscription.code,  # 8 caracteres
         )
+
+        num_chars = len(instructions1) \
+                    + len(instructions2) \
+                    + len(instructions3)
+
+        if num_chars > 255:
+            # Só vai acontecer se
+            diff = num_chars - 255
+            # Diminuir a instrução 2
+            instructions2 = instructions2[0:len(instructions2) - diff]
+
+        instructions = instructions1 + instructions2 + instructions3
+
+        assert len(instructions) <= 255, 'boleto_instructions len({})' \
+                                         ''.format(len(instructions))
 
         return instructions
 
@@ -347,7 +383,7 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
             return None
 
         # Pagarme sets to one day before, so we set one day forward.
-        next_day = self.audience_lot.date_end + timedelta(days=1)
+        next_day = self.lot.date_end + timedelta(days=1)
         return next_day.date()
 
     def _add_items(self):
@@ -364,35 +400,37 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
         if self.installment_part is not None:
             total_amount = self.installment_part.amount
 
-        else:
-            total_amount = -self.subscription.balance_amount
-
-        if not total_amount:
-            raise Exception('Não há valor a transacionar no builder.')
-
-        if total_amount < debts_amount:
             perc = (total_amount * 100) / debts_amount
 
             self.pagarme_transaction.add_metadata(
                 'valor pago proporcional',
                 '{}%'.format(round(perc, 2))
             )
+        else:
+            total_amount = debts_amount
+
+        if not total_amount:
+            raise Exception('Não há valor a transacionar no builder.')
 
         for debt in self.subscription.debts_list:
-            # Pagamento é parcial ao montante total a pagar.
-            perc = ((total_amount * 100) / debt.amount) / 100
+            if self.installment_part is not None:
+                # Pagamento é parcial ao montante total a pagar.
+                perc = ((debt.amount * 100) / total_amount) / 100
 
-            assert perc <= 100, \
-                'Percentual maior do que o pagamento:' \
-                ' {} > 100'.format(round(perc, 2))
+                assert perc <= 100, \
+                    'Percentual maior do que o pagamento:' \
+                    ' {} > 100'.format(round(perc, 2))
 
-            amount = debt.amount * perc
-            liquid_amount = debt.liquid_amount * perc
+                amount = debt.amount * perc
+                liquid_amount = debt.liquid_amount * perc
+            else:
+                amount = debt.amount
+                liquid_amount = debt.liquid_amount
 
             self.add_item(
                 identifier=debt.item_id,
-                title=debt.title,
+                title=debt.name,
                 amount=amount,
                 liquid_amount=liquid_amount,
-                quantity=debt.quantity,
+                quantity=1,  # @TODO - dar suporte a quantidade em Debt.
             )

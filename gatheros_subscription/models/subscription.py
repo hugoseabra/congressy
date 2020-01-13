@@ -4,9 +4,10 @@ Inscrições de pessoas em eventos.
 """
 
 import uuid
+from decimal import Decimal
 
 from django.db import models
-from django.db.models import Max
+from django.db.models import Max, Sum
 from django.utils.functional import cached_property
 
 from base.models import EntityMixin
@@ -238,18 +239,60 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
         return self.status == Subscription.CONFIRMED_STATUS
 
     @property
+    def awaiting(self):
+        return self.status == Subscription.AWAITING_STATUS
+
+    @property
     def free(self):
-        return self.lot is not None and not self.lot.price
+        lot_free = not self.lot.price
+
+        serv_free = self.subscription_services.filter(
+            optional__liquid_price__gt=0
+        ).count() == 0
+
+        prod_free = self.subscription_products.filter(
+            optional__liquid_price__gt=0
+        ).count() == 0
+
+        return lot_free and serv_free and prod_free
+
+    @property
+    def debts_list(self):
+        return list(self.debts.exclude(
+            status='paid',
+        ).order_by('type'))
+
+    @property
+    def debts_amount(self):
+        debts_amount = self.debts.aggregate(total=Sum('amount'))
+        return debts_amount['total'] or Decimal(0)
+
+    @property
+    def debts_liquid_amount(self):
+        debts_amount = self.debts.aggregate(
+            total=Sum('liquid_amount')
+        )
+        return debts_amount['total'] or Decimal(0)
+
+    @property
+    def accredited(self):
+        return self.accreditation_checkin is not None
+
+    @property
+    def accredited_on(self):
+        checkin = self.accreditation_checkin
+
+        if not checkin:
+            return None
+
+        return checkin.registration or checkin.created_on
 
     def save(self, *args, **kwargs):
         """ Salva entidade. """
-        self.check_rules()
-        self.congressy_percent = self.event.congressy_percent
-        super(Subscription, self).save(*args, **kwargs)
-
-    def clean(self):
-        """ Limpa dados dos campos. """
         self.event = self.lot.event
+        self.congressy_percent = self.event.congressy_percent
+        self.check_rules()
+        super(Subscription, self).save(*args, **kwargs)
 
     def check_rules(self):
         """ Verifica regras de negócios de inscrição """
@@ -304,16 +347,3 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
             return None
 
         return checkins.last()
-
-    @property
-    def accredited(self):
-        return self.accreditation_checkin is not None
-
-    @property
-    def accredited_on(self):
-        checkin = self.accreditation_checkin
-
-        if not checkin:
-            return None
-
-        return checkin.registration or checkin.created_on

@@ -24,6 +24,7 @@ django-user-agents==0.3.2
 django-widget-tweaks==1.4.1
 django-wkhtmltopdf==3.1.0
 djangorestframework==3.7.7
+django-rest-auth==0.9.5
 drf-nested-routers==0.91
 et-xmlfile==1.0.1
 idna==2.6
@@ -34,7 +35,7 @@ lxml==4.2.1
 lorem==0.1.1
 olefile==0.45.1
 openpyxl==2.5.1
-pagarme-python==3.3.0
+pagarme-python==3.3.2
 packaging==17.1
 phonenumbers==8.9.1
 Pillow==5.0.0
@@ -52,10 +53,10 @@ python-statemachine==0.6.2
 pytz==2018.3
 qrcode==5.3
 requests==2.18.4
-ua-parser==0.7.3
-user-agents==1.1.0
 six==1.11.0
 timestring==1.6.2
 tolerance==0.1.2
+ua-parser==0.7.3
+user-agents==1.1.0
 Unidecode==1.0.22
 urllib3==1.22

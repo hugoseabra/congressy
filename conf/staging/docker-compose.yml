@@ -34,7 +34,7 @@ services:
       - /staging/services/volume/container-entry.sh
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
-      - /etc/localtime:/etc/localtime
+#      - /etc/localtime:/etc/localtime
       - staging_media:/code/media
       - staging_exporter:/tmp/exporter
       - staging_barcodes:/tmp/barcodes
@@ -42,8 +42,13 @@ services:
       - staging_vouchers:/tmp/vouchers
 
   reverse-proxy:
-    image: traefik
-    command: --api --docker
+    image: traefik:v1.7.19-alpine
+    command:
+      - --api
+      - --docker
+      - --accesslog
+      - --accesslog.format=json
+      - --accesslog.fields.names="StartLocal=keep StartUTC=keep"
     networks:
       - traefik
     ports:
@@ -52,6 +57,7 @@ services:
     volumes:
       - /tmp/staging-files/traefik.toml:/etc/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+#      - /etc/localtime:/etc/localtime:ro
 
   celery:
     image: cgsy-staging
@@ -65,7 +71,6 @@ services:
     entrypoint:
       - /staging/services/celery/container-entry.sh
     volumes:
-      - /etc/localtime:/etc/localtime
       - staging_media:/code/media
       - staging_exporter:/tmp/exporter
       - staging_barcodes:/tmp/barcodes
@@ -88,7 +93,6 @@ services:
       - rabbitmq
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
-      - /etc/localtime:/etc/localtime
       - staging_media:/code/media
       - staging_exporter:/tmp/exporter
       - staging_barcodes:/tmp/barcodes
@@ -118,7 +122,6 @@ services:
       - "8000"
     env_file: /tmp/staging-files/env-manage-staging
     volumes:
-      - /etc/localtime:/etc/localtime
       - staging_media:/code/media
       - staging_exporter:/tmp/exporter
       - staging_barcodes:/tmp/barcodes
@@ -131,6 +134,24 @@ services:
       - "traefik.backend=cgsy-staging"
       - "traefik.protocol=http"
       - "traefik.port=8000"
+      - "traefik.frontend.rule=Host:test.congressy.com;PathPrefix:/manage,/admin,/remarketing,/account,/invitations,/pagarme,/captcha,/hotsite,/api,/static-manage,/media-manage"
+      - "traefik.docker.network=traefik_default"
+      - "traefik.frontend.entryPoints=http"
+
+  hotsite:
+    image: hotsite-v2
+    container_name: cgsy-hotsite
+    ports:
+      - 80
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.passHostHeader=true"
+      - "traefik.weight=7"
+      - "traefik.backend=cgsy-hotsite"
+      - "traefik.protocol=http"
+      - "traefik.port=80"
       - "traefik.frontend.rule=Host:test.congressy.com"
       - "traefik.docker.network=traefik_default"
       - "traefik.frontend.entryPoints=http"

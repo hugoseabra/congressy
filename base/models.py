@@ -14,7 +14,11 @@ class RuleIntegrityError(IntegrityError):
     """
     Exceção erro durante verificação de integridade de entidade de domínio.
     """
-    pass
+
+    def __init__(self, message, field_name: str = None, *args, **kwargs):
+        self.message = message
+        self.field_name = field_name
+        super().__init__(*args, **kwargs)
 
 
 class RuleInstanceTypeError(TypeError):
@@ -38,6 +42,10 @@ class RuleChecker(ABC):
     @abstractmethod
     def check(self, model_instance, *args, **kwargs):  # pragma: no cover
         pass
+
+
+def make_safe(param):
+    pass
 
 
 class EntityMixin(object):
@@ -78,4 +86,10 @@ class EntityMixin(object):
             try:
                 rule.check(self)
             except RuleIntegrityError as e:
-                raise ValidationError(mark_safe(str(e)))
+                msg = mark_safe(str(e))
+                if e.field_name is not None:
+                    error_dict = dict()
+                    error_dict[e.field_name] = msg
+                    raise ValidationError(error_dict)
+
+                return ValidationError(msg)

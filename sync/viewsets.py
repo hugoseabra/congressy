@@ -2,12 +2,11 @@ from typing import Any
 
 from django.core.exceptions import PermissionDenied
 from rest_framework import viewsets, status
-from rest_framework.authentication import SessionAuthentication, \
-    BasicAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from core.viewsets import AuthenticatedViewSetMixin
 from gatheros_event.models import Event
 from sync.endpoint_permissions import (
     SyncClientOrganizerOnly,
@@ -17,15 +16,7 @@ from sync.models import SyncClient, SyncQueue
 from sync.serializers import SyncClientSerializer, SyncQueueSerializer
 
 
-class SyncClientRestrictionMixin:
-    authentication_classes = (
-        SessionAuthentication,
-        BasicAuthentication,
-        TokenAuthentication,
-    )
-
-
-class SyncClientViewSet(SyncClientRestrictionMixin, viewsets.ModelViewSet):
+class SyncClientViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, SyncClientOrganizerOnly)
     serializer_class = SyncClientSerializer
     queryset = SyncClient.objects.get_queryset()
@@ -113,7 +104,7 @@ class SyncClientViewSet(SyncClientRestrictionMixin, viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class SyncQueueViewSet(SyncClientRestrictionMixin, viewsets.ModelViewSet):
+class SyncQueueViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, SyncQueueAllowedClientKey)
     serializer_class = SyncQueueSerializer
     queryset = SyncQueue.objects.get_queryset()

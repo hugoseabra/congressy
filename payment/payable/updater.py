@@ -29,7 +29,7 @@ def update_payables(split_rule: SplitRule, check_hours_delay=8):
     now = datetime.now()
     next_check = now + timedelta(hours=check_hours_delay)
 
-    transaction = split_rule.transaction
+    transaction = Transaction.objects.get(pk=split_rule.transaction_id)
 
     event = transaction.subscription.event
 

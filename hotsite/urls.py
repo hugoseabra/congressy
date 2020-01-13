@@ -59,4 +59,4 @@ public_hotsite_urls = [
     ),
 ]
 
-urlpatterns_public_hotsite = [url(r'^', include(public_hotsite_urls))]
+urlpatterns_public_hotsite = [url(r'^hotsite/0/', include(public_hotsite_urls))]

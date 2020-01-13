@@ -1,18 +1,10 @@
 from rest_framework import viewsets
-from rest_framework.authentication import (
-    BasicAuthentication,
-    SessionAuthentication,
-)
-from rest_framework.permissions import IsAuthenticated
+
 from certificate import models, serializers
+from core.viewsets import AuthenticatedViewSetMixin
 
 
-class RestrictionViewMixin(object):
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)
-
-
-class CertificateViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+class CertificateViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """

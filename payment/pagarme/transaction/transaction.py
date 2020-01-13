@@ -1,5 +1,6 @@
+import json
 import os
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from decimal import Decimal
 
 from payment.helpers.payment_helpers import as_payment_amount
@@ -15,16 +16,17 @@ class PagarmeTransaction:
 
     def __init__(self,
                  transaction_id: str,
-                 payment_method: str,
                  interests_amount: Decimal,
                  installments=1):
 
         self.transaction_id = transaction_id
-        self.payment_method = payment_method
         self.interests_amount = interests_amount
         self.installments = installments
 
+        self.payment_method = None
+
         self.boleto_data = dict()
+        self.credit_card_hash = None
         self.credit_card_data = dict()
 
         self.amount = Decimal(0)
@@ -86,6 +88,8 @@ class PagarmeTransaction:
                         boleto_instructions: str,
                         expiration_date: date = None, ):
 
+        self.payment_method = self.BOLETO
+
         assert len(boleto_instructions) <= 255, \
             "boleto instructions {} > 255".format(
                 len(boleto_instructions)
@@ -108,9 +112,23 @@ class PagarmeTransaction:
                 'boleto_expiration_date': expiration_date.strftime('%Y-%m-%d'),
             })
 
-    def set_credit_card_data(self, card_hash: str):
+    def set_as_credit_card_hash(self, card_hash: str):
+        self.payment_method = self.BOLETO
+
+        self.credit_card_hash = card_hash
+
+    def set_as_credit_card_data(self,
+                                card_number: str,
+                                card_cvv: str,
+                                card_expiration_date: str,
+                                card_holder_name: str):
+
+        self.payment_method = self.CREDIT_CARD
         self.credit_card_data = {
-            'card_hash': card_hash
+            'card_number': card_number,
+            'card_cvv': card_cvv,
+            'card_expiration_date': card_expiration_date,
+            'card_holder_name': card_holder_name,
         }
 
     def __iter__(self):
@@ -146,8 +164,17 @@ class PagarmeTransaction:
             iters.update(self.boleto_data)
 
         elif self.payment_method == self.CREDIT_CARD:
-            assert self.credit_card_data is not None
-            iters.update(self.credit_card_data)
+            if self.credit_card_hash:
+                iters.update({'card_hash': self.credit_card_hash})
+            else:
+                iters.update({
+                    'card_number': self.credit_card_data.get('card_number'),
+                    'card_cvv': self.credit_card_data.get('card_cvv'),
+                    'card_expiration_date':
+                        self.credit_card_data.get('card_expiration_date'),
+                    'card_holder_name':
+                        self.credit_card_data.get('card_holder_name'),
+                })
 
         # now 'yield' through the items
         for x, y in iters.items():
@@ -167,6 +194,12 @@ class PagarmeTransaction:
                 'Tipo de pagamento inválido. Você deve informar' \
                 ' "boleto ou credit_card".' \
                 ' Valor informado: {}'.format(self.payment_method)
+
+        if self.payment_method == self.CREDIT_CARD:
+            if not self.credit_card_hash and not self.credit_card_data:
+                self.errors['payment_method'] = \
+                    'Dados de cartão inválidos: informe card_hash ou dados' \
+                    ' do cartão de crédito.'
 
         if not self.amount:
             self.errors['amount'] = 'Você deve informar um valor.'
@@ -191,6 +224,6 @@ class PagarmeTransaction:
         if len(invalid_items):
             msg = "Alguns itens são inválidos:"
             for title, errors in invalid_items.items():
-                msg += ' {}: {}'.format(title, ', '.join(errors))
+                msg += ' {}: {}'.format(title, json.dumps(errors))
 
             self.errors['items'] = msg

@@ -73,10 +73,10 @@ class SubscriptionViewFormView(SubscriptionViewMixin, generic.DetailView):
 
         if self.financial is True:
             has_payable_products = self.object.subscription_products.filter(
-                optional_price__gt=0
+                optional__liquid_price__gt=0
             ).count() > 0
             has_payable_services = self.object.subscription_services.filter(
-                optional_price__gt=0
+                optional__liquid_price__gt=0
             ).count() > 0
 
             if not has_payable_products \

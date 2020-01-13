@@ -3,12 +3,12 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from core.viewsets import AuthenticatedViewSetMixin
 from installment.models import Part, Contract
 from installment.serializers import PartSerializer
-from .mixins import RestrictionViewMixin
 
 
-class PartsList(RestrictionViewMixin, ListAPIView):
+class PartsList(AuthenticatedViewSetMixin, ListAPIView):
     serializer_class = PartSerializer
 
     def get_queryset(self):
@@ -46,7 +46,7 @@ class PartsList(RestrictionViewMixin, ListAPIView):
         return parts
 
 
-class PartViewSet(RestrictionViewMixin, ModelViewSet):
+class PartViewSet(AuthenticatedViewSetMixin, ModelViewSet):
     serializer_class = PartSerializer
 
     def get_queryset(self):
