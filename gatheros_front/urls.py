@@ -15,5 +15,5 @@ urlpatterns_private = [
     url(r'^$', views.start, name='start'),
 ]
 
-urlpatterns_public = [url(r'^', include(urlpatterns_public))]
+urlpatterns_public = [url(r'^account/', include(urlpatterns_public))]
 urlpatterns_private = [url(r'^', include(urlpatterns_private))]

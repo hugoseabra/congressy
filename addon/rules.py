@@ -128,6 +128,5 @@ class MustBeSameOptionalLotCategory(RuleChecker):
 
         if optional.lot_category.pk != sub.lot.category.pk:
             raise RuleIntegrityError(
-                'Você deve informar uma categoria de lote que já esteja'
-                ' inserida no opcional "{}".'.format(optional.name)
+                'O opcional informado não pertence a Categoria informada.'
             )

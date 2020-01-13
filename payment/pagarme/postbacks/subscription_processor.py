@@ -16,7 +16,8 @@ from .exceptions import (
 
 def postback_processor(transaction_pk, transaction_data):
     transaction = Transaction.objects.get(uuid=transaction_pk)
-    event = transaction.subscription.event
+    subscription = transaction.subscription
+    event = subscription.event
 
     # status history
     history = TransactionStatusCollection()
@@ -49,7 +50,7 @@ def postback_processor(transaction_pk, transaction_data):
             transaction=transaction,
             data=transaction_data,
             date_created=datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
-            status=transaction_data.get('current_status'),
+            status=new_status,
         )
 
         # ==================================================================
@@ -66,32 +67,6 @@ def postback_processor(transaction_pk, transaction_data):
         # ============================ PAYMENT ================================
         if new_status == Transaction.PAID:
 
-            payment_form = PaymentForm(
-                subscription=transaction.subscription,
-                transaction=transaction,
-                data={
-                    'cash_type': transaction.type,
-                    'amount': transaction.amount,
-                    'discount_amount': transaction.discount_amount,
-                    'installment_interests_amount':
-                        transaction.installment_interests_amount,
-                    'liquid_amount': transaction.liquid_amount,
-                },
-            )
-
-            if not payment_form.is_valid():
-                error_msgs = []
-                for field, errs in payment_form.errors.items():
-                    error_msgs.append(str(errs))
-
-                msg = 'Erro ao criar pagamento de uma transação: ' \
-                      ' {}'.format("".join(error_msgs))
-
-                raise PaymentNotCreatedError(msg)
-
-            # por agora, não vamos vincular pagamento a nada.
-            payment = payment_form.save()
-
             # ===================== INSTALLMENT ===============================
             if transaction.part_id:
                 part = transaction.part
@@ -101,21 +76,19 @@ def postback_processor(transaction_pk, transaction_data):
                 part.paid = True
                 part.save()
 
-                # vincula pagamento à parcela
-                payment.part = part
-                payment.save()
-
+                # Ao pagar a última parcela o contrato é encerrado.
                 if contract.paid is False and contract.closed is False:
+                    # Se contrato não foi encerrado...
                     # PRÓXIMA PARCELA
                     next_part = contract.parts.get(
                         paid=False,
                         installment_number=part.installment_number + 1
                     )
 
+                    benefactor_id = None
+
                     if transaction.payer:
                         benefactor_id = transaction.payer.benefactor_id
-                    else:
-                        benefactor_id = None
 
                     checkout_form = SubscriptionCheckoutForm(data={
                         'event_pk': event.pk,
@@ -129,22 +102,16 @@ def postback_processor(transaction_pk, transaction_data):
                         )
                     })
 
-                    valid = checkout_form.is_valid()
-                    if valid is False:
+                    if checkout_form.is_valid() is False:
                         raise Exception(checkout_form.errors)
 
                     checkout_form.save()
 
         elif new_status == Transaction.REFUNDED:
-            try:
-                payment = transaction.payment
-                payment.delete()
-
-            except AttributeError:
-                pass
 
             # ===================== INSTALLMENT ===============================
             if transaction.part_id:
+                # Isso irá reabrir o contrato de parcelamento.
                 transaction.part.paid = False
                 transaction.part.save()
 

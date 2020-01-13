@@ -99,6 +99,8 @@ class Payment(models.Model):
         return string
 
     def save(self, *args, **kwargs):
+        self.subscription = self.transaction.subscription
+
         if self._state.adding is True:
             self.lot = self.subscription.lot
 

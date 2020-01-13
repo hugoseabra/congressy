@@ -265,6 +265,13 @@ class Event(models.Model, GatherosModelMixin):
         null=True,
     )
 
+    hotsite_version = models.PositiveIntegerField(
+        verbose_name='Versão do hotsite',
+        default=1,
+        null=False,
+        blank=True,
+    )
+
     class Meta:
         verbose_name = 'evento'
         verbose_name_plural = 'eventos'

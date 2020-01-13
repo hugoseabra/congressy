@@ -51,5 +51,5 @@ public_password_urls = [
 ]
 
 urlpatterns_private_me = [url(r'^', include(private_urls))]
-urlpatterns_public_account = [url(r'^', include(public_account_urls))]
-urlpatterns_public_password = [url(r'^', include(public_password_urls))]
+urlpatterns_public_account = [url(r'^account/', include(public_account_urls))]
+urlpatterns_public_password = [url(r'^account/', include(public_password_urls))]

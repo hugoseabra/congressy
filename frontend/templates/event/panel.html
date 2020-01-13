@@ -215,7 +215,7 @@
         <div class="col-md-3 float-right">
             <div class="buttonbar">
                 {% if info and info.description_html %}
-                    <a href="{% url 'public:hotsite' info.event.slug %}"
+                    <a href="/{{ info.event.slug }}"
                        target="_blank"
                        class="btn btn-success btn-block">
                         <i class="fa fa-globe"></i>

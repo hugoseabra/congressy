@@ -2,12 +2,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from core.viewsets import AuthenticatedViewSetMixin
 from installment.models import Contract
 from installment.serializers import ContractSerializer
-from .mixins import RestrictionViewMixin
 
 
-class ContractViewSet(RestrictionViewMixin, ModelViewSet):
+class ContractViewSet(AuthenticatedViewSetMixin, ModelViewSet):
     serializer_class = ContractSerializer
 
     def get_queryset(self):

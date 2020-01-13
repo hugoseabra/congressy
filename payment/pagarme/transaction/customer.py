@@ -95,7 +95,7 @@ class Customer:
         }
 
         if self.phones:
-            iters['phone_numbers'] = self.phones,
+            iters['phone_numbers'] = self.phones[0],
 
         if self.customer_type == self.INDIVIDUAL:
             assert isinstance(self.birthday, date), \

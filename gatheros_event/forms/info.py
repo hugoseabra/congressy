@@ -62,10 +62,6 @@ class Info4ImagesForm(BaseModelFileForm):
         """ Meta """
         model = Info
         fields = [
-            'image1',
-            'image2',
-            'image3',
-            'image4',
             'description_html',
             'event',
             'config_type',

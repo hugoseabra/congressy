@@ -5,13 +5,7 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.utils.text import slugify
 from rest_framework import viewsets, status
-from rest_framework.authentication import (
-    BasicAuthentication,
-    SessionAuthentication,
-    TokenAuthentication,
-)
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -20,16 +14,8 @@ from attendance.helpers.async_exporter_helpers import \
     AttendanceServiceAsyncExporter
 from attendance.models import AttendanceService
 from attendance.tasks import async_attendance_exporter_task
+from core.viewsets import AuthenticatedViewSetMixin
 from gatheros_subscription.models import Subscription
-
-
-class RestrictionViewMixin(object):
-    authentication_classes = (
-        SessionAuthentication,
-        BasicAuthentication,
-        TokenAuthentication,
-    )
-    permission_classes = (IsAuthenticated,)
 
 
 def search_subscriptions(queryset, search_criteria):
@@ -77,7 +63,8 @@ def search_subscriptions(queryset, search_criteria):
     return queryset
 
 
-class AttendanceServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+class AttendanceServiceViewSet(AuthenticatedViewSetMixin,
+                               viewsets.ModelViewSet):
     """
          Essa view é responsavel por retornar o usuário, se membro da
          organização, poderá acessar os serviços opcionais de todos os seus
@@ -102,7 +89,7 @@ class AttendancePageSizer(LimitOffsetPagination):
     default_limit = 6
 
 
-class SubscriptionAttendanceViewSet(RestrictionViewMixin,
+class SubscriptionAttendanceViewSet(AuthenticatedViewSetMixin,
                                     viewsets.ModelViewSet):
     queryset = Subscription.objects.all().order_by('person__name')
     serializer_class = serializers.SubscriptionAttendanceSerializer
@@ -189,7 +176,7 @@ class SubscriptionAttendanceViewSet(RestrictionViewMixin,
         return Response(content, status=405)
 
 
-class CheckinViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+class CheckinViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
     queryset = models.Checkin.objects.all()
     serializer_class = serializers.CheckinSerializer
 
@@ -213,7 +200,7 @@ class CheckinViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         return Response(content, status=405)
 
 
-class CheckoutViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+class CheckoutViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
     queryset = models.Checkout.objects.all()
     serializer_class = serializers.CheckoutSerializer
 
@@ -237,7 +224,7 @@ class CheckoutViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         return Response(content, status=405)
 
 
-class AttendanceServiceExporterViewSet(RestrictionViewMixin, APIView):
+class AttendanceServiceExporterViewSet(AuthenticatedViewSetMixin, APIView):
 
     # @TODO Implement OrganizerOnly permission
     # @TODO Implement FeatureFlag permission

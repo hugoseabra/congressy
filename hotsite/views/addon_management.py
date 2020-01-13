@@ -137,8 +137,7 @@ class ProductOptionalManagementView(generic.TemplateView):
             _, created = SubscriptionProduct.objects.get_or_create(
                 optional=product,
                 subscription=subscription,
-                optional_price=product.price,
-                optional_liquid_price=product.liquid_price,
+                optional__liquid_price=product.liquid_price,
             )
 
             if created:
@@ -284,8 +283,7 @@ class ServiceOptionalManagementView(generic.TemplateView):
             _, created = SubscriptionService.objects.get_or_create(
                 optional=service,
                 subscription=subscription,
-                optional_price=service.price,
-                optional_liquid_price=service.liquid_price,
+                optional__liquid_price=service.liquid_price,
             )
 
             if created:

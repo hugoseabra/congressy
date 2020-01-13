@@ -12,7 +12,11 @@ from .event.form import (
     EventSlugUpdaterView,
     EventSubscriptionTypeFormView,
 )
-from .event.hotsite import EventHotsiteView
+from .event.hotsite import (
+    EventHotsiteView,
+    EventHotsite2View,
+    EventHotsiteBannerView,
+)
 from .event.info import EventInfoView
 from .event.list import EventListView
 from .event.panel import EventPanelView

@@ -107,8 +107,8 @@ class PagarmeAPISubscriptionService(PagarmeTransactionCreatorMixin):
         self.pagarme_transaction = pagarme_transaction
 
         self.subscription = subscription
-        self.lot = self.subscription.audience_lot
-        self.audience_category = self.lot.audience_category
+        self.lot = self.subscription.lot
+        self.category = self.lot.category
 
         self.transaction = None
         self.transaction_status = None
@@ -206,7 +206,7 @@ class PagarmeAPISubscriptionService(PagarmeTransactionCreatorMixin):
                 round(self.transaction.amount, 2),
             ))
             print('Pagarme Transaction ID: {}'.format(
-                self.transaction.pagarme_transaction_id
+                self.transaction.pagarme_id
             ))
 
         return self.transaction
@@ -221,15 +221,17 @@ class PagarmeAPISubscriptionService(PagarmeTransactionCreatorMixin):
 
         amount = pt.amount if contract_part is None else contract_part.amount
 
-        discounted_amount = pt.discounted_amount
-        if contract_part:
-            pt.discounted_amount = contract_part.discount_amount
+        # discounted_amount = pt.discounted_amount
+        # if contract_part:
+        #     pt.discounted_amount = contract_part.discount_amount
 
-        liquid_amount = \
-            pt.amount if contract_part is None else contract_part.liquid_amount
+        if contract_part is None:
+            liquid_amount = pt.liquid_amount
+        else:
+            liquid_amount = contract_part.liquid_amount
 
-        if contract_part:
-            installment_interests_amount = contract_part.interests_amount
+        # if contract_part:
+        #     installment_interests_amount = contract_part.interests_amount
 
         self.transaction = Transaction(
             uuid=pt.transaction_id,
@@ -241,8 +243,8 @@ class PagarmeAPISubscriptionService(PagarmeTransactionCreatorMixin):
             installments=pt.installments,
             installment_part=num_installment_part,
             installment_amount=installment_amount,
-            installment_interests_amount=installment_interests_amount,
-            discounted_amount=discounted_amount,
+            # installment_interests_amount=installment_interests_amount,
+            # discounted_amount=discounted_amount,
         )
 
         if contract_part:
@@ -252,9 +254,10 @@ class PagarmeAPISubscriptionService(PagarmeTransactionCreatorMixin):
 
     def _increment_congressy_transaction(self, response_data):
 
-        self.transaction.pagarme_transaction_id = response_data['id']
+        self.transaction.pagarme_id = response_data['id']
         self.transaction.status = response_data['status']
         self.transaction.date_created = response_data['date_created']
+        self.transaction.data = response_data
 
         if self.pagarme_transaction.is_boleto():
             boleto_exp_date = response_data.get('boleto_expiration_date')
@@ -266,10 +269,12 @@ class PagarmeAPISubscriptionService(PagarmeTransactionCreatorMixin):
 
         if self.pagarme_transaction.is_credit_card():
             card = response_data['card']
-            self.transaction.credit_card_brand = card['card_brand']
-            self.transaction.credit_card_holder = card['holder_name']
-            self.transaction.credit_card_first_digits = card['first_digits']
-            self.transaction.credit_card_last_digits = card['last_digits']
+            self.transaction.credit_card_brand = card.get('card_brand')
+            self.transaction.credit_card_holder = card.get('holder_name')
+            self.transaction.credit_card_first_digits = \
+                card.get('first_digits')
+            self.transaction.credit_card_last_digits = \
+                card.get('last_digits')
 
         self.transaction_status = TransactionStatus.objects.create(
             transaction=self.transaction,

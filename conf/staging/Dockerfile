@@ -27,6 +27,7 @@ RUN set -ex \
         libxml2 \
         curl \
         cron \
+        tzdata \
     " \
     && seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{} \
     && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
@@ -74,6 +75,11 @@ RUN set -ex \
         django-uwsgi==0.2.2 \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# -----------------------------------------------------------------------------
+# Date time and timezone
+#ENV TZ=America/Sao_Paulo
+#RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # -----------------------------------------------------------------------------
 # Setup configuration files

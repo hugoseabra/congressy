@@ -57,6 +57,7 @@ class InfoForm(BaseModelFileForm):
         model = Info
         fields = [
             'lead',
+            'show_banner',
             'description_html',
             'scientific_rules',
             'editorial_body',
@@ -165,3 +166,97 @@ class HotsiteForm(CombinedFormBase):
         'info': InfoForm,
         'place': PlaceForm
     }
+
+
+class HotsiteForm2(HotsiteForm):
+    def save_all(self, commit=True):
+        instances = super().save_all(commit=commit)
+        event = self.info.event
+        event.hotsite_version = 2
+        event.save()
+
+        return instances
+
+class BannerForm(BaseModelFileForm):
+    remove_image = forms.CharField(
+        max_length=10,
+        widget=forms.HiddenInput,
+        required=False,
+    )
+
+    image_main2 = forms.CharField(
+        widget=forms.HiddenInput,
+        required=True,
+    )
+
+    class Meta:
+        model = Info
+        fields = ('event',)
+
+    def __init__(self, event, **kwargs):
+        self.event = event
+
+        data = kwargs.get('data')
+
+        if data:
+            data = data.copy()
+            data.update({'event': event.pk})
+
+            # TODO: this isn't DRY. Separate this logic into a helper.
+
+            possible_remove_image = data.get('remove_image')
+            possible_base64 = data.get('image_main2')
+
+            if possible_remove_image and possible_remove_image == 'True':
+
+                del data['image_main2']
+
+                try:
+                    event.info.image_main2.delete(save=True)
+                except AttributeError:
+                    pass
+
+            else:
+
+                if possible_base64:
+                    # Decoding from base64 avatar into a file obj.
+                    try:
+                        file_ext, imgstr = possible_base64.split(';base64,')
+                        ext = file_ext.split('/')[-1]
+                        file_name = str(event.slug) + "." + ext
+                        data['image_main2'] = ContentFile(
+                            base64.b64decode(imgstr),
+                            name=file_name
+                        )
+                    except (binascii.Error, ValueError):
+                        pass
+
+            kwargs.update({'data': data})
+
+        super().__init__(**kwargs)
+
+        if data:
+            possible_remove_image = data.get('remove_image')
+
+            if possible_remove_image and possible_remove_image == 'True':
+                self.fields['image_main2'].required = False
+
+    def clean(self):
+        self._clear_file('image_main2')
+        return super().clean()
+
+    def save(self, commit=True):
+        image_main = self.data.get('image_main2')
+
+        update_hotsite_version = False
+        if isinstance(image_main, ContentFile):
+            self.instance.image_main2 = image_main
+            update_hotsite_version = True
+
+        instance = super().save(commit)
+
+        if update_hotsite_version is True:
+            self.event.hotsite_version = 2
+            self.event.save()
+
+        return instance
