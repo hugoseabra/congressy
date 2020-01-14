@@ -180,7 +180,7 @@ class EventSerializer(serializers.ModelSerializer):
         ret['subscriptions_enabled'] = is_event_subscribable(instance) is True
 
         prices = list()
-        for lot in instance.lots.all():
+        for lot in instance.lots.filter(private=False, active=True):
             if lot.price:
                 prices.append(lot.get_calculated_price())
             else:
