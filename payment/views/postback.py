@@ -178,14 +178,8 @@ def postback_url_view(request, uidb64):
                         order_id=subscription.code,
                     )
 
-        # ==================================================================
-        # Registra inscrição como notificada.
-        subscription.notified = True
-        subscription.save()
-
-        person = subscription.person
-
         # ================= NOTIFICATION ===================================
+        person = subscription.person
 
         if hasattr(person, 'user') and person.user is not None:
             notification = PaymentNotification(
@@ -193,6 +187,10 @@ def postback_url_view(request, uidb64):
             )
 
             notification.notify()
+
+            # Registra inscrição como notificada.
+            subscription.notified = True
+            subscription.save()
 
         notify_admins_postback(transaction, data)
 

@@ -7,7 +7,7 @@ from gatheros_subscription.models import Subscription, Lot
 
 
 @receiver(post_save, sender=Subscription)
-def clean_addon_when_lot_change(instance, raw, created, **_):
+def clean_addon_when_lot_change(instance: Subscription, raw, created, **_):
     """
      Limpa inscrições de opcionais se lote da inscrição mudar.
      """
@@ -17,8 +17,5 @@ def clean_addon_when_lot_change(instance, raw, created, **_):
 
     if instance.has_changed('lot_id') is True:
         # Se lote mudou
-        for addon in instance.subscription_products.all():
-            addon.delete()
-
-        for addon in instance.subscription_services.all():
-            addon.delete()
+        instance.subscription_products.all().delete()
+        instance.subscription_services.all().delete()
