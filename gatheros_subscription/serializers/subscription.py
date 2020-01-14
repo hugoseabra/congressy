@@ -273,7 +273,7 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
             'origin',
         ]
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
 
         self.subscription_free = False
 
@@ -282,7 +282,7 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
             # Guarda o estado da inscrição para verificação pós edição.
             self.subscription_free = instance.free is True
 
-        super().__init__(**kwargs)
+        super().__init__(*args, **kwargs)
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
