@@ -484,7 +484,20 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
 
         if instance.free is True:
             instance.status = Subscription.CONFIRMED_STATUS
-            instance.save()
+
+            with atomic():
+                instance.save()
+
+                # Inscrições, confirmada, não notificada e completa devem ser
+                # notificadas.
+                #
+                # Inscrições pagas serão notificadas no pagamento.
+                if instance.confirmed is True \
+                        and instance.completed is True \
+                        and instance.notified is False:
+                    notify_new_free_subscription(instance.event, instance)
+                    instance.notified = True
+                    instance.save()
 
         return instance
 
@@ -522,10 +535,10 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
             # notificadas.
             #
             # Inscrições pagas serão notificadas no pagamento.
-            if instance.free \
-                    and instance.notified \
-                    and instance.confirmed \
-                    and instance.completed:
+            if instance.free is True \
+                    and instance.confirmed is True \
+                    and instance.completed is True \
+                    and instance.notified is False:
                 notify_new_free_subscription(instance.event, instance)
                 instance.notified = True
                 instance.save()
