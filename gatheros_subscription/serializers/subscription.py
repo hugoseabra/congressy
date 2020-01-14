@@ -1,13 +1,13 @@
 from decimal import Decimal
-from typing import Any
 
 import absoluteuri
-from django.db.models import Model
+from django.db.transaction import atomic
 from django.forms import model_to_dict
 from django.urls import reverse
 from rest_framework import serializers
 
 from gatheros_subscription.models import Subscription
+from mailer.services import notify_new_free_subscription
 
 
 class SubscriptionSerializer(serializers.BaseSerializer):
@@ -273,6 +273,17 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
             'origin',
         ]
 
+    def __init__(self, **kwargs):
+
+        self.subscription_free = False
+
+        instance = kwargs.get('instance')
+        if instance:
+            # Guarda o estado da inscrição para verificação pós edição.
+            self.subscription_free = instance.free is True
+
+        super().__init__(**kwargs)
+
     def to_representation(self, instance):
         rep = super().to_representation(instance)
 
@@ -468,7 +479,7 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
 
         return rep
 
-    def create(self, validated_data: Any) -> Any:
+    def create(self, validated_data: dict) -> Subscription:
         instance = super().create(validated_data)
 
         if instance.free is True:
@@ -477,12 +488,47 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
 
         return instance
 
-    def update(self, instance: Model, validated_data: Any) -> Any:
+    def update(self,
+               instance: Subscription,
+               validated_data: dict) -> Subscription:
+
         instance = super().update(instance, validated_data)
 
         if instance.free is True:
+            if self.subscription_free is False:
+                # A inscrição não era gratuita antes da edição, mas agora é,
+                # então ela mudou de paga para gratuita.
+                # Vamos re-notificar o participante com novo código.
+                instance.regenerate_code()
+                instance.notified = False
+
             instance.status = Subscription.CONFIRMED_STATUS
+
+        else:
+            if self.subscription_free is True:
+                # A inscrição era gratuita antes da edição, mas agora não
+                # é mais, então ela mudou de gratuita para paga.
+                # Vamos re-notificar o participante com novo código.
+                instance.regenerate_code()
+                instance.notified = False
+
+            if instance.has_debts is True:
+                instance.status = Subscription.AWAITING_STATUS
+
+        with atomic():
             instance.save()
+
+            # Inscrições, confirmada, não notificada e completa devem ser
+            # notificadas.
+            #
+            # Inscrições pagas serão notificadas no pagamento.
+            if instance.free \
+                    and instance.notified \
+                    and instance.confirmed \
+                    and instance.completed:
+                notify_new_free_subscription(instance.event, instance)
+                instance.notified = True
+                instance.save()
 
         return instance
 
