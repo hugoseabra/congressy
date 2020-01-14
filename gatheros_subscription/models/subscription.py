@@ -263,6 +263,10 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
         ).order_by('type'))
 
     @property
+    def has_debts(self):
+        return len(self.debts_list) > 0
+
+    @property
     def debts_amount(self):
         debts_amount = self.debts.aggregate(total=Sum('amount'))
         return debts_amount['total'] or Decimal(0)
@@ -302,7 +306,7 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
 
         # RULE 2 - rule.rule_2_codigo_inscricao_deve_ser_gerado
         if not self.code:
-            self.code = Subscription.objects.generate_code(self.event)
+            self.regenerate_code()
 
         # RULE 3 - rule.test_rule_3_numero_inscricao_gerado
         if not self.event_count:
@@ -335,6 +339,9 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
         if not self.count:
             return '--'
         return '{0:03d}'.format(self.count)
+
+    def regenerate_code(self):
+        self.code = Subscription.objects.generate_code(self.event)
 
     @cached_property
     def accreditation_checkin(self):
