@@ -20,8 +20,6 @@ class Command(BaseCommand):
             for answer in question.answers.filter(human_display__isnull=True):
                 answer_value = answer.value
 
-                is_slugfied = (' ' in answer_value) is False
-
                 human_display = self.get_human_display(
                     question,
                     answer_value,
