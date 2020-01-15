@@ -319,6 +319,8 @@ class EventDuplicationForm(forms.Form):
             # Buscando referência nova para evento
             event = Event.objects.get(pk=self.event.pk)
             event.pk = None
+            # Força entidadecomo nova.
+            event._state.adding = True
             event.slug = None
             event.organization = self.cleaned_data.get('organization')
             event.name = self.cleaned_data.get('event_name')
@@ -374,6 +376,8 @@ class EventDuplicationForm(forms.Form):
             try:
                 info = Info.objects.get(event_id=self.event.pk)
                 info.pk = None
+                # Força entidadecomo nova.
+                info._state.adding = True
                 info.event_id = event.pk
 
             except Info.DoesNotExist:
@@ -384,6 +388,8 @@ class EventDuplicationForm(forms.Form):
             try:
                 form_config = FormConfig.objects.get(event_id=self.event.pk)
                 form_config.pk = None
+                # Força entidadecomo nova.
+                form_config._state.adding = True
                 form_config.event_id = event.pk
 
             except FormConfig.DoesNotExist:
@@ -394,6 +400,8 @@ class EventDuplicationForm(forms.Form):
             try:
                 place = Place.objects.get(event_id=self.event.pk)
                 place.pk = None
+                # Força entidadecomo nova.
+                place._state.adding = True
                 place.event_id = event.pk
 
             except Place.DoesNotExist:
@@ -422,11 +430,15 @@ class EventDuplicationForm(forms.Form):
 
                 if dup_cat_lots is True:
                     cat.pk = None
+                    # Força entidadecomo nova.
+                    cat._state.adding = True
                     cat.event_id = event.pk
                     cat.save()
 
                     for lot in lots:
                         lot.pk = None
+                        # Força entidadecomo nova.
+                        lot._state.adding = True
                         lot.category_id = cat.pk
                         lot.event_id = event.pk
                         lot.event_survey_id = None
@@ -456,6 +468,8 @@ class EventDuplicationForm(forms.Form):
             if dup_cert and hasattr(self.event, 'certificate'):
                 certificate = self.event.certificate
                 certificate.pk = None
+                # Força entidadecomo nova.
+                certificate._state.adding = True
                 certificate.event_id = event.pk
                 certificate.save()
 
@@ -467,9 +481,13 @@ class EventDuplicationForm(forms.Form):
                     questions = survey.questions.all()
 
                     survey.pk = None
+                    # Força entidadecomo nova.
+                    survey._state.adding = True
                     survey.save()
 
                     event_survey.pk = None
+                    # Força entidadecomo nova.
+                    event_survey._state.adding = True
                     event_survey.event_id = event.pk
                     event_survey.survey_id = survey.pk
                     event_survey.save()
@@ -481,6 +499,8 @@ class EventDuplicationForm(forms.Form):
                             options = list()
 
                         question.pk = None
+                        # Força entidadecomo nova.
+                        question._state.adding = True
                         question.survey_id = survey.pk
                         question.save()
 
@@ -515,6 +535,8 @@ class EventDuplicationForm(forms.Form):
                             continue
 
                         att_serv.pk = None
+                        # Força entidadecomo nova.
+                        att_serv._state.adding = True
                         att_serv.accreditation = False
                         att_serv.event_id = event.pk
                         att_serv.save()
