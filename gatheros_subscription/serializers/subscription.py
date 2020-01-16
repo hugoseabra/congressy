@@ -88,6 +88,18 @@ class SubscriptionSerializer(serializers.BaseSerializer):
             rep['person_data']['birth_date'] = \
                 person.birth_date.strftime('%Y-%m-%d')
 
+        if person.user_id:
+            user = person.user
+            rep['person_data']['user_data'] = {
+                'pk': user.pk,
+                'fist_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'last_login':
+                    user.last_login.strftime('%Y-%m-%d %H:%M:%S')
+                    if user.last_login else None,
+            }
+
         lot = obj.lot
 
         survey = None
@@ -275,7 +287,7 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
 
-        self.subscription_free = False
+        self.subscription_free = None
 
         instance = kwargs.get('instance')
         if instance:
@@ -304,7 +316,9 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
                 'fist_name': user.first_name,
                 'last_name': user.last_name,
                 'email': user.email,
-                'last_login': user.last_login,
+                'last_login':
+                    user.last_login.strftime('%Y-%m-%d %H:%M:%S')
+                    if user.last_login else None,
             }
 
         lot = instance.lot
