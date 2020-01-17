@@ -15,7 +15,7 @@ class EventSubscribable(EventCompositeSpecificationMixin):
     def is_satisfied_by(self, event: Event):
         super().is_satisfied_by(event)
 
-        if event.date_end < datetime.now() or event.date_start < datetime.now():
+        if event.date_end < datetime.now():
             return False
 
         lots = event.lots.all()
