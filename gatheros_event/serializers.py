@@ -4,9 +4,18 @@ import absoluteuri
 from rest_framework import serializers
 
 from gatheros_event.helpers.event_business import is_free_event
-from gatheros_event.helpers.event_subscribable import is_event_subscribable
-from gatheros_event.models import Person, Event, Organization, Category, Info, \
-    Place
+from gatheros_event.helpers.event_subscribable import (
+    is_event_subscribable,
+    has_enabled_private_lots,
+)
+from gatheros_event.models import (
+    Category,
+    Event,
+    Info,
+    Organization,
+    Person,
+    Place,
+)
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -178,6 +187,8 @@ class EventSerializer(serializers.ModelSerializer):
 
         ret['free'] = is_free_event(instance) is True
         ret['subscriptions_enabled'] = is_event_subscribable(instance) is True
+        ret['has_enabled_private_lots'] = \
+            has_enabled_private_lots(instance) is True
 
         prices = list()
         for lot in instance.lots.filter(private=False, active=True):
