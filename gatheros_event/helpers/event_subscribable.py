@@ -9,9 +9,24 @@
 
 """
 
-from gatheros_event.event_specifications import EventSubscribable
+from gatheros_event.event_specifications import (
+    EventSubscribable,
+    LotSubscribable,
+)
 from gatheros_event.models import Event
 
 
 def is_event_subscribable(event: Event):
     return EventSubscribable().is_satisfied_by(event)
+
+
+def has_enabled_private_lots(event: Event):
+    has_lots = False
+
+    lot_spec = LotSubscribable()
+    for lot in event.lots.filter(active=True, private=True, ):
+        if lot_spec.is_satisfied_by(lot) is True:
+            has_lots = True
+            break
+
+    return has_lots is True
