@@ -31,6 +31,11 @@ public_payment_api_urls = [
         postback_url_view,
         name='payment_postback_url'
     ),
+    url(
+        r'installments/calculator/(?P<amount>\d+\.\d{2})/$',
+        viewsets.get_installment_prices,
+        name='installment_prices'
+    ),
 ]
 
 urlpatterns = router.urls
