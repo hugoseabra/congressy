@@ -102,7 +102,7 @@ steps:
 
   - name: copy-docker-composer
     commands:
-      - cp conf/staging/docker-composer.yml /tmp/staging-files/.
+      - cp conf/staging/docker-compose.yml /tmp/staging-files/.
 
 #=============================================================================#
 # STAGING
