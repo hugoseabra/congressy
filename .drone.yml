@@ -188,6 +188,8 @@ steps:
     image: docker
     pull: if-not-exists
     volumes:
+      - name: tmp_dir
+        path: /tmp
       - name: localtime
         path: /etc/localtime
       - name: docker-sock
@@ -276,6 +278,9 @@ steps:
         - failure
 
 volumes:
+  - name: tmp_dir
+    host:
+      path: /tmp
   - name: main_cache
     host:
       path: /tmp/bkp
