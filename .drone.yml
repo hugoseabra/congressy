@@ -33,6 +33,7 @@ steps:
       - echo "${DRONE_COMMIT_AUTHOR_NAME}" > /tmp/staging-files/build_author
       - echo "${DRONE_COMMIT_AUTHOR_AVATAR}" > /tmp/staging-files/build_author_avatar
       - echo "${DRONE_BUILD_LINK}" > /tmp/staging-files/build_link
+      - echo "latest" > /tmp/staging-files/hotsite-version
 
   - name: create-awsecr-service
     environment:
@@ -98,6 +99,10 @@ steps:
       - echo "RABBITMQ_USER=cgsy" >> /tmp/staging-files/env-manage-staging
       - echo "RABBITMQ_PASS=cgsy" >> /tmp/staging-files/env-manage-staging
       - echo "RABBITMQ_SERVER=rabbitmq" >> /tmp/staging-files/env-manage-staging
+
+  - name: copy-docker-composer
+    commands:
+      - cp conf/staging/docker-composer.yml /tmp/staging-files/.
 
 #=============================================================================#
 # STAGING
@@ -187,8 +192,12 @@ steps:
         path: /etc/localtime
       - name: docker-sock
         path: /var/run/docker.sock
+    environment:
+      AWS_ACCOUNT_ID:
+        from_secret: AWS_ACCOUNT_ID
     commands:
       - ./bin/env/staging/05_download_hotsite.sh
+      - docker tag $${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/hotsite-v2:`cat /tmp/staging-files/hotsite-version`
 
   - name: build-staging-image
     image: docker
