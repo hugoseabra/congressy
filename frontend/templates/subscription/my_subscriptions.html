@@ -21,12 +21,22 @@
                         <div class="panel-body" style="min-height: 465px;">
                             <div class="row">
                                 <div class="col-xs-12 text-center">
-                                    {% if item.event.info.image_main.thumbnail.url %}
-                                        <img src="{{ item.event.info.image_main.thumbnail.url }}"
-                                         class="img-thumbnail" alt="{{ item.event.name|truncatechars:50 }}" width="40%">
+                                    {% if item.event.hotsite_version == 2 %}
+                                        {% if item.event.info.image_main2.thumbnail.url %}
+                                            <img src="{{ item.event.info.image_main2.thumbnail.url }}"
+                                             class="img-thumbnail" alt="{{ item.event.name|truncatechars:50 }}">
+                                        {% else %}
+                                            <img src="{% static 'assets/img/banner_samples/400x210.png' %}"
+                                             class="img-thumbnail" alt="{{ item.event.name|truncatechars:50 }}">
+                                        {% endif %}
                                     {% else %}
-                                        <img src="{% static 'assets/img/200x266.png' %}"
-                                         class="img-thumbnail" alt="{{ item.event.name|truncatechars:50 }}" width="40%">
+                                        {% if item.event.info.image_main.thumbnail.url %}
+                                            <img src="{{ item.event.info.image_main.thumbnail.url }}"
+                                             class="img-thumbnail" alt="{{ item.event.name|truncatechars:50 }}" width="40%">
+                                        {% else %}
+                                            <img src="{% static 'assets/img/image_samples/200x266.png' %}"
+                                             class="img-thumbnail" alt="{{ item.event.name|truncatechars:50 }}" width="40%">
+                                        {% endif %}
                                     {% endif %}
                                     <div style="position: relative;margin-top: -17px">
                                         <span class="fa fa-circle" aria-hidden="true"

@@ -2,6 +2,7 @@
 import os
 import shutil
 
+from django.db.models import Q
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 
@@ -78,3 +79,21 @@ def remove_service_debts_when_deleted(instance, **_):
     )
     if qs.count():
         qs.delete()
+
+
+@receiver(pre_delete, sender=Product)
+def remove_incomplete_subscriptions_on_product(instance, **_):
+    """ Remove inscrições incompletas """
+    instance.subscription_products.filter(
+        Q(subscription__completed=False, ) |
+        Q(subscription__test_subscription=True, )
+    ).delete()
+
+
+@receiver(pre_delete, sender=Service)
+def remove_incomplete_subscriptions_on_service(instance, **_):
+    """ Remove inscrições incompletas """
+    instance.subscription_services.filter(
+        Q(subscription__completed=False, ) |
+        Q(subscription__test_subscription=True, )
+    ).delete()

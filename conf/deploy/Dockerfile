@@ -26,6 +26,7 @@ RUN set -ex \
         build-essential \
         libxml2 \
         curl \
+        cron \
         tzdata \
     " \
     && seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{} \

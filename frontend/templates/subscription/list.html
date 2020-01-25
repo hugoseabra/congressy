@@ -797,14 +797,14 @@
                             var institution = get_institution_el(row);
                             var testBage = get_test_badge_el(row);
                             var badge = get_origin_badge_el(row);
-                            var code = get_code_badge_el(row);
+                            // var code = get_code_badge_el(row);
 
                             return statusBall
                                 + '&nbsp;'
                                 + nameWithLink
                                 + testBage
                                 + badge
-                                + code
+                                // + code
                                 + institution
                                 + dateCreated;
                         }
@@ -826,7 +826,6 @@
                         },
                     {% endif %}
                     {data: 'lot_data.name'},
-                    {data: 'event_count'},
                     {
                         data: 'link', "render": function (data, type, row, meta) {
                             return get_dropdown_btn(row);
@@ -877,21 +876,11 @@
                         {
                             "targets": 4,
                             "orderable": true,
-                            "class": "text-center"
-                        },
-                        {
-                            "targets": 5,
-                            "orderable": true,
                             "type": 'date-euro'
                         },
                     {% else %}
                         {
                             "targets": 3,
-                            "orderable": true,
-                            "class": 'text-center'
-                        },
-                        {
-                            "targets": 4,
                             "orderable": true,
                             "class": 'text-center',
                             "type": 'date-euro'
@@ -1140,9 +1129,7 @@
                                     <th width="10%">Credenciado</th>
                                 {% endif %}
 
-                                <th width="18%">Lote</th>
-
-                                <th width="10%" class="text-center"># Insc.</th>
+                                <th width="25%">Lote</th>
 
                                 <th class="text-center" width="5%"></th>
 

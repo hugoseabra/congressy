@@ -1,3 +1,4 @@
 from .benefactor import BenefactorViewSet
 from .transaction import TransactionReadOnlyViewSet, TransactionStatusListView
 from .checkout import SubscriptionCheckoutView
+from .price_calculator import get_installment_prices

@@ -208,11 +208,11 @@ function publish_optional(type, id) {
 
     var url;
     if (type === 'service') {
-        url = '/api/addon/optionals/services/' + id + '/'
+        url = '/api/addon/optionals/services/' + id + '/?show_inactive=true'
     }
 
     if (type === 'product') {
-        url = '/api/addon/optionals/products/' + id + '/'
+        url = '/api/addon/optionals/products/' + id + '/?show_inactive=true'
     }
 
     if (!url) {
@@ -233,11 +233,11 @@ function unpublish_optional(type, id) {
 
     var url;
     if (type === 'service') {
-        url = '/api/addon/optionals/services/' + id + '/'
+        url = '/api/addon/optionals/services/' + id + '/?show_inactive=true'
     }
 
     if (type === 'product') {
-        url = '/api/addon/optionals/products/' + id + '/'
+        url = '/api/addon/optionals/products/' + id + '/?show_inactive=true'
     }
 
     if (!url) {
@@ -264,7 +264,7 @@ function save_service_limit() {
     limit = (limit) ? parseInt(limit) : 0;
 
     save_optional(
-        '/api/addon/optionals/services/' + service_id + '/',
+        '/api/addon/optionals/services/' + service_id + '/?show_inactive=true',
         {'quantity': limit},
         'Limite de vagas configurado com sucesso!'
     );
@@ -289,7 +289,7 @@ function save_product_limit() {
     limit = (limit) ? parseInt(limit) : 0;
 
     save_optional(
-        '/api/addon/optionals/products/' + service_id + '/',
+        '/api/addon/optionals/products/' + service_id + '/?show_inactive=true',
         {'quantity': limit},
         'Limite de estoque configurado com sucesso!'
     );
@@ -302,11 +302,11 @@ function set_restrict_unique(type, id) {
 
     var url;
     if (type === 'service') {
-        url = '/api/addon/optionals/services/' + id + '/'
+        url = '/api/addon/optionals/services/' + id + '/?show_inactive=true'
     }
 
     if (type === 'product') {
-        url = '/api/addon/optionals/products/' + id + '/'
+        url = '/api/addon/optionals/products/' + id + '/?show_inactive=true'
     }
 
     if (!url) {
@@ -321,11 +321,11 @@ function unset_restrict_unique(type, id) {
 
     var url;
     if (type === 'service') {
-        url = '/api/addon/optionals/services/' + id + '/'
+        url = '/api/addon/optionals/services/' + id + '/?show_inactive=true'
     }
 
     if (type === 'product') {
-        url = '/api/addon/optionals/products/' + id + '/'
+        url = '/api/addon/optionals/products/' + id + '/?show_inactive=true'
     }
 
     if (!url) {
@@ -339,7 +339,7 @@ function unset_restrict_unique(type, id) {
 function service_fetch_data_and_open_delete_modal(optional_id) {
 
 
-    var url = '/api/addon/optionals/services/' + optional_id + '/';
+    var url = '/api/addon/optionals/services/' + optional_id + '/?show_inactive=true';
     send(url, 'GET', {}, function (response) {
         $('#service_optional_delete_id').val(optional_id);
         $('#service_optional_name').text(response.name);
@@ -393,7 +393,7 @@ function submit_delete_optional(typeOfOptional) {
     } else if (typeOfOptional === "product"){
         $('#modal-product-delete').modal('hide');
         optional_id = $('#product_optional_delete_id');
-        url = '/api/addon/optionals/products/' + optional_id.val() + '/';
+        url = '/api/addon/optionals/products/' + optional_id.val() + '/?show_inactive=true';
         delete_optional(url, 'Produto deletado com sucesso!');
         optional_id.val("");
     }

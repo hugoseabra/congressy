@@ -191,9 +191,24 @@ class AnswerSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         attrs = super().validate(attrs)
 
+        value = attrs.get('value')
         subscription = attrs.get('subscription')
         person = subscription.person
         question = attrs.get('question')
+
+        if value:
+            if question.has_options is True:
+                try:
+                    option = Option.objects.get(
+                        question_id=question.pk,
+                        value=value,
+                    )
+                    attrs['human_display'] = option.name
+
+                except Option.DoesNotExist:
+                    pass
+            else:
+                attrs['human_display'] = attrs.get('value')
 
         user = None
         author = None
@@ -225,8 +240,10 @@ class AnswerSerializer(serializers.ModelSerializer):
 
         return attrs
 
-    def to_representation(self, instance: Any) -> Any:
+    def to_representation(self, instance: Answer) -> dict:
         rep = super().to_representation(instance)
+
+        rep['human_display'] = instance.human_display
 
         author = instance.author
         rep['author_data'] = model_to_dict(author)

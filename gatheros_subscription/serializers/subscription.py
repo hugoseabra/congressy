@@ -88,6 +88,18 @@ class SubscriptionSerializer(serializers.BaseSerializer):
             rep['person_data']['birth_date'] = \
                 person.birth_date.strftime('%Y-%m-%d')
 
+        if person.user_id:
+            user = person.user
+            rep['person_data']['user_data'] = {
+                'pk': user.pk,
+                'fist_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'last_login':
+                    user.last_login.strftime('%Y-%m-%d %H:%M:%S')
+                    if user.last_login else None,
+            }
+
         lot = obj.lot
 
         survey = None
@@ -273,16 +285,16 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
             'origin',
         ]
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
 
-        self.subscription_free = False
+        self.subscription_free = None
 
         instance = kwargs.get('instance')
         if instance:
             # Guarda o estado da inscrição para verificação pós edição.
             self.subscription_free = instance.free is True
 
-        super().__init__(**kwargs)
+        super().__init__(*args, **kwargs)
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -304,7 +316,9 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
                 'fist_name': user.first_name,
                 'last_name': user.last_name,
                 'email': user.email,
-                'last_login': user.last_login,
+                'last_login':
+                    user.last_login.strftime('%Y-%m-%d %H:%M:%S')
+                    if user.last_login else None,
             }
 
         lot = instance.lot
@@ -484,7 +498,20 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
 
         if instance.free is True:
             instance.status = Subscription.CONFIRMED_STATUS
-            instance.save()
+
+            with atomic():
+                instance.save()
+
+                # Inscrições, confirmada, não notificada e completa devem ser
+                # notificadas.
+                #
+                # Inscrições pagas serão notificadas no pagamento.
+                if instance.confirmed is True \
+                        and instance.completed is True \
+                        and instance.notified is False:
+                    notify_new_free_subscription(instance.event, instance)
+                    instance.notified = True
+                    instance.save()
 
         return instance
 
@@ -522,10 +549,10 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
             # notificadas.
             #
             # Inscrições pagas serão notificadas no pagamento.
-            if instance.free \
-                    and instance.notified \
-                    and instance.confirmed \
-                    and instance.completed:
+            if instance.free is True \
+                    and instance.confirmed is True \
+                    and instance.completed is True \
+                    and instance.notified is False:
                 notify_new_free_subscription(instance.event, instance)
                 instance.notified = True
                 instance.save()

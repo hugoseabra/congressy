@@ -67,10 +67,11 @@ class LotViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
 
-        exhibition_code = self.request.query_params.get('exhibition_code',
-                                                        None)
+        exhibition_code = \
+            self.request.query_params.get('exhibition_code', None)
         show_private = self.request.query_params.get('show_private', None)
         show_inactive = self.request.query_params.get('show_inactive', None)
+        ignore_dates = self.request.query_params.get('ignore_dates', None)
 
         if exhibition_code:
             queryset = queryset.filter(
@@ -85,11 +86,13 @@ class LotViewSet(AuthenticatedViewSetMixin, viewsets.ModelViewSet):
                 or (show_inactive != '1' and show_inactive != 'true'):
             queryset = queryset.filter(active=True)
 
-        now = datetime.now()
-        queryset = queryset.filter(
-            date_start__lte=now,
-            date_end__gte=now,
-        )
+        if ignore_dates is None \
+                or (ignore_dates != '1' and ignore_dates != 'true'):
+            now = datetime.now()
+            queryset = queryset.filter(
+                date_start__lte=now,
+                date_end__gte=now,
+            )
 
         return queryset
 

@@ -4,3 +4,4 @@ from .subscription import SubscriptionSerializer
 from .transaction import TransactionSerializer
 from .transaction_status import TransactionStatusSerializer
 from .checkout import SubscriptionCheckoutSerializer
+from .price_calculator import PriceCalculatorSerializer
