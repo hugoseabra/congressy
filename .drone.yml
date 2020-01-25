@@ -175,8 +175,8 @@ steps:
     image: tmaier/docker-compose
     pull: if-not-exists
     volumes:
-      - name: main_cache
-        path: /tmp/bkp
+      - name: tmp_dir
+        path: /tmp
       - name: localtime
         path: /etc/localtime
       - name: docker-sock
