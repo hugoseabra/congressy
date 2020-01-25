@@ -1,4 +1,3 @@
-from code import interact
 from decimal import Decimal
 
 
@@ -29,9 +28,11 @@ class Calculator(object):
             if part <= 1:
                 continue
 
-            part_amount = amount / part
             if part > self.free_installments:
-                part_amount += part * interests_amount
+                interest_part_amount = part * interests_amount
+                part_amount = (amount + interest_part_amount) / part
+            else:
+                part_amount = amount / part
 
             prices.append(round(part_amount, 2))
 
@@ -47,10 +48,10 @@ class Calculator(object):
             if part <= 1:
                 continue
 
-            part_amount = 0.00
-
             if part > self.free_installments:
                 part_amount = part * interests_amount
+            else:
+                part_amount = 0.00
 
             prices.append(round(part_amount, 2))
 
@@ -61,8 +62,7 @@ class Calculator(object):
         if installments <= 1:
             return round(amount, 2)
 
-        interests = amount * self.interests
-        return round(Decimal(interests * installments), 2)
+        return round(amount * self.interests, 2) * installments
 
     def get_receiver_amount(self, amount, percent, installments=1):
         """

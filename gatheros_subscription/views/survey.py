@@ -7,7 +7,6 @@ from django.db.transaction import atomic
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.utils.text import slugify
 from django.views import generic
 
 from core.util import represents_int

@@ -376,6 +376,10 @@ class Lot(models.Model, GatherosModelMixin, EntityMixin):
 
         return Lot.LOT_STATUS_RUNNING
 
+    @property
+    def running(self):
+        return self.status == Lot.LOT_STATUS_RUNNING
+
     def get_status_display(self):
         """
         Recupera nome do status

@@ -2,23 +2,31 @@
 
 import base64
 import json
+import os
 from datetime import datetime
 
 import absoluteuri
 import requests
 from django.conf import settings
-from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
 
-from gatheros_subscription.helpers.report_payment import PaymentReportCalculator
+from gatheros_subscription.helpers.report_payment import \
+    PaymentReportCalculator
 from installment.models import Contract
 
 
 def get_logo():
-    uri = staticfiles_storage.url('assets/img/logo_v3.png')
-    url = settings.BASE_DIR + "/frontend" + uri
-    with open(url, 'rb') as f:
+    path = os.path.join(
+        settings.BASE_DIR,
+        'frontend',
+        'static',
+        'assets',
+        'img',
+        'logo_v3.png',
+    )
+
+    with open(path, 'rb') as f:
         read_data = f.read()
         f.close()
 

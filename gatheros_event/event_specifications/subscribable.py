@@ -15,21 +15,17 @@ class EventSubscribable(EventCompositeSpecificationMixin):
     def is_satisfied_by(self, event: Event):
         super().is_satisfied_by(event)
 
-        if event.date_end < datetime.now() or event.date_start < datetime.now():
-            return False
-
-        lots = event.lots.all()
-
-        if lots.count() == 0:
+        if event.date_end < datetime.now():
             return False
 
         subscribable_lot_flag = False
-        for lot in lots:
+        for lot in event.lots.all():
             lot_spec = LotSubscribable()
             if lot_spec.is_satisfied_by(lot):
                 subscribable_lot_flag = True
+                break
 
-        if not subscribable_lot_flag:
+        if subscribable_lot_flag is False:
             return False
 
         valid_subs = Subscription.objects.filter(
@@ -38,8 +34,8 @@ class EventSubscribable(EventCompositeSpecificationMixin):
             status=Subscription.CONFIRMED_STATUS,
         ).count()
 
-        if event.expected_subscriptions and \
-                valid_subs > event.expected_subscriptions:
+        expected_subs = event.expected_subscriptions
+        if expected_subs and expected_subs <= valid_subs:
             return False
 
         return True
@@ -53,12 +49,4 @@ class LotSubscribable(LotCompositeSpecificationMixin):
 
     def is_satisfied_by(self, lot: Lot):
         super().is_satisfied_by(lot)
-
-        if not lot.active:
-            return False
-
-        now = datetime.now()
-        if now > lot.date_end:
-            return False
-
-        return True
+        return lot.active is True and lot.running is True

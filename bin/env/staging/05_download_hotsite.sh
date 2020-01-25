@@ -17,7 +17,7 @@ echo "SAVING HOTSITE VERSION";
 echo "###########################################################"
 echo;
 
-BASE=$(dirname $(dirname $(dirname "$0")))
+BASE="/tmp/staging-files"
 VERSION_FILE="$BASE/hotsite-version"
 PREVIOUS_VERSION_FILE="$BASE/previous_hotsite_version"
 PREVIOUS_VERSION="latest"
@@ -25,10 +25,16 @@ VERSION="latest"
 
 if [[ -f "$PREVIOUS_VERSION_FILE" ]]; then
     PREVIOUS_VERSION=$(cat ${PREVIOUS_VERSION_FILE})
+else
+    echo "none" > "${PREVIOUS_VERSION_FILE}"
+    PREVIOUS_VERSION='none'
 fi
 
 if [[ -f "$VERSION_FILE" ]]; then
     VERSION=$(cat ${VERSION_FILE})
+else
+    echo "latest" > "${VERSION_FILE}"
+    VERSION='latest'
 fi
 
 echo "Download versão '${VERSION}' sobre a versão '${PREVIOUS_VERSION}'..."

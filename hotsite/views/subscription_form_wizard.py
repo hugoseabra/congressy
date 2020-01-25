@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db.transaction import atomic
 from django.forms import ValidationError
-from django.http import QueryDict
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
@@ -613,7 +612,9 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
         # Persisting survey
         if isinstance(form, forms.SurveyForm):
 
-            survey_director = SubscriptionSurveyDirector(self.current_subscription.subscription)
+            survey_director = SubscriptionSurveyDirector(
+                self.current_subscription.subscription
+            )
 
             lot = self.get_lot()
 
@@ -647,8 +648,7 @@ class SubscriptionWizardView(SessionWizardView, SelectLotMixin):
 
                     survey_data[question_name] = answer
 
-            # TODO: MAYBE WE CAN CHANGE QUERYDICT INSTANCE TO A SIMPLE DICT ???
-            survey_files = QueryDict('', mutable=True)
+            survey_files = dict()
             for form_question, uploaded_file in form_files.items():
                 if form_question == 'csrfmiddlewaretoken':
                     survey_files.update({form_question: uploaded_file})
