@@ -190,6 +190,11 @@ class EventSerializer(serializers.ModelSerializer):
         ret['has_enabled_private_lots'] = \
             has_enabled_private_lots(instance) is True
 
+        ret['period'] = instance.get_period()
+        ret['url'] = absoluteuri.build_absolute_uri(
+            '/{}'.format(instance.slug)
+        )
+
         prices = list()
         for lot in instance.lots.filter(private=False, active=True):
             if lot.running is False:
