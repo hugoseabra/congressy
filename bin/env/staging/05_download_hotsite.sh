@@ -25,14 +25,14 @@ VERSION="latest"
 
 if [[ -f "$PREVIOUS_VERSION_FILE" ]]; then
     PREVIOUS_VERSION=$(cat ${PREVIOUS_VERSION_FILE})
-else:
+else
     echo "none" > "${PREVIOUS_VERSION_FILE}"
     PREVIOUS_VERSION='none'
 fi
 
 if [[ -f "$VERSION_FILE" ]]; then
     VERSION=$(cat ${VERSION_FILE})
-else:
+else
     echo "latest" > "${VERSION_FILE}"
     VERSION='latest'
 fi

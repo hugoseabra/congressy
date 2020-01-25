@@ -184,22 +184,22 @@ steps:
     commands:
       - ./bin/env/staging/02_recreate-db-staging.sh
 
-  - name: download-hotsite-v2
-    image: docker
-    pull: if-not-exists
-    volumes:
-      - name: tmp_dir
-        path: /tmp
-      - name: localtime
-        path: /etc/localtime
-      - name: docker-sock
-        path: /var/run/docker.sock
-    environment:
-      AWS_ACCOUNT_ID:
-        from_secret: AWS_ACCOUNT_ID
-    commands:
-      - ./bin/env/staging/05_download_hotsite.sh
-      - docker tag $${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/hotsite-v2:`cat /tmp/staging-files/hotsite-version`
+#  - name: download-hotsite-v2
+#    image: docker
+#    pull: if-not-exists
+#    volumes:
+#      - name: tmp_dir
+#        path: /tmp
+#      - name: localtime
+#        path: /etc/localtime
+#      - name: docker-sock
+#        path: /var/run/docker.sock
+#    environment:
+#      AWS_ACCOUNT_ID:
+#        from_secret: AWS_ACCOUNT_ID
+#    commands:
+#      - ./bin/env/staging/05_download_hotsite.sh
+#      - docker tag $${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/hotsite-v2:`cat /tmp/staging-files/hotsite-version`
 
   - name: build-staging-image
     image: docker
