@@ -28,9 +28,11 @@ function error_msg() {
     echo ;
 }
 
-function update_postgres_service() {
-
+function check_traefik_network() {
     docker network ls|grep traefik_network > /dev/null || docker network create --driver bridge traefik_network
+}
+
+function update_postgres_service() {
 
     docker-compose -f ./bin/env/docker-compose.yml up -d --force --remove-orphans
     sleep 5
@@ -52,6 +54,9 @@ RECREATE=$(cat ${BKP_DUMP_DIR}/recreate.txt)
 
 # Se container do Banco de dados não existe e está configurado para
 # "não recriar", temos de vamos garantir que o serviço esteja ativo.
+
+# Verificando rede do traefik para conectar microservices
+check_traefik_network
 
 # Se não há container ativo, verificar se existe.
 if [[ -z "$CONTAINER_ACTIVE" ]]; then
