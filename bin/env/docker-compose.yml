@@ -59,6 +59,23 @@ services:
     networks:
       - rabbitmq
 
+  reverse-proxy:
+    image: traefik:v1.7.19-alpine
+    command:
+      - --api
+      - --docker
+      - --accesslog
+      - --accesslog.format=json
+      - --accesslog.fields.names="StartLocal=keep StartUTC=keep"
+    networks:
+      - traefik
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /tmp/staging-files/traefik.toml:/etc/traefik/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+
 networks:
   postgres:
     name: local_postgres
@@ -68,3 +85,6 @@ networks:
     name: local_wkhtmltopdf
   rabbitmq:
     name: local_rabbitmq
+  traefik:
+    external:
+      name: traefik_network

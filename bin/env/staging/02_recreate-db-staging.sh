@@ -29,6 +29,9 @@ function error_msg() {
 }
 
 function update_postgres_service() {
+
+    docker network ls|grep traefik_network > /dev/null || docker network create --driver bridge traefik_network
+
     docker-compose -f ./bin/env/docker-compose.yml up -d --force --remove-orphans
     sleep 5
 
