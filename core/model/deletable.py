@@ -12,13 +12,14 @@ class NotDeletableError(IntegrityError):
     def __init__(self, *args, **kwargs):
         super(NotDeletableError, self).__init__(
             'Você não pode excluir este registro.',
-            * args,
+            *args,
             **kwargs
         )
 
 
 class CheckerCollector(Collector):
     """Collection checker for deletable model"""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.protected = set()
@@ -41,7 +42,10 @@ class CheckerCollector(Collector):
 
 class DeletableModelMixin(object):
     """Deletable model checker"""
-    checker = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.checker = None
 
     def is_deletable(self):
         """Checks if model is deletable"""
