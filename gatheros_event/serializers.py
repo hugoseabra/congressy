@@ -185,6 +185,11 @@ class EventSerializer(serializers.ModelSerializer):
         ret['num_categories'] = instance.lot_categories.count()
         ret['num_surveys'] = instance.surveys.count()
 
+        ret['status'] = instance.status
+        ret['future'] = instance.future
+        ret['running'] = instance.running
+        ret['finished'] = instance.finished
+
         ret['free'] = is_free_event(instance) is True
         ret['subscriptions_enabled'] = is_event_subscribable(instance) is True
         ret['has_enabled_private_lots'] = \
