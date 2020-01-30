@@ -405,7 +405,10 @@ class Lot(models.Model, GatherosModelMixin, EntityMixin):
                     'Você não pode editar o evento do lote.'
                 ]})
 
-            if self.subscriptions.count() > 0:
+            if self.subscriptions.filter(
+                    completed=True,
+                    test_subscription=False
+            ).exists():
                 if self.has_changed('price'):
                     raise ValidationError({'price': [
                         'Preço não pode ser alterado após haverem inscrições'
