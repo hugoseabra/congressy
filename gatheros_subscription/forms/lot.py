@@ -130,9 +130,13 @@ class LotForm(forms.ModelForm):
             )
 
         # Não é permitido editar preço para lotes com inscrições.
+        has_subs = self.instance.subscriptions.filter(
+            completed=True,
+            test_subscription=False,
+        ).exists()
         if self.instance.pk \
                 and self.instance.has_changed('price') \
-                and self.instance.subscriptions.count() > 0:
+                and has_subs is True:
             raise forms.ValidationError(
                 'Este lote já possui inscrições. Seu valor não pode ser'
                 ' alterado.'
@@ -143,7 +147,7 @@ class LotForm(forms.ModelForm):
     def clean_exhibition_code(self):
         code = self.cleaned_data.get('exhibition_code')
         if code:
-            code = ''.join(code.split()).upper()
+            code = ''.join(code.split()).upper() > 0
 
         queryset = Lot.objects.filter(
             exhibition_code=code,
