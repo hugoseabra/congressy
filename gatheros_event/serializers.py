@@ -185,6 +185,11 @@ class EventSerializer(serializers.ModelSerializer):
         ret['num_categories'] = instance.lot_categories.count()
         ret['num_surveys'] = instance.surveys.count()
 
+        ret['status'] = instance.status
+        ret['future'] = instance.future
+        ret['running'] = instance.running
+        ret['finished'] = instance.finished
+
         ret['free'] = is_free_event(instance) is True
         ret['subscriptions_enabled'] = is_event_subscribable(instance) is True
         ret['has_enabled_private_lots'] = \
@@ -207,5 +212,29 @@ class EventSerializer(serializers.ModelSerializer):
 
         ret['min_price'] = round(min(prices), 2) if prices else '0.00'
         ret['max_price'] = round(max(prices), 2) if prices else '0.00'
+
+        ret['has_surveys'] = instance.surveys.filter(
+            survey__questions__active=True
+        ).count() > 0
+
+        has_addon = False
+        for cat in instance.lot_categories.filter(active=True):
+            for addon in cat.service_optionals.filter(published=True):
+                if addon.status == addon.OPTIONAL_STATUS_RUNNING:
+                    has_addon = True
+                    break
+
+            if has_addon is True:
+                break
+
+            for addon in cat.product_optionals.filter(published=True):
+                if addon.status == addon.OPTIONAL_STATUS_RUNNING:
+                    has_addon = True
+                    break
+
+            if has_addon is True:
+                break
+
+        ret['has_addons'] = has_addon
 
         return ret
