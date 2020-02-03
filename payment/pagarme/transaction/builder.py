@@ -2,6 +2,8 @@ from abc import ABCMeta, abstractmethod
 from datetime import timedelta, date
 from decimal import Decimal
 
+import absoluteuri
+
 from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription, Lot
 from payment.helpers.postback_url import get_postback_url
@@ -42,23 +44,27 @@ class AbstractPagarmeTransactionBuilder:
             self.contract = None
 
         self.pagarme_transaction.add_metadata(
-            'percentual congressy',
+            'congressy_percent',
             '{}%'.format(self.event.congressy_percent)
         )
         self.pagarme_transaction.add_metadata(
-            'transferência de taxa',
+            'transfer_tax',
             1 if self.lot.transfer_tax is True else 0
         )
 
         # organização
-        self.pagarme_transaction.add_metadata('ID organização',
+        self.pagarme_transaction.add_metadata('organization_id',
                                               self.organization.pk)
 
-        self.pagarme_transaction.add_metadata('organização',
+        self.pagarme_transaction.add_metadata('organization',
                                               self.organization.name)
 
-        self.pagarme_transaction.add_metadata('ID evento', self.event.pk)
-        self.pagarme_transaction.add_metadata('evento', self.event.name)
+        self.pagarme_transaction.add_metadata('event_id', self.event.pk)
+        self.pagarme_transaction.add_metadata('event', self.event.name)
+        self.pagarme_transaction.add_metadata('link', absoluteuri.reverse(
+            'public:hotsite',
+            kwargs={'slug': self.event.slug}
+        ))
 
         # Uma vez processado, o builder não será mais reprocessado para não
         # haver discrepância entre seu estado computado e o estado de
@@ -275,34 +281,31 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
 
     def _set_metadata_items(self):
         # participante
-        self.pagarme_transaction.add_metadata('nome do participante',
+        self.pagarme_transaction.add_metadata('person_name',
                                               self.person.name)
-        self.pagarme_transaction.add_metadata('E-mail participante',
+        self.pagarme_transaction.add_metadata('person_email',
                                               self.person.email)
-        self.pagarme_transaction.add_metadata('ID participante',
+        self.pagarme_transaction.add_metadata('person_id',
                                               str(self.person.pk))
         self.pagarme_transaction.add_metadata(
-            'Fone participante',
+            'person_phone',
             str(self.person.get_phone_display()),
         )
 
         # sobre inscrição
         if self.category:
             self.pagarme_transaction.add_metadata(
-                'categoria do lote',
+                'lot_category',
                 self.category.name
             )
             self.pagarme_transaction.add_metadata(
-                'ID categoria do lote',
+                'lot_category_id',
                 self.category.pk
             )
 
-        self.pagarme_transaction.add_metadata(
-            'ID lote',
-            self.lot.pk
-        )
+        self.pagarme_transaction.add_metadata('lot_id', self.lot.pk)
 
-        self.pagarme_transaction.add_metadata('ID inscrição',
+        self.pagarme_transaction.add_metadata('subscription_id',
                                               str(self.subscription.pk))
 
         limit = self.event.limit
@@ -312,13 +315,14 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
         else:
             vacancy = num_subscription
 
-        self.pagarme_transaction.add_metadata('vaga', vacancy)
+        self.pagarme_transaction.add_metadata('vacancy', vacancy)
 
         if self.installment_part:
             contract = self.installment_part.contract
-            self.pagarme_transaction.add_metadata('parcelamento', contract.pk)
+            self.pagarme_transaction.add_metadata('installment_contract',
+                                                  contract.pk)
             self.pagarme_transaction.add_metadata(
-                'parcela',
+                'installment_part',
                 '{}/{}'.format(
                     self.installment_part.installment_number,
                     contract.num_installments
