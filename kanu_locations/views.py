@@ -1,3 +1,6 @@
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 from unidecode import unidecode
 from rest_framework import generics
 from rest_framework import viewsets
@@ -6,6 +9,7 @@ from kanu_datatable import DataTableAPIView
 
 from .models import City
 from .serializers import CitySerializer
+from .zip_code import ZipCode
 
 
 class CityListView(DataTableAPIView, generics.RetrieveAPIView,
@@ -31,3 +35,12 @@ class CityListView(DataTableAPIView, generics.RetrieveAPIView,
             qs = qs.filter(uf=self.request.GET.get('uf'))
 
         return qs
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def get_zip_code(request, zip_code_number):
+    zip_code = ZipCode(zip_code=zip_code_number)
+    zip_code.process()
+
+    return Response(data=zip_code.data)
