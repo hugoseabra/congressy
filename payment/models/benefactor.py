@@ -74,6 +74,13 @@ class Benefactor(EntityMixin, models.Model):
         null=False,
     )
 
+    reference = models.CharField(
+        max_length=200,
+        verbose_name='referência',
+        blank=True,
+        null=True,
+    )
+
     gender = models.CharField(
         max_length=1,
         choices=GENDER_CHOICES,
