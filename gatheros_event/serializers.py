@@ -16,6 +16,7 @@ from gatheros_event.models import (
     Person,
     Place,
 )
+from payment.helpers.payment_helpers import is_person_enabled_for_payment
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -43,6 +44,8 @@ class PersonSerializer(serializers.ModelSerializer):
                 'email': user.email,
                 'last_login': user.last_login,
             }
+
+        ret['payment_enabled'] = is_person_enabled_for_payment(instance)
 
         return ret
 

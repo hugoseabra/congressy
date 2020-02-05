@@ -3,6 +3,7 @@ from rest_framework.fields import empty
 
 from core.serializers import FormSerializerMixin
 from gatheros_event.locale import locales
+from payment.helpers.payment_helpers import is_benefactor_enabled_for_payment
 from payment.managers import BenefactorManager
 from payment.models import Benefactor
 
@@ -76,5 +77,7 @@ class BenefactorSerializer(FormSerializerMixin, serializers.ModelSerializer):
                 'email': user.email,
                 'last_login': user.last_login,
             }
+
+        rep['payment_enabled'] = is_benefactor_enabled_for_payment(instance)
 
         return rep
