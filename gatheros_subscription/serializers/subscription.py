@@ -828,7 +828,7 @@ class SubscriptionPaymentSerializer(serializers.ModelSerializer):
                 payer = trans.payer
                 benefactor = payer.benefactor
 
-                item['payer'] = payer.pk
+                item['payer'] = benefactor.pk
 
                 item['payer_data'] = {
                     'pk': str(benefactor.pk),
