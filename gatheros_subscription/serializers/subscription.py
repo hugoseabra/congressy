@@ -8,6 +8,7 @@ from rest_framework import serializers
 
 from gatheros_subscription.models import Subscription
 from mailer.services import notify_new_free_subscription
+from payment.helpers.payment_helpers import has_open_boleto
 
 
 class SubscriptionSerializer(serializers.BaseSerializer):
@@ -264,6 +265,8 @@ class SubscriptionSerializer(serializers.BaseSerializer):
         rep['total_amount'] = total_amount
         rep['paid_amount'] = paid_amount
 
+        rep['has_open_boleto'] = has_open_boleto(obj)
+
         return rep
 
 
@@ -490,6 +493,8 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
 
         rep['total_amount'] = total_amount
         rep['paid_amount'] = paid_amount
+
+        rep['has_open_boleto'] = has_open_boleto(instance)
 
         return rep
 
@@ -758,6 +763,8 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
 
         rep['total_amount'] = total_amount
         rep['paid_amount'] = paid_amount
+
+        rep['has_open_boleto'] = has_open_boleto(instance)
 
         return rep
 
