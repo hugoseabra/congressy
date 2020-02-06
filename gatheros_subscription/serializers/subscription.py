@@ -821,6 +821,27 @@ class SubscriptionPaymentSerializer(serializers.ModelSerializer):
                 'lot': sub.lot_id,
             }
 
+            item['payer'] = trans.payer.pk if hasattr(trans, 'payer') else None
+            item['payer_data'] = dict()
+
+            if item['payer']:
+                payer = item['payer']
+                benefactor = payer.benefactor
+                
+                item['payer_data'] = {
+                    'pk': str(benefactor.pk),
+                    'name': benefactor.name,
+                    'reference': benefactor.reference,
+                    'is_company': benefactor.is_company,
+                    'email': benefactor.email,
+                    'phone': benefactor.phone,
+                    'country': benefactor.country,
+                    'cpf': benefactor.cpf,
+                    'cnpj': benefactor.cnpj,
+                    'doc_type': benefactor.doc_type,
+                    'doc_number': benefactor.doc_number,
+                }
+
             item.update(model_to_dict(trans))
 
             del item['data']
