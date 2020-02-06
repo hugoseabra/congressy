@@ -16,7 +16,10 @@ from gatheros_event.models import (
     Person,
     Place,
 )
-from payment.helpers.payment_helpers import is_person_enabled_for_payment
+from payment.helpers.payment_helpers import (
+    is_person_enabled_for_payment,
+    is_boleto_allowed,
+)
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -239,5 +242,7 @@ class EventSerializer(serializers.ModelSerializer):
                 break
 
         ret['has_addons'] = has_addon
+
+        ret['boleto_enabled'] = is_boleto_allowed(instance)
 
         return ret
