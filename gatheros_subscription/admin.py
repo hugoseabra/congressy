@@ -1,7 +1,5 @@
 from django.contrib import admin
 
-from django_grappelli_custom_autocomplete.admin import CustomAutocompleteMixin
-
 from .models import (
     EventSurvey,
     LotCategory,
@@ -12,7 +10,7 @@ from .models import (
 
 
 @admin.register(FormConfig)
-class FormConfigAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class FormConfigAdmin(admin.ModelAdmin):
     search_fields = (
         'event__name',      
     )
@@ -20,7 +18,7 @@ class FormConfigAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 
 
 @admin.register(LotCategory)
-class LotCategoryAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class LotCategoryAdmin(admin.ModelAdmin):
     search_fields = (
         'event__name',
     )
@@ -28,7 +26,7 @@ class LotCategoryAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 
 
 @admin.register(Lot)
-class LotAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class LotAdmin(admin.ModelAdmin):
     search_fields = (
         'pk',
         'event__name',
@@ -99,7 +97,7 @@ class LotAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 
 
 @admin.register(Subscription)
-class SubscriptionAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class SubscriptionAdmin(admin.ModelAdmin):
     search_fields = (
         'uuid',
         'code',

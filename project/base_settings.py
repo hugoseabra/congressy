@@ -58,8 +58,6 @@ INSTALLED_APPS = [
     'django_cron',
     'corsheaders',
 
-    'django_grappelli_custom_autocomplete',
-
     # KANU_APPS
     'kanu_locations',
 
@@ -334,9 +332,6 @@ WKHTMLTOPDF_CMD = os.path.join(
     BASE_DIR, "bin", "wkhtmltox", "bin", 'wkhtmltopdf'
 )
 
-# ================= ADMIN THEME TEMPLATE - GRAPELLI ========================= #
-GRAPPELLI_ADMIN_TITLE = 'CONGRESSY'
-GRAPPELLI_SWITCH_USER = True
 # =========================== CRON CLASSES ================================== #
 ALLOW_PARALLEL_RUNS = True
 FAILED_RUNS_CRONJOB_EMAIL_PREFIX = "[Server check]: "
