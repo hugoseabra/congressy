@@ -4,16 +4,13 @@ Django Admin for Partners
 from datetime import datetime
 
 from django.contrib import admin
-from django_grappelli_custom_autocomplete.admin import \
-    CustomAutocompleteTabularMixin
 
 from gatheros_event.models import Event
 from . import forms
 from .models import Partner, PartnerPlan, PartnerContract
 
 
-class PartnerContractAdminInline(CustomAutocompleteTabularMixin,
-                                 admin.StackedInline):
+class PartnerContractAdminInline(admin.StackedInline):
     model = PartnerContract
     form = forms.PartnerContractForm
     extra = 0
@@ -21,9 +18,9 @@ class PartnerContractAdminInline(CustomAutocompleteTabularMixin,
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "event":
-            kwargs["queryset"] = Event.objects \
-                .filter(date_start__gte=datetime.now()) \
-                .order_by('name')
+            kwargs["queryset"] = Event.objects.filter(
+                date_start__gte=datetime.now()
+            ).order_by('name')
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 

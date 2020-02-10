@@ -12,8 +12,6 @@ django-cron==0.5.0
 django-datetime-widget==0.9.3
 django-extra-fields==1.0.0
 django-formtools==2.1
-django-grappelli==2.12.3
-django-grappelli-custom-autocomplete==1.4
 django-js-asset==1.0.0
 django-health-check==3.9.0
 django-localflavor==2.0

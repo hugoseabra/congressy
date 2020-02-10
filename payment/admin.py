@@ -3,13 +3,12 @@
 Django Admin para Payments
 """
 from django.contrib import admin
-from django_grappelli_custom_autocomplete.admin import CustomAutocompleteMixin
 
 from .models import BankAccount, Transaction, TransactionStatus
 
 
 @admin.register(Transaction)
-class TransactionAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class TransactionAdmin(admin.ModelAdmin):
     search_fields = (
         'uuid',
         'subscription__uuid',
@@ -30,7 +29,7 @@ class TransactionAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 
 
 @admin.register(TransactionStatus)
-class TransactionStatusAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class TransactionStatusAdmin(admin.ModelAdmin):
     search_fields = (
         'transaction__subscription__person__name',
         'transaction__subscription__event__name',

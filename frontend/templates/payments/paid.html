@@ -32,9 +32,9 @@
                                    data-toggle="tooltip"
                                    title="{{ item.status_name }}"></i>
                             {% endif %}
-                            <a href="{% url 'subscription:subscription-payments' event.pk sub.pk %}" target="_blank">
-                                {{ sub.name }}
-                            </a>
+                                <a href="{% url 'subscription:subscription-payments' event.pk sub.pk %}" target="_blank">
+                                    {{ sub.name }}
+                                </a>
                             {% if item.is_part and item.part_info %}
                                 ({{ item.part_info }})
                             {% endif %}
@@ -42,6 +42,13 @@
                         <small class="text-muted hidden-md hidden-lg hidden-xl" {% if sub.lot_name|length > 30 %}data-toggle="tooltip" title="{{sub.lot_name}}"{% endif %}} style="cursor: default">
                             {{ sub.lot_name|truncatechars:30 }}
                         </small>
+                        {% if item.pagarme_id %}
+                        <div>
+                            <small class="text-muted">
+                                <strong>Transação:</strong> {{ item.pagarme_id }}
+                            </small>
+                        </div>
+                        {% endif %}
                     </td>
                     <td class="hidden-sm hidden-xs">
                         <div data-toggle="tooltip" title="{{sub.lot_name}}" style="cursor: default">
