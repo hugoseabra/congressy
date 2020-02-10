@@ -3,8 +3,8 @@ from decimal import Decimal
 
 from django.conf import settings
 
-from gatheros_event.models import Event
-from payment.models import Transaction
+from gatheros_event.models import Event, Person
+from payment.models import Transaction, Benefactor
 
 
 def event_starts_in(now: datetime):
@@ -153,3 +153,135 @@ def get_amounts_from_transaction(event: Event, amount: Decimal):
         'liquid_amount': liquid_amount,
         'congressy_amount': congressy_amount,
     }
+
+
+def is_person_enabled_for_payment(person: Person) -> bool:
+    if person.country:
+        is_brazilian = person.country.lower() == 'br'
+    else:
+        is_brazilian = True
+
+    common_fields = [
+        'name',
+        'country',
+        'phone',
+        'email',
+    ]
+
+    required_br_address = [
+        'street',
+        'village',
+        'city',
+        'zip_code',
+    ]
+
+    required_inter_address = [
+        'address_international',
+        'city_international',
+        'state_international',
+        'zip_code_international',
+    ]
+
+    required_pf_fields = [
+        'gender',
+        'birth_date',
+    ]
+
+    required_pf_br_fields = [
+        'cpf',
+    ]
+
+    required_doc_inter_fields = [
+        'international_doc_type',
+        'international_doc',
+    ]
+
+    fields = common_fields
+    fields += required_pf_fields
+
+    if is_brazilian is True:
+        fields += required_pf_br_fields
+        fields += required_br_address
+    else:
+        fields += required_doc_inter_fields
+        fields += required_inter_address
+
+    for f_name in fields:
+        if hasattr(person, f_name) is False or not getattr(person, f_name):
+            return False
+
+    return True
+
+
+def is_benefactor_enabled_for_payment(benefactor: Benefactor) -> bool:
+    if benefactor.country:
+        is_brazilian = benefactor.country.lower() == 'br'
+    else:
+        is_brazilian = True
+
+    is_company = benefactor.is_company is True
+
+    common_fields = [
+        'name',
+        'country',
+        'phone',
+        'email',
+    ]
+
+    required_br_address = [
+        'street',
+        'village',
+        'city',
+        'zip_code',
+    ]
+
+    required_inter_address = [
+        'address_international',
+        'city_international',
+        'state_international',
+        'zip_code_international',
+    ]
+
+    required_pf_fields = [
+        'gender',
+        'birth_date',
+    ]
+
+    required_pf_br_fields = [
+        'cpf',
+    ]
+
+    required_pj_br_fields = [
+        'cnpj',
+    ]
+
+    required_doc_inter_fields = [
+        'doc_type',
+        'doc_number',
+    ]
+
+    fields = common_fields
+
+    if is_company is True:
+        if is_brazilian is True:
+            fields += required_pj_br_fields
+            fields += required_br_address
+        else:
+            fields += required_doc_inter_fields
+            fields += required_inter_address
+
+    else:
+        fields += required_pf_fields
+
+        if is_brazilian is True:
+            fields += required_pf_br_fields
+            fields += required_br_address
+        else:
+            fields += required_inter_address
+
+    for f_name in fields:
+        if hasattr(benefactor, f_name) is False or not getattr(benefactor,
+                                                               f_name):
+            return False
+
+    return True

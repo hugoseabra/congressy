@@ -160,7 +160,7 @@
                                                                 data-toggle="tooltip"
                                                                 data-placement="left"
                                                                 title=""
-                                                                data-original-title="Gerenciar privacidade">
+                                                                data-original-title="Gerenciar restrição / cupom">
                                                             <button
                                                                     class="btn btn-sm btn-info btn-block {% if not lot.private %}btn-trans{% endif %}"
                                                                     data-toggle="modal"
@@ -168,7 +168,7 @@
                                                                     onclick="$('#lot-privacy-lot_id').val('{{ lot.pk }}');$('#lot-privacy_name').text('{{ lot.name|escapejs }}');app.setSwitchery('#lot-privacy_private', {% if lot.private %}true{% else %}false{% endif %});$('#lot-privacy_exhibition-code').val('{{ lot.exhibition_code|default_if_none:exhibition_code|escapejs }}')"
                                                                     data-target="#lot-privacy_form">
                                                                 <i class="fas fa-lock"></i>
-                                                                <span class="hidden-md">Privacidade</span>
+                                                                <span class="hidden-md">Restrito / Cupom</span>
                                                             </button>
                                                         </div>
                                                     {% endif %}
@@ -363,7 +363,7 @@
                                                                 data-toggle="tooltip"
                                                                 data-placement="left"
                                                                 title=""
-                                                                data-original-title="Gerenciar privacidade">
+                                                                data-original-title="Gerenciar restrição / cupom">
                                                             <button
                                                                     class="btn btn-sm btn-info btn-block {% if not lot.private %}btn-trans{% endif %}"
                                                                     data-toggle="modal"
@@ -371,7 +371,7 @@
                                                                     onclick="$('#lot-privacy-lot_id').val('{{ lot.pk }}');$('#lot-privacy_name').text('{{ lot.name|escapejs }}');app.setSwitchery('#lot-privacy_private', {% if lot.private %}true{% else %}false{% endif %});$('#lot-privacy_exhibition-code').val('{{ lot.exhibition_code|default_if_none:exhibition_code|escapejs }}')"
                                                                     data-target="#lot-privacy_form">
                                                                 <i class="fas fa-lock"></i>
-                                                                <span class="hidden-md">Privacidade</span>
+                                                                <span class="hidden-md">Restrito / Cupom</span>
                                                             </button>
                                                         </div>
                                                     {% endif %}
