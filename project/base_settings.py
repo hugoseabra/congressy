@@ -17,9 +17,6 @@ BASE_DIR = os.path.abspath(os.path.join(
 DEBUG = False
 # ================================= APPS ==================================== #
 INSTALLED_APPS = [
-    # ADMIN TEMPLATE
-    'grappelli',
-
     # DJANGO_APPS
     'django.contrib.admin',
     'django.contrib.auth',
