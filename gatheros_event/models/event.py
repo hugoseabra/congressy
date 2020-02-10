@@ -267,7 +267,7 @@ class Event(models.Model, GatherosModelMixin):
 
     hotsite_version = models.PositiveIntegerField(
         verbose_name='Versão do hotsite',
-        default=1,
+        default=2,
         null=False,
         blank=True,
     )

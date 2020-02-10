@@ -159,6 +159,7 @@ class EventAddFormView(BaseEventView, generic.CreateView):
     def get_initial(self):
         initial = super(EventAddFormView, self).get_initial()
         initial['organization'] = self.organization
+        initial['hotsite_version'] = 2
 
         return initial
 
