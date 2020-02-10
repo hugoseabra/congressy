@@ -1,12 +1,11 @@
 from django.contrib import admin
-from django_grappelli_custom_autocomplete.admin import CustomAutocompleteMixin
 
 from certificate import forms
 from certificate.models import Certificate
 
 
 @admin.register(Certificate)
-class CertificateAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class CertificateAdmin(admin.ModelAdmin):
     form = forms.CertificateForm
     raw_id_fields = ['event']
     fieldsets = (

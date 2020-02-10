@@ -213,7 +213,7 @@ BANK_ACCOUNTS = (
     ('077', '077 - BANCO INTER'),
     ('078', '078 - HAITONG BI DO BRASIL S.A.'),
     ('079', '079 - BANCO ORIGINAL DO AGRO S/A'),
-    ('080', '080 - B&amp;T CC LTDA.'),
+    ('080', '080 - B&T CC LTDA.'),
     ('081', '081 - BANCOSEGURO S.A.'),
     ('082', '082 - BANCO TOPÁZIO S.A.'),
     ('083', '083 - BANCO DA CHINA BRASIL S.A.'),

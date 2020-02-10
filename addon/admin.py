@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django_grappelli_custom_autocomplete.admin import CustomAutocompleteMixin
 
 from .models import (
     OptionalServiceType,
@@ -16,12 +15,12 @@ admin.site.register(OptionalProductType)
 
 
 @admin.register(Theme)
-class ThemeAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class ThemeAdmin(admin.ModelAdmin):
     raw_id_fields = ['event']
 
 
 @admin.register(Service)
-class OptionalServiceAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class OptionalServiceAdmin(admin.ModelAdmin):
     search_fields = (
         'lot_category__event__name',
         'lot_category__lots__name',
@@ -66,7 +65,7 @@ class OptionalServiceAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 
 
 @admin.register(Product)
-class OptionalProductAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class OptionalProductAdmin(admin.ModelAdmin):
     search_fields = (
         'lot_category__event__name',
         'lot_category__lots__name',
@@ -104,8 +103,7 @@ class OptionalProductAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 
 
 @admin.register(SubscriptionService)
-class OptionalSubscriptionServiceAdmin(CustomAutocompleteMixin,
-                                       admin.ModelAdmin):
+class OptionalSubscriptionServiceAdmin(admin.ModelAdmin):
     fields = (
         'optional',
         'subscription',
@@ -142,8 +140,7 @@ class OptionalSubscriptionServiceAdmin(CustomAutocompleteMixin,
 
 
 @admin.register(SubscriptionProduct)
-class OptionalSubscriptionProductAdmin(CustomAutocompleteMixin,
-                                       admin.ModelAdmin):
+class OptionalSubscriptionProductAdmin(admin.ModelAdmin):
     fields = (
         'optional',
         'subscription',

@@ -74,6 +74,13 @@ class Benefactor(EntityMixin, models.Model):
         null=False,
     )
 
+    reference = models.CharField(
+        max_length=30,
+        verbose_name='referência',
+        blank=True,
+        null=True,
+    )
+
     gender = models.CharField(
         max_length=1,
         choices=GENDER_CHOICES,
@@ -239,6 +246,14 @@ class Benefactor(EntityMixin, models.Model):
 
     created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     modified = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    card_holder_name = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
+        verbose_name='Nome impresso no cartão',
+        help_text='Nome impresso no último cartão utilizado.'
+    )
 
     def get_phone_display(self):
         phone = str(self.phone)

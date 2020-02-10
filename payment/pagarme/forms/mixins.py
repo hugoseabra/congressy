@@ -219,7 +219,7 @@ class CheckoutValidationForm(forms.Form):
 
             else:
                 customer_data['doc_type'] = Benefactor.INTERNATIONAL_DOC_EIN
-                customer_data['doc_number'] = payer.ein
+                customer_data['doc_number'] = payer.doc_number
 
         else:
 

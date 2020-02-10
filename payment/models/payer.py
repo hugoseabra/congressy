@@ -52,6 +52,8 @@ class Payer(EntityMixin, models.Model):
         on_delete=models.CASCADE,
         verbose_name='transaction',
         related_name='payer',
+        null=False,
+        blank=False,
     )
 
     subscription = models.ForeignKey(
@@ -59,6 +61,8 @@ class Payer(EntityMixin, models.Model):
         on_delete=models.CASCADE,
         verbose_name='inscrição',
         related_name='payers',
+        null=False,
+        blank=False,
     )
 
     lot = models.ForeignKey(
@@ -68,6 +72,7 @@ class Payer(EntityMixin, models.Model):
         related_name='payers',
         # Making field write once
         editable=False,
+        null=False,
     )
 
     benefactor = models.ForeignKey(
@@ -75,6 +80,8 @@ class Payer(EntityMixin, models.Model):
         on_delete=models.CASCADE,
         verbose_name='benfeitor',
         related_name='payers',
+        null=False,
+        blank=False,
     )
 
     created = models.DateTimeField(auto_now_add=True, blank=True, null=True)

@@ -465,14 +465,14 @@
                             aria-hidden="true">&times;
                     </button>
                     <h4 class="modal-title" id="lot-privacy_form-title">
-                        Gerenciar Privacidade</h4>
+                        Gerenciar Restrição / Cupom</h4>
                 </div>
                 <div class="modal-body">
                     <form class="form-horizontal" role="form"
                           onsubmit="save_privacy();return false;">
                         <div class="form-group">
                             <div class="col-sm-12">
-                                <label for="lot-privacy_private">Privado:</label>
+                                <label for="lot-privacy_private">Ocultar:</label>
                                 <div>
                                     <input
                                             type="checkbox"
@@ -483,7 +483,7 @@
                                 </div>
                                 <div>
                                     <small class="text-muted help-text">
-                                        Configurar privacidade do lote <strong
+                                        Configurar restrição do lote <strong
                                             id="lot-privacy_name"></strong>.
                                     </small>
                                 </div>
@@ -512,7 +512,7 @@
                             data-dismiss="modal">Fechar
                     </button>
                     <button type="button" class="btn btn-primary"
-                            onclick="save_privacy()">Salvar Privacidade
+                            onclick="save_privacy()">Salvar Restrição
                     </button>
                     <input type="hidden" name="lot-privacy-lot_id"
                            id="lot-privacy-lot_id" value=""/>

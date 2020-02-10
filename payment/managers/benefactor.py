@@ -29,7 +29,8 @@ class BenefactorManager(managers.Manager):
     ]
 
     required_for_legal_international = [
-        'ein',
+        'doc_type',
+        'doc_number',
     ]
 
     required_for_person = [

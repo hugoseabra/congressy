@@ -19,11 +19,7 @@ class EventHotsiteView(AccountMixin, FormView, EventDraftStateMixin):
         if not self.event:
             return False
 
-        same_org = self.event.organization == self.organization
-
-        hotsite_v1 = self.event.hotsite_version == 1
-
-        return same_org and hotsite_v1
+        return self.event.organization == self.organization
 
     def get_permission_denied_url(self):
         return reverse('event:event-list')

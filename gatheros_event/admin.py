@@ -4,12 +4,23 @@ Django Admin para Gatheros Event
 """
 from django.contrib import admin
 from django.db.models import Sum
-from django_grappelli_custom_autocomplete.admin import CustomAutocompleteMixin
 
 from gatheros_event.forms import FeatureConfigurationForm
-from .models import Category, Event, Info, Invitation, Member, Occupation, \
-    Organization, Person, Place, Segment, Subject, FeatureConfiguration, \
-    FeatureManagement
+from .models import (
+    Category,
+    Event,
+    Info,
+    Invitation,
+    Member,
+    Occupation,
+    Organization,
+    Person,
+    Place,
+    Segment,
+    Subject,
+    FeatureConfiguration,
+    FeatureManagement,
+)
 
 
 @admin.register(Segment)
@@ -22,7 +33,7 @@ class NameActivePKAdmin(admin.ModelAdmin):
 
 
 @admin.register(Event)
-class EventAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class EventAdmin(admin.ModelAdmin):
     """
     Admin para Event
     """
@@ -106,7 +117,7 @@ class EventAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 
 
 @admin.register(Person)
-class PersonAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class PersonAdmin(admin.ModelAdmin):
     """
     Admin para Person
     """
@@ -178,7 +189,7 @@ class PersonAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 
 
 @admin.register(Organization)
-class OrganizationAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class OrganizationAdmin(admin.ModelAdmin):
     """
     Admin para Organization
     """
@@ -232,7 +243,7 @@ class OrganizationAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
 
 
 @admin.register(Place)
-class PlaceAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class PlaceAdmin(admin.ModelAdmin):
     """
     Admin para Place
     """
@@ -275,7 +286,7 @@ class EventInfoAdmin(admin.ModelAdmin):
 
 
 @admin.register(Member)
-class MemberAdmin(CustomAutocompleteMixin, admin.ModelAdmin):
+class MemberAdmin(admin.ModelAdmin):
     """
     Admin para Member
     """

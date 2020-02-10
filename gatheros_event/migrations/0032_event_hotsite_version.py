@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='event',
             name='hotsite_version',
-            field=models.PositiveIntegerField(blank=True, default=1, verbose_name='Versão do hotsite'),
+            field=models.PositiveIntegerField(blank=True, default=2, verbose_name='Versão do hotsite'),
         ),
     ]

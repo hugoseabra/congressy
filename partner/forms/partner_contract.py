@@ -22,8 +22,8 @@ class PartnerContractForm(forms.ModelForm):
         try:
             if not self.instance.pk:
                 PartnerContract.objects.get(
-                    event=cleaned_data['event'],
-                    partner=cleaned_data['partner']
+                    event=cleaned_data.get('event'),
+                    partner=cleaned_data.get('partner'),
                 )
 
                 raise forms.ValidationError(

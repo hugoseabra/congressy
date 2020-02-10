@@ -8,6 +8,7 @@ from rest_framework import serializers
 
 from gatheros_subscription.models import Subscription
 from mailer.services import notify_new_free_subscription
+from payment.helpers.payment_helpers import has_open_boleto
 
 
 class SubscriptionSerializer(serializers.BaseSerializer):
@@ -264,6 +265,8 @@ class SubscriptionSerializer(serializers.BaseSerializer):
         rep['total_amount'] = total_amount
         rep['paid_amount'] = paid_amount
 
+        rep['has_open_boleto'] = has_open_boleto(obj)
+
         return rep
 
 
@@ -490,6 +493,8 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
 
         rep['total_amount'] = total_amount
         rep['paid_amount'] = paid_amount
+
+        rep['has_open_boleto'] = has_open_boleto(instance)
 
         return rep
 
@@ -759,6 +764,8 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
         rep['total_amount'] = total_amount
         rep['paid_amount'] = paid_amount
 
+        rep['has_open_boleto'] = has_open_boleto(instance)
+
         return rep
 
 
@@ -813,6 +820,29 @@ class SubscriptionPaymentSerializer(serializers.ModelSerializer):
                 'code': sub.code,
                 'lot': sub.lot_id,
             }
+
+            item['payer'] = None
+            item['payer_data'] = dict()
+
+            if hasattr(trans, 'payer'):
+                payer = trans.payer
+                benefactor = payer.benefactor
+
+                item['payer'] = benefactor.pk
+
+                item['payer_data'] = {
+                    'pk': str(benefactor.pk),
+                    'name': benefactor.name,
+                    'reference': benefactor.reference,
+                    'is_company': benefactor.is_company,
+                    'email': benefactor.email,
+                    'phone': benefactor.phone,
+                    'country': benefactor.country,
+                    'cpf': benefactor.cpf,
+                    'cnpj': benefactor.cnpj,
+                    'doc_type': benefactor.doc_type,
+                    'doc_number': benefactor.doc_number,
+                }
 
             item.update(model_to_dict(trans))
 
