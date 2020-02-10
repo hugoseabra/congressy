@@ -102,6 +102,7 @@ class EventPaymentView(AccountMixin,
                 'is_pending': trans.status == Transaction.WAITING_PAYMENT,
                 'status_name': trans.get_status_display(),
                 'liquid_amount': trans.transaction_liquid_amount,
+                'pagarme_id': trans.pagarme_id,
                 'part_info': None,
             }
 
