@@ -58,7 +58,7 @@ def get_installment_prices(request, amount=None):
 
     prices = list()
     total_prices = list()
-    no_interests_installments = list()
+    free_interests_parts = list()
     installment_part = 1
 
     for price in calculator.get_installment_prices(amount):
@@ -67,7 +67,7 @@ def get_installment_prices(request, amount=None):
         prices.append(price)
 
         if installment_part <= free_installments:
-            no_interests_installments.append(installment_part)
+            free_interests_parts.append(installment_part)
 
         installment_part += 1
 
@@ -76,14 +76,19 @@ def get_installment_prices(request, amount=None):
 
     response_data = list()
     for i in range(0, len(prices)):
+        total_amount = total_prices[i]
+        interests_amount = total_amount - amount
+
         serializer = PriceCalculatorSerializer(
             context={
                 'request': request,
             },
             data={
                 'installment': i + 1,
-                'no_interests_installments': no_interests_installments,
+                'free_interests_parts': free_interests_parts,
+                'interests_rate_percent': interests_rate,
                 'installment_amount': round(prices[i], 2),
+                'interests_amount': round(interests_amount, 2),
                 'amount': round(total_prices[i], 2),
             }
         )
