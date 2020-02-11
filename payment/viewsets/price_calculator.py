@@ -1,3 +1,4 @@
+import uuid
 from decimal import Decimal
 
 from django.conf import settings
@@ -6,6 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+from gatheros_subscription.models import Subscription
 from payment.installments import Calculator
 from payment.serializers import (
     PriceCalculatorSerializer,
@@ -19,6 +21,31 @@ def get_installment_prices(request, amount=None):
         content = {'detail': ['You must provide a price.']}
         return Response(data=content, status=status.HTTP_400_BAD_REQUEST)
 
+    free_installments = 0
+
+    if 'subscription' in request.GET:
+        sub_pk = request.GET.get('subscription')
+        try:
+            uuid.UUID(sub_pk)
+        except ValueError:
+            content = {'details': ['Invalid UUID for subscription']}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            sub = Subscription.objects.get(
+                pk=str(sub_pk),
+                test_subscription=False,
+            )
+
+            lot = sub.lot
+
+            if lot.num_install_interest_absortion:
+                free_installments = lot.num_install_interest_absortion
+
+        except Subscription.DoesNotExist:
+            content = {'details': ['Subscription not found']}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
     amount = Decimal(amount)
 
     interests_rate = settings.CONGRESSY_INSTALLMENT_INTERESTS_RATE
@@ -26,17 +53,25 @@ def get_installment_prices(request, amount=None):
     calculator = Calculator(
         interests_rate=Decimal(interests_rate / 100),
         total_installments=10,
+        free_installments=free_installments,
     )
 
     prices = list()
     total_prices = list()
+    no_interests_installments = list()
+    installment_part = 1
+
     for price in calculator.get_installment_prices(amount):
         if price < min_installment_price:
             continue
         prices.append(price)
 
-    for price in calculator.get_installment_totals(amount):
+        if installment_part <= free_installments:
+            no_interests_installments.append(installment_part)
 
+        installment_part += 1
+
+    for price in calculator.get_installment_totals(amount):
         total_prices.append(price)
 
     response_data = list()
@@ -47,6 +82,7 @@ def get_installment_prices(request, amount=None):
             },
             data={
                 'installment': i + 1,
+                'no_interests_installments': no_interests_installments,
                 'installment_amount': round(prices[i], 2),
                 'amount': round(total_prices[i], 2),
             }

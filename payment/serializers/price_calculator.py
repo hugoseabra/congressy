@@ -16,3 +16,24 @@ class PriceCalculatorSerializer(serializers.Serializer):
         min_value=1,
         required=True,
     )
+    no_interests_installments = serializers.ListField(
+        required=False,
+    )
+
+    def to_representation(self, data):
+        rep = super().to_representation(data)
+
+        rep['installment_amount_display'] = rep['installment_amount']
+
+        part = int(rep['installment'])
+
+        if part in rep.get('no_interests_installments', None):
+            rep['installment_amount_display'] = '{} {}'.format(
+                rep['installment_amount'],
+                '(sem juros)',
+            )
+
+        del rep['no_interests_installments']
+
+        print(rep)
+        return rep
