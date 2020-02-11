@@ -64,7 +64,7 @@ function fetch_cities(uf_el, city_list_el, city_hidden_el, selected_value, callb
     callback = callback || null;
 
     $.ajax({
-        url: "/api/cities/?uf=" + $(uf_el).val() + '&length=1000',
+        url: "/api/city/cities/?uf=" + $(uf_el).val() + '&length=1000',
         success: function (result) {
 
             var listitems = [];
@@ -123,7 +123,7 @@ function repopulate_cities(uf_el, selected_value, callback) {
 
 
     $.ajax({
-        url: "/api/cities/?uf=" + uf_el + '&length=1000',
+        url: "/api/city/cities/?uf=" + uf_el + '&length=1000',
         success: function (result) {
 
             var listitems = [];
@@ -163,7 +163,7 @@ function hotsiteRepopulate_cities(uf_el, selected_value, callback) {
 
 
     $.ajax({
-        url: "/api/cities/?uf=" + uf_el + '&length=1000',
+        url: "/api/city/cities/?uf=" + uf_el + '&length=1000',
         success: function (result) {
 
             var listitems = [];
