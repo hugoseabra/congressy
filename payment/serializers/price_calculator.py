@@ -1,3 +1,6 @@
+import locale
+from decimal import Decimal
+
 from rest_framework import serializers
 
 
@@ -27,13 +30,18 @@ class PriceCalculatorSerializer(serializers.Serializer):
 
         part = int(rep['installment'])
 
+        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+
         if part in rep.get('no_interests_installments', None):
             rep['installment_amount_display'] = '{} {}'.format(
-                rep['installment_amount'],
+                locale.currency(
+                    Decimal(rep['installment_amount']),
+                    grouping=True,
+                    symbol=None,
+                ),
                 '(sem juros)',
             )
 
         del rep['no_interests_installments']
 
-        print(rep)
         return rep
