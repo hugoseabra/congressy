@@ -540,7 +540,7 @@
 
                 if (id_city.val()) {
                     $.ajax({
-                        url: "/api/cities/" + id_city.val(),
+                        url: "/api/city/cities/" + id_city.val(),
                         success: function (result) {
                             console.log(result);
                             hotsiteRepopulate_cities(result.uf, result.id);
