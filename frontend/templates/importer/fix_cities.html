@@ -84,7 +84,7 @@
             callback = callback || null;
 
             $.ajax({
-                url: "/api/cities/?uf=" + $(uf_el).val() + '&length=1000',
+                url: "/api/city/cities/?uf=" + $(uf_el).val() + '&length=1000',
                 success: function (result) {
 
                     var listitems = [];
