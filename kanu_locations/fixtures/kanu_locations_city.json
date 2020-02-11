@@ -50065,5 +50065,176 @@
       "name_ascii": "BRASILIA",
       "uf": "DF"
     }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5566,
+    "fields": {
+      "name": "CEILÂNDIA",
+      "name_ascii": "CEILANDIA",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5567,
+    "fields": {
+      "name": "SAMAMBAIA",
+      "name_ascii": "SAMAMBAIA",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5568,
+    "fields": {
+      "name": "TAGUATINGA",
+      "name_ascii": "TAGUATINGA",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5569,
+    "fields": {
+      "name": "PLANALTINA",
+      "name_ascii": "PLANALTINA",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5570,
+    "fields": {
+      "name": "GAMA",
+      "name_ascii": "GAMA",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5571,
+    "fields": {
+      "name": "GARÁ",
+      "name_ascii": "GARA",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5572,
+    "fields": {
+      "name": "SANTA MARIA",
+      "name_ascii": "SANTA MARIA",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5573,
+    "fields": {
+      "name": "SOBRADINHO",
+      "name_ascii": "SOBRADINHO",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5574,
+    "fields": {
+      "name": "SOBRADINHO II",
+      "name_ascii": "SOBRADINHO II",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5575
+    "fields": {
+      "name": "SÃO SEBASTIÃO",
+      "name_ascii": "SAO SEBASTIAO",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5576,
+    "fields": {
+      "name": "VICENTE PIRES",
+      "name_ascii": "VICENTE PIRES",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5577,
+    "fields": {
+      "name": "ITAPOÃ",
+      "name_ascii": "ITAPOA",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5578,
+    "fields": {
+      "name": "BRAZLÂNDIA",
+      "name_ascii": "BRAZLANDIA",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5579,
+    "fields": {
+      "name": "PARANOÁ",
+      "name_ascii": "PARANOA",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5580,
+    "fields": {
+      "name": "RIACHO FUNDO",
+      "name_ascii": "RIACHO FUNDO",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5581,
+    "fields": {
+      "name": "CRUZEIRO",
+      "name_ascii": "CRUZEIRO",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5582,
+    "fields": {
+      "name": "JARDIM BOTÂNICO",
+      "name_ascii": "JARDIM BOTÂNICO",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5583,
+    "fields": {
+      "name": "NÚCLEO BANDEIRANTES",
+      "name_ascii": "NUCLEO BANDEIRANTES",
+      "uf": "DF"
+    }
+  },
+  {
+    "model": "kanu_locations.city",
+    "pk": 5584,
+    "fields": {
+      "name": "PARK WAY",
+      "name_ascii": "PARK WAY",
+      "uf": "DF"
+    }
   }
 ]
