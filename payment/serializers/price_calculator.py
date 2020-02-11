@@ -1,9 +1,9 @@
 import locale
 from decimal import Decimal
 
-from decimal import Decimal
-
 from rest_framework import serializers
+
+locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
 
 class PriceCalculatorSerializer(serializers.Serializer):
@@ -16,6 +16,16 @@ class PriceCalculatorSerializer(serializers.Serializer):
         decimal_places=2,
         max_digits=11,
         required=True,
+    )
+    interests_amount = serializers.DecimalField(
+        decimal_places=2,
+        max_digits=11,
+        required=False,
+    )
+    interests_rate_percent = serializers.DecimalField(
+        decimal_places=2,
+        max_digits=11,
+        required=False,
     )
     installment = serializers.IntegerField(
         min_value=1,
@@ -41,20 +51,17 @@ class PriceCalculatorSerializer(serializers.Serializer):
                 round(Decimal(interests_rate_percent), 2),
         })
 
-        rep['installment_amount_display'] = installment_amount
+        rep['installment_amount_display'] = locale.currency(
+            installment_amount,
+            grouping=True,
+            symbol=None,
+        )
 
         part = int(rep['installment'])
 
-        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-
         if part in rep.get('free_interests_parts', None):
             rep['installment_amount_display'] = '{} {}'.format(
-                locale.currency(
-                    installment_amount,
-                    grouping=True,
-                    symbol=None,
-                ),
-                round(installment_amount, 2),
+                rep['installment_amount_display'],
                 '(sem juros)',
             )
 
