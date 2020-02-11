@@ -42,8 +42,9 @@ class CheckoutValidationForm(forms.Form):
     )
 
     # Valor devido íntegro sem taxas de parcelamento
-    interests_amount = forms.IntegerField(
-        widget=forms.HiddenInput(),
+    interests_amount = forms.DecimalField(
+        decimal_places=2,
+        max_digits=11,
         required=False,
     )
 

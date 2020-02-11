@@ -15,7 +15,7 @@ class PriceCalculatorSerializer(serializers.Serializer):
     installment_amount = serializers.DecimalField(
         decimal_places=2,
         max_digits=11,
-        required=True,
+        required=False,
     )
     interests_amount = serializers.DecimalField(
         decimal_places=2,
