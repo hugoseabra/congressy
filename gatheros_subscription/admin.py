@@ -30,6 +30,7 @@ class LotAdmin(admin.ModelAdmin):
     search_fields = (
         'pk',
         'event__name',
+        'event__slug',
         'name',
     )
     list_display = (
@@ -106,6 +107,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         'person__email',
         'person__cpf',
         'event__name',
+        'event__slug',
     )
     list_display = ('person', 'event_count', 'lot', 'code', 'completed',)
     list_filter = ('completed',)

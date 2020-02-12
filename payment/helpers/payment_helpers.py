@@ -155,6 +155,12 @@ def get_amounts_from_transaction(event: Event, amount: Decimal):
     }
 
 
+def is_data_valid_for_payment(data: dict) -> bool:
+    from pprint import pprint
+    pprint(data)
+    return True
+
+
 def is_person_enabled_for_payment(person: Person) -> bool:
     if person.country:
         is_brazilian = person.country.lower() == 'br'
@@ -206,9 +212,14 @@ def is_person_enabled_for_payment(person: Person) -> bool:
         fields += required_doc_inter_fields
         fields += required_inter_address
 
+    data = dict()
     for f_name in fields:
         if hasattr(person, f_name) is False or not getattr(person, f_name):
             return False
+
+        data[f_name] = getattr(person, f_name)
+
+    is_data_valid_for_payment(data)
 
     return True
 
@@ -279,9 +290,14 @@ def is_benefactor_enabled_for_payment(benefactor: Benefactor) -> bool:
         else:
             fields += required_inter_address
 
+    data = dict()
     for f_name in fields:
         if hasattr(benefactor, f_name) is False or not getattr(benefactor,
                                                                f_name):
             return False
+
+        data[f_name] = getattr(benefactor, f_name)
+
+    is_data_valid_for_payment(data)
 
     return True
