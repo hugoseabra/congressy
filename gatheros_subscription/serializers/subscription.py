@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 
 import absoluteuri
@@ -783,6 +784,8 @@ class SubscriptionPaymentSerializer(serializers.ModelSerializer):
         rep['transactions'] = list()
         rep['amount'] = Decimal(0)
 
+        today = datetime.now().date()
+
         for trans in instance.transactions.all():
             lot = trans.lot
             sub = trans.subscription
@@ -843,6 +846,11 @@ class SubscriptionPaymentSerializer(serializers.ModelSerializer):
                     'doc_type': benefactor.doc_type,
                     'doc_number': benefactor.doc_number,
                 }
+
+            if trans.type == trans.BOLETO:
+                item['expired'] = trans.boleto_expiration_date <= today
+            else:
+                item['expired'] = False
 
             item.update(model_to_dict(trans))
 
