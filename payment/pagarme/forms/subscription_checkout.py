@@ -4,6 +4,7 @@
 
 import logging
 import uuid
+from datetime import datetime
 
 from django import forms
 from django.db.models import ObjectDoesNotExist
@@ -144,6 +145,8 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                         'lot_id': lot_id,
                         'type': Transaction.BOLETO,
                         'status': Transaction.WAITING_PAYMENT,
+                        # boleto futuro
+                        'boleto_expiration_date__gt': datetime.today()
                         # 'admin_cancelled': False,
                     }
 
