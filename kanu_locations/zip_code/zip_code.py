@@ -1,7 +1,7 @@
 from django.db.models import Q
 
 from kanu_locations.models import City
-from .exceptions import CongressyAPIException
+from .exceptions import CongressyException
 from .http import Resource
 
 
@@ -46,7 +46,7 @@ class ZipCode(Resource):
         result = self.get(self.uri)
 
         if 'erro' in result and result['erro'] is True:
-            raise CongressyAPIException()
+            raise CongressyException('CEP Inválido')
 
         map = {
             'logradouro': 'street_name',

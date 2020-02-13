@@ -10,7 +10,7 @@ from kanu_datatable import DataTableAPIView
 from .models import City
 from .serializers import CitySerializer
 from .zip_code import ZipCode
-from .zip_code.exceptions import CongressyAPIException
+from .zip_code.exceptions import CongressyAPIException, CongressyException
 
 
 class CityListView(DataTableAPIView, generics.RetrieveAPIView,
@@ -45,7 +45,7 @@ def get_zip_code(request, zip_code_number):
 
     try:
         zip_code.process()
-    except CongressyAPIException:
+    except CongressyException:
         msg = {'detail': ['CEP inválido']}
         return Response(msg, status=status.HTTP_404_NOT_FOUND)
 
