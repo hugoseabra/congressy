@@ -615,6 +615,8 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
             'pk': lot.pk,
             'name': lot.name,
             'event': lot.event_id,
+            'date_start': lot.date_start.strftime('%Y-%m-%d %H:%M:%S'),
+            'date_end': lot.date_end.strftime('%Y-%m-%d %H:%M:%S'),
             'event_data': {
                 'pk': lot.event_id,
                 'name': lot.event.name,
