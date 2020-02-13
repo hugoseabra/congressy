@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from unidecode import unidecode
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework import viewsets
 
 from kanu_datatable import DataTableAPIView
@@ -10,6 +10,7 @@ from kanu_datatable import DataTableAPIView
 from .models import City
 from .serializers import CitySerializer
 from .zip_code import ZipCode
+from .zip_code.exceptions import CongressyAPIException
 
 
 class CityListView(DataTableAPIView, generics.RetrieveAPIView,
@@ -41,6 +42,11 @@ class CityListView(DataTableAPIView, generics.RetrieveAPIView,
 @permission_classes((AllowAny,))
 def get_zip_code(request, zip_code_number):
     zip_code = ZipCode(zip_code=zip_code_number)
-    zip_code.process()
+
+    try:
+        zip_code.process()
+    except CongressyAPIException:
+        msg = {'detail': ['CEP inválido']}
+        return Response(msg, status=status.HTTP_404_NOT_FOUND)
 
     return Response(data=zip_code.data)
