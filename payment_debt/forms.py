@@ -1,8 +1,9 @@
 from decimal import Decimal
 
 from django import forms
+from django.conf import settings
 
-from payment.helpers import payment_helpers
+from payment.installments import Calculator
 from payment_debt.models import Debt
 
 
@@ -19,6 +20,7 @@ class DebtForm(forms.ModelForm):
 
     def __init__(self, subscription, *args, **kwargs):
         self.subscription = subscription
+        self.lot = subscription.lot
 
         self.amount = Decimal(0)
 
@@ -51,7 +53,7 @@ class DebtForm(forms.ModelForm):
         # Calcula valor líquido.
         debt_type = cleaned_data.get('type', Debt.DEBT_TYPE_SUBSCRIPTION)
         if debt_type == Debt.DEBT_TYPE_SUBSCRIPTION:
-            self.amount = self.subscription.lot.get_calculated_price()
+            self.original_amount = self.subscription.lot.get_calculated_price()
             self.liquid_amount = self.subscription.lot.get_liquid_price()
 
         elif debt_type == Debt.DEBT_TYPE_SERVICE:
@@ -60,8 +62,10 @@ class DebtForm(forms.ModelForm):
         elif debt_type == Debt.DEBT_TYPE_PRODUCT:
             self._set_product_amounts()
 
+        self.amount = self.original_amount
+
+        self._set_amount_with_interests()
         self._set_installments_amount()
-        self._set_installment_interests_amount()
 
         return cleaned_data
 
@@ -70,13 +74,38 @@ class DebtForm(forms.ModelForm):
 
     def save(self, commit=True):
         self.instance.subscription = self.subscription
-        self.instance.amount = self.amount
+        self.instance.amount = self.original_amount
         self.instance.liquid_amount = self.liquid_amount
         self.instance.installment_amount = self.installment_amount
         self.instance.installment_interests_amount = \
             self.installment_interests_amount
 
         return super().save(commit)
+
+    def _set_amount_with_interests(self):
+        """
+        Define valor final do pagamento de acordo com juros de parcelamento.
+        """
+        interests_rate = settings.CONGRESSY_INSTALLMENT_INTERESTS_RATE
+
+        amount = self.amount
+
+        calculator = Calculator(
+            interests_rate=Decimal(interests_rate / 100),
+            total_installments=10,
+            free_installments=self.lot.num_install_interest_absortion,
+        )
+        amount_with_interests = calculator.get_installment_total_amount(
+            amount=amount,
+            installments=self.cleaned_data.get('installments'),
+        )
+        self.installment_interests_amount = \
+            calculator.get_installment_interests_amount(
+                amount=amount,
+                installments=self.cleaned_data.get('installments')
+            )
+
+        self.amount = amount_with_interests
 
     def _set_service_amounts(self):
         """
@@ -87,7 +116,7 @@ class DebtForm(forms.ModelForm):
                 optional_id=self.cleaned_data.get('item_id')
         ):
             self.liquid_amount += sub_addon.optional.liquid_price
-            self.amount += sub_addon.optional.price
+            self.original_amount += sub_addon.optional.price
 
     def _set_product_amounts(self):
         """
@@ -98,7 +127,7 @@ class DebtForm(forms.ModelForm):
                 optional_id=self.cleaned_data.get('item_id')
         ):
             self.liquid_amount += sub_addon.optional.liquid_price
-            self.amount += sub_addon.optional.price
+            self.original_amount += sub_addon.optional.price
 
     def _set_installments_amount(self):
         """ Seta montante por parcela. """
@@ -107,23 +136,7 @@ class DebtForm(forms.ModelForm):
 
         installments = self.cleaned_data.get('installments', 1)
 
-        if installments <= 1:
-            self.installment_amount = self.original_amount
-            return
+        self.installment_amount = self.amount
 
-        self.installment_amount = self.amount / int(installments)
-
-    def _set_installment_interests_amount(self):
-        """ Seta valor de juros a ser pago ao final de todas as parcelas. """
-        if not self.amount:
-            self.installment_amount = Decimal(0.00)
-
-        installments = self.cleaned_data.get('installments', 1)
-
-        if installments <= 1:
-            # Sem parcelamento, sem juros.
-            self.installment_interests_amount = Decimal(0)
-            return
-
-        self.installment_interests_amount = \
-            round((self.amount - self.original_amount), 2)
+        if installments > 1:
+            self.installment_amount = self.amount / int(installments)

@@ -135,6 +135,13 @@ class Debt(models.Model):
     def has_credit(self):
         return self.status == self.DEBT_STATUS_CREDIT
 
+    @property
+    def total_amount(self):
+        if self.installment_interests_amount:
+            return self.amount + self.installment_interests_amount
+
+        return self.amount
+
 
 class DebtConfig(models.Model):
     """

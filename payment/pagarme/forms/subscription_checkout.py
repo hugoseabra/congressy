@@ -111,11 +111,8 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                 debt_form.save()
 
         try:
-            interests_amount = self.cleaned_data.get('interests_amount')
+            interests_amount = self.interests_amount
             amount_to_transact = self.amount_to_transact
-
-            if interests_amount and interests_amount > 0:
-                amount_to_transact += interests_amount
 
             builder = self._create_builder(
                 payer=self.payer_instance,
@@ -360,12 +357,69 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
             self.amount_to_transact += debt_form.amount
             self.liquid_amount += debt_form.liquid_amount
 
+    def _set_interests_amount(self):
+        if not self.subscription_instance:
+            return
+
+        self.subscription_debt_form = self._create_subscription_debt_form()
+
+        if self.subscription_debt_form:
+
+            if not self.subscription_debt_form.is_valid():
+                error_msgs = []
+                for field, errs in self.subscription_debt_form.errors.items():
+                    error_msgs.append(str(errs))
+
+                raise forms.ValidationError(
+                    'Dados de pendência inválidos:'
+                    ' {}'.format("".join(error_msgs))
+                )
+
+            self.interests_amount += \
+                self.subscription_debt_form.installment_interests_amount
+
+        self.product_debt_forms = self._create_product_debt_forms()
+
+        for debt_form in self.product_debt_forms:
+            if not debt_form.is_valid():
+                from pprint import pprint
+                pprint(debt_form.errors)
+
+                error_msgs = []
+                for field, errs in debt_form.errors.items():
+                    error_msgs.append(str(errs))
+
+                raise forms.ValidationError(
+                    'Dados de pendência de opcionais inválidos:'
+                    ' {}'.format("".join(error_msgs))
+                )
+
+            self.interests_amount += debt_form.installment_interests_amount
+
+        self.service_debt_forms = self._create_service_debt_forms()
+
+        for debt_form in self.service_debt_forms:
+            if not debt_form.is_valid():
+                from pprint import pprint
+                pprint(debt_form.errors)
+
+                error_msgs = []
+                for field, errs in debt_form.errors.items():
+                    error_msgs.append(str(errs))
+
+                raise forms.ValidationError(
+                    'Dados de pendência de atividades extras inválidos:'
+                    ' {}'.format("".join(error_msgs))
+                )
+
+            self.interests_amount += debt_form.installment_interests_amount
+
     def _create_builder_instance(self):
         # Construção de dados para transação do Pagarme
 
         transaction = PagarmeTransaction(
             transaction_id=str(uuid.uuid4()),
-            interests_amount=self.cleaned_data.get('interests_amount'),
+            interests_amount=self.interests_amount,
             installments=self.cleaned_data.get('num_installments'),
         )
 
