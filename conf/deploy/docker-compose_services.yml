@@ -55,7 +55,9 @@ services:
       - ./shared-volume/qrcodes:/tmp/qrcodes
       - ./shared-volume/barcodes:/tmp/barcodes
       - ./shared-volume/vouchers:/tmp/vouchers
-    env_file: ./env-file
+    env_file:
+      - ./env-file
+      - ./env-manage-file
     networks:
       - wkhtmltopdf
 
