@@ -38,7 +38,7 @@ class EventAdmin(admin.ModelAdmin):
     Admin para Event
     """
     search_fields = ('pk', 'name', 'organization__name',)
-    list_filter = ('subscription_type',)
+    list_filter = ('subscription_type', 'hotsite_version',)
     list_display = (
         'name',
         'get_partner_percents',
@@ -75,6 +75,7 @@ class EventAdmin(admin.ModelAdmin):
         }),
         ('Publicação', {
             'fields': (
+                'hotsite_version',
                 'image_main',
                 'banner_top',
                 'banner_small',
