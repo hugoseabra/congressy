@@ -45,7 +45,7 @@ class LotAdmin(admin.ModelAdmin):
         'internal',
         'pk'
     )
-    raw_id_fields = ['category']
+    raw_id_fields = ['category', 'event']
     fieldsets = (
         (None, {
             'fields': (
