@@ -135,37 +135,34 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                 builder.set_as_boleto(expiration_date=exp_date)
 
                 # Se existe boleto aberta com o mesmo valor.
-                try:
-                    transaction_filter = {
-                        'amount': amount_to_transact,
-                        'liquid_amount': self.liquid_amount,
-                        'lot_id': lot_id,
-                        'type': Transaction.BOLETO,
-                        'status': Transaction.WAITING_PAYMENT,
-                        # boleto futuro
-                        'boleto_expiration_date__gt': datetime.today()
-                        # 'admin_cancelled': False,
-                    }
+                transaction_filter = {
+                    'amount': amount_to_transact,
+                    'liquid_amount': self.liquid_amount,
+                    'lot_id': lot_id,
+                    'type': Transaction.BOLETO,
+                    'status': Transaction.WAITING_PAYMENT,
+                    # boleto futuro
+                    'boleto_expiration_date__gt': datetime.today()
+                    # 'admin_cancelled': False,
+                }
 
-                    if self.installment_part_instance:
-                        transaction_filter['part_id'] = \
-                            self.installment_part_instance.pk
+                if self.installment_part_instance:
+                    transaction_filter['part_id'] = \
+                        self.installment_part_instance.pk
 
-                    if isinstance(self.payer_instance, Benefactor):
-                        transaction_filter['payer__benefactor_id'] = \
-                            self.payer_instance.pk
-                        transaction_filter['payer__subscription_id'] = \
-                            self.subscription_instance.pk
+                if isinstance(self.payer_instance, Benefactor):
+                    transaction_filter['payer__benefactor_id'] = \
+                        self.payer_instance.pk
+                    transaction_filter['payer__subscription_id'] = \
+                        self.subscription_instance.pk
 
-                    transaction = \
-                        self.subscription_instance.transactions.get(
-                            **transaction_filter
-                        )
+                transaction_qs = \
+                    self.subscription_instance.transactions.filter(
+                        **transaction_filter
+                    )
 
-                    return transaction
-
-                except ObjectDoesNotExist:
-                    pass
+                if transaction_qs.exists() is True:
+                    return transaction_qs.last()
 
             elif transaction_type == Transaction.CREDIT_CARD:
 
@@ -184,21 +181,18 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                     builder.set_as_credit_card_data(**card_data)
 
                 # Se existe par aberta com o mesmo valor.
-                try:
-                    transaction = \
-                        self.subscription_instance.transactions.get(
-                            amount=amount_to_transact + interests_amount,
-                            liquid_amount=self.liquid_amount,
-                            lot_id=lot_id,
-                            type=Transaction.CREDIT_CARD,
-                            status=Transaction.PROCESSING,
-                            # admin_cancelled=False,
-                        )
+                transaction_qs = \
+                    self.subscription_instance.transactions.filter(
+                        amount=amount_to_transact + interests_amount,
+                        liquid_amount=self.liquid_amount,
+                        lot_id=lot_id,
+                        type=Transaction.CREDIT_CARD,
+                        status=Transaction.PROCESSING,
+                        # admin_cancelled=False,
+                    ).order_by('date_created')
 
-                    return transaction
-
-                except ObjectDoesNotExist:
-                    pass
+                if transaction_qs.exists() is True:
+                    return transaction_qs.last()
 
             builder.build()
 
