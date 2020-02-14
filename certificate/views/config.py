@@ -13,6 +13,7 @@ class CertificateConfigView(CertificateFeatureFlagMixin, generic.DetailView):
     template_name = 'certificate/certificado_.html'
     long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
     ticket_name = "Lote 1 - Especial"
+    category_name = "Categoria Estudantes"
 
     def get_object(self, queryset=None):
 
@@ -43,6 +44,11 @@ class CertificateConfigView(CertificateFeatureFlagMixin, generic.DetailView):
         )
 
         ref_object.text_content = ref_object.text_content.replace(
+            "{{CATEGORY_NAME}}",
+            self.category_name
+        )
+
+        ref_object.text_content = ref_object.text_content.replace(
             self.long_name,
             "<strong>" + self.long_name + "</strong>"
         )
@@ -50,6 +56,11 @@ class CertificateConfigView(CertificateFeatureFlagMixin, generic.DetailView):
         ref_object.text_content = ref_object.text_content.replace(
             self.ticket_name,
             "<strong>" + self.ticket_name + "</strong>"
+        )
+
+        ref_object.text_content = ref_object.text_content.replace(
+            self.category_name,
+            "<strong>" + self.category_name + "</strong>"
         )
 
         ref_object.text_content = ref_object.text_content.replace(

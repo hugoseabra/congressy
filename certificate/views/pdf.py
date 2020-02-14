@@ -80,6 +80,8 @@ class CertificatePDFView(CertificateFeatureFlagMixin):
         text = text.replace("{{NOME}}", "<strong>{{NOME}}</strong>")
         text = text.replace("{{TICKET_NAME}}",
                             "<strong>{{TICKET_NAME}}</strong>")
+        text = text.replace("{{CATEGORY_NAME}}",
+                            "<strong>{{CATEGORY_NAME}}</strong>")
 
         text_template = Template(text)
         context = Context(
@@ -87,6 +89,7 @@ class CertificatePDFView(CertificateFeatureFlagMixin):
                 'NOME': self.subscription.person.name.upper(),
                 'EVENTO': self.subscription.event.name,
                 'TICKET_NAME': self.subscription.lot.name,
+                'CATEGORY_NAME': self.subscription.lot.category.name,
             }
         )
         res = text_template.render(context)
@@ -153,6 +156,7 @@ class CertificatePDFExampleView(CertificateFeatureFlagMixin):
     event = None
     long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
     ticket_name = "Lote 1 - Especial"
+    category_name = "Categoria Estudantes"
     wkhtml_ws_url = settings.WKHTMLTOPDF_WS_URL
 
     def get_filename(self):
@@ -178,10 +182,14 @@ class CertificatePDFExampleView(CertificateFeatureFlagMixin):
             static('assets/plugins/bootstrap/css/bootstrap.min.css')
         main_css_path = static('assets/css/main.css')
 
-        context['bootstrap_min_css'] = absoluteuri.build_absolute_uri(
-            bootstrap_path
-        )
-        context['main_css'] = absoluteuri.build_absolute_uri(main_css_path)
+        if settings.DEBUG is False:
+            context['bootstrap_min_css'] = \
+                absoluteuri.build_absolute_uri(bootstrap_path)
+            context['main_css'] = absoluteuri.build_absolute_uri(main_css_path)
+        else:
+            context['bootstrap_min_css'] = \
+                'http://172.17.0.1:8000' + bootstrap_path
+            context['main_css'] = 'http://172.17.0.1:8000' + main_css_path
 
         context['certificate'] = self.event.certificate
         context['text'] = self.get_text()
@@ -192,6 +200,10 @@ class CertificatePDFExampleView(CertificateFeatureFlagMixin):
         text = self.event.certificate.text_content
 
         text = text.replace("{{NOME}}", "<strong>{{NOME}}</strong>")
+        text = text.replace("{{TICKET_NAME}}",
+                            "<strong>{{TICKET_NAME}}</strong>")
+        text = text.replace("{{CATEGORY_NAME}}",
+                            "<strong>{{CATEGORY_NAME}}</strong>")
 
         text_template = Template(text)
         context = Context(
@@ -199,6 +211,7 @@ class CertificatePDFExampleView(CertificateFeatureFlagMixin):
                 'NOME': self.long_name,
                 'EVENTO': self.event.name,
                 'TICKET_NAME': self.ticket_name,
+                'CATEGORY_NAME': self.category_name,
                 'CPF': "629.162.880-58",
             }
         )
