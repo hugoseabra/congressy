@@ -61,10 +61,14 @@ class CertificatePDFView(CertificateFeatureFlagMixin):
             'assets/plugins/bootstrap/css/bootstrap.min.css')
         main_css_path = static('assets/css/main.css')
 
-        context['bootstrap_min_css'] = absoluteuri.build_absolute_uri(
-            bootstrap_path
-        )
-        context['main_css'] = absoluteuri.build_absolute_uri(main_css_path)
+        if settings.DEBUG is False:
+            context['bootstrap_min_css'] = \
+                absoluteuri.build_absolute_uri(bootstrap_path)
+            context['main_css'] = absoluteuri.build_absolute_uri(main_css_path)
+        else:
+            context['bootstrap_min_css'] = \
+                'http://172.17.0.1:8000' + bootstrap_path
+            context['main_css'] = 'http://172.17.0.1:8000' + main_css_path
 
         context['event'] = self.event
         context['certificate'] = self.event.certificate
@@ -78,10 +82,17 @@ class CertificatePDFView(CertificateFeatureFlagMixin):
     def get_text(self):
         text = self.event.certificate.text_content
         text = text.replace("{{NOME}}", "<strong>{{NOME}}</strong>")
+        text = text.replace("{{EVENTO}}", "<strong>{{EVENTO}}</strong>")
         text = text.replace("{{TICKET_NAME}}",
                             "<strong>{{TICKET_NAME}}</strong>")
         text = text.replace("{{CATEGORY_NAME}}",
                             "<strong>{{CATEGORY_NAME}}</strong>")
+        text = text.replace("{{CPF}}",
+                            "<strong>{{CPF}}</strong>")
+        text = text.replace("{{BIRTH_DATE}}",
+                            "<strong>{{BIRTH_DATE}}</strong>")
+
+        person = self.subscription.person
 
         text_template = Template(text)
         context = Context(
@@ -90,6 +101,9 @@ class CertificatePDFView(CertificateFeatureFlagMixin):
                 'EVENTO': self.subscription.event.name,
                 'TICKET_NAME': self.subscription.lot.name,
                 'CATEGORY_NAME': self.subscription.lot.category.name,
+                'CPF': person.get_cpf_display() if person.cpf else None,
+                'BIRTH_DATE': person.get_birth_date_display()
+                if person.birth_date else None,
             }
         )
         res = text_template.render(context)
@@ -100,15 +114,15 @@ class CertificatePDFView(CertificateFeatureFlagMixin):
         if not self.subscription.confirmed:
             return False
 
-        certificate_config = self.subscription.event.certificate
-
-        if certificate_config.only_attending_participantes:
-
-            if not subscription_has_certificate(self.subscription.pk):
-                self.permission_denied_message = "Certificado disponivel " \
-                                                 "apenas participantes com " \
-                                                 "presença confirmada!"
-                return False
+        # certificate_config = self.subscription.event.certificate
+        #
+        # if certificate_config.only_attending_participantes:
+        #
+        #     if not subscription_has_certificate(self.subscription.pk):
+        #         self.permission_denied_message = "Certificado disponivel " \
+        #                                          "apenas participantes com " \
+        #                                          "presença confirmada!"
+        #         return False
 
         return True
 
@@ -157,6 +171,8 @@ class CertificatePDFExampleView(CertificateFeatureFlagMixin):
     long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
     ticket_name = "Lote 1 - Especial"
     category_name = "Categoria Estudantes"
+    cpf = "629.162.880-58"
+    birth_date = "01/01/2012"
     wkhtml_ws_url = settings.WKHTMLTOPDF_WS_URL
 
     def get_filename(self):
@@ -204,6 +220,10 @@ class CertificatePDFExampleView(CertificateFeatureFlagMixin):
                             "<strong>{{TICKET_NAME}}</strong>")
         text = text.replace("{{CATEGORY_NAME}}",
                             "<strong>{{CATEGORY_NAME}}</strong>")
+        text = text.replace("{{CPF}}",
+                            "<strong>{{CPF}}</strong>")
+        text = text.replace("{{BIRTH_DATE}}",
+                            "<strong>{{BIRTH_DATE}}</strong>")
 
         text_template = Template(text)
         context = Context(
@@ -212,7 +232,8 @@ class CertificatePDFExampleView(CertificateFeatureFlagMixin):
                 'EVENTO': self.event.name,
                 'TICKET_NAME': self.ticket_name,
                 'CATEGORY_NAME': self.category_name,
-                'CPF': "629.162.880-58",
+                'CPF': self.cpf,
+                'BIRTH_DATE': self.birth_date,
             }
         )
 
@@ -280,7 +301,7 @@ class CertificateManualView(CertificateFeatureFlagMixin,
                 reverse_lazy('certificate:event-certificate-config', kwargs={
                     'event_pk': self.event.pk
                 }))
-        
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
