@@ -2,7 +2,6 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework import generics, status
 from rest_framework import viewsets
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from unidecode import unidecode
@@ -10,11 +9,12 @@ from unidecode import unidecode
 from kanu_datatable import DataTableAPIView
 from .models import City
 from .serializers import CitySerializer
-from .zip_code import ZipCode
+from .zip_code import ZipCodeCepAberto as ZipCode
 from .zip_code.exceptions import CongressyException
 
 
-class CityListView(DataTableAPIView, generics.RetrieveAPIView,
+class CityListView(DataTableAPIView,
+                   generics.RetrieveAPIView,
                    viewsets.GenericViewSet):
     """
     Rota para pesquisar e recuperar Cidades
@@ -43,7 +43,7 @@ class ZipCodeViewSet(viewsets.ViewSet):
     permission_classes = (AllowAny,)
 
     # Cache requested url for each user for 2 hours
-    @method_decorator(cache_page(60*60*24*10))
+    @method_decorator(cache_page(60 * 60 * 24 * 10))
     def list(self, request, *args, **kwargs):
         zip_code_number = self.kwargs.get('zip_code_number')
 

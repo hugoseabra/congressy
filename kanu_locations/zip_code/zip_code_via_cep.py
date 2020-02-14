@@ -12,7 +12,7 @@ class ZipCode(Resource):
 
     def __init__(self, zip_code: str, *args, **kwargs):
         self.zip_code = ''.join(*[filter(str.isalnum, zip_code)])
-        self.zip_code_formatted = ''.join(*[filter(str.isalnum, zip_code)])
+        self.zip_code_formatted = None
         self.street_name = None
         self.complement = None
         self.neighborhood = None
@@ -48,7 +48,7 @@ class ZipCode(Resource):
         if 'erro' in result and result['erro'] is True:
             raise CongressyException('CEP Inválido')
 
-        map = {
+        map_keys = {
             'logradouro': 'street_name',
             'complemento': 'complement',
             'bairro': 'neighborhood',
@@ -61,7 +61,7 @@ class ZipCode(Resource):
         city_name = None
         city_uf = None
 
-        for key, local_key in map.items():
+        for key, local_key in map_keys.items():
             if key in result and hasattr(self, local_key):
                 value = str(result[key]).upper()
                 if key == 'localidade':
@@ -84,5 +84,4 @@ class ZipCode(Resource):
                 pass
 
     def get(self, endpoint):
-        uri = self.get_uri(endpoint)
-        return self.transporter.request('GET', uri, dict())
+        return self.request(method='GET', endpoint=endpoint)
