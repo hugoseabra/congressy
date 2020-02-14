@@ -18,7 +18,6 @@ class ZipCode(Resource):
         self.neighborhood = None
         self.city_name = None
         self.state_name = None
-        self.ibge = None
         self.city_id = None
 
         self.uri = 'cep?cep={}'.format(
@@ -40,7 +39,6 @@ class ZipCode(Resource):
             'city_id': self.city_id,
             'city_name': self.city_name,
             'state_name': self.state_name,
-            'ibge': self.ibge,
             'zip_code': self.zip_code,
             'zip_code_formatted': self.zip_code_formatted,
         }
@@ -66,8 +64,8 @@ class ZipCode(Resource):
         if self.city_name and self.state_name:
             try:
                 city_instance = City.objects.get(
-                    Q(name__icontains=self.city_name) |
-                    Q(name_ascii__icontains=self.city_name),
+                    Q(name__iexact=self.city_name) |
+                    Q(name_ascii__iexact=self.city_name),
                     uf=self.state_name,
                 )
                 self.city_id = city_instance.pk

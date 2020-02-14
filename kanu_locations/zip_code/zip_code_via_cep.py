@@ -18,7 +18,6 @@ class ZipCode(Resource):
         self.neighborhood = None
         self.city_name = None
         self.state_name = None
-        self.ibge = None
         self.city_id = None
 
         self.uri = '{}/json/unicode/'.format(self.zip_code)
@@ -37,7 +36,6 @@ class ZipCode(Resource):
             'city_id': self.city_id,
             'city_name': self.city_name,
             'state_name': self.state_name,
-            'ibge': self.ibge,
             'zip_code': self.zip_code,
             'zip_code_formatted': self.zip_code_formatted,
         }
@@ -53,7 +51,6 @@ class ZipCode(Resource):
             'complemento': 'complement',
             'bairro': 'neighborhood',
             'localidade': 'city_name',
-            'ibge': 'ibge',
             'uf': 'state_name',
             'cep': 'zip_code_formatted',
         }
