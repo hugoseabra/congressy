@@ -39,17 +39,20 @@ class CityListView(DataTableAPIView, generics.RetrieveAPIView,
         return qs
 
 
-@api_view(['GET'])
-@permission_classes((AllowAny,))
-# Cache requested url for each user for 10 days
-@method_decorator(cache_page(60*60*24*10))
-def get_zip_code(request, zip_code_number):
-    zip_code = ZipCode(zip_code=zip_code_number)
+class ZipCodeViewSet(viewsets.ViewSet):
+    permission_classes = (AllowAny,)
 
-    try:
-        zip_code.process()
-    except CongressyException:
-        msg = {'detail': ['CEP inválido']}
-        return Response(msg, status=status.HTTP_404_NOT_FOUND)
+    # Cache requested url for each user for 2 hours
+    @method_decorator(cache_page(60*60*24*10))
+    def list(self, request, *args, **kwargs):
+        zip_code_number = self.kwargs.get('zip_code_number')
 
-    return Response(data=zip_code.data)
+        zip_code = ZipCode(zip_code=zip_code_number)
+
+        try:
+            zip_code.process()
+        except CongressyException:
+            msg = {'detail': ['CEP inválido']}
+            return Response(msg, status=status.HTTP_404_NOT_FOUND)
+
+        return Response(data=zip_code.data)
