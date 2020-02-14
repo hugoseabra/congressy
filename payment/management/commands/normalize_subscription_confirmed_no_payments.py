@@ -28,14 +28,17 @@ class Command(BaseCommand):
 
             for sub in subs:
                 price_to_pay = sub.lot.get_calculated_price()
-                num += 1
-                sub.status = Subscription.AWAITING_STATUS
-                sub.save()
 
                 processed_subs.append({
                     'sub': sub,
                     'to_pay': price_to_pay,
+                    'status': sub.status,
                 })
+
+                num += 1
+                sub.status = Subscription.AWAITING_STATUS
+                sub.save()
+
 
             msg1 = 'Inscrições confirmadas, com lote pago e sem' \
                    ' pagamento: {}'.format(num)
@@ -45,7 +48,7 @@ class Command(BaseCommand):
                 self._print_subscription(item['sub'],
                                          item['to_pay'])
 
-    def _print_subscription(self, subscription: Subscription, to_pay):
+    def _print_subscription(self, subscription: Subscription, to_pay, status):
         self.stdout.write(self.style.SUCCESS(
             " Atualizando inscrição PK: {}\n"
             "    Evento: {} ({})\n"
@@ -55,9 +58,9 @@ class Command(BaseCommand):
             "    Horario de modificação da inscrição: {}\n"
             "    Origem: {}\n"
             "    Completed: {}\n"
-            "    Status: {}\n"
             "    Notificado: {}\n"
             "    E-mail do Participante: {}\n"
+            "    Status: {}\n"
             "    A pagar: {}\n".format(
                 subscription.pk,
                 subscription.event.name,
@@ -70,9 +73,9 @@ class Command(BaseCommand):
                 subscription.modified,
                 subscription.get_origin_display(),
                 subscription.completed,
-                subscription.status,
                 subscription.notified,
                 subscription.person.email,
+                status,
                 to_pay,
             )
         ))
