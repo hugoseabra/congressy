@@ -2,6 +2,7 @@
 Gerenciamento de coleções de Receivers que serão usados para diferentes
 operações de processamento para obter regras de rateamento de pagamento.
 """
+from datetime import date
 from decimal import Decimal
 
 from django.conf import settings
@@ -13,6 +14,7 @@ from payment.pagarme.transaction.receivers import (
     CongressyReceiver,
     OrganizerReceiver,
 )
+from payment.payable.credit_card import get_payables
 
 RECEIVER_TYPE_SUBSCRIPTION = 'receiver_subscription'
 RECEIVER_TYPE_PRODUCT = 'receiver_product'
@@ -57,6 +59,12 @@ class TransactionReceiverCreator(object):
 
         self._check_criterias()
 
+    def is_cc(self) -> bool:
+        return self.transaction_type == 'credit_card'
+
+    def is_boleto(self) -> bool:
+        return self.transaction_type == 'boleto'
+
     def get_original_amount(self):
         """
         Regata o montante configurado como preço original levando em
@@ -75,6 +83,31 @@ class TransactionReceiverCreator(object):
 
         # A divisão pelo percentual se dá pelo cálculo reverso de percentual.
         return amount_no_interests / total_percent
+
+    def get_payables_amount(self, payable_amount: Decimal,
+                            fee_percent: Decimal = None):
+        """
+        Resgata valor de recebíveis
+        """
+        # Agora vamos verificar possíveis valores de taxa de
+        # antecipação paga pelo participante no parcelamento
+        amount = Decimal(0)
+
+        if self.is_cc() is True and self.installments > 1:
+            payables = get_payables(
+                recipient_id=self.organization.recipient_id,
+                transaction_amount=self.amount,
+                transaction_date=date.today(),
+                payable_amount=payable_amount,
+                installments=self.installments,
+                fee_percent=fee_percent,
+                antecipation_fee_percent=Decimal(1.99),
+            )
+
+            for payable in payables:
+                amount += payable.get_antecipation_amount()
+
+        return amount
 
     def get_congressy_amount(self):
         original_amount = self.get_original_amount()
@@ -117,6 +150,12 @@ class TransactionReceiverCreator(object):
         """
         cgsy_amount = round(self.get_congressy_amount(), 2)
         org_amount = round(self.get_organizer_amount(), 2)
+
+        org_payable_amount = \
+            self.get_payables_amount(payable_amount=org_amount)
+
+        cgsy_amount -= org_payable_amount
+        org_amount += org_payable_amount
 
         # ==== RECEIVERS
         receivers = list()
