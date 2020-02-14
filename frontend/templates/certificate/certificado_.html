@@ -28,6 +28,7 @@
             width: {{ object.text_width|unlocalize }}px;
             height: {{ object.text_height|unlocalize }}px;
             font-size: {{ object.text_font_size|unlocalize }}px;
+            line-height: {{ object.text_line_height|unlocalize }}px;
             overflow: hidden;
         }
 
@@ -206,7 +207,6 @@
             window.cgsy.cert.persistence.url = "{% url 'certificate:certificate-detail' event.pk object.pk %}";
             var certificate_template_modal = $('#certificateTemplateModal');
 
-
             $('.open-edit-modal').on("click", function () {
                 $('#certificateDataModal').modal('show');
             });
@@ -278,7 +278,6 @@
                 interact.moveElement(title, '{{ object.title_position_x|unlocalize }}', '{{ object.title_position_y|unlocalize }}');
                 interact.moveElement(text, '{{ object.text_position_x|unlocalize }}', '{{ object.text_position_y|unlocalize }}');
                 interact.moveElement(date, '{{ object.date_position_x|unlocalize }}', '{{ object.date_position_y|unlocalize }}');
-
 
                 $('.open-config-modal').on("click", function () {
                     $('#certificateAlignmentModal').modal('show');
@@ -439,6 +438,31 @@
                                     {%endverbatim %}
                                 </code>
                                 = Nome do ingresso / lote
+                            </div>
+
+                            <div>
+                                <code>
+                                    {% verbatim %}
+                                    {{ CATEGORY_NAME }}
+                                    {%endverbatim %}
+                                </code>
+                                = Nome da categoria do lote
+                            </div>
+                            <div>
+                                <code>
+                                    {% verbatim %}
+                                    {{ CPF }}
+                                    {%endverbatim %}
+                                </code>
+                                = CPF (documento brasileiro)
+                            </div>
+                            <div>
+                                <code>
+                                    {% verbatim %}
+                                    {{ BIRTH_DATE }}
+                                    {%endverbatim %}
+                                </code>
+                                = Data de nascimento
                             </div>
 
                         </div>

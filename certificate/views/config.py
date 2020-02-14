@@ -13,6 +13,9 @@ class CertificateConfigView(CertificateFeatureFlagMixin, generic.DetailView):
     template_name = 'certificate/certificado_.html'
     long_name = "Pedro de Alcântara João Carlos Leopoldo Salvador Bibiano"
     ticket_name = "Lote 1 - Especial"
+    cpf = "629.162.880-58"
+    birth_date = "01/01/2012"
+    category_name = "Categoria Estudantes"
 
     def get_object(self, queryset=None):
 
@@ -43,6 +46,21 @@ class CertificateConfigView(CertificateFeatureFlagMixin, generic.DetailView):
         )
 
         ref_object.text_content = ref_object.text_content.replace(
+            "{{CATEGORY_NAME}}",
+            self.category_name
+        )
+
+        ref_object.text_content = ref_object.text_content.replace(
+            "{{CPF}}",
+            self.cpf
+        )
+
+        ref_object.text_content = ref_object.text_content.replace(
+            "{{BIRTH_DATE}}",
+            self.birth_date
+        )
+
+        ref_object.text_content = ref_object.text_content.replace(
             self.long_name,
             "<strong>" + self.long_name + "</strong>"
         )
@@ -53,8 +71,28 @@ class CertificateConfigView(CertificateFeatureFlagMixin, generic.DetailView):
         )
 
         ref_object.text_content = ref_object.text_content.replace(
+            self.category_name,
+            "<strong>" + self.category_name + "</strong>"
+        )
+
+        ref_object.text_content = ref_object.text_content.replace(
+            self.cpf,
+            "<strong>" + self.cpf + "</strong>"
+        )
+
+        ref_object.text_content = ref_object.text_content.replace(
+            self.birth_date,
+            "<strong>" + self.birth_date + "</strong>"
+        )
+
+        ref_object.text_content = ref_object.text_content.replace(
             "{{EVENTO}}",
             self.event.name
+        )
+
+        ref_object.text_content = ref_object.text_content.replace(
+            self.event.name,
+            "<strong>" + self.event.name + "</strong>"
         )
 
         if settings.DEBUG:

@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='certificate',
             name='text_line_height',
-            field=models.FloatField(blank=True, default=22, help_text='Espaço entre-linhas (cm) do conteúdo.', null=True, verbose_name='espaço entre-linhas do texto'),
+            field=models.FloatField(blank=True, default=28, help_text='Espaço entre-linhas (cm) do conteúdo.', null=True, verbose_name='espaço entre-linhas do texto'),
         ),
         migrations.AlterField(
             model_name='certificate',
