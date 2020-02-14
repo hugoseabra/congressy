@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.db.models.functions import Upper
 
 from kanu_locations.models import City
 from .exceptions import CongressyException
@@ -51,25 +52,23 @@ class ZipCode(Resource):
         if not result:
             raise CongressyException('CEP Inválido')
 
-        city_name = None
-
         if 'cidade' in result:
             city_data = result['cidade']
             if 'nome' in city_data:
-                city_name = city_data['nome']
-
-        city_uf = None
+                self.city_name = city_data['nome']
+                self.city_name = str(self.city_name).upper()
 
         if 'estado' in result:
             state_data = result['estado']
             if 'sigla' in state_data:
-                city_uf = state_data['sigla']
+                self.state_name = state_data['sigla']
+                self.state_name = str(self.state_name).upper()
 
-        if city_uf and city_name:
+        if self.city_name and self.state_name:
             try:
                 city_instance = City.objects.get(
-                    Q(name=city_name) | Q(name_ascii=city_name),
-                    uf=city_uf,
+                    Q(name=self.city_name) | Q(name_ascii=self.city_name),
+                    uf=self.state_name,
                 )
                 self.city_id = city_instance.pk
 
@@ -83,13 +82,10 @@ class ZipCode(Resource):
         #  'estado': {'sigla': 'GO'}}
 
         if 'logradouro' in result and result['logradouro']:
-            self.street_name = result['logradouro']
+            self.street_name = str(result['logradouro']).upper()
 
         if 'bairro' in result and result['bairro']:
-            self.neighborhood = result['bairro']
-
-        if 'cep' in result and result['bairro']:
-            self.neighborhood = result['bairro']
+            self.neighborhood = str(result['bairro']).upper()
 
         self.zip_code_formatted = '{}{}-{}'.format(
             self.zip_code[:2],
