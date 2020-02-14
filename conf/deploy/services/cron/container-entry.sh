@@ -12,7 +12,7 @@ source /deploy/scripts.sh
 run_python_script "Configurando SYNC" /deploy/setup/configure-sync.py
 run_bash_script "Verificando existência do Bucket" /create-s3bucket.sh
 
-run_python_script "Configurando SYNC" /deploy/setup/configure-cron.py
+run_python_script "Configurando CRON" /deploy/setup/configure-cron.py
 
 printf " > Setando entradas: "
 crontab /crontab.txt

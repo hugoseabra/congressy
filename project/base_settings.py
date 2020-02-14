@@ -337,7 +337,6 @@ ALLOW_PARALLEL_RUNS = True
 FAILED_RUNS_CRONJOB_EMAIL_PREFIX = "[Server check]: "
 
 CRON_CLASSES = [
-    "payment.cron.SubscriptionStatusIrregularityTestJob",
     "payment.cron.SubscriptionPaidAndIncomplete",
     "payment.cron.CheckPayables",
 ]

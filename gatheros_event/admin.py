@@ -37,7 +37,7 @@ class EventAdmin(admin.ModelAdmin):
     """
     Admin para Event
     """
-    search_fields = ('pk', 'name', 'organization__name',)
+    search_fields = ('pk', 'name', 'slug', 'organization__name',)
     list_filter = ('subscription_type', 'hotsite_version',)
     list_display = (
         'name',
