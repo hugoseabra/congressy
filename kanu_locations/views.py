@@ -9,7 +9,7 @@ from unidecode import unidecode
 from kanu_datatable import DataTableAPIView
 from .models import City
 from .serializers import CitySerializer
-from .zip_code import ZipCodeViaCep as ZipCode
+from .zip_code import ZipCodeCepAberto as ZipCode
 from .zip_code.exceptions import CongressyException
 
 
