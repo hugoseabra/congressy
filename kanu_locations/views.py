@@ -1,16 +1,17 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from rest_framework import generics, status
+from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from unidecode import unidecode
-from rest_framework import generics, status
-from rest_framework import viewsets
 
 from kanu_datatable import DataTableAPIView
-
 from .models import City
 from .serializers import CitySerializer
 from .zip_code import ZipCode
-from .zip_code.exceptions import CongressyAPIException, CongressyException
+from .zip_code.exceptions import CongressyException
 
 
 class CityListView(DataTableAPIView, generics.RetrieveAPIView,
@@ -40,6 +41,8 @@ class CityListView(DataTableAPIView, generics.RetrieveAPIView,
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
+# Cache requested url for each user for 10 days
+@method_decorator(cache_page(60*60*24*10))
 def get_zip_code(request, zip_code_number):
     zip_code = ZipCode(zip_code=zip_code_number)
 
