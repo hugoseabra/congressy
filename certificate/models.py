@@ -83,7 +83,7 @@ class Certificate(models.Model):
     )
 
     text_line_height = models.FloatField(
-        default=22,
+        default=28,
         verbose_name='espaço entre-linhas do texto',
         help_text='Espaço entre-linhas (cm) do conteúdo.',
         null=True,
