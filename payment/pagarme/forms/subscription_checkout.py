@@ -374,9 +374,9 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                     'Dados de pendência inválidos:'
                     ' {}'.format("".join(error_msgs))
                 )
-
-            self.interests_amount += \
-                self.subscription_debt_form.installment_interests_amount
+            if self.subscription_debt_form.installment_interests_amount:
+                self.interests_amount += \
+                    self.subscription_debt_form.installment_interests_amount
 
         self.product_debt_forms = self._create_product_debt_forms()
 
@@ -394,7 +394,8 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                     ' {}'.format("".join(error_msgs))
                 )
 
-            self.interests_amount += debt_form.installment_interests_amount
+            if debt_form.installment_interests_amount:
+                self.interests_amount += debt_form.installment_interests_amount
 
         self.service_debt_forms = self._create_service_debt_forms()
 
@@ -412,7 +413,8 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                     ' {}'.format("".join(error_msgs))
                 )
 
-            self.interests_amount += debt_form.installment_interests_amount
+            if debt_form.installment_interests_amount:
+                self.interests_amount += debt_form.installment_interests_amount
 
     def _create_builder_instance(self):
         # Construção de dados para transação do Pagarme
