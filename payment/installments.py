@@ -1,5 +1,4 @@
 from decimal import Decimal
-from collections import Iterable
 
 
 class Calculator(object):
@@ -8,6 +7,7 @@ class Calculator(object):
     cenários: informando valores de acordo com um montante, juros absorvidos
     e valores de juros separadamente.
     """
+
     def __init__(self,
                  interests_rate: Decimal,
                  total_installments=1,
@@ -54,13 +54,13 @@ class Calculator(object):
         """ Resgata lista de valores de juros por parcela. """
         interests_amount = amount * self.interests_rate
 
-        prices = [0.00]
+        prices = [Decimal(0.00)]
 
         for part in range(1, int(self.total_installments) + 1):
             if part <= 1:
                 continue
 
-            part_amount = 0.00
+            part_amount = Decimal(0.00)
 
             if part > self.free_installments:
                 part_amount = part * interests_amount
@@ -83,8 +83,8 @@ class Calculator(object):
         return total_prices[installments - 1]
 
     def get_installment_part_amount(self,
-                                 amount: Decimal,
-                                 installments=1) -> Decimal:
+                                    amount: Decimal,
+                                    installments=1) -> Decimal:
         """ Resgata valor de acordo com a parcela informada. """
         if installments > self.total_installments:
             raise Exception(
@@ -93,11 +93,11 @@ class Calculator(object):
             )
 
         part_prices = self.get_installment_prices(amount)
-        return part_prices[installments-1]
+        return part_prices[installments - 1]
 
     def get_installment_interests_amount(self,
-                                 amount: Decimal,
-                                 installments=1) -> Decimal:
+                                         amount: Decimal,
+                                         installments=1) -> Decimal:
         """ Resgata valor de juros de acordo com a parcela informada. """
         if installments > self.total_installments:
             raise Exception(
@@ -106,7 +106,7 @@ class Calculator(object):
             )
 
         part_prices = self.get_liquid_interest_prices(amount)
-        return part_prices[installments-1]
+        return part_prices[installments - 1]
 
     def get_absorbed_interests_amount(self,
                                       amount: Decimal,
@@ -129,6 +129,7 @@ class InstallmentResult(object):
     Resultado de cálculos de parcelamento de um valor total de diversos itens
     comercializados.
     """
+
     def __init__(self,
                  calculator: Calculator,
                  amount: Decimal,
