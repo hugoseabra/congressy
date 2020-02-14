@@ -15,6 +15,7 @@ class TransactionAdmin(admin.ModelAdmin):
         'subscription__code',
         'subscription__person__uuid',
         'subscription__person__name',
+        'subscription__person__email',
         'subscription__event__name',
     )
     list_display = (

@@ -425,10 +425,10 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
                     'Percentual maior do que o pagamento:' \
                     ' {} > 100'.format(round(perc, 2))
 
-                amount = debt.amount * perc
+                amount = debt.total_amount * perc
                 liquid_amount = debt.liquid_amount * perc
             else:
-                amount = debt.amount
+                amount = debt.total_amount
                 liquid_amount = debt.liquid_amount
 
             self.add_item(

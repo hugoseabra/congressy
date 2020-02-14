@@ -94,6 +94,9 @@ class CheckoutValidationForm(forms.Form):
         # Valor a transacionar
         self.amount_to_transact = Decimal(0)
 
+        # Valor de juros (possívelmente de parcelamento)
+        self.interests_amount = Decimal(0)
+
         # Valor destinado ao organizador.
         self.liquid_amount = Decimal(0)
 
@@ -191,6 +194,7 @@ class CheckoutValidationForm(forms.Form):
             self._set_payer_instance()
 
         self._set_amount_to_transact()
+        self._set_interests_amount()
 
         if self.amount_to_transact <= 0:
             raise forms.ValidationError(
@@ -291,6 +295,9 @@ class CheckoutValidationForm(forms.Form):
         raise NotImplementedError()
 
     def _set_amount_to_transact(self):
+        raise NotImplementedError()
+
+    def _set_interests_amount(self):
         raise NotImplementedError()
 
     def clean_benefactor_pk(self):
