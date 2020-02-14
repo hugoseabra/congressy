@@ -66,7 +66,8 @@ class ZipCode(Resource):
         if self.city_name and self.state_name:
             try:
                 city_instance = City.objects.get(
-                    Q(name=self.city_name) | Q(name_ascii=self.city_name),
+                    Q(name__icontains=self.city_name) |
+                    Q(name_ascii__icontains=self.city_name),
                     uf=self.state_name,
                 )
                 self.city_id = city_instance.pk
