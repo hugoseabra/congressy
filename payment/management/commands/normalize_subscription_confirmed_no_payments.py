@@ -9,17 +9,17 @@ from payment.models import Transaction
 
 
 class Command(BaseCommand):
-    help = 'Atualiza as inscrições pagas mas que ainda constam como pendentes.'
+    help = 'Atualiza inscrições com confirmadas, com lote pagos mas sem' \
+           ' pagamento nenhum.'
 
     def handle(self, *args, **options):
+
         subs = Subscription.objects.annotate(
             num_trans=Count('transactions')
         ).filter(
-            status=Subscription.AWAITING_STATUS,
-            origin=Subscription.DEVICE_ORIGIN_HOTSITE,
+            status='confirmed',
             lot__price__gt=0,
-            num_trans__gt=0,
-            transactions__status=Transaction.PAID,
+            num_trans=0
         )
 
         with atomic():
@@ -28,39 +28,24 @@ class Command(BaseCommand):
 
             for sub in subs:
                 price_to_pay = sub.lot.get_calculated_price()
-
-                trans = sub.transactions.aggregate(total_amount=Sum('amount'))
-
-                paid = trans['total_amount'] or 0
-
-                # Se não há pagamentos, tudo certo.
-                # Se há pagamento e valor pago é menor do que o que se tem
-                # de pagar
-                if not paid and paid < price_to_pay:
-                    continue
-
-                # Se há pagamentos suficientes, devemos confirmar a inscrição.
-
                 num += 1
-                sub.status = Subscription.CONFIRMED_STATUS
+                sub.status = Subscription.AWAITING_STATUS
                 sub.save()
 
                 processed_subs.append({
                     'sub': sub,
                     'to_pay': price_to_pay,
-                    'paid': paid,
                 })
 
-            self.stdout.write(self.style.SUCCESS(
-                'Inscrições pagas e pendentes: {}'.format(num)
-            ))
+            msg1 = 'Inscrições confirmadas, com lote pago e sem' \
+                   ' pagamento: {}'.format(num)
+            self.stdout.write(self.style.SUCCESS(msg1))
 
             for item in processed_subs:
                 self._print_subscription(item['sub'],
-                                         item['to_pay'],
-                                         item['paid'])
+                                         item['to_pay'])
 
-    def _print_subscription(self, subscription: Subscription, to_pay, paid):
+    def _print_subscription(self, subscription: Subscription, to_pay):
         self.stdout.write(self.style.SUCCESS(
             " Atualizando inscrição PK: {}\n"
             "    Evento: {} ({})\n"
@@ -70,10 +55,10 @@ class Command(BaseCommand):
             "    Horario de modificação da inscrição: {}\n"
             "    Origem: {}\n"
             "    Completed: {}\n"
+            "    Status: {}\n"
             "    Notificado: {}\n"
             "    E-mail do Participante: {}\n"
-            "    A pagar: {}\n"
-            "    Pago: {}\n".format(
+            "    A pagar: {}\n".format(
                 subscription.pk,
                 subscription.event.name,
                 subscription.lot.name,
@@ -85,9 +70,9 @@ class Command(BaseCommand):
                 subscription.modified,
                 subscription.get_origin_display(),
                 subscription.completed,
+                subscription.status,
                 subscription.notified,
                 subscription.person.email,
                 to_pay,
-                paid,
             )
         ))
