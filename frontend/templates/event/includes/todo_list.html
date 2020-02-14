@@ -26,6 +26,7 @@
             <a>Criar HotSite </a>
         </td>
         <td>
+            {% if event.hotsite_version == 2 %}
             <button type="button"
                     class="btn btn-success btn-trans btn-sm dropdown-toggle"
                     data-toggle="dropdown"
@@ -34,6 +35,16 @@
                     aria-haspopup="true">
                 <span>Acessar</span>
             </button>
+            {% else %}
+            <button type="button"
+                    class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                    data-toggle="dropdown"
+                    onclick="location.href='{% url 'event:event-hotsite' event.pk %}'"
+                    aria-expanded="false"
+                    aria-haspopup="true">
+                <span>Acessar</span>
+            </button>
+            {% endif %}
         </td>
 
         <td>
