@@ -1,5 +1,4 @@
 from django.db.models import Q
-from django.db.models.functions import Upper
 
 from kanu_locations.models import City
 from .exceptions import CongressyException
