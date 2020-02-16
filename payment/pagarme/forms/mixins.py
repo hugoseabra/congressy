@@ -262,9 +262,9 @@ class CheckoutValidationForm(forms.Form):
             if payer.complement:
                 payer.address_international += ', ' + payer.complement
 
-            billing_data['street_number'] = payer.address_international
+            billing_data['street'] = payer.address_international
 
-            billing_data['number'] = ''
+            billing_data['street_number'] = ''
             billing_data['neighborhood'] = ''
             billing_data['city'] = payer.city_international
             billing_data['state'] = payer.state_international
