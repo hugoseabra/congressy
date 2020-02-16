@@ -276,6 +276,17 @@ class Person(models.Model, EntityMixin, GatherosModelMixin):
                       (self.birth_date.month, self.birth_date.day)
         return current.year - self.birth_date.year - was_earlier
 
+    @property
+    def doc_type(self):
+        return self.international_doc_type
+
+    @property
+    def doc_number(self):
+        return self.international_doc
+
+    def get_doc_type_display(self):
+        return self.get_international_doc_type_display()
+
     class Meta:
         verbose_name = 'pessoa'
         verbose_name_plural = 'pessoas'

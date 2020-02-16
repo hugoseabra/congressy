@@ -223,7 +223,7 @@ class CheckoutValidationForm(forms.Form):
                 customer_data['doc_number'] = str(payer.cnpj).zfill(14)
 
             else:
-                customer_data['doc_type'] = Benefactor.INTERNATIONAL_DOC_EIN
+                customer_data['doc_type'] = payer.doc_type
                 customer_data['doc_number'] = payer.doc_number
 
         else:
@@ -233,7 +233,7 @@ class CheckoutValidationForm(forms.Form):
                 customer_data['doc_number'] = str(payer.cpf).zfill(11)
 
             else:
-                customer_data['doc_type'] = payer.get_doc_type_display()
+                customer_data['doc_type'] = payer.doc_type
                 customer_data['doc_number'] = payer.doc_number
 
         return customer_data
