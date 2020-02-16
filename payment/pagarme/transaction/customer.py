@@ -8,7 +8,7 @@ class Customer:
     DOC_TYPES_BR_INDIVIDUAL = ['cpf']
     DOC_TYPES_BR_CORPORATION = ['cnpj']
 
-    DOC_TYPES_INTERNATIONAL_INDIVIDUAL = ['id', 'passport']
+    DOC_TYPES_INTERNATIONAL_INDIVIDUAL = ['ID', 'Passport']
     DOC_TYPES_INTERNATIONAL_CORPORATION = ['ein']
 
     BR_COUNTRY = 'br'
