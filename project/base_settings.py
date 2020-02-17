@@ -338,6 +338,7 @@ FAILED_RUNS_CRONJOB_EMAIL_PREFIX = "[Server check]: "
 
 CRON_CLASSES = [
     "payment.cron.SubscriptionPaidAndIncomplete",
+    "payment.cron.SubscriptionConfirmedWithNoPayments",
     "payment.cron.CheckPayables",
 ]
 # =============================== BITLY ===================================== #

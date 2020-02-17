@@ -2,11 +2,18 @@ from .exceptions import CongressyAPIException
 
 
 class Transporter(object):
+
     def __init__(self):
         import requests
         self.sess = requests.Session()
 
-    def request(self, method, uri, headers, data=None, params=None, **kwargs):
+    def request(self,
+                method,
+                uri,
+                headers=None,
+                data=None,
+                params=None,
+                **kwargs):
         response = self.sess.request(method,
                                      uri,
                                      headers=headers,
@@ -27,8 +34,10 @@ class Resource(object):
     def __init__(self,
                  base_url: str,
                  api_key: str = None,
+                 api_header_key='Token',
                  transporter_class=Transporter):
         self.api_key = api_key
+        self.api_header_key = api_header_key
 
         if base_url.endswith('/'):
             base_url = base_url[:-1]
@@ -40,21 +49,41 @@ class Resource(object):
         if not endpoint.startswith('/'):
             endpoint = '/{}'.format(endpoint)
 
-        if not endpoint.endswith('/'):
-            endpoint = '{}/'.format(endpoint)
-
         return '{}{}'.format(self.base_url, endpoint)
 
-    def request(self, method, endpoint, **kwargs):
-        headers = {
+    def request(self,
+                method,
+                endpoint,
+                headers=None,
+                data=None,
+                params=None,
+                **kwargs):
+
+        default_headers = {
             'User-Agent': 'congressy-sdk-python/0.0.1',
-            'Content-Type': 'application/json',
-            'Authorization': self.api_key
+            'Content-Type': 'application/json; charset=utf-8',
         }
+
+        if self.api_key:
+            authorization_value = '{} {}'.format(
+                self.api_header_key,
+                self.api_key
+            )
+            default_headers.update({
+                'Authorization': authorization_value,
+            })
+
+        if not headers or isinstance(headers, dict) is False:
+            headers = dict()
+
+        headers.update(default_headers)
+
         return self.transporter.request(
             method,
             self.get_uri(endpoint),
             headers=headers,
+            data=data,
+            params=params,
             **kwargs,
         )
 
