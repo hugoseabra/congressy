@@ -1,19 +1,20 @@
-from rest_framework.decorators import api_view, permission_classes
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from rest_framework import generics, status
+from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from unidecode import unidecode
-from rest_framework import generics, status
-from rest_framework import viewsets
 
 from kanu_datatable import DataTableAPIView
-
 from .models import City
 from .serializers import CitySerializer
-from .zip_code import ZipCode
-from .zip_code.exceptions import CongressyAPIException, CongressyException
+from .zip_code import ZipCodeViaCep as ZipCode
+from .zip_code.exceptions import CongressyException
 
 
-class CityListView(DataTableAPIView, generics.RetrieveAPIView,
+class CityListView(DataTableAPIView,
+                   generics.RetrieveAPIView,
                    viewsets.GenericViewSet):
     """
     Rota para pesquisar e recuperar Cidades
@@ -38,15 +39,20 @@ class CityListView(DataTableAPIView, generics.RetrieveAPIView,
         return qs
 
 
-@api_view(['GET'])
-@permission_classes((AllowAny,))
-def get_zip_code(request, zip_code_number):
-    zip_code = ZipCode(zip_code=zip_code_number)
+class ZipCodeViewSet(viewsets.ViewSet):
+    permission_classes = (AllowAny,)
 
-    try:
-        zip_code.process()
-    except CongressyException:
-        msg = {'detail': ['CEP inválido']}
-        return Response(msg, status=status.HTTP_404_NOT_FOUND)
+    # Cache requested url for each user for 2 hours
+    @method_decorator(cache_page(60 * 60 * 24 * 10))
+    def list(self, request, *args, **kwargs):
+        zip_code_number = self.kwargs.get('zip_code_number')
 
-    return Response(data=zip_code.data)
+        zip_code = ZipCode(zip_code=zip_code_number)
+
+        try:
+            zip_code.process()
+        except CongressyException:
+            msg = {'detail': ['CEP inválido']}
+            return Response(msg, status=status.HTTP_404_NOT_FOUND)
+
+        return Response(data=zip_code.data)

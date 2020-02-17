@@ -24,22 +24,25 @@ class BenefactorSerializer(FormSerializerMixin, serializers.ModelSerializer):
                 'beneficiary_id': data.get('beneficiary')
             }
 
+            doc_type = data.get('doc_type')
+            doc_number = data.get('doc_number')
+
             if is_company is False:
                 if is_br:
                     filter_search['cpf'] = data.get('cpf')
 
                 else:
-                    filter_search['doc_type'] = data.get('doc_type')
+                    filter_search['doc_type'] = doc_type
                     filter_search['doc_number'] = \
-                        data.get('doc_number').strip()
+                        data.get('doc_number').strip() if doc_number else None
             else:
                 if is_br:
                     filter_search['cnpj'] = data.get('cnpj')
 
                 else:
-                    filter_search['doc_type'] = data.get('doc_type')
+                    filter_search['doc_type'] = doc_type
                     filter_search['doc_number'] = \
-                        data.get('doc_number').strip()
+                        data.get('doc_number').strip() if doc_number else None
 
             try:
                 self.instance = self.Meta.model.objects.get(**filter_search)
