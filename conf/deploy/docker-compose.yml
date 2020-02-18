@@ -78,7 +78,7 @@ services:
       - "traefik.backend=cgsy-manage"
       - "traefik.protocol=http"
       - "traefik.port=8000"
-      - "traefik.frontend.rule=Host:ev.congressy.com;PathPrefix:/manage,/admin,/remarketing,/account,/invitations,/pagarme,/captcha,/hotsite,/api,/static-manage,/media-manage"
+      - "traefik.frontend.rule=Host:ev.congressy.com;PathPrefix:/manage,/admin,/remarketing,/account,/invitations,/pagarme,/captcha,/hotsite,/api,/static-manage,/media-manage,/ckeditor"
       - "traefik.docker.network=traefik_default"
       - "traefik.frontend.entryPoints=http"
 
