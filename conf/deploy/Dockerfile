@@ -71,6 +71,8 @@ RUN set -ex \
         s3cmd==2.0.2 \
         jinja2==2.10.1 \
         django-uwsgi==0.2.2 \
+        # documentação do admin
+        docutils \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
