@@ -1,11 +1,8 @@
-from datetime import datetime
-
 from django.core.management.base import BaseCommand
-from django.db.models import Count, Sum
+from django.db.models import Count
 from django.db.transaction import atomic
 
 from gatheros_subscription.models import Subscription
-from payment.models import Transaction
 
 
 class Command(BaseCommand):
@@ -39,14 +36,14 @@ class Command(BaseCommand):
                 sub.status = Subscription.AWAITING_STATUS
                 sub.save()
 
-
             msg1 = 'Inscrições confirmadas, com lote pago e sem' \
                    ' pagamento: {}'.format(num)
             self.stdout.write(self.style.SUCCESS(msg1))
 
             for item in processed_subs:
                 self._print_subscription(item['sub'],
-                                         item['to_pay'])
+                                         item['to_pay'],
+                                         item['status'])
 
     def _print_subscription(self, subscription: Subscription, to_pay, status):
         self.stdout.write(self.style.SUCCESS(
