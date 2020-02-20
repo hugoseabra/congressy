@@ -172,7 +172,7 @@ class Subscription(models.Model, EntityMixin, GatherosModelMixin):
 
     author = models.OneToOneField(
         Author,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.SET_NULL,
         verbose_name='autor de resposta',
         related_name='subscription',
         blank=True,
