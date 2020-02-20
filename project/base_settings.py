@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'permission',
     'stdimage',
     'ckeditor',
+    'ckeditor_uploader',
     'datetimewidget',
     'widget_tweaks',
     'django_user_agents',
@@ -211,6 +212,16 @@ FIXTURE_DIRS = [
     os.path.join(BASE_DIR, 'fixtures', 'workflows'),
 ]
 # ============================= CKEDITOR ==================================== #
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_IMAGE_BACKEND = "pillow"
+# CKEDITOR_THUMBNAIL_SIZE = (300, 300)
+# CKEDITOR_IMAGE_QUALITY = 90
+CKEDITOR_BROWSE_SHOW_DIRS = True
+CKEDITOR_ALLOW_NONIMAGE_FILES = False
+CKEDITOR_UPLOAD_SLUGIFY_FILENAME = True
+CKEDITOR_RESTRICT_BY_USER = False
+CKEDITOR_JQUERY_URL = 'http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
+
 CKEDITOR_CONFIGS = {
     'default': {
         'toolbar_Custom': [
@@ -275,6 +286,7 @@ CKEDITOR_CONFIGS = {
                     'Table',
                     'HorizontalRule',
                     'Youtube',
+                    'Image',
                 ]
             },
             {
@@ -289,12 +301,15 @@ CKEDITOR_CONFIGS = {
         'toolbar': 'Custom',
         'extraPlugins': ','.join([
             'youtube',
+            'image2',  # the upload image feature
         ]),
+        'removePlugins': ','.join(['image']),
         'width': '100%',
         'height': 150,
     },
 }
 
+# =============================== CACHE ===================================== #
 # =============================== CACHE ===================================== #
 CACHES = {
     'default': {

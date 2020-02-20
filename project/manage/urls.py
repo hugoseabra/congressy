@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.generic import RedirectView
 
 from certificate.urls import urlpatterns_certificate_urls
@@ -30,7 +31,8 @@ admin_urlpatterns = []
 
 admin_urlpatterns += [
     url(r'^admin/cgsy20/doc/', include('django.contrib.admindocs.urls')),
-    url(r'^admin/cgsy20/', admin.site.urls)
+    url(r'^admin/cgsy20/', admin.site.urls),
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
 ]
 
 private_urlpatterns = [
@@ -114,3 +116,6 @@ if settings.DEBUG:
         urlpatterns = [
                           url(r'^__debug__/', include(debug_toolbar.urls)),
                       ] + urlpatterns
+
+
+urlpatterns += staticfiles_urlpatterns()

@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='subscription',
             name='author',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='subscription', to='survey.Author', verbose_name='autor de resposta'),
+            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='subscription', to='survey.Author', verbose_name='autor de resposta'),
         ),
         migrations.AddField(
             model_name='lot',

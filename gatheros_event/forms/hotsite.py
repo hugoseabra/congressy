@@ -6,6 +6,7 @@ import binascii
 
 import lorem
 from ckeditor.widgets import CKEditorWidget
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django import forms
 from django.core.files.base import ContentFile
 
@@ -67,7 +68,7 @@ class InfoForm(BaseModelFileForm):
             'stream_youtube_code',
         ]
         widgets = {
-            'description_html': CKEditorWidget(),
+            'description_html': CKEditorUploadingWidget(),
             'scientific_rules': CKEditorWidget(),
             'editorial_body': CKEditorWidget(),
             'voucher_extra_info': forms.Textarea(attrs={
