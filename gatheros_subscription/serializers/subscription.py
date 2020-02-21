@@ -267,7 +267,21 @@ class SubscriptionSerializer(serializers.BaseSerializer):
         rep['total_amount'] = total_amount
         rep['paid_amount'] = paid_amount
 
-        rep['has_open_boleto'] = has_open_boleto(obj)
+        rep['has_open_boleto'] = False
+        rep['has_open_boleto_same_billing_amount'] = False
+        rep['boletos'] = list()
+
+        if has_open_boleto(obj) is True:
+            rep['has_open_boleto'] = True
+
+            for boleto in get_opened_boleto_transactions(obj):
+                rep['boletos'].append({
+                    'pk': str(boleto.pk),
+                    'amount': round(boleto.amount, 2),
+                    'lot': boleto.lot_id,
+                })
+                if round(boleto.amount, 2) == total_amount:
+                    rep['has_open_boleto_same_billing_amount'] = True
 
         return rep
 
