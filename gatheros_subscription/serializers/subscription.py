@@ -9,7 +9,8 @@ from rest_framework import serializers
 
 from gatheros_subscription.models import Subscription
 from mailer.services import notify_new_free_subscription
-from payment.helpers.payment_helpers import has_open_boleto
+from payment.helpers.payment_helpers import has_open_boleto, \
+    get_opened_boleto_transactions
 
 
 class SubscriptionSerializer(serializers.BaseSerializer):
@@ -767,7 +768,21 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
         rep['total_amount'] = total_amount
         rep['paid_amount'] = paid_amount
 
-        rep['has_open_boleto'] = has_open_boleto(instance)
+        rep['has_open_boleto'] = False
+        rep['has_open_boleto_same_billing_amount'] = False
+        rep['boletos'] = list()
+
+        if has_open_boleto(instance) is True:
+            rep['has_open_boleto'] = True
+
+            for boleto in get_opened_boleto_transactions(instance):
+                rep['boletos'].append({
+                    'pk': str(boleto.pk),
+                    'amount': round(boleto.amount, 2),
+                    'lot': boleto.lot_id,
+                })
+                if round(boleto.amount, 2) == total_amount:
+                    rep['has_open_boleto_same_billing_amount'] = True
 
         return rep
 
