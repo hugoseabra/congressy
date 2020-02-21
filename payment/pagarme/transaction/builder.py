@@ -357,9 +357,8 @@ class SubscriptionTransactionBuilder(AbstractPagarmeTransactionBuilder):
                         ' liberada para outro participante.'
 
         # Instrução 3: 30 + 10 + 4 (possivel) + 8 (id da categoria) = 52
-        instructions3 = ' Ev.: {}. Lote: {}. Insc.: {}.'.format(
+        instructions3 = ' Ev.: {}. Insc.: {}.'.format(
             self.event.name[:10],
-            self.subscription.lot.name[:10],
             self.subscription.code,  # 8 caracteres
         )
 
