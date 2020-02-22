@@ -17,4 +17,4 @@ echo ;
 echo "########################################################################"
 echo ;
 source /deploy/uwsgi-env.sh
-uwsgi --enable-threads --cache 5000 --thunder-lock --thunder-lock-watchdog --show-config --static-map /static-manage/=/code/static/ --static-map /media-manage/=/code/media/
+uwsgi --http-socket --enable-threads --cache 5000 --thunder-lock --show-config --static-map /static-manage/=/code/static/ --static-map /media-manage/=/code/media/
