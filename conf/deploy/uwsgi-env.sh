@@ -23,6 +23,8 @@ export UWSGI_WSGI_ENV_BEHAVIOR=holy
 export UWSGI_HARAKIRI=600
 export UWSGI_POST_BUFFERING=8192
 
+export UWSGI_THUNDER_LOCK=1
+
 # By default uWSGI allocates a very small buffer (4096 bytes) for the headers
 # of each request. If you start receiving “invalid request block size” in your
 # logs, it could mean you need a bigger buffer. Increase it (up to 65535) with

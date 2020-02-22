@@ -117,16 +117,24 @@ def postback_url_view(request, uidb64):
         event = subscription.event
 
         total_debt = Decimal(0)
-        existing_amount = Decimal(0)
+        existing_payment = Decimal(0)
 
         if transaction.amount > Decimal(0):
 
             # Pegar o valor da divida
-            existing_amount = subscription.debts_amount
+            total_debt = subscription.debts_amount
+
+            # Pegar qualquer dinheiro já pago
+            existing_amount = subscription.payments.filter(
+                paid=True
+            ).aggregate(total=Sum('amount'))
+
+            # Pegar o valor da divida
+            existing_payment = existing_amount['total']
 
         subscription.status = subscription_status_manager.get_new_status(
             debt=total_debt,
-            existing_payments=existing_amount,
+            existing_payments=existing_payment,
         )
 
         if subscription.confirmed is True:
