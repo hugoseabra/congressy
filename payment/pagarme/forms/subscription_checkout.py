@@ -138,7 +138,7 @@ class SubscriptionCheckoutForm(CheckoutValidationForm):
                 transaction_filter = {
                     'amount': amount_to_transact,
                     'liquid_amount': self.liquid_amount,
-                    'lot_id': lot_id,
+                    # 'lot_id': lot_id,
                     'type': Transaction.BOLETO,
                     'status': Transaction.WAITING_PAYMENT,
                     # boleto futuro
