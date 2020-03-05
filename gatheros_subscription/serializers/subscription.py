@@ -133,6 +133,8 @@ class SubscriptionSerializer(serializers.BaseSerializer):
             'survey_data': survey_data,
             'status': lot.status,
             'status_name': lot.get_status_display(),
+            'active': lot.active is True,
+            'description': lot.description,
         }
 
         if lot.category_id:
@@ -370,6 +372,8 @@ class SubscriptionModelSerializer(serializers.ModelSerializer):
             'survey_data': survey_data,
             'status': lot.status,
             'status_name': lot.get_status_display(),
+            'active': lot.active is True,
+            'description': lot.description,
         }
 
         if lot.category_id:
@@ -642,6 +646,8 @@ class SubscriptionBillingSerializer(serializers.ModelSerializer):
             'survey_data': survey_data,
             'status': lot.status,
             'status_name': lot.get_status_display(),
+            'active': lot.active is True,
+            'description': lot.description,
         }
 
         if lot.category_id:
