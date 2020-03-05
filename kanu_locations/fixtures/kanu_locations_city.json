@@ -50149,7 +50149,7 @@
   },
   {
     "model": "kanu_locations.city",
-    "pk": 5575
+    "pk": 5575,
     "fields": {
       "name": "SÃO SEBASTIÃO",
       "name_ascii": "SAO SEBASTIAO",

@@ -6,6 +6,38 @@ import os
 from django.conf import settings
 
 
+def system_name(request):
+    """
+    Renderiza nome do sistema
+    """
+    return {
+        'system_name': 'Visit SP'
+    }
+
+
+def system_owner_link(request):
+    """
+    Renderiza o link do dono do sistema.
+    """
+    return {
+        'system_owner_link': 'https://visitsp.tur.br'
+    }
+
+
+def system_main_logo_path(request):
+    """
+    Renderiza o caminho de URL da logo principal
+    """
+    logo_path = os.path.join(
+        settings.STATIC_DIR,
+        'assets/img/header-logo_black.png'
+    )
+
+    return {
+        'system_main_logo_path': logo_path,
+    }
+
+
 def render_app_only(request):
     """
     Verificar se querystring 'apponly' e 'notitle'
