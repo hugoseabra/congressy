@@ -135,6 +135,10 @@ class ProfileCreateView(TemplateView, FormView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+
+        ctx['GOOGLE_RECAPTCHA_PUBLIC_KEY'] = \
+            settings.GOOGLE_RECAPTCHA_PUBLIC_KEY
+
         ctx['is_embeded'] = self.request.GET.get('embeded') == '1'
         return ctx
 

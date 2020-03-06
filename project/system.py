@@ -8,20 +8,20 @@ from core.helpers import sentry
 
 
 def get_system_name():
-    return os.getenv('CGSY_SYSTEM_NAME', 'Congressy')
+    return os.getenv('CGSY_SYSTEM_NAME') or 'Congressy'
 
 
 def get_system_alias():
-    return os.getenv('CGSY_SYSTEM_ALIAS', 'congressy')
+    return os.getenv('CGSY_SYSTEM_ALIAS') or 'congressy'
 
 
 def get_system_owner_link():
-    return os.getenv('CGSY_SYSTEM_OWNER_LINK', 'https://congressy.com')
+    return os.getenv('CGSY_SYSTEM_OWNER_LINK') or 'https://congressy.com'
 
 
 def get_system_owner_terms_link():
-    return os.getenv('CGSY_SYSTEM_TERMS_LINK',
-                     'https://www.congressy.com/termos-de-uso/')
+    link = os.getenv('CGSY_SYSTEM_TERMS_LINK')
+    return link or 'https://www.congressy.com/termos-de-uso/'
 
 
 def get_system_main_logo():
