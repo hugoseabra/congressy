@@ -2,8 +2,10 @@ import os
 import sys
 from datetime import datetime
 
-sys.path.append(sys.path.append(os.path.dirname(os.path.dirname(__file__))))
+sys.path.append('/deploy')
+sys.path.append('/code')
 
+from project import system
 from scripts import setup
 
 
@@ -21,6 +23,8 @@ def read_file(file_path):
 env_dict = {
     'APP_VERSION': read_file('/code/version'),
     'COPYRIGHT_YEAR': datetime.now().strftime('%Y'),
+    'system_name': system.get_system_name(),
+    'system_owner_link': system.get_system_owner_link(),
 }
 
 setup(
