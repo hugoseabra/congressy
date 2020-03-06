@@ -3,10 +3,12 @@ Task to send e-mails
 """
 
 from mailer import tasks
-from mailer.celery import app
+from project.celery import app
 
 
 @app.task(bind=True,
+          queue='mailer',
+          options={'queue': 'mailer'},
           rate_limit='10/m',  # Processar até 10 tasks por minuto
           default_retry_delay=2 * 60,  # retry in 2m
           ignore_result=True)

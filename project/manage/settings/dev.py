@@ -60,8 +60,8 @@ DEBUG_TOOLBAR_CONFIG = {
 WKHTMLTOPDF_WS_URL = 'http://localhost:5010'
 
 # ================================ CELERY ==================================== #
-CELERY_BROKER_URL = 'amqp://cgsy:cgsy@localhost:5672/'
-CELERY_RESULT_BACKEND = 'amqp://cgsy:cgsy@localhost:5672/'
+CELERY_BROKER_URL = 'amqp://cgsy:cgsy@localhost:5672//'
+# CELERY_RESULT_BACKEND = 'amqp://cgsy:cgsy@localhost:5672/'
 
 # ======================== HEALTH CHECK - RABBITMQ ========================== #
 BROKER_URL = CELERY_BROKER_URL

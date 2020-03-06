@@ -28,13 +28,13 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
 
     # Healthchecks
-    'health_check',
-    'health_check.db',
-    'health_check.cache',
-    'health_check.storage',
-    'health_check.contrib.psutil',
-    'health_check.contrib.rabbitmq',
-    'health_check.contrib.celery',
+    # 'health_check',
+    # 'health_check.db',
+    # 'health_check.cache',
+    # 'health_check.storage',
+    # 'health_check.contrib.psutil',
+    # 'health_check.contrib.rabbitmq',
+    # 'health_check.contrib.celery',
 
     # Django added apps
     'django.contrib.admindocs',
