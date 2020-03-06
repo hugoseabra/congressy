@@ -14,6 +14,7 @@ from django.utils.http import urlsafe_base64_encode
 from gatheros_event.models import Member
 from gatheros_subscription.helpers.voucher import create_voucher
 from mailer import exception, checks
+from project.system import get_system_name, get_system_owner_link
 from .worker import send_mail
 
 
@@ -82,6 +83,8 @@ def notify_new_unpaid_subscription_boleto(event, transaction):
     # @TODO set event.date_start to period
     template_name = 'mailer/subscription/notify_unpaid_subscription.html'
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -138,6 +141,8 @@ def notify_paid_subscription_boleto(event, transaction):
     # @TODO set event.date_start to period
     template_name = 'mailer/subscription/notify_paid_subscription.html'
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -190,6 +195,8 @@ def notify_new_user_and_unpaid_subscription_boleto(event, transaction):
             'mailer/subscription/notify_new_user_and_unpaid_subscription.html'
 
         body = render_to_string(template_name, {
+            'system_name': get_system_name(),
+            'system_owner_link': get_system_owner_link(),
             'person': person,
             'event': event,
             'period': event.date_start,
@@ -209,6 +216,8 @@ def notify_new_user_and_unpaid_subscription_boleto(event, transaction):
             '/notify_new_subscription_and_unpaid_subscription.html'
 
         body = render_to_string(template_name, {
+            'system_name': get_system_name(),
+            'system_owner_link': get_system_owner_link(),
             'person': person,
             'event': event,
             'period': event.date_start,
@@ -275,6 +284,8 @@ def notify_new_user_and_paid_subscription_boleto(event, transaction):
         'mailer/subscription/notify_new_user_and_paid_subscription.html'
 
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -317,6 +328,8 @@ def notify_new_unpaid_subscription_credit_card(event, transaction):
     # @TODO set event.date_start to period
     template_name = 'mailer/subscription/notify_unpaid_subscription.html'
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -357,6 +370,8 @@ def notify_new_refused_subscription_credit_card(event, transaction):
     # @TODO set event.date_start to period
     template_name = 'mailer/subscription/notify_refused_subscription.html'
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -397,6 +412,8 @@ def notify_new_refused_subscription_boleto(event, transaction):
     # @TODO set event.date_start to period
     template_name = 'mailer/subscription/notify_refused_subscription.html'
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -452,6 +469,8 @@ def notify_new_paid_subscription_credit_card(event, transaction):
     # @TODO set event.date_start to period
     template_name = 'mailer/subscription/notify_paid_subscription.html'
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -506,6 +525,8 @@ def notify_new_user_and_unpaid_subscription_credit_card(event, transaction):
         'mailer/subscription/notify_new_user_and_unpaid_subscription.html'
 
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -560,6 +581,8 @@ def notify_new_user_and_refused_subscription_credit_card(event, transaction):
         'mailer/subscription/notify_new_user_and_refused_subscription.html'
 
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -614,6 +637,8 @@ def notify_new_user_and_refused_subscription_boleto(event, transaction):
         'mailer/subscription/notify_new_user_and_refused_subscription.html'
 
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -672,6 +697,8 @@ def notify_new_user_and_paid_subscription_credit_card(event, transaction):
         'mailer/subscription/notify_new_user_and_paid_subscription.html'
 
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -731,6 +758,8 @@ def notify_new_user_and_paid_subscription_credit_card_with_discrepancy(event,
         '_card_with_discrepancy.html'
 
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -796,6 +825,8 @@ def notify_new_free_subscription(event, subscription):
     # @TODO set event.date_start to
     template_name = 'mailer/subscription/notify_free_subscription.html'
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -872,6 +903,8 @@ def notify_new_user_and_free_subscription(event, subscription):
         'mailer/subscription/notify_new_user_and_free_subscription.html'
 
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -924,6 +957,8 @@ def notify_refunded_subscription_boleto(event, transaction):
         'mailer/subscription/notify_refunded_subscription.html'
 
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -978,6 +1013,8 @@ def notify_refunded_subscription_credit_card(event, transaction):
         'mailer/subscription/notify_refunded_subscription.html'
 
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -1031,6 +1068,8 @@ def notify_pending_refund_subscription(event, transaction):
         'mailer/subscription/notify_pending_refund_subscription.html'
 
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -1070,6 +1109,8 @@ def notify_pending_chargeback_subscription(event, transaction):
         'mailer/subscription/notify_pending_chargedback_subscription.html'
 
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -1107,6 +1148,8 @@ def notify_chargedback_subscription(event, transaction):
         'mailer/subscription/notify_chargedback_subscription.html'
 
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -1143,6 +1186,8 @@ def notify_paid_with_incoming_installment(event, transaction):
     template_name = \
         'mailer/subscription/notify_paid_with_incoming_installment.html'
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'is_new': subscription.notified is False,
@@ -1181,6 +1226,8 @@ def notify_unpaid_installment(event, transaction):
 
     template_name = 'mailer/subscription/notify_unpaid_installment.html'
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'is_new': subscription.notified is False,
@@ -1233,6 +1280,8 @@ def notify_installment_with_discrepancy(event, transaction):
     template_name = \
         'mailer/subscription/notify_paid_installment_discrepancy.html'
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'organizer_email': author_email,
         'organizer_phone': author_phone,
@@ -1263,8 +1312,15 @@ def notify_new_user(context):
     Define a notificação para um usuario na plataforma.
     """
 
-    body = render_to_string('mailer/account_confirmation_email.html',
-                            context=context)
+    context.update({
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
+    })
+
+    body = render_to_string(
+        template_name='mailer/account_confirmation_email.html',
+        context=context
+    )
 
     subject = 'Confirmação de cadastro na {0}'.format(context['site_name'])
 
@@ -1282,8 +1338,13 @@ def notify_new_partner(context):
     Define a notificação para um novo parceiro na plataforma.
     """
 
+    context.update({
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
+    })
+
     body = render_to_string(
-        'mailer/notify_partner_registration_email.html',
+        template_name='mailer/notify_partner_registration_email.html',
         context=context
     )
 
@@ -1302,9 +1363,15 @@ def notify_reset_password(context):
     """
     Define a notificação para um usuario na plataforma.
     """
+    context.update({
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
+    })
 
-    body = render_to_string('mailer/password_reset_email.html',
-                            context=context)
+    body = render_to_string(
+        template_name='mailer/password_reset_email.html',
+        context=context
+    )
 
     subject = 'Redefina sua senha na {0}'.format(context['site_name'])
 
@@ -1321,9 +1388,15 @@ def notify_set_password(context):
     """
     Define a notificação para um usuario na plataforma.
     """
+    context.update({
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
+    })
 
-    body = render_to_string('mailer/password_set_email.html',
-                            context=context)
+    body = render_to_string(
+        template_name='mailer/password_set_email.html',
+        context=context
+    )
 
     subject = 'Defina sua senha na {0}'.format(context['site_name'])
 
@@ -1343,14 +1416,18 @@ def notify_partner_contract(context):
     Define a notificação para um parceiro quando o mesmo é vinculado a um
     evento.
     """
+    context.update({
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
+    })
+
+    body = render_to_string(
+        template_name='mailer/notify_partner_contract_email.html',
+        context=context
+    )
 
     subject = 'Parceria Congressy: Vinculado ao evento {0}'.format(context[
                                                                        'event'])
-
-    body = render_to_string('mailer/notify_partner_contract_email.html',
-                            context=context)
-
-    sender = send_mail.delay
     sender = send_mail.delay
 
     return sender(
@@ -1366,10 +1443,15 @@ def notify_new_partner_internal(context):
     Define a notificação interna para o comercial no evento de cadastro um novo
     parceiro na plataforma.
     """
+    context.update({
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
+    })
 
     body = render_to_string(
-        'mailer/notify_partner_registration_internal_email.html',
-        context=context)
+        template_name='mailer/notify_partner_registration_internal_email.html',
+        context=context
+    )
 
     subject = 'Novo parceiro cadastrado: {0}'.format(context['partner_name'])
 
@@ -1402,6 +1484,8 @@ def notify_new_event(event):
     body = render_to_string(
         template_name='mailer/notify_new_event.html',
         context={
+            'system_name': get_system_name(),
+            'system_owner_link': get_system_owner_link(),
             'event': event,
             'author_email': author_email,
             'link': link
@@ -1453,6 +1537,8 @@ def notify_open_boleto(transaction):
         'mailer/subscription/notify_unpaid_boleto.html'
 
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -1510,6 +1596,8 @@ def notify_voucher(subscription):
     # @TODO set event.date_start to period
     template_name = 'mailer/subscription/notify_voucher.html'
     body = render_to_string(template_name, {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -1554,6 +1642,8 @@ def notify_invite(organization, link, inviter, invited_person, email):
         org_admin_email = member.person.email
 
     body = render_to_string('mailer/notify_invitation.html', {
+        'system_name': get_system_name(),
+        'system_owner_link': get_system_owner_link(),
         'organizacao': organization.name,
         'hospedeiro': inviter,
         'convidado': invited_person,

@@ -51,7 +51,7 @@ update_db:
 	python manage.py migrate
 	python manage.py loaddata 000_site_dev
 	python manage.py loaddata 001_admin_staging
-	python manage.py loaddata 001_authtoken_staging
+	python manage.py update_drf_token -u 5 -t 4352cababfd0f7912869a5c7d2b90144e963dff1
 
 .PHONY: restart_ngrok
 restart_ngrok:
