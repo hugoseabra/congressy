@@ -16,7 +16,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{% block title %}Congressy{% endblock %}</title>
+    <title>{% block title %}{{system_name}}{% endblock %}</title>
     <meta name="description" content="">
     {#    <meta name="viewport"#}
     {#          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>#}
@@ -91,8 +91,7 @@
         <!--logo start-->
         <div class="brand">
             <a href="{% url 'event:event-list' %}">
-                <img class="img base_logo"
-                     src="{% static "assets/img/header-logo_black.png" %}"/>
+                <img class="img base_logo" src="{{ system_main_logo_path }}"/>
             </a>
         </div>
         <!--logo end-->

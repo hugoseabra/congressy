@@ -3,13 +3,13 @@
 {% load humanize %}
 {% load subscription_tags %}
 
-{% block title %}Nova Parceiro | Congressy{% endblock %}
+{% block title %}Nova Parceiro | {{system_name}}{% endblock %}
 {% block login_block_title %}Nova conta de parceiro{% endblock %}
 
 
 {% block form %}
-    <p class="text-center"> Olá, bem-vindo ao programa de parceiros da
-        Congressy. Por gentileza complete o cadastro abaixo para se
+    <p class="text-center"> Olá, bem-vindo ao programa de parceiros da plataforma
+        {{system_name}}. Por gentileza complete o cadastro abaixo para se
         cadastrar como parceiro. </p>
 
 

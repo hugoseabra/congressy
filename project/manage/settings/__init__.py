@@ -39,7 +39,7 @@ ACCOUNT_REGISTRATION = True
 # ========================= SERVER CONFIGURATION ============================ #
 WSGI_APPLICATION = 'project.wsgi.application'
 
-SITE_ID = 1
+SITE_ID = os.getenv('SITE_ID', 1)
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static-manage/'

@@ -348,7 +348,7 @@ class ProfileForm(forms.ModelForm):
                 self.fields['name'].widget.attrs['title'] = \
                     'Por questões de segurança, o nome não pode ser' \
                     ' alterado. Caso você deseja fazer alguma alteração,' \
-                    ' solicite ao suporte técnico da Congressy.'
+                    ' solicite ao suporte técnico.'
 
             self.fields['email'].disabled = True
             self.fields['email'].widget.attrs['data-toggle'] = 'tooltip'
