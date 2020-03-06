@@ -1,7 +1,7 @@
 {% extends is_embeded|yesno:"registration/login_base_embeded.html,registration/login_base.html" %}
 {% load static %}
 
-{% block title %}Nova conta | {{system_name}}{% endblock %}
+{% block title %}Criar conta | {{system_name}}{% endblock %}
 {% block login_block_title %}Nova conta{% endblock %}
 
 {# @TODO Corrigir problema com o success message, talvez um if testando o contexto por mensagem de successo #}
@@ -83,7 +83,7 @@
                     Aceitar e Criar Conta
                 </button>
                 <div class="help-block text-center" style="font-size: 13px;">
-                    {% include 'hotsite/includes/termo-de-uso.html' %}
+                    {% include 'registration/includes/termo-de-uso.html' %}
                 </div>
             </div>
         </div>

@@ -5,31 +5,18 @@ import json
 import os
 from tempfile import gettempdir
 
-import absoluteuri
 import requests
 from django.conf import settings
-from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
 
 from gatheros_subscription.helpers.barcode import get_barcode_file_path
 from gatheros_subscription.helpers.qrcode import get_qrcode_file_path
+from project.system import get_system_voucher_logo, get_system_url
 
 
 def get_logo():
-    logo_file_path = os.path.join(
-        settings.BASE_DIR,
-        'frontend',
-        'static',
-        'assets',
-        'img',
-        'logo_v4.png'
-    )
-    with open(logo_file_path, 'rb') as f:
-        read_data = f.read()
-        f.close()
-
-    return base64.b64encode(read_data)
+    return get_system_url(get_system_voucher_logo())
 
 
 def get_template_path():
@@ -57,7 +44,7 @@ def get_context(subscription):
         qrcode_fh.close()
 
     context = {
-        'base_url': absoluteuri.build_absolute_uri(settings.STATIC_URL),
+        'base_statuc_url': get_system_url(settings.STATIC_URL),
         'qrcode': qrcode_content,
         'barcode': barcode_content,
         'logo': get_logo(),
@@ -135,4 +122,4 @@ def create_voucher(subscription, save=False, force=False):
 
 
 def get_voucher_file_name(subscription):
-    return "{}-{}.pdf".format(subscription.event.slug, subscription.pk)
+    return "{}-{}.pdf".format(subscription.event.slug, subscription.code)
