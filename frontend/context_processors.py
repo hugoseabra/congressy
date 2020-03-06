@@ -5,13 +5,15 @@ import os
 
 from django.conf import settings
 
+from project import system
+
 
 def system_name(request):
     """
     Renderiza nome do sistema
     """
     return {
-        'system_name': 'Visit SP'
+        'system_name': system.get_system_name()
     }
 
 
@@ -20,7 +22,16 @@ def system_owner_link(request):
     Renderiza o link do dono do sistema.
     """
     return {
-        'system_owner_link': 'https://visitsp.tur.br'
+        'system_owner_link': system.get_system_owner_link()
+    }
+
+
+def system_owner_terms_link(request):
+    """
+    Renderiza o link do dono do sistema.
+    """
+    return {
+        'system_owner_terms_link': system.get_system_owner_terms_link()
     }
 
 
@@ -28,13 +39,26 @@ def system_main_logo_path(request):
     """
     Renderiza o caminho de URL da logo principal
     """
-    logo_path = os.path.join(
-        settings.STATIC_DIR,
-        'assets/img/header-logo_black.png'
-    )
-
     return {
-        'system_main_logo_path': logo_path,
+        'system_main_logo_path': system.get_system_main_logo(),
+    }
+
+
+def system_voucher_logo_path(request):
+    """
+    Renderiza o caminho de URL da logo principal
+    """
+    return {
+        'system_voucher_logo_path': system.get_system_voucher_logo(),
+    }
+
+
+def system_registration_logo_path(request):
+    """
+    Renderiza o caminho de URL da logo principal
+    """
+    return {
+        'system_registration_logo_path': system.get_system_registration_logo(),
     }
 
 
