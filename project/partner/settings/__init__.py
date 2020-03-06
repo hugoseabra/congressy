@@ -30,7 +30,7 @@ INSTALLED_APPS += [
 # ========================= SERVER CONFIGURATION ============================ #
 WSGI_APPLICATION = 'project.wsgi.application'
 
-SITE_ID = 2
+SITE_ID = os.getenv('SITE_ID', 2)
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static-manage/'
