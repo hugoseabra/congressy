@@ -33,25 +33,24 @@ steps:
       - echo "${DRONE_COMMIT_AUTHOR_NAME}" > /tmp/staging-files/build_author
       - echo "${DRONE_COMMIT_AUTHOR_AVATAR}" > /tmp/staging-files/build_author_avatar
       - echo "${DRONE_BUILD_LINK}" > /tmp/staging-files/build_link
-      - echo "latest" > /tmp/staging-files/hotsite-version
 
-  - name: create-awsecr-service
-    environment:
-      AWS_KEY:
-        from_secret: AWS_KEY
-      AWS_SECRET:
-        from_secret: AWS_SECRET
-      AWS_ACCOUNT_ID:
-        from_secret: AWS_ACCOUNT_ID
-    commands:
-      - mkdir -p /tmp/awsecr
-      - echo "AWS_KEY=$${AWS_KEY}" > /tmp/awsecr/env-awsecr
-      - echo "AWS_SECRET=$${AWS_SECRET}" >> /tmp/awsecr/env-awsecr
-      - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> /tmp/awsecr/env-awsecr
-      - echo "AWS_REGION=us-east-1" >> /tmp/awsecr/env-awsecr
-      - echo "AWS_FORMAT=json" >> /tmp/awsecr/env-awsecr
-      - cp ./bin/env/prod/01_create-awsecr-container.sh /tmp/awsecr/.
-      - sh /tmp/awsecr/01_create-awsecr-container.sh
+#  - name: create-awsecr-service
+#    environment:
+#      AWS_KEY:
+#        from_secret: AWS_KEY
+#      AWS_SECRET:
+#        from_secret: AWS_SECRET
+#      AWS_ACCOUNT_ID:
+#        from_secret: AWS_ACCOUNT_ID
+#    commands:
+#      - mkdir -p /tmp/awsecr
+#      - echo "AWS_KEY=$${AWS_KEY}" > /tmp/awsecr/env-awsecr
+#      - echo "AWS_SECRET=$${AWS_SECRET}" >> /tmp/awsecr/env-awsecr
+#      - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> /tmp/awsecr/env-awsecr
+#      - echo "AWS_REGION=us-east-1" >> /tmp/awsecr/env-awsecr
+#      - echo "AWS_FORMAT=json" >> /tmp/awsecr/env-awsecr
+#      - cp ./bin/env/prod/01_create-awsecr-container.sh /tmp/awsecr/.
+#      - sh /tmp/awsecr/01_create-awsecr-container.sh
 
   - name: create-staging-env-file
     environment:
@@ -183,23 +182,6 @@ steps:
         path: /var/run/docker.sock
     commands:
       - ./bin/env/staging/02_recreate-db-staging.sh
-
-#  - name: download-hotsite-v2
-#    image: docker
-#    pull: if-not-exists
-#    volumes:
-#      - name: tmp_dir
-#        path: /tmp
-#      - name: localtime
-#        path: /etc/localtime
-#      - name: docker-sock
-#        path: /var/run/docker.sock
-#    environment:
-#      AWS_ACCOUNT_ID:
-#        from_secret: AWS_ACCOUNT_ID
-#    commands:
-#      - ./bin/env/staging/05_download_hotsite.sh
-#      - docker tag $${ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/hotsite-v2:`cat /tmp/staging-files/hotsite-version`
 
   - name: build-staging-image
     image: docker
