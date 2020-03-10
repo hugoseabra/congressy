@@ -4,3 +4,6 @@
      [entryPoints.http.redirect]
      regex = "^http://(.*)$"
      replacement = "https://$1"
+
+[ping]
+entryPoint = "http"
