@@ -1,4 +1,4 @@
-version: "3.5"
+ version: "3.5"
 services:
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas
@@ -13,6 +13,7 @@ services:
     command:
       - --api
       - --docker
+      - --ping
       - --accesslog
       - --accesslog.format=json
       - --accesslog.fields.names="StartLocal=keep StartUTC=keep"
@@ -89,6 +90,8 @@ services:
       - 80
     networks:
       - traefik
+    volumes:
+      - /tmp/installed_packages:/usr/src/app/node_modules
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.passHostHeader=true"
