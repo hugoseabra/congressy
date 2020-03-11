@@ -1,5 +1,5 @@
 DOCKER_COMPOSE_ENV=bin/env/docker-compose_dev.yml
-CELERY_SERVICES=-A attendance -A mailer -A gatheros_subscription -A buzzlead worker
+CELERY_SERVICES=-A project
 DJANGO_SETTINGS_MODULE=project.manage.settings.dev
 
 .PHONY: export_settings
@@ -28,12 +28,12 @@ broker_kill:
 
 .PHONY: broker_create
 broker_create: broker_kill
-	celery -E $(CELERY_SERVICES) --loglevel=INFO --pidfile="/tmp/celery.pid" --detach;
+	celery -E $(CELERY_SERVICES) worker --autoscale=10,1 --loglevel=DEBUG --pidfile="/tmp/celery.pid" --detach;
 
 
 .PHONY: broker_debug
 broker_debug: broker_kill
-	celery -E $(CELERY_SERVICES) --loglevel=INFO;
+	celery -E $(CELERY_SERVICES) worker --autoscale=10,1 --loglevel=DEBUG;
 
 
 .PHONY: services

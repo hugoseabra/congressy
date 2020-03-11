@@ -65,6 +65,7 @@ services:
     command:
       - --api
       - --docker
+      - --ping
       - --accesslog
       - --accesslog.format=json
       - --accesslog.fields.names="StartLocal=keep StartUTC=keep"

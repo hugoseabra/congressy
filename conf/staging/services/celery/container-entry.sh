@@ -12,8 +12,4 @@ echo " > Iniciando CELERY"
 echo ;
 echo "########################################################################"
 echo ;
-celery \
-    -E --loglevel=INFO \
-    -A attendance \
-    -A mailer \
-    -A gatheros_subscription worker
+celery --events --loglevel=INFO -A project worker --autoscale=10,1 --loglevel=INFO;

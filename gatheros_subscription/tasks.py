@@ -1,15 +1,17 @@
 import logging
 
 from gatheros_event.models import Event
-from gatheros_subscription.celery import app
 from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.helpers.subscription_async_exporter import \
     SubscriptionServiceAsyncExporter
+from project.celery import app
 
 logger = logging.getLogger(__name__)
 
 
 @app.task(bind=True,
+          queue='gatheros_subscription',
+          options={'queue': 'gatheros_subscription'},
           rate_limit='5/m',  # Processar até 5 tasks por minuto
           default_retry_delay=30,  # retry in 30s
           ignore_result=True)

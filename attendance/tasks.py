@@ -4,12 +4,14 @@ from attendance.helpers.async_exporter_helpers import \
     AttendanceServiceAsyncExporter
 from attendance.models import AttendanceService
 from attendance.views.export import export_attendance
-from gatheros_subscription.celery import app
+from project.celery import app
 
 logger = logging.getLogger(__name__)
 
 
 @app.task(bind=True,
+          queue='attendance',
+          options={'queue': 'attendance'},
           rate_limit='10/m',  # Processar até 10 tasks por minuto
           default_retry_delay=2 * 60,  # retry in 2m
           ignore_result=True)
