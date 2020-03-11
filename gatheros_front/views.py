@@ -54,6 +54,9 @@ class Login(auth_views.LoginView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
+        ctx['GOOGLE_RECAPTCHA_PUBLIC_KEY'] = \
+            settings.GOOGLE_RECAPTCHA_PUBLIC_KEY
+
         ctx['allow_account_registration'] = \
             LOGIN_SUPERUSER_ONLY is False or ALLOW_ACCOUNT_REGISTRATION
 

@@ -208,9 +208,6 @@ class EventSerializer(serializers.ModelSerializer):
 
         prices = list()
         for lot in instance.lots.filter(private=False, active=True):
-            if lot.running is False:
-                continue
-
             if lot.price:
                 prices.append(lot.get_calculated_price())
             else:

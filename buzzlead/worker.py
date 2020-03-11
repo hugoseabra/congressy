@@ -3,10 +3,12 @@ Task to send e-mails
 """
 
 from buzzlead import tasks
-from buzzlead.celery import app
+from project.celery import app
 
 
 @app.task(bind=True,
+          queue='buzzlead',
+          options={'queue': 'buzzlead'},
           rate_limit='10/m',  # Processar até 10 tasks por minuto
           # default_retry_delay=30,  # retry in 30s
           ignore_result=True)

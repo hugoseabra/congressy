@@ -28,13 +28,13 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
 
     # Healthchecks
-    'health_check',
-    'health_check.db',
-    'health_check.cache',
-    'health_check.storage',
-    'health_check.contrib.psutil',
-    'health_check.contrib.rabbitmq',
-    'health_check.contrib.celery',
+    # 'health_check',
+    # 'health_check.db',
+    # 'health_check.cache',
+    # 'health_check.storage',
+    # 'health_check.contrib.psutil',
+    # 'health_check.contrib.rabbitmq',
+    # 'health_check.contrib.celery',
 
     # Django added apps
     'django.contrib.admindocs',
@@ -199,10 +199,10 @@ TEMPLATES = [
                 'frontend.context_processors.render_app_only',
                 'frontend.context_processors.system_name',
                 'frontend.context_processors.system_owner_link',
+                'frontend.context_processors.system_owner_terms_link',
                 'frontend.context_processors.system_main_logo_path',
                 'frontend.context_processors.system_voucher_logo_path',
                 'frontend.context_processors.system_registration_logo_path',
-                'frontend.context_processors.system_owner_terms_link',
                 'frontend.context_processors.is_debug_mode',
                 'frontend.context_processors.is_offline_server',
             ],

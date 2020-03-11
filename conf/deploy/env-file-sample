@@ -1,14 +1,5 @@
 AWS_KEY=
 AWS_SECRET=
-DOMAIN=ev.congressy.com
-BUCKET_LOCATION=us-east-1
-BUCKET_NAME=cgsyplatform
-DBHOST=postgres
-DBUSER=congressy
-DBPASS=congressy
-DBNAME=cgsyplatform
-DBPORT=5432
-SITE_ID=
 SENTRY_PRIVATE_DSN=
 SENTRY_PUBLIC_DSN=
 RABITMQ_USER=
