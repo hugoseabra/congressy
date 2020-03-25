@@ -58,3 +58,9 @@ class FeatureManagement(models.Model):
         verbose_name='Sorteios',
         help_text="Seu evento terá sorteios ?"
     )
+
+    integrations = models.BooleanField(
+        default=True,
+        verbose_name='integrações',
+        help_text='Integrações'
+    )
