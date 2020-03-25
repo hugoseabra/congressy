@@ -1,0 +1,43 @@
+{% load l10n form_config_tags %}
+
+<h4 class="text-bold">CONFIGURAÇÃO</h4>
+<div>
+    <form action="" method="post" class="form-horizontal form-border" role="form">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="float-left" style="width: 80%">
+                    {% render_generic_field form.api_key %}
+                </div>
+                <div class="float-left" style="margin-top: 47px">
+                    {% if not integration %}
+                    <button type="button" class="btn btn-primary btn-sm">Enviar</button>
+                    {% endif %}
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        {% if integration %}
+        <div class="row">
+            <div class="col-md-4">
+                {% render_generic_field form.list_id %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                {% render_switchery_field form.sync_phone %}
+            </div>
+            <div class="col-md-4">
+                {% render_switchery_field form.sync_address %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-right" style="padding: 0 45px">
+                <button class="btn btn-success btn-sm">
+                    <span class="fa fa-save"></span>
+                    Salvar
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </form>
+</div>

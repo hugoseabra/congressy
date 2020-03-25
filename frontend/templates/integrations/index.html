@@ -1,0 +1,93 @@
+{% extends "base/base.html" %}
+{% load l10n static %}
+
+{% block title %}
+    Integrações | {{system_name}}
+{% endblock %}
+
+{% block page_title %}
+    Integrações
+{% endblock %}
+
+{% block page_sub_title %}
+    {{ event.name }}
+    {% if object %}
+        - {{ object.name }} (ID: {{ object.pk }})
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="well well-sm primary-color">
+                                <div class="float-left" style="margin-top: 10px;">
+                                    <span class="fab fa-mailchimp fa-2x"></span>
+                                </div>
+                                <div class="float-left" style="margin-left:8px;margin-top: 6px;">
+                                    <div>MailChimp</div>
+                                    <small><small class="text-muted">Ativa sincronização com listas de audiência com MailChimp.</small></small>
+                                </div>
+                                <div class="float-right" style="margin-left:8px;margin-top: 6px;">
+                                    <button title="Clique para configurar" data-toggle="tooltip" class="btn btn-block btn-trans btn-primary" id="mailchimp-config-button">
+                                        <span class="fa fa-unlink"></span>
+                                        Configurar
+                                    </button>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="row" id="mailchimp-form-block" style="display:none">
+                                    <div class="col-md-12">
+                                        <div class="panel panel-primary" style="margin-bottom:0;margin-top: 12px;color:#333">
+                                            <div class="panel-body" id="mailchimp-form"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div>
+                        <div>
+                            <div class="well well-sm primary-color" style="border: 2px solid green">
+                                <div class="float-left" style="margin-top: 10px;">
+                                    <span class="fab fa-mailchimp fa-2x"></span>
+                                </div>
+                                <div class="float-left" style="margin-left:8px;margin-top: 6px;">
+                                    <div>MailChimp</div>
+                                    <small><small class="text-muted">Ativa sincronização com listas de audiência com MailChimp.</small></small>
+                                </div>
+                                <div class="float-right" style="margin-left:8px;margin-top: 6px;">
+                                    <button title="Clique para alterar a configuração" data-toggle="tooltip" class="btn btn-block btn-success">
+                                        <span class="fa fa-link"></span>
+                                        Configurar
+                                    </button>
+                                </div>
+                                <div class="float-right" style="margin-right:8px;margin-top: 14px;">
+                                    <span class="text-success text-bold">Ativo</span>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static "assets/js/ajax.js" %}"></script>
+<script src="{% static "assets/js/integrations/mailchimp.js" %}"></script>
+<script src="{% static "assets/js/integrations/mailchimp_usage.js" %}"></script>
+<script>
+window.integrations.Config.mailchimp_form_url = '{% url 'integrations:event-integrations-mailchimp' event.pk %}';
+
+</script>
+{% endblock %}

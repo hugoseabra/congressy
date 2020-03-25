@@ -159,6 +159,17 @@ Variáveis:
         </a>
     </li>
 
+    {% if event.feature_management.integrations is True %}
+    <li {% if active == 'integrations' %}class="active"{% endif %}>
+        <a class="sidebar-itens" href=
+                "{% url 'integrations:event-integrations' event.pk %}"
+           title="Integrações">
+            <i class="fas fa-plug"></i>
+            Integrações
+        </a>
+    </li>
+    {% endif %}
+
     <li {% if active == 'dados-do-evento' %}class="active"{% endif %}>
         <a class="sidebar-itens" href=
                 "{% url 'event:event-edit' event.pk %}"
