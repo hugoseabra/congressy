@@ -158,6 +158,15 @@ Variáveis:
             Lotes
         </a>
     </li>
+    {% if  event.feature_management.videos is True %}
+        <li {% if active == 'videos' %}class="active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'videos:event-videos' event.pk %}"
+               title="Videos">
+                <i class="fas fa-photo-video"></i> Videos
+            </a>
+        </li>
+    {% endif %}
 
     <li {% if active == 'dados-do-evento' %}class="active"{% endif %}>
         <a class="sidebar-itens" href=
@@ -168,8 +177,7 @@ Variáveis:
     </li>
     {% if event.feature_configuration.feature_survey and event.feature_management.survey %}
         <li {% if active == 'form-personalizado' %}class="active"{% endif %}>
-            <a class="sidebar-itens" href=
-                    "{% url 'subscription:form-config' event.pk %}"
+            <a class="sidebar-itens" href="{% url 'subscription:form-config' event.pk %}"
                title="Form. Personalizado"
                style="padding-right: 0;font-size: 15px">
                 <i class="fab fa-wpforms"></i> Form. Personalizado

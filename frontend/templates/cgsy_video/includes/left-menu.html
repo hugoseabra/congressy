@@ -1,0 +1,25 @@
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <div class="panel-title">Menu</div>
+    </div>
+    <div class="panel-body">
+
+        <ul class="nav nav-stacked compose-nav">
+            <li {% if active == 'videos' %}class="active"{% endif %}>
+                <a href="{% url 'videos:event-videos' event.pk %}">
+                    Vídeos
+                </a>
+            </li>
+            <li {% if active == 'playlists' %}class="active"{% endif %}>
+                <a href="">
+                    Playlists
+                </a>
+            </li>
+            <li {% if active == 'categories' %}class="active"{% endif %}>
+                <a href="">
+                    Categorias
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

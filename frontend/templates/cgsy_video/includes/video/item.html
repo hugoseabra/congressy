@@ -1,0 +1,109 @@
+{% load static %}
+<div class="well well-sm" style="{% if active is True %}border:1px solid green{% endif %}">
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="video-image-block">
+                <div style="position:absolute;margin: 5px 0 0 5px;z-index:10;">
+                    <button title="Editar dados do vídeo" data-toggle="tooltip" class="btn btn-block btn-sm video-config-button">
+                        <span class="fas fa-edit"></span>
+                        Editar
+                    </button>
+                </div>
+                {% if restricted is True %}
+                <div style="position:absolute;right:5px;margin-top:8px;z-index:10;font-size:12px" class="badge badge-danger">Restrito</div>
+                {% endif %}
+                <img src="https://img.youtube.com/vi/IjqC457Uaik/0.jpg" class="img img-responsive video-thumbnail" />
+                <div class="overlay">
+                    <a href="javascript:void(0)" class="icon" data-toggle="tooltip" data-placement="bottom" title="Clique para visualizar">
+                        <i class="fas fa-play" style="font-size:85px"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <div style="font-size: smaller;font-weight: 600">
+                Palestra Piangers VR (Parte 01) - Napster, Frozen (Evolução da distribuição de músicas) Palestra Piangers VR (Parte 01) ... (120 chars)
+            </div>
+            <div  style="line-height: 0.95" data-toggle="tooltip" title="Palestra realizada em agosto de 2017 em Gramado/RS, para o evento Gramado Summit. Palestra realizada em agosto de 2017 em Gramado/RS, para o evento Gramado Summit. Palestra realizada em agosto de 2017 em Gramado/RS, para o evento Gramado Summit.">
+                <small><small class="text-muted">
+                    Palestra realizada em agosto de 2017 em Gramado/RS, para o evento Gramado Summit. Palestra realizada...(100 chars)
+                </small></small>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-sm-6">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% if date_start or date_end %}
+                            <div style="font-size: smaller">
+                                <strong>Programação:</strong>
+                                {% if date_start %}
+                                <div style="margin-left:4px;font-size: smaller">
+                                    <strong>Inicia em:</strong> 20/05/2020 15h00
+                                </div>
+                                {% endif %}
+                                {% if date_end %}
+                                <div style="margin-left:4px;font-size: smaller">
+                                    <strong>Encerra em:</strong> 20/05/2020 15h00
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12" style="font-size:smaller">
+                            <div><strong>Playlists:</strong></div>
+                            <div>Marketing e outros 3 playlists</div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 text-right">
+                        <div class="col-sm-12">
+                            <div style="margin-left:4px;font-size: smaller">
+                                <div><strong>Categoria:</strong></div>
+                                <div>
+                                    Marketing
+                                    &ensp;
+                                    <span class="fas fa-pencil-alt" style="font-size:12px;cursor:pointer" data-toggle="tooltip" title="Alterar a categoria"></span>
+                                </div>
+                            </div>
+                            <div style="display:none">
+                                <select class="form-control" style="height:25px;padding:0px 0 2px 8px;margin-bottom:3px;font-size:12px">
+                                    <option>- Categoria -</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            {% if provider == 'vimeo' %}
+                            <div class="badge badge-success" style="font-size:16px">
+                                <i class="fab fa-vimeo-v"></i>
+                                Vimeo
+                            </div>
+                            {% endif %}
+                            {% if provider == 'youtube' %}
+                            <div class="badge badge-success" style="font-size:16px">
+                                <i class="fab fa-youtube"></i>
+                                Youtube
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-sm-12">
+                            <div style="margin-top: 10px">
+                                <span style="font-size: smaller">Ativo:</span>
+                                <input type="checkbox" name="hide_dates" style="display:none" class="js-switch" id="id_hide_dates" data-switchery="true">
+                                <span class="switchery switchery-small" style="box-shadow: rgb(179, 184, 195) 0px 0px 0px 0px inset; border-color: rgb(179, 184, 195); background-color: rgb(179, 184, 195); transition: border 0.4s ease 0s, box-shadow 0.4s ease 0s;">
+                                    <small style="left: 0px; transition: background-color 0.4s ease 0s, left 0.2s ease 0s;"></small>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
