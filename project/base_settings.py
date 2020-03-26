@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'base',
     'frontend',
     'buzzlead',
+    'cgsy_video',
 ]
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
 LANGUAGE_CODE = 'pt-br'
