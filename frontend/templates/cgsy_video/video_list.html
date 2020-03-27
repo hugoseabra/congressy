@@ -86,20 +86,14 @@
 
                         <div class="row">
                             <div class="col-xs-12">
-
-
-
-                                {% include 'cgsy_video/includes/video/pagination-top.html' %}
+                                {% include 'cgsy_video/includes/video/search.html' with pagination=True %}
 
                                 {% include 'cgsy_video/includes/video/item.html' with active=True restricted=True %}
                                 {% include 'cgsy_video/includes/video/item.html' with active=False restricted=False %}
 
                                 {% include 'cgsy_video/includes/video/pagination.html' %}
-
                             </div>
                         </div>
-
-
                     </div>
                 </div>
             </div>

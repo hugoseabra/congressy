@@ -8,9 +8,11 @@
             </a>
         </div>
     </div>
+    {% if pagination is True %}
     <div class="col-xs-6">
         {% include 'cgsy_video/includes/video/pagination.html' %}
     </div>
+    {% endif %}
 </div>
 
 {% include 'cgsy_video/includes/video/filters.html' %}
