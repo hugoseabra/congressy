@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from core.database.postgresql import patch_unaccent
 
 # Patch para buscas no postgresql
+
 patch_unaccent()
 
 # ========================== BASE CONFIGURATION ============================= #
@@ -68,6 +69,7 @@ INSTALLED_APPS = [
     'frontend',
     'buzzlead',
     'cgsy_video',
+    'webpack_loader',
 ]
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
 LANGUAGE_CODE = 'pt-br'
@@ -315,8 +317,6 @@ CKEDITOR_CONFIGS = {
         'height': 150,
     },
 }
-
-# =============================== CACHE ===================================== #
 # =============================== CACHE ===================================== #
 CACHES = {
     'default': {

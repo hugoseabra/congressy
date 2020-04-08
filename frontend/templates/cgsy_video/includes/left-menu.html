@@ -10,11 +10,16 @@
                     Vídeos
                 </a>
             </li>
-            <li {% if active == 'playlists' %}class="active"{% endif %}>
-                <a href="">
-                    Playlists
-                </a>
-            </li>
+<!--            <li {% if active == 'files' %}class="active"{% endif %}>-->
+<!--                <a href="">-->
+<!--                    Arquivos-->
+<!--                </a>-->
+<!--            </li>-->
+<!--            <li {% if active == 'playlists' %}class="active"{% endif %}>-->
+<!--                <a href="">-->
+<!--                    Playlists-->
+<!--                </a>-->
+<!--            </li>-->
             <li {% if active == 'categories' %}class="active"{% endif %}>
                 <a href="{% url 'videos:event-video-categories' event.pk %}">
                     Categorias
