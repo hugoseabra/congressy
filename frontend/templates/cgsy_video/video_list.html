@@ -1,4 +1,5 @@
 {% extends 'base/base.html' %}
+{% load render_bundle from webpack_loader %}
 
 {% block title %}
     Videos | {{system_name}}
@@ -18,7 +19,6 @@
 <style>
     .video-image-block {
         position: relative;
-        max-width: 400px;
         z-index:0;
     }
     .video-config-button {
@@ -67,11 +67,21 @@
     }
 </style>
 {% endblock %}
+{% block scripts %}
+<script>
+    window.cgsy_environemnt = window.cgsy_environemnt || {};
+    window.cgsy_environemnt.API_BASE_URL='http://localhost:8001';
+    window.cgsy_environemnt.API_TOKEN='4352cababfd0f7912869a5c7d2b90144e963dff1';
+    // VIDEOS CONTEXT
+    window.cgsy_environemnt.PROJECT_PK='1843cf44-58ed-48ac-873d-8a47adc65ea1';
+
+    // setTimeout(() => $('#video-form-fields-modal').modal(), 1000)
+</script>
+{% render_bundle 'chunk-vendors' config='VIDEOS' %}
+{% render_bundle 'video_list' config='VIDEOS' %}
+{% endblock %}
 
 {% block content %}
-
-{% include 'cgsy_video/video_form.html' %}
-{% include 'cgsy_video/includes/video/player.html' %}
 
 <div class="row">
     <div class="col-md-2 col-sm-12">
@@ -83,6 +93,16 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-xs-12">
+
+                        <div class="row">
+                            <div class="col-xs-12">
+
+                                <div id="video-list">
+                                    <videos />
+                                </div>
+
+                            </div>
+                        </div>
 
                         <div class="row">
                             <div class="col-xs-12">
@@ -100,5 +120,17 @@
 
         </div>
     </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<div id="video-link-form">
+    <video-form />
+</div>
+<div id="video-form">
+    <video-form-fields />
+</div>
+<div id="video-player">
+    <video-player />
 </div>
 {% endblock %}
