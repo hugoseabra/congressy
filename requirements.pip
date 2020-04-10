@@ -2,6 +2,7 @@ app-version==0.2.1
 appdirs==1.4.3
 celery==4.3.0
 certifi==2018.1.18
+congressy-sdk==0.0
 chardet==3.0.4
 Django==1.11
 django-absoluteuri==1.2.0

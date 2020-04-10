@@ -68,10 +68,13 @@ CELERY_BROKER_URL = 'amqp://cgsy:cgsy@localhost:5672//'
 # ======================== HEALTH CHECK - RABBITMQ ========================== #
 BROKER_URL = CELERY_BROKER_URL
 
+# ============================== VIDEOS ===================================== #
+CGSY_VIDEOS_API_ADMIN_TOKEN = '4352cababfd0f7912869a5c7d2b90144e963dff1'
+
 # ============================ FRONTEND ===================================== #
 FRONTEND_DEBUG = os.getenv('FRONTEND_DEBUG', DEBUG)
 frontend_loader = get_frontend_loader(
     front_end_dir_path=os.path.join(BASE_DIR, 'frontend', 'vue_frontend'),
-    debug_mode=eval(FRONTEND_DEBUG) is True,
+    debug_mode=eval(str(FRONTEND_DEBUG)) is True,
 )
 WEBPACK_LOADER = dict(frontend_loader)

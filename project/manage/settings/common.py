@@ -61,6 +61,6 @@ BROKER_URL = CELERY_BROKER_URL
 FRONTEND_DEBUG = os.getenv('FRONTEND_DEBUG', DEBUG)
 frontend_loader = get_frontend_loader(
     front_end_dir_path=os.path.join(BASE_DIR, 'frontend', 'vue_frontend'),
-    debug_mode=eval(FRONTEND_DEBUG) is True,
+    debug_mode=eval(str(FRONTEND_DEBUG)) is True,
 )
 WEBPACK_LOADER = dict(frontend_loader)

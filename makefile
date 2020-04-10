@@ -28,12 +28,12 @@ broker_kill:
 
 .PHONY: broker_create
 broker_create: broker_kill
-	celery -E $(CELERY_SERVICES) worker --autoscale=10,1 --loglevel=DEBUG --pidfile="/tmp/celery.pid" --detach;
+	celery -E $(CELERY_SERVICES) worker --autoscale=10,5 --loglevel=DEBUG --pidfile="/tmp/celery.pid" --detach;
 
 
 .PHONY: broker_debug
 broker_debug: broker_kill
-	celery -E $(CELERY_SERVICES) worker --autoscale=10,1 --loglevel=DEBUG;
+	celery -E $(CELERY_SERVICES) worker --autoscale=10,5 --loglevel=DEBUG;
 
 
 .PHONY: services
