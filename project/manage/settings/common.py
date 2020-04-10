@@ -64,3 +64,7 @@ frontend_loader = get_frontend_loader(
     debug_mode=eval(str(FRONTEND_DEBUG)) is True,
 )
 WEBPACK_LOADER = dict(frontend_loader)
+
+# ============================== VIDEOS ===================================== #
+CGSY_VIDEOS_API_ADMIN_TOKEN = '4352cababfd0f7912869a5c7d2b90144e963dff1'
+CGSY_VIDEOS_API_URL = 'https://api.congressy.com'
