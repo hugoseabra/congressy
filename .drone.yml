@@ -183,6 +183,7 @@ steps:
     pull: if-not-exists
     commands:
       - cd frontend/vue_frontend/videos
+      - yarn install
       - yarn build
 
   - name: build-staging-image
