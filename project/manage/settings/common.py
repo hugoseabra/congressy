@@ -5,9 +5,10 @@
 # Não mude as configurações de DATABASES.
 #############################################################################
 
+# ================================= APPS ==================================== #
+from project.frontend import get_frontend_loader
 from . import *
 
-# ================================= APPS ==================================== #
 INSTALLED_APPS.extend([
     'django_uwsgi',
 ])
@@ -55,3 +56,11 @@ CELERY_RESULT_BACKEND = 'amqp://{{ RABBITMQ_USER }}:{{ RABBITMQ_PASS }}@{{ RABBI
 
 # ======================== HEALTH CHECK - RABBITMQ ========================== #
 BROKER_URL = CELERY_BROKER_URL
+
+# ============================ FRONTEND ===================================== #
+FRONTEND_DEBUG = os.getenv('FRONTEND_DEBUG', DEBUG)
+frontend_loader = get_frontend_loader(
+    front_end_dir_path=os.path.join(BASE_DIR, 'frontend', 'vue_frontend'),
+    debug_mode=eval(str(FRONTEND_DEBUG)) is True,
+)
+WEBPACK_LOADER = dict(frontend_loader)

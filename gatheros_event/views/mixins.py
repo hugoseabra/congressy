@@ -293,11 +293,6 @@ class EventViewMixin(AccountMixin):
             organization=event.organization,
             force=True
         )
-
-        self.permission_denied_url = reverse(
-            'event:event-panel',
-            kwargs={'pk': event.pk}
-        )
         return super(EventViewMixin, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -331,7 +326,7 @@ class EventViewMixin(AccountMixin):
         return self.get_event().organization == self.organization
 
     def get_permission_denied_url(self):
-        return reverse('event:event-list')
+        return reverse('event:event-panel', kwargs={'pk': self.event.pk})
 
 
 class EventDraftStateMixin(object):

@@ -30,6 +30,7 @@ class LotSerializer(serializers.ModelSerializer):
             ret['exhibition_code'] = None
 
         ret['status'] = instance.status
+        ret['status_name'] = instance.get_status_display()
         ret['num_subscriptions'] = instance.subscriptions.count()
 
         lot_cat = instance.category

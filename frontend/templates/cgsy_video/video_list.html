@@ -1,0 +1,165 @@
+{% extends 'base/base.html' %}
+{% load render_bundle from webpack_loader %}
+
+{% block title %}
+    Videos | {{system_name}}
+{% endblock %}
+
+{% block page_title %}
+    Vídeos
+{% endblock %}
+{% block page_sub_title %}
+    {{ event.name }}
+{% endblock %}
+{% block page_description %}
+    Publique vídeos para o seu evento.
+{% endblock %}
+
+{% block styles %}
+<style>
+    #video-list .video-image-block {
+        position: relative;
+        z-index:0;
+    }
+    #video-list .video-config-button {
+        color: #333;
+        background-color: #eee;
+        opacity: 0.5;
+        visibility: hidden;
+    }
+    #video-list .overlay {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        opacity: 0;
+        transition: .3s ease;
+        background-color: #333;
+    }
+
+    #video-list .video-image-block:hover .overlay {
+        opacity: 0.9;
+    }
+
+    #video-list .video-image-block:hover .video-config-button {
+        visibility: visible;
+    }
+
+    #video-list .video-config-button:hover {
+        opacity: 1;
+    }
+
+    #video-list .fa-play:hover {
+        color: #eee;
+    }
+
+    #video-list .icon {
+        color: white;
+        font-size: 100px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        text-align: center;
+    }
+</style>
+{% endblock %}
+{% block scripts %}
+
+{% if videos_enabled %}
+<script>
+    window.cgsy_environemnt = window.cgsy_environemnt || {};
+    window.cgsy_environemnt.API_BASE_URL='{{ API_BASE_URL }}';
+    window.cgsy_environemnt.API_TOKEN='{{ API_TOKEN }}';
+    // VIDEOS CONTEXT
+    window.cgsy_environemnt.PROJECT_PK='{{ PROJECT_PK }}';
+    // setTimeout(() => $('#video-form-fields-modal').modal(), 1000)
+</script>
+{% render_bundle 'chunk-vendors' config='VIDEOS' %}
+{% render_bundle 'video_list' config='VIDEOS' %}
+
+{% else %}
+    <script>
+    setTimeout(function(){ window.location.reload()}, 3000);
+    </script>
+{% endif %}
+
+{% endblock %}
+
+{% block content %}
+{% if videos_enabled is False %}
+<div class="panel">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="text-center" style="height: 100px;margin-top:50px">
+                    <div>
+                        <i class="fas fa-circle-notch text-muted fa-spin fa-4x"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Aguarde enquanto sua página de vídeo é criada.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-md-2 col-sm-12">
+        {% include 'cgsy_video/includes/left-menu.html' with active='videos' %}
+    </div>
+    <div class="col-md-10 col-sm-12">
+        {% include 'cgsy_video/includes/video/top-menu.html' %}
+        <div class="panel">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-12">
+
+                        <div class="row">
+                            <div class="col-xs-12">
+
+                                <div id="video-list">
+                                    <videos />
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {# {% include 'cgsy_video/includes/video/search.html' with pagination=True #}
+
+                                {#{% include 'cgsy_video/includes/video/item.html' with active=True restricted=True %}#}
+                                {#{% include 'cgsy_video/includes/video/item.html' with active=False restricted=False %}#}
+
+                                {#{% include 'cgsy_video/includes/video/pagination.html' %}#}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block modals %}
+{% if videos_enabled %}
+<div id="video-link-form">
+    <video-form />
+</div>
+<div id="video-form">
+    <video-form-fields />
+</div>
+<div id="video-player">
+    <video-player />
+</div>
+{% endif %}
+{% endblock %}

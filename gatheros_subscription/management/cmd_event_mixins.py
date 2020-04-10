@@ -6,10 +6,11 @@ class CommandEventMixin:
         event = None
 
         while not event:
-            if pk is None:
+            if not pk:
                 self.stdout.write("\n")
                 self.stdout.write("Informe o evento (ou encerre com Ctrl+c)")
                 pk = input("Event PK: ")
+                continue
 
             try:
                 event = self.get_event_instance(pk)

@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@curveball/http-errors": "^0.3.0",
+    "axios": "^0.19.2"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
+}

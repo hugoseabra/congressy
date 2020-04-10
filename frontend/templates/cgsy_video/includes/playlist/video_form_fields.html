@@ -1,0 +1,241 @@
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <div class="panel-title">Dados do vídeo</div>
+    </div>
+    <div class="panel-body">
+        {% include 'generic/alert.html' with icon=True type="warning" msg="Este vídeo não está disponível para visualizar." %}
+
+        <div class="row">
+            <div class="col-md-2">
+                <div class="row">
+
+                    <div class="col-sm-4 col-md-12">
+
+                        <div class="form-group">
+                            <label for="id_active">
+                                Publicado:
+                                <small>
+                                    <i class="fas fa-question-circle" data-toggle="tooltip" data-placement="right" title="Pessoas não podem acessar vídeos que não estejam publicados."></i>
+                                </small>
+                            </label>
+                            <div>
+                                <input type="checkbox" name="active" style="display:none" class="js-switch" id="id_active">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-sm-4 col-md-12">
+
+                        <div class="form-group">
+                            <label for="id_restrict">
+                                Restrito:
+                                <small>
+                                    <i class="fas fa-question-circle" data-toggle="tooltip" data-placement="right"
+                                       title="Vídeo restrito a participantes com inscrição confirmada.
+                                        Se desativado, todos poderão assistir o vídeo, incluindo pessoas não inscritas."></i>
+                                </small>
+                            </label>
+                            <div>
+                                <input type="checkbox" name="restrict" style="display:none" class="js-switch" id="id_restrict">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-sm-4 col-md-12">
+
+                        <div class="form-group">
+                            <label for="id_360_degrees">
+                                360 graus:
+                                <small>
+                                    <i class="fas fa-question-circle" data-toggle="tooltip" data-placement="right" title="Este vídeo fornece experiência de 360 graus aos participantes?"></i>
+                                </small>
+                            </label>
+                            <div>
+                                <input type="checkbox" name="360_degrees" style="display:none" class="js-switch" id="id_360_degrees">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-md-10">
+
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div class="form-group">
+                            <label for="id_name" style="margin-bottom:0 ">
+                                Título <span style="color:#C9302C">*</span>
+                                <small>
+                                    <i class="fas fa-question-circle" data-toggle="tooltip" data-placement="right" title="Título do vídeo a ser apresentado para o cliente."></i>
+                                </small>
+                            </label>
+                            <input type="text" name="name" required="" maxlength="255" class="form-control" id="id_name">
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="clearfix"></div>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div class="form-group">
+                            <label for="id_category" style="margin-bottom:0 ">
+                                Categoria
+                                <small>
+                                    <i class="fas fa-question-circle" data-toggle="tooltip" data-placement="right" title="Assunto do vídeo."></i>
+                                </small>
+                            </label>
+
+                            <select name="category" class="form-control" id="id_category">
+                              <option value="" selected="">---------</option>
+                              <option value="1139">Geral</option>
+                            </select>
+
+                            <div class="clearfix"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div class="form-group">
+                            <label for="id_link" style="margin-bottom:0 ">
+                                Link <span style="color:#C9302C">*</span>
+                            </label>
+                            <div class="input-group date timepicker">
+                                <span class="input-group-addon">
+                                    <span class="fas fa-video-camera"></span>
+                                </span>
+                                <input type="text" name="link" required="" maxlength="255" class="form-control" id="id_link">
+                            </div>
+
+                            <div class="clearfix"></div>
+                            <div class="help-block small" style="margin-left:5px">
+                                <div>Cole aqui o link do vídeo do:</div>
+                                <div>
+                                    <div>- <span class="fab fa-vimeo-square fa-2x"></span> <strong>Vimeo</strong>; ou</div>
+                                    <div>- <span class="fab fa-youtube-square fa-2x"></span> <strong>Youtube</strong>;</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div style="border:1px dashed #ddd;margin: 0 10px;">
+                    <div class="text-center" style="height: 50px">
+                        <div class="text-muted small" style="margin:26px;">pré-visualização</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <input type="checkbox" name="schedule_enabled" style="display:none" class="js-switch" id="id_schedule_enabled">
+                    <label for="id_schedule_enabled">
+                        Definir regras de pubicação:
+                    </label>
+                    <div class="help-block small">
+                        Defina quando as pessoas poderão assistir o vídeo. Se desativado, o vídeo estará sempre disponível.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div style="margin-left:10px;font-weight: bold;font-size: large">Publicação</div>
+                <br />
+                <div class="row">
+                        <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_starts_at_hour" style="margin-bottom:0 ">
+                                Inicia em
+                            </label>
+                            <div class="input-group datapicker">
+                                <input type="tel" class="form-control cgsy-date-input" placeholder="dd/mm/AAAA" name="starts_at_hour" value=""  id="id_starts_at_hour" maxlength="10">
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                            <div class="input-group date timepicker">
+                                <input type="tel" name="starts_at_time" class="form-control cgsy-time-input" placeholder="hh:mm" value="" id="id_starts_at_time" maxlength="5">
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-time"></span>
+                                </span>
+                            </div>
+                            <div class="help-block small">
+                                Pessoas só poderão assistir o vídeo somente a partir desta data e hora.
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_ends_at_hour" style="margin-bottom:0 ">
+                                Finaliza em
+                            </label>
+                            <div class="input-group datapicker">
+                                <input type="tel" class="form-control cgsy-date-input" placeholder="dd/mm/AAAA" name="ends_at_hour" value=""  id="id_ends_at_hour" maxlength="10">
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                            <div class="input-group date timepicker">
+                                <input type="tel" name="ends_at_time" class="form-control cgsy-time-input" placeholder="hh:mm" value="" id="id_ends_at_time" maxlength="5">
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-time"></span>
+                                </span>
+                            </div>
+                            <div class="help-block small">
+                                Pessoas só poderão assistir o vídeo somente até esta data e hora.
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <hr />
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <input type="checkbox" name="add_playlists" style="display:none" class="js-switch" id="id_add_playlists">
+                    <label for="id_add_playlists">
+                        Adicionar a playlists:
+                    </label>
+                    <div class="help-block small">
+                        Adicione o vídeo a uma mais playlists para restringi-lo de acordo com ingressos.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                {% include 'cgsy_video/includes/video/video_form_playlists.html' %}
+            </div>
+        </div>
+
+    </div>
+</div>

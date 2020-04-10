@@ -13,6 +13,7 @@ app_names = (
     'buzzlead',
     'gatheros_subscription',
     'mailer',
+    'cgsy_video',
 )
 
 queues = list()

@@ -36,6 +36,7 @@ admin_urlpatterns += [
 ]
 
 private_urlpatterns = [
+    url(r'^manage/', include('cgsy_video.urls', 'videos')),
     url(r'^manage/', include('attendance.urls', 'attendance')),
     url(r'^manage/', include('addon.urls', 'addon')),
     url(r'^manage/', include('scientific_work.urls', 'scientific_work')),

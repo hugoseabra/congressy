@@ -242,4 +242,18 @@ class EventSerializer(serializers.ModelSerializer):
 
         ret['boleto_enabled'] = is_boleto_allowed(instance)
 
+        ret['video_config'] = {
+            'enabled': False,
+            'token': None,
+            'project_pk': None,
+        }
+
+        if instance.feature_management.videos is True:
+            if hasattr(instance, 'video_config') and instance.video_config:
+                ret['video_config'].update({
+                    'enabled': True,
+                    'token': instance.video_config.token,
+                    'project_pk': instance.video_config.project_pk,
+                })
+
         return ret

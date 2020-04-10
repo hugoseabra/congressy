@@ -7,6 +7,7 @@ class FeatureManagement(models.Model):
     """
     Recursos ativados pelo organizador.
     """
+
     class Meta:
         verbose_name = 'Gestão de Feature'
         verbose_name_plural = 'Gestão de Features'
@@ -57,4 +58,10 @@ class FeatureManagement(models.Model):
         default=False,
         verbose_name='Sorteios',
         help_text="Seu evento terá sorteios ?"
+    )
+
+    videos = models.BooleanField(
+        default=False,
+        verbose_name='Videos',
+        help_text="Funcionalidade de vídeos"
     )

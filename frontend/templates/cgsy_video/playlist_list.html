@@ -1,0 +1,181 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+    Videos | {{system_name}}
+{% endblock %}
+
+{% block page_title %}
+    Categorias
+{% endblock %}
+{% block page_sub_title %}
+    {{ event.name }}
+{% endblock %}
+{% block page_description %}
+    Defina categorias dos vídeos do seu evento.
+{% endblock %}
+
+{% block styles %}
+<style>
+    .video-image-block {
+        position: relative;
+        max-width: 400px;
+        z-index:0;
+    }
+    .video-config-button {
+        color: #333;
+        background-color: #eee;
+        opacity: 0.5;
+        visibility: hidden;
+    }
+    .overlay {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        opacity: 0;
+        transition: .3s ease;
+        background-color: #333;
+    }
+
+    .video-image-block:hover .overlay {
+        opacity: 0.9;
+    }
+
+    .video-image-block:hover .video-config-button {
+        visibility: visible;
+    }
+
+    .video-config-button:hover {
+        opacity: 1;
+    }
+
+    .fa-play:hover {
+        color: #eee;
+    }
+
+    .icon {
+        color: white;
+        font-size: 100px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% include 'cgsy_video/category_form.html' %}
+
+<div class="row">
+    <div class="col-md-2 col-sm-12">
+        {% include 'cgsy_video/includes/left-menu.html' with active='categories' %}
+    </div>
+    <div class="col-md-10 col-sm-12">
+        {% include 'cgsy_video/includes/category/top-menu.html' %}
+        <div class="panel">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-12">
+
+                        <table id="attendance_service_table" class="table table-striped table-bordered"
+                               cellspacing="0"
+                               width="100%">
+                            <thead>
+                            <tr>
+                                <th width="5%">Ativo</th>
+                                <th>Nome da Categoria</th>
+                                <th width="10%"># Vídeos</th>
+                                <th width="5%"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="active" style="display:none" class="js-switch" id="id_active_1">
+                                    </td>
+                                    <td>
+                                        <a href="">Marketing</a>
+                                    </td>
+                                    <td class="text-center">1</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button type="button"
+                                                    class="btn btn-primary btn-trans btn-sm dropdown-toggle"
+                                                    data-toggle="dropdown"
+                                                    aria-expanded="true">
+                                                <span class="fas fa-cog"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right"
+                                                role="menu">
+                                                <li>
+                                                    <a href="">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                        Editar
+                                                    </a>
+                                                </li>
+
+                                                <li>
+                                                    <a href="javascript:void(0)" onclick="">
+                                                        <i class="fas fa-trash-alt"> </i>
+                                                        Excluir
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="active" style="display:none" class="js-switch" id="id_active_2">
+                                    </td>
+                                    <td>
+                                        <a href="">Vendas</a>
+                                    </td>
+                                    <td class="text-center">1</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button type="button"
+                                                    class="btn btn-primary btn-trans btn-sm dropdown-toggle"
+                                                    data-toggle="dropdown"
+                                                    aria-expanded="true">
+                                                <span class="fas fa-cog"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right"
+                                                role="menu">
+                                                <li>
+                                                    <a href="">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                        Editar
+                                                    </a>
+                                                </li>
+
+                                                <li>
+                                                    <a href="javascript:void(0)" onclick="">
+                                                        <i class="fas fa-trash-alt"> </i>
+                                                        Excluir
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
