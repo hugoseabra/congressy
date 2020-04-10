@@ -12,7 +12,7 @@ def get_congressy_client(api_key):
     }
 
     if settings.DEBUG is True:
-        kwargs.update({'host': 'http://localhost:8001'})
+        kwargs.update({'host': settings.CGSY_VIDEOS_API_URL})
 
     return Congressy(**kwargs)
 
@@ -161,16 +161,18 @@ def get_subscriber(subscription):
     )
     sub = subs[0] if subs else None
 
+    not_confirmed = subscription.confirmed is False
+    test_subscription = subscription.test_subscription is True
+    skip = not_confirmed is True or test_subscription is True
+
+    if skip is True:
+        if sub:
+            sub.delete()
+
+        return None
+
     if sub is None:
         sub = subscriber_class(**subscriber_data)
-
-        not_confirmed = subscription.confirmed is False
-        test_subscription = subscription.test_subscription is True
-
-        if not_confirmed is True or test_subscription is True:
-            sub.delete()
-            return None
-
     else:
         for k, v in subscriber_data.items():
             setattr(sub, k, v)

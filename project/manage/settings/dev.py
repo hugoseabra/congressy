@@ -70,6 +70,7 @@ BROKER_URL = CELERY_BROKER_URL
 
 # ============================== VIDEOS ===================================== #
 CGSY_VIDEOS_API_ADMIN_TOKEN = '4352cababfd0f7912869a5c7d2b90144e963dff1'
+CGSY_VIDEOS_API_URL = 'http://localhost:8001'
 
 # ============================ FRONTEND ===================================== #
 FRONTEND_DEBUG = os.getenv('FRONTEND_DEBUG', DEBUG)

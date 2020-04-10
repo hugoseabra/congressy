@@ -17,17 +17,17 @@
 
 {% block styles %}
 <style>
-    .video-image-block {
+    #video-list .video-image-block {
         position: relative;
         z-index:0;
     }
-    .video-config-button {
+    #video-list .video-config-button {
         color: #333;
         background-color: #eee;
         opacity: 0.5;
         visibility: hidden;
     }
-    .overlay {
+    #video-list .overlay {
         position: absolute;
         top: 0;
         bottom: 0;
@@ -39,23 +39,23 @@
         background-color: #333;
     }
 
-    .video-image-block:hover .overlay {
+    #video-list .video-image-block:hover .overlay {
         opacity: 0.9;
     }
 
-    .video-image-block:hover .video-config-button {
+    #video-list .video-image-block:hover .video-config-button {
         visibility: visible;
     }
 
-    .video-config-button:hover {
+    #video-list .video-config-button:hover {
         opacity: 1;
     }
 
-    .fa-play:hover {
+    #video-list .fa-play:hover {
         color: #eee;
     }
 
-    .icon {
+    #video-list .icon {
         color: white;
         font-size: 100px;
         position: absolute;
@@ -68,21 +68,46 @@
 </style>
 {% endblock %}
 {% block scripts %}
+
+{% if videos_enabled %}
 <script>
     window.cgsy_environemnt = window.cgsy_environemnt || {};
-    window.cgsy_environemnt.API_BASE_URL='http://localhost:8001';
-    window.cgsy_environemnt.API_TOKEN='4352cababfd0f7912869a5c7d2b90144e963dff1';
+    window.cgsy_environemnt.API_BASE_URL='{{ API_BASE_URL }}';
+    window.cgsy_environemnt.API_TOKEN='{{ API_TOKEN }}';
     // VIDEOS CONTEXT
-    window.cgsy_environemnt.PROJECT_PK='1843cf44-58ed-48ac-873d-8a47adc65ea1';
-
+    window.cgsy_environemnt.PROJECT_PK='{{ PROJECT_PK }}';
     // setTimeout(() => $('#video-form-fields-modal').modal(), 1000)
 </script>
 {% render_bundle 'chunk-vendors' config='VIDEOS' %}
 {% render_bundle 'video_list' config='VIDEOS' %}
+
+{% else %}
+    <script>
+    setTimeout(function(){ window.location.reload()}, 3000);
+    </script>
+{% endif %}
+
 {% endblock %}
 
 {% block content %}
-
+{% if videos_enabled is False %}
+<div class="panel">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="text-center" style="height: 100px;margin-top:50px">
+                    <div>
+                        <i class="fas fa-circle-notch text-muted fa-spin fa-4x"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Aguarde enquanto sua página de vídeo é criada.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
 <div class="row">
     <div class="col-md-2 col-sm-12">
         {% include 'cgsy_video/includes/left-menu.html' with active='videos' %}
@@ -121,9 +146,12 @@
         </div>
     </div>
 </div>
+{% endif %}
+
 {% endblock %}
 
 {% block modals %}
+{% if videos_enabled %}
 <div id="video-link-form">
     <video-form />
 </div>
@@ -133,4 +161,5 @@
 <div id="video-player">
     <video-player />
 </div>
+{% endif %}
 {% endblock %}

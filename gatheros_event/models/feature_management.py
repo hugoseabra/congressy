@@ -61,7 +61,7 @@ class FeatureManagement(models.Model):
     )
 
     videos = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name='Videos',
         help_text="Funcionalidade de vídeos"
     )

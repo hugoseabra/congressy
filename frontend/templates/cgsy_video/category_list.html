@@ -26,18 +26,15 @@
 <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.min.js' %}"></script>
 <script>
     window.cgsy_environemnt = window.cgsy_environemnt || {};
-    window.cgsy_environemnt.API_BASE_URL='http://localhost:8001';
-    window.cgsy_environemnt.API_TOKEN='4352cababfd0f7912869a5c7d2b90144e963dff1';
+    window.cgsy_environemnt.API_BASE_URL='{{ API_BASE_URL }}';
+    window.cgsy_environemnt.API_TOKEN='{{ API_TOKEN }}';
     // VIDEOS CONTEXT
-    window.cgsy_environemnt.PROJECT_PK='1843cf44-58ed-48ac-873d-8a47adc65ea1';
+    window.cgsy_environemnt.PROJECT_PK='{{ PROJECT_PK }}';
 </script>
 {% render_bundle 'chunk-vendors' config='VIDEOS' %}
 {% render_bundle 'category_list' config='VIDEOS' %}
 {% endblock %}
 {% block content %}
-
-
-
 <div class="row">
     <div class="col-md-2 col-sm-12">
         {% include 'cgsy_video/includes/left-menu.html' with active='categories' %}
