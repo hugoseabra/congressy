@@ -71,7 +71,7 @@ def get_ngrok_host():
         return host
 
 
-def get_system_url(path: str = None):
+def get_system_url(path: str = None, forces_slash=True):
     if settings.DEBUG is True:
         url = get_ngrok_host()
     else:
@@ -84,7 +84,7 @@ def get_system_url(path: str = None):
         if str(path).startswith('/') is True:
             path = path.lstrip('/')
 
-        if str(path).endswith('/') is False:
+        if str(path).endswith('/') is False and forces_slash is True:
             path += '/'
 
         url += path

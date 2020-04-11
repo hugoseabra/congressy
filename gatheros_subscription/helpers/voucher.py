@@ -12,11 +12,20 @@ from django.template.loader import render_to_string
 
 from gatheros_subscription.helpers.barcode import get_barcode_file_path
 from gatheros_subscription.helpers.qrcode import get_qrcode_file_path
-from project.system import get_system_voucher_logo, get_system_url
+from project.system import get_system_url, get_system_alias
 
 
 def get_logo():
-    return get_system_url(get_system_voucher_logo())
+    return os.path.join(
+        settings.BASE_DIR,
+        'frontend',
+        'static',
+        'assets',
+        'img',
+        'logos',
+        get_system_alias(),
+        'cgsy_system_voucher_logo.png'
+    )
 
 
 def get_template_path():
@@ -43,11 +52,15 @@ def get_context(subscription):
         qrcode_content = base64.b64encode(qrcode_fh.read()).decode('UTF-8')
         qrcode_fh.close()
 
+    with open(get_logo(), 'rb') as logo_fh:
+        logo_content = base64.b64encode(logo_fh.read()).decode('UTF-8')
+        logo_fh.close()
+
     context = {
         'base_static_url': get_system_url(settings.STATIC_URL),
         'qrcode': qrcode_content,
         'barcode': barcode_content,
-        'logo': get_logo(),
+        'logo': logo_content,
         'event': event,
         'place': place,
         'person': subscription.person,
