@@ -1,36 +1,15 @@
- version: "3.5"
+version: "3.5"
 services:
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas
     restart: always
     networks:
       - wkhtmltopdf
-#    volumes:
-#      - /etc/localtime:/etc/localtime
-
-  reverse-proxy:
-    image: traefik:v1.7.19-alpine
-    command:
-      - --api
-      - --docker
-      - --ping
-      - --accesslog
-      - --accesslog.format=json
-      - --accesslog.fields.names="StartLocal=keep StartUTC=keep"
-    networks:
-      - traefik
-    ports:
-      - "80:80"
-      - "8080:8080"
-    volumes:
-      - ./traefik.toml:/etc/traefik/traefik.toml
-      - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
-#      - /etc/localtime:/etc/localtime:ro
 
   celery:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
-    hostname: HOSTNAME-celery
+    hostname: server5-celery
     networks:
       - wkhtmltopdf
     entrypoint:
@@ -46,19 +25,12 @@ services:
   manage:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
-    hostname: HOSTNAME-manage
-#    healthcheck:
-#      test: "/code/bin/env/healthcheck.sh"
-#      interval: 30s
-#      timeout: 10s
-#      retries: 3
-#      start_period: 0s
+    hostname: server5-manage
     depends_on:
       - wkhtmltopdf
-      - reverse-proxy
     networks:
       - wkhtmltopdf
-      - traefik
+      - reverse_proxy_net
     ports:
       - "8000"
     entrypoint:
@@ -80,45 +52,18 @@ services:
       - "traefik.protocol=http"
       - "traefik.port=8000"
       - "traefik.frontend.rule=Host:ev.congressy.com;PathPrefix:/manage,/admin,/remarketing,/account,/invitations,/pagarme,/captcha,/hotsite,/api,/static-manage,/media-manage,/ckeditor"
-      - "traefik.docker.network=traefik_default"
-      - "traefik.frontend.entryPoints=http"
-
-  hotsite:
-    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/hotsite-v2:latest
-    hostname: HOSTNAME-hotsite
-    ports:
-      - 80
-    networks:
-      - traefik
-    volumes:
-      - /tmp/installed_packages:/usr/src/app/node_modules
-    labels:
-      - "traefik.enable=true"
-      - "traefik.frontend.passHostHeader=true"
-      - "traefik.weight=7"
-      - "traefik.backend=cgsy-hotsite"
-      - "traefik.protocol=http"
-      - "traefik.port=80"
-      - "traefik.frontend.rule=Host:ev.congressy.com"
-      - "traefik.docker.network=traefik_default"
+      - "traefik.docker.network=reverse_proxy_net"
       - "traefik.frontend.entryPoints=http"
 
   partner:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     restart: unless-stopped
-    hostname: HOSTNAME-partner
-#    healthcheck:
-#      test: "/code/bin/env/healthcheck.sh"
-#      interval: 30s
-#      timeout: 10s
-#      retries: 3
-#      start_period: 0s
+    hostname: server5-partner
     depends_on:
       - wkhtmltopdf
-      - reverse-proxy
     networks:
       - wkhtmltopdf
-      - traefik
+      - reverse_proxy_net
     ports:
       - "8000"
     volumes:
@@ -140,71 +85,11 @@ services:
       - "traefik.protocol=http"
       - "traefik.port=8000"
       - "traefik.frontend.rule=Host:parceiros.congressy.com"
-      - "traefik.docker.network=traefik_default"
+      - "traefik.docker.network=reverse_proxy_net"
       - "traefik.frontend.entryPoints=http"
-
-#  admin_intranet:
-#    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
-#    restart: unless-stopped
-#    hostname: HOSTNAME-admin
-##    healthcheck:
-##      test: "/code/bin/env/healthcheck.sh"
-##      interval: 30s
-##      timeout: 10s
-##      retries: 3
-##      start_period: 0s
-#    depends_on:
-#      - wkhtmltopdf
-#    networks:
-#      - wkhtmltopdf
-#      - traefik
-#    ports:
-#      - "8000"
-#    entrypoint:
-#      - /deploy/services/web/admin_intranet/container-entry.sh
-#    volumes:
-#      - ./shared-volume/media:/code/media
-#      - ./shared-volume/exporter:/tmp/exporter
-#      - ./shared-volume/qrcodes:/tmp/qrcodes
-#      - ./shared-volume/barcodes:/tmp/barcodes
-#      - ./shared-volume/vouchers:/tmp/vouchers
-#    env_file:
-#      - ./env-file
-#      - ./env-admin_intranet-file
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.frontend.passHostHeader=true"
-#      - "traefik.weight=10"
-#      - "traefik.backend=cgsy-admin"
-#      - "traefik.protocol=http"
-#      - "traefik.port=8000"
-#      - "traefik.frontend.rule=Host:admin.congressy.com"
-#      - "traefik.docker.network=traefik_default"
-#      - "traefik.frontend.entryPoints=http"
-
-#  filebeat:
-#    image: docker.elastic.co/beats/filebeat:6.2.4
-#    user: "root"
-#    hostname: HOSTNAME-filebeat
-#    command: -strict.perms=false
-#    volumes:
-#      - ./ELK/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro
-#      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-#      - /var/run/docker.sock:/var/run/docker.sock:ro
-#
-#  metricbeat:
-#    image: docker.elastic.co/beats/metricbeat:7.0.0
-#    user: "root"
-#    hostname: HOSTNAME-metricbeat
-#    command: -strict.perms=false
-#    volumes:
-#      - ./ELK/metricbeat/metricbeat.docker.yml:/usr/share/metricbeat/metricbeat.yml:ro
-#      - /var/run/docker.sock:/var/run/docker.sock:ro
-#      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
-#      - /proc:/hostfs/proc:ro
-#      - /:/hostfs:ro
 
 networks:
   wkhtmltopdf:
-  traefik:
-    name: traefik_default
+  reverse_proxy_net:
+    external: true
+

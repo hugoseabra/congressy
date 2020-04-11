@@ -12,4 +12,4 @@ echo " > Iniciando CELERY"
 echo ;
 echo "########################################################################"
 echo ;
-celery --events --loglevel=INFO -A project worker --autoscale=10,1 --loglevel=INFO;
+celery --events --loglevel=INFO -A project worker --autoscale=5,2 --loglevel=INFO;
