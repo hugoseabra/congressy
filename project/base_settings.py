@@ -16,6 +16,7 @@ BASE_DIR = os.path.abspath(os.path.join(
     '..',
 ))
 DEBUG = False
+STAGING = False
 # ================================= APPS ==================================== #
 INSTALLED_APPS = [
     # DJANGO_APPS

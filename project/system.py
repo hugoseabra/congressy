@@ -72,7 +72,7 @@ def get_ngrok_host():
 
 
 def get_system_url(path: str = None):
-    if settings.DEBUG is True:
+    if settings.DEBUG is True and settings.STAGING is False:
         url = get_ngrok_host()
     else:
         url = absoluteuri.build_absolute_uri('')
