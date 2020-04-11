@@ -15,6 +15,7 @@ patch_unaccent()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEBUG = False
+STAGING = False
 # ================================= APPS ==================================== #
 INSTALLED_APPS = [
     # DJANGO_APPS
