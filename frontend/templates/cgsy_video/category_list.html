@@ -1,0 +1,64 @@
+{% extends 'base/base.html' %}
+{% load render_bundle from webpack_loader %}
+{% load static %}
+
+{% block title %}
+    Videos | {{system_name}}
+{% endblock %}
+
+{% block page_title %}
+    Categorias
+{% endblock %}
+{% block page_sub_title %}
+    {{ event.name }}
+{% endblock %}
+{% block page_description %}
+    Defina categorias dos vídeos do seu evento.
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/dataTables/css/datatables.min.css' %}">
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+    window.cgsy_environemnt = window.cgsy_environemnt || {};
+    window.cgsy_environemnt.API_BASE_URL='{{ API_BASE_URL }}';
+    window.cgsy_environemnt.API_TOKEN='{{ API_TOKEN }}';
+    // VIDEOS CONTEXT
+    window.cgsy_environemnt.PROJECT_PK='{{ PROJECT_PK }}';
+</script>
+{% render_bundle 'chunk-vendors' config='VIDEOS' %}
+{% render_bundle 'category_list' config='VIDEOS' %}
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-2 col-sm-12">
+        {% include 'cgsy_video/includes/left-menu.html' with active='categories' %}
+    </div>
+    <div class="col-md-10 col-sm-12">
+        {% include 'cgsy_video/includes/category/top-menu.html' %}
+        <div class="panel">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div id="category-list">
+                            <category-grid />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<div id="category-form">
+    <category-form />
+</div>
+{% endblock %}

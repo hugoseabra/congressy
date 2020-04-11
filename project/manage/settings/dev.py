@@ -1,8 +1,10 @@
 # pylint: skip-file
 
 from . import *
+from project.frontend import get_frontend_loader
 
 # ========================== BASE CONFIGURATION ============================= #
+
 SECRET_KEY = '1@==vhll7d5v(%=t++oy-38+639o-4*f73^!o=v!a^z$#(6x%$'
 
 DEBUG = True
@@ -65,3 +67,15 @@ CELERY_BROKER_URL = 'amqp://cgsy:cgsy@localhost:5672//'
 
 # ======================== HEALTH CHECK - RABBITMQ ========================== #
 BROKER_URL = CELERY_BROKER_URL
+
+# ============================== VIDEOS ===================================== #
+CGSY_VIDEOS_API_ADMIN_TOKEN = '4352cababfd0f7912869a5c7d2b90144e963dff1'
+CGSY_VIDEOS_API_URL = 'http://localhost:8001'
+
+# ============================ FRONTEND ===================================== #
+FRONTEND_DEBUG = os.getenv('FRONTEND_DEBUG', DEBUG)
+frontend_loader = get_frontend_loader(
+    front_end_dir_path=os.path.join(BASE_DIR, 'frontend', 'vue_frontend'),
+    debug_mode=eval(str(FRONTEND_DEBUG)) is True,
+)
+WEBPACK_LOADER = dict(frontend_loader)

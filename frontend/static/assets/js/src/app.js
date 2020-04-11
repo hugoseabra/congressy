@@ -62,12 +62,10 @@
                         color: '#5B8790',
                         secondaryColor: '#B3B8C3'
                     });
-                }
-
-
-                var id = $(html).prop('id');
-                if (id) {
-                    switcheryElements[id] = switchery;
+                    var id = $(html).prop('id');
+                    if (id) {
+                        switcheryElements[id] = switchery;
+                    }
                 }
             });
         };
@@ -165,6 +163,7 @@
         return {
             'setSwitchery': setSwitchery,
             'disableSwitchery': enableDisableSwitchery,
+            'icheckStart': icheckStart,
             'switcheryToggle': switcheryToggle,
             'switcheryElements': switcheryElements,
             'tooltips': tooltips,

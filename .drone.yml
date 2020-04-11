@@ -5,7 +5,7 @@
 ###############################################################################
 
 #=============================================================================#
-# INFRA
+# INFRA - STAGING
 #=============================================================================#
 kind: pipeline
 type: exec
@@ -34,23 +34,23 @@ steps:
       - echo "${DRONE_COMMIT_AUTHOR_AVATAR}" > /tmp/staging-files/build_author_avatar
       - echo "${DRONE_BUILD_LINK}" > /tmp/staging-files/build_link
 
-#  - name: create-awsecr-service
-#    environment:
-#      AWS_KEY:
-#        from_secret: AWS_KEY
-#      AWS_SECRET:
-#        from_secret: AWS_SECRET
-#      AWS_ACCOUNT_ID:
-#        from_secret: AWS_ACCOUNT_ID
-#    commands:
-#      - mkdir -p /tmp/awsecr
-#      - echo "AWS_KEY=$${AWS_KEY}" > /tmp/awsecr/env-awsecr
-#      - echo "AWS_SECRET=$${AWS_SECRET}" >> /tmp/awsecr/env-awsecr
-#      - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> /tmp/awsecr/env-awsecr
-#      - echo "AWS_REGION=us-east-1" >> /tmp/awsecr/env-awsecr
-#      - echo "AWS_FORMAT=json" >> /tmp/awsecr/env-awsecr
-#      - cp ./bin/env/prod/01_create-awsecr-container.sh /tmp/awsecr/.
-#      - sh /tmp/awsecr/01_create-awsecr-container.sh
+  - name: create-awsecr-service
+    environment:
+      AWS_KEY:
+        from_secret: AWS_KEY
+      AWS_SECRET:
+        from_secret: AWS_SECRET
+      AWS_ACCOUNT_ID:
+        from_secret: AWS_ACCOUNT_ID
+    commands:
+      - mkdir -p /tmp/awsecr
+      - echo "AWS_KEY=$${AWS_KEY}" > /tmp/awsecr/env-awsecr
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> /tmp/awsecr/env-awsecr
+      - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> /tmp/awsecr/env-awsecr
+      - echo "AWS_REGION=us-east-1" >> /tmp/awsecr/env-awsecr
+      - echo "AWS_FORMAT=json" >> /tmp/awsecr/env-awsecr
+      - cp ./bin/env/prod/01_create-awsecr-container.sh /tmp/awsecr/.
+      - sh /tmp/awsecr/01_create-awsecr-container.sh
 
   - name: create-staging-env-file
     environment:
@@ -130,11 +130,6 @@ clone:
 
 # Steps of deploy, according to configurations and conditionals
 steps:
-#  - name: fetch-tags
-#    pull: if-not-exists
-#    image: alpine/git
-#    commands:
-#      - git fetch --tags
   - name: copy-version-files
     image: alpine
     pull: if-not-exists
@@ -182,6 +177,14 @@ steps:
         path: /var/run/docker.sock
     commands:
       - ./bin/env/staging/02_recreate-db-staging.sh
+
+  - name: build-video-app
+    image: node:13.10-alpine3.10
+    pull: if-not-exists
+    commands:
+      - cd frontend/vue_frontend/videos
+      - yarn install
+      - yarn build
 
   - name: build-staging-image
     image: docker

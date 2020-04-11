@@ -13,3 +13,9 @@ logs/
 celeryd.pid
 version
 venv/
+affiliate/
+
+.env
+
+node_modules
+webpack-stats*local.json

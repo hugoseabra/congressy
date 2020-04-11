@@ -44,7 +44,7 @@ def get_context(subscription):
         qrcode_fh.close()
 
     context = {
-        'base_statuc_url': get_system_url(settings.STATIC_URL),
+        'base_static_url': get_system_url(settings.STATIC_URL),
         'qrcode': qrcode_content,
         'barcode': barcode_content,
         'logo': get_logo(),

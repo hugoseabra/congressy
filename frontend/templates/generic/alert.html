@@ -1,0 +1,26 @@
+<div class="alert alert-{{ type|default:'info' }}">
+    <div class="row">
+        {% if icon is True %}
+        <div class="col-xs-2 col-sm-2 col-md-1 text-center">
+                {% if type == 'warning' %}
+                <i class="fas fa-exclamation-triangle warning-color {% if intro %}fa-2x{% endif %}"></i>
+                {% endif %}
+                {% if type == 'danger' or type == 'error' %}
+                <i class="fas fa-exclamation-circle danger-color {% if intro %}fa-2x{% endif %}"></i>
+                {% endif %}
+                {% if type == 'info' %}
+                <i class="fas fa-info-circle info-color {% if intro %}fa-2x{% endif %}"></i>
+                {% endif %}
+                {% if type == 'success' %}
+                <i class="fas fa-check-circle success-color {% if intro %}fa-2x{% endif %}"></i>
+                {% endif %}
+        </div>
+        {% endif %}
+        <div class="{% if icon is True %}col-xs-10 col-sm-10 col-md-11{% else %}col-md-12{% endif %}">
+            {% if intro %}
+            <span class="text-bold">{{ intro }}</span>
+            {% endif %}
+            {{ msg }}
+        </div>
+    </div>
+</div>
