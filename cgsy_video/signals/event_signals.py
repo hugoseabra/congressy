@@ -3,7 +3,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from cgsy_video import workers
-from gatheros_event.models import Event
+from gatheros_event.models import Event, FeatureManagement
 
 
 @receiver(post_save, sender=Event)
@@ -11,6 +11,9 @@ def synchronize_video_config(instance: Event, raw, **_):
     """ Atualiza configuração de vídeo na integração """
     if raw is True:
         return
+
+    if hasattr(instance, 'feature_management') is False:
+        FeatureManagement.objects.create(event=instance)
 
     if instance.feature_management.videos is False:
         return
