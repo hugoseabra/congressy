@@ -1,11 +1,18 @@
 import Vue from "vue/dist/vue.js"; // See note about import below
 import Vuex from "vuex";
 
-import Category from "../model/category"
-import CategoryCollection from "../model/category_collection"
-
 Vue.use(Vuex);
 Vue.config.productionTip = false;
+
+const createLoaderMessenger = (msg) => {
+    return Messenger().post({
+        id: 'messenger-loader',
+        hideAfter: 50000, // long time. Loader will wait to be finished.
+        message: msg,
+        progressMessage: msg,
+        action: function () {} // action will persist notification.
+    });
+}
 
 let messenger = new Vuex.Store({
     mutations: {
@@ -22,22 +29,13 @@ let messenger = new Vuex.Store({
             state.msgs['error'].push(msg);
         },
         triggerLoader(state, msg) {
-            if (state.loader) {
-                return;
-            }
-            state.loader = Messenger().run({
-                hideAfter: 50000, // long time. Loader will wait to be finished.
-                progressMessage: msg,
-                action: function () {} // action will persist notification.
-            });
+            state.loader_msg = msg;
+            createLoaderMessenger(state.loader_msg);
         },
         hideLoader(state) {
-            if (!state.loader) {
-                return;
-            }
-            const m = state.loader;
-            state.loader = null;
+            const m = createLoaderMessenger(state.loader_msg);
             m.cancel();
+            state.loader_msg = null;
         },
         trigger(state, payload) {
             const top_bottom = payload && payload.hasOwnProperty('top') in payload && payload['top'] === true ? 'top' : 'bottom';
@@ -79,7 +77,7 @@ let messenger = new Vuex.Store({
         }
     },
     state: {
-        'loader': null,
+        'loader_msg': null,
         'msgs': {
             'success': [],
             'warning': [],

@@ -28,12 +28,11 @@
 </template>
 
 <script>
-    import VideoPlayer from './VideoPlayer';
     import VideoFormPreview from "./VideoPreview";
 
     export default {
         name: "VideoPlayer",
-        components: {VideoFormPreview, VideoPlayer},
+        components: {VideoFormPreview},
         computed: {
             provider() {
                 return this.$video_store.state.player_provider;
@@ -41,6 +40,11 @@
             link() {
                 return this.$video_store.state.player_link;
             }
+        },
+        mounted() {
+            window.jQuery('#video-player-modal').on('hide.bs.modal', () => {
+                this.$video_store.commit('clearPlayer');
+            });
         }
     }
 </script>

@@ -11,4 +11,4 @@ gatheros_event/docs/
 partner/docs/
 payment/docs/
 scientific_work/docs/
-node_modules/
+frontend/vue_frontend/**/node_modules

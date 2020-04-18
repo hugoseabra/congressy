@@ -18,5 +18,5 @@ affiliate/
 .env
 
 node_modules
-static/vue
+frontend/static/vue
 webpack-stats*local.json
