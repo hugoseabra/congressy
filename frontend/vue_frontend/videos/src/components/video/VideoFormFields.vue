@@ -97,10 +97,10 @@
     <div class="row">
         <div class="col-md-12">
             <div class="form-group">
-                <label for="id_description_html" style="margin-bottom:0 ">
+                <label>
                     Descrição:
                 </label>
-                <textarea name="description_html" id="id_description_html" class="form-control" rows="6" v-model="description_html"></textarea>
+                <vue-editor v-model="description_html"></vue-editor>
             </div>
         </div>
     </div>
@@ -244,13 +244,18 @@
 </template>
 
 <script>
+    import { VueEditor } from "vue2-editor";
+
     export default {
         name: 'VideoFormField',
+        components: {VueEditor,},
         props: {
             pk: String,
         },
         data() {
             return {
+                'editor': null,
+
                 'button_disabled': false,
                 'schedule_enabled': false,
                 'categories': this.$category_store.state.items.filter((i) => i.active === true),
@@ -260,7 +265,7 @@
                 'provider': null,
                 'thumbnail_large': null,
                 'external_link': null,
-                'description_html': null,
+                'description_html': '',
                 'order': null,
                 'active': false,
                 'restrict': false,
@@ -294,9 +299,6 @@
 
                 window.clearTimeout(this.switchery_loader);
                 this.switchery_loader = window.setTimeout(() => {
-                    console.log('active', this.active);
-                    console.log('restrict', this.restrict);
-
                     window.app.setSwitchery('input#id_restrict', this.restrict);
                     window.app.setSwitchery('input#id_active', this.active);
                     window.app.setSwitchery('input#id_schedule_enabled', (!this.ends_at_time) === false);
@@ -318,7 +320,6 @@
                     'name',
                     'provider',
                     'external_link',
-                    'description_html',
                     'thumbnail_large',
                     'order',
                 ]
@@ -331,10 +332,16 @@
                     }
                 });
 
-                if (this.item.category) {
+                if (this.item.hasOwnProperty('category') && this.item.category) {
                     this.category_pk = this.item.category.pk;
                 } else {
                     this.category_pk = '';
+                }
+
+                if (this.item.hasOwnProperty('description_html')) {
+                    this.description_html = this.item.description_html;
+                } else {
+                    this.description_html = '';
                 }
 
                 if (this.item.hasOwnProperty('restrict')) {
@@ -421,7 +428,7 @@
                         ':' + pad(d.getSeconds()) +
                         dif + pad(tzo / 60) +
                         ':' + pad(tzo % 60);
-                
+
             },
             submit(e) {
                 e.preventDefault();
@@ -439,6 +446,7 @@
                         'pk': this.category_pk,
                     },
                 }
+
                 this.$video_store.commit('updateItem', data);
                 this.$video_store.dispatch('save').then(() => {
                     this.$video_store.commit('resetItem');
