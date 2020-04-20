@@ -1,5 +1,4 @@
 import Base from './base';
-import Namespace from "./namespace";
 
 export default class Project extends Base {
     constructor() {
@@ -14,6 +13,7 @@ export default class Project extends Base {
             'pk': 'pk',
             'strings': {
                 'name': null,
+                'main_video': null,
             },
             'integers': {},
             'objects': {

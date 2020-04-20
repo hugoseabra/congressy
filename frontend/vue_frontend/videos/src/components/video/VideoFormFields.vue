@@ -9,39 +9,18 @@
     <hr />
     <div class="row">
         <div class="col-md-12">
-            <div class="row">
-                <div class="col-md-9">
-                    <div class="form-group">
-                        <label for="id_external_link" style="margin-bottom:0 ">
-                            Link: <span style="color:#C9302C">*</span>
-                        </label>
-                        <div class="input-group date timepicker">
-                            <span class="input-group-addon">
-                                <span class="fab fa-youtube" v-if="provider === 'youtube'"></span>
-                                <span class="fab fa-vimeo" v-else-if="provider === 'vimeo'"></span>
-                                <span class="fas fa-video-camera" v-else></span>
-                            </span>
-                            <input type="text" disabled name="external_link" v-model="external_link" required="" maxlength="255" class="form-control" id="id_external_link">
-                        </div>
-                    </div>
-                    <div class="clearfix"></div>
+            <div class="form-group">
+                <label for="id_external_link" style="margin-bottom:0 ">
+                    Link: <span style="color:#C9302C">*</span>
+                </label>
+                <div class="input-group date timepicker">
+                    <span class="input-group-addon">
+                        <span class="fab fa-youtube" v-if="provider === 'youtube'"></span>
+                        <span class="fab fa-vimeo" v-else-if="provider === 'vimeo'"></span>
+                        <span class="fas fa-video-camera" v-else></span>
+                    </span>
+                    <input type="text" disabled name="external_link" v-model="external_link" required="" maxlength="255" class="form-control" id="id_external_link">
                 </div>
-                <div class="col-md-3">
-                     <div class="form-group">
-                        <label for="id_restrict">
-                            Restrito:
-                            <small>
-                                <i class="fas fa-question-circle" data-toggle="tooltip" data-placement="right"
-                                   title="Vídeo restrito a participantes com inscrição confirmada.
-                                    Se desativado, todos poderão assistir o vídeo, incluindo pessoas não inscritas."></i>
-                            </small>
-                        </label>
-                        <div>
-                            <input type="checkbox" name="restrict" class="js-switch" id="id_restrict" v-model="restrict">
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
@@ -106,7 +85,7 @@
     </div>
     <hr />
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-5">
 
             <div class="form-group">
                 <label for="id_active">
@@ -121,6 +100,21 @@
             </div>
 
         </div>
+        <div class="col-md-3">
+             <div class="form-group">
+                <label for="id_restrict">
+                    Restrito:
+                    <small>
+                        <i class="fas fa-question-circle" data-toggle="tooltip" data-placement="right"
+                           title="Vídeo restrito a participantes com inscrição confirmada.
+                            Se desativado, todos poderão assistir o vídeo, incluindo pessoas não inscritas."></i>
+                    </small>
+                </label>
+                <div>
+                    <input type="checkbox" name="restrict" class="js-switch" id="id_restrict" v-model="restrict">
+                </div>
+            </div>
+        </div>
         <div class="col-md-4">
             <div class="form-group">
                 <label for="id_order">
@@ -128,6 +122,22 @@
                 </label>
                 <div>
                     <input type="number" name="order" class="form-control" id="id_order" v-model="order">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5">
+            <div class="form-group">
+                <label for="id_main">
+                    Vídeo Principal (introdução):
+                    <small>
+                        <i class="fas fa-question-circle" data-toggle="tooltip" data-placement="right"
+                           title="Vídeo de introdução da página."></i>
+                    </small>
+                </label>
+                <div>
+                    <input type="checkbox" name="main" class="js-switch" id="id_main" v-model="main">
                 </div>
             </div>
         </div>
@@ -260,6 +270,7 @@
                 'schedule_enabled': false,
                 'categories': this.$category_store.state.items.filter((i) => i.active === true),
                 'item': {},
+                'project': {},
 
                 'name': null,
                 'provider': null,
@@ -274,6 +285,7 @@
                 'starts_at_time': null,
                 'ends_at_date': null,
                 'ends_at_time': null,
+                'main': false,
 
                 'switchery_loader_toggle': null,
                 'switchery_loader': null,
@@ -301,6 +313,7 @@
                 this.switchery_loader = window.setTimeout(() => {
                     window.app.setSwitchery('input#id_restrict', this.restrict);
                     window.app.setSwitchery('input#id_active', this.active);
+                    window.app.setSwitchery('input#id_main', this.isVideoMain());
                     window.app.setSwitchery('input#id_schedule_enabled', (!this.ends_at_time) === false);
                 }, 600);
             },
@@ -378,7 +391,9 @@
                     this.starts_at = false;
                 }
 
-                this.loadSwitchery();
+                if (this.item.hasOwnProperty('pk')) {
+                    this.fetchProject().then(() => this.loadSwitchery());
+                }
             },
             get_date(datetime) {
                 if (!datetime) {
@@ -432,7 +447,7 @@
             },
             submit(e) {
                 e.preventDefault();
-                this.button_disabled = true;
+
                 const data = {
                     'name': this.name,
                     'provider': this.provider,
@@ -447,13 +462,77 @@
                     },
                 }
 
+                this.button_disabled = true;
                 this.$video_store.commit('updateItem', data);
-                this.$video_store.dispatch('save').then(() => {
-                    this.$video_store.commit('resetItem');
-                    this.$video_store.dispatch('fetchCollection').then(() => {
-                        this.button_disabled = false;
-                        this.hideForm();
+                this.updateMainVideo().then(() => {
+                    this.$video_store.dispatch('save').then(() => {
+                        this.$video_store.commit('resetItem');
+                        this.$video_store.dispatch('fetchCollection').then(() => {
+                            this.button_disabled = false;
+                            this.hideForm();
+                        });
                     });
+                });
+            },
+            fetchProject() {
+                return new Promise((resolve, reject) => {
+                    let project_pk = null;
+
+                    if (Object.keys(this.item).length === 0) {
+                        return resolve();
+                    }
+
+                    if (this.item.hasOwnProperty('project') && this.item.project) {
+                        if (typeof this.item.project === 'string') {
+                            project_pk = this.item.project;
+                        } else {
+                            project_pk = this.item.project.pk;
+                        }
+                    }
+
+                    if (!project_pk) {
+                        return resolve();
+                    }
+
+                    this.$project_store.commit('updateItem', {
+                        'pk': project_pk,
+                    });
+
+                    this.$project_store.dispatch('fetch').then(() => {
+                        this.project = this.$project_store.state.item;
+                        resolve();
+                    }).catch(reason => reject(reason));
+                });
+            },
+            isVideoMain() {
+                let main = false;
+                if (this.project.main_video) {
+                    if (typeof this.project.main_video === 'string') {
+                        main = this.project.main_video === this.item.pk;
+                    } else {
+                        main = this.project.main_video.pk === this.item.pk;
+                    }
+                }
+                return main;
+            },
+            updateMainVideo() {
+                return new Promise((resolve, reject) => {
+                    if (this.main === false) {
+                        return resolve();
+                    }
+
+                    if (Object.keys(this.item).length === 0) {
+                        return resolve();
+                    }
+
+                    if (Object.keys(this.project).length === 0) {
+                        return resolve();
+                    }
+
+                    this.$project_store.commit('updateCover', this.item.pk);
+                    this.$project_store.dispatch('saveCover').then(() => {
+                        resolve();
+                    }).catch(reason => reject(reason));
                 });
             }
         },

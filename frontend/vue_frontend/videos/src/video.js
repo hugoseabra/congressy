@@ -1,14 +1,18 @@
 import Vue from "vue/dist/vue.js"; // See note about import below
 import "./filters"
+import messenger from "./store/messenger"
+
+import project_store from "./store/project"
 import category_store from "./store/category"
 import video_store from "./store/video"
-import messenger from "./store/messenger"
+
 import Videos from "./components/video/Videos";
 import VideoForm from "./components/video/VideoForm";
 import VideoPlayer from "./components/video/VideoPlayer";
 
 Vue.config.productionTip = false;
 Vue.use(messenger);
+Vue.use(project_store);
 Vue.use(category_store);
 Vue.use(video_store);
 

@@ -1,6 +1,6 @@
 import HTTPClient from "../../../http/dist/client";
 
-var dot = require('dot-object');
+const dot = require('dot-object');
 
 export default class Base {
 
@@ -184,10 +184,10 @@ export default class Base {
                 resolve()
             };
 
-            const uri = this.normalizeIncomingData(this.itemEndpoint);
+            const uri = this.normalizaEndpoint(this.itemEndpoint);
 
             self.client
-                .patch(uri, self.toData())
+                .get(uri)
                 .then(result)
                 .catch(reason => reject(reason));
         });
