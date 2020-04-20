@@ -5,12 +5,12 @@
                 <div class="video-image-block">
                     <div style="position:absolute;margin: 5px 0 0 5px;z-index:10;">
                         <div>
-<!--                            <button title="Editar dados do vídeo"-->
-<!--                                    data-toggle="tooltip"-->
-<!--                                    class="btn btn-sm video-config-button">-->
-<!--                                <span class="fas fa-edit"></span>-->
-<!--                                Editar-->
-<!--                            </button>-->
+                            <button title="Editar dados do vídeo" @click="editVideo"
+                                    data-toggle="tooltip"
+                                    class="btn btn-sm video-config-button">
+                                <span class="fas fa-edit"></span>
+                                Editar
+                            </button>
                         </div>
                         <div>
                             <button type="button" @click="deleteVideo"
@@ -178,7 +178,7 @@
                 'link': null,
 
                 'category_edition_mode': false,
-                'categories': this.$category_store.state.items,
+                'categories': this.$category_store.state.items.filter((i) => i.active === true),
 
                 'category_name': null,
                 'category_pk': null,
@@ -243,7 +243,7 @@
                 if (!datetime) {
                     return;
                 }
-                const day = datetime.getDay().toString().padStart(2, '0');
+                const day = datetime.getDate().toString().padStart(2, '0');
                 const month = (datetime.getMonth() + 1).toString().padStart(2, '0');
                 const year = datetime.getFullYear();
                 const hours = datetime.getHours().toString().padStart(2, '0');
@@ -281,6 +281,10 @@
                     'link': this.external_link,
                 });
                 window.jQuery('#video-player-modal').modal();
+            },
+            editVideo() {
+                this.$video_store.commit('selectItem', this.pk);
+                this.$emit('showForm');
             },
             deleteVideo() {
                 if (!confirm(`Deseja realmente excluir o vídeo "${this.name}"?`)) {

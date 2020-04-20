@@ -101,11 +101,17 @@ export default class Base {
     }
 
     normalizaEndpoint(endpoint) {
-        const regex = /\[([^\]\[\r\n]*)\]/gi;
+        const regex = /\[([^\][\r\n]*)\]/gi;
         let placeholders_brackets = [];
         let placeholders = [];
         let match;
-        while (match = regex.exec(endpoint)) {
+        let has_match = true;
+        while (has_match) {
+            match = regex.exec(endpoint);
+            if (!match) {
+                has_match = false;
+                continue;
+            }
             placeholders_brackets.push(match[0]);
             placeholders.push(match[1]);
         }
