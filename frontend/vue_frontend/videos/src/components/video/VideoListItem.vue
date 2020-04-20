@@ -262,6 +262,7 @@
                     }
                 });
                 this.$video_store.dispatch('save');
+                this.$video_store.commit('updateItemInCollection');
                 this.$video_store.commit('resetItem');
                 setTimeout(() => this.category_edition_mode = false, 500);
             },
@@ -272,6 +273,7 @@
                     'active': this.active
                 });
                 this.$video_store.dispatch('save');
+                this.$video_store.commit('updateItemInCollection');
                 this.$video_store.commit('resetItem');
                 window.setTimeout(() => window.app.switcheryToggle(), 300);
             },
@@ -295,6 +297,7 @@
                     'active': this.active
                 });
                 this.$video_store.dispatch('remove');
+                this.$video_store.commit('removeItemInCollection');
                 this.$video_store.commit('resetItem');
             }
         }

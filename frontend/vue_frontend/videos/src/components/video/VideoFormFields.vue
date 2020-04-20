@@ -82,7 +82,6 @@
 
                         <select name="category" class="form-control" id="id_category" v-model="category_pk">
                             <option disabled value="">Escolha uma categoria</option>
-                            <option>- Nenhuma -</option>
                             <option v-for="item in categories" :key="item.pk" :value="item.pk">{{ item.name }}</option>
                         </select>
 
@@ -270,6 +269,9 @@
                 'starts_at_time': null,
                 'ends_at_date': null,
                 'ends_at_time': null,
+
+                'switchery_loader_toggle': null,
+                'switchery_loader': null,
             }
         },
         mounted() {
@@ -285,10 +287,16 @@
         },
         methods: {
             loadSwitchery() {
-                window.setTimeout(() => {
+                window.clearTimeout(this.switchery_loader_toggle);
+                this.switchery_loader_toggle = window.setTimeout(() => {
                     window.app.switcheryToggle();
                 }, 300);
-                window.setTimeout(() => {
+
+                window.clearTimeout(this.switchery_loader);
+                this.switchery_loader = window.setTimeout(() => {
+                    console.log('active', this.active);
+                    console.log('restrict', this.restrict);
+
                     window.app.setSwitchery('input#id_restrict', this.restrict);
                     window.app.setSwitchery('input#id_active', this.active);
                     window.app.setSwitchery('input#id_schedule_enabled', (!this.ends_at_time) === false);
@@ -298,7 +306,12 @@
                 this.schedule_enabled = !this.schedule_enabled;
             },
             hideForm() {
+                this.resetForm();
                 this.$emit('hideForm');
+            },
+            resetForm() {
+                this.item = {};
+                this.loadData();
             },
             loadData() {
                 const strings = [
@@ -324,12 +337,39 @@
                     this.category_pk = '';
                 }
 
-                this.restrict = this.item.restrict;
-                this.active = this.item.active;
-                this.starts_at_date = this.get_date(this.item.starts_at);
-                this.starts_at_time = this.get_time(this.item.starts_at);
-                this.ends_at_date = this.get_date(this.item.ends_at);
-                this.ends_at_time = this.get_time(this.item.ends_at);
+                if (this.item.hasOwnProperty('restrict')) {
+                    this.restrict = this.item.restrict;
+                } else {
+                    this.restrict = false;
+                }
+
+                if (this.item.hasOwnProperty('active')) {
+                    this.active = this.item.active;
+                } else {
+                    this.active = false;
+                }
+
+                if (this.item.hasOwnProperty('starts_at')) {
+                    this.starts_at_date = this.get_date(this.item.starts_at);
+                    this.starts_at_time = this.get_time(this.item.starts_at);
+                } else {
+                    this.starts_at_date = null;
+                    this.starts_at_time = null;
+                }
+
+                if (this.item.hasOwnProperty('ends_at')) {
+                    this.ends_at_date = this.get_date(this.item.ends_at);
+                    this.ends_at_time = this.get_time(this.item.ends_at);
+                } else {
+                    this.ends_at_date = null;
+                    this.ends_at_time = null;
+                }
+
+                if (this.item.hasOwnProperty('starts_at')) {
+                    this.starts_at = this.item.starts_at;
+                } else {
+                    this.starts_at = false;
+                }
 
                 this.loadSwitchery();
             },

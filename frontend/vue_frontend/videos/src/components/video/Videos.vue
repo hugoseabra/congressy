@@ -40,6 +40,7 @@
             },
             hideList() {
                 this.show_list = false;
+                this.pk = null;
                 window.jQuery('#add-video-button').hide();
             },
             showForm() {
