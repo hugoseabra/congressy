@@ -78,11 +78,12 @@ class InvitationListView(AccountMixin, ListView):
         return self.invitation_organization
 
     def _can_view(self):
-        can_manage = self.request.user.has_perm(
-            'gatheros_event.can_invite',
-            self.get_invitation_organization()
-        )
-        return self.is_manager and can_manage
+        return False
+        # can_manage = self.request.user.has_perm(
+        #     'gatheros_event.can_invite',
+        #     self.get_invitation_organization()
+        # )
+        # return self.is_manager and can_manage
 
     def _can_view_members(self):
         return self.request.user.has_perm(
@@ -164,10 +165,11 @@ class InvitationCreateView(AccountMixin, FormView):
         })
 
     def can_access(self):
-        return self.request.user.has_perm(
-            'gatheros_event.can_invite',
-            self.get_invitation_organization()
-        )
+        return False
+        # return self.request.user.has_perm(
+        #     'gatheros_event.can_invite',
+        #     self.get_invitation_organization()
+        # )
 
     def _can_view_members(self):
         return self.request.user.has_perm(

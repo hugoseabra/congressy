@@ -73,6 +73,10 @@ let video_store = new Vuex.Store({
             state.player_provider = provider;
             state.player_link = link;
         },
+        clearPlayer(state) {
+            state.player_provider = null;
+            state.player_link = null;
+        },
         addHook(state, {type, id, callback}) {
             if (callback instanceof Function) {
                 state.hooks[type]['items'][id] = callback;
@@ -87,64 +91,71 @@ let video_store = new Vuex.Store({
             Object.values(state.hooks['after']['items']).forEach(callback => callback());
         },
         fetchCollection({state, commit}) {
-            this.dispatch('runBeforeHooks');
+            return new Promise((resolve, reject) => {
+                this.dispatch('runBeforeHooks');
 
-            if (state.processing) {
-                setTimeout(() => this.dispatch('fetchCollection'), 2000);
-                return;
-            }
+                if (state.processing) {
+                    setTimeout(() => this.dispatch('fetchCollection'), 2000);
+                    return resolve();
+                }
 
-            this._vm.$messenger.commit('triggerLoader', 'aguarde...');
-            this.commit('setAsProcessing');
+                this._vm.$messenger.commit('triggerLoader', 'aguarde...');
+                this.commit('setAsProcessing');
 
-            collection.fetch().then(() => {
-                commit('updateItems');
+                collection.fetch().then(() => {
+                    commit('updateItems');
 
-                this.commit('setAsNotProcessing');
-                this._vm.$messenger.commit('hideLoader');
+                    this.commit('setAsNotProcessing');
+                    this._vm.$messenger.commit('hideLoader');
+                    resolve();
 
-            }).catch((reason) => {
-                this._vm.$messenger.commit('addError', reason.message);
-                this._vm.$messenger.commit('trigger');
+                }).catch((reason) => {
+                    this._vm.$messenger.commit('addError', reason.message);
+                    this._vm.$messenger.commit('trigger');
 
-                this.commit('setAsNotProcessing');
+                    this.commit('setAsNotProcessing');
+                    reject(reason);
+                });
             });
         },
         save({state, commit}) {
             this.dispatch('runBeforeHooks');
 
-            if (state.processing) {
-                setTimeout(() => this.dispatch('save'), 2000);
-                return;
-            }
-
-            const item = new Video();
-            item.populate(state.item);
-
-            this._vm.$messenger.commit('triggerLoader', 'aguarde...');
-
-            this.commit('setAsProcessing');
-
-            item.save().then(() => {
-                this._vm.$messenger.commit('hideLoader');
-                this._vm.$messenger.commit('addSuccess', 'Video salvo com sucesso.');
-                this._vm.$messenger.commit('trigger');
-
-                commit('updateItem', item.toData());
-                setTimeout(() => this.dispatch('fetchCollection'), 200);
-
-                this.commit('setAsNotProcessing');
-
-            }).catch((reason) => {
-                if (reason.hasOwnProperty('stack')) {
-                    console.error(reason.stack);
+            return new Promise((resolve, reject) => {
+                if (state.processing) {
+                    setTimeout(() => this.dispatch('save'), 2000);
+                    return resolve();
                 }
-                this._vm.$messenger.commit('hideLoader');
-                this._vm.$messenger.commit('addError', reason.message);
-                this._vm.$messenger.commit('trigger');
 
-                this.commit('setAsNotProcessing');
-                this.dispatch('runAfterHooks');
+                const item = new Video();
+                item.populate(state.item);
+                this._vm.$messenger.commit('triggerLoader', 'aguarde...');
+                this.commit('setAsProcessing');
+
+
+                item.save().then(() => {
+                    this._vm.$messenger.commit('hideLoader');
+                    this._vm.$messenger.commit('addSuccess', 'Video salvo com sucesso.');
+                    this._vm.$messenger.commit('trigger');
+
+                    commit('updateItem', item.toData());
+                    setTimeout(() => this.dispatch('fetchCollection'), 200);
+
+                    this.commit('setAsNotProcessing');
+                    resolve();
+
+                }).catch((reason) => {
+                    if (reason.hasOwnProperty('stack')) {
+                        console.error(reason.stack);
+                    }
+                    this._vm.$messenger.commit('hideLoader');
+                    this._vm.$messenger.commit('addError', reason.message);
+                    this._vm.$messenger.commit('trigger');
+
+                    this.commit('setAsNotProcessing');
+                    this.dispatch('runAfterHooks');
+                    reject(reason);
+                });
             });
         },
         saveByLink({state, commit}, link) {

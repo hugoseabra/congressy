@@ -5,7 +5,6 @@ import video_store from "./store/video"
 import messenger from "./store/messenger"
 import Videos from "./components/video/Videos";
 import VideoForm from "./components/video/VideoForm";
-import VideoFormFields from "./components/video/VideoFormFields";
 import VideoPlayer from "./components/video/VideoPlayer";
 
 Vue.config.productionTip = false;
@@ -25,10 +24,6 @@ new Vue({
 new Vue({
     el: "#video-link-form",
     components: {VideoForm}
-});
-new Vue({
-    el: "#video-form",
-    components: {VideoFormFields}
 });
 new Vue({
     el: "#video-player",

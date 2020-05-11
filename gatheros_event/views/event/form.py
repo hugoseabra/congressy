@@ -123,6 +123,11 @@ class EventAddFormView(BaseEventView, generic.CreateView):
     form_title = 'Novo evento'
     object = None
 
+    def pre_dispatch(self, request):
+        raise PermissionDenied(
+            'Novos eventos não são mais possíveis.'
+        )
+
     def get_form(self, form_class=None):
         if not form_class:
             form_class = self.form_class
