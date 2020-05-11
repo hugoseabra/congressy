@@ -23,17 +23,17 @@
         <i class="fas fa-users"></i> Membros
         </a>
     </li>
-    <li {% if active == 'convites' %} class="active" {% endif %}>
-        <a class="sidebar-itens" href=
-                {% if active == 'convites' %}
-                    "{% url 'event:invitation-list' invitation_organization.pk %}"
-                {% else %}
-                    "{% url 'event:invitation-list' organization.pk %}"
-
-                {% endif %}
- >
-        <i class="fas fa-envelope-open"></i> Convites
-        </a>
-    </li>
+{#    <li {% if active == 'convites' %} class="active" {% endif %}>#}
+{#        <a class="sidebar-itens" href=#}
+{#                {% if active == 'convites' %}#}
+{#                    "{% url 'event:invitation-list' invitation_organization.pk %}"#}
+{#                {% else %}#}
+{#                    "{% url 'event:invitation-list' organization.pk %}"#}
+{##}
+{#                {% endif %}#}
+{# >#}
+{#        <i class="fas fa-envelope-open"></i> Convites#}
+{#        </a>#}
+{#    </li>#}
 </ul>
 

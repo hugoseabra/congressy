@@ -121,17 +121,23 @@ class ProfileCreateView(TemplateView, FormView):
     }
 
     def dispatch(self, request, *args, **kwargs):
-        if LOGIN_SUPERUSER_ONLY is True or ALLOW_ACCOUNT_REGISTRATION is False:
-            messages.warning(
-                self.request,
-                'Não é possível redefinir sua senha neste ambiente.'
-            )
-            return redirect('front:start')
+        messages.warning(
+            self.request,
+            'A Congressy não está permitindo criação de novas contas.'
+        )
+        return redirect('front:start')
 
-        if request.user.is_authenticated:
-            return redirect('front:start')
-
-        return super().dispatch(request, *args, **kwargs)
+        # if LOGIN_SUPERUSER_ONLY is True or ALLOW_ACCOUNT_REGISTRATION is False:
+        #     messages.warning(
+        #         self.request,
+        #         'Não é possível redefinir sua senha neste ambiente.'
+        #     )
+        #     return redirect('front:start')
+        #
+        # if request.user.is_authenticated:
+        #     return redirect('front:start')
+        #
+        # return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)

@@ -102,17 +102,17 @@
                     <li>
 {#                         <div id="google_translate_element"></div>#}
                     </li>
-                    <li style="padding-top: 5px">
-                        <span class="meta ">
-                            <button type="button" onclick="location.href=
-                                    '{% url 'event:event-add' %}'"
-                                    class="btn btn-sm
-                        btn-success navbar-btn">
-                            <i class="fa fa-plus"></i>
-                                Novo Evento
-                            </button>
-                        </span>
-                    </li>
+{#                    <li style="padding-top: 5px">#}
+{#                        <span class="meta ">#}
+{#                            <button type="button" onclick="location.href=#}
+{#                                    '{% url 'event:event-add' %}'"#}
+{#                                    class="btn btn-sm#}
+{#                        btn-success navbar-btn">#}
+{#                            <i class="fa fa-plus"></i>#}
+{#                                Novo Evento#}
+{#                            </button>#}
+{#                        </span>#}
+{#                    </li>#}
                     {% has_events user as has_events %}
                     <li class="dropdown"
                         style="background-color: #F0F3F3; outline:
@@ -309,6 +309,19 @@
                                 {% endfor %}
                             {% endif %}
                         {% endblock messages %}
+
+                        <div class="alert alert-warning">
+                            <div class="row">
+                                <div class="col-xs-2 col-sm-2 col-md-1 text-center">
+                                    <i class="fas fa-exclamation-triangle warning-color fa-2x"></i>
+                                </div>
+                                <div class="col-xs-10 col-sm-10 col-md-11">
+                                    <div class="text-bold">Atenção!</div>
+                                    Novos eventos estão indisponíveis no momento.
+                                </div>
+                            </div>
+                        </div>
+
                         {% block content %}{% endblock %}
 
                     </section>
