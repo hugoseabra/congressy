@@ -363,10 +363,11 @@ CRON_CLASSES = [
     "payment.cron.SubscriptionConfirmedWithNoPayments",
     "payment.cron.CheckPayables",
 ]
-# =============================== BITLY ===================================== #
+# =============================== 
+===================================== #
 BITLY_LOGIN = 'congressy'
-BITLY_API_KEY = 'R_90819c7eac3f4c039e5f9c37f6786dda'
-BITLY_ACCESS_TOKEN = '5e9398fb6cc39e8dee301f9c0192959563b8bd02'
+BITLY_API_KEY = 'BITLY_API_KEY'
+BITLY_ACCESS_TOKEN = 'BITLY_ACCESS_TOKEN'
 # Tempo em que o relatório de cada link irá renovar os dados.
 BITLY_TIMEOUT_STATS = 30
 # ========================== PARTNER ======================================== #
