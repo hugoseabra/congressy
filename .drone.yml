@@ -225,9 +225,8 @@ steps:
     image: appleboy/drone-telegram
     pull: if-not-exists
     settings:
-      token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
-      to: -275808686 # ID chat Congressy
-#      to: 245012348 # ID hugoseabra
+      token: token # <-- from secret
+      to: chatid # <-- Chat ID from secret
       format: markdown
       message: >
         *{{uppercase build.status }} - Ambiente RC*
