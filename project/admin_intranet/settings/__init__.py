@@ -60,4 +60,4 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append(
 )
 
 # ============================ GOOGLE RECAPTCHA ============================= #
-GOOGLE_RECAPTCHA_SECRET_KEY = '6Lerw18UAAAAAGJyU5G_3CZN6Et4ZTcIhLiUhawX'
+GOOGLE_RECAPTCHA_SECRET_KEY = 'GOOGLE_RECAPTCHA_SECRET_KEY'

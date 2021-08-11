@@ -26,7 +26,7 @@ class ZipCode(Resource):
 
         kwargs.update({
             'base_url': 'http://www.cepaberto.com/api/v3/',
-            'api_key': '94f8249f1af2f4509893da94e46244a8',
+            'api_key': '<cep-aberto-api-key>',
         })
         super().__init__(*args, **kwargs)
 
